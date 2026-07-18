@@ -51,6 +51,14 @@
       "finding": "EARLY LIFT confirmed on film: head rises steeply off the mat in the backstroke and hangs visibly high after impact — the 'up & out' before-picture is now documented. Old backswing ≈0.40s vs ≈0.65s in the new clips: a ~60% longer, slower load. Path was straight even then. Note: frame counts read the old tempo nearer 2:1 than the logged ~1:1 — the measurable change is the longer load, not the ratio."
     },
     {
+      "id": "baseline-batch2",
+      "type": "session-update",
+      "target": "baseline-batch1",
+      "setupMatch": "Baseline re-analysis",
+      "setup": "Baseline re-analysis · all 10 v1/v2 clips · overhead + ground-level DTL + side views · Phantom 7.5",
+      "finding": "EARLY LIFT fully documented from three angles: steep rise in the backstroke, head hanging high after impact — in the side view it exits the frame upward. Old backswing ≈0.40s vs ≈0.65s in Session 4: a ~60% longer load. Path straight and starts on-line in every old overhead — the stroke's bones were always good. Face-closing was too subtle to confirm or refute at analysis frame rate. This is the yardstick your next face-on film gets measured against."
+    },
+    {
       "id": "decision-locked-buy",
       "type": "action",
       "pri": true,
