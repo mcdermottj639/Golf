@@ -1,20 +1,20 @@
 {
-  "version": 1,
+  "version": 2,
   "updated": "2026-07-18",
   "entries": [
     {
       "id": "s4-session",
       "type": "session",
       "date": "2026-07-18",
-      "setup": "5 clips · overhead · indoor track mat · Phantom 7.5",
-      "finding": "Tempo now ≈2:1 ✓ (was ~1:1 — the One-Two drill is landing). Path straight (SBST) again. Face stays square through impact on these reps — no visible toe-over. Balls start dead on the center line, no left pull. Early lift can't be judged from overhead."
+      "setup": "5 clips · overhead · 3× Phantom 7.5 + 2× Newport 2 · indoor track mat",
+      "finding": "Tempo now ≈2:1 ✓ (was ~1:1 — the One-Two drill is landing). Path straight (SBST) on BOTH putters — matches Journey Session 4. Face square through impact, no visible toe-over. Balls start dead on the center line. Early lift can't be judged from overhead."
     },
     {
       "id": "s4-faults",
       "type": "faults",
       "faults": [
         { "tag": "early-lift", "why": "unverified this session — overhead can't see it; film face-on to confirm the fix" },
-        { "tag": "short-putts", "why": "the toe-flow mismatch still stands until the zero-torque demo — today's calm reps ran on good timing" }
+        { "tag": "short-putts", "why": "the toe-flow mismatch still stands until the zero-torque switch — today's calm reps ran on good timing" }
       ]
     },
     {
@@ -22,6 +22,32 @@
       "type": "action",
       "pri": true,
       "text": "Film 2–3 strokes face-on + DTL — verify the early-lift fix and the calmer release seen in Session 4"
+    },
+    {
+      "id": "s4-fix-putters",
+      "type": "session-update",
+      "target": "s4-session",
+      "setupMatch": "5 clips · overhead",
+      "setup": "5 clips · overhead · 3× Phantom 7.5 + 2× Newport 2 · indoor track mat",
+      "finding": "Tempo now ≈2:1 ✓ (was ~1:1 — the One-Two drill is landing). Path straight (SBST) on BOTH putters — matches Journey Session 4. Face square through impact, no visible toe-over. Balls start dead on the center line. Early lift can't be judged from overhead."
+    },
+    {
+      "id": "decision-locked-shortlist",
+      "type": "shortlist",
+      "shortlist": [
+        { "name": "L.A.B. Mezz.1 Max", "type": "Zero-torque · max MOI · buy-priority 1", "price": 449 },
+        { "name": "Odyssey Ai-One S2S Jailbird", "type": "Zero-torque · the realistic pick · priority 2", "price": 399 },
+        { "name": "TaylorMade Spider ZT", "type": "Zero-torque · trusted shape · priority 3", "price": 449 },
+        { "name": "L.A.B. DF3", "type": "Zero-torque · XL mallet", "price": 479 },
+        { "name": "Odyssey Ai-One S2S #7", "type": "Zero-torque · fang", "price": 349 },
+        { "name": "Scotty Phantom 7 DB", "type": "Face-balanced · easy swap", "price": 449 }
+      ]
+    },
+    {
+      "id": "decision-locked-buy",
+      "type": "action",
+      "pri": true,
+      "text": "BUY (decision locked): zero-torque at 34\", lie set flat — Mezz.1 Max → Odyssey S2S → Spider ZT. Pick with the 10-ball 5-footer test at the shop"
     }
   ]
 }

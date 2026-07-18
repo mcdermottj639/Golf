@@ -757,7 +757,16 @@ function applyFeed(feed){
   let changed = false;
   (feed.entries || []).forEach(e => {
     if(!e.id || S.feedApplied.includes(e.id)) return;
-    if(e.type === 'session') S.sessions.push({ date:e.date, setup:e.setup, finding:e.finding });
+    if(e.type === 'session') S.sessions.push({ date:e.date, setup:e.setup, finding:e.finding, _fid:e.id });
+    else if(e.type === 'session-update'){
+      const s = S.sessions.find(x => x._fid === e.target) ||
+                S.sessions.find(x => e.setupMatch && (x.setup||'').startsWith(e.setupMatch));
+      if(s){ if(e.setup) s.setup = e.setup; if(e.finding) s.finding = e.finding; }
+    }
+    else if(e.type === 'shortlist' && Array.isArray(e.shortlist)){
+      const demoed = new Set(S.shortlist.filter(p=>p.demoed).map(p=>p.name));
+      S.shortlist = e.shortlist.map(p => ({ ...p, demoed: demoed.has(p.name) }));
+    }
     else if(e.type === 'action') S.actions.push({ id:e.id, text:e.text, done:false, pri:!!e.pri });
     else if(e.type === 'action-done'){ const a = S.actions.find(x => x.id === e.target); if(a) a.done = true; }
     else if(e.type === 'faults' && Array.isArray(e.faults)) S.faults = e.faults;
