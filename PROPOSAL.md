@@ -69,9 +69,17 @@ Things no scattered doc could ever do:
 - **Personal records wall**: best 9, best 18, most birdies in a round, longest made putt — auto-maintained
 - **Season goals**: set targets (handicap 7.9, 17/20 from 5 ft, break 80 at a rated-8+ course) and watch them fill
 
+### 7 · Coach *(added per Jack's feedback — Jul 18)*
+Education that follows your game, not generic tips.
+- **Round quick-log (60 seconds)**: score, putts, course, tap "what gave you trouble" chips (3-putts, bunkers, off the tee, approach, chipping, mental) plus a freeform note — log anything, anytime
+- **Struggle-driven tips**: the app reads your logs and queues lessons that match. Log three 3-putts → a lag-putting lesson appears with a "why you're seeing this" line. Your filmed early-lift fault → tonight's 10-minute drill
+- **Lesson library**: Putting, Wedges & Short Game, Course Management, Mental Game, Bunker Play, Equipment Knowledge — every lesson tagged to struggle areas, "for you" badges on what matches your current game
+- **Drill streaks**: mark today's drill done, keep the weekly streak alive
+- Content is a curated built-in library at launch; Phase 3's AI-caddie loop adds fresh lessons written for your specific game as it evolves
+
 ## Phase plan
 
-- **Phase 1 (MVP, the approval ask)**: Dashboard, My Bag, Putting Lab, Decisions, **Courses**, plus groove-wear/regrip tracking and the wedge matrix — seeded with your real data
+- **Phase 1 (MVP, the approval ask)**: Dashboard, My Bag, Putting Lab, Decisions, **Courses**, **Coach with round logging**, plus groove-wear/regrip tracking and the wedge matrix — seeded with your real data
 - **Phase 2**: light round logging (score, putts, up-and-downs — 60-second entry, not Arccos), weather-adjusted carries, records wall, season goals, trend charts across months
 - **Phase 3**: full course-spreadsheet import, "AI caddie" loop — you film a session, I analyze it and push the log entry to the app
 

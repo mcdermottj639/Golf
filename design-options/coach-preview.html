@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caddie HQ — Coach (Scorecard Heritage)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{max-width:430px;margin:0 auto;padding:22px 16px 90px;background:#f6efdd;color:#26221a;
+  font-family:Georgia,'Times New Roman',serif}
+.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
+  padding:4px 10px;border-radius:6px;margin-bottom:14px;background:#123c26;color:#e9dfc5;font-family:-apple-system,sans-serif}
+h1{font-size:26px;font-weight:700;color:#123c26;letter-spacing:-.01em}
+.tag{font-size:12.5px;margin-top:2px;color:#7c7460;font-style:italic}
+.card{background:#fffdf6;border:1px solid #d8cdb0;box-shadow:2px 2px 0 #e5dcc4;border-radius:6px;padding:15px;margin:12px 0}
+.card h2{font-size:11px;text-transform:uppercase;letter-spacing:.18em;margin-bottom:9px;color:#8e1f2f;font-family:-apple-system,sans-serif;font-weight:700}
+.card h3{font-size:16px;margin-bottom:5px;color:#123c26}
+.sm{font-size:12.5px;line-height:1.55;color:#5a5344}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.chip{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;font-family:-apple-system,sans-serif;
+  background:#ece4cd;color:#5a5344;border:1px solid #d8cdb0}
+.chip.on{background:#8e1f2f;color:#f6ecd9;border-color:#8e1f2f}
+.chip.grn{background:#123c26;color:#e9dfc5;border-color:#123c26}
+.tipcard{border-left:4px solid #8e1f2f;background:#fbf6e8;padding:12px 13px;border-radius:0 6px 6px 0;margin:10px 0}
+.tipcard .src{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#9a9077;font-family:-apple-system,sans-serif;font-weight:700;margin-bottom:4px}
+.tipcard h4{font-size:14.5px;color:#26221a;margin-bottom:4px}
+.tipcard .why{font-size:11.5px;color:#8e1f2f;font-style:italic;margin-top:6px}
+.btn{display:inline-block;background:#123c26;color:#f2e9d0;font-weight:700;font-size:12px;border:none;border-radius:6px;
+  padding:9px 16px;font-family:-apple-system,sans-serif;margin-top:8px}
+.btn.ghost{background:#fffdf6;color:#123c26;border:1px solid #123c26}
+.lib{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:6px}
+.shelf{border:1px solid #d8cdb0;border-radius:6px;padding:11px 12px;background:#fbf6e8}
+.shelf .nm{font-weight:700;font-size:13.5px;color:#123c26}
+.shelf .ct{font-size:10.5px;color:#9a9077;font-family:-apple-system,sans-serif;margin-top:2px}
+.shelf .new{display:inline-block;font-size:9px;font-weight:800;background:#8e1f2f;color:#f6ecd9;border-radius:4px;
+  padding:2px 6px;margin-top:5px;font-family:-apple-system,sans-serif;letter-spacing:.08em}
+.field{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0}
+.inp{border:1px solid #d8cdb0;border-radius:6px;background:#fffdf6;padding:9px 8px;text-align:center}
+.inp .l{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#9a9077;font-family:-apple-system,sans-serif;font-weight:700}
+.inp .v{font-size:18px;font-weight:700;color:#123c26;margin-top:2px}
+.note{border:1px dashed #c9bd9d;border-radius:6px;background:#fffdf6;padding:10px 12px;font-size:12px;color:#9a9077;font-style:italic;margin-top:4px}
+.streak{display:flex;gap:5px;margin-top:8px}
+.day{width:26px;height:26px;border-radius:5px;border:1px solid #d8cdb0;background:#ece4cd;display:flex;align-items:center;justify-content:center;font-size:11px;color:#123c26;font-weight:700}
+.day.hit{background:#123c26;color:#e9dfc5}
+nav{margin:18px -16px -90px;border-radius:6px 6px 0 0;
+  display:grid;grid-template-columns:repeat(5,1fr);padding:10px 8px 16px;text-align:center;background:#123c26;color:#a8bfa8;font-family:-apple-system,sans-serif}
+nav .it{font-size:9.5px;font-weight:700}
+nav .ic{font-size:19px;display:block;margin-bottom:2px}
+nav .on{color:#f2e9d0}
+</style>
+</head>
+<body>
+
+<span class="badge">Coach · Scorecard Heritage</span>
+<h1>Coach</h1>
+<div class="tag">Lessons that follow your game — not generic tips.</div>
+
+<div class="card">
+  <h2>Reading your game · last 3 logs</h2>
+  <p class="sm">Your logs decide what shows up here. Currently working on:</p>
+  <div class="chips">
+    <span class="chip on">Short putts — left miss</span>
+    <span class="chip on">Early lift (putting)</span>
+    <span class="chip on">3-putts from 30+ ft</span>
+    <span class="chip">Wedge distance control</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Today's lesson · picked for you</h2>
+  <div class="tipcard">
+    <div class="src">Distance putting · 4 min read</div>
+    <h4>Lag putting is a ladder, not a line</h4>
+    <p class="sm">Your last round logged three 3-putts from 30+ feet. Great lag putters don't aim at the hole — they aim at a 6-foot circle. Practice the ladder drill: 20, 30, 40 ft, two balls each…</p>
+    <div class="why">Why you're seeing this: 3 three-putts logged at Granite Links on Jul 16.</div>
+  </div>
+  <div class="tipcard">
+    <div class="src">Your stroke · drill</div>
+    <h4>Keep the head low past the tee</h4>
+    <p class="sm">Early lift showed in all 3 filmed sessions. Tonight's 10-minute drill: gate + low chase, 15 reps, count "one-two."</p>
+    <div class="why">Why you're seeing this: fault #1 in your stroke log.</div>
+  </div>
+  <button class="btn">Mark done · keep streak</button>
+  <div class="streak">
+    <div class="day hit">M</div><div class="day hit">T</div><div class="day hit">W</div>
+    <div class="day">T</div><div class="day hit">F</div><div class="day">S</div><div class="day">S</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Log a round · 60 seconds</h2>
+  <div class="field">
+    <div class="inp"><div class="l">Score</div><div class="v">84</div></div>
+    <div class="inp"><div class="l">Putts</div><div class="v">34</div></div>
+    <div class="inp"><div class="l">Course</div><div class="v" style="font-size:12px;padding-top:4px">Granite Links</div></div>
+  </div>
+  <p class="sm" style="margin-top:4px">What gave you trouble? <span style="font-family:-apple-system,sans-serif;font-size:10.5px;color:#9a9077">(tap all that apply)</span></p>
+  <div class="chips">
+    <span class="chip grn">3-putts ✓</span>
+    <span class="chip grn">Bunkers ✓</span>
+    <span class="chip">Off the tee</span>
+    <span class="chip">Approach</span>
+    <span class="chip">Chipping</span>
+    <span class="chip">Mental</span>
+  </div>
+  <div class="note">"Wind got me on the back nine — kept coming up short into 12 and 15…"</div>
+  <button class="btn ghost">Save round → Coach updates</button>
+</div>
+
+<div class="card">
+  <h2>The library · always open</h2>
+  <div class="lib">
+    <div class="shelf"><div class="nm">Putting</div><div class="ct">14 lessons · 6 drills</div><span class="new">2 FOR YOU</span></div>
+    <div class="shelf"><div class="nm">Wedges &amp; Short Game</div><div class="ct">12 lessons · 5 drills</div><span class="new">1 FOR YOU</span></div>
+    <div class="shelf"><div class="nm">Course Management</div><div class="ct">10 lessons</div></div>
+    <div class="shelf"><div class="nm">Mental Game</div><div class="ct">8 lessons</div></div>
+    <div class="shelf"><div class="nm">Bunker Play</div><div class="ct">6 lessons · 3 drills</div><span class="new">1 FOR YOU</span></div>
+    <div class="shelf"><div class="nm">Equipment Knowledge</div><div class="ct">9 explainers</div></div>
+  </div>
+  <p class="sm" style="margin-top:10px">Every lesson tagged to struggles — log a bad bunker day and the bunker shelf moves to the top with the right lesson queued.</p>
+</div>
+
+<nav>
+  <div class="it"><span class="ic">⌂</span>Home</div>
+  <div class="it"><span class="ic">⛳</span>Bag</div>
+  <div class="it on"><span class="ic">🎓</span>Coach</div>
+  <div class="it"><span class="ic">🗺</span>Courses</div>
+  <div class="it"><span class="ic">▤</span>Rounds</div>
+</nav>
+
+</body>
+</html>
