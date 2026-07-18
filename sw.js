@@ -1,5 +1,5 @@
 // Caddie HQ service worker — offline-first cache of the app shell.
-const CACHE = 'caddiehq-v3';
+const CACHE = 'caddiehq-v4';
 const ASSETS = ['./', './index.html', './styles.css', './app.js', './lessons.js',
   './manifest.webmanifest', './icon.svg', './coach-feed.json'];
 

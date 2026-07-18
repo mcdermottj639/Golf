@@ -53,10 +53,52 @@ function seed(){
       { id:'a7', text:'Demo the SM11s: 56.10S feel · 60.08M splash', done:false, pri:false },
     ],
     sessions: [
-      { date:'2026-07-17', setup:'3 strokes · ground-level close-up', finding:'Tempo ~1:1 · face closes · early lift. Contact centered ✓' },
-      { date:'2026-07-18', setup:'2 strokes · face-on / near-DTL', finding:'Path near-neutral · start line straight · early lift pronounced' },
-      { date:'2026-07-18', setup:'9 clips · overhead + DTL', finding:'Path confirmed STRAIGHT (SBST) → zero-torque putter is the match' },
+      { date:'2026-07-17', setup:'3 strokes · ground-level close-up', finding:'Tempo ~1:1 · face closes · early lift. Contact centered ✓',
+        detail: {
+          metrics: [
+            { k:'Tempo', v:'~1:1', s:'warn', n:'target 2:1' },
+            { k:'Contact', v:'Centered', s:'good', n:'off the sweet spot' },
+            { k:'Start line', v:'Up the track', s:'good', n:'aim solid' },
+            { k:'Face', v:'Closes', s:'warn', n:'toe-over, varies rep-to-rep' },
+            { k:'Lift', v:'Lifts early', s:'warn', n:'up & out after impact' },
+          ],
+          story:'The baseline. Three strokes on the indoor mat, filmed as a tight ground-level close-up of the clubhead. Contact was clean and centered on all three, and the ball started on a reasonable line — aim and strike were never the problem. The faults: a quick, short-backswing stroke; the head popping up right after impact; and the toe rotating over through impact — worst on stroke 2, calmer on stroke 3, which is what flagged it as timing-dependent.',
+          limits:'Clubhead-only close-up: posture, eyeline, stance and true path could not be assessed from this angle.',
+        } },
+      { date:'2026-07-18', setup:'2 strokes · face-on / near-DTL', finding:'Path near-neutral · start line straight · early lift pronounced',
+        detail: {
+          metrics: [
+            { k:'Path', v:'Near-neutral', s:'good', n:'not a big arc' },
+            { k:'Face release', v:'Moderate', s:'mid', n:'less than the close-ups showed' },
+            { k:'Lift', v:'Pronounced ✗', s:'warn', n:'clearest fault on film' },
+            { k:'Start line', v:'On center', s:'good', n:'no left miss these reps' },
+            { k:'Tempo', v:'Brisk', s:'warn', n:'still quick' },
+          ],
+          story:'Wider framing unlocked the path question — and the read was mild arc / nearly neutral, clearly not a big-arc stroke. The early lift became the headline: the head pops off the mat right after impact instead of chasing low, the most consistent fault across every stroke filmed to that point. Face rotation was present but moderate.',
+          limits:'Shot from behind-and-slightly-above rather than pure ball-height down-the-line, so the arc read was "best available," not final — Session 3 settled it.',
+        } },
+      { date:'2026-07-18', setup:'9 clips · overhead + DTL', finding:'Path confirmed STRAIGHT (SBST) → zero-torque putter is the match',
+        detail: {
+          metrics: [
+            { k:'Path', v:'STRAIGHT · SBST', s:'good', n:'overhead = gold standard' },
+            { k:'Face at takeaway', v:'Square-ish', s:'good', n:'no arc rotation' },
+            { k:'Start line', v:'Straight', s:'good', n:'good reps on the mat' },
+          ],
+          story:'The big one. The overhead angle — the gold standard for path — showed a clear straight-back-straight-through stroke across multiple Phantom 7.5 reps, superseding the earlier "mild arc" guess from angles that could not actually see path. Verdict: you are a zero-torque / face-balanced player, and both putters you own are arc-suited. The mismatch explains the recurring left miss: the putter wants to close the face and a straight stroke does not time that rotation.',
+          limits:'Overhead cannot see vertical movement, so the lift question stayed open.',
+        } },
     ],
+    evolution: {
+      updated: '2026-07-18',
+      sessions: ['S1','S2','S3','S4','BL'],
+      metrics: [
+        { name:'Path', marks:['?','~','✓','✓','✓'], verdict:'SETTLED — straight (SBST), confirmed from overhead across 15+ clips and both putters.', s:'good' },
+        { name:'Tempo / load', marks:['✗','✗','—','✓','✓'], verdict:'FIXED on film — backswing load grew ~60% (0.40s → 0.65s), ratio ≈2:1. Keep the One-Two drill.', s:'good' },
+        { name:'Face at impact', marks:['✗','~','—','✓','?'], verdict:'Square on the newest film. Historically timing-dependent — zero-torque removes the timing requirement.', s:'mid' },
+        { name:'Early lift', marks:['✗','✗','—','?','✗'], verdict:'THE OPEN FAULT — documented from 3 angles in the baseline. Needs a face-on clip to confirm the fix.', s:'warn' },
+        { name:'Start line / aim', marks:['✓','✓','✓','✓','✓'], verdict:'A strength in every session ever filmed. Protect it: pick a putter you can aim with confidence.', s:'good' },
+      ],
+    },
     fiveFt: [],           // {date, results:[...20 of make/L/R/S/Lg]}
     drillLog: [],         // {date, drill}
     tests: [],            // {date, putter, makes, note} — 10-ball demo tests
@@ -90,6 +132,16 @@ function migrate(s){
     { tag:'early-lift', why:'fault #1 in your filmed stroke sessions' },
     { tag:'tempo', why:'your filmed tempo runs ~1:1 (target 2:1)' },
   ];
+  if(!s.evolution || s.sessions.every(x => !x.detail)){
+    const fresh = seed();
+    if(!s.evolution) s.evolution = fresh.evolution;
+    // graft seed details onto matching pre-detail session rows
+    s.sessions.forEach(row => {
+      if(row.detail) return;
+      const match = fresh.sessions.find(f => f.setup === row.setup);
+      if(match) row.detail = match.detail;
+    });
+  }
   return s;
 }
 function load(){
@@ -181,6 +233,7 @@ const TITLES = {
   courses:['Courses','Everywhere you’ve played, rated and remembered.'],
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
+  session:['Film Breakdown','Frame-by-frame findings from this session.'],
 };
 
 function render(view, arg){
@@ -190,7 +243,7 @@ function render(view, arg){
   $('#pageTag').textContent = tag;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === view));
-  const R = { home, bag, putting, coach, courses, decisions, data:dataView, shelf, lesson }[view] || home;
+  const R = { home, bag, putting, coach, courses, decisions, data:dataView, shelf, lesson, session:sessionView }[view] || home;
   $('#view').innerHTML = R(arg);
   window.scrollTo(0,0);
 }
@@ -383,10 +436,21 @@ function putting(){
     <div class="streak">${streak.map(d=>`<div class="day ${d.hit?'hit':''}">${d.lab}</div>`).join('')}</div>
   </div>
 
+  <h2>Stroke evolution · every session, one view</h2>
+  <div class="card">
+    <table><tr><th></th>${S.evolution.sessions.map(x=>`<th style="text-align:center">${esc(x)}</th>`).join('')}</tr>
+    ${S.evolution.metrics.map(m => `<tr><td class="sm" style="white-space:nowrap"><b>${esc(m.name)}</b></td>
+      ${m.marks.map(mk => `<td style="text-align:center;font-weight:800;color:${mk==='✓'?'var(--green)':mk==='✗'?'var(--burg)':'var(--faint)'}">${esc(mk)}</td>`).join('')}</tr>`).join('')}
+    </table>
+    ${S.evolution.metrics.map(m => `<p class="sm" style="margin-top:7px"><b style="color:${m.s==='good'?'var(--green)':m.s==='warn'?'var(--burg)':'var(--ink)'}">${esc(m.name)}:</b> ${esc(m.verdict)}</p>`).join('')}
+    <p class="sm faint" style="margin-top:8px">✓ good · ✗ fault · ~ partial · ? that angle couldn't see it · — not assessed. BL = baseline re-analysis of the old clips.</p>
+  </div>
+
   <h2>Stroke session log</h2>
   <div class="card">
+    <p class="sm faint" style="margin-bottom:4px">Tap a session for the full film breakdown.</p>
     <table><tr><th>Date</th><th>Setup</th><th>Finding</th></tr>
-    ${S.sessions.map(s => `<tr><td style="white-space:nowrap">${fmtDate(s.date)}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
+    ${S.sessions.map((s,i) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)} ${s.detail?'<span class="faint">▸</span>':''}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
     </table>
     <details><summary>+ Log a session</summary>
       <label>Setup (angle · strokes)</label><input id="sesSetup" placeholder="e.g. 5 strokes · overhead, zero-torque demo">
@@ -492,6 +556,34 @@ function lesson(id){
     <p class="lesson-body">${esc(l.body)}</p>
     ${l.drill ? `<div class="lesson-drill"><b>Drill:</b> ${esc(l.drill)}</div>` : ''}
     <div style="margin-top:12px"><button class="btn" data-action="drill-done">Did the work · keep streak</button></div>
+  </div>`;
+}
+
+// ----- Session deep-dive -----
+function sessionView(i){
+  const s = S.sessions[+i];
+  if(!s) return putting();
+  const d = s.detail;
+  const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
+  return `
+  <button class="backlink" data-action="go" data-view="putting">← Putting Lab</button>
+  <div class="card">
+    <h2>${fmtDate(s.date)} · film breakdown</h2>
+    <h3>${esc(s.setup)}</h3>
+    ${!d ? `<p class="sm" style="margin-top:8px">${esc(s.finding)}</p>
+      <p class="sm faint">No deep-dive attached — sessions you log yourself carry the summary only. Filmed sessions analyzed by Claude arrive with the full breakdown.</p>` : `
+    <div class="rowgrid g3" style="margin:12px 0 4px">
+      ${d.metrics.map(m => `<div class="stat" style="border-top-color:${sc[m.s]||'var(--green)'}">
+        <div class="v" style="font-size:13px;color:${sc[m.s]||'var(--green)'}">${esc(m.v)}</div>
+        <div class="l">${esc(m.k)}</div>
+        <div class="n" style="font-size:9px;color:var(--faint);font-family:var(--sans);margin-top:2px">${esc(m.n||'')}</div>
+      </div>`).join('')}
+    </div>
+    <h2 style="margin-top:14px">What the film showed</h2>
+    <p class="lesson-body">${esc(d.story)}</p>
+    ${d.compare ? `<h2>Versus prior sessions</h2><p class="lesson-body">${esc(d.compare)}</p>` : ''}
+    ${d.limits ? `<div class="tipcard"><div class="src">What this angle couldn't see</div><p class="sm">${esc(d.limits)}</p></div>` : ''}
+    `}
   </div>`;
 }
 
@@ -675,6 +767,7 @@ const ACTIONS = {
     S.clubs.forEach(c => { if(c.cat==='wedge' && c.status==='gaming') c.rounds = (c.rounds||0)+1; });
     save(); rerender(); toast('Round saved — Coach updated');
   },
+  'open-session': el => render('session', el.dataset.i),
   'open-shelf': el => render('shelf', el.dataset.shelf),
   'open-lesson': el => render('lesson', el.dataset.id),
   'edit-course': el => {
@@ -757,18 +850,20 @@ function applyFeed(feed){
   let changed = false;
   (feed.entries || []).forEach(e => {
     if(!e.id || S.feedApplied.includes(e.id)) return;
-    if(e.type === 'session') S.sessions.push({ date:e.date, setup:e.setup, finding:e.finding, _fid:e.id });
+    if(e.type === 'session') S.sessions.push({ date:e.date, setup:e.setup, finding:e.finding, detail:e.detail, _fid:e.id });
     else if(e.type === 'session-update'){
       const s = S.sessions.find(x => x._fid === e.target) ||
                 S.sessions.find(x => e.setupMatch && (x.setup||'').startsWith(e.setupMatch));
-      if(s){ if(e.setup) s.setup = e.setup; if(e.finding) s.finding = e.finding; }
+      if(s){ if(e.setup) s.setup = e.setup; if(e.finding) s.finding = e.finding; if(e.detail) s.detail = e.detail; }
     }
+    else if(e.type === 'evolution' && e.evolution) S.evolution = e.evolution;
     else if(e.type === 'shortlist' && Array.isArray(e.shortlist)){
       const demoed = new Set(S.shortlist.filter(p=>p.demoed).map(p=>p.name));
       S.shortlist = e.shortlist.map(p => ({ ...p, demoed: demoed.has(p.name) }));
     }
     else if(e.type === 'action') S.actions.push({ id:e.id, text:e.text, done:false, pri:!!e.pri });
     else if(e.type === 'action-done'){ const a = S.actions.find(x => x.id === e.target); if(a) a.done = true; }
+    else if(e.type === 'action-update'){ const a = S.actions.find(x => x.id === e.target); if(a && e.text) a.text = e.text; }
     else if(e.type === 'faults' && Array.isArray(e.faults)) S.faults = e.faults;
     else if(e.type === 'deadline'){ S.settings.returnDeadline = e.date; S.settings.deadlineEstimated = false; }
     else return; // unknown type: leave unapplied so a newer app version can pick it up

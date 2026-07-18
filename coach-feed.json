@@ -63,6 +63,75 @@
       "type": "action",
       "pri": true,
       "text": "BUY (decision locked): zero-torque at 34\", lie set flat — Mezz.1 Max → Odyssey S2S → Spider ZT. Pick with the 10-ball 5-footer test at the shop"
+    },
+    {
+      "id": "s4-detail",
+      "type": "session-update",
+      "target": "s4-session",
+      "setupMatch": "5 clips · overhead",
+      "detail": {
+        "metrics": [
+          { "k": "Tempo", "v": "≈2:1 ✓", "s": "good", "n": "back ≈0.65s · down ≈0.30s" },
+          { "k": "Path", "v": "Straight · both putters", "s": "good", "n": "SBST re-confirmed" },
+          { "k": "Face at impact", "v": "Square", "s": "good", "n": "no toe-over at 15fps" },
+          { "k": "Start line", "v": "Dead center", "s": "good", "n": "every visible roll" },
+          { "k": "Lift", "v": "Can't assess", "s": "mid", "n": "overhead can't see it" }
+        ],
+        "story": "Frame-extracted at 15fps and read frame-by-frame. The backswing now runs about 0.65 seconds against a 0.30-second downstroke — right at the 2:1 target, and a visibly longer, calmer load than the baseline. The head tracked the mat lines straight back and through on the Phantom and the Newport 2 alike, the wings stayed symmetric to the line through the hitting zone (no visible toe-over), and every ball started dead on the center line.",
+        "compare": "Versus the baseline clips: backswing load grew from ≈0.40s to ≈0.65s (~60% longer). The face-closing logged in Session 1 did not appear on any rep. The left miss did not appear on camera.",
+        "limits": "Overhead cannot see vertical head movement, so the early-lift fix is still unverified — that is what the face-on film request is for. Small face rotations can hide inside motion blur at 15fps."
+      }
+    },
+    {
+      "id": "baseline-detail",
+      "type": "session-update",
+      "target": "baseline-batch1",
+      "setupMatch": "Baseline re-analysis",
+      "detail": {
+        "metrics": [
+          { "k": "Lift", "v": "Confirmed ✗", "s": "warn", "n": "3 angles, unmistakable" },
+          { "k": "Backswing", "v": "≈0.40s", "s": "warn", "n": "short, steep, brisk" },
+          { "k": "Path", "v": "Straight", "s": "good", "n": "even at baseline" },
+          { "k": "Start line", "v": "On line", "s": "good", "n": "always a strength" },
+          { "k": "Face", "v": "Inconclusive", "s": "mid", "n": "blur at 15fps" }
+        ],
+        "story": "All ten v1/v2 clips re-analyzed with the same frame-extraction method as Session 4, giving measured numbers on both ends of the comparison. The early lift is documented from three separate angles: the head rises steeply off the mat during the short backstroke, passes low at impact, then climbs immediately — in the side view it exits the top of the frame on the follow-through. The backswing measured ≈0.40s: short, steep and brisk.",
+        "compare": "One honest disagreement with the journey: frame counts read the old back-to-through ratio nearer 2:1 than the logged ~1:1. What actually screamed 'quick and hit-y' was the short, steep stroke overall — the measured improvement is the longer, lower, more deliberate load, not the ratio.",
+        "limits": "No true face-on clip exists in the archive, so lift height couldn't be measured in inches — the side view is the best available yardstick until the next face-on session."
+      }
+    },
+    {
+      "id": "evolution-v1",
+      "type": "evolution",
+      "evolution": {
+        "updated": "2026-07-18",
+        "sessions": ["S1", "S2", "S3", "S4", "BL"],
+        "metrics": [
+          { "name": "Path", "marks": ["?", "~", "✓", "✓", "✓"], "verdict": "SETTLED — straight (SBST), confirmed from overhead across 15+ clips and both putters.", "s": "good" },
+          { "name": "Tempo / load", "marks": ["✗", "✗", "—", "✓", "✓"], "verdict": "FIXED on film — backswing load grew ~60% (0.40s → 0.65s), ratio ≈2:1. Keep the One-Two drill.", "s": "good" },
+          { "name": "Face at impact", "marks": ["✗", "~", "—", "✓", "?"], "verdict": "Square on the newest film. Historically timing-dependent — zero-torque removes the timing requirement.", "s": "mid" },
+          { "name": "Early lift", "marks": ["✗", "✗", "—", "?", "✗"], "verdict": "THE OPEN FAULT — documented from 3 angles in the baseline. Needs a face-on clip to confirm the fix.", "s": "warn" },
+          { "name": "Start line / aim", "marks": ["✓", "✓", "✓", "✓", "✓"], "verdict": "A strength in every session ever filmed. Protect it: pick a putter you can aim with confidence.", "s": "good" }
+        ]
+      }
+    },
+    {
+      "id": "shortlist-claude-verified",
+      "type": "shortlist",
+      "shortlist": [
+        { "name": "Odyssey Ai-One S2S Jailbird", "type": "Zero-torque · Claude-verified #1 · trust the look", "price": 399 },
+        { "name": "L.A.B. Mezz.1 Max", "type": "Zero-torque · max MOI · #2 — if the look works in person", "price": 449 },
+        { "name": "TaylorMade Spider ZT", "type": "Zero-torque · trusted shape · #3", "price": 449 },
+        { "name": "L.A.B. DF3", "type": "Zero-torque · XL mallet", "price": 479 },
+        { "name": "Odyssey Ai-One S2S #7", "type": "Zero-torque · fang", "price": 349 },
+        { "name": "Scotty Phantom 7 DB", "type": "Face-balanced · easy swap", "price": 449 }
+      ]
+    },
+    {
+      "id": "buy-action-claude-verified",
+      "type": "action-update",
+      "target": "decision-locked-buy",
+      "text": "BUY (Claude-verified): zero-torque at 34\", lie set flat — Jailbird → Mezz.1 Max → Spider ZT. The 10-ball test at the shop overrides the ranking: buy whichever starts it straightest"
     }
   ]
 }
