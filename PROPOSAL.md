@@ -51,11 +51,36 @@ Where equipment calls get made with data instead of vibes.
 - The zero-torque top-10 shortlist, checkable as you demo each one
 - Deadline tracking so a return window never lapses while you're deciding
 
+### 5 · Courses *(added per Jack's feedback — Jul 18)*
+Every course you've ever played, tracked and ranked.
+- Course log: name, state/country, dates played, **personal rating** (your 0–10 system) and **personal record score**
+- **States & countries map**: how many of the 50 states you've conquered — the collection quest
+- Bucket list with a "next up" queue
+- Course notes: the hole that ate you, the local knowledge for next time
+- Importable from the course rating spreadsheet already in your Drive
+
+### 6 · Gear Intelligence *(the "didn't know I wanted it" layer)*
+Things no scattered doc could ever do:
+- **Groove-wear tracker**: wedges measurably lose spin around 75–100 rounds — the app counts rounds per wedge and warns you *before* your spin quietly dies
+- **Regrip reminders**: grips are done after ~40 rounds; nobody tracks this — the app does
+- **Wedge yardage matrix**: ½ / ¾ / full carries per wedge, built from your logged shots — an on-course cheat sheet card
+- **Weather-adjusted carries**: cold air knocks ~2 yds per 10°F off carry — the matrix adjusts
+- **Bag value tracker**: what your bag is worth, and resale value when you're eyeing an upgrade
+- **Personal records wall**: best 9, best 18, most birdies in a round, longest made putt — auto-maintained
+- **Season goals**: set targets (handicap 7.9, 17/20 from 5 ft, break 80 at a rated-8+ course) and watch them fill
+
 ## Phase plan
 
-- **Phase 1 (MVP, the approval ask)**: all four modules above, seeded with your real data from the Drive folder
-- **Phase 2**: light round logging (score, putts, up-and-downs — 60-second entry, not Arccos), wedge carry-distance calibration, trend charts across months
-- **Phase 3**: course log & rankings (import your course rating spreadsheet), "AI caddie" loop — you film a session, I analyze it and push the log entry to the app
+- **Phase 1 (MVP, the approval ask)**: Dashboard, My Bag, Putting Lab, Decisions, **Courses**, plus groove-wear/regrip tracking and the wedge matrix — seeded with your real data
+- **Phase 2**: light round logging (score, putts, up-and-downs — 60-second entry, not Arccos), weather-adjusted carries, records wall, season goals, trend charts across months
+- **Phase 3**: full course-spreadsheet import, "AI caddie" loop — you film a session, I analyze it and push the log entry to the app
+
+## Design direction
+
+Three candidate designs (screenshots in `design-options/`, one approved by Jack before build):
+- **A · Fairway Clean** — light, minimal, white cards on warm off-white, fairway green accent
+- **B · Scorecard Heritage** — cream scorecard paper, Masters green + burgundy, serif headlines, clubhouse classic
+- **C · Night Range** — near-black, electric lime, bold athletic numerals, TrackMan energy
 
 ## Tech approach
 
