@@ -44,6 +44,13 @@
       ]
     },
     {
+      "id": "baseline-batch1",
+      "type": "session",
+      "date": "2026-07-18",
+      "setup": "Baseline re-analysis · batch 1 of old clips · 1 overhead + 4 ground-level DTL · Phantom 7.5",
+      "finding": "EARLY LIFT confirmed on film: head rises steeply off the mat in the backstroke and hangs visibly high after impact — the 'up & out' before-picture is now documented. Old backswing ≈0.40s vs ≈0.65s in the new clips: a ~60% longer, slower load. Path was straight even then. Note: frame counts read the old tempo nearer 2:1 than the logged ~1:1 — the measurable change is the longer load, not the ratio."
+    },
+    {
       "id": "decision-locked-buy",
       "type": "action",
       "pri": true,
