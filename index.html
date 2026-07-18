@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#123c26">
+<title>Caddie HQ</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="badge">Caddie HQ · Jack McDermott</div>
+  <h1 id="pageTitle">Caddie HQ</h1>
+  <div class="tag" id="pageTag">Your bag, your stroke, your game — one book.</div>
+</header>
+
+<main id="view" class="wrap"></main>
+
+<nav id="nav">
+  <button data-view="home"><span class="ic">⌂</span>Home</button>
+  <button data-view="bag"><span class="ic">⛳</span>Bag</button>
+  <button data-view="putting"><span class="ic">◎</span>Putting</button>
+  <button data-view="coach"><span class="ic">🎓</span>Coach</button>
+  <button data-view="courses"><span class="ic">🗺</span>Courses</button>
+</nav>
+
+<script src="./lessons.js"></script>
+<script src="./app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
