@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caddie HQ — Mockup</title>
+<style>
+:root{
+  --bg:#0e1411; --panel:#17201b; --panel2:#1c2822; --line:#2c3b31;
+  --ink:#eae8de; --muted:#9aa89b; --gold:#cbab4e; --green:#57b07a;
+  --warn:#e08466; --blue:#79b0dd; --teal:#4fbf9a; --chip:#22302a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:radial-gradient(1200px 600px at 70% -10%, #1a271f 0%, var(--bg) 60%);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  line-height:1.55; padding-bottom:80px; max-width:920px; margin:0 auto;
+}
+.wrap{padding:0 18px}
+header{padding:28px 18px 10px}
+.kicker{letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-size:11px;font-weight:700}
+h1{font-size:26px;margin:5px 0 2px;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13px}
+.mockflag{display:inline-block;margin-top:8px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);border:1px dashed #2f4658;background:#16232c;border-radius:6px;padding:3px 9px}
+nav{position:sticky;top:0;z-index:20;background:rgba(14,20,17,.88);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);margin-top:14px;padding:10px 18px;display:flex;gap:8px;flex-wrap:wrap}
+nav button{color:var(--muted);background:none;border:1px solid transparent;font-size:13px;font-weight:700;
+  padding:7px 14px;border-radius:20px;cursor:pointer;font-family:inherit}
+nav button.on{color:var(--bg);background:var(--gold);border-color:var(--gold)}
+nav button:not(.on):hover{color:var(--ink);border-color:var(--line);background:var(--chip)}
+.tab{display:none;margin-top:20px}
+.tab.on{display:block}
+h2{font-size:17px;margin:22px 0 4px;display:flex;align-items:center;gap:9px}
+h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.lead{color:var(--muted);font-size:13px;margin:0 0 12px}
+.card{background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);
+  border-radius:14px;padding:16px;margin:12px 0}
+.grid{display:grid;gap:12px}
+@media(min-width:640px){.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}}
+.stat{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.stat .val{font-size:18px;font-weight:800;margin-top:3px}
+.stat .n{font-size:11.5px;color:var(--muted);margin-top:2px}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid var(--line)}
+.t-warn{color:var(--warn);border-color:#553a33;background:#2a1e1a}
+.t-good{color:var(--green);border-color:#2c4d3a;background:#182a20}
+.t-gold{color:var(--gold);border-color:#4d4425;background:#2a2616}
+.t-blue{color:var(--blue);border-color:#2f4658;background:#16232c}
+.countdown{display:flex;align-items:center;gap:16px}
+.countdown .big{font-size:42px;font-weight:900;color:var(--gold);line-height:1}
+.countdown .big span{font-size:15px;color:var(--muted);font-weight:600}
+.check{list-style:none}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.box{flex:0 0 17px;width:17px;height:17px;border-radius:5px;border:1.5px solid var(--muted);margin-top:2px;position:relative}
+.check li.done .box{background:var(--green);border-color:var(--green)}
+.check li.done .box::after{content:"✓";position:absolute;inset:0;color:#0e1411;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.check li.done .txt{color:var(--muted);text-decoration:line-through}
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12.5px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.clubcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;position:relative}
+.clubcard .name{font-size:14.5px;font-weight:800}
+.clubcard .spec{font-size:12px;color:var(--teal);font-weight:700;margin-top:3px}
+.clubcard .note{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.flag{position:absolute;top:11px;right:11px;font-size:9px;font-weight:800;padding:3px 7px;border-radius:6px}
+.f-warn{background:#2a1e1a;color:var(--warn);border:1px solid #553a33}
+.f-new{background:#3a3212;color:#e6c86a;border:1px solid #5a4d1c}
+.f-ok{background:#16281e;color:#7fd6a9;border:1px solid #2c4d3a}
+.ladder{position:relative;height:4px;background:var(--line);border-radius:2px;margin:34px 14px 46px}
+.mk{position:absolute;top:-8px;transform:translateX(-50%);text-align:center}
+.mk .pin{width:11px;height:11px;border-radius:50%;background:var(--teal);border:2px solid var(--bg);margin:0 auto}
+.mk.pw .pin{background:var(--gold)}
+.mk .lab{font-size:12px;font-weight:800;margin-top:5px}
+.mk .nm{font-size:9.5px;color:var(--muted);font-weight:600}
+.gapb{position:absolute;top:-30px;transform:translateX(-50%);font-size:10.5px;font-weight:800;color:var(--muted);background:var(--chip);border:1px solid var(--line);border-radius:5px;padding:2px 7px}
+.bar{height:10px;border-radius:6px;background:var(--chip);overflow:hidden;border:1px solid var(--line)}
+.bar>span{display:block;height:100%}
+.legend{font-size:11px;color:var(--muted);margin-top:4px}
+.tapgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:10px 0}
+.tap{aspect-ratio:1;border-radius:10px;border:1px solid var(--line);background:var(--chip);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:var(--muted)}
+.tap.make{background:#182a20;border-color:#2c4d3a;color:var(--green)}
+.tap.miss{background:#2a1e1a;border-color:#553a33;color:var(--warn)}
+.btn{display:inline-block;background:var(--gold);color:var(--bg);font-weight:800;font-size:12.5px;border:none;border-radius:10px;padding:9px 16px;cursor:pointer;font-family:inherit}
+.btn.ghost{background:var(--chip);color:var(--ink);border:1px solid var(--line)}
+.callout{border-left:3px solid var(--gold);background:#1b2119;padding:11px 13px;border-radius:0 10px 10px 0;margin:12px 0;font-size:12.5px}
+.callout.warn{border-color:var(--warn);background:#211915}
+.small{font-size:12px}.muted{color:var(--muted)}
+.spark{display:flex;align-items:flex-end;gap:6px;height:64px;padding:4px 2px 0}
+.spark .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.spark .colbar{width:100%;max-width:34px;background:var(--green);border-radius:4px 4px 0 0;opacity:.85}
+.spark .cl{font-size:9.5px;color:var(--muted)}
+.vs{display:grid;gap:10px}
+@media(min-width:640px){.vs{grid-template-columns:1fr 1fr}}
+.vs .opt{border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--chip)}
+.vs .opt h4{margin:0 0 4px;font-size:13.5px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">Caddie HQ · Jack McDermott</div>
+  <h1>⛳ Caddie HQ</h1>
+  <div class="sub">Your bag, your stroke, your practice — one live command center.</div>
+  <div class="mockflag">Interactive mockup · not the real build yet</div>
+</header>
+
+<nav>
+  <button class="on" data-t="dash">Dashboard</button>
+  <button data-t="bag">My Bag</button>
+  <button data-t="lab">Putting Lab</button>
+  <button data-t="dec">Decisions</button>
+</nav>
+
+<div class="wrap">
+
+<!-- ============ DASHBOARD ============ -->
+<div class="tab on" id="dash">
+  <h2><span class="dot"></span>Right now</h2>
+  <div class="card">
+    <div class="countdown">
+      <div class="big">78<span> days</span></div>
+      <div>
+        <div style="font-weight:800;font-size:14px">Phantom 7.5 return window</div>
+        <div class="small muted">Exchange decision open — demo zero-torque before this lapses. <b style="color:var(--warn)">Confirm exact deadline.</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g3">
+    <div class="stat"><div class="lab">5-ft scoreboard</div><div class="val" style="color:var(--muted)">— /20</div><div class="n">no baseline yet — log one!</div></div>
+    <div class="stat"><div class="lab">Primary miss</div><div class="val" style="color:var(--warn)">Left ←</div><div class="n">short putts</div></div>
+    <div class="stat"><div class="lab">Sessions logged</div><div class="val">3</div><div class="n">last: Jul 18 · overhead</div></div>
+  </div>
+
+  <h2><span class="dot"></span>Current focus</h2>
+  <div class="grid g2">
+    <div class="card"><span class="tag t-gold">Mechanics</span>
+      <p class="small" style="margin-top:8px"><b>Stay low through impact.</b> Early lift is your clearest fault across all 14 filmed strokes. Drill: low-follow-through gate.</p></div>
+    <div class="card"><span class="tag t-gold">Tempo</span>
+      <p class="small" style="margin-top:8px"><b>2:1 back-to-through.</b> You're at ~1:1 ("hit-y"). Drill: One-Two count, metronome ~72 bpm.</p></div>
+  </div>
+
+  <h2><span class="dot"></span>Open actions</h2>
+  <div class="card">
+    <ul class="check">
+      <li class="done"><span class="box"></span><span class="txt">Arc vs straight — <b>answered: SBST</b> (overhead, Jul 18)</span></li>
+      <li><span class="box"></span><span class="txt"><b>Demo zero-torque putters at 34"</b> — L.A.B. DF3 / Mezz.1 Max, Odyssey S2S, Spider ZT <span class="tag t-warn">high</span></span></li>
+      <li><span class="box"></span><span class="txt"><b>Book a putter fitting</b> inside the window <span class="tag t-warn">high</span></span></li>
+      <li><span class="box"></span><span class="txt">Nose-drop eyeline test at 34"</span></li>
+      <li><span class="box"></span><span class="txt">Confirm SM11 order specs at demo: 56.10S feel · 60.08M splash</span></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ MY BAG ============ -->
+<div class="tab" id="bag">
+  <h2><span class="dot"></span>The bag</h2>
+  <p class="lead">Every club, every spec, and the story of every change.</p>
+
+  <div class="grid g2">
+    <div class="clubcard"><div class="flag f-warn">MISMATCH</div>
+      <div class="name">Scotty Phantom 7.5 · 34"</div>
+      <div class="spec">Putter · jet neck · max toe flow</div>
+      <div class="note">Arc-suited head vs. your confirmed SBST stroke — flagged as the likely cause of the left miss. In return window.</div></div>
+    <div class="clubcard"><div class="flag f-warn">MISMATCH</div>
+      <div class="name">Scotty Newport 2</div>
+      <div class="spec">Putter (backup) · blade · toe hang</div>
+      <div class="note">Also arc-suited. Historically putted poorly with it — the pattern fits.</div></div>
+    <div class="clubcard"><div class="flag f-new">ON ORDER</div>
+      <div class="name">Vokey SM11 · 60°</div>
+      <div class="spec">8° bounce · M grind</div>
+      <div class="note">The creative wedge — opens wide for flops &amp; splash. Changed from 10S: M's relief is built for the open face.</div></div>
+    <div class="clubcard"><div class="flag f-new">ON ORDER</div>
+      <div class="name">Vokey SM11 · 56°</div>
+      <div class="spec">10° bounce · S grind</div>
+      <div class="note">Workhorse — full &amp; stock shots, standard bunkers. Changed from 8M for forgiveness on square deliveries.</div></div>
+    <div class="clubcard"><div class="flag f-ok">KEEP</div>
+      <div class="name">Vokey SM11 · 50°</div>
+      <div class="spec">10° bounce · S grind</div>
+      <div class="note">Full-swing gap wedge — already right for a shallow sweeper.</div></div>
+    <div class="clubcard"><div class="flag f-ok">GAMING</div>
+      <div class="name">Cobra King Tec irons</div>
+      <div class="spec">PW 44° · (fill remaining lofts)</div>
+      <div class="note">Strong-lofted PW anchors the wedge ladder below.</div></div>
+    <div class="clubcard" style="border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:90px">
+      <span class="muted small">+ Add driver, woods, hybrids, ball…</span></div>
+  </div>
+
+  <h2><span class="dot"></span>Wedge gapping ladder</h2>
+  <div class="card">
+    <div class="ladder">
+      <div class="gapb" style="left:31.25%">6°</div>
+      <div class="gapb" style="left:68.75%">6°</div>
+      <div class="gapb" style="left:93.75%">4°</div>
+      <div class="mk pw" style="left:0%"><div class="pin"></div><div class="lab">44°</div><div class="nm">PW</div></div>
+      <div class="mk" style="left:37.5%"><div class="pin"></div><div class="lab">50°</div><div class="nm">GW · 10S</div></div>
+      <div class="mk" style="left:75%"><div class="pin"></div><div class="lab">56°</div><div class="nm">SW · 10S</div></div>
+      <div class="mk" style="left:100%"><div class="pin"></div><div class="lab">60°</div><div class="nm">LW · 8M</div></div>
+    </div>
+    <p class="small muted" style="margin-top:-30px">Balanced 6/6/4 spread off the strong 44° PW. Phase 2 adds carry distances per club so gaps show in yards, not just degrees.</p>
+  </div>
+
+  <h2><span class="dot"></span>Change history</h2>
+  <div class="card">
+    <table>
+      <tr><th>Date</th><th>Change</th><th>Why</th></tr>
+      <tr><td>Jul 2026</td><td>56°: 8M → <b>10S</b></td><td>Hit mostly full &amp; square — forgiving grind fits the job</td></tr>
+      <tr><td>Jul 2026</td><td>60°: 10S → <b>8M</b></td><td>The club you open up — M grind is built for it</td></tr>
+      <tr><td>2026</td><td>Catalina Studio Style → returned</td><td>Funded the Phantom 7.5</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============ PUTTING LAB ============ -->
+<div class="tab" id="lab">
+  <h2><span class="dot"></span>The diagnosis</h2>
+  <div class="callout warn"><b>Two levers behind the left miss:</b> (1) equipment — max-toe-flow putter + toe-up lie on a confirmed <b>straight SBST stroke</b>; (2) mechanics — face closes through impact, timing-dependent. Fix path: zero-torque head at 34" + lie set flat + low-and-slow drills.</div>
+
+  <h2><span class="dot"></span>5-footer scoreboard</h2>
+  <div class="card">
+    <p class="small muted" style="margin-bottom:6px">Tap 20 balls from the green — makes and miss direction. This is the number that proves the fix.</p>
+    <div class="tapgrid">
+      <div class="tap make">✓</div><div class="tap make">✓</div><div class="tap miss">L</div><div class="tap make">✓</div><div class="tap make">✓</div>
+      <div class="tap make">✓</div><div class="tap miss">L</div><div class="tap make">✓</div><div class="tap make">✓</div><div class="tap make">✓</div>
+      <div class="tap">11</div><div class="tap">12</div><div class="tap">13</div><div class="tap">14</div><div class="tap">15</div>
+      <div class="tap">16</div><div class="tap">17</div><div class="tap">18</div><div class="tap">19</div><div class="tap">20</div>
+    </div>
+    <div class="small"><b>8/10 so far</b> · both misses left — <span class="muted">(sample entry)</span></div>
+    <div class="spark" style="margin-top:14px">
+      <div class="col"><div class="colbar" style="height:45%;background:var(--warn)"></div><div class="cl">Jul 20</div></div>
+      <div class="col"><div class="colbar" style="height:55%"></div><div class="cl">Jul 27</div></div>
+      <div class="col"><div class="colbar" style="height:60%"></div><div class="cl">Aug 3</div></div>
+      <div class="col"><div class="colbar" style="height:75%"></div><div class="cl">Aug 10</div></div>
+      <div class="col"><div class="colbar" style="height:85%;background:var(--gold)"></div><div class="cl">goal 17/20</div></div>
+    </div>
+    <div class="legend">Weekly makes-out-of-20 trend (illustrative)</div>
+  </div>
+
+  <h2><span class="dot"></span>Session log</h2>
+  <div class="card">
+    <table>
+      <tr><th>#</th><th>Date</th><th>Setup</th><th>Key finding</th></tr>
+      <tr><td>1</td><td>Jul 17</td><td>3 strokes · ground-level close-up</td><td>Tempo ~1:1 · face closes · early lift · contact centered ✓</td></tr>
+      <tr><td>2</td><td>Jul 18</td><td>2 strokes · face-on / near-DTL</td><td>Path near-neutral · early lift pronounced</td></tr>
+      <tr><td>3</td><td>Jul 18</td><td>9 clips · overhead + DTL</td><td><b style="color:var(--green)">Path confirmed STRAIGHT (SBST)</b> → zero-torque is the match</td></tr>
+    </table>
+    <button class="btn ghost">+ Log session 4</button>
+  </div>
+
+  <h2><span class="dot"></span>Drills</h2>
+  <div class="grid g2">
+    <div class="card"><span class="tag t-gold">fixes tempo</span>
+      <h3 style="font-size:14px;margin:8px 0 4px">"One-Two" tempo drill</h3>
+      <p class="small muted">Steady count, backswing longer &amp; slower. Metronome ~70–76 bpm. Target 2:1.</p>
+      <div class="bar" style="margin-top:8px"><span style="width:50%;background:var(--warn)"></span></div>
+      <div class="legend">current ~1:1 · target 2:1</div></div>
+    <div class="card"><span class="tag t-gold">fixes lift + face</span>
+      <h3 style="font-size:14px;margin:8px 0 4px">Low-follow-through gate</h3>
+      <p class="small muted">Tee ~6" ahead on the line — chase past it low. Kills the lift and quiets the toe-over.</p>
+      <button class="btn ghost" style="margin-top:8px">Log reps</button></div>
+  </div>
+</div>
+
+<!-- ============ DECISIONS ============ -->
+<div class="tab" id="dec">
+  <h2><span class="dot"></span>The putter call</h2>
+  <p class="lead">Exchange the 7.5 for a zero-torque at 34". Demo → 10-ball test → decide. 78 days left.</p>
+
+  <div class="card">
+    <h3 style="font-size:14px;margin-bottom:8px">Shortlist (from your fitted top-10)</h3>
+    <table>
+      <tr><th></th><th>Putter</th><th>Type</th><th>~$</th><th>Demoed?</th></tr>
+      <tr><td>1</td><td><b>L.A.B. DF3</b></td><td>Zero-torque · XL mallet</td><td>479</td><td class="muted">☐</td></tr>
+      <tr><td>2</td><td><b>Odyssey S2S Jailbird</b></td><td>Zero-torque · high-MOI</td><td>399</td><td class="muted">☐</td></tr>
+      <tr><td>3</td><td><b>L.A.B. Mezz.1 Max</b></td><td>Zero-torque · max MOI</td><td>449</td><td class="muted">☐</td></tr>
+      <tr><td>4</td><td>TaylorMade Spider ZT</td><td>Zero-torque · trusted shape</td><td>449</td><td class="muted">☐</td></tr>
+      <tr><td>6</td><td>Scotty Phantom 7 DB</td><td>Face-balanced · easy swap</td><td>449</td><td class="muted">☐</td></tr>
+    </table>
+  </div>
+
+  <h2><span class="dot"></span>10-ball 5-footer test</h2>
+  <div class="card">
+    <p class="small muted" style="margin-bottom:10px">Head-to-head vs. your 7.5 control. Same green, same putt.</p>
+    <div class="vs">
+      <div class="opt"><h4>Phantom 7.5 <span class="tag t-blue">control</span></h4>
+        <div class="small">Makes: <b>—</b>/10 · Miss pattern: <b>—</b></div>
+        <button class="btn ghost" style="margin-top:8px">Run control</button></div>
+      <div class="opt"><h4>Challenger <span class="tag t-gold">pick from shortlist</span></h4>
+        <div class="small">Makes: <b>—</b>/10 · Miss pattern: <b>—</b></div>
+        <button class="btn" style="margin-top:8px">Run test</button></div>
+    </div>
+    <div class="callout" style="margin-top:12px"><b>Decision rule:</b> the winner needs the left miss to visibly dry up — then give it 2–3 weeks before final judgment. Lie set flat at pickup.</div>
+  </div>
+</div>
+
+</div>
+
+<script>
+document.querySelectorAll('nav button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('nav button').forEach(function(x){x.classList.remove('on')});
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    document.getElementById(b.dataset.t).classList.add('on');
+    window.scrollTo({top:0});
+  });
+});
+document.querySelectorAll('.check li').forEach(function(li){
+  li.addEventListener('click',function(){li.classList.toggle('done')});
+});
+</script>
+</body>
+</html>
