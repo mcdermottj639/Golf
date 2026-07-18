@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caddie HQ — Design Options</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{max-width:430px;margin:0 auto;padding:22px 16px 90px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:4px 10px;border-radius:6px;margin-bottom:14px}
+h1{font-size:24px;letter-spacing:-.02em}
+.tag{font-size:12.5px;margin-top:2px}
+.row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:16px 0}
+.stat{border-radius:var(--r);padding:10px 8px;text-align:center}
+.stat .v{font-size:19px;font-weight:800;line-height:1.1}
+.stat .l{font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+.card{border-radius:var(--r);padding:15px;margin:12px 0}
+.card h2{font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:9px}
+.card h3{font-size:15px;margin-bottom:4px}
+.sm{font-size:12px;line-height:1.5}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+th,td{padding:6px 6px;text-align:left}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+td b{font-size:14px}
+.meter{height:8px;border-radius:5px;overflow:hidden;margin:7px 0 4px}
+.meter span{display:block;height:100%}
+.crs{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0}
+.crs .nm{font-weight:700;font-size:13px}
+.crs .st{font-size:10.5px;margin-left:6px}
+.crs .rt{font-weight:800;font-size:14px}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;margin-top:8px}
+.spark{display:flex;align-items:flex-end;gap:7px;height:52px;margin-top:10px}
+.spark .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px}
+.spark .b{width:100%;max-width:40px;border-radius:4px 4px 0 0}
+.spark .t{font-size:9px}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;
+  display:grid;grid-template-columns:repeat(5,1fr);padding:10px 8px 16px;text-align:center}
+nav .it{font-size:9.5px;font-weight:700;letter-spacing:.04em}
+nav .ic{font-size:19px;display:block;margin-bottom:2px}
+
+/* ============ THEME A — FAIRWAY CLEAN (light minimal) ============ */
+body.theme-a{--r:16px;background:#f7f6f1;color:#1c2a22;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.theme-a .badge{background:#e8f3ec;color:#1e7a4e;border:1px solid #cfe6d8}
+.theme-a h1{font-weight:800;color:#14231b}
+.theme-a .tag{color:#7d8a80}
+.theme-a .stat{background:#fff;border:1px solid #e7e4da;box-shadow:0 1px 3px rgba(20,35,27,.05)}
+.theme-a .stat .v{color:#1e7a4e}
+.theme-a .stat .l{color:#95a198}
+.theme-a .card{background:#fff;border:1px solid #e7e4da;box-shadow:0 1px 3px rgba(20,35,27,.05)}
+.theme-a .card h2{color:#1e7a4e}
+.theme-a .sm{color:#5c6a60}
+.theme-a th{color:#95a198;border-bottom:1px solid #eeece3}
+.theme-a td{border-bottom:1px solid #f2f0e8;color:#31423a}
+.theme-a .meter{background:#efede4}
+.theme-a .meter span{background:linear-gradient(90deg,#e0a63c,#d4842e)}
+.theme-a .crs{border-bottom:1px solid #f2f0e8}
+.theme-a .crs .st{color:#95a198}
+.theme-a .crs .rt{color:#1e7a4e}
+.theme-a .chip{background:#e8f3ec;color:#1e7a4e}
+.theme-a .spark .b{background:#bcd9c8}
+.theme-a .spark .b.hot{background:#1e7a4e}
+.theme-a .spark .b.goal{background:#e0a63c}
+.theme-a .spark .t{color:#95a198}
+.theme-a .warn{color:#b8641f;font-weight:700}
+.theme-a nav{background:rgba(255,255,255,.94);border-top:1px solid #e7e4da;backdrop-filter:blur(8px);color:#95a198}
+.theme-a nav .on{color:#1e7a4e}
+
+/* ============ THEME B — SCORECARD HERITAGE (clubhouse classic) ============ */
+body.theme-b{--r:6px;background:#f6efdd;color:#26221a;font-family:Georgia,'Times New Roman',serif}
+.theme-b .badge{background:#123c26;color:#e9dfc5;letter-spacing:.2em}
+.theme-b h1{font-weight:700;color:#123c26;font-size:26px}
+.theme-b .tag{color:#7c7460;font-style:italic}
+.theme-b .stat{background:#fffdf6;border:1px solid #d8cdb0;border-top:3px solid #123c26}
+.theme-b .stat .v{color:#123c26;font-family:Georgia,serif}
+.theme-b .stat .l{color:#9a9077;font-family:-apple-system,sans-serif}
+.theme-b .card{background:#fffdf6;border:1px solid #d8cdb0;box-shadow:2px 2px 0 #e5dcc4}
+.theme-b .card h2{color:#8e1f2f;font-family:-apple-system,sans-serif;letter-spacing:.18em}
+.theme-b .sm{color:#5a5344}
+.theme-b th{color:#9a9077;border-bottom:2px solid #123c26;font-family:-apple-system,sans-serif}
+.theme-b td{border-bottom:1px solid #e2d8bd}
+.theme-b .meter{background:#ece4cd;border:1px solid #d8cdb0}
+.theme-b .meter span{background:#8e1f2f}
+.theme-b .crs{border-bottom:1px dotted #c9bd9d}
+.theme-b .crs .st{color:#9a9077}
+.theme-b .crs .rt{color:#8e1f2f}
+.theme-b .chip{background:#123c26;color:#e9dfc5}
+.theme-b .spark .b{background:#c9bd9d}
+.theme-b .spark .b.hot{background:#123c26}
+.theme-b .spark .b.goal{background:#8e1f2f}
+.theme-b .spark .t{color:#9a9077;font-family:-apple-system,sans-serif}
+.theme-b .warn{color:#8e1f2f;font-weight:700}
+.theme-b nav{background:#123c26;color:#a8bfa8}
+.theme-b nav .on{color:#f2e9d0}
+
+/* ============ THEME C — NIGHT RANGE (athletic dark, electric lime) ============ */
+body.theme-c{--r:20px;background:#0b0d10;color:#f2f4f0;
+  background-image:radial-gradient(700px 380px at 85% -5%, #1a2410 0%, #0b0d10 60%)}
+.theme-c .badge{background:#1c2413;color:#d6f94b;border:1px solid #37451c}
+.theme-c h1{font-weight:900;letter-spacing:-.03em;text-transform:uppercase;font-size:25px}
+.theme-c h1 em{font-style:normal;color:#d6f94b}
+.theme-c .tag{color:#8b948a}
+.theme-c .stat{background:#14171c;border:1px solid #242a31}
+.theme-c .stat .v{color:#d6f94b;font-weight:900}
+.theme-c .stat .l{color:#6d766d}
+.theme-c .card{background:#14171c;border:1px solid #242a31}
+.theme-c .card h2{color:#d6f94b}
+.theme-c .sm{color:#9aa39a}
+.theme-c th{color:#6d766d;border-bottom:1px solid #242a31}
+.theme-c td{border-bottom:1px solid #1c2126}
+.theme-c td b{color:#fff}
+.theme-c .meter{background:#1c2126}
+.theme-c .meter span{background:linear-gradient(90deg,#d6f94b,#8fbf2e)}
+.theme-c .crs{border-bottom:1px solid #1c2126}
+.theme-c .crs .st{color:#6d766d}
+.theme-c .crs .rt{color:#d6f94b}
+.theme-c .chip{background:#1c2413;color:#d6f94b;border:1px solid #37451c}
+.theme-c .spark .b{background:#39413c}
+.theme-c .spark .b.hot{background:#d6f94b}
+.theme-c .spark .b.goal{background:#fff}
+.theme-c .spark .t{color:#6d766d}
+.theme-c .warn{color:#ff9d5c;font-weight:700}
+.theme-c nav{background:rgba(11,13,16,.94);border-top:1px solid #242a31;backdrop-filter:blur(8px);color:#6d766d}
+.theme-c nav .on{color:#d6f94b}
+</style>
+</head>
+<body class="theme-a">
+
+<span class="badge" id="badge">Option A · Fairway Clean</span>
+<h1 id="title">Caddie HQ</h1>
+<div class="tag">Sat, Jul 18 · Handicap trending <b>8.6 ↓</b></div>
+
+<div class="row">
+  <div class="stat"><div class="v">8.6</div><div class="l">Handicap</div></div>
+  <div class="stat"><div class="v">27</div><div class="l">Courses</div></div>
+  <div class="stat"><div class="v">14/20</div><div class="l">5-ft makes</div></div>
+  <div class="stat"><div class="v">78d</div><div class="l">Return win.</div></div>
+</div>
+
+<div class="card">
+  <h2>Gear intelligence</h2>
+  <h3>56° grooves at 61% life</h3>
+  <div class="meter"><span style="width:61%"></span></div>
+  <p class="sm">Wedge spin drops noticeably below ~50% — on your play rate that's <span class="warn">around October</span>. Grips: round 34 of ~40 before regrip.</p>
+</div>
+
+<div class="card">
+  <h2>Wedge yardage matrix</h2>
+  <table>
+    <tr><th>Club</th><th>½</th><th>¾</th><th>Full</th></tr>
+    <tr><td><b>50°</b> · 10S</td><td>70</td><td>92</td><td><b>108</b></td></tr>
+    <tr><td><b>56°</b> · 10S</td><td>58</td><td>78</td><td><b>95</b></td></tr>
+    <tr><td><b>60°</b> · 8M</td><td>45</td><td>62</td><td><b>80</b></td></tr>
+  </table>
+  <p class="sm" style="margin-top:7px">Calibrated from your logged shots — the on-course cheat sheet.</p>
+</div>
+
+<div class="card">
+  <h2>Courses played</h2>
+  <p class="sm" style="margin-bottom:4px"><b>27 courses · 14 states</b> · avg rating 7.4</p>
+  <div class="crs"><span class="nm">Pebble Beach<span class="st">CA</span></span><span class="rt">8.79 · PR 82</span></div>
+  <div class="crs"><span class="nm">Spyglass Hill<span class="st">CA</span></span><span class="rt">8.75 · PR 85</span></div>
+  <div class="crs"><span class="nm">Chambers Bay<span class="st">WA</span></span><span class="rt">7.91 · PR 88</span></div>
+  <span class="chip">Bucket list · next: Sand Valley →</span>
+</div>
+
+<div class="card">
+  <h2>Putting scoreboard · 5-footers</h2>
+  <div class="spark">
+    <div class="c"><div class="b" style="height:22px"></div><div class="t">Jul 4</div></div>
+    <div class="c"><div class="b" style="height:27px"></div><div class="t">Jul 11</div></div>
+    <div class="c"><div class="b hot" style="height:35px"></div><div class="t">Jul 18</div></div>
+    <div class="c"><div class="b goal" style="height:43px"></div><div class="t">goal 17</div></div>
+  </div>
+  <p class="sm" style="margin-top:8px">Left-miss rate down to <b>2 of 6</b> misses — the zero-torque demo test will tell the rest.</p>
+</div>
+
+<nav>
+  <div class="it on"><span class="ic">⌂</span>Home</div>
+  <div class="it"><span class="ic">⛳</span>Bag</div>
+  <div class="it"><span class="ic">◎</span>Putting</div>
+  <div class="it"><span class="ic">🗺</span>Courses</div>
+  <div class="it"><span class="ic">▤</span>Rounds</div>
+</nav>
+
+<script>
+const q=new URLSearchParams(location.search), t=q.get('t')||'a';
+document.body.className='theme-'+t;
+const names={a:'Option A · Fairway Clean',b:'Option B · Scorecard Heritage',c:'Option C · Night Range'};
+document.getElementById('badge').textContent=names[t];
+if(t==='c'){document.getElementById('title').innerHTML='CADDIE<em>HQ</em>';}
+</script>
+</body>
+</html>

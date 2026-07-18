@@ -1,0 +1,12 @@
+{
+  "name": "Caddie HQ",
+  "short_name": "Caddie HQ",
+  "description": "Jack's golf command center — bag, stroke, coach, courses.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f6efdd",
+  "theme_color": "#123c26",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
