@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "updated": "2026-07-18",
+  "entries": [
+    {
+      "id": "s4-session",
+      "type": "session",
+      "date": "2026-07-18",
+      "setup": "5 clips · overhead · indoor track mat · Phantom 7.5",
+      "finding": "Tempo now ≈2:1 ✓ (was ~1:1 — the One-Two drill is landing). Path straight (SBST) again. Face stays square through impact on these reps — no visible toe-over. Balls start dead on the center line, no left pull. Early lift can't be judged from overhead."
+    },
+    {
+      "id": "s4-faults",
+      "type": "faults",
+      "faults": [
+        { "tag": "early-lift", "why": "unverified this session — overhead can't see it; film face-on to confirm the fix" },
+        { "tag": "short-putts", "why": "the toe-flow mismatch still stands until the zero-torque demo — today's calm reps ran on good timing" }
+      ]
+    },
+    {
+      "id": "s4-action-faceon",
+      "type": "action",
+      "pri": true,
+      "text": "Film 2–3 strokes face-on + DTL — verify the early-lift fix and the calmer release seen in Session 4"
+    }
+  ]
+}

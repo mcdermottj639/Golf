@@ -83,9 +83,18 @@ function seed(){
 
 // ---------- State ----------
 let S;
+function migrate(s){
+  // Additive upgrades for states saved by older app versions.
+  if(!s.feedApplied) s.feedApplied = [];
+  if(!s.faults) s.faults = [
+    { tag:'early-lift', why:'fault #1 in your filmed stroke sessions' },
+    { tag:'tempo', why:'your filmed tempo runs ~1:1 (target 2:1)' },
+  ];
+  return s;
+}
 function load(){
-  try { S = JSON.parse(localStorage.getItem(LS_KEY)) || seed(); }
-  catch(e){ S = seed(); }
+  try { S = migrate(JSON.parse(localStorage.getItem(LS_KEY)) || seed()); }
+  catch(e){ S = migrate(seed()); }
 }
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
 
@@ -128,8 +137,7 @@ function struggles(){
     tags.set(t, `logged at ${r.course || 'your round'} on ${fmtDate(r.date)}`)));
   const mc = missCounts();
   if (mc.L > mc.R) tags.set('short-putts', `${mc.L} left misses in your 5-ft logs`);
-  tags.set('early-lift', 'fault #1 in your filmed stroke sessions');
-  tags.set('tempo', 'your filmed tempo runs ~1:1 (target 2:1)');
+  S.faults.forEach(f => tags.set(f.tag, f.why));
   return tags;
 }
 function pickedLessons(){
@@ -741,7 +749,34 @@ document.getElementById('nav').addEventListener('click', e => {
   if(b){ editingCourse = null; render(b.dataset.view); }
 });
 
+// ---------- Coach feed ----------
+// Claude analyzes filmed sessions and pushes findings to coach-feed.json in the
+// repo; the app merges any entries it hasn't applied yet. Jack's own logs stay
+// local — this is a one-way inbox for coaching updates.
+function applyFeed(feed){
+  let changed = false;
+  (feed.entries || []).forEach(e => {
+    if(!e.id || S.feedApplied.includes(e.id)) return;
+    if(e.type === 'session') S.sessions.push({ date:e.date, setup:e.setup, finding:e.finding });
+    else if(e.type === 'action') S.actions.push({ id:e.id, text:e.text, done:false, pri:!!e.pri });
+    else if(e.type === 'action-done'){ const a = S.actions.find(x => x.id === e.target); if(a) a.done = true; }
+    else if(e.type === 'faults' && Array.isArray(e.faults)) S.faults = e.faults;
+    else if(e.type === 'deadline'){ S.settings.returnDeadline = e.date; S.settings.deadlineEstimated = false; }
+    else return; // unknown type: leave unapplied so a newer app version can pick it up
+    S.feedApplied.push(e.id);
+    changed = true;
+  });
+  if(changed){ save(); rerender(); toast('Coach update from Claude ⛳'); }
+}
+function fetchFeed(){
+  fetch('./coach-feed.json', { cache:'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .then(f => { if(f) applyFeed(f); })
+    .catch(()=>{}); // offline — try again next open
+}
+
 // ---------- Boot ----------
 load(); save();
 render('home');
+fetchFeed();
 })();
