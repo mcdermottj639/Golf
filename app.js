@@ -657,7 +657,8 @@ function courses(){
 
   <h2 id="courseFormAnchor">${editingCourse ? 'Edit course' : 'Add a course'}</h2>
   <div class="card">
-    <label>Name</label><input id="coNa" value="${esc(editingCourse?.name||'')}">
+    <label>Name</label><input id="coNa" list="courseDbList" placeholder="Start typing — the directory suggests as you go" value="${esc(editingCourse?.name||'')}">
+    <datalist id="courseDbList">${(typeof COURSE_DB!=='undefined'?COURSE_DB:[]).map(c=>`<option value="${esc(c.n)}">${esc(c.st)}</option>`).join('')}</datalist>
     <div class="formrow g3">
       <div><label>State</label><input id="coSt" maxlength="14" value="${esc(editingCourse?.st||'')}" placeholder="MA"></div>
       <div><label>Your rating 0–10</label><input id="coRt" inputmode="decimal" value="${editingCourse?.rating ?? ''}" placeholder="7.5"></div>
@@ -882,6 +883,14 @@ document.addEventListener('click', e => {
   if(chip){ chip.classList.toggle(chip.id==='coBucket' ? 'grn' : 'on'); return; }
   const el = e.target.closest('[data-action]');
   if(el && ACTIONS[el.dataset.action]) ACTIONS[el.dataset.action](el);
+});
+
+// Course directory autofill: picking/typing a known course fills its state.
+document.addEventListener('input', e => {
+  if(e.target.id !== 'coNa' || typeof COURSE_DB === 'undefined') return;
+  const hit = COURSE_DB.find(c => c.n.toLowerCase() === e.target.value.trim().toLowerCase());
+  const st = document.getElementById('coSt');
+  if(hit && st && !st.value) st.value = hit.st;
 });
 
 document.getElementById('nav').addEventListener('click', e => {
