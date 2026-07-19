@@ -778,6 +778,30 @@
       }
     },
     {
+      "id": "s6-swing-sim",
+      "type": "session",
+      "date": "2026-07-19",
+      "setup": "FULL SWING · 2 clips · simulator bay · screen-recorded",
+      "finding": "First long-game film on record: full coiled shoulder turn, unhurried ~3:1 tempo, and a balanced held finish — with the visible tracer running straight up the middle. No sign of the putting lift habit leaking into the full swing.",
+      "detail": {
+        "metrics": [
+          { "k": "Shoulder turn", "v": "Full coil", "s": "good", "n": "back to target at the top" },
+          { "k": "Tempo", "v": "Unhurried ~3:1", "s": "good", "n": "no snatch from the top" },
+          { "k": "Finish", "v": "Balanced · held", "s": "good", "n": "weight fully left, toe up" },
+          { "k": "Ball flight", "v": "Up the middle", "s": "good", "n": "tracer on the visible shot" },
+          { "k": "Face/path detail", "v": "Can't assess", "s": "mid", "n": "compressed screen-record, one angle" }
+        ],
+        "story": "Two simulator-bay swings, captured as screen-recorded story clips. The good stuff is structural and it's all there: a genuinely full shoulder coil at the top (not an arms lift), an unhurried transition — the backswing takes roughly three times the downswing, which is right where a full swing should live — and a committed, balanced finish that holds while the ball flies. The one readable tracer runs straight up the middle of the fairway. Notably, the up-and-out habit from the putting baseline does not appear here: the follow-through wraps full and low.",
+        "compare": "First full-swing entry, so this IS the baseline. The putting project's faults look putting-specific — encouraging for the long game.",
+        "limits": "Screen-recorded social clips: heavy compression, UI overlays, and one camera angle per swing. Club face, path, plane, and strike location can't be judged from this. For a real swing breakdown, film direct slo-mo (240fps) — down-the-line at hand height and face-on — and send the raw clips."
+      }
+    },
+    {
+      "id": "swing-film-action",
+      "type": "action",
+      "text": "For a real swing breakdown: film 3 swings slo-mo, down-the-line at hand height + face-on, raw clips (not screen recordings)"
+    },
+    {
       "id": "evolution-v3",
       "type": "evolution",
       "evolution": {
