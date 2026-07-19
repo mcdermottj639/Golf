@@ -13,8 +13,14 @@
       "id": "s4-faults",
       "type": "faults",
       "faults": [
-        { "tag": "early-lift", "why": "unverified this session — overhead can't see it; film face-on to confirm the fix" },
-        { "tag": "short-putts", "why": "the toe-flow mismatch still stands until the zero-torque switch — today's calm reps ran on good timing" }
+        {
+          "tag": "early-lift",
+          "why": "unverified this session — overhead can't see it; film face-on to confirm the fix"
+        },
+        {
+          "tag": "short-putts",
+          "why": "the toe-flow mismatch still stands until the zero-torque switch — today's calm reps ran on good timing"
+        }
       ]
     },
     {
@@ -35,12 +41,36 @@
       "id": "decision-locked-shortlist",
       "type": "shortlist",
       "shortlist": [
-        { "name": "L.A.B. Mezz.1 Max", "type": "Zero-torque · max MOI · buy-priority 1", "price": 449 },
-        { "name": "Odyssey Ai-One S2S Jailbird", "type": "Zero-torque · the realistic pick · priority 2", "price": 399 },
-        { "name": "TaylorMade Spider ZT", "type": "Zero-torque · trusted shape · priority 3", "price": 449 },
-        { "name": "L.A.B. DF3", "type": "Zero-torque · XL mallet", "price": 479 },
-        { "name": "Odyssey Ai-One S2S #7", "type": "Zero-torque · fang", "price": 349 },
-        { "name": "Scotty Phantom 7 DB", "type": "Face-balanced · easy swap", "price": 449 }
+        {
+          "name": "L.A.B. Mezz.1 Max",
+          "type": "Zero-torque · max MOI · buy-priority 1",
+          "price": 449
+        },
+        {
+          "name": "Odyssey Ai-One S2S Jailbird",
+          "type": "Zero-torque · the realistic pick · priority 2",
+          "price": 399
+        },
+        {
+          "name": "TaylorMade Spider ZT",
+          "type": "Zero-torque · trusted shape · priority 3",
+          "price": 449
+        },
+        {
+          "name": "L.A.B. DF3",
+          "type": "Zero-torque · XL mallet",
+          "price": 479
+        },
+        {
+          "name": "Odyssey Ai-One S2S #7",
+          "type": "Zero-torque · fang",
+          "price": 349
+        },
+        {
+          "name": "Scotty Phantom 7 DB",
+          "type": "Face-balanced · easy swap",
+          "price": 449
+        }
       ]
     },
     {
@@ -71,11 +101,36 @@
       "setupMatch": "5 clips · overhead",
       "detail": {
         "metrics": [
-          { "k": "Tempo", "v": "≈2:1 ✓", "s": "good", "n": "back ≈0.65s · down ≈0.30s" },
-          { "k": "Path", "v": "Straight · both putters", "s": "good", "n": "SBST re-confirmed" },
-          { "k": "Face at impact", "v": "Square", "s": "good", "n": "no toe-over at 15fps" },
-          { "k": "Start line", "v": "Dead center", "s": "good", "n": "every visible roll" },
-          { "k": "Lift", "v": "Can't assess", "s": "mid", "n": "overhead can't see it" }
+          {
+            "k": "Tempo",
+            "v": "≈2:1 ✓",
+            "s": "good",
+            "n": "back ≈0.65s · down ≈0.30s"
+          },
+          {
+            "k": "Path",
+            "v": "Straight · both putters",
+            "s": "good",
+            "n": "SBST re-confirmed"
+          },
+          {
+            "k": "Face at impact",
+            "v": "Square",
+            "s": "good",
+            "n": "no toe-over at 15fps"
+          },
+          {
+            "k": "Start line",
+            "v": "Dead center",
+            "s": "good",
+            "n": "every visible roll"
+          },
+          {
+            "k": "Lift",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "overhead can't see it"
+          }
         ],
         "story": "Frame-extracted at 15fps and read frame-by-frame. The backswing now runs about 0.65 seconds against a 0.30-second downstroke — right at the 2:1 target, and a visibly longer, calmer load than the baseline. The head tracked the mat lines straight back and through on the Phantom and the Newport 2 alike, the wings stayed symmetric to the line through the hitting zone (no visible toe-over), and every ball started dead on the center line.",
         "compare": "Versus the baseline clips: backswing load grew from ≈0.40s to ≈0.65s (~60% longer). The face-closing logged in Session 1 did not appear on any rep. The left miss did not appear on camera.",
@@ -89,11 +144,36 @@
       "setupMatch": "Baseline re-analysis",
       "detail": {
         "metrics": [
-          { "k": "Lift", "v": "Confirmed ✗", "s": "warn", "n": "3 angles, unmistakable" },
-          { "k": "Backswing", "v": "≈0.40s", "s": "warn", "n": "short, steep, brisk" },
-          { "k": "Path", "v": "Straight", "s": "good", "n": "even at baseline" },
-          { "k": "Start line", "v": "On line", "s": "good", "n": "always a strength" },
-          { "k": "Face", "v": "Inconclusive", "s": "mid", "n": "blur at 15fps" }
+          {
+            "k": "Lift",
+            "v": "Confirmed ✗",
+            "s": "warn",
+            "n": "3 angles, unmistakable"
+          },
+          {
+            "k": "Backswing",
+            "v": "≈0.40s",
+            "s": "warn",
+            "n": "short, steep, brisk"
+          },
+          {
+            "k": "Path",
+            "v": "Straight",
+            "s": "good",
+            "n": "even at baseline"
+          },
+          {
+            "k": "Start line",
+            "v": "On line",
+            "s": "good",
+            "n": "always a strength"
+          },
+          {
+            "k": "Face",
+            "v": "Inconclusive",
+            "s": "mid",
+            "n": "blur at 15fps"
+          }
         ],
         "story": "All ten v1/v2 clips re-analyzed with the same frame-extraction method as Session 4, giving measured numbers on both ends of the comparison. The early lift is documented from three separate angles: the head rises steeply off the mat during the short backstroke, passes low at impact, then climbs immediately — in the side view it exits the top of the frame on the follow-through. The backswing measured ≈0.40s: short, steep and brisk.",
         "compare": "One honest disagreement with the journey: frame counts read the old back-to-through ratio nearer 2:1 than the logged ~1:1. What actually screamed 'quick and hit-y' was the short, steep stroke overall — the measured improvement is the longer, lower, more deliberate load, not the ratio.",
@@ -105,13 +185,74 @@
       "type": "evolution",
       "evolution": {
         "updated": "2026-07-18",
-        "sessions": ["S1", "S2", "S3", "S4", "BL"],
+        "sessions": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "BL"
+        ],
         "metrics": [
-          { "name": "Path", "marks": ["?", "~", "✓", "✓", "✓"], "verdict": "SETTLED — straight (SBST), confirmed from overhead across 15+ clips and both putters.", "s": "good" },
-          { "name": "Tempo / load", "marks": ["✗", "✗", "—", "✓", "✓"], "verdict": "FIXED on film — backswing load grew ~60% (0.40s → 0.65s), ratio ≈2:1. Keep the One-Two drill.", "s": "good" },
-          { "name": "Face at impact", "marks": ["✗", "~", "—", "✓", "?"], "verdict": "Square on the newest film. Historically timing-dependent — zero-torque removes the timing requirement.", "s": "mid" },
-          { "name": "Early lift", "marks": ["✗", "✗", "—", "?", "✗"], "verdict": "THE OPEN FAULT — documented from 3 angles in the baseline. Needs a face-on clip to confirm the fix.", "s": "warn" },
-          { "name": "Start line / aim", "marks": ["✓", "✓", "✓", "✓", "✓"], "verdict": "A strength in every session ever filmed. Protect it: pick a putter you can aim with confidence.", "s": "good" }
+          {
+            "name": "Path",
+            "marks": [
+              "?",
+              "~",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "SETTLED — straight (SBST), confirmed from overhead across 15+ clips and both putters.",
+            "s": "good"
+          },
+          {
+            "name": "Tempo / load",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "✓",
+              "✓"
+            ],
+            "verdict": "FIXED on film — backswing load grew ~60% (0.40s → 0.65s), ratio ≈2:1. Keep the One-Two drill.",
+            "s": "good"
+          },
+          {
+            "name": "Face at impact",
+            "marks": [
+              "✗",
+              "~",
+              "—",
+              "✓",
+              "?"
+            ],
+            "verdict": "Square on the newest film. Historically timing-dependent — zero-torque removes the timing requirement.",
+            "s": "mid"
+          },
+          {
+            "name": "Early lift",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "?",
+              "✗"
+            ],
+            "verdict": "THE OPEN FAULT — documented from 3 angles in the baseline. Needs a face-on clip to confirm the fix.",
+            "s": "warn"
+          },
+          {
+            "name": "Start line / aim",
+            "marks": [
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "A strength in every session ever filmed. Protect it: pick a putter you can aim with confidence.",
+            "s": "good"
+          }
         ]
       }
     },
@@ -119,12 +260,36 @@
       "id": "shortlist-claude-verified",
       "type": "shortlist",
       "shortlist": [
-        { "name": "Odyssey Ai-One S2S Jailbird", "type": "Zero-torque · Claude-verified #1 · trust the look", "price": 399 },
-        { "name": "L.A.B. Mezz.1 Max", "type": "Zero-torque · max MOI · #2 — if the look works in person", "price": 449 },
-        { "name": "TaylorMade Spider ZT", "type": "Zero-torque · trusted shape · #3", "price": 449 },
-        { "name": "L.A.B. DF3", "type": "Zero-torque · XL mallet", "price": 479 },
-        { "name": "Odyssey Ai-One S2S #7", "type": "Zero-torque · fang", "price": 349 },
-        { "name": "Scotty Phantom 7 DB", "type": "Face-balanced · easy swap", "price": 449 }
+        {
+          "name": "Odyssey Ai-One S2S Jailbird",
+          "type": "Zero-torque · Claude-verified #1 · trust the look",
+          "price": 399
+        },
+        {
+          "name": "L.A.B. Mezz.1 Max",
+          "type": "Zero-torque · max MOI · #2 — if the look works in person",
+          "price": 449
+        },
+        {
+          "name": "TaylorMade Spider ZT",
+          "type": "Zero-torque · trusted shape · #3",
+          "price": 449
+        },
+        {
+          "name": "L.A.B. DF3",
+          "type": "Zero-torque · XL mallet",
+          "price": 479
+        },
+        {
+          "name": "Odyssey Ai-One S2S #7",
+          "type": "Zero-torque · fang",
+          "price": 349
+        },
+        {
+          "name": "Scotty Phantom 7 DB",
+          "type": "Face-balanced · easy swap",
+          "price": 449
+        }
       ]
     },
     {
@@ -160,8 +325,16 @@
       "date": "2026-07",
       "text": "Phantom 7.5 → L.A.B. DF3i (zero-torque, $659.99): the SBST-mismatch fix, ending a three-session diagnosis. Left-miss experiment begins."
     },
-    { "id": "buy-done", "type": "action-done", "target": "decision-locked-buy" },
-    { "id": "demo-done", "type": "action-done", "target": "a2" },
+    {
+      "id": "buy-done",
+      "type": "action-done",
+      "target": "decision-locked-buy"
+    },
+    {
+      "id": "demo-done",
+      "type": "action-done",
+      "target": "a2"
+    },
     {
       "id": "act-return-75",
       "type": "action",
@@ -178,8 +351,14 @@
       "id": "df3i-faults",
       "type": "faults",
       "faults": [
-        { "tag": "early-lift", "why": "the one open fault — film face-on with the DF3i to confirm the fix" },
-        { "tag": "short-putts", "why": "DF3i now in the bag — run the 20-ball baseline to prove the left miss is dead" }
+        {
+          "tag": "early-lift",
+          "why": "the one open fault — film face-on with the DF3i to confirm the fix"
+        },
+        {
+          "tag": "short-putts",
+          "why": "DF3i now in the bag — run the 20-ball baseline to prove the left miss is dead"
+        }
       ]
     },
     {
@@ -249,38 +428,139 @@
       "date": "2026-06",
       "text": "Full iron rebuild: KING TEC X 4–PW + KING TEC Utility 2-iron arrive."
     },
-    { "id": "rm-pebble", "type": "course-remove", "target": "Pebble Beach" },
-    { "id": "rm-spyglass", "type": "course-remove", "target": "Spyglass Hill" },
-    { "id": "rm-chambers", "type": "course-remove", "target": "Chambers Bay" },
-    { "id": "add-oldhead", "type": "course-add", "course": { "name": "Old Head", "st": "Ireland" } },
-    { "id": "add-waterville", "type": "course-add", "course": { "name": "Waterville", "st": "Ireland" } },
-    { "id": "add-hogshead", "type": "course-add", "course": { "name": "Hogs Head", "st": "Ireland" } },
-    { "id": "add-metedeconk", "type": "course-add", "course": { "name": "Metedeconk National", "st": "NJ" } },
-    { "id": "add-ferrypoint", "type": "course-add", "course": { "name": "Trump Links at Ferry Point", "st": "NY" } },
+    {
+      "id": "rm-pebble",
+      "type": "course-remove",
+      "target": "Pebble Beach"
+    },
+    {
+      "id": "rm-spyglass",
+      "type": "course-remove",
+      "target": "Spyglass Hill"
+    },
+    {
+      "id": "rm-chambers",
+      "type": "course-remove",
+      "target": "Chambers Bay"
+    },
+    {
+      "id": "add-oldhead",
+      "type": "course-add",
+      "course": {
+        "name": "Old Head",
+        "st": "Ireland"
+      }
+    },
+    {
+      "id": "add-waterville",
+      "type": "course-add",
+      "course": {
+        "name": "Waterville",
+        "st": "Ireland"
+      }
+    },
+    {
+      "id": "add-hogshead",
+      "type": "course-add",
+      "course": {
+        "name": "Hogs Head",
+        "st": "Ireland"
+      }
+    },
+    {
+      "id": "add-metedeconk",
+      "type": "course-add",
+      "course": {
+        "name": "Metedeconk National",
+        "st": "NJ"
+      }
+    },
+    {
+      "id": "add-ferrypoint",
+      "type": "course-add",
+      "course": {
+        "name": "Trump Links at Ferry Point",
+        "st": "NY"
+      }
+    },
     {
       "id": "kingtec-lofts-official",
       "type": "carries",
       "carries": [
-        { "club": "Driver", "loft": "9°", "carry": 235 },
-        { "club": "Mini Driver", "loft": "13.5°", "carry": 220 },
-        { "club": "2-iron (utility)", "loft": "~17°", "carry": 205 },
-        { "club": "4-iron", "loft": "21°", "carry": 190 },
-        { "club": "5-iron", "loft": "23°", "carry": 180 },
-        { "club": "6-iron", "loft": "26°", "carry": 170 },
-        { "club": "7-iron", "loft": "29.5°", "carry": 158 },
-        { "club": "8-iron", "loft": "34°", "carry": 146 },
-        { "club": "9-iron", "loft": "39°", "carry": 134 },
-        { "club": "PW", "loft": "44°", "carry": 122 },
-        { "club": "50° wedge", "loft": "50°", "carry": 108 },
-        { "club": "56° wedge", "loft": "56°", "carry": 95 },
-        { "club": "60° wedge", "loft": "60°", "carry": 80 }
+        {
+          "club": "Driver",
+          "loft": "9°",
+          "carry": 235
+        },
+        {
+          "club": "Mini Driver",
+          "loft": "13.5°",
+          "carry": 220
+        },
+        {
+          "club": "2-iron (utility)",
+          "loft": "~17°",
+          "carry": 205
+        },
+        {
+          "club": "4-iron",
+          "loft": "21°",
+          "carry": 190
+        },
+        {
+          "club": "5-iron",
+          "loft": "23°",
+          "carry": 180
+        },
+        {
+          "club": "6-iron",
+          "loft": "26°",
+          "carry": 170
+        },
+        {
+          "club": "7-iron",
+          "loft": "29.5°",
+          "carry": 158
+        },
+        {
+          "club": "8-iron",
+          "loft": "34°",
+          "carry": 146
+        },
+        {
+          "club": "9-iron",
+          "loft": "39°",
+          "carry": 134
+        },
+        {
+          "club": "PW",
+          "loft": "44°",
+          "carry": 122
+        },
+        {
+          "club": "50° wedge",
+          "loft": "50°",
+          "carry": 108
+        },
+        {
+          "club": "56° wedge",
+          "loft": "56°",
+          "carry": 95
+        },
+        {
+          "club": "60° wedge",
+          "loft": "60°",
+          "carry": 80
+        }
       ]
     },
     {
       "id": "kingtec-composition",
       "type": "club-update",
       "target": "Cobra KING TEC Irons · 4–PW",
-      "club": { "spec": "4–PW · Right · Steel Regular · official lofts 21–44°" }
+      "club": {
+        "spec": "4–PW · Right · Steel Regular · official lofts 21–44°"
+      }
     },
     {
       "id": "mini-is-r7",
@@ -302,32 +582,245 @@
       "id": "strip-price-df3i",
       "type": "club-update",
       "target": "L.A.B. Golf DF3i",
-      "club": { "note": "Bought Jul 18 · PGA Tour Superstore · 34\" confirmed. The zero-torque fix for the confirmed SBST stroke. At first setup, check the sole sits flat — lie-angle balance is what makes the tech work." }
+      "club": {
+        "note": "Bought Jul 18 · PGA Tour Superstore · 34\" confirmed. The zero-torque fix for the confirmed SBST stroke. At first setup, check the sole sits flat — lie-angle balance is what makes the tech work."
+      }
     },
     {
       "id": "strip-price-irons",
       "type": "club-update",
       "target": "Cobra KING TEC Irons · 4–PW",
-      "club": { "note": "Delivered Jun 12 (receipt label said X — it's the standard KING TEC). 44° PW anchors the wedge ladder." }
+      "club": {
+        "note": "Delivered Jun 12 (receipt label said X — it's the standard KING TEC). 44° PW anchors the wedge ladder."
+      }
     },
     {
       "id": "strip-price-2i",
       "type": "club-update",
       "target": "Cobra KING TEC Utility 2-iron",
-      "club": { "note": "Delivered Jun 15. The long-iron slot — pairs with the mini driver for windy/tight days." }
+      "club": {
+        "note": "Delivered Jun 15. The long-iron slot — pairs with the mini driver for windy/tight days."
+      }
+    },
+    {
+      "id": "s5-session",
+      "type": "session",
+      "date": "2026-07-18",
+      "setup": "5 clips · eye-level overhead · L.A.B. DF3i — first filmed reps",
+      "finding": "Start line: dead on the center line, all 5 reps — no left pull anywhere. Tempo measured 0.55s back / 0.23s down ≈ 2.4:1 (motion analysis, steadiest clip). The stroke changes are holding with the new putter in the bag.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Start line",
+            "v": "On line · 5/5",
+            "s": "good",
+            "n": "tracked the dashed line every rep"
+          },
+          {
+            "k": "Tempo",
+            "v": "≈2.4:1",
+            "s": "good",
+            "n": "0.55s back · 0.23s down, measured"
+          },
+          {
+            "k": "Face at address",
+            "v": "Square",
+            "s": "good",
+            "n": "aligned to the track"
+          },
+          {
+            "k": "Finish",
+            "v": "Holds on line",
+            "s": "good",
+            "n": "head stays over the line"
+          },
+          {
+            "k": "Lift",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "still needs face-on"
+          }
+        ],
+        "story": "First filmed strokes with the DF3i, shot from an eye-level overhead with your feet in frame. Every one of the five balls started dead on the mat's center line and tracked it until it left the frame — the miss the whole project was built around simply did not appear. Tempo was measured objectively on the steadiest clip using frame-to-frame motion analysis: quiet address, takeaway, a clear transition dip, and an impact spike gave 0.55s back and 0.23s down — about 2.4:1, squarely in the tour window. The follow-through consistently finishes with the head over the line and holds.",
+        "compare": "Versus Session 4 (Phantom): tempo holding at ~2:1+ (0.55s vs 0.65s load — slightly brisker but the ratio is intact). Versus baseline: a different stroke entirely. The zero-torque head now guarantees the square face that used to depend on timing.",
+        "limits": "Four of five clips were handheld with visible sway, which limited motion analysis to the steadiest clip. This angle still can't see vertical lift — the face-on film remains the last open item. Next session: prop the phone against something instead of holding it."
+      }
+    },
+    {
+      "id": "s5-action-update",
+      "type": "action-update",
+      "target": "act-session5",
+      "text": "Session 5 filmed ✓ (overhead, DF3i) — remaining: face-on clips for the lift verdict + the 20-ball 5-footer baseline"
+    },
+    {
+      "id": "s5-faults",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "early-lift",
+          "why": "the one open fault — film face-on with the DF3i to close it"
+        },
+        {
+          "tag": "short-putts",
+          "why": "first DF3i reps: 5/5 start lines clean — run the 20-ball baseline to make it official"
+        }
+      ]
     },
     {
       "id": "evolution-v2",
       "type": "evolution",
       "evolution": {
         "updated": "2026-07-18",
-        "sessions": ["S1", "S2", "S3", "S4", "BL"],
+        "sessions": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "BL"
+        ],
         "metrics": [
-          { "name": "Path", "marks": ["?", "~", "✓", "✓", "✓"], "verdict": "SETTLED — straight (SBST), confirmed from overhead across 15+ clips and both putters.", "s": "good" },
-          { "name": "Tempo / load", "marks": ["✗", "✗", "—", "✓", "✓"], "verdict": "FIXED on film — backswing load grew ~60% (0.40s → 0.65s), ratio ≈2:1. Keep the One-Two drill.", "s": "good" },
-          { "name": "Face at impact", "marks": ["✗", "~", "—", "✓", "?"], "verdict": "Square on the newest film — and the DF3i now removes the timing requirement for good. Session 5 confirms.", "s": "good" },
-          { "name": "Early lift", "marks": ["✗", "✗", "—", "?", "✗"], "verdict": "THE OPEN FAULT — documented from 3 angles in the baseline. Film face-on with the DF3i.", "s": "warn" },
-          { "name": "Start line / aim", "marks": ["✓", "✓", "✓", "✓", "✓"], "verdict": "A strength in every session ever filmed — now paired with a face that squares itself.", "s": "good" }
+          {
+            "name": "Path",
+            "marks": [
+              "?",
+              "~",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "SETTLED — straight (SBST), confirmed from overhead across 15+ clips and both putters.",
+            "s": "good"
+          },
+          {
+            "name": "Tempo / load",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "✓",
+              "✓"
+            ],
+            "verdict": "FIXED on film — backswing load grew ~60% (0.40s → 0.65s), ratio ≈2:1. Keep the One-Two drill.",
+            "s": "good"
+          },
+          {
+            "name": "Face at impact",
+            "marks": [
+              "✗",
+              "~",
+              "—",
+              "✓",
+              "?"
+            ],
+            "verdict": "Square on the newest film — and the DF3i now removes the timing requirement for good. Session 5 confirms.",
+            "s": "good"
+          },
+          {
+            "name": "Early lift",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "?",
+              "✗"
+            ],
+            "verdict": "THE OPEN FAULT — documented from 3 angles in the baseline. Film face-on with the DF3i.",
+            "s": "warn"
+          },
+          {
+            "name": "Start line / aim",
+            "marks": [
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "A strength in every session ever filmed — now paired with a face that squares itself.",
+            "s": "good"
+          }
+        ]
+      }
+    },
+    {
+      "id": "evolution-v3",
+      "type": "evolution",
+      "evolution": {
+        "updated": "2026-07-18",
+        "sessions": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "BL",
+          "S5"
+        ],
+        "metrics": [
+          {
+            "name": "Path",
+            "marks": [
+              "?",
+              "~",
+              "✓",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "SETTLED — straight (SBST), confirmed across 20+ clips, three putters, four sessions.",
+            "s": "good"
+          },
+          {
+            "name": "Tempo / load",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "HOLDING — measured 2.4:1 with the DF3i (0.55s/0.23s). The One-Two drill did its job; keep it as maintenance.",
+            "s": "good"
+          },
+          {
+            "name": "Face at impact",
+            "marks": [
+              "✗",
+              "~",
+              "—",
+              "✓",
+              "?",
+              "✓"
+            ],
+            "verdict": "Square at address and start lines prove it at impact — and the DF3i now guarantees it by design.",
+            "s": "good"
+          },
+          {
+            "name": "Early lift",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "?",
+              "✗",
+              "?"
+            ],
+            "verdict": "THE LAST OPEN FAULT — no angle yet has re-tested it. One face-on clip with the DF3i closes the book.",
+            "s": "warn"
+          },
+          {
+            "name": "Start line / aim",
+            "marks": [
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "5/5 on the center line with the new putter. The left miss has not appeared on film since the switch.",
+            "s": "good"
+          }
         ]
       }
     }
