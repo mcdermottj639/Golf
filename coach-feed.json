@@ -183,6 +183,15 @@
       ]
     },
     {
+      "id": "df3i-34-confirmed",
+      "type": "club-update",
+      "target": "L.A.B. Golf DF3i",
+      "club": {
+        "spec": "34\" ✓ · Zero-torque · ACCRA x L.A.B. Black shaft · Press Pistol 2° grip",
+        "note": "Bought Jul 18 · PGA Tour Superstore · $659.99 · length confirmed 34\". The zero-torque fix for the confirmed SBST stroke. At first setup, check the sole sits flat — lie-angle balance is what makes the tech work."
+      }
+    },
+    {
       "id": "evolution-v2",
       "type": "evolution",
       "evolution": {
