@@ -192,6 +192,55 @@
       }
     },
     {
+      "id": "add-stealth2",
+      "type": "club-add",
+      "club": {
+        "name": "TaylorMade Stealth 2 Driver",
+        "cat": "wood",
+        "spec": "9° · driver",
+        "status": "gaming",
+        "note": "The big stick. Add shaft/flex when you have it in hand."
+      }
+    },
+    {
+      "id": "add-minidriver",
+      "type": "club-add",
+      "club": {
+        "name": "Mini Driver",
+        "cat": "wood",
+        "spec": "13.5°",
+        "status": "gaming",
+        "note": "The fairway-finder off the tee and 3-wood slot. Confirm the model (BRNR?) and shaft."
+      }
+    },
+    {
+      "id": "add-kingtec-2i",
+      "type": "club-add",
+      "club": {
+        "name": "Cobra KING TEC Utility 2-iron",
+        "cat": "iron",
+        "spec": "Right · Steel Regular",
+        "status": "gaming",
+        "note": "Delivered Jun 15 · $206. The long-iron slot — pairs with the mini driver for windy/tight days."
+      }
+    },
+    {
+      "id": "kingtecx-details",
+      "type": "club-update",
+      "target": "Cobra King Tec irons",
+      "club": {
+        "name": "Cobra KING TEC X Irons · 4–PW",
+        "spec": "Right · Steel Regular · PW 44°",
+        "note": "Delivered Jun 12 · $999 + custom. Strong-lofted set — the 44° PW anchors the wedge ladder."
+      }
+    },
+    {
+      "id": "june-rebuild-history",
+      "type": "history",
+      "date": "2026-06",
+      "text": "Full iron rebuild: KING TEC X 4–PW + KING TEC Utility 2-iron arrive."
+    },
+    {
       "id": "evolution-v2",
       "type": "evolution",
       "evolution": {
