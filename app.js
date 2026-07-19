@@ -118,6 +118,22 @@ function seed(){
     ],
     rounds: [],           // {date, course, score, putts, troubles:[], note}
     matrix: { 50:{h:null,t:null,f:null}, 56:{h:null,t:null,f:null}, 60:{h:null,t:null,f:null} },
+    carries: [
+      { club:'Driver', loft:'9°', carry:235 },
+      { club:'Mini Driver', loft:'13.5°', carry:220 },
+      { club:'2-iron (utility)', loft:'~17°', carry:205 },
+      { club:'4-iron', loft:'~20.5°', carry:190 },
+      { club:'5-iron', loft:'~23.5°', carry:180 },
+      { club:'6-iron', loft:'~27°', carry:170 },
+      { club:'7-iron', loft:'~30.5°', carry:158 },
+      { club:'8-iron', loft:'~34.5°', carry:146 },
+      { club:'9-iron', loft:'~39°', carry:134 },
+      { club:'PW', loft:'44°', carry:122 },
+      { club:'50° wedge', loft:'50°', carry:108 },
+      { club:'56° wedge', loft:'56°', carry:95 },
+      { club:'60° wedge', loft:'60°', carry:80 },
+    ],
+    carriesCalibrated: false,
     lessonsRead: [],
     drillDays: [],        // ISO dates a drill was marked done
   };
@@ -132,6 +148,7 @@ function migrate(s){
     { tag:'early-lift', why:'fault #1 in your filmed stroke sessions' },
     { tag:'tempo', why:'your filmed tempo runs ~1:1 (target 2:1)' },
   ];
+  if(!s.carries){ const fresh = seed(); s.carries = fresh.carries; s.carriesCalibrated = false; }
   if(!s.evolution || s.sessions.every(x => !x.detail)){
     const fresh = seed();
     if(!s.evolution) s.evolution = fresh.evolution;
@@ -344,6 +361,22 @@ function bag(){
     <label>Specs (loft, shaft, flex…)</label><input id="clSp" placeholder="e.g. 9° · Ventus Blue 6S">
     <label>Notes</label><input id="clNo" placeholder="Why it's in the bag">
     <div style="margin-top:10px"><button class="btn" data-action="add-club">Save club</button></div>
+  </div>
+
+  <h2>Full-bag distance ladder</h2>
+  <div class="card">
+    ${S.carriesCalibrated ? '' : `<p class="sm"><span class="warn">Estimated</span> for your game until you calibrate — edit any number as real carries come in from the range or course.</p>`}
+    <table><tr><th>Club</th><th>Loft</th><th>Carry</th><th>Gap</th></tr>
+      ${S.carries.map((c,i) => {
+        const next = S.carries[i+1];
+        const gap = next && c.carry && next.carry ? c.carry - next.carry : null;
+        return `<tr><td><b>${esc(c.club)}</b></td><td class="sm faint">${esc(c.loft)}</td>
+          <td><input data-carry="${i}" inputmode="numeric" style="width:58px;text-align:center;padding:5px 4px" value="${c.carry ?? ''}"></td>
+          <td class="sm ${gap!==null && (gap>=20||gap<=5) ? 'warn':'faint'}">${gap!==null ? gap+' yd' : '—'}</td></tr>`;
+      }).join('')}
+    </table>
+    <button class="btn ghost tiny" data-action="save-carries">Save carries</button>
+    <p class="sm faint" style="margin-top:8px">Gap flags: over 20 yd = a hole in the bag · 5 yd or less = two clubs fighting for one number. Watch the mini → 2-iron → 4-iron stack.</p>
   </div>
 
   ${wedges.length ? `<h2>Wedge gapping ladder</h2>
@@ -733,6 +766,13 @@ const ACTIONS = {
       loft: $('#clCat').value==='wedge' ? parseInt(($('#clSp').value.match(/\d{2}/)||[])[0]) || undefined : undefined });
     save(); rerender(); toast('Club added');
   },
+  'save-carries': () => {
+    document.querySelectorAll('[data-carry]').forEach(inp => {
+      S.carries[+inp.dataset.carry].carry = inp.value ? parseInt(inp.value) : null;
+    });
+    S.carriesCalibrated = true;
+    save(); rerender(); toast('Carries saved');
+  },
   'save-matrix': () => {
     document.querySelectorAll('[data-matrix]').forEach(inp => {
       const [L,k] = inp.dataset.matrix.split('.');
@@ -870,6 +910,11 @@ function applyFeed(feed){
       if(c) Object.assign(c, e.club || {});
     }
     else if(e.type === 'history') S.bagHistory.unshift({ date:e.date, text:e.text });
+    else if(e.type === 'history-edit'){
+      const h = S.bagHistory.find(x => e.match && x.text.includes(e.match));
+      if(h && e.text) h.text = e.text;
+    }
+    else if(e.type === 'carries' && Array.isArray(e.carries) && !S.carriesCalibrated) S.carries = e.carries;
     else if(e.type === 'shortlist' && Array.isArray(e.shortlist)){
       const demoed = new Set(S.shortlist.filter(p=>p.demoed).map(p=>p.name));
       S.shortlist = e.shortlist.map(p => ({ ...p, demoed: demoed.has(p.name) }));

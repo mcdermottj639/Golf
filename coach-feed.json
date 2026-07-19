@@ -250,6 +250,30 @@
       "text": "Full iron rebuild: KING TEC X 4–PW + KING TEC Utility 2-iron arrive."
     },
     {
+      "id": "strip-price-history",
+      "type": "history-edit",
+      "match": "$659.99",
+      "text": "Phantom 7.5 → L.A.B. DF3i (zero-torque): the SBST-mismatch fix, ending a three-session diagnosis. Left-miss experiment begins."
+    },
+    {
+      "id": "strip-price-df3i",
+      "type": "club-update",
+      "target": "L.A.B. Golf DF3i",
+      "club": { "note": "Bought Jul 18 · PGA Tour Superstore · 34\" confirmed. The zero-torque fix for the confirmed SBST stroke. At first setup, check the sole sits flat — lie-angle balance is what makes the tech work." }
+    },
+    {
+      "id": "strip-price-irons",
+      "type": "club-update",
+      "target": "Cobra KING TEC Irons · 4–PW",
+      "club": { "note": "Delivered Jun 12 (receipt label said X — it's the standard KING TEC). 44° PW anchors the wedge ladder." }
+    },
+    {
+      "id": "strip-price-2i",
+      "type": "club-update",
+      "target": "Cobra KING TEC Utility 2-iron",
+      "club": { "note": "Delivered Jun 15. The long-iron slot — pairs with the mini driver for windy/tight days." }
+    },
+    {
       "id": "evolution-v2",
       "type": "evolution",
       "evolution": {
