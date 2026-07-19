@@ -638,7 +638,7 @@ function courses(){
   return `
   <div class="rowgrid g3">
     <div class="stat"><div class="v">${played.length}</div><div class="l">Played</div></div>
-    <div class="stat"><div class="v">${states.size}</div><div class="l">States</div></div>
+    <div class="stat"><div class="v">${states.size}</div><div class="l">States/Countries</div></div>
     <div class="stat"><div class="v">${avg}</div><div class="l">Avg rating</div></div>
   </div>
 
