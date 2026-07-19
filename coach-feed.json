@@ -743,6 +743,41 @@
       }
     },
     {
+      "id": "brief-hudsonhills-20260719",
+      "type": "briefing",
+      "briefing": {
+        "course": "Hudson Hills Golf Course",
+        "date": "2026-07-19",
+        "focus": "Fairway-finder day. 139 slope, narrow and tree-lined — the mini driver and 2-iron are your scoring clubs off the tee, and bogey is never an emergency here.",
+        "sections": [
+          {
+            "t": "The course in one paragraph",
+            "b": "Mungeam design (2004) carved into a hillside: 6,935 yards, par 71, rating 73.7 / slope 139 from the tips — the longest, toughest, best-kept muni in Westchester. Narrow fairways lined with trees and fescue, elevated tees AND elevated greens, a few blind shots, and almost no flat lies. Front nine is an accuracy exam; back nine wants length and short game. Play the tees that match a 6,300–6,500 game, not the tips — the slope is real."
+          },
+          {
+            "t": "Off the tee — your bag is built for this place",
+            "b": "This is exactly why you carry the r7 Mini and the 2-iron. Blind or squeezed landing area (the 2nd is famously tight, the 7th is a beast): mini driver (~220) or 2-iron (~205) and walk to the fairway. Save the Stealth 2 for the open, longer back-nine holes where the extra 15 yards matters. One rule all day: on any tee shot you can't fully see, take the club you'd bet $100 finds short grass."
+          },
+          {
+            "t": "The lies are the hidden test",
+            "b": "Hillside course = sidehill everything. Ball above your feet wants to go LEFT — with your strong lofts, take one less club and aim right edge. Ball below feet pushes right; widen the stance and swing smooth. Uphill approach: club UP, always — elevated greens reject anything short and roll it 20 yards back down the hill. Short-siding yourself here is the double-bogey machine; center of every green is a genuinely good shot."
+          },
+          {
+            "t": "Wedges & lay-ups",
+            "b": "When you punch out or lay up, do it to YOUR numbers: 95 (full 56°) or 108 (full 50°) — not 'as far as possible' into an awkward half-shot from a sloped lie. On uphill wedges into elevated greens, the ball lands steep and stops fast: fly it to the flag."
+          },
+          {
+            "t": "Greens — first real test for the DF3i",
+            "b": "Reviewers call them tour-fast. Perfect debut for the zero-torque: your job is speed only, the face is handled. Lag ladder mindset from 25+ feet — die everything into the 6-foot circle. Spend the first three greens calibrating pace, and on breaking putts play extra break with dying speed. Keep the low-through-impact feel from the gate drill: that is still your one open fault, and fast greens punish a popped stroke worst."
+          },
+          {
+            "t": "Logistics & scoring mindset",
+            "b": "Extremely hilly — take the cart, save the legs for the back nine. July heat means carries play a touch longer (load the weather tile at the first tee — the ladder's Today column does the math). Target: doubles are the enemy, not bogeys. Count them; fewer than three doubles on a 139 slope is a won day. Log the round in Coach after — score, putts, and what bit you — and I'll debrief it against this plan."
+          }
+        ]
+      }
+    },
+    {
       "id": "evolution-v3",
       "type": "evolution",
       "evolution": {
