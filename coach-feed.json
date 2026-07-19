@@ -229,9 +229,18 @@
       "type": "club-update",
       "target": "Cobra King Tec irons",
       "club": {
-        "name": "Cobra KING TEC X Irons · 4–PW",
+        "name": "Cobra KING TEC Irons · 4–PW",
         "spec": "Right · Steel Regular · PW 44°",
         "note": "Delivered Jun 12 · $999 + custom. Strong-lofted set — the 44° PW anchors the wedge ladder."
+      }
+    },
+    {
+      "id": "kingtec-not-x",
+      "type": "club-update",
+      "target": "Cobra KING TEC X Irons · 4–PW",
+      "club": {
+        "name": "Cobra KING TEC Irons · 4–PW",
+        "note": "Delivered Jun 12 · $999 + custom (receipt label said X — it's the standard KING TEC). 44° PW anchors the wedge ladder."
       }
     },
     {
