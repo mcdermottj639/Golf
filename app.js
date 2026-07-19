@@ -640,11 +640,13 @@ let editingCourse = null;
 // ----- Decisions -----
 function decisions(){
   const dl = daysLeft(S.settings.returnDeadline);
+  const decided = S.clubs.find(c => c.cat==='putter' && c.status==='gaming' && c.flow==='zt');
   return `
   <button class="backlink" data-action="go" data-view="home">← Home</button>
   <div class="card">
     <h2>The putter call</h2>
-    <p class="sm">Exchange the Phantom 7.5 for a <b>zero-torque at 34"</b>. Demo → 10-ball test → decide. <b>${dl===null?'Deadline not set':dl+' days left'}.</b></p>
+    ${decided ? `<p class="sm"><b class="good">DECIDED ✓ — ${esc(decided.name)} is in the bag.</b> Remaining: return the Phantom 7.5 before the window closes (<b>${dl===null?'deadline not set':dl+' days left'}</b>), then film Session 5 and run the 20-ball baseline to confirm the left miss is gone.</p>`
+    : `<p class="sm">Exchange the Phantom 7.5 for a <b>zero-torque at 34"</b>. Demo → 10-ball test → decide. <b>${dl===null?'Deadline not set':dl+' days left'}.</b></p>`}
   </div>
 
   <h2>Shortlist · from your fitted top-10</h2>
@@ -857,6 +859,12 @@ function applyFeed(feed){
       if(s){ if(e.setup) s.setup = e.setup; if(e.finding) s.finding = e.finding; if(e.detail) s.detail = e.detail; }
     }
     else if(e.type === 'evolution' && e.evolution) S.evolution = e.evolution;
+    else if(e.type === 'club-add' && e.club) S.clubs.push({ id:e.id, rounds:0, ...e.club });
+    else if(e.type === 'club-update'){
+      const c = S.clubs.find(x => x.id === e.target || x.name === e.target);
+      if(c) Object.assign(c, e.club || {});
+    }
+    else if(e.type === 'history') S.bagHistory.unshift({ date:e.date, text:e.text });
     else if(e.type === 'shortlist' && Array.isArray(e.shortlist)){
       const demoed = new Set(S.shortlist.filter(p=>p.demoed).map(p=>p.name));
       S.shortlist = e.shortlist.map(p => ({ ...p, demoed: demoed.has(p.name) }));

@@ -132,6 +132,70 @@
       "type": "action-update",
       "target": "decision-locked-buy",
       "text": "BUY (Claude-verified): zero-torque at 34\", lie set flat — Jailbird → Mezz.1 Max → Spider ZT. The 10-ball test at the shop overrides the ranking: buy whichever starts it straightest"
+    },
+    {
+      "id": "df3i-in-bag",
+      "type": "club-add",
+      "club": {
+        "name": "L.A.B. Golf DF3i",
+        "cat": "putter",
+        "spec": "Zero-torque · ACCRA x L.A.B. Black shaft · Press Pistol 2° grip · premium stock green",
+        "status": "gaming",
+        "flow": "zt",
+        "note": "Bought Jul 18 · PGA Tour Superstore · $659.99. The zero-torque fix for the confirmed SBST stroke. CONFIRM the order went in at 34\" — L.A.B. heads are lie-angle-balanced, so length/lie must match your setup for the tech to work."
+      }
+    },
+    {
+      "id": "phantom-to-return",
+      "type": "club-update",
+      "target": "Scotty Phantom 7.5",
+      "club": {
+        "status": "backup",
+        "note": "Replaced by the DF3i. Return or exchange before the window closes — don't let the deadline lapse."
+      }
+    },
+    {
+      "id": "df3i-history",
+      "type": "history",
+      "date": "2026-07",
+      "text": "Phantom 7.5 → L.A.B. DF3i (zero-torque, $659.99): the SBST-mismatch fix, ending a three-session diagnosis. Left-miss experiment begins."
+    },
+    { "id": "buy-done", "type": "action-done", "target": "decision-locked-buy" },
+    { "id": "demo-done", "type": "action-done", "target": "a2" },
+    {
+      "id": "act-return-75",
+      "type": "action",
+      "pri": true,
+      "text": "Return/exchange the Phantom 7.5 before the window deadline"
+    },
+    {
+      "id": "act-session5",
+      "type": "action",
+      "pri": true,
+      "text": "Session 5 with the DF3i: film overhead + face-on, and run the 20-ball 5-footer baseline — the left-miss verdict"
+    },
+    {
+      "id": "df3i-faults",
+      "type": "faults",
+      "faults": [
+        { "tag": "early-lift", "why": "the one open fault — film face-on with the DF3i to confirm the fix" },
+        { "tag": "short-putts", "why": "DF3i now in the bag — run the 20-ball baseline to prove the left miss is dead" }
+      ]
+    },
+    {
+      "id": "evolution-v2",
+      "type": "evolution",
+      "evolution": {
+        "updated": "2026-07-18",
+        "sessions": ["S1", "S2", "S3", "S4", "BL"],
+        "metrics": [
+          { "name": "Path", "marks": ["?", "~", "✓", "✓", "✓"], "verdict": "SETTLED — straight (SBST), confirmed from overhead across 15+ clips and both putters.", "s": "good" },
+          { "name": "Tempo / load", "marks": ["✗", "✗", "—", "✓", "✓"], "verdict": "FIXED on film — backswing load grew ~60% (0.40s → 0.65s), ratio ≈2:1. Keep the One-Two drill.", "s": "good" },
+          { "name": "Face at impact", "marks": ["✗", "~", "—", "✓", "?"], "verdict": "Square on the newest film — and the DF3i now removes the timing requirement for good. Session 5 confirms.", "s": "good" },
+          { "name": "Early lift", "marks": ["✗", "✗", "—", "?", "✗"], "verdict": "THE OPEN FAULT — documented from 3 angles in the baseline. Film face-on with the DF3i.", "s": "warn" },
+          { "name": "Start line / aim", "marks": ["✓", "✓", "✓", "✓", "✓"], "verdict": "A strength in every session ever filmed — now paired with a face that squares itself.", "s": "good" }
+        ]
+      }
     }
   ]
 }
