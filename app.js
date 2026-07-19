@@ -320,12 +320,17 @@ function tipHTML(p){
 
 // ----- Bag -----
 function bag(){
-  const order = { gaming:0, ordered:1, backup:2, wishlist:3 };
-  const clubs = [...S.clubs].sort((a,b)=>(order[a.status]??9)-(order[b.status]??9));
+  const lineup = S.clubs.filter(c => c.status==='gaming' || c.status==='ordered');
+  const bullpen = S.clubs.filter(c => c.status==='backup');
+  const wishlist = S.clubs.filter(c => c.status==='wishlist');
   const wedges = S.clubs.filter(c=>c.cat==='wedge' && c.loft).sort((a,b)=>a.loft-b.loft);
   return `
-  <h2>The clubs</h2>
-  ${clubs.map(clubCard).join('')}
+  <h2>The starting lineup · in the bag now</h2>
+  ${lineup.length ? lineup.map(clubCard).join('') : '<p class="sm faint">Nothing gaming yet.</p>'}
+  ${bullpen.length ? `<h2>The bullpen · owned, not in the 14</h2>
+  ${bullpen.map(clubCard).join('')}` : ''}
+  ${wishlist.length ? `<h2>Scouting list</h2>
+  ${wishlist.map(clubCard).join('')}` : ''}
   <div class="formrow" style="margin-top:6px">
     <button class="btn" data-action="show-add-club">+ Add a club</button>
   </div>
@@ -334,7 +339,7 @@ function bag(){
     <label>Name</label><input id="clNa" placeholder="e.g. TaylorMade Qi35 driver">
     <div class="formrow">
       <div><label>Category</label><select id="clCat"><option value="wood">Driver / wood</option><option value="hybrid">Hybrid</option><option value="iron">Irons</option><option value="wedge">Wedge</option><option value="putter">Putter</option><option value="ball">Ball</option><option value="other">Other</option></select></div>
-      <div><label>Status</label><select id="clSt"><option value="gaming">Gaming</option><option value="ordered">On order</option><option value="backup">Backup</option><option value="wishlist">Wishlist</option></select></div>
+      <div><label>Status</label><select id="clSt"><option value="gaming">Starting lineup</option><option value="ordered">On order</option><option value="backup">Bullpen</option><option value="wishlist">Scouting list</option></select></div>
     </div>
     <label>Specs (loft, shaft, flex…)</label><input id="clSp" placeholder="e.g. 9° · Ventus Blue 6S">
     <label>Notes</label><input id="clNo" placeholder="Why it's in the bag">
