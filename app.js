@@ -138,6 +138,7 @@ function seed(){
     carriesCalibrated: false,
     lessonsRead: [],
     drillDays: [],        // ISO dates a drill was marked done
+    briefings: [],        // {id, course, date, focus, sections:[{t,b}]} — pushed by Claude pre-round
   };
 }
 
@@ -151,6 +152,7 @@ function migrate(s){
     { tag:'tempo', why:'your filmed tempo runs ~1:1 (target 2:1)' },
   ];
   if(!s.carries){ const fresh = seed(); s.carries = fresh.carries; s.carriesCalibrated = false; }
+  if(!s.briefings) s.briefings = [];
   if(!s.evolution || s.sessions.every(x => !x.detail)){
     const fresh = seed();
     if(!s.evolution) s.evolution = fresh.evolution;
@@ -269,6 +271,7 @@ const TITLES = {
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
+  briefing:['Round Prep','Course knowledge, tuned to your game.'],
 };
 
 function render(view, arg){
@@ -278,7 +281,7 @@ function render(view, arg){
   $('#pageTag').textContent = tag;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === view));
-  const R = { home, bag, putting, coach, courses, decisions, data:dataView, shelf, lesson, session:sessionView }[view] || home;
+  const R = { home, bag, putting, coach, courses, decisions, data:dataView, shelf, lesson, session:sessionView, briefing }[view] || home;
   $('#view').innerHTML = R(arg);
   window.scrollTo(0,0);
 }
@@ -311,6 +314,20 @@ function home(){
     </div>
     <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
   </div>
+
+  ${(() => {
+    const today10 = today();
+    const up = S.briefings.filter(b => !b.date || b.date >= today10).sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    const recent = S.briefings.filter(b => b.date && b.date < today10).slice(-1);
+    const b = up[0] || recent[0];
+    return `<div class="card">
+      <h2>Round prep</h2>
+      ${b ? `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
+        <span><b>${esc(b.course)}</b><span class="sm faint"> · ${fmtDate(b.date)}${up[0] ? '' : ' (played)'}</span><br>
+        <span class="sm">${esc(b.focus || 'Course briefing ready')}</span></span><span class="arr">→</span></div>`
+      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round.</p>`}
+    </div>`;
+  })()}
 
   <h2>The numbers</h2>
   <div class="rowgrid g2">
@@ -669,6 +686,28 @@ function sessionView(i){
   </div>`;
 }
 
+// ----- Round-prep briefing -----
+function briefing(id){
+  const b = S.briefings.find(x => x.id === id);
+  if(!b) return home();
+  const played = S.courses.find(c => c.name.toLowerCase() === b.course.toLowerCase());
+  const wx = playsFactor();
+  return `
+  <button class="backlink" data-action="go" data-view="home">← Home</button>
+  <div class="card">
+    <h2>Round prep · ${fmtDate(b.date)}</h2>
+    <h3 style="font-size:19px">${esc(b.course)}</h3>
+    ${b.focus ? `<p class="sm" style="margin-top:4px"><b class="warn">Today's one focus:</b> ${esc(b.focus)}</p>` : ''}
+    ${played ? `<p class="sm faint" style="margin-top:6px">Your history: ${played.rating != null ? 'rated ' + Number(played.rating).toFixed(2) : 'unrated'}${played.pr != null ? ' · PR ' + esc(played.pr) : ''}${played.notes ? ' · "' + esc(played.notes) + '"' : ''}</p>` : ''}
+    ${wx ? `<p class="sm faint">Conditions now: ${Math.round(S.weather.t)}°F — carries play ${wx>1?'+':''}${((wx-1)*100).toFixed(1)}% (see the ladder's Today column).</p>` : ''}
+  </div>
+  ${(b.sections || []).map(s => `<div class="card">
+    <h2>${esc(s.t)}</h2>
+    <p class="lesson-body">${esc(s.b)}</p>
+  </div>`).join('')}
+  <p class="sm faint" style="margin:10px 0">Briefed by Claude from course research + your bag, carries, and stroke history.</p>`;
+}
+
 // ----- Courses -----
 function courses(){
   const played = S.courses.filter(c=>!c.bucket);
@@ -860,6 +899,7 @@ const ACTIONS = {
     save(); rerender(); toast('Round saved — Coach updated');
   },
   'open-session': el => render('session', el.dataset.i),
+  'open-briefing': el => render('briefing', el.dataset.id),
   'open-shelf': el => render('shelf', el.dataset.shelf),
   'open-lesson': el => render('lesson', el.dataset.id),
   'edit-course': el => {
@@ -999,6 +1039,10 @@ function applyFeed(feed){
     else if(e.type === 'course-add' && e.course && !S.courses.some(c => c.name === e.course.name))
       S.courses.push({ id:e.id, rating:null, pr:null, bucket:false, notes:'', ...e.course });
     else if(e.type === 'course-remove') S.courses = S.courses.filter(c => c.name !== e.target);
+    else if(e.type === 'briefing' && e.briefing){
+      S.briefings = S.briefings.filter(b => b.id !== e.id);
+      S.briefings.push({ id:e.id, ...e.briefing });
+    }
     else if(e.type === 'shortlist' && Array.isArray(e.shortlist)){
       const demoed = new Set(S.shortlist.filter(p=>p.demoed).map(p=>p.name));
       S.shortlist = e.shortlist.map(p => ({ ...p, demoed: demoed.has(p.name) }));
