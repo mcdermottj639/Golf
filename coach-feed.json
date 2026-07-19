@@ -250,6 +250,16 @@
       "text": "Full iron rebuild: KING TEC X 4–PW + KING TEC Utility 2-iron arrive."
     },
     {
+      "id": "mini-is-r7",
+      "type": "club-update",
+      "target": "Mini Driver",
+      "club": {
+        "name": "TaylorMade r7 Quad Mini Driver",
+        "spec": "13.5°",
+        "note": "The fairway-finder off the tee and 3-wood slot. Add shaft/flex when you have it in hand."
+      }
+    },
+    {
       "id": "strip-price-history",
       "type": "history-edit",
       "match": "$659.99",
