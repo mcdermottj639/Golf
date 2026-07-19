@@ -189,6 +189,22 @@ function toast(msg){
   clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 1800);
 }
 function uid(){ return 'i' + Math.random().toString(36).slice(2,9); }
+function spark(vals, h=34, color='currentColor'){
+  if(vals.length < 2) return '<div class="sub">needs 2+ entries</div>';
+  const w = 120, mn = Math.min(...vals), mx = Math.max(...vals);
+  const pts = vals.map((v,i) =>
+    `${(i/(vals.length-1)*w).toFixed(1)},${(h-3-(mx===mn ? h/2 : (v-mn)/(mx-mn)*(h-6))).toFixed(1)}`).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="height:${h}px">
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg>`;
+}
+// Weather → "plays like": cold air shortens carry ≈1% per 10°F below 70.
+function playsFactor(){
+  const wx = S.weather;
+  if(!wx || Date.now() - wx.ts > 3*3600*1000) return null;
+  return 1 + (wx.t - 70) * 0.001;
+}
+const WX_ICON = c => c===0?'☀️':c<=3?'⛅️':c<=48?'🌫':c<=67?'🌦':c<=77?'🌨':c<=82?'🌧':'⛈';
 
 // ---------- Derived ----------
 function latestFiveFt(){ return S.fiveFt.length ? S.fiveFt[S.fiveFt.length-1] : null; }
@@ -296,6 +312,29 @@ function home(){
     <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
   </div>
 
+  <h2>The numbers</h2>
+  <div class="rowgrid g2">
+    <div class="charttile"><div class="lab">5-ft makes · trend</div>
+      <div class="big">${sc ? sc.makes+'/'+sc.total : '—'}</div>
+      <div style="color:var(--gtext)">${spark(S.fiveFt.map(e=>fiveFtScore(e).makes))}</div>
+      <div class="sub">goal: 17/20</div></div>
+    <div class="charttile"><div class="lab">Round scores</div>
+      <div class="big">${S.rounds.length ? (S.rounds.filter(r=>r.score).slice(-1)[0]?.score ?? '—') : '—'}</div>
+      <div style="color:var(--btext)">${spark(S.rounds.map(r=>r.score).filter(Boolean))}</div>
+      <div class="sub">${S.rounds.length} logged</div></div>
+    <div class="charttile"><div class="lab">Carry ladder</div>
+      <div class="big">${S.carries[0]?.carry ?? '—'}<span style="font-size:11px"> yd top</span></div>
+      <div style="color:var(--gtext)">${spark(S.carries.map(c=>c.carry).filter(Boolean))}</div>
+      <div class="sub">${S.carriesCalibrated ? 'calibrated' : 'estimated'} · 13 clubs</div></div>
+    <div class="charttile" data-action="get-weather" style="cursor:pointer"><div class="lab">Conditions</div>
+      ${S.weather && playsFactor() ? `
+      <div class="big">${WX_ICON(S.weather.code)} ${Math.round(S.weather.t)}°F</div>
+      <div class="sub">wind ${Math.round(S.weather.wind)} mph</div>
+      <div class="sub" style="margin-top:4px;color:var(--btext);font-weight:700">150 plays ~${Math.round(150/playsFactor())}</div>`
+      : `<div class="big">—</div><div class="sub">tap to load local weather<br>+ "plays like" carries</div>`}
+    </div>
+  </div>
+
   ${picks.length ? `<div class="card">
     <h2>From your coach today</h2>
     ${picks.map(p => tipHTML(p)).join('')}
@@ -368,15 +407,18 @@ function bag(){
   <h2>Full-bag distance ladder</h2>
   <div class="card">
     ${S.carriesCalibrated ? '' : `<p class="sm"><span class="warn">Estimated</span> for your game until you calibrate — edit any number as real carries come in from the range or course.</p>`}
-    <table><tr><th>Club</th><th>Loft</th><th>Carry</th><th>Gap</th></tr>
+    <table><tr><th>Club</th><th>Loft</th><th>Carry</th>${playsFactor() ? '<th>Today</th>' : ''}<th>Gap</th></tr>
       ${S.carries.map((c,i) => {
         const next = S.carries[i+1];
         const gap = next && c.carry && next.carry ? c.carry - next.carry : null;
+        const pf = playsFactor();
         return `<tr><td><b>${esc(c.club)}</b></td><td class="sm faint">${esc(c.loft)}</td>
           <td><input data-carry="${i}" inputmode="numeric" style="width:58px;text-align:center;padding:5px 4px" value="${c.carry ?? ''}"></td>
+          ${pf ? `<td class="sm" style="color:var(--btext);font-weight:700">${c.carry ? Math.round(c.carry*pf) : '—'}</td>` : ''}
           <td class="sm ${gap!==null && (gap>=20||gap<=5) ? 'warn':'faint'}">${gap!==null ? gap+' yd' : '—'}</td></tr>`;
       }).join('')}
     </table>
+    ${playsFactor() ? `<p class="sm faint">"Today" = carry adjusted for ${Math.round(S.weather.t)}°F air (${playsFactor()>1?'+':''}${((playsFactor()-1)*100).toFixed(1)}%).</p>` : ''}
     <button class="btn ghost tiny" data-action="save-carries">Save carries</button>
     <p class="sm faint" style="margin-top:8px">Gap flags: over 20 yd = a hole in the bag · 5 yd or less = two clubs fighting for one number. Watch the mini → 2-iron → 4-iron stack.</p>
   </div>
@@ -868,7 +910,35 @@ const ACTIONS = {
   'reset': () => {
     if(confirm('Wipe all logged data and restore the original seed?')){ S = seed(); save(); render('home'); toast('Reset done'); }
   },
+  'toggle-theme': () => {
+    S.settings.theme = S.settings.theme === 'night' ? 'heritage' : 'night';
+    applyTheme(); save();
+    toast(S.settings.theme === 'night' ? 'Night mode ☾' : 'Heritage mode ☀');
+  },
+  'get-weather': () => fetchWeather(true),
 };
+
+function applyTheme(){
+  document.body.classList.toggle('night', S.settings.theme === 'night');
+  const b = document.querySelector('.themebtn');
+  if(b) b.textContent = S.settings.theme === 'night' ? '☀' : '☾';
+}
+
+function fetchWeather(manual){
+  if(!manual && S.weather && Date.now() - S.weather.ts < 30*60*1000) return;
+  if(!navigator.geolocation){ if(manual) toast('No location on this device'); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude, longitude } = pos.coords;
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(3)}&longitude=${longitude.toFixed(3)}&current=temperature_2m,wind_speed_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph`)
+      .then(r => r.json())
+      .then(j => {
+        const c = j.current || {};
+        S.weather = { t:c.temperature_2m, wind:c.wind_speed_10m, code:c.weather_code ?? 0, ts:Date.now() };
+        save(); rerender();
+      })
+      .catch(() => { if(manual) toast('Weather unavailable — offline?'); });
+  }, () => { if(manual) toast('Location permission needed for weather'); }, { timeout:8000, maximumAge:600000 });
+}
 
 document.addEventListener('click', e => {
   // 5-ft tap grid
@@ -953,8 +1023,10 @@ function fetchFeed(){
 
 // ---------- Boot ----------
 load(); save();
+applyTheme();
 render('home');
 fetchFeed();
+if(S.weather) fetchWeather();  // silent refresh only if previously enabled
 // iOS resumes a suspended PWA without reloading the page — re-check the
 // coach feed whenever the app comes back to the foreground.
 document.addEventListener('visibilitychange', () => {
