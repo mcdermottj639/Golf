@@ -896,4 +896,9 @@ function fetchFeed(){
 load(); save();
 render('home');
 fetchFeed();
+// iOS resumes a suspended PWA without reloading the page — re-check the
+// coach feed whenever the app comes back to the foreground.
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible') fetchFeed();
+});
 })();
