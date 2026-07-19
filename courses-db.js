@@ -1,5 +1,9 @@
 // Course directory — seeded from the "Golf Course Rating System via Lurch" sheet (both tabs).
 const COURSE_DB = [
+  {n:"Hogs Head",st:"Ireland"},
+  {n:"Metedeconk National",st:"NJ"},
+  {n:"Old Head",st:"Ireland"},
+  {n:"Waterville",st:"Ireland"},
   {n:"Achusnet Golf Course",st:"MA"},
   {n:"Ak-Chin Southern Dunes",st:"AZ"},
   {n:"Aldarra Golf Club",st:"WA"},

@@ -111,9 +111,11 @@ function seed(){
       { name:'Scotty Phantom 7 DB', type:'Face-balanced · easy swap', price:449, demoed:false },
     ],
     courses: [
-      { id:'x1', name:'Pebble Beach', st:'CA', rating:8.79, pr:null, bucket:false, notes:'' },
-      { id:'x2', name:'Spyglass Hill', st:'CA', rating:8.75, pr:null, bucket:false, notes:'' },
-      { id:'x3', name:'Chambers Bay', st:'WA', rating:7.91, pr:null, bucket:false, notes:'' },
+      { id:'x1', name:'Old Head', st:'Ireland', rating:null, pr:null, bucket:false, notes:'' },
+      { id:'x2', name:'Waterville', st:'Ireland', rating:null, pr:null, bucket:false, notes:'' },
+      { id:'x3', name:'Hogs Head', st:'Ireland', rating:null, pr:null, bucket:false, notes:'' },
+      { id:'x5', name:'Metedeconk National', st:'NJ', rating:null, pr:null, bucket:false, notes:'' },
+      { id:'x6', name:'Trump Links at Ferry Point', st:'NY', rating:null, pr:null, bucket:false, notes:'' },
       { id:'x4', name:'Sand Valley', st:'WI', rating:null, pr:null, bucket:true, notes:'Next up.' },
     ],
     rounds: [],           // {date, course, score, putts, troubles:[], note}
@@ -924,6 +926,9 @@ function applyFeed(feed){
       if(h && e.text) h.text = e.text;
     }
     else if(e.type === 'carries' && Array.isArray(e.carries) && !S.carriesCalibrated) S.carries = e.carries;
+    else if(e.type === 'course-add' && e.course && !S.courses.some(c => c.name === e.course.name))
+      S.courses.push({ id:e.id, rating:null, pr:null, bucket:false, notes:'', ...e.course });
+    else if(e.type === 'course-remove') S.courses = S.courses.filter(c => c.name !== e.target);
     else if(e.type === 'shortlist' && Array.isArray(e.shortlist)){
       const demoed = new Set(S.shortlist.filter(p=>p.demoed).map(p=>p.name));
       S.shortlist = e.shortlist.map(p => ({ ...p, demoed: demoed.has(p.name) }));

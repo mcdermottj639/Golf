@@ -249,6 +249,14 @@
       "date": "2026-06",
       "text": "Full iron rebuild: KING TEC X 4–PW + KING TEC Utility 2-iron arrive."
     },
+    { "id": "rm-pebble", "type": "course-remove", "target": "Pebble Beach" },
+    { "id": "rm-spyglass", "type": "course-remove", "target": "Spyglass Hill" },
+    { "id": "rm-chambers", "type": "course-remove", "target": "Chambers Bay" },
+    { "id": "add-oldhead", "type": "course-add", "course": { "name": "Old Head", "st": "Ireland" } },
+    { "id": "add-waterville", "type": "course-add", "course": { "name": "Waterville", "st": "Ireland" } },
+    { "id": "add-hogshead", "type": "course-add", "course": { "name": "Hogs Head", "st": "Ireland" } },
+    { "id": "add-metedeconk", "type": "course-add", "course": { "name": "Metedeconk National", "st": "NJ" } },
+    { "id": "add-ferrypoint", "type": "course-add", "course": { "name": "Trump Links at Ferry Point", "st": "NY" } },
     {
       "id": "kingtec-lofts-official",
       "type": "carries",
