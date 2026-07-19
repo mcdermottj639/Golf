@@ -250,6 +250,31 @@
       "text": "Full iron rebuild: KING TEC X 4–PW + KING TEC Utility 2-iron arrive."
     },
     {
+      "id": "kingtec-lofts-official",
+      "type": "carries",
+      "carries": [
+        { "club": "Driver", "loft": "9°", "carry": 235 },
+        { "club": "Mini Driver", "loft": "13.5°", "carry": 220 },
+        { "club": "2-iron (utility)", "loft": "~17°", "carry": 205 },
+        { "club": "4-iron", "loft": "21°", "carry": 190 },
+        { "club": "5-iron", "loft": "23°", "carry": 180 },
+        { "club": "6-iron", "loft": "26°", "carry": 170 },
+        { "club": "7-iron", "loft": "29.5°", "carry": 158 },
+        { "club": "8-iron", "loft": "34°", "carry": 146 },
+        { "club": "9-iron", "loft": "39°", "carry": 134 },
+        { "club": "PW", "loft": "44°", "carry": 122 },
+        { "club": "50° wedge", "loft": "50°", "carry": 108 },
+        { "club": "56° wedge", "loft": "56°", "carry": 95 },
+        { "club": "60° wedge", "loft": "60°", "carry": 80 }
+      ]
+    },
+    {
+      "id": "kingtec-composition",
+      "type": "club-update",
+      "target": "Cobra KING TEC Irons · 4–PW",
+      "club": { "spec": "4–PW · Right · Steel Regular · official lofts 21–44°" }
+    },
+    {
       "id": "mini-is-r7",
       "type": "club-update",
       "target": "Mini Driver",
