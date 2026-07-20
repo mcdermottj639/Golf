@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-07-18",
+  "updated": "2026-07-20",
   "entries": [
     {
       "id": "s4-session",
@@ -1034,6 +1034,77 @@
           }
         ]
       }
+    },
+    {
+      "id": "wedges-vokey-locked-20260720",
+      "type": "history",
+      "date": "2026-07",
+      "text": "Vokey wedge set locked in the bag: 50.08F · 56.10S · 60.08M — full ladder behind the 44° PW."
+    },
+    {
+      "id": "wedge-60-in-bag-20260720",
+      "type": "club-update",
+      "target": "c3",
+      "club": {
+        "status": "gaming",
+        "spec": "8° bounce · M grind",
+        "note": "60.08M — the creative wedge. M (mid) grind, 8° bounce, built to open wide for flops & splash. In the bag."
+      }
+    },
+    {
+      "id": "wedge-56-in-bag-20260720",
+      "type": "club-update",
+      "target": "c4",
+      "club": {
+        "status": "gaming",
+        "spec": "10° bounce · S grind",
+        "note": "56.10S — the workhorse. S (standard) grind, 10° bounce for full & stock shots and standard bunkers. In the bag."
+      }
+    },
+    {
+      "id": "wedge-50-spec-fix-20260720",
+      "type": "club-update",
+      "target": "c5",
+      "club": {
+        "status": "gaming",
+        "spec": "8° bounce · F grind",
+        "note": "50.08F — full-swing gap wedge. F (full) sole, 8° bounce, right for a shallow sweeping angle of attack. (Corrects an earlier 10S listing.)"
+      }
+    },
+    {
+      "id": "phantom-returned-official-20260720",
+      "type": "club-update",
+      "target": "Scotty Phantom 7.5",
+      "club": {
+        "status": "returned",
+        "note": "Returned Jul 20, 2026 ✓ — official. The arc-suited head that fought the SBST stroke is out of the bag; the L.A.B. DF3i is the gamer. Putter search closed."
+      }
+    },
+    {
+      "id": "phantom-return-history-20260720",
+      "type": "history",
+      "date": "2026-07",
+      "text": "Phantom 7.5 officially returned — the L.A.B. DF3i is the gamer. The putter search that opened with the SBST mismatch is closed."
+    },
+    {
+      "id": "act-return-75-done-20260720",
+      "type": "action-done",
+      "target": "act-return-75"
+    },
+    {
+      "id": "a3-done-20260720",
+      "type": "action-done",
+      "target": "a3"
+    },
+    {
+      "id": "a4-done-20260720",
+      "type": "action-done",
+      "target": "a4"
+    },
+    {
+      "id": "a7-done-20260720",
+      "type": "action-done",
+      "target": "a7"
     }
   ]
 }
