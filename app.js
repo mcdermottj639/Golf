@@ -319,12 +319,14 @@ function home(){
     const today10 = today();
     const up = S.briefings.filter(b => !b.date || b.date >= today10).sort((a,b) => (a.date||'').localeCompare(b.date||''));
     const recent = S.briefings.filter(b => b.date && b.date < today10).slice(-1);
-    const b = up[0] || recent[0];
+    const recent3 = S.briefings.filter(b => b.date && b.date < today10 &&
+      (new Date(today10) - new Date(b.date)) < 4*86400000);
+    const rows = [...up, ...recent3.slice(-1)].slice(0, 3);
     return `<div class="card">
-      <h2>Round prep</h2>
-      ${b ? `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-        <span><b>${esc(b.course)}</b><span class="sm faint"> · ${fmtDate(b.date)}${up[0] ? '' : ' (played)'}</span><br>
-        <span class="sm">${esc(b.focus || 'Course briefing ready')}</span></span><span class="arr">→</span></div>`
+      <h2>Round prep & plans</h2>
+      ${rows.length ? rows.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
+        <span><b>${esc(b.course)}</b><span class="sm faint"> · ${b.date ? fmtDate(b.date) + (b.date < today10 ? ' (played)' : '') : 'standing plan'}</span><br>
+        <span class="sm">${esc(b.focus || 'Briefing ready')}</span></span><span class="arr">→</span></div>`).join('')
       : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round.</p>`}
     </div>`;
   })()}
@@ -695,7 +697,7 @@ function briefing(id){
   return `
   <button class="backlink" data-action="go" data-view="home">← Home</button>
   <div class="card">
-    <h2>Round prep · ${fmtDate(b.date)}</h2>
+    <h2>${b.date ? 'Round prep · ' + fmtDate(b.date) : 'Standing plan'}</h2>
     <h3 style="font-size:19px">${esc(b.course)}</h3>
     ${b.focus ? `<p class="sm" style="margin-top:4px"><b class="warn">Today's one focus:</b> ${esc(b.focus)}</p>` : ''}
     ${played ? `<p class="sm faint" style="margin-top:6px">Your history: ${played.rating != null ? 'rated ' + Number(played.rating).toFixed(2) : 'unrated'}${played.pr != null ? ' · PR ' + esc(played.pr) : ''}${played.notes ? ' · "' + esc(played.notes) + '"' : ''}</p>` : ''}

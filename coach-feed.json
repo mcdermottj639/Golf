@@ -802,6 +802,46 @@
       "text": "For a real swing breakdown: film 3 swings slo-mo, down-the-line at hand height + face-on, raw clips (not screen recordings)"
     },
     {
+      "id": "plan-grip-experiment",
+      "type": "briefing",
+      "briefing": {
+        "course": "The Grip Experiment",
+        "focus": "Conventional vs. left-hand-low vs. claw — decided by makes and miss direction, not feel. One stage at a time.",
+        "sections": [
+          {
+            "t": "Why your right hand is the suspect",
+            "b": "For a right-handed putter, the trail hand is the strong, dominant one — under pressure it wants to rotate and flip the face closed through impact, and a closed face is a pull left. That is literally what Session 1's frame-by-frame showed: toe-over rotation, varying rep to rep. Both alternative grips exist to take that rotation out of the stroke. The DF3i already removes most of the need — this experiment measures what's left."
+          },
+          {
+            "t": "The three contenders",
+            "b": "CONVENTIONAL (reverse overlap): handle in the palms, palms parallel to the face, thumbs down the Press Pistol's flat front, pressure 3/10, right palm 'along for the ride.' LEFT-HAND-LOW: lead hand below trail — levels the shoulders and turns the stroke into a shoulder-rocked pendulum; the structural fix, and a natural pair with a straight SBST stroke. CLAW: normal left hand, right hand in a pencil/saw hold — the surgical 'delete the right hand' move; smallest change, shines inside 10 feet."
+          },
+          {
+            "t": "Stage 0 — baseline the conventional grip FIRST (weeks 1–2)",
+            "b": "You just changed the two biggest levers (zero-torque head, lie). Roll the DF3i with your normal grip for two weeks: one 20-ball 5-footer test per week, tapped into the Putting Lab with miss directions. GATE: 2 or fewer left misses per 20 in both weeks → conventional wins, experiment over, don't add complexity to a solved problem. 3+ lefts in either week → advance to Stage 1."
+          },
+          {
+            "t": "Stage 1 — the head-to-head (only if the gate trips)",
+            "b": "Practice-green session: alternate 10-ball blocks from 5 feet — conventional, LHL, claw, then repeat (60 balls, two blocks each). Log every block in the Decisions 10-ball tester named 'DF3i · conventional', 'DF3i · LHL', 'DF3i · claw' with miss pattern notes. Then add the lag check: 5 balls from 30 feet with each grip — average leave distance matters as much as makes, because alternative grips usually tax distance feel first. Two separate sessions minimum before any verdict."
+          },
+          {
+            "t": "Stage 2 — commit and groove",
+            "b": "Winner = most makes + fewest left misses across all blocks, with a lag leave you can live with. Commit to it for 3 full weeks before re-judging (every grip change feels bad for two weeks — that's adaptation, not information). Hybrid option is legitimate: conventional for lag, claw inside 10 feet, if the blocks split that way. Film one face-on session with the winner so the early-lift verdict lands on the final setup."
+          },
+          {
+            "t": "Hardware note",
+            "b": "The Press Pistol 2° stays — flat-front, face-square-friendly, and its built-in forward press works for all three holds. The only future nudge if hands stay noisy: an oversized SuperStroke-style grip, which damps wrist rotation further. Later, only if the data asks for it."
+          }
+        ]
+      }
+    },
+    {
+      "id": "grip-experiment-action",
+      "type": "action",
+      "pri": true,
+      "text": "Grip Experiment running — Stage 0: two weekly 20-ball tests with conventional grip. Gate: 3+ left misses advances to the grip head-to-head (plan on Home)"
+    },
+    {
       "id": "evolution-v3",
       "type": "evolution",
       "evolution": {
