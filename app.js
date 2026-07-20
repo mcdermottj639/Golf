@@ -1043,9 +1043,12 @@ function applyFeed(feed){
     else if(e.type === 'course-remove') S.courses = S.courses.filter(c => c.name !== e.target);
     else if(e.type === 'test' && e.test) S.tests.push({ date:e.test.date || null, putter:e.test.putter, makes:e.test.makes, note:e.test.note || '' });
     else if(e.type === 'briefing' && e.briefing){
-      S.briefings = S.briefings.filter(b => b.id !== e.id && b.id !== e.replaces);
+      S.briefings = S.briefings.filter(b => b.id !== e.id && b.id !== e.replaces &&
+        // standing plans (undated) are singletons per title — newest wins
+        !(!e.briefing.date && !b.date && b.course === e.briefing.course));
       S.briefings.push({ id:e.id, ...e.briefing });
     }
+    else if(e.type === 'briefing-remove') S.briefings = S.briefings.filter(b => b.id !== e.target);
     else if(e.type === 'shortlist' && Array.isArray(e.shortlist)){
       const demoed = new Set(S.shortlist.filter(p=>p.demoed).map(p=>p.name));
       S.shortlist = e.shortlist.map(p => ({ ...p, demoed: demoed.has(p.name) }));

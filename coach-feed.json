@@ -952,6 +952,7 @@
         { "tag": "three-putts", "why": "DF3i pace calibration: lags short + short putts firm at Hudson Hills + mat arrivals dying — the new head's power curve isn't learned yet. Lag ladder drill, twice this week" }
       ]
     },
+    { "id": "rm-grip-v1", "type": "briefing-remove", "target": "plan-grip-experiment" },
     {
       "id": "evolution-v3",
       "type": "evolution",
