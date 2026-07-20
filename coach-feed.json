@@ -945,6 +945,14 @@
       }
     },
     {
+      "id": "df3i-pace-fault",
+      "type": "faults",
+      "faults": [
+        { "tag": "early-lift", "why": "the one open stroke fault — film face-on with the DF3i to close it" },
+        { "tag": "three-putts", "why": "DF3i pace calibration: lags short + short putts firm at Hudson Hills + mat arrivals dying — the new head's power curve isn't learned yet. Lag ladder drill, twice this week" }
+      ]
+    },
+    {
       "id": "evolution-v3",
       "type": "evolution",
       "evolution": {
