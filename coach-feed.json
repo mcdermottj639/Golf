@@ -926,6 +926,25 @@
       ]
     },
     {
+      "id": "s7-entryside",
+      "type": "session-update",
+      "target": "s7-grip-block1",
+      "setupMatch": "GRIP EXPERIMENT · Stage 0 block 1",
+      "finding": "8/10. Unbiased pattern read: all 10 start lines clean (no face-flip). The signal is at ARRIVAL — 2 misses + 2 lip-hangs, all on dying pace, and both misses settled on the same (pull) side. Working hypothesis: soft-pace drift, not a stroke fault — three testable causes queued for the next block.",
+      "detail": {
+        "metrics": [
+          { "k": "Makes", "v": "8 / 10", "s": "good", "n": "4-footers, conventional grip" },
+          { "k": "Start lines", "v": "Clean · 10/10", "s": "good", "n": "no face rotation anywhere" },
+          { "k": "Arrival quality", "v": "4 soft arrivals", "s": "mid", "n": "2 misses + 2 lip-hangs (6, 9)" },
+          { "k": "Miss side", "v": "Both pull-side", "s": "mid", "n": "2-of-2 — a lean, not yet proof" },
+          { "k": "Verdict", "v": "Pace first, side second", "s": "good", "n": "watch item, not a diagnosis" }
+        ],
+        "story": "Scored deliberately without assuming the old left-miss theory. What the film actually shows: ten clean start lines — the face-rotation era is over on this evidence. The live signal is arrival speed: four putts arrived dying (two hung on the lip before dropping — putts 6 and 9 — and two died out). Secondary observation, flagged at low confidence: both genuine misses settled on the same side (the pull side). Two data points is a lean, not a pattern. Three candidate causes, all testable: (1) a tiny pull bias that only shows when the ball decelerates below hole-speed; (2) mat lean or seam near the cup; (3) a whisker of aim. None of them is the old face-flip — that would show in the start lines, and it doesn't.",
+        "compare": "Versus the diagnosis era: the catastrophic miss is gone. What's left is one notch of arrival pace and a two-putt side lean worth tracking honestly.",
+        "limits": "Handheld camera (it drops as each putt ends) prevented measured entry-side tracking on makes this block. NEXT BLOCK: prop the phone on the chair beside the mat — a stable frame lets the analysis measure every ball's entry point relative to the cup in fractions of an inch, makes included. Test the mat too: roll 3 balls at dead-slow speed down the center line with no stroke; if they drift the same way, cause (2) is convicted."
+      }
+    },
+    {
       "id": "evolution-v3",
       "type": "evolution",
       "evolution": {
