@@ -405,9 +405,21 @@ function tipHTML(p){
 
 // ----- Bag -----
 function bag(){
-  const lineup = S.clubs.filter(c => c.status==='gaming' || c.status==='ordered');
-  const bullpen = S.clubs.filter(c => c.status==='backup');
-  const wishlist = S.clubs.filter(c => c.status==='wishlist');
+  // Order the bag the way it sits in real life: driver → woods → hybrids →
+  // irons → wedges → putter, then by loft within each category.
+  const CAT_RANK = { wood:0, hybrid:1, iron:2, wedge:3, putter:4, ball:5, other:6 };
+  const clubLoft = c => {
+    if(typeof c.loft === 'number') return c.loft;
+    const deg = ((c.spec||'') + ' ' + (c.name||'')).match(/(\d+(?:\.\d+)?)\s*°/);
+    if(deg) return parseFloat(deg[1]);
+    const iron = (c.name||'').match(/(\d+)\s*-?\s*iron/i);   // "2-iron" sorts ahead of the 4–PW set
+    if(iron) return 15 + parseInt(iron[1],10) * 3.5;
+    return 999;
+  };
+  const bagSort = (a,b) => (CAT_RANK[a.cat] ?? 5) - (CAT_RANK[b.cat] ?? 5) || clubLoft(a) - clubLoft(b);
+  const lineup = S.clubs.filter(c => c.status==='gaming' || c.status==='ordered').sort(bagSort);
+  const bullpen = S.clubs.filter(c => c.status==='backup').sort(bagSort);
+  const wishlist = S.clubs.filter(c => c.status==='wishlist').sort(bagSort);
   const wedges = S.clubs.filter(c=>c.cat==='wedge' && c.loft).sort((a,b)=>a.loft-b.loft);
   return `
   <h2>The starting lineup · in the bag now</h2>
