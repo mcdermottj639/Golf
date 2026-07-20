@@ -836,6 +836,53 @@
       }
     },
     {
+      "id": "plan-grip-experiment-v2",
+      "type": "briefing",
+      "replaces": "plan-grip-experiment",
+      "briefing": {
+        "course": "The Grip Experiment",
+        "focus": "Conventional vs. left-hand-low vs. claw — decided by makes and miss direction, not feel. Full hold instructions + setup constants inside.",
+        "sections": [
+          {
+            "t": "The setup constants — same for all three grips",
+            "b": "These never change during the experiment, so the grip is the only variable. BALL POSITION: one to two ball-widths inside your lead (left) heel — forward of center, so the DF3i meets the ball just past the low point with a slight upstroke for true roll (ball too far back = downward strike = the hop-and-skid your old thin contact hinted at). EYES: directly over the ball or a hair inside the line — run the nose-drop test once to set it (drop a ball from the bridge of your nose at address; it should land on the ball or just inside). STANCE: feet shoulder-width, knees soft, weight 55/45 favoring the lead side, and dead still — the stroke moves, the body doesn't. DISTANCE FROM BALL: arms hang straight down from the shoulders, no reaching — this also keeps the sole flat (the toe-up aim-left problem lives here). ALIGNMENT: square the face to your line FIRST, then build the stance around the face. PRESS: none added — the Press Pistol 2° has the forward lean built in; hands sit even with the ball."
+          },
+          {
+            "t": "Grip 1 · Conventional (reverse overlap) — the exact hold",
+            "b": "LEFT HAND first, at the top: the handle runs up your LIFELINE (the crease between thumb pad and heel pad), NOT across the fingers like a full-swing grip — this locks the wrist. Left thumb flat, straight down the Press Pistol's flat front. RIGHT HAND below it: same palm placement — handle up the lifeline, right thumb flat down the front — so both PALMS FACE EACH OTHER, parallel to the putter face. They now work as one unit: if the palms oppose, the face can't rotate without both wrists agreeing. FINISH: lift your left index finger and lay it OVER the fingers of the right hand (across the pinky and ring finger) — that's the reverse overlap, and it further handcuffs the right wrist. Pressure 3/10, both hands. Feel: the back of the left hand IS the putter face — swing it at the target; the right palm just mirrors."
+          },
+          {
+            "t": "Grip 2 · Left-hand-low — the exact hold",
+            "b": "Everything mirrors: RIGHT HAND goes at the TOP now — handle up the right lifeline, right thumb flat down the front. LEFT HAND below it — handle up the left lifeline, left thumb down the front, palms opposing as always. OVERLAP: lay your right index finger over the fingers of the left hand (the mirror of reverse overlap). CRITICAL CHECKS: your shoulders should feel — and be — LEVEL at address (that's the whole point; the normal grip tilts the right shoulder down), and your LEFT wrist stays flat and leads the stroke like a paddle; the left hand going low turns your lead side into the engine and demotes the right hand to a passenger. Expect it to feel alien for two weeks and expect lag to suffer first — that's why the 30-foot check is in the protocol."
+          },
+          {
+            "t": "Grip 3 · Claw — the exact hold",
+            "b": "LEFT HAND: identical to conventional — top of the grip, up the lifeline, thumb down the front. This hand now does ALL the holding. RIGHT HAND: rotate it so the palm faces YOUR BODY (not the target), then hold the grip like a PENCIL — thumb pad resting on the back of the handle, the first two fingertips lying on the front/top. The handle sits in the notch between thumb and index finger. Pressure 2/10 — the right hand is a fairing, not a motor; it physically cannot rotate the face from that position, which is the entire trick. Right elbow drifts slightly away from your side — let it. Variation if the pencil feels twitchy: the SAW — same idea but all four right fingertips lie across the front of the grip like holding a saw handle. Either counts as 'claw' in the blocks; pick one and keep it."
+          },
+          {
+            "t": "Why the right hand is the suspect",
+            "b": "For a right-handed putter, the trail hand is the strong, dominant one — under pressure it wants to rotate and flip the face closed through impact, and a closed face is a pull left. That is literally what Session 1's frame-by-frame showed: toe-over rotation, varying rep to rep. LHL and claw both exist to take that rotation out of the stroke. The DF3i already removes most of the need — this experiment measures what's left."
+          },
+          {
+            "t": "Stage 0 — baseline the conventional grip FIRST (weeks 1–2)",
+            "b": "You just changed the two biggest levers (zero-torque head, lie). Roll the DF3i with the conventional hold above for two weeks: one 20-ball 5-footer test per week, tapped into the Putting Lab with miss directions. GATE: 2 or fewer left misses per 20 in both weeks → conventional wins, experiment over, don't add complexity to a solved problem. 3+ lefts in either week → advance to Stage 1."
+          },
+          {
+            "t": "Stage 1 — the head-to-head (only if the gate trips)",
+            "b": "Practice-green session: alternate 10-ball blocks from 5 feet — conventional, LHL, claw, then repeat (60 balls, two blocks each). Log every block in the Decisions 10-ball tester named 'DF3i · conventional', 'DF3i · LHL', 'DF3i · claw' with miss pattern notes. Then the lag check: 5 balls from 30 feet with each grip — average leave distance matters as much as makes, because alternative grips tax distance feel first. Two separate sessions minimum before any verdict."
+          },
+          {
+            "t": "Stage 2 — commit and groove",
+            "b": "Winner = most makes + fewest left misses across all blocks, with a lag leave you can live with. Commit for 3 full weeks before re-judging (every grip change feels bad for two weeks — that's adaptation, not information). Hybrid is legitimate: conventional for lag, claw inside 10 feet, if the blocks split that way. Film one face-on session with the winner so the early-lift verdict lands on the final setup."
+          },
+          {
+            "t": "Hardware note",
+            "b": "The Press Pistol 2° stays — flat-front, face-square-friendly, works for all three holds. Future nudge only if hands stay noisy: an oversized SuperStroke-style grip damps wrist rotation further. Later, only if the data asks."
+          }
+        ]
+      }
+    },
+    {
       "id": "grip-experiment-action",
       "type": "action",
       "pri": true,
