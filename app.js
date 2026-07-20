@@ -291,6 +291,8 @@ function rerender(){ render(current.view, current.arg); }
 // ----- Home -----
 function home(){
   const dl = daysLeft(S.settings.returnDeadline);
+  const phantom = S.clubs.find(c => /phantom 7\.5/i.test(c.name));
+  const returnDone = !phantom || phantom.status === 'returned';
   const last = latestFiveFt();
   const sc = last ? fiveFtScore(last) : null;
   const picks = pickedLessons().slice(0,1);
@@ -301,11 +303,16 @@ function home(){
     <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div></div>
     <div class="stat"><div class="v">${S.courses.filter(c=>!c.bucket).length}</div><div class="l">Courses</div></div>
     <div class="stat"><div class="v">${sc ? sc.makes+'/'+sc.total : '—'}</div><div class="l">5-ft makes</div></div>
-    <div class="stat ${dl!==null && dl<21 ? 'alert':''}"><div class="v">${dl===null?'—':dl+'d'}</div><div class="l">Return win.</div></div>
+    <div class="stat ${!returnDone && dl!==null && dl<21 ? 'alert':''}"><div class="v">${returnDone ? '✓' : (dl===null?'—':dl+'d')}</div><div class="l">Return win.</div></div>
   </div>
 
   <div class="card">
     <h2>Putter return window</h2>
+    ${returnDone ? `
+    <h3 class="good">Closed ✓ — Phantom 7.5 returned</h3>
+    <p class="sm">The putter search is settled: the <b>L.A.B. DF3i</b> is the gamer, and the arc-suited Phantom 7.5 is officially returned. Nothing left on the clock.</p>
+    <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
+    ` : `
     <h3>${dl===null ? 'No deadline set' : dl + ' days left on the Phantom 7.5'}</h3>
     <p class="sm">${S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> — confirm the real one with the shop and update it below.' : 'Deadline confirmed.'}</p>
     <div class="formrow" style="margin-top:8px">
@@ -313,6 +320,7 @@ function home(){
       <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
     </div>
     <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
+    `}
   </div>
 
   ${(() => {
@@ -765,11 +773,15 @@ let editingCourse = null;
 function decisions(){
   const dl = daysLeft(S.settings.returnDeadline);
   const decided = S.clubs.find(c => c.cat==='putter' && c.status==='gaming' && c.flow==='zt');
+  const phantom = S.clubs.find(c => /phantom 7\.5/i.test(c.name));
+  const returnDone = !phantom || phantom.status === 'returned';
   return `
   <button class="backlink" data-action="go" data-view="home">← Home</button>
   <div class="card">
     <h2>The putter call</h2>
-    ${decided ? `<p class="sm"><b class="good">DECIDED ✓ — ${esc(decided.name)} is in the bag.</b> Remaining: return the Phantom 7.5 before the window closes (<b>${dl===null?'deadline not set':dl+' days left'}</b>), then film Session 5 and run the 20-ball baseline to confirm the left miss is gone.</p>`
+    ${decided ? `<p class="sm"><b class="good">DECIDED ✓ — ${esc(decided.name)} is in the bag.</b> ${returnDone
+        ? 'The Phantom 7.5 is officially returned — the equipment half of the left miss is settled. Next: film Session 5 and run the 20-ball baseline to confirm the miss is gone.'
+        : `Remaining: return the Phantom 7.5 before the window closes (<b>${dl===null?'deadline not set':dl+' days left'}</b>), then film Session 5 and run the 20-ball baseline to confirm the left miss is gone.`}</p>`
     : `<p class="sm">Exchange the Phantom 7.5 for a <b>zero-torque at 34"</b>. Demo → 10-ball test → decide. <b>${dl===null?'Deadline not set':dl+' days left'}.</b></p>`}
   </div>
 
