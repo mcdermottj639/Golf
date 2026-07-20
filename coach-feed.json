@@ -889,6 +889,43 @@
       "text": "Grip Experiment running — Stage 0: two weekly 20-ball tests with conventional grip. Gate: 3+ left misses advances to the grip head-to-head (plan on Home)"
     },
     {
+      "id": "s7-grip-block1",
+      "type": "session",
+      "date": "2026-07-20",
+      "setup": "GRIP EXPERIMENT · Stage 0 block 1 · 10× 4-footers · conventional grip · DF3i · return mat",
+      "finding": "8/10. Both misses died AT the hole — one beside the cup on the pull side, one hung on the near-left lip. No face-flip pattern anywhere: every start line tracked the center. The old blow-through left miss did not appear.",
+      "detail": {
+        "metrics": [
+          { "k": "Makes", "v": "8 / 10", "s": "good", "n": "4-footers, conventional grip" },
+          { "k": "Start lines", "v": "On line · 10/10", "s": "good", "n": "no face-flip visible" },
+          { "k": "Miss 1 (putt 4)", "v": "Beside cup", "s": "mid", "n": "pull side, by an inch" },
+          { "k": "Miss 2 (putt 10)", "v": "Hung on lip", "s": "mid", "n": "near-left edge, dead pace" },
+          { "k": "Pattern", "v": "Pace, not face", "s": "good", "n": "both misses died arriving" }
+        ],
+        "story": "First measured block of the Grip Experiment, scored frame-by-frame from ten clips. Eight drops. The scoring learned this mat's behavior on the way: made balls fall through and auto-return the full length of the mat at steady speed (which is how putt 3 — initially scored short — was corrected to a make: gravity can't roll a ball six feet back up a flat mat). The two real misses share a signature: both balls DIED at the hole. One settled an inch to the pull side, one hung on the near-left lip. That's dying-speed variance, not the old face-rotation miss — start lines were clean on all ten.",
+        "compare": "Versus the old baseline: the catastrophic left start line is gone. What's left is arrival-speed fine-tuning — a firmer 'back of the cup' pace would likely have converted both misses.",
+        "limits": "Ramped return mat punishes dying pace more than a real green (a real cup accepts soft-entry putts these lips rejected). 4-footers, not the protocol's 5 — still counts as Stage 0 evidence, but run the official 20-ball at 5 feet for the gate. Clips end at arrival, so 'vanish + full-length return' = make is the scoring rule."
+      }
+    },
+    {
+      "id": "s7-test-log",
+      "type": "test",
+      "test": {
+        "date": "2026-07-20",
+        "putter": "DF3i · conventional (4ft mat)",
+        "makes": 8,
+        "note": "8/10 · misses: 1 pull-side at cup, 1 lip near-left · both died arriving · start lines clean"
+      }
+    },
+    {
+      "id": "s7-faults",
+      "type": "faults",
+      "faults": [
+        { "tag": "early-lift", "why": "the one open fault — film face-on with the DF3i to close it" },
+        { "tag": "short-putts", "why": "Stage 0 block 1: 8/10 conventional, zero face-flips — misses were pace at the lip. Run the official 20-ball at 5ft for the gate" }
+      ]
+    },
+    {
       "id": "evolution-v3",
       "type": "evolution",
       "evolution": {

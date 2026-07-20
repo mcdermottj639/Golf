@@ -1041,6 +1041,7 @@ function applyFeed(feed){
     else if(e.type === 'course-add' && e.course && !S.courses.some(c => c.name === e.course.name))
       S.courses.push({ id:e.id, rating:null, pr:null, bucket:false, notes:'', ...e.course });
     else if(e.type === 'course-remove') S.courses = S.courses.filter(c => c.name !== e.target);
+    else if(e.type === 'test' && e.test) S.tests.push({ date:e.test.date || null, putter:e.test.putter, makes:e.test.makes, note:e.test.note || '' });
     else if(e.type === 'briefing' && e.briefing){
       S.briefings = S.briefings.filter(b => b.id !== e.id && b.id !== e.replaces);
       S.briefings.push({ id:e.id, ...e.briefing });
