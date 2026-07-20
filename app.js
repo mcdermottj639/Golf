@@ -857,14 +857,17 @@ const ACTIONS = {
       S.carries[+inp.dataset.carry].carry = inp.value ? parseInt(inp.value) : null;
     });
     S.carriesCalibrated = true;
-    save(); rerender(); toast('Carries saved');
+    syncWedgeCarries('ladder');
+    save(); rerender(); toast('Carries saved everywhere');
   },
   'save-matrix': () => {
     document.querySelectorAll('[data-matrix]').forEach(inp => {
       const [L,k] = inp.dataset.matrix.split('.');
       S.matrix[L][k] = inp.value ? parseInt(inp.value) : null;
     });
-    save(); toast('Carries saved');
+    if(Object.values(S.matrix).some(m => m.f != null)) S.carriesCalibrated = true;
+    syncWedgeCarries('matrix');
+    save(); rerender(); toast('Carries saved everywhere');
   },
   'add-history': () => {
     const v = $('#newHist').value.trim(); if(!v) return;
@@ -1011,6 +1014,18 @@ document.getElementById('nav').addEventListener('click', e => {
   const b = e.target.closest('button');
   if(b){ editingCourse = null; render(b.dataset.view); }
 });
+
+
+// Wedge full carries live in both the matrix (full column) and the distance
+// ladder — one save updates both, whichever side was edited.
+function syncWedgeCarries(source){
+  Object.keys(S.matrix).forEach(L => {
+    const row = S.carries.find(c => c.club === L + '° wedge');
+    if(!row) return;
+    if(source === 'matrix' && S.matrix[L].f != null) row.carry = S.matrix[L].f;
+    if(source === 'ladder' && row.carry != null) S.matrix[L].f = row.carry;
+  });
+}
 
 // ---------- Coach feed ----------
 // Claude analyzes filmed sessions and pushes findings to coach-feed.json in the
