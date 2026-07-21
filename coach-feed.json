@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-07-20",
+  "updated": "2026-07-21",
   "entries": [
     {
       "id": "s4-session",
@@ -1105,6 +1105,68 @@
       "id": "a7-done-20260720",
       "type": "action-done",
       "target": "a7"
+    },
+    {
+      "id": "s8-dtl-gate",
+      "type": "session",
+      "date": "2026-07-21",
+      "setup": "5 clips · ground-level down-the-line (hand height) · L.A.B. DF3i · tunnel + gate drill on the alignment/return mat",
+      "finding": "The DTL film Session 4's action asked for. Start line dead on the center dashed line all 5 reps — the ball launches up the tunnel and gates out CENTER every time, no left leak. Face square through impact, no toe-over or flip. First ground-level look at head height: the head stays low and extends down the line through impact — none of the abrupt lift-and-hang from the baseline clips. Pace-to-a-hole can't be scored from a gate drill.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Start line",
+            "v": "On line · 5/5",
+            "s": "good",
+            "n": "up the center dashed line every rep"
+          },
+          {
+            "k": "Gate",
+            "v": "Center · 5/5",
+            "s": "good",
+            "n": "ball trail enters the far gate centered"
+          },
+          {
+            "k": "Face at impact",
+            "v": "Square",
+            "s": "good",
+            "n": "no toe-over / flip"
+          },
+          {
+            "k": "Head thru impact",
+            "v": "Stays low",
+            "s": "good",
+            "n": "extends down-line, no abrupt lift"
+          },
+          {
+            "k": "Path",
+            "v": "Straight (SBST)",
+            "s": "good",
+            "n": "tracks the line back & through"
+          },
+          {
+            "k": "Pace to hole",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "gate drill — no holed outcome"
+          }
+        ],
+        "story": "Five HDR clips tone-mapped and read frame-by-frame at ~30fps: the through-stroke for head height, a background-subtracted ball trail for the roll, and the gate zone for arrival. Same story on all five reps — the head comes down low, stays square through the ball, and extends down the line rather than snapping up and out. Every ball leaves on the center dashed line, tracks straight up the tunnel, and enters the far gate centered — the old left leak simply isn't here. This is the down-the-line, hand-height angle Session 4's action wanted: it's the first look that can actually see head height, and early-lift reads gone from behind. Caveat: a true face-on is still the cleanest vertical-rise check, and a gate drill can't judge pace to a real hole — so the open pace-calibration work stands."
+      }
+    },
+    {
+      "id": "s8-faults",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "early-lift",
+          "why": "DTL film (Session 8) finally shows head height — head stays low and extends down-line through impact, lift-and-hang not present. Strongly corroborated as gone; a true face-on would close it for good."
+        },
+        {
+          "tag": "three-putts",
+          "why": "DF3i pace calibration still open — gate/tunnel reps can't judge pace to a hole. Lag ladder drill stays on the card until the arrivals stop dying short."
+        }
+      ]
     }
   ]
 }
