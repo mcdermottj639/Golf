@@ -167,6 +167,10 @@ td b{font-size:14px}
 .poscap{font-family:var(--sans);font-size:10px;line-height:1.28;color:var(--gtext);margin-top:3px}
 .poscap b{color:var(--ink)}
 .hipcompare{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.poslegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 12px;font-family:var(--sans);font-size:10.5px;color:var(--gtext)}
+.poslegend span{display:inline-flex;align-items:center;gap:5px}
+.poslegend i{width:14px;height:5px;border-radius:3px;display:inline-block}
+.poslegend i.arc{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--burg);border-left-color:transparent;border-bottom-color:transparent;transform:rotate(45deg)}
 
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:30;
   display:grid;grid-template-columns:repeat(6,1fr);padding:8px 6px calc(10px + env(safe-area-inset-bottom));
