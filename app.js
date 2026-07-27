@@ -266,6 +266,7 @@ const TITLES = {
   home:['Caddie HQ','Your bag, your stroke, your game — one book.'],
   bag:['My Bag','Every club, every spec, and the story of every change.'],
   swing:['Swing Lab','Driver to wedge — film, plans, and speed work.'],
+  positions:['Swing Positions','Where the body goes, address to finish.'],
   putting:['Putting Lab','The left-miss project — tracked until it’s dead.'],
   coach:['Coach','Lessons that follow your game — not generic tips.'],
   courses:['Courses','Everywhere you’ve played, rated and remembered.'],
@@ -282,7 +283,7 @@ function render(view, arg){
   $('#pageTag').textContent = tag;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === view));
-  const R = { home, bag, swing, putting, coach, courses, decisions, data:dataView, shelf, lesson, session:sessionView, briefing }[view] || home;
+  const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, data:dataView, shelf, lesson, session:sessionView, briefing }[view] || home;
   $('#view').innerHTML = R(arg);
   window.scrollTo(0,0);
 }
@@ -539,6 +540,9 @@ function swing(){
     <p class="sm">Driver through wedge — your film breakdowns, standing plans, and at-home training in one place.${sessions.length ? '' : ' Send Claude swing clips (down-the-line + face-on) and the breakdowns land here.'}</p>
   </div>
 
+  <div class="card flat"><div class="linkrow" data-action="go" data-view="positions">
+    <span><b>📐 Swing Positions · visual guide</b><br><span class="sm">Body checkpoints, address → finish, with a slide-vs-clear hip diagram</span></span><span class="arr">→</span></div></div>
+
   ${plans.length ? `<h2>Plans &amp; training</h2>
   <div class="card">
     ${plans.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
@@ -559,6 +563,72 @@ function swing(){
     <b>2 · Face-on</b> — chest height, square to you: posture, weight shift, hip clearance, low point.<br>
     Film 3 swings per angle in slo-mo (240fps), and grab the sim's numbers — path, attack angle, face-to-path, spin, carry.</p>
   </div>`;
+}
+
+// ----- Swing Positions · visual guide (inline SVG, theme-aware) -----
+function posFig(p){
+  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--green)', FNT='var(--faint)', CLB='var(--gtext)';
+  const ln=(a,b,c,w=4.5)=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" style="stroke:${c};stroke-width:${w};stroke-linecap:round"/>`;
+  const hipL=[p.hip[0]-13,p.hip[1]], hipR=[p.hip[0]+13,p.hip[1]];
+  const leadCol=p.post?GRN:INK;
+  const svg=`<svg viewBox="0 0 200 240" role="img" aria-label="${esc(p.name)}">
+    <line x1="18" y1="212" x2="182" y2="212" style="stroke:${FNT};stroke-width:2"/>
+    <ellipse cx="${p.trailFoot[0]}" cy="217" rx="${(5+(1-p.wtLead)*15).toFixed(1)}" ry="3.5" style="fill:${FNT};opacity:.5"/>
+    <ellipse cx="${p.leadFoot[0]}" cy="217" rx="${(5+p.wtLead*15).toFixed(1)}" ry="3.5" style="fill:${FNT};opacity:.5"/>
+    ${ln(hipL,p.trailKnee,INK)}${ln(p.trailKnee,p.trailFoot,INK)}
+    ${ln(hipR,p.leadKnee,leadCol)}${ln(p.leadKnee,p.leadFoot,leadCol)}
+    ${ln(p.hip,p.sh,INK,5)}
+    ${ln(p.sh,p.hands,INK)}
+    ${p.club?ln(p.hands,p.club,CLB,3):''}
+    ${p.ball?`<circle cx="${p.ball[0]}" cy="${p.ball[1]}" r="4" style="fill:#fff;stroke:${INK};stroke-width:2"/>`:''}
+    <line x1="${hipL[0]}" y1="${hipL[1]}" x2="${hipR[0]}" y2="${hipR[1]}" style="stroke:${BURG};stroke-width:7;stroke-linecap:round"/>
+    ${p.hipOpen?`<circle cx="${hipR[0]}" cy="${hipR[1]-2}" r="4.5" style="fill:${BURG}"/>`:''}
+    <circle cx="${p.head[0]}" cy="${p.head[1]}" r="9" style="fill:none;stroke:${INK};stroke-width:4.5"/>
+    ${p.hipOpen?`<path d="M ${p.hip[0]+22} ${p.hip[1]-12} q 15 3 12 19" style="fill:none;stroke:${BURG};stroke-width:2.5"/><polygon points="${p.hip[0]+29},${p.hip[1]+11} ${p.hip[0]+37},${p.hip[1]+6} ${p.hip[0]+37},${p.hip[1]+15}" style="fill:${BURG}"/>`:''}
+  </svg>`;
+  return `<div class="posfig">${svg}<div class="poscap"><b>${esc(p.name)}</b><br>${esc(p.cap)}</div></div>`;
+}
+function hipTopDown(){
+  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--green)', FNT='var(--faint)';
+  const feet=`<ellipse cx="52" cy="112" rx="15" ry="8" style="fill:none;stroke:${INK};stroke-width:3"/><ellipse cx="112" cy="112" rx="15" ry="8" style="fill:none;stroke:${INK};stroke-width:3"/>`;
+  const tgt=`<line x1="18" y1="134" x2="150" y2="134" style="stroke:${FNT};stroke-width:2;stroke-dasharray:4 4"/><polygon points="150,134 142,130 142,138" style="fill:${FNT}"/><text x="60" y="150" style="fill:${FNT};font:9px var(--sans)">target →</text>`;
+  const slide=`<svg viewBox="0 0 170 158" role="img" aria-label="Hips sliding">
+    ${tgt}${feet}
+    <rect x="57" y="58" width="50" height="24" rx="11" style="fill:none;stroke:${BURG};stroke-width:4"/>
+    <circle cx="107" cy="70" r="4" style="fill:${BURG}"/>
+    <line x1="92" y1="38" x2="138" y2="38" style="stroke:${BURG};stroke-width:4"/><polygon points="138,38 129,33 129,43" style="fill:${BURG}"/>
+    <text x="12" y="20" style="fill:${BURG};font:bold 12px var(--sans)">✗ SLIDE</text>
+  </svg>`;
+  const clear=`<svg viewBox="0 0 170 158" role="img" aria-label="Hips clearing">
+    ${tgt}${feet}
+    <g transform="rotate(30 82 70)"><rect x="57" y="58" width="50" height="24" rx="11" style="fill:none;stroke:${GRN};stroke-width:4"/><circle cx="107" cy="70" r="4" style="fill:${GRN}"/></g>
+    <path d="M 60 32 q 45 -4 66 30" style="fill:none;stroke:${GRN};stroke-width:4"/><polygon points="126,62 129,49 118,55" style="fill:${GRN}"/>
+    <text x="12" y="20" style="fill:${GRN};font:bold 12px var(--sans)">✓ CLEAR</text>
+  </svg>`;
+  return `<div class="posfig">${slide}</div><div class="posfig">${clear}</div>`;
+}
+function swingPositions(){
+  const plan = S.briefings.find(b => /Swing Positions/i.test(b.course));
+  const F = [
+    {name:'1 · Address',    hip:[100,150], sh:[95,108],  head:[91,97], trailKnee:[80,182], leadKnee:[120,182], trailFoot:[74,212], leadFoot:[126,212], hands:[112,158], club:[117,208], ball:[117,208], wtLead:0.5,  hipOpen:0,  post:false, cap:'50/50 · hips level · hinge from the sockets · lead foot flared'},
+    {name:'2 · Top',        hip:[100,150], sh:[100,106], head:[93,95], trailKnee:[80,182], leadKnee:[122,182], trailFoot:[74,212], leadFoot:[126,212], hands:[64,78],  club:[40,52],  wtLead:0.25, hipOpen:0,  post:false, cap:'loaded into the trail glute · trail knee holds flex · shaft on line'},
+    {name:'3 · Transition', hip:[100,150], sh:[101,108], head:[92,96], trailKnee:[86,182], leadKnee:[122,182], trailFoot:[76,212], leadFoot:[126,212], hands:[84,140], club:[66,98],  wtLead:0.6,  hipOpen:14, post:false, cap:'press lead foot → hips clear → arms DROP'},
+    {name:'4 · Impact',     hip:[100,148], sh:[96,106],  head:[90,95], trailKnee:[86,184], leadKnee:[124,182], trailFoot:[80,214], leadFoot:[126,212], hands:[120,156],club:[112,208], ball:[112,208], wtLead:0.88, hipOpen:38, post:true,  cap:'80–90% lead · lead leg posts up · hips open 35–45° · hands ahead'},
+    {name:'5 · Finish',     hip:[100,150], sh:[103,104], head:[106,92],trailKnee:[92,184], leadKnee:[124,180], trailFoot:[82,214], leadFoot:[124,212], hands:[122,72], club:[152,96], wtLead:0.95, hipOpen:52, post:true,  cap:'stacked on lead · hips fully cleared · tall & held'},
+  ];
+  return `
+  <button class="backlink" data-action="go" data-view="swing">← Swing Lab</button>
+  <div class="card">
+    <h2>Swing Positions · visual guide</h2>
+    <p class="sm">Face-on checkpoints, address to finish. <b style="color:var(--burg)">Burgundy</b> = the pelvis / belt line · <b style="color:var(--gtext)">green</b> = the lead leg posting up. The shaded pad under each foot shows where your weight is; the curved arrow marks the hips clearing.</p>
+    <div class="posgrid">${F.map(posFig).join('')}</div>
+  </div>
+  <div class="card">
+    <h2>The hips · slide vs clear <span class="sm faint">(top-down)</span></h2>
+    <div class="hipcompare">${hipTopDown()}</div>
+    <p class="sm" style="margin-top:8px"><b class="warn">Slide</b> = the pelvis shifts sideways at the target and stays closed — no speed, hands flip to save the face. <b style="color:var(--gtext)">Clear</b> = the pelvis turns, the lead hip pulls back and up, and the belt buckle ends left of the ball. Feet shift, hips spin.</p>
+  </div>
+  ${plan ? `<div class="card flat"><div class="linkrow" data-action="open-briefing" data-id="${plan.id}"><b>Read the full checkpoint detail</b><span class="arr">→</span></div></div>` : ''}`;
 }
 
 function putting(){
