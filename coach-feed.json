@@ -1258,6 +1258,52 @@
       "id": "swing-film-numbers-action-20260726",
       "type": "action",
       "text": "Next sim session: grab launch data — driver attack angle / path / face-to-path / spin, wedge carry+spin+gaps — plus one DTL (hand-height) and one face-on clip per club, so the swing read is tied to numbers."
+    },
+    {
+      "id": "grip-experiment-done-20260726",
+      "type": "action-done",
+      "target": "grip-experiment-action"
+    },
+    {
+      "id": "rm-grip-plan-v2-20260726",
+      "type": "briefing-remove",
+      "target": "plan-grip-experiment-v2"
+    },
+    {
+      "id": "grip-decision-20260726",
+      "type": "history",
+      "date": "2026-07",
+      "text": "Grip Experiment CLOSED: conventional (reverse-overlap) confirmed best with the DF3i — no left-miss return, don't add complexity to a solved problem. LHL/claw shelved."
+    },
+    {
+      "id": "golf-mind-20260726",
+      "type": "briefing",
+      "briefing": {
+        "course": "Golf Mind",
+        "focus": "Jack's own swing thoughts & setup keys, in his words — the go-to reference before a round or a range session. Grip is settled: conventional. Updated Jul 26.",
+        "sections": [
+          {
+            "t": "Driver — the big stick",
+            "b": "Aim the CENTER of the fairway — the start line tends to pull left, so center-aim leaves room. The straight ball comes from a LONGER, fuller swing — commit to that one. A tighter, shorter swing turns it into a cut, and when that goes wrong the miss is a PUSH-SLICE. So: full swing for straight; if you shorten it, expect the cut and know the push-slice is the bad one."
+          },
+          {
+            "t": "Mini driver",
+            "b": "Weight BACK. Tee it LOW for the piercing straight ball — NEVER at normal driver-tee height. From that setup you can work it both ways, draw or fade. This is the fairway-finder off the tee; low tee + weight back is what makes it behave."
+          },
+          {
+            "t": "Irons",
+            "b": "Ball position right of center, toward the trail (right) thigh. The new KING TECs fly HIGHER and longer than the old set — trust the extra height. When you need to flight it down or take something off, CHOKE DOWN and hit the control shot rather than just swinging soft."
+          },
+          {
+            "t": "Wedges",
+            "b": "(Open — fill in as you dial the Vokeys: your go-to feels for full vs. partial, and any open-face/flop keys. Ladder to stay honest: 60°→80 · 56°→95 · 50°→108 · PW→122.)"
+          },
+          {
+            "t": "Putting — DF3i",
+            "b": "Ball off the FRONT foot. Rock the SHOULDERS — no hands. LOOSE grip. Hands over the ball: it FEELS like a forward press, but it isn't. Bend over MORE, stand CLOSE, and eyes stay DOWN through the strike. Grip settled: conventional / reverse-overlap won the experiment — no need to revisit it."
+          }
+        ]
+      }
     }
   ]
 }
