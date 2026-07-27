@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-07-21",
+  "updated": "2026-07-26",
   "entries": [
     {
       "id": "s4-session",
@@ -1167,6 +1167,143 @@
           "why": "DF3i pace calibration still open — gate/tunnel reps can't judge pace to a hole. Lag ladder drill stays on the card until the arrivals stop dying short."
         }
       ]
+    },
+    {
+      "id": "s9-driver-20260726",
+      "type": "session",
+      "date": "2026-07-26",
+      "setup": "FULL SWING · Driver · 5 phone stills (backswing → finish) · simulator bay",
+      "finding": "Well-sequenced, athletic driver swing — no glaring faults for an 8-cap. Full coil, lower-body-led transition, head behind the ball, balanced held finish. Two fine-tuning items: the club sits slightly ACROSS THE LINE / laid-off at the top, and the hips look to slide level through impact rather than clearing up-and-around. The 'feels great at the top but not through contact' complaint reads as a transition/hip-clearance thing, not a backswing problem.",
+      "detail": {
+        "metrics": [
+          { "k": "Shoulder turn", "v": "Full coil", "s": "good", "n": "back to target, head behind ball" },
+          { "k": "Transition", "v": "Lower body first", "s": "good", "n": "hips start down, no cast" },
+          { "k": "Top of swing", "v": "Across the line", "s": "warn", "n": "shaft points right of target, trail elbow drifts behind" },
+          { "k": "Hips thru impact", "v": "Slide > rotate", "s": "warn", "n": "level/slidey — wants to clear up & around" },
+          { "k": "Finish", "v": "Balanced · held", "s": "good", "n": "weight left, trail toe up" },
+          { "k": "Launch data", "v": "Can't assess", "s": "mid", "n": "no path/AoA/spin numbers in frame" }
+        ],
+        "story": "Five phone stills spanning top-of-backswing to finish. The bones are good: a genuinely full shoulder coil with the head staying behind the ball, a transition that starts from the ground up (hips opening while the hands still drop into the slot — not a cast from the top), and a committed, balanced finish that holds. Two things to fine-tune. (1) At the top the club is slightly across the line / laid off — shaft pointing right of target with the trail elbow drifting behind the body; that forces a small re-route coming down. (2) Through the delivery the hips look to slide level toward the target rather than clearing rotationally — which is exactly the 'great at the top, loses it through contact' feel. More lead-hip clearance would add speed and help hit UP on the driver.",
+        "compare": "Second full-swing entry on record (after the Jul 19 sim baseline). Same across-the-line top shows here AND in the wedge swing filmed the same day — a shared pattern, so it's worth fixing at the source rather than per-club.",
+        "limits": "Phone stills, one angle, no launch monitor readout captured — face angle, club path, attack angle and spin can't be measured. For a real breakdown film DTL slo-mo at hand height + face-on, and grab the sim's path/AoA/spin numbers so the visual read can be tied to data."
+      }
+    },
+    {
+      "id": "s10-wedge-20260726",
+      "type": "session",
+      "date": "2026-07-26",
+      "setup": "FULL SWING · Wedge · 5 phone stills (backswing → finish) · simulator bay",
+      "finding": "Strong wedge action — compact backswing, lower-body-led transition, and (the best part) spine angle well maintained through impact: a genuine ball-first, cover-the-ball look, the opposite of the driver and exactly right. Same slightly ACROSS-THE-LINE top as the driver shows up here too. Finish runs near-full; watch that partial-wedge distance control isn't riding a full swing every time.",
+      "detail": {
+        "metrics": [
+          { "k": "Backswing length", "v": "Compact", "s": "good", "n": "shortened from driver — correct" },
+          { "k": "Transition", "v": "Lower body first", "s": "good", "n": "drops into slot, no cast" },
+          { "k": "Top of swing", "v": "Across the line", "s": "warn", "n": "same laid-off look as the driver" },
+          { "k": "Spine / posture thru impact", "v": "Held · covers ball", "s": "good", "n": "stays down, hits down — ideal" },
+          { "k": "Strike look", "v": "Ball-first / descending", "s": "good", "n": "on top of it, not hanging back" },
+          { "k": "Finish / distance ctrl", "v": "Near-full", "s": "mid", "n": "fine for stock; flight partials for control" }
+        ],
+        "story": "Five phone stills, top to finish. The wedge swing's standout is impact: forward tilt and spine angle are well maintained, you stay 'on top of' the ball and cover it — a descending, ball-first strike, which is exactly what you want with a wedge and the mirror image of hitting up on the driver. Sequencing is the same good story as the driver — lower body leads, no cast. The one shared item is the top: slightly across the line / laid off, trail elbow drifting behind — the identical pattern to the driver frame, which is why the fix is one feel for both clubs. The finish runs close to full; for stock shots that's fine, just make sure partial-wedge distances come from controlled length and flight, not a full send every time.",
+        "compare": "Filmed the same day as the driver. Two things carry across both clubs: good ground-up sequencing (keep it) and the across-the-line top (fix it once, for both). The wedge's maintained spine angle is a nice contrast to the driver's slidey hips.",
+        "limits": "Phone stills, one angle, no launch data — face control, spin, launch and carry can't be read. Film DTL + face-on slo-mo and capture the sim's spin/launch/carry to flight and gap the wedges precisely."
+      }
+    },
+    {
+      "id": "plan-swing-hips-20260726",
+      "type": "briefing",
+      "briefing": {
+        "course": "Swing Focus — Hips & the Laid-Off Top",
+        "focus": "Two swings filmed Jul 26 share two traits: good ground-up sequencing (keep) and a slightly across-the-line top (fix). Your own read — 'feels great at the top but not through contact' — points at hip clearance in transition. This is the standing swing plan until the next filmed check.",
+        "sections": [
+          {
+            "t": "The one connection: laid-off top + stalled hips are the same story",
+            "b": "When the club gets across the line / laid off at the top (shaft pointing right of target, trail elbow drifting behind you), the downswing has to re-route the club to save the shot. The most common save is the hips SLIDING toward the target and the chest hanging back — which is precisely the 'great at the top, lose it through contact' feeling. So we don't chase two separate fixes: clean up the top so the hips don't have to bail you out, and train the hips to CLEAR (rotate open) instead of slide. Fix the cause, the symptom follows."
+          },
+          {
+            "t": "What the film showed (both clubs, Jul 26)",
+            "b": "GOOD, protect it: full coil, head behind the ball (driver), lower-body-led transition on both, and a balanced held finish. WEDGE bonus: spine angle stayed, you covered the ball — a proper descending strike. TO FIX: (1) slightly across-the-line top on BOTH clubs — one feel fixes both; (2) driver hips look to slide level through impact instead of clearing up-and-around. No launch numbers were in frame, so path/attack-angle/spin are still unmeasured — that's the next data to grab."
+          },
+          {
+            "t": "Fix 1 · Clean up the top (trail elbow in front)",
+            "b": "FEEL: at the top, the trail (right) elbow points more DOWN at the ground and stays in FRONT of your trail-hip seam, keeping the club a hair more in front of your chest. Right now the elbow drifts behind you, which lays the shaft off. DRILL — Split-hand / trail-arm-only: make slow half-swings feeling the trail elbow lead down into the slot; pause at the top and check the shaft points AT the target line, not right of it. Mirror or a phone on a tripod DTL at the top confirms it. 10 slow reps before you hit balls."
+          },
+          {
+            "t": "Fix 2 · Clear the hips, don't slide them",
+            "b": "FEEL: from the top, the lead (left) hip clears BACK and UP — belt buckle turning left and rotating open — while your chest stays over the ball a beat longer. Not a slide toward the target; a turn around a post. This is where your speed and your 'through contact' consistency live. DRILLS: (a) Trail-foot-back / step-through: hit half wedges stepping the trail foot back through impact — forces rotation over slide. (b) Lead-hip-to-the-wall: set up with your lead hip a few inches off a wall/bag; on the downswing the hip should clear so it just brushes back and up, not bump forward into it. (c) Chair/impact-bag: feel the trail glute fire and the hips deepen (not thrust toward the ball) so you don't early-extend. 2–3 sets of 10 each, twice a week."
+          },
+          {
+            "t": "Driver vs wedge — keep them different on purpose",
+            "b": "DRIVER: ball forward, hips clearing up-and-around so you hit slightly UP — that's carry and less spin. WEDGE: keep exactly what the film showed — stay down, cover the ball, hit DOWN; don't let 'clear the hips' turn into standing up out of a wedge. Same sequencing engine, opposite low-point. If a swing thought bleeds the wrong way, park it — the wedge is already good."
+          },
+          {
+            "t": "How to test it at the sim (get the numbers this time)",
+            "b": "The visual read can only go so far without data. Next session, capture and log these: DRIVER — attack angle (want positive / hitting up), club path, face-to-path, spin (are you spinning it too much?), and ball speed. WEDGES — carry, spin, launch, and gap-check 60/56/50 against the ladder (80/95/108). Film one DTL clip at hand height + one face-on per club. Bring those back and this plan gets a lot more precise — including whether the across-the-line top is actually costing you a path/face number or is just cosmetic."
+          }
+        ]
+      }
+    },
+    {
+      "id": "swing-hips-action-20260726",
+      "type": "action",
+      "pri": true,
+      "text": "SWING — Hip clearance: trail-foot-back + lead-hip-to-the-wall drills, 2×/week. Feel the lead hip clear BACK & UP through impact, don't slide. (Plan: Swing Focus on Home)"
+    },
+    {
+      "id": "swing-laidoff-action-20260726",
+      "type": "action",
+      "pri": true,
+      "text": "SWING — Fix the across-the-line top on BOTH clubs: trail elbow points down & stays in front of the trail-hip seam. 10 slow trail-arm reps before hitting balls; check the shaft points at the target line."
+    },
+    {
+      "id": "swing-film-numbers-action-20260726",
+      "type": "action",
+      "text": "Next sim session: grab launch data — driver attack angle / path / face-to-path / spin, wedge carry+spin+gaps — plus one DTL (hand-height) and one face-on clip per club, so the swing read is tied to numbers."
+    },
+    {
+      "id": "grip-experiment-done-20260726",
+      "type": "action-done",
+      "target": "grip-experiment-action"
+    },
+    {
+      "id": "rm-grip-plan-v2-20260726",
+      "type": "briefing-remove",
+      "target": "plan-grip-experiment-v2"
+    },
+    {
+      "id": "grip-decision-20260726",
+      "type": "history",
+      "date": "2026-07",
+      "text": "Grip Experiment CLOSED: conventional (reverse-overlap) confirmed best with the DF3i — no left-miss return, don't add complexity to a solved problem. LHL/claw shelved."
+    },
+    {
+      "id": "golf-mind-20260726",
+      "type": "briefing",
+      "briefing": {
+        "course": "Golf Mind",
+        "focus": "Jack's own swing thoughts & setup keys, in his words — the go-to reference before a round or a range session. Grip is settled: conventional. Updated Jul 26.",
+        "sections": [
+          {
+            "t": "Driver — the big stick",
+            "b": "Aim the CENTER of the fairway — the start line tends to pull left, so center-aim leaves room. The straight ball comes from a LONGER, fuller swing — commit to that one. A tighter, shorter swing turns it into a cut, and when that goes wrong the miss is a PUSH-SLICE. So: full swing for straight; if you shorten it, expect the cut and know the push-slice is the bad one."
+          },
+          {
+            "t": "Mini driver",
+            "b": "Weight BACK. Tee it LOW for the piercing straight ball — NEVER at normal driver-tee height. From that setup you can work it both ways, draw or fade. This is the fairway-finder off the tee; low tee + weight back is what makes it behave."
+          },
+          {
+            "t": "Irons",
+            "b": "Ball position right of center, toward the trail (right) thigh. The new KING TECs fly HIGHER and longer than the old set — trust the extra height. When you need to flight it down or take something off, CHOKE DOWN and hit the control shot rather than just swinging soft."
+          },
+          {
+            "t": "Wedges",
+            "b": "(Open — fill in as you dial the Vokeys: your go-to feels for full vs. partial, and any open-face/flop keys. Ladder to stay honest: 60°→80 · 56°→95 · 50°→108 · PW→122.)"
+          },
+          {
+            "t": "Putting — DF3i",
+            "b": "Ball off the FRONT foot. Rock the SHOULDERS — no hands. LOOSE grip. Hands over the ball: it FEELS like a forward press, but it isn't. Bend over MORE, stand CLOSE, and eyes stay DOWN through the strike. Grip settled: conventional / reverse-overlap won the experiment — no need to revisit it."
+          }
+        ]
+      }
     }
   ]
 }
