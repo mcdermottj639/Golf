@@ -1576,6 +1576,56 @@
       "type": "action-update",
       "target": "swing-laidoff-action-20260726",
       "text": "SWING — Fix the across-the-line top on BOTH clubs: trail elbow points down & in front of the trail-hip seam. Groove it with the one-handed Miracle 201 drop (the feel that's working) — a few slow reps before hitting balls; check the shaft points at the target line."
+    },
+    {
+      "id": "plan-swing-hips-20260727-3",
+      "type": "briefing",
+      "replaces": "plan-swing-hips-20260727-2",
+      "discipline": "full-swing",
+      "briefing": {
+        "course": "Swing Focus — Hips & the Laid-Off Top",
+        "focus": "Good ground-up sequencing (keep) and a slightly across-the-line top (fix); your read — 'great at the top, lose it through contact' — is hip clearance in transition, and it's the SAME root as your lifelong over-the-top slice (Fix 3). WORKING (Jul 27): one-handed Miracle 201 swings are landing the drop into the slot. Standing swing plan until the next filmed check.",
+        "sections": [
+          {
+            "t": "✓ What's working — one-handed Miracle 201 drop",
+            "b": "CONFIRMED (Jul 27): swinging the MIRACLE 201 ONE-HANDED (trail/right hand only) tonight really helped you FEEL the club drop into the slot in transition. Make it your go-to reset — the heavy, whippy head with just the trail hand forces the elbow to lead DOWN (in front of the trail-hip seam) and shallows the shaft, so the hips can clear instead of the club laying off. Use it as a warm-up primer and any time the top gets across the line: a few slow one-handed 201 reps feeling the drop, then blend it into your two-hand swing. A club held trail-arm-only works as a stand-in when the trainer isn't handy."
+          },
+          {
+            "t": "The one connection: laid-off top, stalled hips AND the over-the-top slice are one story",
+            "b": "When the club gets across the line / laid off at the top (shaft pointing right of target, trail elbow drifting behind you), the downswing has to re-route the club to save the shot. Two re-routes usually happen together: the hips SLIDE toward the target and the chest hangs back (the 'lose it through contact' feel), AND the trail shoulder throws the club OUT over the plane so it cuts across the ball — that's the over-the-top slice. One cause, three symptoms. So we don't chase three fixes: clean up the top, drop the club into the slot (shallow), and let the hips CLEAR — and all three symptoms go with it."
+          },
+          {
+            "t": "What the film showed (both clubs, Jul 26)",
+            "b": "GOOD, protect it: full coil, head behind the ball (driver), lower-body-led transition on both, and a balanced held finish. WEDGE bonus: spine angle stayed, you covered the ball — a proper descending strike. TO FIX: (1) slightly across-the-line top on BOTH clubs — one feel fixes both; (2) driver hips look to slide level through impact instead of clearing up-and-around. No launch numbers were in frame, so path/attack-angle/spin are still unmeasured — that's the next data to grab."
+          },
+          {
+            "t": "Fix 1 · Clean up the top (trail elbow in front)",
+            "b": "FEEL: at the top, the trail (right) elbow points more DOWN at the ground and stays in FRONT of your trail-hip seam, keeping the club a hair more in front of your chest. Right now the elbow drifts behind you, which lays the shaft off. DRILL — the one-handed Miracle 201 (or club trail-arm-only): make slow half-swings feeling the trail elbow lead down into the slot; pause at the top and check the shaft points AT the target line, not right of it. Mirror or a phone on a tripod DTL at the top confirms it. 10 slow reps before you hit balls. (This is the drill that's working for you — see 'What's working' above.)"
+          },
+          {
+            "t": "Fix 2 · Clear the hips, don't slide them",
+            "b": "FEEL: from the top, the lead (left) hip clears BACK and UP — belt buckle turning left and rotating open — while your chest stays over the ball a beat longer. Not a slide toward the target; a turn around a post. This is where your speed and your 'through contact' consistency live. DRILLS: (a) Trail-foot-back / step-through: hit half wedges stepping the trail foot back through impact — forces rotation over slide. (b) Lead-hip-to-the-wall: set up with your lead hip a few inches off a wall/bag; on the downswing the hip should clear so it just brushes back and up, not bump forward into it. (c) Chair/impact-bag: feel the trail glute fire and the hips deepen (not thrust toward the ball) so you don't early-extend. 2–3 sets of 10 each, twice a week."
+          },
+          {
+            "t": "Fix 3 · Your over-the-top slice — same root, plus the path & face piece",
+            "b": "The lifelong slice comes from the SAME move: OVER THE TOP means in transition the upper body (trail shoulder) takes over and throws the club OUT and over the plane, so it swings across the ball OUT-TO-IN; with an open face that start-left, curve-right is your slice (a square face on that same path is a pull). Everything in this plan already fixes the CAUSE — the one-handed drop shallows the club, the trail elbow leading down puts it on line, and the hips CLEARING makes room so the arms deliver from the INSIDE instead of over the top. The extra piece is PATH then FACE. (1) PATH feel: from the top, feel the club fall behind you and swing OUT toward right-center field (in-to-out). DRILL — put a headcover/water bottle a few inches OUTSIDE the ball on the target line; swing so you miss it (coming over the top clips it). (2) FACE: a slice also needs an open face — once your path comes from the inside, if the ball still fades or you start pulling, the face is open to the path; with your conventional grip, let the trail forearm rotate/release through and check the grip isn't too weak. Fix PATH FIRST — chasing the face while still coming over the top just makes a bigger slice or a smother-hook."
+          },
+          {
+            "t": "Driver vs wedge — keep them different on purpose",
+            "b": "DRIVER: ball forward, hips clearing up-and-around so you hit slightly UP — that's carry and less spin. WEDGE: keep exactly what the film showed — stay down, cover the ball, hit DOWN; don't let 'clear the hips' turn into standing up out of a wedge. Same sequencing engine, opposite low-point. If a swing thought bleeds the wrong way, park it — the wedge is already good."
+          },
+          {
+            "t": "How to test it at the sim (get the numbers this time)",
+            "b": "The visual read can only go so far without data. Next session, capture and log these: DRIVER — attack angle (want positive / hitting up), CLUB PATH (over-the-top shows as a negative/left number — you want it near zero to slightly positive/right), FACE-TO-PATH (that's what curves it), spin, and ball speed. WEDGES — carry, spin, launch, and gap-check 60/56/50 against the ladder (80/95/108). Film one DTL clip at hand height + one face-on per club. Bring those back and we can prove whether the path is actually coming from the inside now."
+          }
+        ]
+      }
+    },
+    {
+      "id": "swing-ott-action-20260727",
+      "type": "action",
+      "pri": true,
+      "text": "SWING — Kill the over-the-top slice: headcover/bottle just OUTSIDE the ball on the target line, swing to miss it (from the inside, out to right-center field). Path first, then release the face. Drop into the slot with the one-handed 201 first."
     }
   ]
 }
