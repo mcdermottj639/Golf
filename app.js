@@ -636,6 +636,26 @@ function topShaft(){
     <text x="30" y="20" style="fill:${BURG};font:bold 10px var(--sans)">✗ across the line — points right (your tendency)</text>
   </svg>`;
 }
+// Top-down club path + ball flight: over-the-top slice vs from-the-inside.
+function pathDiagram(){
+  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)';
+  const stage=`<line x1="84" y1="150" x2="84" y2="34" style="stroke:${FNT};stroke-width:1.5;stroke-dasharray:4 4"/><polygon points="84,30 96,35 84,40" style="fill:${FNT}"/><text x="90" y="30" style="fill:${FNT};font:8px var(--sans)">target</text><circle cx="84" cy="150" r="4" style="fill:#fff;stroke:${INK};stroke-width:2"/>`;
+  const ott=`<svg viewBox="0 0 168 168" role="img" aria-label="Over the top, out-to-in, slice">
+    ${stage}
+    <line x1="120" y1="166" x2="52" y2="126" style="stroke:${BURG};stroke-width:5;stroke-linecap:round"/><polygon points="52,126 63,127 57,136" style="fill:${BURG}"/>
+    <text x="112" y="150" style="fill:${BURG};font:8px var(--sans)">out→in</text>
+    <path d="M 84 150 C 84 112 100 84 128 50" style="fill:none;stroke:${BURG};stroke-width:3;stroke-dasharray:5 4"/><polygon points="128,50 120,58 131,60" style="fill:${BURG}"/>
+    <text x="8" y="18" style="fill:${BURG};font:bold 11px var(--sans)">✗ Over the top → slice</text>
+  </svg>`;
+  const inside=`<svg viewBox="0 0 168 168" role="img" aria-label="From the inside, straight or draw">
+    ${stage}
+    <line x1="48" y1="166" x2="116" y2="126" style="stroke:${GRN};stroke-width:5;stroke-linecap:round"/><polygon points="116,126 105,127 111,136" style="fill:${GRN}"/>
+    <text x="40" y="150" style="fill:${GRN};font:8px var(--sans)">in→out</text>
+    <path d="M 84 150 C 84 112 80 84 74 50" style="fill:none;stroke:${GRN};stroke-width:3"/><polygon points="74,50 70,60 80,57" style="fill:${GRN}"/>
+    <text x="8" y="18" style="fill:${GRN};font:bold 11px var(--sans)">✓ From the inside</text>
+  </svg>`;
+  return `<div class="posfig">${ott}</div><div class="posfig">${inside}</div>`;
+}
 function swingPositions(){
   const plan = S.briefings.find(b => /Swing Positions/i.test(b.course));
   const F = [
@@ -668,6 +688,11 @@ function swingPositions(){
     <h2>Shaft at the top <span class="sm faint">(down-the-line)</span></h2>
     <div class="posfig" style="padding:8px 6px">${topShaft()}</div>
     <p class="sm" style="margin-top:8px">Your tendency is <b class="warn">across the line</b> — at the top the shaft points right of the target. The fix is Fix 1: feel the <b>trail elbow lead down</b> and the shaft drops back <b style="color:var(--gtext)">on line</b>. The one-handed Miracle 201 drop trains this directly.</p>
+  </div>
+  <div class="card">
+    <h2>Club path · your slice <span class="sm faint">(top-down)</span></h2>
+    <div class="hipcompare">${pathDiagram()}</div>
+    <p class="sm" style="margin-top:8px">Your slice is an <b class="warn">over-the-top</b> path — the upper body throws the club out, then across the ball <b>out-to-in</b>; an open face turns that into start-left, curve-right. <b>Same cure as everything above:</b> shallow the club (the one-handed drop) and let the hips CLEAR so the club falls behind you and swings from the <b style="color:var(--gtext)">inside</b>. Feel it: swing out toward right-center field; a headcover just <i>outside</i> the ball that you must miss forces the inside path. Fix the path first — then the face.</p>
   </div>
   ${plan ? `<div class="card flat"><div class="linkrow" data-action="open-briefing" data-id="${plan.id}"><b>Read the full checkpoint detail</b><span class="arr">→</span></div></div>` : ''}`;
 }
