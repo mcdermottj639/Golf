@@ -1335,6 +1335,54 @@
           }
         ]
       }
+    },
+    {
+      "id": "plan-miracle201-20260727",
+      "type": "briefing",
+      "briefing": {
+        "course": "At-Home Training — Miracle 201",
+        "focus": "Your WINNERSPIRIT Miracle 201 is the perfect home tool for the two things the Jul 26 film flagged: sequencing (hips lead) and releasing THROUGH contact instead of losing it. This is the standing at-home practice plan. Pairs with the Swing Focus plan.",
+        "sections": [
+          {
+            "t": "How the tool talks to you (read first)",
+            "b": "The Miracle 201 is a weighted (~550g), whippy carbon/glass-fiber trainer with TWO feedback channels. (1) THE CLICK: a slider fires an audible click at the point of maximum speed in your swing — WHERE you hear it tells you WHEN you're releasing. (2) THE SPEED DIAL: adjustable from ~15–50 m/s (≈34–111 mph); it sets how much speed is needed to trigger the click. Turn it DOWN for tempo work, UP to demand more clubhead speed or simulate a longer club. Because the shaft is heavy and flexible, you physically cannot rush it — it forces you to load and wait, which is exactly the medicine for your quick, across-the-line top."
+          },
+          {
+            "t": "Setup & safety — every session",
+            "b": "Space: ~8 ft clear all around and a high ceiling (garage, basement with clearance, or backyard). Never near people, lights, or a TV. Hold it with your normal CONVENTIONAL grip and your real posture — this only transfers if the setup matches your actual swing. WARM UP FIRST: 20–30 slow, smooth swings before anything hard — at 550g it's heavier than your driver and a cold max swing is how you tweak a back or oblique. Do a few swings LEFT-handed too (opposite of normal) each session — it balances the body and builds the anti-rotation muscles that protect you."
+          },
+          {
+            "t": "Drill 1 · Tempo & sequencing — the load-and-wait (core)",
+            "b": "Dial LOW. Make smooth 3:1 swings and FEEL the shaft bend and lag behind your hands at the top — if you snatch from the top it flails and clicks early/weak. Count 'one-and-… two': long patient load back, unhurried transition, then let it sling. This directly rewires the 'great at the top but quick coming down' pattern. 2 sets of 10, both directions. This is the most important drill on the list — do it every session."
+          },
+          {
+            "t": "Drill 2 · Impact timing — make the CLICK fire PAST the ball",
+            "b": "This one targets your exact complaint: 'lose it through contact.' GOAL: the click should crack at the BOTTOM of the arc — at or just PAST your lead leg — not up in the downswing. An EARLY click = casting / throwing the release away before impact (all your speed spent above the ball). Keep the wrists hinged and let the head release LATE so the click fires down by where the ball would be. 3 sets of 8. Listen every rep and adjust until the click consistently lives at/after the bottom."
+          },
+          {
+            "t": "Drill 3 · Transition & hips-lead (ties to Swing Focus)",
+            "b": "From the top, start down with the LOWER BODY — feel the lead hip clear BACK and UP while the trainer's head still lags behind. Because the head is heavy and slow to catch up, it exaggerates the hips-lead-hands feeling you need. If you spin the shoulders/arms first, the click comes early and weak — instant feedback that you cast. Do this right after the wall / trail-foot-back drills in your Swing Focus plan so the feel carries over. 2 sets of 8."
+          },
+          {
+            "t": "Drill 4 · Top-of-swing check — kill the laid-off shaft",
+            "b": "Slow reps to a PAUSE at the top. Feel the trail (right) elbow point down and stay IN FRONT of your trail-hip seam — the whippy shaft makes an across-the-line/laid-off top feel obviously 'stuck' and off-plane, which a normal club hides. Check in a mirror or a phone on a tripod that the shaft points at the target line, not right of it. 10 slow reps, no speed — this is a position drill."
+          },
+          {
+            "t": "Drill 5 · Speed sets (separate days)",
+            "b": "Dial UP. After a full warm-up: all-out swings for pure speed — at higher dial settings the click ONLY fires if you genuinely accelerate through the bottom. Protocol: 3 sets of 5 MAX-effort swings with full rest between sets (this is nervous-system/speed work — quality over quantity, never grind it into cardio). Throw in a few non-dominant-side swings. Benchmark: the highest dial setting you can consistently trigger — track it over weeks and watch it climb."
+          },
+          {
+            "t": "Weekly plan & what to log",
+            "b": "2–3 short sessions/week, 10–15 min each — and DON'T max out every time: alternate a TEMPO/TIMING day (Drills 1–4, low dial) with a SPEED day (Drill 5, high dial). Pre-round: 15–20 easy swings as a dynamic warm-up and tempo primer. Log in Coach: the dial setting you can reliably trigger, and whether the click is firing at/past the ball yet. Next time you film at the sim we'll check whether the later release and hips-lead carried into the real swing."
+          }
+        ]
+      }
+    },
+    {
+      "id": "miracle201-action-20260727",
+      "type": "action",
+      "pri": true,
+      "text": "Miracle 201 at home — 2–3×/week: alternate a tempo/timing day (low dial, Drills 1–4) and a speed day (high dial). Priority feel: make the CLICK fire at/just PAST the ball to kill the early release. (Plan: At-Home Training on Home)"
     }
   ]
 }
