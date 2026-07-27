@@ -1382,7 +1382,59 @@
       "id": "miracle201-action-20260727",
       "type": "action",
       "pri": true,
-      "text": "Miracle 201 at home — 2–3×/week: alternate a tempo/timing day (low dial, Drills 1–4) and a speed day (high dial). Priority feel: make the CLICK fire at/just PAST the ball to kill the early release. (Plan: At-Home Training on Home)"
+      "text": "Miracle 201 at home — 2–3×/week: alternate a tempo/timing day (low dial, Drills 1–4) and a speed day (high dial). Priority feel: make the CLICK fire at/just PAST the ball to kill the early release. (Plan: At-Home Training in the Swing lab)"
+    },
+    {
+      "id": "plan-swing-hips-20260727",
+      "type": "briefing",
+      "replaces": "plan-swing-hips-20260726",
+      "discipline": "full-swing",
+      "briefing": {
+        "course": "Swing Focus — Hips & the Laid-Off Top",
+        "focus": "Two swings filmed Jul 26 share two traits: good ground-up sequencing (keep) and a slightly across-the-line top (fix). Your own read — 'feels great at the top but not through contact' — points at hip clearance in transition. WORKING (Jul 27): one-arm/trail-arm swings are landing the drop into the slot. Standing swing plan until the next filmed check.",
+        "sections": [
+          {
+            "t": "✓ What's working — the one-arm (trail-arm) drop",
+            "b": "CONFIRMED (Jul 27): one-arm, right-hand-only swings really helped you FEEL the club drop into the slot in transition. Make this your go-to reset — it trains Fix 1 directly (trail elbow leading DOWN, in front of the trail-hip seam) and starts the shallowing that lets the hips clear instead of the shaft laying off. Use it as a warm-up primer and any time the top gets across the line: a few slow trail-arm-only reps feeling the elbow lead the drop, then blend it back into the two-arm swing. The Miracle 201 one-handed is a great way to exaggerate the same feel."
+          },
+          {
+            "t": "The one connection: laid-off top + stalled hips are the same story",
+            "b": "When the club gets across the line / laid off at the top (shaft pointing right of target, trail elbow drifting behind you), the downswing has to re-route the club to save the shot. The most common save is the hips SLIDING toward the target and the chest hanging back — which is precisely the 'great at the top, lose it through contact' feeling. So we don't chase two separate fixes: clean up the top so the hips don't have to bail you out, and train the hips to CLEAR (rotate open) instead of slide. Fix the cause, the symptom follows."
+          },
+          {
+            "t": "What the film showed (both clubs, Jul 26)",
+            "b": "GOOD, protect it: full coil, head behind the ball (driver), lower-body-led transition on both, and a balanced held finish. WEDGE bonus: spine angle stayed, you covered the ball — a proper descending strike. TO FIX: (1) slightly across-the-line top on BOTH clubs — one feel fixes both; (2) driver hips look to slide level through impact instead of clearing up-and-around. No launch numbers were in frame, so path/attack-angle/spin are still unmeasured — that's the next data to grab."
+          },
+          {
+            "t": "Fix 1 · Clean up the top (trail elbow in front)",
+            "b": "FEEL: at the top, the trail (right) elbow points more DOWN at the ground and stays in FRONT of your trail-hip seam, keeping the club a hair more in front of your chest. Right now the elbow drifts behind you, which lays the shaft off. DRILL — Split-hand / trail-arm-only: make slow half-swings feeling the trail elbow lead down into the slot; pause at the top and check the shaft points AT the target line, not right of it. Mirror or a phone on a tripod DTL at the top confirms it. 10 slow reps before you hit balls. (This is the drill that's working for you — see 'What's working' above.)"
+          },
+          {
+            "t": "Fix 2 · Clear the hips, don't slide them",
+            "b": "FEEL: from the top, the lead (left) hip clears BACK and UP — belt buckle turning left and rotating open — while your chest stays over the ball a beat longer. Not a slide toward the target; a turn around a post. This is where your speed and your 'through contact' consistency live. DRILLS: (a) Trail-foot-back / step-through: hit half wedges stepping the trail foot back through impact — forces rotation over slide. (b) Lead-hip-to-the-wall: set up with your lead hip a few inches off a wall/bag; on the downswing the hip should clear so it just brushes back and up, not bump forward into it. (c) Chair/impact-bag: feel the trail glute fire and the hips deepen (not thrust toward the ball) so you don't early-extend. 2–3 sets of 10 each, twice a week."
+          },
+          {
+            "t": "Driver vs wedge — keep them different on purpose",
+            "b": "DRIVER: ball forward, hips clearing up-and-around so you hit slightly UP — that's carry and less spin. WEDGE: keep exactly what the film showed — stay down, cover the ball, hit DOWN; don't let 'clear the hips' turn into standing up out of a wedge. Same sequencing engine, opposite low-point. If a swing thought bleeds the wrong way, park it — the wedge is already good."
+          },
+          {
+            "t": "How to test it at the sim (get the numbers this time)",
+            "b": "The visual read can only go so far without data. Next session, capture and log these: DRIVER — attack angle (want positive / hitting up), club path, face-to-path, spin (are you spinning it too much?), and ball speed. WEDGES — carry, spin, launch, and gap-check 60/56/50 against the ladder (80/95/108). Film one DTL clip at hand height + one face-on per club. Bring those back and this plan gets a lot more precise — including whether the across-the-line top is actually costing you a path/face number or is just cosmetic."
+          }
+        ]
+      }
+    },
+    {
+      "id": "swing-hips-action-fix-20260727",
+      "type": "action-update",
+      "target": "swing-hips-action-20260726",
+      "text": "SWING — Hip clearance: trail-foot-back + lead-hip-to-the-wall drills, 2×/week. Feel the lead hip clear BACK & UP through impact, don't slide. (Plan: Swing Focus in the Swing lab)"
+    },
+    {
+      "id": "swing-laidoff-action-fix-20260727",
+      "type": "action-update",
+      "target": "swing-laidoff-action-20260726",
+      "text": "SWING — Fix the across-the-line top on BOTH clubs: trail elbow points down & in front of the trail-hip seam. Groove it with the one-arm/trail-arm drop drill (the feel that's working) — 10 slow reps before hitting balls; check the shaft points at the target line."
     }
   ]
 }
