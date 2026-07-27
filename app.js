@@ -265,6 +265,7 @@ function weekStreak(){
 const TITLES = {
   home:['Caddie HQ','Your bag, your stroke, your game — one book.'],
   bag:['My Bag','Every club, every spec, and the story of every change.'],
+  swing:['Swing Lab','Driver to wedge — film, plans, and speed work.'],
   putting:['Putting Lab','The left-miss project — tracked until it’s dead.'],
   coach:['Coach','Lessons that follow your game — not generic tips.'],
   courses:['Courses','Everywhere you’ve played, rated and remembered.'],
@@ -281,7 +282,7 @@ function render(view, arg){
   $('#pageTag').textContent = tag;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === view));
-  const R = { home, bag, putting, coach, courses, decisions, data:dataView, shelf, lesson, session:sessionView, briefing }[view] || home;
+  const R = { home, bag, swing, putting, coach, courses, decisions, data:dataView, shelf, lesson, session:sessionView, briefing }[view] || home;
   $('#view').innerHTML = R(arg);
   window.scrollTo(0,0);
 }
@@ -325,17 +326,16 @@ function home(){
 
   ${(() => {
     const today10 = today();
-    const up = S.briefings.filter(b => !b.date || b.date >= today10).sort((a,b) => (a.date||'').localeCompare(b.date||''));
-    const recent = S.briefings.filter(b => b.date && b.date < today10).slice(-1);
-    const recent3 = S.briefings.filter(b => b.date && b.date < today10 &&
-      (new Date(today10) - new Date(b.date)) < 4*86400000);
-    const rows = [...up, ...recent3.slice(-1)].slice(0, 3);
+    const up = S.briefings.filter(b => b.date && b.date >= today10).sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    const recent = S.briefings.filter(b => b.date && b.date < today10 &&
+      (new Date(today10) - new Date(b.date)) < 4*86400000).slice(-1);
+    const rows = [...up, ...recent].slice(0, 3);
     return `<div class="card">
-      <h2>Round prep & plans</h2>
+      <h2>Round prep</h2>
       ${rows.length ? rows.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-        <span><b>${esc(b.course)}</b><span class="sm faint"> · ${b.date ? fmtDate(b.date) + (b.date < today10 ? ' (played)' : '') : 'standing plan'}</span><br>
+        <span><b>${esc(b.course)}</b><span class="sm faint"> · ${fmtDate(b.date)}${b.date < today10 ? ' (played)' : ''}</span><br>
         <span class="sm">${esc(b.focus || 'Briefing ready')}</span></span><span class="arr">→</span></div>`).join('')
-      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round.</p>`}
+      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Golf Mind, Miracle 201) live in the <b>Swing</b> lab.</p>`}
     </div>`;
   })()}
 
@@ -522,6 +522,45 @@ function ladderHTML(wedges){
 }
 
 // ----- Putting Lab -----
+// A session belongs to the Swing Lab if its setup names the full swing or a
+// full-swing club; everything else (the putter project) stays in the Putting Lab.
+// Read setup only — putting findings mention "backswing", which must not match.
+function sessionDiscipline(s){
+  return /full[\s-]?swing|driver|\biron\b|\bwedge\b|mini/i.test(s.setup || '') ? 'swing' : 'putting';
+}
+
+// ----- Swing Lab -----
+function swing(){
+  const sessions = S.sessions.map((s,i) => ({ s, i })).filter(o => sessionDiscipline(o.s) === 'swing').reverse();
+  const plans = S.briefings.filter(b => !b.date && (b.discipline || 'swing') !== 'putting');
+  return `
+  <div class="card">
+    <h2>The swing</h2>
+    <p class="sm">Driver through wedge — your film breakdowns, standing plans, and at-home training in one place.${sessions.length ? '' : ' Send Claude swing clips (down-the-line + face-on) and the breakdowns land here.'}</p>
+  </div>
+
+  ${plans.length ? `<h2>Plans &amp; training</h2>
+  <div class="card">
+    ${plans.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
+      <span><b>${esc(b.course)}</b><br><span class="sm">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('')}
+  </div>` : ''}
+
+  <h2>Film room</h2>
+  <div class="card">
+    ${sessions.length ? `<p class="sm faint" style="margin-bottom:4px">Tap a session for the full breakdown.</p>
+    <table><tr><th>Date</th><th>Setup</th><th>Finding</th></tr>
+    ${sessions.map(({s,i}) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)} ${s.detail?'<span class="faint">▸</span>':''}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
+    </table>` : '<p class="sm faint">No swing sessions logged yet.</p>'}
+  </div>
+
+  <h2>Filming guide</h2>
+  <div class="card flat">
+    <p class="sm"><b>1 · Down-the-line</b> — behind the ball, camera at hand/hip height on the target line: plane, path, shaft position at the top.<br>
+    <b>2 · Face-on</b> — chest height, square to you: posture, weight shift, hip clearance, low point.<br>
+    Film 3 swings per angle in slo-mo (240fps), and grab the sim's numbers — path, attack angle, face-to-path, spin, carry.</p>
+  </div>`;
+}
+
 function putting(){
   const entries = S.fiveFt.slice(-6);
   const mc = missCounts();
@@ -531,6 +570,10 @@ function putting(){
     <h2>The diagnosis</h2>
     <p class="sm"><b>Two levers behind the left miss:</b> (1) equipment — max-toe-flow putter + toe-up lie on a confirmed <b>straight SBST stroke</b>; (2) mechanics — face closes through impact, timing-dependent. Fix: zero-torque head at 34" + lie set flat + the two drills below.</p>
   </div>
+
+  ${(() => { const pl = S.briefings.filter(b => !b.date && b.discipline === 'putting');
+    return pl.length ? `<h2>Plans</h2><div class="card">${pl.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
+      <span><b>${esc(b.course)}</b><br><span class="sm">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('')}</div>` : ''; })()}
 
   <h2>5-footer scoreboard</h2>
   <div class="card">
@@ -571,7 +614,7 @@ function putting(){
   <div class="card">
     <p class="sm faint" style="margin-bottom:4px">Tap a session for the full film breakdown.</p>
     <table><tr><th>Date</th><th>Setup</th><th>Finding</th></tr>
-    ${S.sessions.map((s,i) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)} ${s.detail?'<span class="faint">▸</span>':''}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
+    ${S.sessions.map((s,i) => ({s,i})).filter(o => sessionDiscipline(o.s) === 'putting').map(({s,i}) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)} ${s.detail?'<span class="faint">▸</span>':''}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
     </table>
     <details><summary>+ Log a session</summary>
       <label>Setup (angle · strokes)</label><input id="sesSetup" placeholder="e.g. 5 strokes · overhead, zero-torque demo">
@@ -686,8 +729,9 @@ function sessionView(i){
   if(!s) return putting();
   const d = s.detail;
   const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
+  const disc = sessionDiscipline(s);
   return `
-  <button class="backlink" data-action="go" data-view="putting">← Putting Lab</button>
+  <button class="backlink" data-action="go" data-view="${disc==='swing'?'swing':'putting'}">← ${disc==='swing'?'Swing Lab':'Putting Lab'}</button>
   <div class="card">
     <h2>${fmtDate(s.date)} · film breakdown</h2>
     <h3>${esc(s.setup)}</h3>
@@ -714,8 +758,10 @@ function briefing(id){
   if(!b) return home();
   const played = S.courses.find(c => c.name.toLowerCase() === b.course.toLowerCase());
   const wx = playsFactor();
+  const backView = b.date ? 'home' : (b.discipline === 'putting' ? 'putting' : 'swing');
+  const backLabel = b.date ? 'Home' : (b.discipline === 'putting' ? 'Putting Lab' : 'Swing Lab');
   return `
-  <button class="backlink" data-action="go" data-view="home">← Home</button>
+  <button class="backlink" data-action="go" data-view="${backView}">← ${backLabel}</button>
   <div class="card">
     <h2>${b.date ? 'Round prep · ' + fmtDate(b.date) : 'Standing plan'}</h2>
     <h3 style="font-size:19px">${esc(b.course)}</h3>
