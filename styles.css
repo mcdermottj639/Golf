@@ -177,7 +177,7 @@ td b{font-size:14px}
 .poslegend i.arc{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--burg);border-left-color:transparent;border-bottom-color:transparent;transform:rotate(45deg)}
 
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:30;
-  display:grid;grid-template-columns:repeat(6,1fr);padding:8px 6px calc(10px + env(safe-area-inset-bottom));
+  display:grid;grid-template-columns:repeat(7,1fr);padding:8px 6px calc(10px + env(safe-area-inset-bottom));
   text-align:center;background:var(--green);color:#a8bfa8;font-family:var(--sans)}
 nav button{background:none;border:none;color:#a8bfa8;font-size:9.5px;font-weight:700;padding:2px 0}
 nav button .ic{font-size:19px;display:block;margin-bottom:1px}
@@ -263,3 +263,11 @@ body.night .themebtn{background:rgba(255,255,255,.06);border-color:rgba(255,255,
 body.night .badge{background:linear-gradient(135deg,#1f6440,#123c26)}
 body.night .meter, body.night .tap, body.night .day{border-radius:10px}
 body.night table{font-family:var(--sans)}
+
+/* ---- Scores: scoring-mix bar ---- */
+.mixbar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line2)}
+.mixbar span{display:block;height:100%}
+.mixbar .birdie{background:var(--green)}
+.mixbar .par{background:#7d9a7d}
+.mixbar .bogey{background:#d8c48a}
+.mixbar .double{background:var(--burg)}
