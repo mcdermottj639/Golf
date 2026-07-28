@@ -1750,6 +1750,95 @@
       "type": "action",
       "pri": true,
       "text": "PUTTING — Add a pace step to the routine: one rehearsal stroke made while LOOKING AT THE HOLE, sized to the putt, between the hole-look and the spot-look. Then test eyes-on-hole through the stroke on lags past 25 ft: 10 vs 10, measure the spread."
+    },
+    {
+      "id": "golf-mind-20260728",
+      "type": "briefing",
+      "replaces": "golf-mind-20260727",
+      "briefing": {
+        "course": "Golf Mind",
+        "focus": "Jack's own swing thoughts & setup keys, in his words — the go-to reference before a round or a range session. Grip is settled: conventional. Putting setup & press locked Jul 28.",
+        "sections": [
+          {
+            "t": "Driver — the big stick",
+            "b": "Aim the CENTER of the fairway — the start line tends to pull left, so center-aim leaves room. The straight ball comes from a LONGER, fuller swing — commit to that one. A tighter, shorter swing turns it into a cut, and when that goes wrong the miss is a PUSH-SLICE. So: full swing for straight; if you shorten it, expect the cut and know the push-slice is the bad one."
+          },
+          {
+            "t": "Mini driver",
+            "b": "Club setup: the r7 Quad's adjustable WEIGHTS are set in the BACK position. Tee it LOW for the piercing straight ball — NEVER at normal driver-tee height. From that setup you can work it both ways, draw or fade. This is the fairway-finder off the tee; weights back + low tee is what makes it behave."
+          },
+          {
+            "t": "Irons",
+            "b": "Ball position right of center, toward the trail (right) thigh. The new KING TECs fly HIGHER and longer than the old set — trust the extra height. When you need to flight it down or take something off, CHOKE DOWN and hit the control shot rather than just swinging soft."
+          },
+          {
+            "t": "Wedges",
+            "b": "(Open — fill in as you dial the Vokeys: your go-to feels for full vs. partial, and any open-face/flop keys. Ladder to stay honest: 60°→80 · 56°→95 · 50°→108 · PW→122.)"
+          },
+          {
+            "t": "Putting — DF3i",
+            "b": "Ball off the LEFT BREAST — chest reference, not foot: the stroke arc centers on your sternum, so that cue travels even when your stance width drifts. WEIGHT STACKED ON THE BALL (this is what pins the low point — it's the whole fix from the weight-back experiment). Rock the SHOULDERS — no hands. LOOSE grip. AT ADDRESS the hands sit EVEN with the ball: the Press Pistol's built-in 2° does the leaning, which is why it FEELS like a forward press without being one. THEN a deliberate small FORWARD PRESS to trigger the stroke — these are not in conflict: address is neutral, the press is the starter motor. Same size every time, or the loft changes and pace goes with it. Bend over MORE, stand CLOSE, eyes DOWN through the strike. Two practice strokes — one eyes on ball, one eyes on hole; the hole one is the PACE stroke, keep it last. Grip settled: conventional / reverse-overlap won the experiment — no need to revisit it."
+          }
+        ]
+      }
+    },
+    {
+      "id": "plan-putt-routine-20260728-v2",
+      "type": "briefing",
+      "replaces": "plan-putt-routine-20260728",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "Jack's settled DF3i setup and full pre-putt routine, in his words. Corrected Jul 28: the routine DOES contain a pace step — two rehearsal strokes, one eyes-on-ball and one eyes-on-hole. The real issue is where they sit in the sequence.",
+        "sections": [
+          {
+            "t": "The setup",
+            "b": "Ball off the LEFT BREAST. Weight stacked ON the ball (confirmed: pressure over the ball, not on the trail foot). Normal address, hands even with the ball. Forward press right before contact, then putt."
+          },
+          {
+            "t": "Why the chest reference beats the foot reference",
+            "b": "'Left breast' is the better cue — keep it. A shoulder-rocked stroke arcs around your STERNUM, not your feet, so referencing the ball to your chest points it at the thing that actually governs the low point. A foot reference drifts every time stance width changes by an inch. In putting posture the two land in roughly the same place, so you kept the position and upgraded the cue."
+          },
+          {
+            "t": "Weight on the ball — what it buys",
+            "b": "Pressure over the ball puts the sternum over or a whisker behind it, pinning the arc's bottom at or just behind the ball so the DF3i is a hair ascending at contact. That's the true-roll window, and it's why the setup feels good — a pinned low point is what a repeatable strike feels like from the inside."
+          },
+          {
+            "t": "The forward press — a TRIGGER, not a position",
+            "b": "No conflict with the 'hands even at address' note, and both stay: ADDRESS is neutral (the Press Pistol's 2° supplies the lean), and the PRESS is the starter motor that breaks inertia so you're not stroking from a frozen stop. Crenshaw, Nicklaus, plenty of company. Your tempo was a documented fault once (~1:1, fixed to 2.4:1 by the One-Two drill) — a rhythm trigger is real maintenance for that."
+          },
+          {
+            "t": "The one rule for the press",
+            "b": "SAME SIZE, EVERY TIME. Press sets shaft lean, lean sets effective loft, loft sets rollout. A press that varies putt to putt is a PACE that varies putt to putt — and pace is the only fault still open on your card. Small, identical, moving along the target line rather than hinging the wrists. The zero-torque head protects the face; it can't protect you from a press that changes size."
+          },
+          {
+            "t": "The full routine",
+            "b": "TWO PRACTICE STROKES — first eyes on the ball, then eyes on the hole. Then: 1) line it up, aim the FACE first · 2) set feet and hands, normal address · 3) look at the hole · 4) look at the aiming spot · 5) look at the ball · 6) forward press · 7) putt."
+          },
+          {
+            "t": "CORRECTION — the pace step is already there",
+            "b": "Earlier read of this routine said it had no pace step. Wrong — the eyes-on-hole rehearsal IS the pace step, and it's the single most reliable distance-control device there is. Your eyes calibrate stroke length to distance far better than conscious estimation does. It's in the routine, and the order is right: ball-look first (path and contact), hole-look second (pace), so the feel you walk in with is the pace feel. Keep that order deliberately — if the hole stroke ever ends up first, the pace feel gets overwritten."
+          },
+          {
+            "t": "The actual issue — decay",
+            "b": "The rehearsals happen BEFORE the whole aiming sequence. Between your eyes-on-hole stroke and the actual putt sit: lining it up, setting feet and hands, a hole look, a spot look, a ball look, and a press. That's a long time for a feel to survive, and feel is perishable — it fades faster than a mental note does. This is why a rehearsed pace can be right and the putt still arrives soft: the rehearsal was good, the delivery was late."
+          },
+          {
+            "t": "The fix — close the gap, don't add steps",
+            "b": "Don't add a third rehearsal. TIGHTEN THE MIDDLE instead. Two ways, pick one and stick with it: (A) move the two practice strokes LATER — read and aim the face first, then rehearse, then step straight in for spot → ball → press → go. Or (B) keep your order and CUT step 3, the hole look. You already looked at the hole during the pace rehearsal; looking again mostly burns time and invites second-guessing. Either way the target is the same — fewer beats between the pace feel and the stroke."
+          },
+          {
+            "t": "Worth testing on lags",
+            "b": "Past ~25 feet, try keeping your eyes ON THE HOLE through the actual stroke, not just the rehearsal. Feels absurd, works well — the ball isn't moving, you don't need to watch it. Test it as a block, not mid-round: 10 lags eyes-on-ball vs 10 eyes-on-hole, measure the spread of stopping points. Same protocol as the weight A/B."
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-routine-pace-action-fix-20260728",
+      "type": "action-update",
+      "target": "putt-routine-pace-action-20260728",
+      "text": "PUTTING — Tighten the gap between the eyes-on-hole rehearsal and the stroke: either move both practice strokes later (after aiming the face), or cut the redundant hole-look at step 3. Pick one, keep it. Then test eyes-on-hole through the stroke on lags past 25 ft: 10 vs 10, measure the spread."
     }
   ]
 }
