@@ -1667,6 +1667,55 @@
       "id": "putt-ball-action-20260728",
       "type": "action",
       "text": "PUTTING — Log 10-ball putter tests with a Pro V1 or TP5x ONLY. Soft two-piece balls (Bridgestone e6, Callaway Supersoft) come off the DF3i a few percent slower and make ball type a hidden variable in the results. Same ball every test; keep the soft ones in the shag bag for chipping."
+    },
+    {
+      "id": "ball-fullswing-20260728",
+      "type": "briefing",
+      "discipline": "full-swing",
+      "briefing": {
+        "discipline": "full-swing",
+        "course": "Ball Selection — Full Shots, Spin & the Slice",
+        "focus": "Companion to the putting ball note (Putting Lab). The same four balls that split pop-vs-thud off the DF3i behave very differently through the bag — and the biggest effect is on the club you are actively rebuilding. Headline: the ball that curves LEAST is the one that would mask your over-the-top slice, and the ball that putts and spins BEST is the one that magnifies it. Play the premium ball and fix the path; just know which part of the curve is the ball.",
+        "sections": [
+          {
+            "t": "The short version — one ball, all 14 clubs",
+            "b": "Pick ONE premium urethane ball (Pro V1 or TP5x) and play it everywhere: tee, approach, wedges, putter. Not because mixed balls are catastrophic on any single shot, but because every distance number you own — the wedge ladder, the sim data, the 10-ball putter tests — silently assumes one ball. The moment you mix, you cannot tell a swing change from a ball change. Keep the Bridgestone e6 and Callaway Supersoft for shag-bag chipping and nothing else."
+          },
+          {
+            "t": "Driver — the slice piece (read this one)",
+            "b": "Curve comes from the tilt of the spin axis, and the SIZE of the curve scales with TOTAL spin. So a low-spin ball curves less for the exact same face-to-path number. That is precisely what the e6 and Supersoft are engineered to do — they are marketed as straight-distance balls because low spin plus low compression flattens the sidespin component. WHICH MEANS: some of the slice you see with a Pro V1 or TP5x is ball-amplified. THE TRAP: do not solve the slice by switching balls. It is a band-aid over the exact fault your swing plan is mid-fix (Fix 3 — path first, then face), and it costs you greenside spin and putting speed control to buy a curve reduction you should be earning from the swing. Play the premium ball, keep the honest feedback, fix the path."
+          },
+          {
+            "t": "Compression vs swing speed — mostly a myth, with one real part",
+            "b": "The old rule that you must match ball compression to swing speed is largely overstated for DISTANCE — modern multilayer balls perform across a wide speed range, and the ball-speed gap between a 38-compression and a 90-compression ball off the driver is smaller than the marketing suggests. What is NOT overstated is SPIN and CONTROL. The soft two-piece balls give up meaningful spin on irons and a lot on wedges, and that is where the strokes actually are for an 8.5. So: ignore the compression chart, care about the cover."
+          },
+          {
+            "t": "Irons — spin, descent angle, stopping power",
+            "b": "Lower-spin balls fly a touch further with irons and land FLATTER. A flatter descent angle means less holding power — approach shots release through the back of the green instead of taking one hop and sitting. With the Cobra KING TEC 4-PW that difference shows up most on the mid and short irons, where you are trying to attack a flag rather than just find the surface. The premium ball costs you a yard or two of carry and buys you a steeper descent that actually stops. That trade is worth taking every time."
+          },
+          {
+            "t": "Wedges — this is where the cover decides everything",
+            "b": "The urethane-vs-ionomer gap is largest here and it is not subtle: on a FULL wedge, typically on the order of 1,500-2,500 rpm; on partial shots and greenside pitches the proportional gap is even bigger. A Supersoft or e6 off a tight lie with the 60.08M will come out hot and RELEASE — it physically cannot check. Your 60 is the creative club in the bag and creativity is a urethane privilege. The 56.10S workhorse and the 50.08F sweeper both lose one-hop-and-stop with an ionomer cover too. If you play a soft two-piece ball for a round, you are effectively playing a different short game."
+          },
+          {
+            "t": "Your carry ladder assumes one ball",
+            "b": "PW 122 / 50 deg 108 / 56 deg 95 / 60 deg 80 behind the 44 deg PW — those numbers were calibrated with a specific ball. Lower-spin balls fly slightly further and roll considerably more, so the same swing on a Supersoft lands long and finishes much longer. The gaps between clubs stay roughly proportional, but every absolute number shifts and the total distance (carry plus roll) shifts a lot more. Re-check the ladder only when you deliberately change ball model — never let a mixed shag bag quietly re-write it."
+          },
+          {
+            "t": "The sim session — lock the ball or the numbers are noise",
+            "b": "The standing swing plan asks you to finally capture real numbers: driver attack angle, CLUB PATH, FACE-TO-PATH, spin, ball speed, plus the wedge gap-check. Every one of those except path is ball-sensitive, and spin and curve are ball-sensitive in a big way. If you hit a bucket of mixed range rocks and then a couple of premium balls, the spin and curve numbers are uninterpretable — you will not know whether the path fix worked or whether you just changed the ball. SAME MODEL FOR THE WHOLE SESSION, and write down which ball on the log. If the sim uses its own range balls, note that too and treat the spin numbers as relative-only, never absolute."
+          },
+          {
+            "t": "Pro V1 vs TP5x — how to pick between your two",
+            "b": "Both are correct answers; this is a preference call, not a performance one. PRO V1: softer feel, lower flight and lower long-game spin, spins plenty around the greens. TP5x: firmer feel, higher launch, lower driver spin. THE SMALL TIEBREAKER FOR YOU: since curve scales with total spin, the lower-spin driver profile of the TP5x will curve marginally less while the over-the-top path is still a work in progress — and it is the firmer of the two off the DF3i face, so it gives the crispest putting feedback. Marginal on both counts. Pick whichever you prefer looking at and putting with, then stop switching."
+          }
+        ]
+      }
+    },
+    {
+      "id": "ball-sim-action-20260728",
+      "type": "action",
+      "text": "BALL — Play ONE premium urethane ball (Pro V1 or TP5x) across the whole bag, and lock it for the sim session. Spin, curve and carry are all ball-sensitive, so a mixed bucket makes the path/face/spin numbers uninterpretable — log which ball was used. Keep the e6/Supersoft for shag-bag chipping only."
     }
   ]
 }
