@@ -576,11 +576,6 @@ function swing(){
   return `
   ${routineBlock(plans)}
 
-  <div class="card">
-    <h2>The swing</h2>
-    <p class="sm">Driver through wedge — your film breakdowns, standing plans, and at-home training in one place.${sessions.length ? '' : ' Send Claude swing clips (down-the-line + face-on) and the breakdowns land here.'}</p>
-  </div>
-
   <div class="card flat"><div class="linkrow" data-action="go" data-view="positions">
     <span><b>📐 Swing Positions · visual guide</b><br><span class="sm">Body checkpoints, address → finish, with a slide-vs-clear hip diagram</span></span><span class="arr">→</span></div></div>
 
@@ -594,7 +589,7 @@ function swing(){
     ${sessions.length ? `<p class="sm faint" style="margin-bottom:4px">Tap a session for the full breakdown.</p>
     <table><tr><th>Date</th><th>Setup</th><th>Finding</th></tr>
     ${sessions.map(({s,i}) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)} ${s.detail?'<span class="faint">▸</span>':''}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
-    </table>` : '<p class="sm faint">No swing sessions logged yet.</p>'}
+    </table>` : '<p class="sm">No swing sessions logged yet. Send Claude swing clips — down-the-line and face-on — and the breakdowns land here.</p>'}
   </div>
 
   <h2>Filming guide</h2>
