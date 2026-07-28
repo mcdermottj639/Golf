@@ -1693,6 +1693,63 @@
           "why": "DF3i pace calibration still open. New candidate cause: weight sitting BACK with the ball off the front foot puts the low point behind the ball — added loft, hop-and-skid, putts arriving soft. Run the A/B lag ladder before blaming the head's power curve."
         }
       ]
+    },
+    {
+      "id": "plan-putt-routine-20260728",
+      "type": "briefing",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "Jack's settled DF3i setup and pre-putt routine, in his words, plus the one thing the routine is missing. Logged Jul 28 after working the weight question out on the mat.",
+        "sections": [
+          {
+            "t": "The setup, your words",
+            "b": "Ball position off the LEFT BREAST. Weight stacked right ON the ball. Normal address. Forward press right before contact, then putt. This supersedes the weight-back feel that started the conversation — the low point question is answered."
+          },
+          {
+            "t": "Why the chest reference beats the foot reference",
+            "b": "You landed on 'left breast' rather than 'front heel,' and that's the better cue — keep it. The arc of a shoulder-rocked stroke is centered on your STERNUM, not your feet. Referencing the ball to your chest points it at the thing that actually governs the low point. Foot reference drifts every time your stance width changes by an inch; the chest reference doesn't. In putting posture those two land in roughly the same place anyway, so you've lost nothing and gained a cue that travels."
+          },
+          {
+            "t": "Weight stacked on the ball — what that buys",
+            "b": "Pressure over the ball puts the sternum over or a whisker behind it, which pins the arc's bottom right where it belongs: at or just behind the ball, so the DF3i is a hair ascending at contact. That's the true-roll window. It's also why the setup 'feels good' — a pinned low point is what a repeatable strike feels like from the inside."
+          },
+          {
+            "t": "The forward press — a TRIGGER, not a position",
+            "b": "This is a change from the static 'hands even, no press' note, and it's a legitimate one — because a press before contact does a different job than press held at address. Its purpose is to break inertia and start the stroke rhythmically instead of from a dead, frozen stop. Crenshaw, Nicklaus, half the great putters ever. Your tempo was a documented fault once (~1:1, fixed to 2.4:1 by the One-Two drill) — a press trigger is genuine maintenance for that."
+          },
+          {
+            "t": "The one rule for the press",
+            "b": "SAME SIZE, EVERY TIME. The press changes the shaft lean, the shaft lean changes the effective loft, and the loft changes how far the ball rolls. A press that varies putt to putt is a loft that varies putt to putt — which is a PACE that varies putt to putt, and pace is the only fault still open on your card. Make it small, make it identical, and move it along the target line rather than hinging the wrists. The DF3i's zero-torque head protects the face; it can't protect you from a press that changes size."
+          },
+          {
+            "t": "The routine as you described it",
+            "b": "1) Line it up — read, aim the FACE first. 2) Set feet and hands, normal address. 3) Look at the hole. 4) Look at the aiming spot. 5) Look at the ball. 6) Forward press. 7) Putt. Structurally sound: face aimed before the stance gets built, an intermediate spot for line, one clear trigger to start it. Keep it brisk — three looks is the most you want before you go stale over the ball."
+          },
+          {
+            "t": "THE GAP — nothing in this routine sets pace",
+            "b": "Read the seven steps again and ask what any of them does about how HARD you hit it. Nothing. Every step is aimed at LINE — the read, the face, the spot, the ball. And line is the part of your putting that's already settled: path ✓, face ✓, start lines 10/10 twice over. The one thing still broken is pace — lags short at Hudson Hills, arrivals dying on the mat, both Stage-0 misses dying at the hole. Your routine has no pace step in it at all."
+          },
+          {
+            "t": "The fix — one rehearsal stroke, eyes on the hole",
+            "b": "Add ONE practice stroke between step 3 and step 4, made while LOOKING AT THE HOLE, that rehearses the actual LENGTH of stroke the putt needs. This is the single most reliable distance-control device there is: your eyes calibrate stroke size to distance far better than your conscious mind estimates it. Then look at the spot, look at the ball, press, go — pace is already loaded, and the last look is line. One rehearsal, not three."
+          },
+          {
+            "t": "Worth testing on lags",
+            "b": "On anything past ~25 feet, try keeping your eyes ON THE HOLE through the stroke instead of returning them to the ball. It feels absurd and it is remarkably effective for distance — the ball isn't moving, you don't need to watch it. Test it as a block, not mid-round: 10 lags eyes-on-ball vs 10 eyes-on-hole, measure the spread of stopping points. Same measurement protocol as the weight A/B."
+          },
+          {
+            "t": "One conflict to clean up",
+            "b": "Your Golf Mind putting note still reads 'Hands over the ball: it FEELS like a forward press, but it isn't.' That was written about the static address position and it's still true there — but it now sits awkwardly next to a deliberate press trigger. They're compatible (address neutral, press to start), just say so in the note so future-you doesn't read it as a contradiction."
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-routine-pace-action-20260728",
+      "type": "action",
+      "pri": true,
+      "text": "PUTTING — Add a pace step to the routine: one rehearsal stroke made while LOOKING AT THE HOLE, sized to the putt, between the hole-look and the spot-look. Then test eyes-on-hole through the stroke on lags past 25 ft: 10 vs 10, measure the spread."
     }
   ]
 }
