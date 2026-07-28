@@ -530,11 +530,28 @@ function sessionDiscipline(s){
   return /full[\s-]?swing|driver|\biron\b|\bwedge\b|mini/i.test(s.setup || '') ? 'swing' : 'putting';
 }
 
+// ----- Lab plan blocks -----
+// Pre-shot routines head every lab: they're what you read standing on the first tee,
+// so they sit above the diagnosis and the drills rather than buried under them.
+const isRoutine = b => /routine/i.test(b.course || '');
+function planLinks(list){
+  return list.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
+      <span><b>${esc(b.course)}</b><br><span class="sm">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('');
+}
+function routineBlock(plans){
+  const r = plans.filter(isRoutine);
+  return r.length ? `<h2>Pre-round · routine</h2>
+  <div class="card">${planLinks(r)}</div>` : '';
+}
+
 // ----- Swing Lab -----
 function swing(){
   const sessions = S.sessions.map((s,i) => ({ s, i })).filter(o => sessionDiscipline(o.s) === 'swing').reverse();
   const plans = S.briefings.filter(b => !b.date && (b.discipline || 'swing') !== 'putting');
+  const other = plans.filter(b => !isRoutine(b));
   return `
+  ${routineBlock(plans)}
+
   <div class="card">
     <h2>The swing</h2>
     <p class="sm">Driver through wedge — your film breakdowns, standing plans, and at-home training in one place.${sessions.length ? '' : ' Send Claude swing clips (down-the-line + face-on) and the breakdowns land here.'}</p>
@@ -543,10 +560,9 @@ function swing(){
   <div class="card flat"><div class="linkrow" data-action="go" data-view="positions">
     <span><b>📐 Swing Positions · visual guide</b><br><span class="sm">Body checkpoints, address → finish, with a slide-vs-clear hip diagram</span></span><span class="arr">→</span></div></div>
 
-  ${plans.length ? `<h2>Plans &amp; training</h2>
+  ${other.length ? `<h2>Plans &amp; training</h2>
   <div class="card">
-    ${plans.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-      <span><b>${esc(b.course)}</b><br><span class="sm">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('')}
+    ${planLinks(other)}
   </div>` : ''}
 
   <h2>Film room</h2>
@@ -753,15 +769,17 @@ function putting(){
   const entries = S.fiveFt.slice(-6);
   const mc = missCounts();
   const streak = weekStreak();
+  const plans = S.briefings.filter(b => !b.date && b.discipline === 'putting');
+  const other = plans.filter(b => !isRoutine(b));
   return `
+  ${routineBlock(plans)}
+
   <div class="card">
     <h2>The diagnosis</h2>
     <p class="sm"><b>Two levers behind the left miss:</b> (1) equipment — max-toe-flow putter + toe-up lie on a confirmed <b>straight SBST stroke</b>; (2) mechanics — face closes through impact, timing-dependent. Fix: zero-torque head at 34" + lie set flat + the two drills below.</p>
   </div>
 
-  ${(() => { const pl = S.briefings.filter(b => !b.date && b.discipline === 'putting');
-    return pl.length ? `<h2>Plans</h2><div class="card">${pl.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-      <span><b>${esc(b.course)}</b><br><span class="sm">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('')}</div>` : ''; })()}
+  ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
 
   <h2>5-footer scoreboard</h2>
   <div class="card">
