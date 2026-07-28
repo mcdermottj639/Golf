@@ -566,39 +566,97 @@ function swing(){
 }
 
 // ----- Swing Positions · visual guide (inline SVG, theme-aware) -----
-// A more anatomical face-on figure: filled torso, two arms, clubhead, cap bill,
-// weight-pressure pads with %, pelvis belt line, and a hip-clearing arc.
-function posFig(p){
-  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)', CLB='var(--soft)';
-  const ln=(a,b,c,w=5)=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" style="stroke:${c};stroke-width:${w};stroke-linecap:round"/>`;
-  const shoW=17, hipW=12;
-  const shoL=[p.sh[0]-shoW,p.sh[1]], shoR=[p.sh[0]+shoW,p.sh[1]];
-  const hipL=[p.hip[0]-hipW,p.hip[1]], hipR=[p.hip[0]+hipW,p.hip[1]];
-  const legCol=p.post?GRN:INK;
-  const pad=(x,w)=>{const ww=(10+w*24).toFixed(1); return `<rect x="${(x-ww/2).toFixed(1)}" y="219" width="${ww}" height="6" rx="3" style="fill:${FNT};opacity:${(0.3+w*0.55).toFixed(2)}"/><text x="${x}" y="234" text-anchor="middle" style="fill:${FNT};font:8px var(--sans)">${Math.round(w*100)}</text>`;};
-  const foot=(f,toe)=>toe
-    ? `<path d="M ${f[0]-7} ${f[1]} q 9 0 11 -6" style="fill:none;stroke:${INK};stroke-width:5.5;stroke-linecap:round"/>`
-    : `<line x1="${f[0]-8}" y1="${f[1]}" x2="${f[0]+9}" y2="${f[1]}" style="stroke:${INK};stroke-width:6;stroke-linecap:round"/>`;
-  const svg=`<svg viewBox="0 0 200 240" role="img" aria-label="${esc(p.name)}">
-    <line x1="16" y1="214" x2="184" y2="214" style="stroke:${FNT};stroke-width:1.5;opacity:.55"/>
-    <ellipse cx="100" cy="216" rx="52" ry="5" style="fill:${FNT};opacity:.14"/>
-    ${pad(p.trailFoot[0],1-p.wtLead)}${pad(p.leadFoot[0],p.wtLead)}
-    ${ln(hipL,p.trailKnee,INK)}${ln(p.trailKnee,p.trailFoot,INK)}
-    ${ln(hipR,p.leadKnee,legCol)}${ln(p.leadKnee,p.leadFoot,legCol)}
-    ${foot(p.trailFoot,p.trailToe)}${foot(p.leadFoot,false)}
-    <polygon points="${hipL[0]},${hipL[1]} ${hipR[0]},${hipR[1]} ${shoR[0]},${shoR[1]} ${shoL[0]},${shoL[1]}" style="fill:${INK};opacity:.11"/>
-    <line x1="${shoL[0]}" y1="${shoL[1]}" x2="${shoR[0]}" y2="${shoR[1]}" style="stroke:${INK};stroke-width:6;stroke-linecap:round"/>
-    ${ln(shoL,p.hands,INK,4)}${ln(shoR,p.hands,INK,4)}
-    ${p.club?`${ln(p.hands,p.club,CLB,3)}<rect x="${p.club[0]-4}" y="${p.club[1]-3}" width="9" height="6" rx="2" transform="rotate(${p.clubAng||0} ${p.club[0]} ${p.club[1]})" style="fill:${CLB}"/>`:''}
-    <line x1="${hipL[0]}" y1="${hipL[1]}" x2="${hipR[0]}" y2="${hipR[1]}" style="stroke:${BURG};stroke-width:7;stroke-linecap:round"/>
-    ${p.hipOpen?`<circle cx="${hipR[0]}" cy="${hipR[1]}" r="4.5" style="fill:${BURG}"/>`:''}
-    <line x1="${p.sh[0]}" y1="${p.sh[1]}" x2="${p.head[0]}" y2="${p.head[1]+8}" style="stroke:${INK};stroke-width:4"/>
-    <circle cx="${p.head[0]}" cy="${p.head[1]}" r="8.5" style="fill:none;stroke:${INK};stroke-width:4.5"/>
-    ${p.bill?`<line x1="${p.head[0]}" y1="${p.head[1]+3}" x2="${p.head[0]+p.bill}" y2="${p.head[1]+7}" style="stroke:${INK};stroke-width:4;stroke-linecap:round"/>`:''}
-    ${p.ball?`<circle cx="${p.ball[0]}" cy="${p.ball[1]}" r="4" style="fill:#fff;stroke:${INK};stroke-width:2"/>`:''}
-    ${p.hipOpen?`<path d="M ${p.hip[0]+20} ${p.hip[1]-13} q 17 4 13 21" style="fill:none;stroke:${BURG};stroke-width:2.5"/><polygon points="${p.hip[0]+27},${p.hip[1]+12} ${p.hip[0]+36},${p.hip[1]+6} ${p.hip[0]+37},${p.hip[1]+16}" style="fill:${BURG}"/>`:''}
+// Face-on figure, richer anatomy: shoe shapes (flat / flared / up on the toe),
+// pressure pills with % (green = loaded foot), pelvis belt + buckle, cap,
+// hip-clearing arc with degrees, and motion arrows (arms drop, foot press).
+// Trail side (right, for a RH golfer) draws on the viewer's LEFT; target is right.
+function posSvg(p, solid){
+  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)', CLB='var(--soft)', CARD='var(--card)';
+  const G=220; // ground line
+  const ln=(a,b,c,w=6)=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" style="stroke:${c};stroke-width:${w};stroke-linecap:round"/>`;
+  // In solid mode the figure is a filled silhouette: fat capsule limbs, solid
+  // torso & head, card-color underlays so arms/club/belt read on top of the body.
+  const legW=solid?11:6, armW=solid?8:4.5;
+  const under=(a,b,w)=>solid?ln(a,b,CARD,w+3.5):'';
+  const shT=[p.sh[0]-p.shW, p.sh[1]+(p.tiltT||0)], shL=[p.sh[0]+p.shW, p.sh[1]+(p.tiltL||0)];
+  const hipT=[p.hip[0]-p.hipW, p.hip[1]], hipL=[p.hip[0]+p.hipW, p.hip[1]];
+  const shoe=(x,mode)=>{
+    const r=`<rect x="${x-12}" y="${G-8}" width="25" height="9" rx="4.5" style="fill:${INK}"/>`;
+    if(mode==='flare') return `<g transform="rotate(-16 ${x} ${G-4})">${r}</g>`;
+    if(mode==='toe')   return `<g transform="rotate(55 ${x+10} ${G-2})">${r}</g>`;
+    return r;
+  };
+  const pill=(x,pct)=>{const hot=pct>=60;
+    return `<rect x="${x-14}" y="${G+7}" width="28" height="14" rx="7" style="fill:${hot?GRN:'none'};stroke:${hot?GRN:FNT};stroke-width:1.5"/>
+    <text x="${x}" y="${G+17.5}" text-anchor="middle" style="fill:${hot?CARD:FNT};font:800 9px var(--sans)">${pct}</text>`;};
+  const wl=Math.round(p.wtLead*100);
+  const legT = ln(hipT,p.kneeT,INK,legW)+ln(p.kneeT,[p.footT,G-6],INK,legW-1);
+  const legL = under(hipL,p.kneeL,legW)+under(p.kneeL,[p.footL,G-6],legW-1)
+    + ln(hipL,p.kneeL,p.post?GRN:INK,legW)+ln(p.kneeL,[p.footL,G-6],p.post?GRN:INK,legW-1);
+  const club = p.club?`${under(p.hands,p.club,3.5)}${ln(p.hands,p.club,CLB,3.5)}
+    <path d="M ${p.club[0]} ${p.club[1]} l ${p.blade[0]} ${p.blade[1]} l ${p.blade[2]} ${p.blade[3]}" style="fill:none;stroke:${CLB};stroke-width:5;stroke-linecap:round"/>`:'';
+  const cap = `<path d="M ${p.head[0]-8} ${p.head[1]-4} A 9 9 0 0 1 ${p.head[0]+8} ${p.head[1]-4}" style="fill:${INK}"/>
+    <line x1="${p.head[0]+5}" y1="${p.head[1]-5}" x2="${p.head[0]+(p.bill||8)+5}" y2="${p.head[1]-3}" style="stroke:${INK};stroke-width:4;stroke-linecap:round"/>`;
+  return `<svg viewBox="0 0 200 246" role="img" aria-label="${esc(p.name)}">
+    <line x1="10" y1="${G}" x2="182" y2="${G}" style="stroke:${FNT};stroke-width:1.5;opacity:.6"/>
+    <polygon points="190,${G} 181,${G-4.5} 181,${G+4.5}" style="fill:${FNT};opacity:.7"/>
+    <text x="164" y="${G-6}" style="fill:${FNT};font:italic 8.5px var(--sans)">target</text>
+    ${pill(p.footT,100-wl)}${pill(p.footL,wl)}
+    ${legT}${legL}
+    ${shoe(p.footT,p.toeT?'toe':'flat')}${shoe(p.footL,p.flareL?'flare':(p.toeL?'toe':'flat'))}
+    <polygon points="${hipT[0]},${hipT[1]} ${hipL[0]},${hipL[1]} ${shL[0]},${shL[1]} ${shT[0]},${shT[1]}" style="fill:${INK};opacity:${solid?1:.13}${solid?`;stroke:${INK};stroke-width:7;stroke-linejoin:round`:''}"/>
+    ${solid?'':`<line x1="${p.hip[0]}" y1="${p.hip[1]}" x2="${p.sh[0]}" y2="${p.sh[1]}" style="stroke:${INK};stroke-width:4;opacity:.5"/>`}
+    ${ln(shT,shL,INK,solid?11:6.5)}
+    ${under(shT,p.hands,armW)}${under(shL,p.hands,armW)}
+    ${ln(shT,p.hands,INK,armW)}${ln(shL,p.hands,INK,armW)}
+    ${club}
+    <circle cx="${p.hands[0]}" cy="${p.hands[1]}" r="${solid?4.5:3.5}" style="fill:${INK}${solid?`;stroke:${CARD};stroke-width:2`:''}"/>
+    ${solid?`<line x1="${hipT[0]}" y1="${hipT[1]}" x2="${hipL[0]}" y2="${hipL[1]}" style="stroke:${CARD};stroke-width:10;stroke-linecap:round"/>`:''}
+    <line x1="${hipT[0]}" y1="${hipT[1]}" x2="${hipL[0]}" y2="${hipL[1]}" style="stroke:${BURG};stroke-width:${solid?6:7};stroke-linecap:round"/>
+    ${p.hipOpen?`<circle cx="${hipL[0]}" cy="${hipL[1]}" r="4.5" style="fill:${BURG}"/>`:''}
+    <line x1="${p.sh[0]}" y1="${p.sh[1]}" x2="${p.head[0]}" y2="${p.head[1]+8}" style="stroke:${INK};stroke-width:${solid?7:4.5}"/>
+    ${solid?`<circle cx="${p.head[0]}" cy="${p.head[1]}" r="11.5" style="fill:${CARD};opacity:.92"/>`:''}
+    <circle cx="${p.head[0]}" cy="${p.head[1]}" r="8.5" style="fill:${solid?INK:CARD};stroke:${INK};stroke-width:4"/>
+    ${cap}
+    ${p.ball?`<ellipse cx="${p.ball[0]}" cy="${G-1.5}" rx="6" ry="2" style="fill:${FNT};opacity:.35"/><circle cx="${p.ball[0]}" cy="${p.ball[1]}" r="4.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>`:''}
+    ${p.hipOpen?`<path d="M ${hipL[0]+7} ${p.hip[1]-16} q 17 6 11 24" style="fill:none;stroke:${BURG};stroke-width:2.5"/><polygon points="${hipL[0]+15},${p.hip[1]+10} ${hipL[0]+24},${p.hip[1]+3} ${hipL[0]+25},${p.hip[1]+13}" style="fill:${BURG}"/>`:''}
+    ${p.deg?`<text x="${hipL[0]+16}" y="${p.hip[1]+26}" style="fill:${BURG};font:800 9px var(--sans)">${p.deg}</text>`:''}
+    ${p.drop?`<path d="M 50 92 q -6 26 8 44" style="fill:none;stroke:${INK};stroke-width:2.5;stroke-dasharray:4 3"/><polygon points="58,136 46,132 54,125" style="fill:${INK}"/><text x="30" y="88" style="fill:${INK};font:italic 800 9px var(--sans)">drop</text>`:''}
+    ${p.press?`<line x1="${p.footL}" y1="${G-40}" x2="${p.footL}" y2="${G-18}" style="stroke:${GRN};stroke-width:3"/><polygon points="${p.footL},${G-12} ${p.footL-5},${G-20} ${p.footL+5},${G-20}" style="fill:${GRN}"/>`:''}
   </svg>`;
-  return `<div class="posfig">${svg}<div class="poscap"><b>${esc(p.name)}</b><br>${esc(p.cap)}</div></div>`;
+}
+function posFig(p, solid){
+  return `<div class="posfig">${posSvg(p, solid)}<div class="posname">${p.n} · ${esc(p.name)}</div>
+  <div class="poschips">${p.chips.map(c=>`<span>${esc(c)}</span>`).join('')}</div></div>`;
+}
+// The six checkpoints, matched to the "Swing Positions — Body Checkpoints" plan.
+function posData(){
+  return [
+    {n:1, name:'Address', head:[96,95], bill:7, sh:[97,110], shW:17, tiltT:3, tiltL:-3, hip:[100,151], hipW:12,
+      kneeT:[82,184], kneeL:[118,184], footT:74, footL:126, flareL:true, hands:[105,163],
+      club:[96,211], blade:[7,2,2,-7], ball:[100,215], wtLead:0.5,
+      chips:['50/50 on the arches','hinge from the hip sockets','lead foot flared 20–30°','ball center (irons) · hands under chin']},
+    {n:2, name:'Takeaway', head:[95,95], bill:7, sh:[96,110], shW:17, tiltT:2, tiltL:-2, hip:[100,151], hipW:12,
+      kneeT:[82,184], kneeL:[118,184], footT:74, footL:126, flareL:true, hands:[79,159],
+      club:[38,153], blade:[-2,-10,0,0], ball:[100,215], wtLead:0.45,
+      chips:['one piece — chest & arms together','shaft parallel · toe up','trail hip turns behind — no sway']},
+    {n:3, name:'Top', head:[93,94], bill:6, sh:[97,108], shW:16, tiltT:-7, tiltL:7, hip:[99,151], hipW:11,
+      kneeT:[82,184], kneeL:[116,183], footT:74, footL:126, flareL:true, hands:[62,70],
+      club:[106,53], blade:[7,-3,0,0], wtLead:0.25,
+      chips:['shoulders ~90° · hips ~45°','loaded into the trail glute','trail knee holds flex','shaft points on line']},
+    {n:4, name:'Transition', head:[93,95], bill:6, sh:[98,109], shW:16, tiltT:-4, tiltL:4, hip:[101,150], hipW:11,
+      kneeT:[86,184], kneeL:[118,183], footT:76, footL:126, flareL:true, hands:[76,118],
+      club:[54,80], blade:[-2,-8,0,0], wtLead:0.6, hipOpen:true, drop:true, press:true,
+      chips:['1 · press the lead foot','2 · lead hip clears back & up','3 · arms DROP into the slot']},
+    {n:5, name:'Impact', head:[91,94], bill:7, sh:[96,108], shW:16, tiltT:-2, tiltL:2, hip:[102,149], hipW:11,
+      kneeT:[88,185], kneeL:[120,182], footT:76, footL:126, toeT:true, hands:[114,160],
+      club:[95,211], blade:[7,2,2,-7], ball:[100,215], wtLead:0.85, hipOpen:true, deg:'35–45°', post:true,
+      chips:['80–90% into the lead foot','lead leg posts up','hips open · buckle left of ball','hands ahead · head behind ball']},
+    {n:6, name:'Finish', head:[104,92], bill:8, sh:[102,106], shW:13, tiltT:0, tiltL:0, hip:[100,150], hipW:9,
+      kneeT:[90,186], kneeL:[118,183], footT:80, footL:122, toeT:true, hands:[120,70],
+      club:[84,52], blade:[-7,-4,0,0], wtLead:0.95, hipOpen:true, post:true,
+      chips:['belt buckle past the target','tall & stacked on the lead leg','trail laces to target · hold 3s']},
+  ];
 }
 // Top-down: the pelvis sliding at the target vs rotating (clearing).
 function hipTopDown(){
@@ -658,26 +716,20 @@ function pathDiagram(){
 }
 function swingPositions(){
   const plan = S.briefings.find(b => /Swing Positions/i.test(b.course));
-  const F = [
-    {name:'1 · Address',    hip:[100,150], sh:[95,108],  head:[91,97],  bill:7,  trailKnee:[80,182], leadKnee:[120,182], trailFoot:[74,213], leadFoot:[126,213], hands:[110,158], club:[118,205], clubAng:60, ball:[118,209], wtLead:0.5,  hipOpen:0,  post:false, cap:'50/50 · hips level · hinge from the sockets · lead foot flared'},
-    {name:'2 · Top',        hip:[100,150], sh:[100,106], head:[93,95],  bill:6,  trailKnee:[80,182], leadKnee:[122,182], trailFoot:[74,213], leadFoot:[126,213], hands:[62,74],  club:[42,46],  clubAng:40, wtLead:0.25, hipOpen:0,  post:false, cap:'loaded into the trail glute · trail knee holds flex · shaft on line'},
-    {name:'3 · Transition', hip:[100,150], sh:[101,108], head:[92,96],  bill:6,  trailKnee:[86,182], leadKnee:[122,182], trailFoot:[76,213], leadFoot:[126,213], hands:[84,138], club:[64,96],  clubAng:55, wtLead:0.6,  hipOpen:14, post:false, cap:'press lead foot → hips clear → arms DROP'},
-    {name:'4 · Impact',     hip:[100,148], sh:[96,106],  head:[90,95],  bill:7,  trailKnee:[86,184], leadKnee:[124,182], trailFoot:[80,213], leadFoot:[126,213], hands:[120,156],club:[112,205], clubAng:70, ball:[112,209], wtLead:0.88, hipOpen:38, post:true,  trailToe:true, cap:'80–90% lead · lead leg posts up · hips open 35–45° · hands ahead'},
-    {name:'5 · Finish',     hip:[100,150], sh:[104,104], head:[108,93], bill:-6, trailKnee:[92,184], leadKnee:[124,181], trailFoot:[84,213], leadFoot:[124,213], hands:[124,70], club:[152,90], clubAng:20, wtLead:0.95, hipOpen:52, post:true,  trailToe:true, cap:'stacked on lead · hips fully cleared · tall & held'},
-  ];
+  const F = posData();
   const legend = `<div class="poslegend">
     <span><i style="background:var(--burg)"></i>pelvis / belt line</span>
     <span><i style="background:var(--gtext)"></i>lead leg posting up</span>
-    <span><i style="background:var(--faint)"></i>weight pad · % under foot</span>
+    <span><i style="background:var(--gtext);border-radius:7px;height:10px"></i>pressure pill · % under foot</span>
     <span><i class="arc"></i>hips clearing</span>
   </div>`;
   return `
   <button class="backlink" data-action="go" data-view="swing">← Swing Lab</button>
   <div class="card">
     <h2>Swing Positions · visual guide</h2>
-    <p class="sm">Face-on checkpoints, address to finish. Read the number under each foot for weight (%), the burgundy belt line for the pelvis, and the arrow for the hips clearing.</p>
+    <p class="sm">The six face-on checkpoints, address to finish — freeze each one in a mirror and match it. The pill under each foot is pressure (green = the loaded foot); the burgundy belt is your pelvis. Trail side = right, lead = left, target to the right.</p>
     ${legend}
-    <div class="posgrid">${F.map(posFig).join('')}</div>
+    <div class="posgrid">${F.map(p=>posFig(p,true)).join('')}</div>
   </div>
   <div class="card">
     <h2>The hips · slide vs clear <span class="sm faint">(top-down)</span></h2>
