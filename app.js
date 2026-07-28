@@ -286,7 +286,30 @@ function render(view, arg){
     b.classList.toggle('on', b.dataset.view === view));
   const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing }[view] || home;
   $('#view').innerHTML = R(arg);
+  buildJumpBar();
   window.scrollTo(0,0);
+}
+
+// Every view is a stack of <h2> sections, so the in-page nav is built from the
+// rendered DOM rather than hand-maintained in each of the thirteen views —
+// add a section anywhere and it shows up here for free.
+function buildJumpBar(){
+  const view = $('#view');
+  if(!view) return;
+  const hs = [...view.querySelectorAll('h2')];
+  if(hs.length < 2) return;
+  const bar = document.createElement('div');
+  bar.className = 'jumpbar';
+  hs.forEach((h, i) => {
+    h.id = h.id || `sec${i}`;
+    const b = document.createElement('button');
+    b.className = 'jump';
+    b.dataset.jump = h.id;
+    // Headings read "Scoring mix · 45 holes" — the half before the dot is the label.
+    b.textContent = h.textContent.split('·')[0].trim();
+    bar.appendChild(b);
+  });
+  view.prepend(bar);
 }
 let current = { view:'home' };
 function rerender(){ render(current.view, current.arg); }
@@ -1481,6 +1504,13 @@ function fetchWeather(manual){
 }
 
 document.addEventListener('click', e => {
+  // in-page section jump
+  const jump = e.target.closest('[data-jump]');
+  if(jump){
+    document.getElementById(jump.dataset.jump)
+      ?.scrollIntoView({ behavior:'smooth', block:'start' });
+    return;
+  }
   // 5-ft tap grid
   const tap = e.target.closest('[data-tap]');
   if(tap){
