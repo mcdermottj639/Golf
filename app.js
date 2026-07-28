@@ -781,21 +781,6 @@ function putting(){
 
   ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
 
-  <h2>5-footer scoreboard</h2>
-  <div class="card">
-    <p class="sm">Tap each ball: <b>green = make</b>, then cycle the miss — L, R, S (short), Lg (long). Tap again to clear.</p>
-    <div class="tapgrid" id="tapgrid">
-      ${Array.from({length:20}, (_,i)=>`<div class="tap" data-tap="${i}" data-state="">${i+1}</div>`).join('')}
-    </div>
-    <button class="btn" data-action="save-fiveft">Save today's 20</button>
-    ${entries.length ? `
-    <div class="spark">
-      ${entries.map(e => { const s=fiveFtScore(e); return `<div class="c"><div class="b ${e===latestFiveFt()?'hot':''}" style="height:${Math.max(4, s.total? s.makes/20*56 : 2)}px"></div><div class="t">${fmtDate(e.date)}</div></div>`; }).join('')}
-      <div class="c"><div class="b goal" style="height:${17/20*56}px"></div><div class="t">goal 17</div></div>
-    </div>
-    <p class="sm" style="margin-top:8px">All-time miss pattern: <b>${mc.L} left</b> · ${mc.R} right · ${mc.S} short · ${mc.Lg} long ${mc.L>mc.R?'— <span class="warn">the left miss is still the story</span>':'— <span class="good">left miss under control</span>'}</p>` : '<p class="sm faint" style="margin-top:8px">No entries yet — the first 20-ball test sets your baseline.</p>'}
-  </div>
-
   <h2>Drills · this week</h2>
   <div class="card">
     <div class="tipcard green"><div class="src">Fixes tempo</div><h4>"One-Two" tempo drill</h4>
@@ -835,6 +820,21 @@ function putting(){
     <b>2 · Down-the-line</b> — behind the ball at hip height: start line, face at address.<br>
     <b>3 · Face-on</b> — waist height: posture, eyeline, tempo.<br>
     Film 3–5 strokes per angle so rep-to-rep patterns show.</p>
+  </div>
+
+  <h2>5-footer scoreboard</h2>
+  <div class="card">
+    <p class="sm">Tap each ball: <b>green = make</b>, then cycle the miss — L, R, S (short), Lg (long). Tap again to clear.</p>
+    <div class="tapgrid" id="tapgrid">
+      ${Array.from({length:20}, (_,i)=>`<div class="tap" data-tap="${i}" data-state="">${i+1}</div>`).join('')}
+    </div>
+    <button class="btn" data-action="save-fiveft">Save today's 20</button>
+    ${entries.length ? `
+    <div class="spark">
+      ${entries.map(e => { const s=fiveFtScore(e); return `<div class="c"><div class="b ${e===latestFiveFt()?'hot':''}" style="height:${Math.max(4, s.total? s.makes/20*56 : 2)}px"></div><div class="t">${fmtDate(e.date)}</div></div>`; }).join('')}
+      <div class="c"><div class="b goal" style="height:${17/20*56}px"></div><div class="t">goal 17</div></div>
+    </div>
+    <p class="sm" style="margin-top:8px">All-time miss pattern: <b>${mc.L} left</b> · ${mc.R} right · ${mc.S} short · ${mc.Lg} long ${mc.L>mc.R?'— <span class="warn">the left miss is still the story</span>':'— <span class="good">left miss under control</span>'}</p>` : '<p class="sm faint" style="margin-top:8px">No entries yet — the first 20-ball test sets your baseline.</p>'}
   </div>`;
 }
 
