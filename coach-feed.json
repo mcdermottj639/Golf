@@ -2185,6 +2185,57 @@
       "type": "action-update",
       "target": "putt-routine-pace-action-20260728",
       "text": "PUTTING — Bed in the locked routine (Option 2): both rehearsals BESIDE the ball in posture, eyes-on-ball then eyes-on-hole, the second finishing with the press. Same beat count every putt. Then validate: 10 lags at 30 ft old order vs 10 new, measure the spread."
+    },
+    {
+      "id": "wianno-mg-debrief-20260728",
+      "type": "briefing",
+      "briefing": {
+        "course": "Wianno Member-Guest — Debrief",
+        "discipline": "full-swing",
+        "focus": "Five 9-hole matches with your brother at Wianno Club (Osterville, MA), Jul 9–11 2026, Blue tees, par 35. 45 holes, 212 strokes, +37. Transcribed from the GHIN cards — every total reconciles against the hole-by-hole and the bogey/double markings.",
+        "sections": [
+          {
+            "t": "The five cards",
+            "b": "Jul 9 · FRONT · 46 (+11) · rating 35.4/125 — 6 6 5 6 4 4 6 5 4. Jul 10 · FRONT · 40 (+5) · 35.4/125 — 6 3 5 6 3 4 5 5 3. Jul 10 · BACK · 44 (+9) · 35.1/125 — 4 5 6 5 3 6 4 5 6. Jul 11 · FRONT · 41 (+6) · 35.4/125 — 5 5 4 5 4 5 4 5 4. Jul 11 · BACK · 41 (+6) · 35.1/125 — 6 3 6 5 3 5 4 4 5. Trend across the event: 46 → 40 → 44 → 41 → 41."
+          },
+          {
+            "t": "The scoring mix — 45 holes",
+            "b": "1 birdie · 16 pars · 18 bogeys · 10 DOUBLES. That's the whole story in one line. Ten doubles is ten strokes handed over, and it's more than a quarter of your +37. Paired as 18s: Jul 10 = 84, Jul 11 = 82 — differentials of roughly 12.2 and 10.4 against an 11.1 index, so you played about to your handicap, not above or below it."
+          },
+          {
+            "t": "THE FINDING — doubles are the entire gap",
+            "b": "Look at Jul 11 front: 41 with ZERO doubles and ZERO birdies — six bogeys and three pars, nothing else. Now Jul 9 front: 46 with FOUR doubles. Same golfer, same tees, two days apart, five shots apart, and the difference is entirely doubles. You do not need to make more putts or hit it further to shoot 38. You need to stop making 6s. The doubles line up almost perfectly with the score every round: 4 doubles → 46 · 3 → 44 · 2 → 40 · 1 → 41 · 0 → 41."
+          },
+          {
+            "t": "THE OPENING HOLE — +7 across five nines",
+            "b": "Your first hole of each nine: 6, 6, 5 on the front and 4, 6 on the back. Par 4 every time. That's 27 strokes on 20 par — SEVEN over, on five holes, before you've settled into anything. You never once made par on the opening hole of the front nine in three tries. This is the single most concentrated leak in the whole event, and it is not a swing problem — it's a not-warmed-up problem."
+          },
+          {
+            "t": "What that validates",
+            "b": "The Swing Routine plan already carries a 'Warm-up primer — before the first tee' section: a few slow one-handed Miracle 201 reps (or trail-arm-only with a club) feeling the elbow lead down into the slot, then blend into two-hand swings. Consider this the evidence for it. Prime the feel before the first tee rather than hunting for it on the 4th hole — on this card, hunting for it cost you a shot and a half per opening hole."
+          },
+          {
+            "t": "Par 3s are bleeding — and there's no driver involved",
+            "b": "13 par-3 plays, +11. That's +0.85 a hole, essentially the same rate as your par 4s (+0.92) — but on par 3s the tee shot is an iron and there's no driving miss to blame. That points at iron control and green-hitting, not the swing faults on your card. Worst offender: HOLE 3 (par 3) went 5, 5, 4 — five over in three plays, never a par. One hole, +5."
+          },
+          {
+            "t": "Hole 1 and Hole 3 together",
+            "b": "Those two holes alone account for +10 of your +37, across just 6 of 45 holes played. Roughly a quarter of everything you lost came from two holes you played six times. If you get another crack at Wianno, they are the entire prep list."
+          },
+          {
+            "t": "Par 5s — no offense at all",
+            "b": "8 par-5 plays: four bogeys, four pars, ZERO birdies. +4 total. Par 5s are supposed to be where a mid-single-digit makes his money, and you didn't convert one all week. Your wedge ladder off the 44° PW (60°→80 · 56°→95 · 50°→108 · PW→122) exists precisely so the third shot into a par 5 is a number rather than a guess — decide the lay-up yardage from the ladder rather than hitting it as far as it goes."
+          },
+          {
+            "t": "One caveat on the data",
+            "b": "These were matches, so some of these scores are most-likely-score postings rather than holed-out strokes. That mostly affects the doubles — a picked-up hole posts as a net double. The trend and the opening-hole pattern hold regardless, but don't read the double count as gospel on any single hole."
+          },
+          {
+            "t": "Handicap flag",
+            "b": "The GHIN cards show a Handicap Index of 11.1. Caddie HQ's profile still says 8.5. Update it in Settings so the app's math (and any future round prep) works off the real number — profile isn't something the coach feed can push."
+          }
+        ]
+      }
     }
   ]
 }
