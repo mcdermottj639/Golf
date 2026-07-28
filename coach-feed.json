@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-07-27",
+  "updated": "2026-07-28",
   "entries": [
     {
       "id": "s4-session",
@@ -1626,6 +1626,73 @@
       "type": "action",
       "pri": true,
       "text": "SWING — Kill the over-the-top slice: headcover/bottle just OUTSIDE the ball on the target line, swing to miss it (from the inside, out to right-center field). Path first, then release the face. Drop into the slot with the one-handed 201 first."
+    },
+    {
+      "id": "plan-putt-weight-20260728",
+      "type": "briefing",
+      "briefing": {
+        "course": "Putting Setup — Weight & Low Point",
+        "discipline": "putting",
+        "focus": "You feel better with the weight BACK while the ball sits off the front foot — and you've heard the weight is supposed to be forward. Here's what that combination actually costs you, why it lands squarely on the one putting fault still open on your card, and how to settle it with evidence instead of dogma.",
+        "sections": [
+          {
+            "t": "What 'weight forward' is actually for",
+            "b": "It isn't a rule for its own sake. Lead-side pressure does one job: it PINS THE LOW POINT of the stroke. Where your weight sits decides where the arc bottoms out, and where the arc bottoms out decides how the DF3i meets the ball. That's the whole mechanism — everything below follows from it."
+          },
+          {
+            "t": "The cost — loft, hop, skid, short",
+            "b": "Ball off the FRONT foot is correct. But weight back moves the bottom of the arc BEHIND the ball, so by the time the putter arrives the head is climbing hard and the shaft is leaning AWAY from the target. That adds loft you never asked for. The ball launches slightly, HOPS, SKIDS, and only then starts rolling. Every bit of that hop is energy that was supposed to become roll — so the putt arrives soft. Worse, the skid distance changes with green speed and grain, so your PACE stops being repeatable from green to green."
+          },
+          {
+            "t": "Why this is your fault, specifically",
+            "b": "Read the card. Path: settled. Face: settled. Start line: 10/10 clean, twice over. The ONE thing still open is pace — lags coming up short at Hudson Hills, arrivals dying on the mat, and both genuine misses in the Stage-0 4-footer block DIED at the hole. Hop-and-skid off a back-weighted low point is the textbook cause of exactly that signature. Your stroke is no longer the problem. Your strike quality might be."
+          },
+          {
+            "t": "The second cost — the pull",
+            "b": "Sitting back drops the trail shoulder and slides your EYELINE behind the ball. Eyes behind the ball make you see the line right of where it truly is, and you square it up with a whisker of pull. Both real misses in the Stage-0 block settled on the PULL side — logged there as a lean, not proof. This belongs on that candidate-cause list."
+          },
+          {
+            "t": "The third cost — the flip can come back",
+            "b": "Hanging back leaves the hands behind the ball through impact. Hands behind = the wrists want to save it = a flick. That flick was the engine of the old blow-through left miss. The DF3i's zero-torque head has buried that miss on film — but hands-behind is the one setup that can wake it up."
+          },
+          {
+            "t": "Before changing anything — feel isn't real",
+            "b": "Your own Golf Mind note states the principle: 'Hands over the ball: it FEELS like a forward press, but it isn't.' The same illusion runs in reverse. Weight that FEELS back is often pressure that's actually close to neutral — and neutral may be perfectly fine. Don't discard a setup you putt well from on the strength of a feel. FILM IT FACE-ON first. That single clip also closes the early-lift fault, the last open item from Session 8."
+          },
+          {
+            "t": "What has to be true (the real checklist)",
+            "b": "Forget 'weight forward' as a slogan. Four things actually matter, and you can keep your comfort as long as they hold. (1) STERNUM at or just ahead of the ball. (2) HANDS level with or a touch ahead of the ball at impact — never behind it. (3) LOW POINT at or just behind the ball, so the DF3i is a HAIR ascending at contact — that slight upstroke is what produces true roll. (4) PRESSURE around 55/45 lead — enough to anchor the low point, not so much that you start steering. If your weight-back feel still delivers 1 through 3, keep it."
+          },
+          {
+            "t": "Settle it with data, not opinion",
+            "b": "A/B LAG LADDER — 30 feet, two blocks of 10. Block A: your current weight-back feel. Block B: 55/45 lead, everything else identical. Mark where each ball STOPS and measure the spread. Tighter spread wins — that's the answer, not anyone's opinion. SOUND TEST: a purely rolling ball makes one clean click; a hopping ball adds a faint scuff a beat later — listen for the scuff. FACE-ON CLIP: check shaft lean at impact and where the head bottoms out relative to the ball."
+          },
+          {
+            "t": "One thing in your favor",
+            "b": "The DF3i at 34\" is zero-torque and heavy in the head — it squares itself and it wants to be swung, not steered. You can bias a touch more forward than feels natural without losing the feel you like. This putter absorbs the change better than a blade would."
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-weight-ab-action-20260728",
+      "type": "action",
+      "pri": true,
+      "text": "PUTTING — A/B the weight distribution: 30-ft lag ladder, 10 balls weight-back vs 10 balls 55/45 lead, measure the spread of stopping points. Take one face-on clip while you're there (also closes early-lift)."
+    },
+    {
+      "id": "putt-weight-faults-20260728",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "early-lift",
+          "why": "DTL film (Session 8) shows the head staying low and extending down-line — strongly corroborated as gone. One face-on clip closes it; take it during the weight A/B."
+        },
+        {
+          "tag": "three-putts",
+          "why": "DF3i pace calibration still open. New candidate cause: weight sitting BACK with the ball off the front foot puts the low point behind the ball — added loft, hop-and-skid, putts arriving soft. Run the A/B lag ladder before blaming the head's power curve."
+        }
+      ]
     }
   ]
 }
