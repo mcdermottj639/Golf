@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-07-27",
+  "updated": "2026-07-28",
   "entries": [
     {
       "id": "s4-session",
@@ -1626,6 +1626,47 @@
       "type": "action",
       "pri": true,
       "text": "SWING — Kill the over-the-top slice: headcover/bottle just OUTSIDE the ball on the target line, swing to miss it (from the inside, out to right-center field). Path first, then release the face. Drop into the slot with the one-handed 201 first."
+    },
+    {
+      "id": "putt-ball-control-20260728",
+      "type": "briefing",
+      "discipline": "putting",
+      "briefing": {
+        "discipline": "putting",
+        "course": "Putting — Ball Control & the DF3i Face Sound",
+        "focus": "CONFIRMED (Jul 28): the pop-vs-thud you hear off the DF3i is the BALL, not the stroke. Firm premium balls ring the steel insert; soft two-piece balls deaden it — AND roll out shorter off an identical stroke. Standing rule: one ball for putting, and it is the premium one. Keeps ball type out of the 10-ball test results.",
+        "sections": [
+          {
+            "t": "What you heard — a clean 2-2 split",
+            "b": "Four balls, sorted by ear, and they split perfectly along compression. POP (crisp, ringing): TaylorMade TP5x (~90 compression, urethane cover) and Titleist Pro V1 (~87, urethane). THUD (deep, dull): Bridgestone e6 (~45, ionomer) and Callaway Supersoft (~38, ionomer). Both pop balls are firm premium multilayers; both thud balls are soft two-piece. That is not coincidence — it is the mechanism."
+          },
+          {
+            "t": "Why — dwell time, not the cover",
+            "b": "The DF3i is a 303 stainless steel insert bonded to a 6061 aluminum body — that hard face is what rings. A soft, low-compression core squashes more and stays on the face LONGER: longer contact time means lower frequency (the thud), and more of the impact energy gets absorbed deforming the ball instead of ringing the insert. THE WRINKLE: cover material would predict the opposite. Surlyn/ionomer is normally the clicky one — that is why old hard two-piece rocks sounded like marbles. But e6 and Supersoft are LOW-COMPRESSION Surlyn, and at putting speeds (~6 mph) you barely engage the cover at all, so the soft core wins outright. Your ear is reading compression, not cover."
+          },
+          {
+            "t": "What it costs — two balls, two putters",
+            "b": "This is not just acoustics. The soft balls come off the face a few percent SLOWER at identical stroke speed, and because rollout scales roughly with the square of ball speed, a few percent of speed is closer to 5-6% of distance. On a 30-footer that is a foot and a half to two feet — the gap between a tap-in and a knee-knocker. Feeding yourself knee-knockers is exactly the wrong move given the signature left miss on short putts. Mixing balls on the practice green scrambles speed calibration."
+          },
+          {
+            "t": "The rule — Pro V1 or TP5x only",
+            "b": "GAME ONE BALL for putting, and make it the Pro V1 or the TP5x. At ~8.5 the urethane cover is the right call for greenside spin regardless; ringing nicely off the DF3i is a free bonus. Put the e6 and Supersoft in the shag bag for chipping. FOR THE 10-BALL TESTS: same ball every time, premium only — otherwise ball compression is a hidden variable and a change in the results cannot be told apart from a change in the stroke."
+          },
+          {
+            "t": "Open question — does a dead ball feed the left miss? (UNVERIFIED)",
+            "b": "HYPOTHESIS, not a finding — worth a cheap test. A ball that comes off dead makes you add hit to reach the hole, and added hit on a short putt is a classic way to steer an SBST stroke left. Next practice green: roll ten 6-footers with a Pro V1, then ten with a Supersoft, and note where the misses go. If the soft ball pulls left more often, that is one more reason the ball rule matters. If it does not, drop it — the speed-calibration argument stands on its own either way."
+          },
+          {
+            "t": "Free bonus — the sound is a strike detector too",
+            "b": "Once ball type is locked to one model, any remaining pop-vs-thud variation is STRIKE LOCATION, not the ball. A flush hit loads the steel insert; a heel or toe miss bypasses it and excites the hollow aluminum body instead, which reads as the same kind of dull thud. So with a fixed ball the sound becomes an on-course feedback loop: pop means you found the middle, thud means you did not. Confirm the mapping once with foot spray or a dry-erase dot grid on the insert."
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-ball-action-20260728",
+      "type": "action",
+      "text": "PUTTING — Log 10-ball putter tests with a Pro V1 or TP5x ONLY. Soft two-piece balls (Bridgestone e6, Callaway Supersoft) come off the DF3i a few percent slower and make ball type a hidden variable in the results. Same ball every test; keep the soft ones in the shag bag for chipping."
     }
   ]
 }
