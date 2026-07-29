@@ -121,6 +121,13 @@ Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 �
 - **Close out a to-do**: append an `action-done` targeting the action's id.
 - **Round-prep briefing**: append a `briefing` entry (dated = one round; undated =
   standing plan, singleton per course/title).
+- **Jack mentions a course he's playing** (standing instruction, Jul 29 2026): don't wait
+  to be asked — append a `course-add` for it alongside whatever else the message calls
+  for, so it's already in Courses for him to rate afterward. Use the plain course name
+  (no format/event suffix) and its state/country in `st`; leave `rating`/`pr`/`notes`
+  empty — those are his to fill in. `course-add` is a no-op if the name already exists,
+  so a duplicate is harmless. Name it the same as the matching briefing's `course` where
+  possible — `briefing()` links a briefing's "Your history" line by exact name match.
 
 After any feed change: `python3 -c "import json; json.load(open('coach-feed.json'))"`,
 `node --check app.js`, bump `"updated"`, commit, push.

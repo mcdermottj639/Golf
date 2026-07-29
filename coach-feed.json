@@ -3080,6 +3080,30 @@
           }
         ]
       }
+    },
+    {
+      "id": "add-beekman-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Beekman Golf Course",
+        "st": "NY"
+      }
+    },
+    {
+      "id": "add-hudsonhills-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Hudson Hills Golf Course",
+        "st": "NY"
+      }
+    },
+    {
+      "id": "add-wianno-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Wianno Club",
+        "st": "MA"
+      }
     }
   ]
 }
