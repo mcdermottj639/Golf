@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-07-28",
+  "updated": "2026-07-29",
   "entries": [
     {
       "id": "s4-session",
@@ -3027,6 +3027,57 @@
           "ONE swing thought: the trail elbow",
           "Feels wrong over the ball? STEP OFF and restart",
           "Under pressure: LONGER, never shorter"
+        ]
+      }
+    },
+    {
+      "id": "brief-beekman-scramble-20260801",
+      "type": "briefing",
+      "briefing": {
+        "course": "Beekman Golf Course — Scramble",
+        "date": "2026-08-01",
+        "focus": "Scramble, not stroke play. Your job is to be the team's SECOND ball — when someone's already safe, swing free and go at the flag. And on every lay-up, leave the team one of YOUR numbers (122 · 108 · 95 · 80), never a 70-yard guess.",
+        "sections": [
+          {
+            "t": "The course in one paragraph",
+            "b": "Beekman Golf Course, Hopewell Junction NY (11 Country Club Rd) — a 1964 Cortlandt Fish public 27-holer in the Berkshire foothills where they rise out of the Hudson Valley, about an hour's drive for you. Three nines — HIGHLAND (3,142 yds, par 36, ~124 slope), VALLEY (2,952, par 35, ~118), TACONIC (3,125, par 36, ~126) — played in three 18-hole pairings between 6,485 and 6,532 yards. Zoysia fairways, which is the detail worth knowing: zoysia sits the ball UP on a tight, firm cushion, so contact is clean and there's less grab than the bent/poa you're used to. Reviews are consistent — well-kept greens, all three nines hilly, and it doesn't drain well, so wet spots after rain."
+          },
+          {
+            "t": "Find out which two nines you're playing",
+            "b": "Ask at check-in, because the three nines are genuinely different golf courses. TACONIC is the hardest: narrowest fairways and the water — the par-5 6th has a pond fronting the green, which in a scramble is a decision hole, not a hero hole. HIGHLAND climbs over 500 feet to a panorama of Stormville Mountain: elevation change on nearly every shot, blind or semi-blind looks, and the yardage on the sprinkler head is a starting point, not the answer. VALLEY is the gentlest and flattest of the three — that's your birdie nine, and a scramble team that only pars the Valley holes has already lost the tournament."
+          },
+          {
+            "t": "Scramble math — where teams actually win",
+            "b": "You don't win a scramble by avoiding doubles; the format erases those for you. You win it by converting the 5–7 genuinely gettable holes and by never wasting a hole where all four of you miss. So the whole game is about SEQUENCING: get one ball safe, then let everyone else be aggressive off that safety net. The single biggest error you'll see all day is the team's last hitter playing conservatively when a ball is already in the fairway — that shot is completely free, and a free shot played safe is a shot thrown away."
+          },
+          {
+            "t": "Your role off the tee",
+            "b": "You have the perfect scramble bag for this: mini driver (~220) and the KING TEC 2-iron (~205) for when a ball simply has to be in the short grass, and the Stealth 2 for when one already is. Rule for the day: if nobody is safe yet, hit the club you'd bet $100 finds the fairway — on Taconic's tight holes and Highland's blind ones, that's the mini or the 2-iron, and nobody on your team will ever complain about a ball in play. If someone IS safe, take the driver and take the whole thing on. Your own note from the swing plan applies double here: the straight one comes from a LONGER, fuller swing; steering it is what turns it into the push-slice. In a scramble you have permission to make the fullest swing you own."
+          },
+          {
+            "t": "Approaches — the lay-up is the shot that scores",
+            "b": "This is the biggest edge you personally bring, and almost nobody uses it. In a scramble you CHOOSE the yardage for the next shot. On any par 5 you're laying up on — including Taconic's 6th over the water — pick the ball that leaves a full 95 (56°) or a full 108 (50°), not the one that's 18 yards closer and leaves a nervy three-quarter 70-yarder. Same on a punch-out. Your ladder off the 44° PW: PW 122 · 50° 108 · 56° 95 · 60° 80. Say the number out loud when the team is choosing the ball — it's the most useful sentence you can contribute all day. On approaches themselves: first player in plays to the CENTER of the green, everyone after that fires at the flag. Uphill into these hillside greens, club UP; anything short rolls back down to you."
+          },
+          {
+            "t": "The hill, the lies, and your free club-length",
+            "b": "All three nines are hilly, so you'll get very few flat lies — except that a scramble hands you a club-length of relief (confirm no-closer-to-the-hole at check-in). USE IT properly: don't just drop it where it's convenient, walk it to the flattest stance and the best ANGLE into the flag, and get out of any divot or wet spot. When you're stuck with a slope: ball above your feet turns it LEFT — with your strong lofts take one less and aim at the right edge; ball below the feet leaks right, so widen the stance and swing smooth. On the Highland especially, trust the elevation over the number."
+          },
+          {
+            "t": "Putting — the whole team's read is yours to use",
+            "b": "Best sequencing: whoever's least confident putts first and the best putter goes last, so the last ball has watched three balls take the line. Everyone marks the spot and putts from it. Two things that win scrambles on the green: the early putters should get the ball PAST the hole so the team learns the break and the speed — a putt left short teaches nothing — and the last putter plays the read that the first three just paid for. For you specifically: the DF3i handles the face, so your job is pace, and the routine still runs on every putt, including the 3-footer after a teammate has already stuffed it close. Your signature miss is left on the short ones, and 'gimme' tap-ins in a scramble are exactly where a stroke gets loose."
+          },
+          {
+            "t": "The opening hole — you have data on this",
+            "b": "Wianno told you the truth in numbers: across five opening holes you went 6, 6, 5, 4, 6 — SEVEN over par on five holes, and never a par on the first hole of a front nine. That's a not-warmed-up problem, not a swing problem, and you're driving an hour to a 7 AM-ish start. Get there early enough for the warm-up primer off the swing plan: a few slow ONE-HANDED reps (Miracle 201 or trail-arm-only), feeling the trail elbow lead down into the slot, then blend to two-handed swings. Then five minutes on the putting green for pace only — zoysia surrounds and well-kept greens mean you want the speed calibrated before the first putt counts for four people."
+          },
+          {
+            "t": "Confirm these at check-in",
+            "b": "Scramble formats vary and the details change your strategy: (1) is there a MINIMUM DRIVES rule — most events require each player's tee shot be used two or three times? If so, bank yours early on the wide holes rather than discovering on 17 that you owe two. (2) Net or gross, and how team handicap is figured. (3) Whether they're selling mulligans/skins — buy them for the tightest tee shots, not the first hole. (4) Cart path only? On a course this hilly, that changes club selection every hole. (5) Which nines, and shotgun or tee times."
+          },
+          {
+            "t": "Mindset for the day",
+            "b": "Early August, hilly, an hour in the car first — take the cart, drink more than you think, and load the weather tile at the first tee so the ladder's Today column adjusts your carries for the heat. This is the one round all year where your worst shot literally does not exist, so the risk-management instincts that serve you in stroke play are mostly wrong here: be the guy who takes on the flag once a teammate is safe. Log it in Coach afterward — score, the holes you converted, and any hole where all four of you missed — and I'll debrief it against this plan."
+          }
         ]
       }
     }
