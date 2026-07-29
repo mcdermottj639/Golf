@@ -100,6 +100,7 @@ function seed(){
       ],
     },
     fiveFt: [],           // {date, results:[...20 of make/L/R/S/Lg]}
+    stats: [],            // stat snapshots (GHIN etc), oldest first — see the `stats` feed type
     drillLog: [],         // {date, drill}
     tests: [],            // {date, putter, makes, note} — 10-ball demo tests
     shortlist: [
@@ -147,6 +148,7 @@ let S;
 function migrate(s){
   // Additive upgrades for states saved by older app versions.
   if(!s.feedApplied) s.feedApplied = [];
+  if(!s.stats) s.stats = [];
   if(!s.faults) s.faults = [
     { tag:'early-lift', why:'fault #1 in your filmed stroke sessions' },
     { tag:'tempo', why:'your filmed tempo runs ~1:1 (target 2:1)' },
@@ -1177,6 +1179,111 @@ function roundDiff(r){
   return (r.holes && r.holes.length <= 9) ? d * 2 : d;
 }
 
+// Stat snapshots pasted in from whatever app produced them (GHIN, older trackers).
+// Stored as a list so an old baseline and a current read can sit side by side —
+// the delta between them is worth more than either one alone. Snapshots carry
+// their own sample sizes, and everything here degrades when a field is absent.
+function latestStats(){ return S.stats && S.stats.length ? S.stats[S.stats.length-1] : null; }
+function baselineStats(){ return S.stats && S.stats.length > 1 ? S.stats[0] : null; }
+function parOrBetter(g){ const s = g && g.scoring; return s ? (s.birdie||0) + (s.par||0) : null; }
+function blowUps(g){ const s = g && g.scoring; return s ? (s.double||0) + (s.triple||0) : null; }
+// Up-and-down rate: some sources give a percentage, GHIN gives a per-round count
+// that only means something against how many greens were missed.
+function upDownPct(g){
+  if(!g) return null;
+  if(g.upDownPct != null) return g.upDownPct;
+  if(g.upDownsPerRound != null && g.gir != null){
+    const missed = 18 * (1 - g.gir / 100);
+    return missed > 0 ? (g.upDownsPerRound / missed) * 100 : null;
+  }
+  return null;
+}
+
+function statTips(){
+  const g = latestStats(), b = baselineStats();
+  const t = [];
+  if(!g) return t;
+  const a = g.approach, p = g.putting, ap = g.avgByPar || {}, d = g.driving;
+  const nAdv = g.roundsAdvanced || g.rounds || 0, nSc = g.roundsScoring || g.rounds || 0;
+  const thin = n => n < 5 ? ` (only ${n} round${n===1?'':'s'} behind this — indicative, not settled)` : '';
+
+  // The headline when there's a baseline: where the strokes actually moved.
+  if(b){
+    const dPutts = (b.putts != null && g.putts != null) ? b.putts - g.putts : null;
+    const dGir = (b.gir != null && g.gir != null) ? g.gir - b.gir : null;
+    if(dPutts != null && dPutts >= 1.5 && dGir != null && dGir <= -3)
+      t.push({ s:'warn', src:`Then vs now · ${b.rounds || b.roundsScoring} rds → ${nSc} rds`, h:'The leak moved to the long game',
+        b:`Putts per round are DOWN ${dPutts.toFixed(1)} (${b.putts.toFixed(1)} → ${g.putts.toFixed(1)}) — the putter project did its job. But greens in regulation fell ${Math.abs(dGir).toFixed(1)} points (${b.gir}% → ${g.gir}%)${b.driving && d ? ` and fairways ${b.driving.fairway}% → ${d.fairway}%` : ''}, and your scoring barely moved: par-or-better ${parOrBetter(b)}% → ${parOrBetter(g)}%, doubles ${blowUps(b)}% → ${blowUps(g)}%. You've been handing back on approach what you gained on the greens. The putting saga is won — the work belongs tee-to-green now.` });
+    const dOne = (b.putting && p && b.putting.one != null && p.one != null) ? p.one - b.putting.one : null;
+    if(dPutts != null && dPutts >= 1.5 && dOne != null && Math.abs(dOne) <= 2)
+      t.push({ s:'mid', src:'Read this one carefully', h:'Some of the putting gain is an illusion',
+        b:`Putts per round dropped ${dPutts.toFixed(1)}, but your one-putt rate is flat (${b.putting.one}% → ${p.one}%). Missing more greens mechanically lowers putts per round — you chip on and putt once instead of lagging from 40 feet. Part of that improvement is fewer greens hit, not a better stroke. The 5-footer scoreboard and the stroke film are the honest measures; putts per round is contaminated by GIR.` });
+  }
+
+  if(a && a.short != null){
+    const sides = (a.left || 0) + (a.right || 0);
+    if(a.short >= 30 && a.short >= sides)
+      t.push({ s:'warn', src:`Approach · ${nAdv} rounds`, h:'You miss short, not sideways',
+        b:`${a.short}% of approaches finish SHORT against ${a.left||0}% left, ${a.right||0}% right and ${a.long||0}% long. That is not dispersion — a scattergun misses every direction. A miss that only ever goes one way is a DISTANCE problem: the number you're clubbing to is longer than the club actually carries. Club up one when between clubs, and re-baseline your ladder to AVERAGE carry rather than your best strike. A yardage set built from your purest 7-iron comes up short all day${thin(nAdv)}.` });
+  }
+  const ud = upDownPct(g), udB = upDownPct(b);
+  if(ud != null && ud < 30)
+    t.push({ s:'warn', src:`Short game · ${nAdv} rounds`, h:`Scrambling around ${Math.round(ud)}%`,
+      b:`${g.gir != null ? `At ${g.gir}% greens you're missing about ${(18*(1-g.gir/100)).toFixed(0)} a round. ` : ''}Every miss you don't convert is a bogey at best.${udB != null ? ` And this isn't new — it was ${udB.toFixed(0)}% in the older data too, so it's a standing weakness rather than a bad patch.` : ''} With greens hit this low, up-and-down rate moves your score more than ball-striking does, and it's the cheapest thing here to practise${thin(nAdv)}.` });
+  if(p && p.three != null && p.three >= 10)
+    t.push({ s:'warn', src:`Putting · ${nAdv} rounds`, h:`${p.three}% three-putts or worse`,
+      b:`Roughly ${(p.three/100*18).toFixed(1)} a round, against ${p.one||0}% one-putts. Three-putts are a PACE fault, not a line fault — the first putt is finishing outside gimme range. Same signature as the lag work already on your card${thin(nAdv)}.` });
+  if(ap[5] != null && ap[4] != null && (ap[5] - 5) >= 0.6)
+    t.push({ s:'mid', src:`Scoring · ${nSc} rounds`, h:'Par 5s give you nothing',
+      b:`Averaging ${ap[5].toFixed(2)} on par 5s — barely better relative to par than your ${ap[4].toFixed(2)} on par 4s. A par 5 is the one hole where a mid-handicap gets a free run at birdie. Decide the lay-up off your wedge ladder so the third shot is a number you own.` });
+  const blow = blowUps(g);
+  if(blow != null && blow >= 15)
+    t.push({ s:'warn', src:`Scoring · ${nSc} rounds`, h:`${blow}% of holes are double or worse`,
+      b:`Across ${nSc} rounds, so this is the baseline rather than one bad week. Against ${g.scoring.birdie||0}% birdies, your score is decided by the bad holes, not the good ones. Taking the punch-out instead of the hero shot is worth more strokes than any swing change.` });
+  return t;
+}
+
+function statsCard(){
+  const g = latestStats(), b = baselineStats();
+  if(!g) return '';
+  const pc = v => v == null ? '—' : `${(+v).toFixed(v % 1 ? 1 : 0)}%`;
+  const nm = v => v == null ? '—' : (+v).toFixed(v % 1 ? 2 : 1);
+  const rows = [
+    ['Par or better', parOrBetter(b), parOrBetter(g), pc, 'up'],
+    ['Double or worse', blowUps(b), blowUps(g), pc, 'down'],
+    ['Birdies', b && b.scoring && b.scoring.birdie, g.scoring && g.scoring.birdie, pc, 'up'],
+    ['Avg · par 3', b && b.avgByPar && b.avgByPar[3], g.avgByPar && g.avgByPar[3], nm, 'down'],
+    ['Avg · par 4', b && b.avgByPar && b.avgByPar[4], g.avgByPar && g.avgByPar[4], nm, 'down'],
+    ['Avg · par 5', b && b.avgByPar && b.avgByPar[5], g.avgByPar && g.avgByPar[5], nm, 'down'],
+    ['Greens in reg.', b && b.gir, g.gir, pc, 'up'],
+    ['Fairways hit', b && b.driving && b.driving.fairway, g.driving && g.driving.fairway, pc, 'up'],
+    ['Putts / round', b && b.putts, g.putts, nm, 'down'],
+    ['One-putts', b && b.putting && b.putting.one, g.putting && g.putting.one, pc, 'up'],
+    ['Up & down', upDownPct(b), upDownPct(g), pc, 'up'],
+  ].filter(r => r[2] != null);
+  const arrow = (was, now, dir) => {
+    if(was == null || now == null) return '';
+    const d = now - was;
+    if(Math.abs(d) < 0.05) return '<span class="faint">—</span>';
+    const good = dir === 'up' ? d > 0 : d < 0;
+    return `<b style="color:${good ? 'var(--green)' : 'var(--burg)'}">${d > 0 ? '+' : ''}${d.toFixed(Math.abs(d) < 10 ? 1 : 0)}</b>`;
+  };
+  const a = g.approach;
+  return `
+  <h2>Tracked stats</h2>
+  <div class="card">
+    <table><tr><th>Metric</th>${b ? `<th>${esc(b.label || 'Then')}</th>` : ''}<th>${esc(g.label || 'Now')}</th>${b ? '<th>Δ</th>' : ''}</tr>
+      ${rows.map(([k, was, now, fmt, dir]) => `<tr><td class="sm"><b>${k}</b></td>
+        ${b ? `<td class="sm faint">${fmt(was)}</td>` : ''}<td><b>${fmt(now)}</b></td>
+        ${b ? `<td class="sm">${arrow(was, now, dir)}</td>` : ''}</tr>`).join('')}
+    </table>
+    ${a && a.short != null ? `<p class="sm" style="margin-top:8px">Approach misses: <b class="warn">${a.short}% short</b> · ${a.left||0}% left · ${a.right||0}% right · ${a.long||0}% long.</p>` : ''}
+    <p class="sm faint" style="margin-top:8px">
+      ${b ? `<b>${esc(b.label||'Then')}</b> — ${b.rounds || b.roundsScoring} rounds${b.avgScore ? `, averaging ${b.avgScore}` : ''}. ` : ''}
+      <b>${esc(g.label||'Now')}</b> — ${g.roundsScoring || g.rounds} rounds of scoring${g.roundsAdvanced && g.roundsAdvanced !== (g.roundsScoring || g.rounds) ? `, but only ${g.roundsAdvanced} with the shot-level detail, so treat greens, fairways and putts as indicative` : ''}.</p>
+  </div>`;
+}
+
 // Best 40% of score differentials, the way a handicap index is built. Needs a few
 // rounds behind it before it means anything, so it stays null until then.
 function estIndex(){
@@ -1215,7 +1322,7 @@ function scoreStats(){
 // Tips fire off thresholds in the data, so they only appear once there's
 // enough of it to mean anything. Each one carries the number that triggered it.
 function scoreTips(st){
-  const t = [];
+  const t = statTips();
   if(!st.holes) return t;
   const blowN = st.mix.double + st.mix.triple;
   const blowShots = st.mix.double * 2 + st.mix.triple * 3;
@@ -1230,7 +1337,10 @@ function scoreTips(st){
   const p3 = st.byPar[3], p4 = st.byPar[4], p5 = st.byPar[5];
   // A par 3 takes the driver out of your hands, so it should be clearly your best
   // scoring hole. Parity with the par 4s is itself the finding.
-  if(p3.n >= 6 && p4.n >= 6 && (p3.over / p3.n) >= (p4.over / p4.n) * 0.9) t.push({ s:'warn', src:'Where it points', h:'Par 3s are no better than your par 4s',
+  // A handful of par 3s at one course must not outvote a season of them.
+  const bp = (latestStats() || {}).avgByPar;
+  const bigSampleSaysFine = bp && bp[3] != null && bp[4] != null && (bp[3] - 3) < (bp[4] - 4) * 0.9;
+  if(!bigSampleSaysFine && p3.n >= 6 && p4.n >= 6 && (p3.over / p3.n) >= (p4.over / p4.n) * 0.9) t.push({ s:'warn', src:'Where it points', h:'Par 3s are no better than your par 4s',
     b:`+${(p3.over/p3.n).toFixed(2)} a hole on par 3s against +${(p4.over/p4.n).toFixed(2)} on par 4s. There's no driver on a par 3 and no second shot to recover with, so it should be comfortably your best hole type — level with the par 4s means the tee shot itself isn't finding greens. That's iron control, not driving. Club to cover the front edge rather than to reach the pin.` });
   if(p5.n >= 4 && p5.red === 0) t.push({ s:'mid', src:'Missing offense', h:'No birdies on par 5s',
     b:`${p5.n} par-5 holes played, zero under par. Par 5s are where a mid-handicap makes his money. Decide the lay-up off your wedge ladder so the third shot is a NUMBER you own rather than whatever's left — 60°→80 · 56°→95 · 50°→108 · PW→122.` });
@@ -1307,6 +1417,8 @@ function scores(){
       <div class="src">${esc(t.src)}</div><h4>${t.h}</h4><p class="sm">${t.b}</p></div>`).join('')}
     <p class="sm faint">Generated from your own rounds — these change as the data does.</p>
   </div>` : ''}
+
+  ${statsCard()}
 
   <h2>Every round</h2>
   <div class="card">
@@ -1585,6 +1697,10 @@ function applyFeed(feed){
     else if(e.type === 'course-add' && e.course && !S.courses.some(c => c.name === e.course.name))
       S.courses.push({ id:e.id, rating:null, pr:null, bucket:false, notes:'', ...e.course });
     else if(e.type === 'course-remove') S.courses = S.courses.filter(c => c.name !== e.target);
+    else if(e.type === 'stats' && e.stats){
+      if(!S.stats.some(x => x.id === e.id)) S.stats.push({ id:e.id, ...e.stats });
+      S.stats.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    }
     else if(e.type === 'round' && e.round){
       if(!S.rounds.some(r => r.feedId === e.id)) S.rounds.push({ feedId:e.id, troubles:[], putts:null, note:'', ...e.round });
     }
