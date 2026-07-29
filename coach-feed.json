@@ -785,11 +785,36 @@
       "finding": "First long-game film on record: full coiled shoulder turn, unhurried ~3:1 tempo, and a balanced held finish — with the visible tracer running straight up the middle. No sign of the putting lift habit leaking into the full swing.",
       "detail": {
         "metrics": [
-          { "k": "Shoulder turn", "v": "Full coil", "s": "good", "n": "back to target at the top" },
-          { "k": "Tempo", "v": "Unhurried ~3:1", "s": "good", "n": "no snatch from the top" },
-          { "k": "Finish", "v": "Balanced · held", "s": "good", "n": "weight fully left, toe up" },
-          { "k": "Ball flight", "v": "Up the middle", "s": "good", "n": "tracer on the visible shot" },
-          { "k": "Face/path detail", "v": "Can't assess", "s": "mid", "n": "compressed screen-record, one angle" }
+          {
+            "k": "Shoulder turn",
+            "v": "Full coil",
+            "s": "good",
+            "n": "back to target at the top"
+          },
+          {
+            "k": "Tempo",
+            "v": "Unhurried ~3:1",
+            "s": "good",
+            "n": "no snatch from the top"
+          },
+          {
+            "k": "Finish",
+            "v": "Balanced · held",
+            "s": "good",
+            "n": "weight fully left, toe up"
+          },
+          {
+            "k": "Ball flight",
+            "v": "Up the middle",
+            "s": "good",
+            "n": "tracer on the visible shot"
+          },
+          {
+            "k": "Face/path detail",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "compressed screen-record, one angle"
+          }
         ],
         "story": "Two simulator-bay swings, captured as screen-recorded story clips. The good stuff is structural and it's all there: a genuinely full shoulder coil at the top (not an arms lift), an unhurried transition — the backswing takes roughly three times the downswing, which is right where a full swing should live — and a committed, balanced finish that holds while the ball flies. The one readable tracer runs straight up the middle of the fairway. Notably, the up-and-out habit from the putting baseline does not appear here: the follow-through wraps full and low.",
         "compare": "First full-swing entry, so this IS the baseline. The putting project's faults look putting-specific — encouraging for the long game.",
@@ -896,11 +921,36 @@
       "finding": "8/10. Both misses died AT the hole — one beside the cup on the pull side, one hung on the near-left lip. No face-flip pattern anywhere: every start line tracked the center. The old blow-through left miss did not appear.",
       "detail": {
         "metrics": [
-          { "k": "Makes", "v": "8 / 10", "s": "good", "n": "4-footers, conventional grip" },
-          { "k": "Start lines", "v": "On line · 10/10", "s": "good", "n": "no face-flip visible" },
-          { "k": "Miss 1 (putt 4)", "v": "Beside cup", "s": "mid", "n": "pull side, by an inch" },
-          { "k": "Miss 2 (putt 10)", "v": "Hung on lip", "s": "mid", "n": "near-left edge, dead pace" },
-          { "k": "Pattern", "v": "Pace, not face", "s": "good", "n": "both misses died arriving" }
+          {
+            "k": "Makes",
+            "v": "8 / 10",
+            "s": "good",
+            "n": "4-footers, conventional grip"
+          },
+          {
+            "k": "Start lines",
+            "v": "On line · 10/10",
+            "s": "good",
+            "n": "no face-flip visible"
+          },
+          {
+            "k": "Miss 1 (putt 4)",
+            "v": "Beside cup",
+            "s": "mid",
+            "n": "pull side, by an inch"
+          },
+          {
+            "k": "Miss 2 (putt 10)",
+            "v": "Hung on lip",
+            "s": "mid",
+            "n": "near-left edge, dead pace"
+          },
+          {
+            "k": "Pattern",
+            "v": "Pace, not face",
+            "s": "good",
+            "n": "both misses died arriving"
+          }
         ],
         "story": "First measured block of the Grip Experiment, scored frame-by-frame from ten clips. Eight drops. The scoring learned this mat's behavior on the way: made balls fall through and auto-return the full length of the mat at steady speed (which is how putt 3 — initially scored short — was corrected to a make: gravity can't roll a ball six feet back up a flat mat). The two real misses share a signature: both balls DIED at the hole. One settled an inch to the pull side, one hung on the near-left lip. That's dying-speed variance, not the old face-rotation miss — start lines were clean on all ten.",
         "compare": "Versus the old baseline: the catastrophic left start line is gone. What's left is arrival-speed fine-tuning — a firmer 'back of the cup' pace would likely have converted both misses.",
@@ -921,8 +971,14 @@
       "id": "s7-faults",
       "type": "faults",
       "faults": [
-        { "tag": "early-lift", "why": "the one open fault — film face-on with the DF3i to close it" },
-        { "tag": "short-putts", "why": "Stage 0 block 1: 8/10 conventional, zero face-flips — misses were pace at the lip. Run the official 20-ball at 5ft for the gate" }
+        {
+          "tag": "early-lift",
+          "why": "the one open fault — film face-on with the DF3i to close it"
+        },
+        {
+          "tag": "short-putts",
+          "why": "Stage 0 block 1: 8/10 conventional, zero face-flips — misses were pace at the lip. Run the official 20-ball at 5ft for the gate"
+        }
       ]
     },
     {
@@ -933,11 +989,36 @@
       "finding": "8/10. Unbiased pattern read: all 10 start lines clean (no face-flip). The signal is at ARRIVAL — 2 misses + 2 lip-hangs, all on dying pace, and both misses settled on the same (pull) side. Working hypothesis: soft-pace drift, not a stroke fault — three testable causes queued for the next block.",
       "detail": {
         "metrics": [
-          { "k": "Makes", "v": "8 / 10", "s": "good", "n": "4-footers, conventional grip" },
-          { "k": "Start lines", "v": "Clean · 10/10", "s": "good", "n": "no face rotation anywhere" },
-          { "k": "Arrival quality", "v": "4 soft arrivals", "s": "mid", "n": "2 misses + 2 lip-hangs (6, 9)" },
-          { "k": "Miss side", "v": "Both pull-side", "s": "mid", "n": "2-of-2 — a lean, not yet proof" },
-          { "k": "Verdict", "v": "Pace first, side second", "s": "good", "n": "watch item, not a diagnosis" }
+          {
+            "k": "Makes",
+            "v": "8 / 10",
+            "s": "good",
+            "n": "4-footers, conventional grip"
+          },
+          {
+            "k": "Start lines",
+            "v": "Clean · 10/10",
+            "s": "good",
+            "n": "no face rotation anywhere"
+          },
+          {
+            "k": "Arrival quality",
+            "v": "4 soft arrivals",
+            "s": "mid",
+            "n": "2 misses + 2 lip-hangs (6, 9)"
+          },
+          {
+            "k": "Miss side",
+            "v": "Both pull-side",
+            "s": "mid",
+            "n": "2-of-2 — a lean, not yet proof"
+          },
+          {
+            "k": "Verdict",
+            "v": "Pace first, side second",
+            "s": "good",
+            "n": "watch item, not a diagnosis"
+          }
         ],
         "story": "Scored deliberately without assuming the old left-miss theory. What the film actually shows: ten clean start lines — the face-rotation era is over on this evidence. The live signal is arrival speed: four putts arrived dying (two hung on the lip before dropping — putts 6 and 9 — and two died out). Secondary observation, flagged at low confidence: both genuine misses settled on the same side (the pull side). Two data points is a lean, not a pattern. Three candidate causes, all testable: (1) a tiny pull bias that only shows when the ball decelerates below hole-speed; (2) mat lean or seam near the cup; (3) a whisker of aim. None of them is the old face-flip — that would show in the start lines, and it doesn't.",
         "compare": "Versus the diagnosis era: the catastrophic miss is gone. What's left is one notch of arrival pace and a two-putt side lean worth tracking honestly.",
@@ -948,11 +1029,21 @@
       "id": "df3i-pace-fault",
       "type": "faults",
       "faults": [
-        { "tag": "early-lift", "why": "the one open stroke fault — film face-on with the DF3i to close it" },
-        { "tag": "three-putts", "why": "DF3i pace calibration: lags short + short putts firm at Hudson Hills + mat arrivals dying — the new head's power curve isn't learned yet. Lag ladder drill, twice this week" }
+        {
+          "tag": "early-lift",
+          "why": "the one open stroke fault — film face-on with the DF3i to close it"
+        },
+        {
+          "tag": "three-putts",
+          "why": "DF3i pace calibration: lags short + short putts firm at Hudson Hills + mat arrivals dying — the new head's power curve isn't learned yet. Lag ladder drill, twice this week"
+        }
       ]
     },
-    { "id": "rm-grip-v1", "type": "briefing-remove", "target": "plan-grip-experiment" },
+    {
+      "id": "rm-grip-v1",
+      "type": "briefing-remove",
+      "target": "plan-grip-experiment"
+    },
     {
       "id": "evolution-v3",
       "type": "evolution",
@@ -1176,12 +1267,42 @@
       "finding": "Well-sequenced, athletic driver swing — no glaring faults for an 8-cap. Full coil, lower-body-led transition, head behind the ball, balanced held finish. Two fine-tuning items: the club sits slightly ACROSS THE LINE / laid-off at the top, and the hips look to slide level through impact rather than clearing up-and-around. The 'feels great at the top but not through contact' complaint reads as a transition/hip-clearance thing, not a backswing problem.",
       "detail": {
         "metrics": [
-          { "k": "Shoulder turn", "v": "Full coil", "s": "good", "n": "back to target, head behind ball" },
-          { "k": "Transition", "v": "Lower body first", "s": "good", "n": "hips start down, no cast" },
-          { "k": "Top of swing", "v": "Across the line", "s": "warn", "n": "shaft points right of target, trail elbow drifts behind" },
-          { "k": "Hips thru impact", "v": "Slide > rotate", "s": "warn", "n": "level/slidey — wants to clear up & around" },
-          { "k": "Finish", "v": "Balanced · held", "s": "good", "n": "weight left, trail toe up" },
-          { "k": "Launch data", "v": "Can't assess", "s": "mid", "n": "no path/AoA/spin numbers in frame" }
+          {
+            "k": "Shoulder turn",
+            "v": "Full coil",
+            "s": "good",
+            "n": "back to target, head behind ball"
+          },
+          {
+            "k": "Transition",
+            "v": "Lower body first",
+            "s": "good",
+            "n": "hips start down, no cast"
+          },
+          {
+            "k": "Top of swing",
+            "v": "Across the line",
+            "s": "warn",
+            "n": "shaft points right of target, trail elbow drifts behind"
+          },
+          {
+            "k": "Hips thru impact",
+            "v": "Slide > rotate",
+            "s": "warn",
+            "n": "level/slidey — wants to clear up & around"
+          },
+          {
+            "k": "Finish",
+            "v": "Balanced · held",
+            "s": "good",
+            "n": "weight left, trail toe up"
+          },
+          {
+            "k": "Launch data",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "no path/AoA/spin numbers in frame"
+          }
         ],
         "story": "Five phone stills spanning top-of-backswing to finish. The bones are good: a genuinely full shoulder coil with the head staying behind the ball, a transition that starts from the ground up (hips opening while the hands still drop into the slot — not a cast from the top), and a committed, balanced finish that holds. Two things to fine-tune. (1) At the top the club is slightly across the line / laid off — shaft pointing right of target with the trail elbow drifting behind the body; that forces a small re-route coming down. (2) Through the delivery the hips look to slide level toward the target rather than clearing rotationally — which is exactly the 'great at the top, loses it through contact' feel. More lead-hip clearance would add speed and help hit UP on the driver.",
         "compare": "Second full-swing entry on record (after the Jul 19 sim baseline). Same across-the-line top shows here AND in the wedge swing filmed the same day — a shared pattern, so it's worth fixing at the source rather than per-club.",
@@ -1196,12 +1317,42 @@
       "finding": "Strong wedge action — compact backswing, lower-body-led transition, and (the best part) spine angle well maintained through impact: a genuine ball-first, cover-the-ball look, the opposite of the driver and exactly right. Same slightly ACROSS-THE-LINE top as the driver shows up here too. Finish runs near-full; watch that partial-wedge distance control isn't riding a full swing every time.",
       "detail": {
         "metrics": [
-          { "k": "Backswing length", "v": "Compact", "s": "good", "n": "shortened from driver — correct" },
-          { "k": "Transition", "v": "Lower body first", "s": "good", "n": "drops into slot, no cast" },
-          { "k": "Top of swing", "v": "Across the line", "s": "warn", "n": "same laid-off look as the driver" },
-          { "k": "Spine / posture thru impact", "v": "Held · covers ball", "s": "good", "n": "stays down, hits down — ideal" },
-          { "k": "Strike look", "v": "Ball-first / descending", "s": "good", "n": "on top of it, not hanging back" },
-          { "k": "Finish / distance ctrl", "v": "Near-full", "s": "mid", "n": "fine for stock; flight partials for control" }
+          {
+            "k": "Backswing length",
+            "v": "Compact",
+            "s": "good",
+            "n": "shortened from driver — correct"
+          },
+          {
+            "k": "Transition",
+            "v": "Lower body first",
+            "s": "good",
+            "n": "drops into slot, no cast"
+          },
+          {
+            "k": "Top of swing",
+            "v": "Across the line",
+            "s": "warn",
+            "n": "same laid-off look as the driver"
+          },
+          {
+            "k": "Spine / posture thru impact",
+            "v": "Held · covers ball",
+            "s": "good",
+            "n": "stays down, hits down — ideal"
+          },
+          {
+            "k": "Strike look",
+            "v": "Ball-first / descending",
+            "s": "good",
+            "n": "on top of it, not hanging back"
+          },
+          {
+            "k": "Finish / distance ctrl",
+            "v": "Near-full",
+            "s": "mid",
+            "n": "fine for stock; flight partials for control"
+          }
         ],
         "story": "Five phone stills, top to finish. The wedge swing's standout is impact: forward tilt and spine angle are well maintained, you stay 'on top of' the ball and cover it — a descending, ball-first strike, which is exactly what you want with a wedge and the mirror image of hitting up on the driver. Sequencing is the same good story as the driver — lower body leads, no cast. The one shared item is the top: slightly across the line / laid off, trail elbow drifting behind — the identical pattern to the driver frame, which is why the fix is one feel for both clubs. The finish runs close to full; for stock shots that's fine, just make sure partial-wedge distances come from controlled length and flight, not a full send every time.",
         "compare": "Filmed the same day as the driver. Two things carry across both clubs: good ground-up sequencing (keep it) and the across-the-line top (fix it once, for both). The wedge's maintained spine angle is a nice contrast to the driver's slidey hips.",
@@ -2545,6 +2696,105 @@
             "s": 5
           }
         ]
+      }
+    },
+    {
+      "id": "stats-archive-47rd",
+      "type": "stats",
+      "stats": {
+        "label": "Archive · 47 rounds",
+        "date": "2023-01-01",
+        "source": "older tracking app · cumulative stats",
+        "historical": true,
+        "rounds": 47,
+        "roundsScoring": 47,
+        "roundsAdvanced": 47,
+        "avgScore": 84,
+        "highScore": 94,
+        "lowScore": 77,
+        "scoring": {
+          "birdie": 4.4,
+          "par": 36.3,
+          "bogey": 41.1,
+          "double": 16.7,
+          "triple": 1.5
+        },
+        "scoringCounts": {
+          "birdie": 37,
+          "par": 307,
+          "bogey": 348,
+          "double": 141,
+          "triple": 13
+        },
+        "holes": 846,
+        "avgByPar": {
+          "3": 3.6,
+          "4": 4.8,
+          "5": 5.7
+        },
+        "gir": 37.1,
+        "driving": {
+          "fairway": 58.1,
+          "left": 16.8,
+          "right": 21.1,
+          "short": 3.0,
+          "long": 0.5,
+          "sand": 0.5
+        },
+        "putts": 34.2,
+        "puttsPerHole": 1.9,
+        "putting": {
+          "one": 19.5
+        },
+        "upDownPct": 20.5,
+        "upDownRaw": "9 of 44",
+        "sandSavePct": 11.1,
+        "sandSaveRaw": "1 of 9"
+      }
+    },
+    {
+      "id": "stats-ghin-20260729",
+      "type": "stats",
+      "stats": {
+        "label": "GHIN · now",
+        "date": "2026-07-29",
+        "source": "GHIN app · Stats tab",
+        "roundsScoring": 18,
+        "roundsAdvanced": 2,
+        "scoring": {
+          "birdie": 2,
+          "par": 33,
+          "bogey": 45,
+          "double": 19,
+          "triple": 1
+        },
+        "avgByPar": {
+          "3": 3.71,
+          "4": 4.91,
+          "5": 5.73
+        },
+        "gir": 28,
+        "approach": {
+          "long": 0,
+          "short": 44,
+          "left": 8,
+          "right": 3,
+          "other": 17
+        },
+        "driving": {
+          "fairway": 30,
+          "left": 15,
+          "right": 22,
+          "short": 22,
+          "long": 0
+        },
+        "putts": 30.0,
+        "upDownsPerRound": 2.0,
+        "putting": {
+          "one": 19,
+          "two": 68,
+          "three": 13
+        }
       }
     }
   ]
