@@ -2796,6 +2796,119 @@
           "three": 13
         }
       }
+    },
+    {
+      "id": "df3i-since-20260729",
+      "type": "club-update",
+      "target": "L.A.B. Golf DF3i",
+      "club": {
+        "since": "2026-07-18"
+      }
+    },
+    {
+      "id": "stats-archive-47rd-v2",
+      "type": "stats",
+      "replaces": "stats-archive-47rd",
+      "stats": {
+        "label": "Archive · 47 rounds",
+        "date": "2023-01-01",
+        "coversThrough": "2023-12-31",
+        "source": "older tracking app · cumulative stats",
+        "historical": true,
+        "putterEra": "pre-DF3i",
+        "rounds": 47,
+        "roundsScoring": 47,
+        "roundsAdvanced": 47,
+        "avgScore": 84,
+        "highScore": 94,
+        "lowScore": 77,
+        "scoring": {
+          "birdie": 4.4,
+          "par": 36.3,
+          "bogey": 41.1,
+          "double": 16.7,
+          "triple": 1.5
+        },
+        "scoringCounts": {
+          "birdie": 37,
+          "par": 307,
+          "bogey": 348,
+          "double": 141,
+          "triple": 13
+        },
+        "holes": 846,
+        "avgByPar": {
+          "3": 3.6,
+          "4": 4.8,
+          "5": 5.7
+        },
+        "gir": 37.1,
+        "driving": {
+          "fairway": 58.1,
+          "left": 16.8,
+          "right": 21.1,
+          "short": 3.0,
+          "long": 0.5,
+          "sand": 0.5
+        },
+        "putts": 34.2,
+        "puttsPerHole": 1.9,
+        "putting": {
+          "one": 19.5
+        },
+        "upDownPct": 20.5,
+        "upDownRaw": "9 of 44",
+        "sandSavePct": 11.1,
+        "sandSaveRaw": "1 of 9"
+      }
+    },
+    {
+      "id": "stats-ghin-20260729-v2",
+      "type": "stats",
+      "replaces": "stats-ghin-20260729",
+      "stats": {
+        "label": "GHIN · latest",
+        "date": "2026-07-29",
+        "coversThrough": "2026-07-17",
+        "source": "GHIN app · Stats tab",
+        "putterEra": "pre-DF3i",
+        "roundsScoring": 18,
+        "roundsAdvanced": 2,
+        "scoring": {
+          "birdie": 2,
+          "par": 33,
+          "bogey": 45,
+          "double": 19,
+          "triple": 1
+        },
+        "avgByPar": {
+          "3": 3.71,
+          "4": 4.91,
+          "5": 5.73
+        },
+        "gir": 28,
+        "approach": {
+          "long": 0,
+          "short": 44,
+          "left": 8,
+          "right": 3,
+          "other": 17
+        },
+        "driving": {
+          "fairway": 30,
+          "left": 15,
+          "right": 22,
+          "short": 22,
+          "long": 0
+        },
+        "putts": 30.0,
+        "upDownsPerRound": 2.0,
+        "putting": {
+          "one": 19,
+          "two": 68,
+          "three": 13
+        }
+      }
     }
   ]
 }

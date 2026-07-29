@@ -1183,6 +1183,20 @@ function roundDiff(r){
 // Stored as a list so an old baseline and a current read can sit side by side —
 // the delta between them is worth more than either one alone. Snapshots carry
 // their own sample sizes, and everything here degrades when a field is absent.
+// The gamer putter's in-play date, so the app can tell which data predates it.
+function putterSince(){
+  const p = S.clubs.find(c => c.cat === 'putter' && c.status === 'gaming' && c.since);
+  return p ? p.since : null;
+}
+// A snapshot's `coversThrough` is the last round it includes — NOT the day it was
+// read off the phone, which is why the read date can't be used for this.
+function statsCoverPutter(){
+  const since = putterSince();
+  if(!since) return true;
+  return S.stats.some(s => (s.coversThrough || '') >= since)
+      || S.rounds.some(r => (r.date || '') >= since);
+}
+
 function latestStats(){ return S.stats && S.stats.length ? S.stats[S.stats.length-1] : null; }
 function baselineStats(){ return S.stats && S.stats.length > 1 ? S.stats[0] : null; }
 function parOrBetter(g){ const s = g && g.scoring; return s ? (s.birdie||0) + (s.par||0) : null; }
@@ -1212,12 +1226,18 @@ function statTips(){
     const dPutts = (b.putts != null && g.putts != null) ? b.putts - g.putts : null;
     const dGir = (b.gir != null && g.gir != null) ? g.gir - b.gir : null;
     if(dPutts != null && dPutts >= 1.5 && dGir != null && dGir <= -3)
-      t.push({ s:'warn', src:`Then vs now · ${b.rounds || b.roundsScoring} rds → ${nSc} rds`, h:'The leak moved to the long game',
-        b:`Putts per round are DOWN ${dPutts.toFixed(1)} (${b.putts.toFixed(1)} → ${g.putts.toFixed(1)}) — the putter project did its job. But greens in regulation fell ${Math.abs(dGir).toFixed(1)} points (${b.gir}% → ${g.gir}%)${b.driving && d ? ` and fairways ${b.driving.fairway}% → ${d.fairway}%` : ''}, and your scoring barely moved: par-or-better ${parOrBetter(b)}% → ${parOrBetter(g)}%, doubles ${blowUps(b)}% → ${blowUps(g)}%. You've been handing back on approach what you gained on the greens. The putting saga is won — the work belongs tee-to-green now.` });
+      t.push({ s:'warn', src:`Then vs now · ${b.rounds || b.roundsScoring} rds → ${nSc} rds`, h:'The leak is tee-to-green',
+        b:`Putts per round are DOWN ${dPutts.toFixed(1)} (${b.putts.toFixed(1)} → ${g.putts.toFixed(1)}), but greens in regulation fell ${Math.abs(dGir).toFixed(1)} points (${b.gir}% → ${g.gir}%)${b.driving && d ? ` and fairways ${b.driving.fairway}% → ${d.fairway}%` : ''}, and scoring barely moved: par-or-better ${parOrBetter(b)}% → ${parOrBetter(g)}%, doubles ${blowUps(b)}% → ${blowUps(g)}%. Whatever you saved on the greens you handed back before you got there. The strokes are tee-to-green.` });
     const dOne = (b.putting && p && b.putting.one != null && p.one != null) ? p.one - b.putting.one : null;
     if(dPutts != null && dPutts >= 1.5 && dOne != null && Math.abs(dOne) <= 2)
-      t.push({ s:'mid', src:'Read this one carefully', h:'Some of the putting gain is an illusion',
-        b:`Putts per round dropped ${dPutts.toFixed(1)}, but your one-putt rate is flat (${b.putting.one}% → ${p.one}%). Missing more greens mechanically lowers putts per round — you chip on and putt once instead of lagging from 40 feet. Part of that improvement is fewer greens hit, not a better stroke. The 5-footer scoreboard and the stroke film are the honest measures; putts per round is contaminated by GIR.` });
+      t.push({ s:'mid', src:'Read this one carefully', h:'The putting gain is partly an artefact',
+        b:`Putts per round dropped ${dPutts.toFixed(1)}, but the one-putt rate is flat (${b.putting.one}% → ${p.one}%). Missing more greens mechanically lowers putts per round — you chip on and putt once instead of lagging from forty feet. So the drop is at least partly fewer greens hit, not a better stroke.` });
+  }
+
+  if(!statsCoverPutter()){
+    const pn = (S.clubs.find(c => c.cat === 'putter' && c.status === 'gaming') || {}).name || 'the current putter';
+    t.push({ s:'warn', src:'Nothing measured yet', h:`No round data covers ${pn}`,
+      b:`Every stat here — and every round logged — predates it. The mat tests and the stroke film are promising, but they are not scoring. Until a round is played and logged with it, its effect on your score is unmeasured, and nothing in this list should be read as a verdict on it either way. Play one, log the putts, and it becomes answerable.` });
   }
 
   if(a && a.short != null){
@@ -1698,6 +1718,7 @@ function applyFeed(feed){
       S.courses.push({ id:e.id, rating:null, pr:null, bucket:false, notes:'', ...e.course });
     else if(e.type === 'course-remove') S.courses = S.courses.filter(c => c.name !== e.target);
     else if(e.type === 'stats' && e.stats){
+      if(e.replaces) S.stats = S.stats.filter(x => x.id !== e.replaces);
       if(!S.stats.some(x => x.id === e.id)) S.stats.push({ id:e.id, ...e.stats });
       S.stats.sort((a,b) => (a.date||'').localeCompare(b.date||''));
     }
