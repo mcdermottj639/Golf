@@ -2909,6 +2909,126 @@
           "three": 13
         }
       }
+    },
+    {
+      "id": "plan-putt-routine-20260729-v6",
+      "type": "briefing",
+      "replaces": "plan-putt-routine-20260728-v5",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "LOCKED Jul 28 (Option 2). Setup and full pre-putt routine, with the two rehearsal strokes moved beside the ball so the pace feel doesn't decay before delivery.",
+        "sections": [
+          {
+            "t": "The setup",
+            "b": "Ball off the LEFT BREAST. Weight stacked ON the ball — pressure over it, not on the trail foot. Hands EVEN with the ball at address; the Press Pistol's 2° supplies the lean. Rock the shoulders, no hands. Loose grip. Bend over more, stand close, eyes down through the strike."
+          },
+          {
+            "t": "Why beside the ball and not behind it",
+            "b": "Rehearsing in your true putting posture — same spine angle, same arm hang, same shoulder plane — means the stroke that FEELS like 30 feet is the stroke you actually make. Magnitude transfers one-to-one. Rehearsing from behind the ball reads the break better, but you're standing upright there, so the size you feel is only an approximation. Your open fault is pace magnitude, not reading: path ✓, face ✓, start lines 10/10 twice over. Optimise the thing that's broken."
+          },
+          {
+            "t": "What changed and why",
+            "b": "Nothing was added — the pace step was always there (the eyes-on-hole rehearsal IS the pace step, and it's the best distance-control device there is). It just used to sit BEFORE the whole aiming sequence, so the feel had to survive setup, three looks and a press before delivery. Feel is perishable. Now it's about three beats from the stroke instead of six. The old hole-look at step 3 is gone — folded into rehearsal 2, where you were already looking at the hole."
+          },
+          {
+            "t": "Keep the order of the two rehearsals",
+            "b": "Ball-look first (path and contact), hole-look second (pace). The last thing you feel is the thing you carry in — so the pace stroke must be the last one. If the hole stroke ever drifts to first, the pace feel gets overwritten by the contact feel and you're back to guessing distance."
+          },
+          {
+            "t": "The press gets rehearsed too",
+            "b": "Ending rehearsal 2 with the forward press is deliberate. The press was the one part of the stroke that never got a practice rep — and press sets shaft lean, lean sets loft, loft sets rollout. A press that varies is a pace that varies. Rehearsing it at full size every time is how it stays the same size every time."
+          },
+          {
+            "t": "Two rules underneath it",
+            "b": "SAME BEAT COUNT, EVERY PUTT — routine length that varies is itself a pace variable; the putts where you take an extra look are the ones that come up short. And a VERBAL BACKSTOP is worth testing: say the pace intention right before the press ('die it a foot past', 'back of the cup'). Feel decays, a word doesn't."
+          },
+          {
+            "t": "Still to test — lags",
+            "b": "Past ~25 feet, try keeping your eyes ON THE HOLE through the actual stroke, not just the rehearsal. Feels absurd, works well — the ball isn't moving, you don't need to watch it. Block test, not mid-round: 10 lags eyes-on-ball vs 10 eyes-on-hole, measure the spread of stopping points. Same protocol as the lag ladder in the Weight & Low Point plan."
+          }
+        ],
+        "steps": [
+          "Read it from BEHIND the ball — pick the line and a spot a few inches ahead of it",
+          "Step BESIDE the ball, into full putting posture",
+          "Rehearsal 1 — eyes on the BALL. Path and contact.",
+          "Rehearsal 2 — eyes on the HOLE. Pace. Finish it with the forward press.",
+          "Step in — set the FACE to the spot first, then build the stance around it",
+          "Spot → ball → forward press → putt"
+        ],
+        "rules": [
+          "Hole-look rehearsal is always LAST",
+          "Same beat count every putt",
+          "Hands EVEN at address — the press is the trigger"
+        ]
+      }
+    },
+    {
+      "id": "plan-swing-routine-20260729-v2",
+      "type": "briefing",
+      "replaces": "plan-swing-routine-20260728",
+      "briefing": {
+        "course": "Swing Routine — Pre-Shot",
+        "discipline": "full-swing",
+        "focus": "A pre-shot routine built around YOUR pattern, not a generic one. Everything here is aimed at the single root cause the Jul 26 film found: an across-the-line top that forces a re-route, which shows up as sliding hips and the over-the-top slice. The routine's job is to stop you re-routing — and re-routing is something you do OVER the ball, so the routine gets the deciding done before you're standing there.",
+        "sections": [
+          {
+            "t": "The architecture — two zones",
+            "b": "BEHIND THE BALL is where every decision and every rehearsal happens. AT THE BALL is execution only — no thinking, no adjusting, no second guesses. This is the opposite of what we locked for putting, and deliberately so: in putting you rehearse beside the ball because stroke SIZE has to transfer exactly. In the full swing you're not calibrating magnitude, you're calibrating SHAPE and SEQUENCE — those transfer fine from behind the ball, and the commitment you buy is worth more. Different problem, different answer."
+          },
+          {
+            "t": "1 · Decide (behind the ball)",
+            "b": "Lie, wind, number, and where the trouble ISN'T. Then pick a SPECIFIC target — a tree, a bunker lip, a chimney — never 'the fairway'. DRIVER: aim the CENTER of the fairway, because your start line tends to pull left and center-aim leaves you room. Commit to ONE shape and say it out loud in your head. Then stop deciding — anything you reconsider later gets reconsidered over the ball, which is exactly where your swing falls apart."
+          },
+          {
+            "t": "2 · Rehearse (behind the ball, facing the target)",
+            "b": "ONE rehearsal swing. Not three. Feel the trail (right) elbow drop DOWN and stay IN FRONT of your trail-hip seam — that is the whole fix, and it's the one that repairs the top, the hips and the slice together. If the last swing felt across the line, make this a TRAIL-ARM-ONLY rehearsal instead: one hand, slow, feeling the drop into the slot. That's the feel that's been landing for you with the one-handed Miracle 201, and a normal club held trail-arm-only is a fine stand-in on the course."
+          },
+          {
+            "t": "3 · Aim (stepping in)",
+            "b": "Pick an intermediate spot a foot or two ahead of the ball on your start line. Set the CLUBFACE to that spot FIRST, then build the stance around the face — never the other way round. Feet shoulder-width (a touch wider for driver), lead foot flared 20–30° so the hips have somewhere to go. Ball off the lead heel for driver, center to just right of center for irons. Weight 50/50 irons, ~55/45 trail side for driver. Hinge from the hip SOCKETS, chin UP off the chest so the lead shoulder can turn under it."
+          },
+          {
+            "t": "4 · Go (no decisions left)",
+            "b": "One look at the target. One look back to the ball. Then a TRIGGER — a small waggle or a kick of the trail knee. Never start a swing from a frozen stand; a static start is where the snatch comes from, and the snatch is what lays the club off. Count it: 'one-and-… two.' Long patient load, unhurried transition, 3:1. Then hold the finish for THREE SECONDS. If you can't hold it, the sequence or the weight shift was off — that's free feedback on every single swing."
+          },
+          {
+            "t": "The one-thought rule",
+            "b": "ONE swing thought at a time. If you have two, you have none. Yours is the trail elbow — down and in front of the trail-hip seam. Everything else on your card (hip clearance, the slice, the laid-off top) is downstream of that one feel, which is exactly why you don't need a second thought. Rotate a different thought in only when the film says the root has moved."
+          },
+          {
+            "t": "The step-off rule",
+            "b": "If anything feels wrong once you're over the ball — alignment, the number, a gust, a stray thought — STEP OFF and restart from behind the ball. Do not fix it standing there. Over-the-ball corrections are precisely how a re-route gets built into a swing, and re-routing is your documented fault. Stepping off costs eight seconds; a re-route costs the shot."
+          },
+          {
+            "t": "Under pressure — longer, not shorter",
+            "b": "Your own note: the straight ball comes from a LONGER, fuller swing; a tighter, shorter swing turns into a cut, and when that goes wrong the miss is a PUSH-SLICE. Pressure makes everyone shorten and steer, so this is the rule that needs saying out loud before a tee shot that matters — when in doubt, commit to MORE swing, never less. Steering is the re-route wearing a disguise."
+          },
+          {
+            "t": "Warm-up primer — before the first tee",
+            "b": "A few slow ONE-HANDED reps with the Miracle 201, or trail-arm-only with a club, feeling the elbow lead down into the slot. Then blend into two-hand swings. This is your documented working feel — prime it before the round rather than hunting for it on the 4th hole. And keep the routine's beat count identical from the range to the 18th; a routine that shortens under pressure isn't a routine."
+          },
+          {
+            "t": "Wedges — one addition",
+            "b": "Everything above holds, plus: partial distances come from a CONTROLLED length and flight, not a full send with a soft grip. Choke down and hit the control shot. Your ladder off the 44° PW: 60°→80 · 56°→95 · 50°→108 · PW→122. Decide the NUMBER behind the ball like any other shot — the wedge swing on film is already good (spine held, ball-first, covering it); it's the distance decision that needs the routine."
+          }
+        ],
+        "steps": [
+          "Behind the ball — lie, wind, number, and where the trouble ISN'T",
+          "Pick a SPECIFIC target (driver: centre of the fairway)",
+          "Commit to one shape — then stop deciding",
+          "ONE rehearsal — trail elbow DOWN and IN FRONT of the trail-hip seam",
+          "Step in — clubface to the spot FIRST, then stance around it",
+          "One look at the target, one look back at the ball",
+          "Trigger — small waggle or trail-knee kick. Never start frozen.",
+          "Count 'one-and-… two' → swing → hold the finish 3 seconds"
+        ],
+        "rules": [
+          "ONE swing thought: the trail elbow",
+          "Feels wrong over the ball? STEP OFF and restart",
+          "Under pressure: LONGER, never shorter"
+        ]
+      }
     }
   ]
 }

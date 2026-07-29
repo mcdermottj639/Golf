@@ -1057,6 +1057,11 @@ function briefing(id){
     ${played ? `<p class="sm faint" style="margin-top:6px">Your history: ${played.rating != null ? 'rated ' + Number(played.rating).toFixed(2) : 'unrated'}${played.pr != null ? ' · PR ' + esc(played.pr) : ''}${played.notes ? ' · "' + esc(played.notes) + '"' : ''}</p>` : ''}
     ${wx ? `<p class="sm faint">Conditions now: ${Math.round(S.weather.t)}°F — carries play ${wx>1?'+':''}${((wx-1)*100).toFixed(1)}% (see the ladder's Today column).</p>` : ''}
   </div>
+  ${b.steps && b.steps.length ? `<div class="card">
+    <h2>The routine</h2>
+    <ol class="steps">${b.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+    ${b.rules && b.rules.length ? `<div class="steprules">${b.rules.map(r => `<span>${esc(r)}</span>`).join('')}</div>` : ''}
+  </div>` : ''}
   ${(b.sections || []).map(s => `<div class="card">
     <h2>${esc(s.t)}</h2>
     <p class="lesson-body">${esc(s.b)}</p>
