@@ -305,8 +305,10 @@ function buildJumpBar(){
     const b = document.createElement('button');
     b.className = 'jump';
     b.dataset.jump = h.id;
-    // Headings read "Scoring mix · 45 holes" — the half before the dot is the label.
-    b.textContent = h.textContent.split('·')[0].trim();
+    // Headings read "Scoring mix · 45 holes" or "Shaft at the top (down-the-line)".
+    // Keep the half before the dot, drop a trailing parenthetical — a jump label
+    // only has to be recognisable, and short chips keep the bar to fewer rows.
+    b.textContent = h.textContent.split('·')[0].replace(/\s*\([^)]*\)\s*$/, '').trim();
     bar.appendChild(b);
   });
   view.prepend(bar);
@@ -317,6 +319,7 @@ function rerender(){ render(current.view, current.arg); }
 // ----- Home -----
 function home(){
   const dl = daysLeft(S.settings.returnDeadline);
+  const idx = estIndex();
   const phantom = S.clubs.find(c => /phantom 7\.5/i.test(c.name));
   const returnDone = !phantom || phantom.status === 'returned';
   const last = latestFiveFt();
@@ -329,16 +332,12 @@ function home(){
     <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div></div>
     <div class="stat"><div class="v">${S.courses.filter(c=>!c.bucket).length}</div><div class="l">Courses</div></div>
     <div class="stat"><div class="v">${sc ? sc.makes+'/'+sc.total : '—'}</div><div class="l">5-ft makes</div></div>
-    <div class="stat ${!returnDone && dl!==null && dl<21 ? 'alert':''}"><div class="v">${returnDone ? '✓' : (dl===null?'—':dl+'d')}</div><div class="l">Return win.</div></div>
+    <div class="stat"><div class="v">${idx != null ? idx.toFixed(1) : '—'}</div><div class="l">Est. index</div></div>
   </div>
 
+  ${returnDone ? '' : `
   <div class="card">
     <h2>Putter return window</h2>
-    ${returnDone ? `
-    <h3 class="good">Closed ✓ — Phantom 7.5 returned</h3>
-    <p class="sm">The putter search is settled: the <b>L.A.B. DF3i</b> is the gamer, and the arc-suited Phantom 7.5 is officially returned. Nothing left on the clock.</p>
-    <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
-    ` : `
     <h3>${dl===null ? 'No deadline set' : dl + ' days left on the Phantom 7.5'}</h3>
     <p class="sm">${S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> — confirm the real one with the shop and update it below.' : 'Deadline confirmed.'}</p>
     <div class="formrow" style="margin-top:8px">
@@ -346,8 +345,7 @@ function home(){
       <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
     </div>
     <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
-    `}
-  </div>
+  </div>`}
 
   ${(() => {
     const today10 = today();
@@ -1118,6 +1116,7 @@ let editingCourse = null;
 // ----- Decisions -----
 function decisions(){
   const dl = daysLeft(S.settings.returnDeadline);
+  const idx = estIndex();
   const decided = S.clubs.find(c => c.cat==='putter' && c.status==='gaming' && c.flow==='zt');
   const phantom = S.clubs.find(c => /phantom 7\.5/i.test(c.name));
   const returnDone = !phantom || phantom.status === 'returned';
@@ -1176,6 +1175,15 @@ function roundDiff(r){
   if(r.rating == null || !r.slope || r.score == null) return null;
   const d = (113 / r.slope) * (r.score - r.rating);
   return (r.holes && r.holes.length <= 9) ? d * 2 : d;
+}
+
+// Best 40% of score differentials, the way a handicap index is built. Needs a few
+// rounds behind it before it means anything, so it stays null until then.
+function estIndex(){
+  const d = S.rounds.map(roundDiff).filter(v => v != null).sort((a,b) => a - b);
+  if(d.length < 3) return null;
+  const n = Math.max(1, Math.round(d.length * 0.4));
+  return d.slice(0, n).reduce((a,b) => a + b, 0) / n;
 }
 
 function scoreStats(){
@@ -1244,9 +1252,7 @@ function scores(){
   </div>`;
   const st = scoreStats();
   const tips = scoreTips(st);
-  const diffs = all.map(roundDiff).filter(v => v != null).sort((a,b) => a - b);
-  const idx = diffs.length >= 3 ? (diffs.slice(0, Math.max(1, Math.round(diffs.length * 0.4)))
-    .reduce((a,b) => a + b, 0) / Math.max(1, Math.round(diffs.length * 0.4))) : null;
+  const idx = estIndex();
   const vs = all.map(roundVsPar).filter(v => v != null);
   const best = all.filter(r => roundVsPar(r) != null).sort((a,b) => roundVsPar(a) - roundVsPar(b))[0];
   const pct = n => st.holes ? (n / st.holes * 100) : 0;
