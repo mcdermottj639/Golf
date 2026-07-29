@@ -705,9 +705,12 @@ function hipTopDown(){
   </svg>`;
   const clear=`<svg viewBox="0 0 168 156" role="img" aria-label="Hips rotating and clearing">
     ${stage}
-    <line x1="118" y1="40" x2="118" y2="96" style="stroke:${FNT};stroke-width:3;stroke-dasharray:3 3"/><text x="122" y="60" style="fill:${FNT};font:8px var(--sans)">wall</text>
-    <g transform="rotate(34 82 70)">${pelvis(GRN)}</g>
-    <path d="M 58 30 q 46 -6 60 34" style="fill:none;stroke:${GRN};stroke-width:4"/><polygon points="118,64 120,50 109,57" style="fill:${GRN}"/>
+    <!-- The wall sits BEHIND the golfer (up the panel, away from the target line),
+         because that is the direction the lead hip retreats into. Negative rotation
+         is counter-clockwise on screen: lead hip back and up, trail hip toward the ball. -->
+    <line x1="88" y1="34" x2="152" y2="34" style="stroke:${FNT};stroke-width:3;stroke-dasharray:3 3"/><text x="124" y="28" style="fill:${FNT};font:8px var(--sans)">wall</text>
+    <g transform="rotate(-34 82 70)">${pelvis(GRN)}</g>
+    <path d="M 112 78 q 10 -24 -4 -34" style="fill:none;stroke:${GRN};stroke-width:4"/><polygon points="108,38 102,49 114,48" style="fill:${GRN}"/>
     <text x="10" y="19" style="fill:${GRN};font:bold 12px var(--sans)">✓ CLEAR</text>
   </svg>`;
   return `<div class="posfig">${slide}</div><div class="posfig">${clear}</div>`;
