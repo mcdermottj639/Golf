@@ -3104,6 +3104,124 @@
         "name": "Wianno Club",
         "st": "MA"
       }
+    },
+    {
+      "id": "stats-ghin-2023",
+      "type": "stats",
+      "stats": {
+        "label": "2023 · GHIN",
+        "date": "2023-12-31",
+        "coversThrough": "2023-12-31",
+        "source": "GHIN app · Stats tab · 2023 Scores",
+        "historical": true,
+        "roundsScoring": 20,
+        "roundsAdvanced": 0,
+        "scoring": {
+          "birdie": 5,
+          "par": 32,
+          "bogey": 41,
+          "double": 20,
+          "triple": 2
+        },
+        "avgByPar": {
+          "3": 3.88,
+          "4": 4.9,
+          "5": 5.46
+        }
+      }
+    },
+    {
+      "id": "stats-ghin-2024",
+      "type": "stats",
+      "stats": {
+        "label": "2024 · GHIN",
+        "date": "2024-12-31",
+        "coversThrough": "2024-12-31",
+        "source": "GHIN app · Stats tab · 2024 Scores",
+        "historical": true,
+        "roundsScoring": 8,
+        "roundsAdvanced": 0,
+        "scoring": {
+          "birdie": 4,
+          "par": 39,
+          "bogey": 43,
+          "double": 13,
+          "triple": 1
+        },
+        "avgByPar": {
+          "3": 3.7,
+          "4": 4.65,
+          "5": 5.72
+        }
+      }
+    },
+    {
+      "id": "stats-ghin-2025",
+      "type": "stats",
+      "stats": {
+        "label": "2025 · GHIN",
+        "date": "2025-12-31",
+        "coversThrough": "2025-12-31",
+        "source": "GHIN app · Stats tab · 2025 Scores",
+        "historical": true,
+        "roundsScoring": 10,
+        "roundsAdvanced": 2,
+        "scoring": {
+          "birdie": 2,
+          "par": 30,
+          "bogey": 47,
+          "double": 20,
+          "triple": 1
+        },
+        "avgByPar": {
+          "3": 3.74,
+          "4": 4.94,
+          "5": 5.88
+        }
+      }
+    },
+    {
+      "id": "ghin-3yr-debrief-20260729",
+      "type": "briefing",
+      "briefing": {
+        "course": "2023–2025 GHIN — Three-Year Read",
+        "discipline": "full-swing",
+        "focus": "38 rounds of scoring summaries across three seasons. 2024 was your best year by a distance and 2025 gave all of it back — and the one number that has gotten worse every single year, with no exceptions, is your par-5 average.",
+        "sections": [
+          {
+            "t": "The three cards",
+            "b": "2023 · 20 rounds — 5% birdies, 32% pars, 41% bogeys, 20% doubles, 2% triples. Par-or-better 37%. 2024 · 8 rounds — 4% birdies, 39% pars, 43% bogeys, 13% doubles, 1% triples. Par-or-better 43%. 2025 · 10 rounds — 2% birdies, 30% pars, 47% bogeys, 20% doubles, 1% triples. Par-or-better 32%. Read down the par-or-better column and the shape of the three years is obvious: 37 → 43 → 32."
+          },
+          {
+            "t": "THE FINDING — par 5s have gotten worse every year",
+            "b": "5.46 → 5.72 → 5.88. That's the only metric on these three cards that moves in one direction with no exceptions, and it has cost you roughly a stroke and a half a round from where it started. On a par-72 with four par 5s, 2023's average gave you +1.8 on them; 2025 gave you +3.5. Par 5s are the holes a mid-single-digit is SUPPOSED to feed on — you get a wedge in your hand on the third shot by design. Instead they've quietly become your worst holes relative to par."
+          },
+          {
+            "t": "It's the same finding Wianno gave you",
+            "b": "The member-guest cards said it independently: 8 par-5 plays, four pars and four bogeys, ZERO birdies, +4. Two completely different data sources, same conclusion. That's no longer a small-sample fluke — it's the standing pattern, and it's the single most concrete thing on your whole card to attack. The fix is already written down: decide the lay-up off the ladder (PW 122 · 50° 108 · 56° 95 · 60° 80) so the third shot is a NUMBER you own rather than whatever's left after hitting it as far as it goes."
+          },
+          {
+            "t": "What actually happened in 2025",
+            "b": "Bogeys went from 43% to 47% and pars fell from 39% to 30% — that's nine points of pars converting almost one-for-one into bogeys. Doubles also went back up, 13% → 20%. So 2025 wasn't one blow-up round dragging the averages; it was the routine hole getting worse. Rough arithmetic on a par-72 with 4/10/4: 2023 ≈ 86.4, 2024 ≈ 84.2, 2025 ≈ 87.9. Roughly a four-shot swing between your best year and your last one."
+          },
+          {
+            "t": "What 2024 proves you can do",
+            "b": "Don't dismiss 2024 as a fluke just because it's eight rounds. 39% pars and 13% doubles is genuinely good golf, and the par-4 average — 4.65 — is nearly THREE TENTHS better than either year on either side of it. Ten par 4s a round makes that worth about three strokes on its own. Whatever you were doing in 2024 off the tee and into the green, that's the level, and it's yours; it's two years old, not theoretical."
+          },
+          {
+            "t": "The one thing that held up",
+            "b": "Par 3s: 3.88 → 3.70 → 3.74. They improved from 2023 and then stayed improved through the bad year. That's a real gain and worth knowing, because it means the collapse in 2025 was not a general ball-striking collapse — one-shot holes held while the two- and three-shot holes fell apart. That points at what happens AFTER the tee shot, not at the swing itself."
+          },
+          {
+            "t": "Read the sample sizes honestly",
+            "b": "Eight rounds in 2024 against twenty in 2023 — small samples move a lot, and none of these are adjusted for course difficulty, tees played, or conditions. Only two rounds in the whole three years carry GHIN's shot-level detail, so there's no fairways/greens/putts data behind any of this to explain WHY. Treat the year-by-year direction as real and the exact decimals as noisy. What survives that caveat is the par-5 line, because it moves the same way three years running and Wianno confirms it from a separate source."
+          },
+          {
+            "t": "The one job",
+            "b": "Don't try to fix all of this. Par 5s are the leak with the most evidence behind it, the clearest mechanism, and a fix that's already on your card and costs nothing to apply. Take the ladder number on every par-5 lay-up for the rest of this season and watch that 5.88. Everything else here is context."
+          }
+        ]
+      }
     }
   ]
 }
