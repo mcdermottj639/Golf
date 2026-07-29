@@ -1306,6 +1306,32 @@ function statsCard(){
     <p class="sm faint" style="margin-top:8px">
       ${b ? `<b>${esc(b.label||'Then')}</b> — ${b.rounds || b.roundsScoring} rounds${b.avgScore ? `, averaging ${b.avgScore}` : ''}. ` : ''}
       <b>${esc(g.label||'Now')}</b> — ${g.roundsScoring || g.rounds} rounds of scoring${g.roundsAdvanced && g.roundsAdvanced !== (g.roundsScoring || g.rounds) ? `, but only ${g.roundsAdvanced} with the shot-level detail, so treat greens, fairways and putts as indicative` : ''}.</p>
+  </div>
+  ${statsTrend()}`;
+}
+
+// Every snapshot in date order. The Then/Now table only ever shows the oldest and the
+// newest, so a season that sits between them is invisible without this.
+function statsTrend(){
+  const list = (S.stats || []).filter(s => s.scoring || s.avgByPar);
+  if(list.length < 3) return '';
+  const pc = v => v == null ? '—' : `${(+v).toFixed(v % 1 ? 1 : 0)}%`;
+  const nm = v => v == null ? '—' : (+v).toFixed(2);
+  const ap = (s, n) => s.avgByPar && s.avgByPar[n];
+  return `
+  <h2>Year by year</h2>
+  <div class="card">
+    <table><tr><th>Span</th><th>Par+</th><th>Dbl+</th><th>P3</th><th>P4</th><th>P5</th></tr>
+      ${list.map(s => `<tr>
+        <td class="sm"><b>${esc(s.label || fmtDate(s.date))}</b><br><span class="faint">${s.roundsScoring || s.rounds || '—'} rds</span></td>
+        <td><b>${pc(parOrBetter(s))}</b></td>
+        <td><b>${pc(blowUps(s))}</b></td>
+        <td class="sm">${nm(ap(s, 3))}</td>
+        <td class="sm">${nm(ap(s, 4))}</td>
+        <td class="sm">${nm(ap(s, 5))}</td></tr>`).join('')}
+    </table>
+    <p class="sm faint">Par+ = par or better · Dbl+ = double or worse · P3/P4/P5 = scoring average by par.
+    Sample sizes and course difficulty differ year to year, so read the direction rather than the decimals.</p>
   </div>`;
 }
 
