@@ -281,3 +281,15 @@ body.night table{font-family:var(--sans)}
   border:1px solid var(--line)}
 .jump:active{background:var(--green);color:var(--green-ink);border-color:var(--green)}
 h2{scroll-margin-top:14px}
+
+/* ---- Routine steps: the scan-in-five-seconds block ---- */
+.steps{list-style:none;counter-reset:st;margin:2px 0 0}
+.steps li{counter-increment:st;display:flex;gap:10px;align-items:flex-start;padding:8px 0;
+  border-bottom:1px dotted #c9bd9d;font-size:13.5px;line-height:1.45}
+.steps li:last-child{border-bottom:none;padding-bottom:0}
+.steps li::before{content:counter(st);flex:0 0 20px;height:20px;border-radius:50%;
+  background:var(--green);color:var(--green-ink);font-family:var(--sans);font-size:11px;
+  font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.steprules{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;padding-top:11px;border-top:1px solid var(--line2)}
+.steprules span{font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 10px;
+  border-radius:20px;background:var(--burg);color:var(--burg-ink)}
