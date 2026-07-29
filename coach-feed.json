@@ -3487,6 +3487,95 @@
           }
         ]
       }
+    },
+    {
+      "id": "plan-putt-routine-20260729-v7",
+      "type": "briefing",
+      "replaces": "plan-putt-routine-20260729-v6",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "LOCKED Jul 28 (Option 2), AMENDED Jul 29: the forward press was being HELD through the stroke, stacking lean on top of the grip's 2°. The press is now a trigger you choose — four body-led options that can't touch the face.",
+        "sections": [
+          {
+            "t": "The setup",
+            "b": "Ball off the LEFT BREAST. Weight stacked ON the ball — pressure over it, not on the trail foot. Hands EVEN with the ball at address; the Press Pistol's 2° supplies the lean. Rock the shoulders, no hands. Loose grip. Bend over more, stand close, eyes down through the strike."
+          },
+          {
+            "t": "WHAT CHANGED Jul 29 — you're holding the press",
+            "b": "Your own read, and it's the right one. A press that gets HELD keeps the hands in their new forward position all the way to impact, so the pressed lean and the grip's built-in 2° arrive stacked. Effective loft goes toward zero or past it, the ball gets driven DOWN into the green, and you get launch-hop-skid-then-roll instead of roll. That's the same hop-and-skid failure the Weight & Low Point plan describes — arriving from the opposite direction. It also makes the stroke hands-led, which is the single thing the zero-torque head exists to prevent, and the hands are the one part that can rotate the face in the half-second before takeaway. Your miss is left."
+          },
+          {
+            "t": "The distinction that matters — release vs hold",
+            "b": "A trigger is a MOTION, not a POSITION. Done properly you press forward and the putter travels BACK from there — the lean you just added is spent going into the backstroke and is gone by impact. What sets shaft lean at impact is where the low point sits (weight on the ball, sternum over it) plus the grip's 2°, not how far you pressed a beat earlier. That's why Crenshaw's press never produced a de-lofted stab. Held, it's a completely different move with a completely different impact position. Same name, opposite outcome."
+          },
+          {
+            "t": "THE TRIGGER MENU — pick ONE and stick to it",
+            "b": "Every one of these does the only job a trigger has — break inertia so you're not stroking from a dead stop — without putting the hands in charge of shaft lean. (A) THE FLOAT — start with this one. Lift the head a hair off the turf just before takeaway and go. No hand action, no lean change, and it removes ground friction so the takeaway starts smooth instead of dragging. Nicklaus hovered his putter for exactly this reason. (B) THE WHOLE-PUTTER WAGGLE — a small forward-and-back of the entire putter driven from the shoulders, wrists silent. The head moves, nothing hinges, so the shaft angle returns to where it started. (C) THE LEAD-SHOULDER SETTLE — a soft downward press of the lead shoulder. That joint is what actually runs an SBST stroke, so the trigger and the engine are the same muscle and nothing has to hand off. (D) THE TRAIL-KNEE KICK — a small kick in, or a settle of pressure. Furthest of all of them from the hands, and it's the same trigger your full-swing routine already uses, so both routines share one beat."
+          },
+          {
+            "t": "If you want to keep the hand press",
+            "b": "It's legitimate — but only in the released form: press, and let the backstroke start FROM the press, never rocking from the held position. That's the highest-skill option of the five and it's the one you've just proven you drift on under no pressure at all. If you keep it, it needs the film check below every few weeks, not once. The honest recommendation is to spend the next month on the float and see whether you miss the press at all."
+          },
+          {
+            "t": "How to tell it's actually releasing",
+            "b": "FILM IT FACE-ON and compare shaft lean at ADDRESS with shaft lean at IMPACT. Close to equal means the trigger is releasing and doing its job. Meaningfully more lean at impact means you're carrying it in — that's the hold, whatever it felt like. The free second check costs nothing: SOUND. A ball that's purely rolling makes one clean click; a ball driven down into the green adds a faint scuff a beat later. Listen for the scuff on the practice green before you ever reach for a camera."
+          },
+          {
+            "t": "Why beside the ball and not behind it",
+            "b": "Rehearsing in your true putting posture — same spine angle, same arm hang, same shoulder plane — means the stroke that FEELS like 30 feet is the stroke you actually make. Magnitude transfers one-to-one. Rehearsing from behind the ball reads the break better, but you're standing upright there, so the size you feel is only an approximation. Your open fault is pace magnitude, not reading: path ✓, face ✓, start lines 10/10 twice over. Optimise the thing that's broken."
+          },
+          {
+            "t": "Keep the order of the two rehearsals",
+            "b": "Ball-look first (path and contact), hole-look second (pace). The last thing you feel is the thing you carry in — so the pace stroke must be the last one. If the hole stroke ever drifts to first, the pace feel gets overwritten by the contact feel and you're back to guessing distance. And whichever trigger you pick, finish rehearsal 2 WITH it, at full size: the trigger was the one part of the stroke that never got a practice rep, which is exactly how it drifted into a hold without you noticing."
+          },
+          {
+            "t": "Two rules underneath it",
+            "b": "SAME BEAT COUNT, SAME TRIGGER, EVERY PUTT — a routine that varies in length is itself a pace variable, and the putts where you take an extra look are the ones that come up short. And a VERBAL BACKSTOP is worth testing: say the pace intention right before the trigger ('die it a foot past', 'back of the cup'). Feel decays, a word doesn't."
+          },
+          {
+            "t": "Still to test — lags",
+            "b": "Past ~25 feet, try keeping your eyes ON THE HOLE through the actual stroke, not just the rehearsal. Feels absurd, works well — the ball isn't moving, you don't need to watch it. Block test, not mid-round: 10 lags eyes-on-ball vs 10 eyes-on-hole, measure the spread of stopping points. Same protocol as the lag ladder in the Weight & Low Point plan."
+          }
+        ],
+        "steps": [
+          "Read it from BEHIND the ball — pick the line and a spot a few inches ahead of it",
+          "Step BESIDE the ball, into full putting posture",
+          "Rehearsal 1 — eyes on the BALL. Path and contact.",
+          "Rehearsal 2 — eyes on the HOLE. Pace. Finish it with your TRIGGER, full size.",
+          "Step in — set the FACE to the spot first, then build the stance around it",
+          "Spot → ball → TRIGGER → putt"
+        ],
+        "rules": [
+          "Hole-look rehearsal is always LAST",
+          "Same beat count, same trigger, every putt",
+          "Hands EVEN at address — the grip's 2° IS the lean",
+          "The trigger RELEASES — never hold it into the stroke"
+        ]
+      }
+    },
+    {
+      "id": "putt-trigger-action-20260729",
+      "type": "action",
+      "text": "PUTTING — Kill the held press: pick ONE trigger off the menu (start with the float) and bed it in. Test block: 10 balls from 5 ft with the old held press, 10 with the new trigger, both filmed face-on. Compare shaft lean at address vs impact on each, plus the miss pattern, and log both blocks in the 10-ball tester."
+    },
+    {
+      "id": "putt-faults-20260729",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "held-press",
+          "why": "Confirmed by Jack, Jul 29: the forward press is being HELD through the stroke rather than released into the backstroke, so the pressed lean stacks on top of the Press Pistol's 2° and both arrive at impact. De-lofts the putter, drives the ball down, and makes the stroke hands-led — the one thing the zero-torque head exists to prevent. Trigger menu + face-on film check are on the card."
+        },
+        {
+          "tag": "three-putts",
+          "why": "DF3i pace calibration still open — and there's now a confirmed mechanism behind it. A held press de-lofts the putter at impact, so the ball hops and skids before it rolls and arrives soft. Swap to a released trigger first, then re-judge pace; don't blame the head's power curve until the trigger is clean."
+        },
+        {
+          "tag": "early-lift",
+          "why": "DTL film (Session 8) shows the head staying low and extending down-line — strongly corroborated as gone. One face-on clip closes it, and the trigger test is the clip: film it then."
+        }
+      ]
     }
   ]
 }
