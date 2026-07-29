@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-07-21",
+  "updated": "2026-07-29",
   "entries": [
     {
       "id": "s4-session",
@@ -785,11 +785,36 @@
       "finding": "First long-game film on record: full coiled shoulder turn, unhurried ~3:1 tempo, and a balanced held finish — with the visible tracer running straight up the middle. No sign of the putting lift habit leaking into the full swing.",
       "detail": {
         "metrics": [
-          { "k": "Shoulder turn", "v": "Full coil", "s": "good", "n": "back to target at the top" },
-          { "k": "Tempo", "v": "Unhurried ~3:1", "s": "good", "n": "no snatch from the top" },
-          { "k": "Finish", "v": "Balanced · held", "s": "good", "n": "weight fully left, toe up" },
-          { "k": "Ball flight", "v": "Up the middle", "s": "good", "n": "tracer on the visible shot" },
-          { "k": "Face/path detail", "v": "Can't assess", "s": "mid", "n": "compressed screen-record, one angle" }
+          {
+            "k": "Shoulder turn",
+            "v": "Full coil",
+            "s": "good",
+            "n": "back to target at the top"
+          },
+          {
+            "k": "Tempo",
+            "v": "Unhurried ~3:1",
+            "s": "good",
+            "n": "no snatch from the top"
+          },
+          {
+            "k": "Finish",
+            "v": "Balanced · held",
+            "s": "good",
+            "n": "weight fully left, toe up"
+          },
+          {
+            "k": "Ball flight",
+            "v": "Up the middle",
+            "s": "good",
+            "n": "tracer on the visible shot"
+          },
+          {
+            "k": "Face/path detail",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "compressed screen-record, one angle"
+          }
         ],
         "story": "Two simulator-bay swings, captured as screen-recorded story clips. The good stuff is structural and it's all there: a genuinely full shoulder coil at the top (not an arms lift), an unhurried transition — the backswing takes roughly three times the downswing, which is right where a full swing should live — and a committed, balanced finish that holds while the ball flies. The one readable tracer runs straight up the middle of the fairway. Notably, the up-and-out habit from the putting baseline does not appear here: the follow-through wraps full and low.",
         "compare": "First full-swing entry, so this IS the baseline. The putting project's faults look putting-specific — encouraging for the long game.",
@@ -896,11 +921,36 @@
       "finding": "8/10. Both misses died AT the hole — one beside the cup on the pull side, one hung on the near-left lip. No face-flip pattern anywhere: every start line tracked the center. The old blow-through left miss did not appear.",
       "detail": {
         "metrics": [
-          { "k": "Makes", "v": "8 / 10", "s": "good", "n": "4-footers, conventional grip" },
-          { "k": "Start lines", "v": "On line · 10/10", "s": "good", "n": "no face-flip visible" },
-          { "k": "Miss 1 (putt 4)", "v": "Beside cup", "s": "mid", "n": "pull side, by an inch" },
-          { "k": "Miss 2 (putt 10)", "v": "Hung on lip", "s": "mid", "n": "near-left edge, dead pace" },
-          { "k": "Pattern", "v": "Pace, not face", "s": "good", "n": "both misses died arriving" }
+          {
+            "k": "Makes",
+            "v": "8 / 10",
+            "s": "good",
+            "n": "4-footers, conventional grip"
+          },
+          {
+            "k": "Start lines",
+            "v": "On line · 10/10",
+            "s": "good",
+            "n": "no face-flip visible"
+          },
+          {
+            "k": "Miss 1 (putt 4)",
+            "v": "Beside cup",
+            "s": "mid",
+            "n": "pull side, by an inch"
+          },
+          {
+            "k": "Miss 2 (putt 10)",
+            "v": "Hung on lip",
+            "s": "mid",
+            "n": "near-left edge, dead pace"
+          },
+          {
+            "k": "Pattern",
+            "v": "Pace, not face",
+            "s": "good",
+            "n": "both misses died arriving"
+          }
         ],
         "story": "First measured block of the Grip Experiment, scored frame-by-frame from ten clips. Eight drops. The scoring learned this mat's behavior on the way: made balls fall through and auto-return the full length of the mat at steady speed (which is how putt 3 — initially scored short — was corrected to a make: gravity can't roll a ball six feet back up a flat mat). The two real misses share a signature: both balls DIED at the hole. One settled an inch to the pull side, one hung on the near-left lip. That's dying-speed variance, not the old face-rotation miss — start lines were clean on all ten.",
         "compare": "Versus the old baseline: the catastrophic left start line is gone. What's left is arrival-speed fine-tuning — a firmer 'back of the cup' pace would likely have converted both misses.",
@@ -921,8 +971,14 @@
       "id": "s7-faults",
       "type": "faults",
       "faults": [
-        { "tag": "early-lift", "why": "the one open fault — film face-on with the DF3i to close it" },
-        { "tag": "short-putts", "why": "Stage 0 block 1: 8/10 conventional, zero face-flips — misses were pace at the lip. Run the official 20-ball at 5ft for the gate" }
+        {
+          "tag": "early-lift",
+          "why": "the one open fault — film face-on with the DF3i to close it"
+        },
+        {
+          "tag": "short-putts",
+          "why": "Stage 0 block 1: 8/10 conventional, zero face-flips — misses were pace at the lip. Run the official 20-ball at 5ft for the gate"
+        }
       ]
     },
     {
@@ -933,11 +989,36 @@
       "finding": "8/10. Unbiased pattern read: all 10 start lines clean (no face-flip). The signal is at ARRIVAL — 2 misses + 2 lip-hangs, all on dying pace, and both misses settled on the same (pull) side. Working hypothesis: soft-pace drift, not a stroke fault — three testable causes queued for the next block.",
       "detail": {
         "metrics": [
-          { "k": "Makes", "v": "8 / 10", "s": "good", "n": "4-footers, conventional grip" },
-          { "k": "Start lines", "v": "Clean · 10/10", "s": "good", "n": "no face rotation anywhere" },
-          { "k": "Arrival quality", "v": "4 soft arrivals", "s": "mid", "n": "2 misses + 2 lip-hangs (6, 9)" },
-          { "k": "Miss side", "v": "Both pull-side", "s": "mid", "n": "2-of-2 — a lean, not yet proof" },
-          { "k": "Verdict", "v": "Pace first, side second", "s": "good", "n": "watch item, not a diagnosis" }
+          {
+            "k": "Makes",
+            "v": "8 / 10",
+            "s": "good",
+            "n": "4-footers, conventional grip"
+          },
+          {
+            "k": "Start lines",
+            "v": "Clean · 10/10",
+            "s": "good",
+            "n": "no face rotation anywhere"
+          },
+          {
+            "k": "Arrival quality",
+            "v": "4 soft arrivals",
+            "s": "mid",
+            "n": "2 misses + 2 lip-hangs (6, 9)"
+          },
+          {
+            "k": "Miss side",
+            "v": "Both pull-side",
+            "s": "mid",
+            "n": "2-of-2 — a lean, not yet proof"
+          },
+          {
+            "k": "Verdict",
+            "v": "Pace first, side second",
+            "s": "good",
+            "n": "watch item, not a diagnosis"
+          }
         ],
         "story": "Scored deliberately without assuming the old left-miss theory. What the film actually shows: ten clean start lines — the face-rotation era is over on this evidence. The live signal is arrival speed: four putts arrived dying (two hung on the lip before dropping — putts 6 and 9 — and two died out). Secondary observation, flagged at low confidence: both genuine misses settled on the same side (the pull side). Two data points is a lean, not a pattern. Three candidate causes, all testable: (1) a tiny pull bias that only shows when the ball decelerates below hole-speed; (2) mat lean or seam near the cup; (3) a whisker of aim. None of them is the old face-flip — that would show in the start lines, and it doesn't.",
         "compare": "Versus the diagnosis era: the catastrophic miss is gone. What's left is one notch of arrival pace and a two-putt side lean worth tracking honestly.",
@@ -948,11 +1029,21 @@
       "id": "df3i-pace-fault",
       "type": "faults",
       "faults": [
-        { "tag": "early-lift", "why": "the one open stroke fault — film face-on with the DF3i to close it" },
-        { "tag": "three-putts", "why": "DF3i pace calibration: lags short + short putts firm at Hudson Hills + mat arrivals dying — the new head's power curve isn't learned yet. Lag ladder drill, twice this week" }
+        {
+          "tag": "early-lift",
+          "why": "the one open stroke fault — film face-on with the DF3i to close it"
+        },
+        {
+          "tag": "three-putts",
+          "why": "DF3i pace calibration: lags short + short putts firm at Hudson Hills + mat arrivals dying — the new head's power curve isn't learned yet. Lag ladder drill, twice this week"
+        }
       ]
     },
-    { "id": "rm-grip-v1", "type": "briefing-remove", "target": "plan-grip-experiment" },
+    {
+      "id": "rm-grip-v1",
+      "type": "briefing-remove",
+      "target": "plan-grip-experiment"
+    },
     {
       "id": "evolution-v3",
       "type": "evolution",
@@ -1167,6 +1258,1828 @@
           "why": "DF3i pace calibration still open — gate/tunnel reps can't judge pace to a hole. Lag ladder drill stays on the card until the arrivals stop dying short."
         }
       ]
+    },
+    {
+      "id": "s9-driver-20260726",
+      "type": "session",
+      "date": "2026-07-26",
+      "setup": "FULL SWING · Driver · 5 phone stills (backswing → finish) · simulator bay",
+      "finding": "Well-sequenced, athletic driver swing — no glaring faults for an 8-cap. Full coil, lower-body-led transition, head behind the ball, balanced held finish. Two fine-tuning items: the club sits slightly ACROSS THE LINE / laid-off at the top, and the hips look to slide level through impact rather than clearing up-and-around. The 'feels great at the top but not through contact' complaint reads as a transition/hip-clearance thing, not a backswing problem.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Shoulder turn",
+            "v": "Full coil",
+            "s": "good",
+            "n": "back to target, head behind ball"
+          },
+          {
+            "k": "Transition",
+            "v": "Lower body first",
+            "s": "good",
+            "n": "hips start down, no cast"
+          },
+          {
+            "k": "Top of swing",
+            "v": "Across the line",
+            "s": "warn",
+            "n": "shaft points right of target, trail elbow drifts behind"
+          },
+          {
+            "k": "Hips thru impact",
+            "v": "Slide > rotate",
+            "s": "warn",
+            "n": "level/slidey — wants to clear up & around"
+          },
+          {
+            "k": "Finish",
+            "v": "Balanced · held",
+            "s": "good",
+            "n": "weight left, trail toe up"
+          },
+          {
+            "k": "Launch data",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "no path/AoA/spin numbers in frame"
+          }
+        ],
+        "story": "Five phone stills spanning top-of-backswing to finish. The bones are good: a genuinely full shoulder coil with the head staying behind the ball, a transition that starts from the ground up (hips opening while the hands still drop into the slot — not a cast from the top), and a committed, balanced finish that holds. Two things to fine-tune. (1) At the top the club is slightly across the line / laid off — shaft pointing right of target with the trail elbow drifting behind the body; that forces a small re-route coming down. (2) Through the delivery the hips look to slide level toward the target rather than clearing rotationally — which is exactly the 'great at the top, loses it through contact' feel. More lead-hip clearance would add speed and help hit UP on the driver.",
+        "compare": "Second full-swing entry on record (after the Jul 19 sim baseline). Same across-the-line top shows here AND in the wedge swing filmed the same day — a shared pattern, so it's worth fixing at the source rather than per-club.",
+        "limits": "Phone stills, one angle, no launch monitor readout captured — face angle, club path, attack angle and spin can't be measured. For a real breakdown film DTL slo-mo at hand height + face-on, and grab the sim's path/AoA/spin numbers so the visual read can be tied to data."
+      }
+    },
+    {
+      "id": "s10-wedge-20260726",
+      "type": "session",
+      "date": "2026-07-26",
+      "setup": "FULL SWING · Wedge · 5 phone stills (backswing → finish) · simulator bay",
+      "finding": "Strong wedge action — compact backswing, lower-body-led transition, and (the best part) spine angle well maintained through impact: a genuine ball-first, cover-the-ball look, the opposite of the driver and exactly right. Same slightly ACROSS-THE-LINE top as the driver shows up here too. Finish runs near-full; watch that partial-wedge distance control isn't riding a full swing every time.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Backswing length",
+            "v": "Compact",
+            "s": "good",
+            "n": "shortened from driver — correct"
+          },
+          {
+            "k": "Transition",
+            "v": "Lower body first",
+            "s": "good",
+            "n": "drops into slot, no cast"
+          },
+          {
+            "k": "Top of swing",
+            "v": "Across the line",
+            "s": "warn",
+            "n": "same laid-off look as the driver"
+          },
+          {
+            "k": "Spine / posture thru impact",
+            "v": "Held · covers ball",
+            "s": "good",
+            "n": "stays down, hits down — ideal"
+          },
+          {
+            "k": "Strike look",
+            "v": "Ball-first / descending",
+            "s": "good",
+            "n": "on top of it, not hanging back"
+          },
+          {
+            "k": "Finish / distance ctrl",
+            "v": "Near-full",
+            "s": "mid",
+            "n": "fine for stock; flight partials for control"
+          }
+        ],
+        "story": "Five phone stills, top to finish. The wedge swing's standout is impact: forward tilt and spine angle are well maintained, you stay 'on top of' the ball and cover it — a descending, ball-first strike, which is exactly what you want with a wedge and the mirror image of hitting up on the driver. Sequencing is the same good story as the driver — lower body leads, no cast. The one shared item is the top: slightly across the line / laid off, trail elbow drifting behind — the identical pattern to the driver frame, which is why the fix is one feel for both clubs. The finish runs close to full; for stock shots that's fine, just make sure partial-wedge distances come from controlled length and flight, not a full send every time.",
+        "compare": "Filmed the same day as the driver. Two things carry across both clubs: good ground-up sequencing (keep it) and the across-the-line top (fix it once, for both). The wedge's maintained spine angle is a nice contrast to the driver's slidey hips.",
+        "limits": "Phone stills, one angle, no launch data — face control, spin, launch and carry can't be read. Film DTL + face-on slo-mo and capture the sim's spin/launch/carry to flight and gap the wedges precisely."
+      }
+    },
+    {
+      "id": "plan-swing-hips-20260726",
+      "type": "briefing",
+      "briefing": {
+        "course": "Swing Focus — Hips & the Laid-Off Top",
+        "focus": "Two swings filmed Jul 26 share two traits: good ground-up sequencing (keep) and a slightly across-the-line top (fix). Your own read — 'feels great at the top but not through contact' — points at hip clearance in transition. This is the standing swing plan until the next filmed check.",
+        "sections": [
+          {
+            "t": "The one connection: laid-off top + stalled hips are the same story",
+            "b": "When the club gets across the line / laid off at the top (shaft pointing right of target, trail elbow drifting behind you), the downswing has to re-route the club to save the shot. The most common save is the hips SLIDING toward the target and the chest hanging back — which is precisely the 'great at the top, lose it through contact' feeling. So we don't chase two separate fixes: clean up the top so the hips don't have to bail you out, and train the hips to CLEAR (rotate open) instead of slide. Fix the cause, the symptom follows."
+          },
+          {
+            "t": "What the film showed (both clubs, Jul 26)",
+            "b": "GOOD, protect it: full coil, head behind the ball (driver), lower-body-led transition on both, and a balanced held finish. WEDGE bonus: spine angle stayed, you covered the ball — a proper descending strike. TO FIX: (1) slightly across-the-line top on BOTH clubs — one feel fixes both; (2) driver hips look to slide level through impact instead of clearing up-and-around. No launch numbers were in frame, so path/attack-angle/spin are still unmeasured — that's the next data to grab."
+          },
+          {
+            "t": "Fix 1 · Clean up the top (trail elbow in front)",
+            "b": "FEEL: at the top, the trail (right) elbow points more DOWN at the ground and stays in FRONT of your trail-hip seam, keeping the club a hair more in front of your chest. Right now the elbow drifts behind you, which lays the shaft off. DRILL — Split-hand / trail-arm-only: make slow half-swings feeling the trail elbow lead down into the slot; pause at the top and check the shaft points AT the target line, not right of it. Mirror or a phone on a tripod DTL at the top confirms it. 10 slow reps before you hit balls."
+          },
+          {
+            "t": "Fix 2 · Clear the hips, don't slide them",
+            "b": "FEEL: from the top, the lead (left) hip clears BACK and UP — belt buckle turning left and rotating open — while your chest stays over the ball a beat longer. Not a slide toward the target; a turn around a post. This is where your speed and your 'through contact' consistency live. DRILLS: (a) Trail-foot-back / step-through: hit half wedges stepping the trail foot back through impact — forces rotation over slide. (b) Lead-hip-to-the-wall: set up with your lead hip a few inches off a wall/bag; on the downswing the hip should clear so it just brushes back and up, not bump forward into it. (c) Chair/impact-bag: feel the trail glute fire and the hips deepen (not thrust toward the ball) so you don't early-extend. 2–3 sets of 10 each, twice a week."
+          },
+          {
+            "t": "Driver vs wedge — keep them different on purpose",
+            "b": "DRIVER: ball forward, hips clearing up-and-around so you hit slightly UP — that's carry and less spin. WEDGE: keep exactly what the film showed — stay down, cover the ball, hit DOWN; don't let 'clear the hips' turn into standing up out of a wedge. Same sequencing engine, opposite low-point. If a swing thought bleeds the wrong way, park it — the wedge is already good."
+          },
+          {
+            "t": "How to test it at the sim (get the numbers this time)",
+            "b": "The visual read can only go so far without data. Next session, capture and log these: DRIVER — attack angle (want positive / hitting up), club path, face-to-path, spin (are you spinning it too much?), and ball speed. WEDGES — carry, spin, launch, and gap-check 60/56/50 against the ladder (80/95/108). Film one DTL clip at hand height + one face-on per club. Bring those back and this plan gets a lot more precise — including whether the across-the-line top is actually costing you a path/face number or is just cosmetic."
+          }
+        ]
+      }
+    },
+    {
+      "id": "swing-hips-action-20260726",
+      "type": "action",
+      "pri": true,
+      "text": "SWING — Hip clearance: trail-foot-back + lead-hip-to-the-wall drills, 2×/week. Feel the lead hip clear BACK & UP through impact, don't slide. (Plan: Swing Focus on Home)"
+    },
+    {
+      "id": "swing-laidoff-action-20260726",
+      "type": "action",
+      "pri": true,
+      "text": "SWING — Fix the across-the-line top on BOTH clubs: trail elbow points down & stays in front of the trail-hip seam. 10 slow trail-arm reps before hitting balls; check the shaft points at the target line."
+    },
+    {
+      "id": "swing-film-numbers-action-20260726",
+      "type": "action",
+      "text": "Next sim session: grab launch data — driver attack angle / path / face-to-path / spin, wedge carry+spin+gaps — plus one DTL (hand-height) and one face-on clip per club, so the swing read is tied to numbers."
+    },
+    {
+      "id": "grip-experiment-done-20260726",
+      "type": "action-done",
+      "target": "grip-experiment-action"
+    },
+    {
+      "id": "rm-grip-plan-v2-20260726",
+      "type": "briefing-remove",
+      "target": "plan-grip-experiment-v2"
+    },
+    {
+      "id": "grip-decision-20260726",
+      "type": "history",
+      "date": "2026-07",
+      "text": "Grip Experiment CLOSED: conventional (reverse-overlap) confirmed best with the DF3i — no left-miss return, don't add complexity to a solved problem. LHL/claw shelved."
+    },
+    {
+      "id": "golf-mind-20260726",
+      "type": "briefing",
+      "briefing": {
+        "course": "Golf Mind",
+        "focus": "Jack's own swing thoughts & setup keys, in his words — the go-to reference before a round or a range session. Grip is settled: conventional. Updated Jul 26.",
+        "sections": [
+          {
+            "t": "Driver — the big stick",
+            "b": "Aim the CENTER of the fairway — the start line tends to pull left, so center-aim leaves room. The straight ball comes from a LONGER, fuller swing — commit to that one. A tighter, shorter swing turns it into a cut, and when that goes wrong the miss is a PUSH-SLICE. So: full swing for straight; if you shorten it, expect the cut and know the push-slice is the bad one."
+          },
+          {
+            "t": "Mini driver",
+            "b": "Weight BACK. Tee it LOW for the piercing straight ball — NEVER at normal driver-tee height. From that setup you can work it both ways, draw or fade. This is the fairway-finder off the tee; low tee + weight back is what makes it behave."
+          },
+          {
+            "t": "Irons",
+            "b": "Ball position right of center, toward the trail (right) thigh. The new KING TECs fly HIGHER and longer than the old set — trust the extra height. When you need to flight it down or take something off, CHOKE DOWN and hit the control shot rather than just swinging soft."
+          },
+          {
+            "t": "Wedges",
+            "b": "(Open — fill in as you dial the Vokeys: your go-to feels for full vs. partial, and any open-face/flop keys. Ladder to stay honest: 60°→80 · 56°→95 · 50°→108 · PW→122.)"
+          },
+          {
+            "t": "Putting — DF3i",
+            "b": "Ball off the FRONT foot. Rock the SHOULDERS — no hands. LOOSE grip. Hands over the ball: it FEELS like a forward press, but it isn't. Bend over MORE, stand CLOSE, and eyes stay DOWN through the strike. Grip settled: conventional / reverse-overlap won the experiment — no need to revisit it."
+          }
+        ]
+      }
+    },
+    {
+      "id": "golf-mind-20260727",
+      "type": "briefing",
+      "replaces": "golf-mind-20260726",
+      "briefing": {
+        "course": "Golf Mind",
+        "focus": "Jack's own swing thoughts & setup keys, in his words — the go-to reference before a round or a range session. Grip is settled: conventional. Updated Jul 27.",
+        "sections": [
+          {
+            "t": "Driver — the big stick",
+            "b": "Aim the CENTER of the fairway — the start line tends to pull left, so center-aim leaves room. The straight ball comes from a LONGER, fuller swing — commit to that one. A tighter, shorter swing turns it into a cut, and when that goes wrong the miss is a PUSH-SLICE. So: full swing for straight; if you shorten it, expect the cut and know the push-slice is the bad one."
+          },
+          {
+            "t": "Mini driver",
+            "b": "Club setup: the r7 Quad's adjustable WEIGHTS are set in the BACK position. Tee it LOW for the piercing straight ball — NEVER at normal driver-tee height. From that setup you can work it both ways, draw or fade. This is the fairway-finder off the tee; weights back + low tee is what makes it behave."
+          },
+          {
+            "t": "Irons",
+            "b": "Ball position right of center, toward the trail (right) thigh. The new KING TECs fly HIGHER and longer than the old set — trust the extra height. When you need to flight it down or take something off, CHOKE DOWN and hit the control shot rather than just swinging soft."
+          },
+          {
+            "t": "Wedges",
+            "b": "(Open — fill in as you dial the Vokeys: your go-to feels for full vs. partial, and any open-face/flop keys. Ladder to stay honest: 60°→80 · 56°→95 · 50°→108 · PW→122.)"
+          },
+          {
+            "t": "Putting — DF3i",
+            "b": "Ball off the FRONT foot. Rock the SHOULDERS — no hands. LOOSE grip. Hands over the ball: it FEELS like a forward press, but it isn't. Bend over MORE, stand CLOSE, and eyes stay DOWN through the strike. Grip settled: conventional / reverse-overlap won the experiment — no need to revisit it."
+          }
+        ]
+      }
+    },
+    {
+      "id": "plan-miracle201-20260727",
+      "type": "briefing",
+      "briefing": {
+        "course": "At-Home Training — Miracle 201",
+        "focus": "Your WINNERSPIRIT Miracle 201 is the perfect home tool for the two things the Jul 26 film flagged: sequencing (hips lead) and releasing THROUGH contact instead of losing it. This is the standing at-home practice plan. Pairs with the Swing Focus plan.",
+        "sections": [
+          {
+            "t": "How the tool talks to you (read first)",
+            "b": "The Miracle 201 is a weighted (~550g), whippy carbon/glass-fiber trainer with TWO feedback channels. (1) THE CLICK: a slider fires an audible click at the point of maximum speed in your swing — WHERE you hear it tells you WHEN you're releasing. (2) THE SPEED DIAL: adjustable from ~15–50 m/s (≈34–111 mph); it sets how much speed is needed to trigger the click. Turn it DOWN for tempo work, UP to demand more clubhead speed or simulate a longer club. Because the shaft is heavy and flexible, you physically cannot rush it — it forces you to load and wait, which is exactly the medicine for your quick, across-the-line top."
+          },
+          {
+            "t": "Setup & safety — every session",
+            "b": "Space: ~8 ft clear all around and a high ceiling (garage, basement with clearance, or backyard). Never near people, lights, or a TV. Hold it with your normal CONVENTIONAL grip and your real posture — this only transfers if the setup matches your actual swing. WARM UP FIRST: 20–30 slow, smooth swings before anything hard — at 550g it's heavier than your driver and a cold max swing is how you tweak a back or oblique. Do a few swings LEFT-handed too (opposite of normal) each session — it balances the body and builds the anti-rotation muscles that protect you."
+          },
+          {
+            "t": "Drill 1 · Tempo & sequencing — the load-and-wait (core)",
+            "b": "Dial LOW. Make smooth 3:1 swings and FEEL the shaft bend and lag behind your hands at the top — if you snatch from the top it flails and clicks early/weak. Count 'one-and-… two': long patient load back, unhurried transition, then let it sling. This directly rewires the 'great at the top but quick coming down' pattern. 2 sets of 10, both directions. This is the most important drill on the list — do it every session."
+          },
+          {
+            "t": "Drill 2 · Impact timing — make the CLICK fire PAST the ball",
+            "b": "This one targets your exact complaint: 'lose it through contact.' GOAL: the click should crack at the BOTTOM of the arc — at or just PAST your lead leg — not up in the downswing. An EARLY click = casting / throwing the release away before impact (all your speed spent above the ball). Keep the wrists hinged and let the head release LATE so the click fires down by where the ball would be. 3 sets of 8. Listen every rep and adjust until the click consistently lives at/after the bottom."
+          },
+          {
+            "t": "Drill 3 · Transition & hips-lead (ties to Swing Focus)",
+            "b": "From the top, start down with the LOWER BODY — feel the lead hip clear BACK and UP while the trainer's head still lags behind. Because the head is heavy and slow to catch up, it exaggerates the hips-lead-hands feeling you need. If you spin the shoulders/arms first, the click comes early and weak — instant feedback that you cast. Do this right after the wall / trail-foot-back drills in your Swing Focus plan so the feel carries over. 2 sets of 8."
+          },
+          {
+            "t": "Drill 4 · Top-of-swing check — kill the laid-off shaft",
+            "b": "Slow reps to a PAUSE at the top. Feel the trail (right) elbow point down and stay IN FRONT of your trail-hip seam — the whippy shaft makes an across-the-line/laid-off top feel obviously 'stuck' and off-plane, which a normal club hides. Check in a mirror or a phone on a tripod that the shaft points at the target line, not right of it. 10 slow reps, no speed — this is a position drill."
+          },
+          {
+            "t": "Drill 5 · Speed sets (separate days)",
+            "b": "Dial UP. After a full warm-up: all-out swings for pure speed — at higher dial settings the click ONLY fires if you genuinely accelerate through the bottom. Protocol: 3 sets of 5 MAX-effort swings with full rest between sets (this is nervous-system/speed work — quality over quantity, never grind it into cardio). Throw in a few non-dominant-side swings. Benchmark: the highest dial setting you can consistently trigger — track it over weeks and watch it climb."
+          },
+          {
+            "t": "Weekly plan & what to log",
+            "b": "2–3 short sessions/week, 10–15 min each — and DON'T max out every time: alternate a TEMPO/TIMING day (Drills 1–4, low dial) with a SPEED day (Drill 5, high dial). Pre-round: 15–20 easy swings as a dynamic warm-up and tempo primer. Log in Coach: the dial setting you can reliably trigger, and whether the click is firing at/past the ball yet. Next time you film at the sim we'll check whether the later release and hips-lead carried into the real swing."
+          }
+        ]
+      }
+    },
+    {
+      "id": "miracle201-action-20260727",
+      "type": "action",
+      "pri": true,
+      "text": "Miracle 201 at home — 2–3×/week: alternate a tempo/timing day (low dial, Drills 1–4) and a speed day (high dial). Priority feel: make the CLICK fire at/just PAST the ball to kill the early release. (Plan: At-Home Training in the Swing lab)"
+    },
+    {
+      "id": "plan-swing-hips-20260727",
+      "type": "briefing",
+      "replaces": "plan-swing-hips-20260726",
+      "discipline": "full-swing",
+      "briefing": {
+        "course": "Swing Focus — Hips & the Laid-Off Top",
+        "focus": "Two swings filmed Jul 26 share two traits: good ground-up sequencing (keep) and a slightly across-the-line top (fix). Your own read — 'feels great at the top but not through contact' — points at hip clearance in transition. WORKING (Jul 27): one-arm/trail-arm swings are landing the drop into the slot. Standing swing plan until the next filmed check.",
+        "sections": [
+          {
+            "t": "✓ What's working — the one-arm (trail-arm) drop",
+            "b": "CONFIRMED (Jul 27): one-arm, right-hand-only swings really helped you FEEL the club drop into the slot in transition. Make this your go-to reset — it trains Fix 1 directly (trail elbow leading DOWN, in front of the trail-hip seam) and starts the shallowing that lets the hips clear instead of the shaft laying off. Use it as a warm-up primer and any time the top gets across the line: a few slow trail-arm-only reps feeling the elbow lead the drop, then blend it back into the two-arm swing. The Miracle 201 one-handed is a great way to exaggerate the same feel."
+          },
+          {
+            "t": "The one connection: laid-off top + stalled hips are the same story",
+            "b": "When the club gets across the line / laid off at the top (shaft pointing right of target, trail elbow drifting behind you), the downswing has to re-route the club to save the shot. The most common save is the hips SLIDING toward the target and the chest hanging back — which is precisely the 'great at the top, lose it through contact' feeling. So we don't chase two separate fixes: clean up the top so the hips don't have to bail you out, and train the hips to CLEAR (rotate open) instead of slide. Fix the cause, the symptom follows."
+          },
+          {
+            "t": "What the film showed (both clubs, Jul 26)",
+            "b": "GOOD, protect it: full coil, head behind the ball (driver), lower-body-led transition on both, and a balanced held finish. WEDGE bonus: spine angle stayed, you covered the ball — a proper descending strike. TO FIX: (1) slightly across-the-line top on BOTH clubs — one feel fixes both; (2) driver hips look to slide level through impact instead of clearing up-and-around. No launch numbers were in frame, so path/attack-angle/spin are still unmeasured — that's the next data to grab."
+          },
+          {
+            "t": "Fix 1 · Clean up the top (trail elbow in front)",
+            "b": "FEEL: at the top, the trail (right) elbow points more DOWN at the ground and stays in FRONT of your trail-hip seam, keeping the club a hair more in front of your chest. Right now the elbow drifts behind you, which lays the shaft off. DRILL — Split-hand / trail-arm-only: make slow half-swings feeling the trail elbow lead down into the slot; pause at the top and check the shaft points AT the target line, not right of it. Mirror or a phone on a tripod DTL at the top confirms it. 10 slow reps before you hit balls. (This is the drill that's working for you — see 'What's working' above.)"
+          },
+          {
+            "t": "Fix 2 · Clear the hips, don't slide them",
+            "b": "FEEL: from the top, the lead (left) hip clears BACK and UP — belt buckle turning left and rotating open — while your chest stays over the ball a beat longer. Not a slide toward the target; a turn around a post. This is where your speed and your 'through contact' consistency live. DRILLS: (a) Trail-foot-back / step-through: hit half wedges stepping the trail foot back through impact — forces rotation over slide. (b) Lead-hip-to-the-wall: set up with your lead hip a few inches off a wall/bag; on the downswing the hip should clear so it just brushes back and up, not bump forward into it. (c) Chair/impact-bag: feel the trail glute fire and the hips deepen (not thrust toward the ball) so you don't early-extend. 2–3 sets of 10 each, twice a week."
+          },
+          {
+            "t": "Driver vs wedge — keep them different on purpose",
+            "b": "DRIVER: ball forward, hips clearing up-and-around so you hit slightly UP — that's carry and less spin. WEDGE: keep exactly what the film showed — stay down, cover the ball, hit DOWN; don't let 'clear the hips' turn into standing up out of a wedge. Same sequencing engine, opposite low-point. If a swing thought bleeds the wrong way, park it — the wedge is already good."
+          },
+          {
+            "t": "How to test it at the sim (get the numbers this time)",
+            "b": "The visual read can only go so far without data. Next session, capture and log these: DRIVER — attack angle (want positive / hitting up), club path, face-to-path, spin (are you spinning it too much?), and ball speed. WEDGES — carry, spin, launch, and gap-check 60/56/50 against the ladder (80/95/108). Film one DTL clip at hand height + one face-on per club. Bring those back and this plan gets a lot more precise — including whether the across-the-line top is actually costing you a path/face number or is just cosmetic."
+          }
+        ]
+      }
+    },
+    {
+      "id": "swing-hips-action-fix-20260727",
+      "type": "action-update",
+      "target": "swing-hips-action-20260726",
+      "text": "SWING — Hip clearance: trail-foot-back + lead-hip-to-the-wall drills, 2×/week. Feel the lead hip clear BACK & UP through impact, don't slide. (Plan: Swing Focus in the Swing lab)"
+    },
+    {
+      "id": "swing-laidoff-action-fix-20260727",
+      "type": "action-update",
+      "target": "swing-laidoff-action-20260726",
+      "text": "SWING — Fix the across-the-line top on BOTH clubs: trail elbow points down & in front of the trail-hip seam. Groove it with the one-arm/trail-arm drop drill (the feel that's working) — 10 slow reps before hitting balls; check the shaft points at the target line."
+    },
+    {
+      "id": "plan-swing-positions-20260727",
+      "type": "briefing",
+      "discipline": "full-swing",
+      "briefing": {
+        "course": "Swing Positions — Body Checkpoints",
+        "focus": "A checkpoint map of WHERE the body goes — feet, knees, hips, spine, hands, head — from address to finish, so you can freeze each spot in a mirror or on video and match it. Built to answer 'where am I supposed to be?' — especially the hips (see the last two sections). RH references: LEAD = left, TRAIL = right.",
+        "sections": [
+          {
+            "t": "How to use this",
+            "b": "Don't try to hit all of these at once — that's paralysis. Pick ONE checkpoint per session, rehearse it slowly in a mirror (face-on) and on a down-the-line phone clip, then hit a few balls letting it happen. Positions are a map, not a swing thought for over the ball. Everything below is for a right-handed golfer: LEAD side = left, TRAIL side = right."
+          },
+          {
+            "t": "1 · Address — the setup everything else depends on",
+            "b": "FEET: shoulder-width for irons (insides of the heels about under your armpits), a touch wider for driver. Flare the LEAD foot out ~20–30° — this pre-clears room for the hips to turn through later. WEIGHT: 50/50 for irons, balanced on the arches (not toes, not heels); driver slightly on the trail side (~55/45). KNEES: soft athletic flex, like the top of a light squat — not locked, not deep. HIPS: hinge from the hip SOCKETS, not the waist — push your butt back like you're closing a car door with it. Pelvis neutral, hips level, small natural arch in the low back. SPINE/CHEST: tilt forward from that hinge so your chest is over the balls of your feet, plus a slight trail-shoulder-lower tilt (natural, since the trail hand sits lower on the grip). ARMS/HANDS: let the arms hang straight down from the shoulders — hands roughly under your chin, over your shoelaces. Irons: slight shaft lean, hands over the lead thigh. Driver: hands level with the ball. HEAD: steady, eyes down, chin UP off your chest so the lead shoulder can turn under it. BALL: driver off the lead heel; irons center to just right of center (your Golf Mind note)."
+          },
+          {
+            "t": "2 · Takeaway — halfway back (club parallel to the ground)",
+            "b": "Move it back in ONE PIECE — hands, arms and chest turn together, no early wrist roll. FEET/KNEES: quiet; weight just starting to press into the trail heel. HIPS: barely rotating — the TRAIL hip is turning BEHIND you, not sliding out over the trail foot (that slide is a sway). CHECKPOINT: shaft parallel to the target line, toe pointing up, hands over the trail thigh, lead arm straight and still across the chest."
+          },
+          {
+            "t": "3 · Top of the backswing",
+            "b": "FEET: pressure loaded into the trail heel and instep; lead heel can stay down or lift slightly — either is fine. KNEES: the TRAIL knee HOLDS its address flex — if it straightens, you've swayed/stood up. HIPS: turned ~45° so your belt buckle points right of the ball, and you feel LOADED into the trail glute — like you're sitting into that right hip. Trail hip should still be inside the trail foot (outside it = sway). SPINE: same tilt you set at address, unchanged. SHOULDERS: turned ~90°, lead shoulder under the chin, upper back to the target — shoulders turn about twice as much as the hips (that gap is your coil). ARMS/HANDS: lead arm comfortably straight; TRAIL ELBOW points more DOWN at the ground and stays IN FRONT of the trail-hip seam (your working feel); shaft points at / parallel to the target line — not laid off across it. HEAD: still behind the ball, quiet."
+          },
+          {
+            "t": "4 · Transition — how the downswing STARTS (your problem spot)",
+            "b": "The ORDER is the whole game, and it runs ground-up WHILE the club is still finishing the backswing. (1) FEET/PRESSURE FIRST: press down into the LEAD foot — feel pressure move to the lead heel/instep. (2) HIPS SECOND: the LEAD hip then CLEARS — it rotates open (turns left) and back behind you and UP — while (3) the arms and club simply DROP into the slot (this is exactly your one-arm feel). You are NOT shoving the hips toward the target; you're turning them out of the way so the arms have room to fall. TRAIL SIDE: trail heel starts to lift, trail knee kicks in toward the lead knee. CHECKPOINT (down-the-line): when your hands reach hip height, the shaft should point at or just outside the ball and your hips are ALREADY opening. If the hands get to the ball before the hips have turned, you cast."
+          },
+          {
+            "t": "5 · Impact — the position all of it is for",
+            "b": "FEET: ~80–90% of pressure on the LEAD foot; trail foot up on the inside of the toe. LEAD LEG: straightening / 'posting up' — this extension pulls the hips up and around and is a big chunk of the speed you lose when you slide instead. HIPS: OPEN ~35–45° to the target — belt buckle already pointing LEFT of the ball, lead hip HIGH and behind you. SPINE/CHEST: still tilted, chest 'covering' the ball; for irons and wedges you stay DOWN through it. HANDS: ahead of the ball for irons (shaft lean, hands over the lead thigh); level for driver so you catch it slightly on the up. HEAD: still behind the ball, eyes down. This is the money frame — most of the checkpoints above exist only to get you here."
+          },
+          {
+            "t": "6 · Follow-through & finish",
+            "b": "Keep rotating — the belt buckle turns from left-of-the-ball all the way to facing the target and past it. FEET: fully onto the lead foot, trail foot balanced on the toe with the laces to the target. HIPS: fully cleared and open, LEAD LEG tall and straight. CHEST: faces the target, then left of it. ARMS: extend down the line just after impact (the 'chase'), then fold up to a tall, balanced finish. Test: if you can HOLD the finish for 3 seconds without falling off balance, your sequence and weight shift were good."
+          },
+          {
+            "t": "7 · The HIPS in plain terms — SLIDE vs CLEAR (read twice)",
+            "b": "You're unsure here, so plainly: coming down, the hips can do two different things. A SLIDE is the hips moving SIDEWAYS toward the target — the belt buckle stays pointing at the ball, the hips stay 'closed,' and your upper body hangs back to counterbalance. That is the 'great at the top, lose it through contact' miss: no speed, hands flip to square the face, thin or fat strikes. A CLEAR (what you want) is the hips ROTATING — the lead hip turns back behind you and up as the lead leg straightens, so the belt buckle points LEFT of the ball at impact. THREE IMAGES that make it click: (a) There's a wall just behind your lead butt cheek — clearing = that cheek moves BACK to the wall, not toward the target. (b) You're standing in a barrel — you can TURN inside it but you can't slide out of it. (c) Pull your lead back pocket around behind you and up. Note: a SMALL lateral shift is real and necessary — but it happens in the FEET (pressure to the lead foot), and THEN the hips turn. Feet shift, hips spin — never the whole pelvis sliding as one block."
+          },
+          {
+            "t": "8 · How to groove it (feel beats positions)",
+            "b": "Positions are for the mirror; feels are for hitting. Best hip drills, all in your Swing Focus plan: TRAIL-FOOT-BACK step-through and LEAD-HIP-TO-THE-WALL — both make 'clear, don't slide' automatic because sliding is physically blocked. Then the ONE-HANDED Miracle 201 drop to feel the club fall while the hips open. Rehearse a checkpoint at ~50% speed until the shape is in; full speed returns on its own once the body trusts the position. One checkpoint at a time — stack them over weeks, not in one range session."
+          }
+        ]
+      }
+    },
+    {
+      "id": "plan-swing-hips-20260727-2",
+      "type": "briefing",
+      "replaces": "plan-swing-hips-20260727",
+      "discipline": "full-swing",
+      "briefing": {
+        "course": "Swing Focus — Hips & the Laid-Off Top",
+        "focus": "Two swings filmed Jul 26 share two traits: good ground-up sequencing (keep) and a slightly across-the-line top (fix). Your own read — 'feels great at the top but not through contact' — points at hip clearance in transition. WORKING (Jul 27): one-handed Miracle 201 swings are landing the drop into the slot. Standing swing plan until the next filmed check.",
+        "sections": [
+          {
+            "t": "✓ What's working — one-handed Miracle 201 drop",
+            "b": "CONFIRMED (Jul 27): swinging the MIRACLE 201 ONE-HANDED (trail/right hand only) tonight really helped you FEEL the club drop into the slot in transition. Make it your go-to reset — the heavy, whippy head with just the trail hand forces the elbow to lead DOWN (in front of the trail-hip seam) and shallows the shaft, so the hips can clear instead of the club laying off. Use it as a warm-up primer and any time the top gets across the line: a few slow one-handed 201 reps feeling the drop, then blend it into your two-hand swing. A club held trail-arm-only works as a stand-in when the trainer isn't handy."
+          },
+          {
+            "t": "The one connection: laid-off top + stalled hips are the same story",
+            "b": "When the club gets across the line / laid off at the top (shaft pointing right of target, trail elbow drifting behind you), the downswing has to re-route the club to save the shot. The most common save is the hips SLIDING toward the target and the chest hanging back — which is precisely the 'great at the top, lose it through contact' feeling. So we don't chase two separate fixes: clean up the top so the hips don't have to bail you out, and train the hips to CLEAR (rotate open) instead of slide. Fix the cause, the symptom follows."
+          },
+          {
+            "t": "What the film showed (both clubs, Jul 26)",
+            "b": "GOOD, protect it: full coil, head behind the ball (driver), lower-body-led transition on both, and a balanced held finish. WEDGE bonus: spine angle stayed, you covered the ball — a proper descending strike. TO FIX: (1) slightly across-the-line top on BOTH clubs — one feel fixes both; (2) driver hips look to slide level through impact instead of clearing up-and-around. No launch numbers were in frame, so path/attack-angle/spin are still unmeasured — that's the next data to grab."
+          },
+          {
+            "t": "Fix 1 · Clean up the top (trail elbow in front)",
+            "b": "FEEL: at the top, the trail (right) elbow points more DOWN at the ground and stays in FRONT of your trail-hip seam, keeping the club a hair more in front of your chest. Right now the elbow drifts behind you, which lays the shaft off. DRILL — the one-handed Miracle 201 (or club trail-arm-only): make slow half-swings feeling the trail elbow lead down into the slot; pause at the top and check the shaft points AT the target line, not right of it. Mirror or a phone on a tripod DTL at the top confirms it. 10 slow reps before you hit balls. (This is the drill that's working for you — see 'What's working' above.)"
+          },
+          {
+            "t": "Fix 2 · Clear the hips, don't slide them",
+            "b": "FEEL: from the top, the lead (left) hip clears BACK and UP — belt buckle turning left and rotating open — while your chest stays over the ball a beat longer. Not a slide toward the target; a turn around a post. This is where your speed and your 'through contact' consistency live. DRILLS: (a) Trail-foot-back / step-through: hit half wedges stepping the trail foot back through impact — forces rotation over slide. (b) Lead-hip-to-the-wall: set up with your lead hip a few inches off a wall/bag; on the downswing the hip should clear so it just brushes back and up, not bump forward into it. (c) Chair/impact-bag: feel the trail glute fire and the hips deepen (not thrust toward the ball) so you don't early-extend. 2–3 sets of 10 each, twice a week."
+          },
+          {
+            "t": "Driver vs wedge — keep them different on purpose",
+            "b": "DRIVER: ball forward, hips clearing up-and-around so you hit slightly UP — that's carry and less spin. WEDGE: keep exactly what the film showed — stay down, cover the ball, hit DOWN; don't let 'clear the hips' turn into standing up out of a wedge. Same sequencing engine, opposite low-point. If a swing thought bleeds the wrong way, park it — the wedge is already good."
+          },
+          {
+            "t": "How to test it at the sim (get the numbers this time)",
+            "b": "The visual read can only go so far without data. Next session, capture and log these: DRIVER — attack angle (want positive / hitting up), club path, face-to-path, spin (are you spinning it too much?), and ball speed. WEDGES — carry, spin, launch, and gap-check 60/56/50 against the ladder (80/95/108). Film one DTL clip at hand height + one face-on per club. Bring those back and this plan gets a lot more precise — including whether the across-the-line top is actually costing you a path/face number or is just cosmetic."
+          }
+        ]
+      }
+    },
+    {
+      "id": "plan-miracle201-20260727-2",
+      "type": "briefing",
+      "replaces": "plan-miracle201-20260727",
+      "discipline": "full-swing",
+      "briefing": {
+        "course": "At-Home Training — Miracle 201",
+        "focus": "Your WINNERSPIRIT Miracle 201 is the perfect home tool for the two things the Jul 26 film flagged: sequencing (hips lead) and releasing THROUGH contact instead of losing it. WORKING (Jul 27): one-handed reps are landing the drop into the slot. This is the standing at-home practice plan. Pairs with the Swing Focus plan.",
+        "sections": [
+          {
+            "t": "✓ What's working — one-handed reps",
+            "b": "CONFIRMED (Jul 27): swinging the 201 ONE-HANDED (trail/right hand only) is landing the 'drop into the slot' feel for you — the heavy head with a single hand exaggerates the shallowing and lag you're chasing, and makes an early cast obvious. Lean on it: start every session with a few slow one-handed reps (and use them inside Drill 1) before going two-handed, and reach for it any time the top feels across the line."
+          },
+          {
+            "t": "How the tool talks to you (read first)",
+            "b": "The Miracle 201 is a weighted (~550g), whippy carbon/glass-fiber trainer with TWO feedback channels. (1) THE CLICK: a slider fires an audible click at the point of maximum speed in your swing — WHERE you hear it tells you WHEN you're releasing. (2) THE SPEED DIAL: adjustable from ~15–50 m/s (≈34–111 mph); it sets how much speed is needed to trigger the click. Turn it DOWN for tempo work, UP to demand more clubhead speed or simulate a longer club. Because the shaft is heavy and flexible, you physically cannot rush it — it forces you to load and wait, which is exactly the medicine for your quick, across-the-line top."
+          },
+          {
+            "t": "Setup & safety — every session",
+            "b": "Space: ~8 ft clear all around and a high ceiling (garage, basement with clearance, or backyard). Never near people, lights, or a TV. Hold it with your normal CONVENTIONAL grip and your real posture — this only transfers if the setup matches your actual swing. WARM UP FIRST: 20–30 slow, smooth swings before anything hard — at 550g it's heavier than your driver and a cold max swing is how you tweak a back or oblique. Do a few swings LEFT-handed too (opposite of normal) each session — it balances the body and builds the anti-rotation muscles that protect you."
+          },
+          {
+            "t": "Drill 1 · Tempo & sequencing — the load-and-wait (core)",
+            "b": "Dial LOW. Make smooth 3:1 swings and FEEL the shaft bend and lag behind your hands at the top — if you snatch from the top it flails and clicks early/weak. Count 'one-and-… two': long patient load back, unhurried transition, then let it sling. Warm into it with the ONE-HANDED reps that are working for you, then go two-handed. This directly rewires the 'great at the top but quick coming down' pattern. 2 sets of 10, both directions. This is the most important drill on the list — do it every session."
+          },
+          {
+            "t": "Drill 2 · Impact timing — make the CLICK fire PAST the ball",
+            "b": "This one targets your exact complaint: 'lose it through contact.' GOAL: the click should crack at the BOTTOM of the arc — at or just PAST your lead leg — not up in the downswing. An EARLY click = casting / throwing the release away before impact (all your speed spent above the ball). Keep the wrists hinged and let the head release LATE so the click fires down by where the ball would be. 3 sets of 8. Listen every rep and adjust until the click consistently lives at/after the bottom."
+          },
+          {
+            "t": "Drill 3 · Transition & hips-lead (ties to Swing Focus)",
+            "b": "From the top, start down with the LOWER BODY — feel the lead hip clear BACK and UP while the trainer's head still lags behind. Because the head is heavy and slow to catch up, it exaggerates the hips-lead-hands feeling you need. If you spin the shoulders/arms first, the click comes early and weak — instant feedback that you cast. Do this right after the wall / trail-foot-back drills in your Swing Focus plan so the feel carries over. 2 sets of 8."
+          },
+          {
+            "t": "Drill 4 · Top-of-swing check — kill the laid-off shaft",
+            "b": "Slow reps to a PAUSE at the top. Feel the trail (right) elbow point down and stay IN FRONT of your trail-hip seam — the whippy shaft makes an across-the-line/laid-off top feel obviously 'stuck' and off-plane, which a normal club hides. Check in a mirror or a phone on a tripod that the shaft points at the target line, not right of it. 10 slow reps, no speed — this is a position drill."
+          },
+          {
+            "t": "Drill 5 · Speed sets (separate days)",
+            "b": "Dial UP. After a full warm-up: all-out swings for pure speed — at higher dial settings the click ONLY fires if you genuinely accelerate through the bottom. Protocol: 3 sets of 5 MAX-effort swings with full rest between sets (this is nervous-system/speed work — quality over quantity, never grind it into cardio). Throw in a few non-dominant-side swings. Benchmark: the highest dial setting you can consistently trigger — track it over weeks and watch it climb."
+          },
+          {
+            "t": "Weekly plan & what to log",
+            "b": "2–3 short sessions/week, 10–15 min each — and DON'T max out every time: alternate a TEMPO/TIMING day (Drills 1–4, low dial) with a SPEED day (Drill 5, high dial). Pre-round: 15–20 easy swings as a dynamic warm-up and tempo primer. Log in Coach: the dial setting you can reliably trigger, and whether the click is firing at/past the ball yet. Next time you film at the sim we'll check whether the later release and hips-lead carried into the real swing."
+          }
+        ]
+      }
+    },
+    {
+      "id": "swing-laidoff-action-fix2-20260727",
+      "type": "action-update",
+      "target": "swing-laidoff-action-20260726",
+      "text": "SWING — Fix the across-the-line top on BOTH clubs: trail elbow points down & in front of the trail-hip seam. Groove it with the one-handed Miracle 201 drop (the feel that's working) — a few slow reps before hitting balls; check the shaft points at the target line."
+    },
+    {
+      "id": "plan-swing-hips-20260727-3",
+      "type": "briefing",
+      "replaces": "plan-swing-hips-20260727-2",
+      "discipline": "full-swing",
+      "briefing": {
+        "course": "Swing Focus — Hips & the Laid-Off Top",
+        "focus": "Good ground-up sequencing (keep) and a slightly across-the-line top (fix); your read — 'great at the top, lose it through contact' — is hip clearance in transition, and it's the SAME root as your lifelong over-the-top slice (Fix 3). WORKING (Jul 27): one-handed Miracle 201 swings are landing the drop into the slot. Standing swing plan until the next filmed check.",
+        "sections": [
+          {
+            "t": "✓ What's working — one-handed Miracle 201 drop",
+            "b": "CONFIRMED (Jul 27): swinging the MIRACLE 201 ONE-HANDED (trail/right hand only) tonight really helped you FEEL the club drop into the slot in transition. Make it your go-to reset — the heavy, whippy head with just the trail hand forces the elbow to lead DOWN (in front of the trail-hip seam) and shallows the shaft, so the hips can clear instead of the club laying off. Use it as a warm-up primer and any time the top gets across the line: a few slow one-handed 201 reps feeling the drop, then blend it into your two-hand swing. A club held trail-arm-only works as a stand-in when the trainer isn't handy."
+          },
+          {
+            "t": "The one connection: laid-off top, stalled hips AND the over-the-top slice are one story",
+            "b": "When the club gets across the line / laid off at the top (shaft pointing right of target, trail elbow drifting behind you), the downswing has to re-route the club to save the shot. Two re-routes usually happen together: the hips SLIDE toward the target and the chest hangs back (the 'lose it through contact' feel), AND the trail shoulder throws the club OUT over the plane so it cuts across the ball — that's the over-the-top slice. One cause, three symptoms. So we don't chase three fixes: clean up the top, drop the club into the slot (shallow), and let the hips CLEAR — and all three symptoms go with it."
+          },
+          {
+            "t": "What the film showed (both clubs, Jul 26)",
+            "b": "GOOD, protect it: full coil, head behind the ball (driver), lower-body-led transition on both, and a balanced held finish. WEDGE bonus: spine angle stayed, you covered the ball — a proper descending strike. TO FIX: (1) slightly across-the-line top on BOTH clubs — one feel fixes both; (2) driver hips look to slide level through impact instead of clearing up-and-around. No launch numbers were in frame, so path/attack-angle/spin are still unmeasured — that's the next data to grab."
+          },
+          {
+            "t": "Fix 1 · Clean up the top (trail elbow in front)",
+            "b": "FEEL: at the top, the trail (right) elbow points more DOWN at the ground and stays in FRONT of your trail-hip seam, keeping the club a hair more in front of your chest. Right now the elbow drifts behind you, which lays the shaft off. DRILL — the one-handed Miracle 201 (or club trail-arm-only): make slow half-swings feeling the trail elbow lead down into the slot; pause at the top and check the shaft points AT the target line, not right of it. Mirror or a phone on a tripod DTL at the top confirms it. 10 slow reps before you hit balls. (This is the drill that's working for you — see 'What's working' above.)"
+          },
+          {
+            "t": "Fix 2 · Clear the hips, don't slide them",
+            "b": "FEEL: from the top, the lead (left) hip clears BACK and UP — belt buckle turning left and rotating open — while your chest stays over the ball a beat longer. Not a slide toward the target; a turn around a post. This is where your speed and your 'through contact' consistency live. DRILLS: (a) Trail-foot-back / step-through: hit half wedges stepping the trail foot back through impact — forces rotation over slide. (b) Lead-hip-to-the-wall: set up with your lead hip a few inches off a wall/bag; on the downswing the hip should clear so it just brushes back and up, not bump forward into it. (c) Chair/impact-bag: feel the trail glute fire and the hips deepen (not thrust toward the ball) so you don't early-extend. 2–3 sets of 10 each, twice a week."
+          },
+          {
+            "t": "Fix 3 · Your over-the-top slice — same root, plus the path & face piece",
+            "b": "The lifelong slice comes from the SAME move: OVER THE TOP means in transition the upper body (trail shoulder) takes over and throws the club OUT and over the plane, so it swings across the ball OUT-TO-IN; with an open face that start-left, curve-right is your slice (a square face on that same path is a pull). Everything in this plan already fixes the CAUSE — the one-handed drop shallows the club, the trail elbow leading down puts it on line, and the hips CLEARING makes room so the arms deliver from the INSIDE instead of over the top. The extra piece is PATH then FACE. (1) PATH feel: from the top, feel the club fall behind you and swing OUT toward right-center field (in-to-out). DRILL — put a headcover/water bottle a few inches OUTSIDE the ball on the target line; swing so you miss it (coming over the top clips it). (2) FACE: a slice also needs an open face — once your path comes from the inside, if the ball still fades or you start pulling, the face is open to the path; with your conventional grip, let the trail forearm rotate/release through and check the grip isn't too weak. Fix PATH FIRST — chasing the face while still coming over the top just makes a bigger slice or a smother-hook."
+          },
+          {
+            "t": "Driver vs wedge — keep them different on purpose",
+            "b": "DRIVER: ball forward, hips clearing up-and-around so you hit slightly UP — that's carry and less spin. WEDGE: keep exactly what the film showed — stay down, cover the ball, hit DOWN; don't let 'clear the hips' turn into standing up out of a wedge. Same sequencing engine, opposite low-point. If a swing thought bleeds the wrong way, park it — the wedge is already good."
+          },
+          {
+            "t": "How to test it at the sim (get the numbers this time)",
+            "b": "The visual read can only go so far without data. Next session, capture and log these: DRIVER — attack angle (want positive / hitting up), CLUB PATH (over-the-top shows as a negative/left number — you want it near zero to slightly positive/right), FACE-TO-PATH (that's what curves it), spin, and ball speed. WEDGES — carry, spin, launch, and gap-check 60/56/50 against the ladder (80/95/108). Film one DTL clip at hand height + one face-on per club. Bring those back and we can prove whether the path is actually coming from the inside now."
+          }
+        ]
+      }
+    },
+    {
+      "id": "swing-ott-action-20260727",
+      "type": "action",
+      "pri": true,
+      "text": "SWING — Kill the over-the-top slice: headcover/bottle just OUTSIDE the ball on the target line, swing to miss it (from the inside, out to right-center field). Path first, then release the face. Drop into the slot with the one-handed 201 first."
+    },
+    {
+      "id": "plan-putt-weight-20260728",
+      "type": "briefing",
+      "briefing": {
+        "course": "Putting Setup — Weight & Low Point",
+        "discipline": "putting",
+        "focus": "You feel better with the weight BACK while the ball sits off the front foot — and you've heard the weight is supposed to be forward. Here's what that combination actually costs you, why it lands squarely on the one putting fault still open on your card, and how to settle it with evidence instead of dogma.",
+        "sections": [
+          {
+            "t": "What 'weight forward' is actually for",
+            "b": "It isn't a rule for its own sake. Lead-side pressure does one job: it PINS THE LOW POINT of the stroke. Where your weight sits decides where the arc bottoms out, and where the arc bottoms out decides how the DF3i meets the ball. That's the whole mechanism — everything below follows from it."
+          },
+          {
+            "t": "The cost — loft, hop, skid, short",
+            "b": "Ball off the FRONT foot is correct. But weight back moves the bottom of the arc BEHIND the ball, so by the time the putter arrives the head is climbing hard and the shaft is leaning AWAY from the target. That adds loft you never asked for. The ball launches slightly, HOPS, SKIDS, and only then starts rolling. Every bit of that hop is energy that was supposed to become roll — so the putt arrives soft. Worse, the skid distance changes with green speed and grain, so your PACE stops being repeatable from green to green."
+          },
+          {
+            "t": "Why this is your fault, specifically",
+            "b": "Read the card. Path: settled. Face: settled. Start line: 10/10 clean, twice over. The ONE thing still open is pace — lags coming up short at Hudson Hills, arrivals dying on the mat, and both genuine misses in the Stage-0 4-footer block DIED at the hole. Hop-and-skid off a back-weighted low point is the textbook cause of exactly that signature. Your stroke is no longer the problem. Your strike quality might be."
+          },
+          {
+            "t": "The second cost — the pull",
+            "b": "Sitting back drops the trail shoulder and slides your EYELINE behind the ball. Eyes behind the ball make you see the line right of where it truly is, and you square it up with a whisker of pull. Both real misses in the Stage-0 block settled on the PULL side — logged there as a lean, not proof. This belongs on that candidate-cause list."
+          },
+          {
+            "t": "The third cost — the flip can come back",
+            "b": "Hanging back leaves the hands behind the ball through impact. Hands behind = the wrists want to save it = a flick. That flick was the engine of the old blow-through left miss. The DF3i's zero-torque head has buried that miss on film — but hands-behind is the one setup that can wake it up."
+          },
+          {
+            "t": "Before changing anything — feel isn't real",
+            "b": "Your own Golf Mind note states the principle: 'Hands over the ball: it FEELS like a forward press, but it isn't.' The same illusion runs in reverse. Weight that FEELS back is often pressure that's actually close to neutral — and neutral may be perfectly fine. Don't discard a setup you putt well from on the strength of a feel. FILM IT FACE-ON first. That single clip also closes the early-lift fault, the last open item from Session 8."
+          },
+          {
+            "t": "What has to be true (the real checklist)",
+            "b": "Forget 'weight forward' as a slogan. Four things actually matter, and you can keep your comfort as long as they hold. (1) STERNUM at or just ahead of the ball. (2) HANDS level with or a touch ahead of the ball at impact — never behind it. (3) LOW POINT at or just behind the ball, so the DF3i is a HAIR ascending at contact — that slight upstroke is what produces true roll. (4) PRESSURE around 55/45 lead — enough to anchor the low point, not so much that you start steering. If your weight-back feel still delivers 1 through 3, keep it."
+          },
+          {
+            "t": "Settle it with data, not opinion",
+            "b": "A/B LAG LADDER — 30 feet, two blocks of 10. Block A: your current weight-back feel. Block B: 55/45 lead, everything else identical. Mark where each ball STOPS and measure the spread. Tighter spread wins — that's the answer, not anyone's opinion. SOUND TEST: a purely rolling ball makes one clean click; a hopping ball adds a faint scuff a beat later — listen for the scuff. FACE-ON CLIP: check shaft lean at impact and where the head bottoms out relative to the ball."
+          },
+          {
+            "t": "One thing in your favor",
+            "b": "The DF3i at 34\" is zero-torque and heavy in the head — it squares itself and it wants to be swung, not steered. You can bias a touch more forward than feels natural without losing the feel you like. This putter absorbs the change better than a blade would."
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-weight-ab-action-20260728",
+      "type": "action",
+      "pri": true,
+      "text": "PUTTING — A/B the weight distribution: 30-ft lag ladder, 10 balls weight-back vs 10 balls 55/45 lead, measure the spread of stopping points. Take one face-on clip while you're there (also closes early-lift)."
+    },
+    {
+      "id": "putt-weight-faults-20260728",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "early-lift",
+          "why": "DTL film (Session 8) shows the head staying low and extending down-line — strongly corroborated as gone. One face-on clip closes it; take it during the weight A/B."
+        },
+        {
+          "tag": "three-putts",
+          "why": "DF3i pace calibration still open. New candidate cause: weight sitting BACK with the ball off the front foot puts the low point behind the ball — added loft, hop-and-skid, putts arriving soft. Run the A/B lag ladder before blaming the head's power curve."
+        }
+      ]
+    },
+    {
+      "id": "plan-putt-routine-20260728",
+      "type": "briefing",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "Jack's settled DF3i setup and pre-putt routine, in his words, plus the one thing the routine is missing. Logged Jul 28 after working the weight question out on the mat.",
+        "sections": [
+          {
+            "t": "The setup, your words",
+            "b": "Ball position off the LEFT BREAST. Weight stacked right ON the ball. Normal address. Forward press right before contact, then putt. This supersedes the weight-back feel that started the conversation — the low point question is answered."
+          },
+          {
+            "t": "Why the chest reference beats the foot reference",
+            "b": "You landed on 'left breast' rather than 'front heel,' and that's the better cue — keep it. The arc of a shoulder-rocked stroke is centered on your STERNUM, not your feet. Referencing the ball to your chest points it at the thing that actually governs the low point. Foot reference drifts every time your stance width changes by an inch; the chest reference doesn't. In putting posture those two land in roughly the same place anyway, so you've lost nothing and gained a cue that travels."
+          },
+          {
+            "t": "Weight stacked on the ball — what that buys",
+            "b": "Pressure over the ball puts the sternum over or a whisker behind it, which pins the arc's bottom right where it belongs: at or just behind the ball, so the DF3i is a hair ascending at contact. That's the true-roll window. It's also why the setup 'feels good' — a pinned low point is what a repeatable strike feels like from the inside."
+          },
+          {
+            "t": "The forward press — a TRIGGER, not a position",
+            "b": "This is a change from the static 'hands even, no press' note, and it's a legitimate one — because a press before contact does a different job than press held at address. Its purpose is to break inertia and start the stroke rhythmically instead of from a dead, frozen stop. Crenshaw, Nicklaus, half the great putters ever. Your tempo was a documented fault once (~1:1, fixed to 2.4:1 by the One-Two drill) — a press trigger is genuine maintenance for that."
+          },
+          {
+            "t": "The one rule for the press",
+            "b": "SAME SIZE, EVERY TIME. The press changes the shaft lean, the shaft lean changes the effective loft, and the loft changes how far the ball rolls. A press that varies putt to putt is a loft that varies putt to putt — which is a PACE that varies putt to putt, and pace is the only fault still open on your card. Make it small, make it identical, and move it along the target line rather than hinging the wrists. The DF3i's zero-torque head protects the face; it can't protect you from a press that changes size."
+          },
+          {
+            "t": "The routine as you described it",
+            "b": "1) Line it up — read, aim the FACE first. 2) Set feet and hands, normal address. 3) Look at the hole. 4) Look at the aiming spot. 5) Look at the ball. 6) Forward press. 7) Putt. Structurally sound: face aimed before the stance gets built, an intermediate spot for line, one clear trigger to start it. Keep it brisk — three looks is the most you want before you go stale over the ball."
+          },
+          {
+            "t": "THE GAP — nothing in this routine sets pace",
+            "b": "Read the seven steps again and ask what any of them does about how HARD you hit it. Nothing. Every step is aimed at LINE — the read, the face, the spot, the ball. And line is the part of your putting that's already settled: path ✓, face ✓, start lines 10/10 twice over. The one thing still broken is pace — lags short at Hudson Hills, arrivals dying on the mat, both Stage-0 misses dying at the hole. Your routine has no pace step in it at all."
+          },
+          {
+            "t": "The fix — one rehearsal stroke, eyes on the hole",
+            "b": "Add ONE practice stroke between step 3 and step 4, made while LOOKING AT THE HOLE, that rehearses the actual LENGTH of stroke the putt needs. This is the single most reliable distance-control device there is: your eyes calibrate stroke size to distance far better than your conscious mind estimates it. Then look at the spot, look at the ball, press, go — pace is already loaded, and the last look is line. One rehearsal, not three."
+          },
+          {
+            "t": "Worth testing on lags",
+            "b": "On anything past ~25 feet, try keeping your eyes ON THE HOLE through the stroke instead of returning them to the ball. It feels absurd and it is remarkably effective for distance — the ball isn't moving, you don't need to watch it. Test it as a block, not mid-round: 10 lags eyes-on-ball vs 10 eyes-on-hole, measure the spread of stopping points. Same measurement protocol as the weight A/B."
+          },
+          {
+            "t": "One conflict to clean up",
+            "b": "Your Golf Mind putting note still reads 'Hands over the ball: it FEELS like a forward press, but it isn't.' That was written about the static address position and it's still true there — but it now sits awkwardly next to a deliberate press trigger. They're compatible (address neutral, press to start), just say so in the note so future-you doesn't read it as a contradiction."
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-routine-pace-action-20260728",
+      "type": "action",
+      "pri": true,
+      "text": "PUTTING — Add a pace step to the routine: one rehearsal stroke made while LOOKING AT THE HOLE, sized to the putt, between the hole-look and the spot-look. Then test eyes-on-hole through the stroke on lags past 25 ft: 10 vs 10, measure the spread."
+    },
+    {
+      "id": "golf-mind-20260728",
+      "type": "briefing",
+      "replaces": "golf-mind-20260727",
+      "briefing": {
+        "course": "Golf Mind",
+        "focus": "Jack's own swing thoughts & setup keys, in his words — the go-to reference before a round or a range session. Grip is settled: conventional. Putting setup & press locked Jul 28.",
+        "sections": [
+          {
+            "t": "Driver — the big stick",
+            "b": "Aim the CENTER of the fairway — the start line tends to pull left, so center-aim leaves room. The straight ball comes from a LONGER, fuller swing — commit to that one. A tighter, shorter swing turns it into a cut, and when that goes wrong the miss is a PUSH-SLICE. So: full swing for straight; if you shorten it, expect the cut and know the push-slice is the bad one."
+          },
+          {
+            "t": "Mini driver",
+            "b": "Club setup: the r7 Quad's adjustable WEIGHTS are set in the BACK position. Tee it LOW for the piercing straight ball — NEVER at normal driver-tee height. From that setup you can work it both ways, draw or fade. This is the fairway-finder off the tee; weights back + low tee is what makes it behave."
+          },
+          {
+            "t": "Irons",
+            "b": "Ball position right of center, toward the trail (right) thigh. The new KING TECs fly HIGHER and longer than the old set — trust the extra height. When you need to flight it down or take something off, CHOKE DOWN and hit the control shot rather than just swinging soft."
+          },
+          {
+            "t": "Wedges",
+            "b": "(Open — fill in as you dial the Vokeys: your go-to feels for full vs. partial, and any open-face/flop keys. Ladder to stay honest: 60°→80 · 56°→95 · 50°→108 · PW→122.)"
+          },
+          {
+            "t": "Putting — DF3i",
+            "b": "Ball off the LEFT BREAST — chest reference, not foot: the stroke arc centers on your sternum, so that cue travels even when your stance width drifts. WEIGHT STACKED ON THE BALL (this is what pins the low point — it's the whole fix from the weight-back experiment). Rock the SHOULDERS — no hands. LOOSE grip. AT ADDRESS the hands sit EVEN with the ball: the Press Pistol's built-in 2° does the leaning, which is why it FEELS like a forward press without being one. THEN a deliberate small FORWARD PRESS to trigger the stroke — these are not in conflict: address is neutral, the press is the starter motor. Same size every time, or the loft changes and pace goes with it. Bend over MORE, stand CLOSE, eyes DOWN through the strike. Two practice strokes — one eyes on ball, one eyes on hole; the hole one is the PACE stroke, keep it last. Grip settled: conventional / reverse-overlap won the experiment — no need to revisit it."
+          }
+        ]
+      }
+    },
+    {
+      "id": "plan-putt-routine-20260728-v2",
+      "type": "briefing",
+      "replaces": "plan-putt-routine-20260728",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "Jack's settled DF3i setup and full pre-putt routine, in his words. Corrected Jul 28: the routine DOES contain a pace step — two rehearsal strokes, one eyes-on-ball and one eyes-on-hole. The real issue is where they sit in the sequence.",
+        "sections": [
+          {
+            "t": "The setup",
+            "b": "Ball off the LEFT BREAST. Weight stacked ON the ball (confirmed: pressure over the ball, not on the trail foot). Normal address, hands even with the ball. Forward press right before contact, then putt."
+          },
+          {
+            "t": "Why the chest reference beats the foot reference",
+            "b": "'Left breast' is the better cue — keep it. A shoulder-rocked stroke arcs around your STERNUM, not your feet, so referencing the ball to your chest points it at the thing that actually governs the low point. A foot reference drifts every time stance width changes by an inch. In putting posture the two land in roughly the same place, so you kept the position and upgraded the cue."
+          },
+          {
+            "t": "Weight on the ball — what it buys",
+            "b": "Pressure over the ball puts the sternum over or a whisker behind it, pinning the arc's bottom at or just behind the ball so the DF3i is a hair ascending at contact. That's the true-roll window, and it's why the setup feels good — a pinned low point is what a repeatable strike feels like from the inside."
+          },
+          {
+            "t": "The forward press — a TRIGGER, not a position",
+            "b": "No conflict with the 'hands even at address' note, and both stay: ADDRESS is neutral (the Press Pistol's 2° supplies the lean), and the PRESS is the starter motor that breaks inertia so you're not stroking from a frozen stop. Crenshaw, Nicklaus, plenty of company. Your tempo was a documented fault once (~1:1, fixed to 2.4:1 by the One-Two drill) — a rhythm trigger is real maintenance for that."
+          },
+          {
+            "t": "The one rule for the press",
+            "b": "SAME SIZE, EVERY TIME. Press sets shaft lean, lean sets effective loft, loft sets rollout. A press that varies putt to putt is a PACE that varies putt to putt — and pace is the only fault still open on your card. Small, identical, moving along the target line rather than hinging the wrists. The zero-torque head protects the face; it can't protect you from a press that changes size."
+          },
+          {
+            "t": "The full routine",
+            "b": "TWO PRACTICE STROKES — first eyes on the ball, then eyes on the hole. Then: 1) line it up, aim the FACE first · 2) set feet and hands, normal address · 3) look at the hole · 4) look at the aiming spot · 5) look at the ball · 6) forward press · 7) putt."
+          },
+          {
+            "t": "CORRECTION — the pace step is already there",
+            "b": "Earlier read of this routine said it had no pace step. Wrong — the eyes-on-hole rehearsal IS the pace step, and it's the single most reliable distance-control device there is. Your eyes calibrate stroke length to distance far better than conscious estimation does. It's in the routine, and the order is right: ball-look first (path and contact), hole-look second (pace), so the feel you walk in with is the pace feel. Keep that order deliberately — if the hole stroke ever ends up first, the pace feel gets overwritten."
+          },
+          {
+            "t": "The actual issue — decay",
+            "b": "The rehearsals happen BEFORE the whole aiming sequence. Between your eyes-on-hole stroke and the actual putt sit: lining it up, setting feet and hands, a hole look, a spot look, a ball look, and a press. That's a long time for a feel to survive, and feel is perishable — it fades faster than a mental note does. This is why a rehearsed pace can be right and the putt still arrives soft: the rehearsal was good, the delivery was late."
+          },
+          {
+            "t": "The fix — close the gap, don't add steps",
+            "b": "Don't add a third rehearsal. TIGHTEN THE MIDDLE instead. Two ways, pick one and stick with it: (A) move the two practice strokes LATER — read and aim the face first, then rehearse, then step straight in for spot → ball → press → go. Or (B) keep your order and CUT step 3, the hole look. You already looked at the hole during the pace rehearsal; looking again mostly burns time and invites second-guessing. Either way the target is the same — fewer beats between the pace feel and the stroke."
+          },
+          {
+            "t": "Worth testing on lags",
+            "b": "Past ~25 feet, try keeping your eyes ON THE HOLE through the actual stroke, not just the rehearsal. Feels absurd, works well — the ball isn't moving, you don't need to watch it. Test it as a block, not mid-round: 10 lags eyes-on-ball vs 10 eyes-on-hole, measure the spread of stopping points. Same protocol as the weight A/B."
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-routine-pace-action-fix-20260728",
+      "type": "action-update",
+      "target": "putt-routine-pace-action-20260728",
+      "text": "PUTTING — Tighten the gap between the eyes-on-hole rehearsal and the stroke: either move both practice strokes later (after aiming the face), or cut the redundant hole-look at step 3. Pick one, keep it. Then test eyes-on-hole through the stroke on lags past 25 ft: 10 vs 10, measure the spread."
+    },
+    {
+      "id": "plan-putt-routine-20260728-v3",
+      "type": "briefing",
+      "replaces": "plan-putt-routine-20260728-v2",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "LOCKED Jul 28 (Option 2). Setup and full pre-putt routine, with the two rehearsal strokes moved beside the ball so the pace feel doesn't decay before delivery.",
+        "sections": [
+          {
+            "t": "The setup",
+            "b": "Ball off the LEFT BREAST. Weight stacked ON the ball — pressure over it, not on the trail foot. Hands EVEN with the ball at address; the Press Pistol's 2° supplies the lean. Rock the shoulders, no hands. Loose grip. Bend over more, stand close, eyes down through the strike."
+          },
+          {
+            "t": "THE ROUTINE — locked",
+            "b": "BEHIND THE BALL: read it, pick the line, pick an aiming spot a few inches ahead of the ball. BESIDE THE BALL (full putting posture, square to the line): rehearsal 1 — eyes on the ball spot, feel path and contact. Rehearsal 2 — eyes on the HOLE, feel the SIZE of the stroke, and finish that rehearsal WITH your forward press at full size. STEP IN: set the FACE to the spot first, then build the stance around it — feet, hands, normal address. DELIVER: look at the spot, look at the ball, forward press, putt."
+          },
+          {
+            "t": "Why beside the ball and not behind it",
+            "b": "Rehearsing in your true putting posture — same spine angle, same arm hang, same shoulder plane — means the stroke that FEELS like 30 feet is the stroke you actually make. Magnitude transfers one-to-one. Rehearsing from behind the ball reads the break better, but you're standing upright there, so the size you feel is only an approximation. Your open fault is pace magnitude, not reading: path ✓, face ✓, start lines 10/10 twice over. Optimise the thing that's broken."
+          },
+          {
+            "t": "What changed and why",
+            "b": "Nothing was added — the pace step was always there (the eyes-on-hole rehearsal IS the pace step, and it's the best distance-control device there is). It just used to sit BEFORE the whole aiming sequence, so the feel had to survive setup, three looks and a press before delivery. Feel is perishable. Now it's about three beats from the stroke instead of six. The old hole-look at step 3 is gone — folded into rehearsal 2, where you were already looking at the hole."
+          },
+          {
+            "t": "Keep the order of the two rehearsals",
+            "b": "Ball-look first (path and contact), hole-look second (pace). The last thing you feel is the thing you carry in — so the pace stroke must be the last one. If the hole stroke ever drifts to first, the pace feel gets overwritten by the contact feel and you're back to guessing distance."
+          },
+          {
+            "t": "The press gets rehearsed too",
+            "b": "Ending rehearsal 2 with the forward press is deliberate. The press was the one part of the stroke that never got a practice rep — and press sets shaft lean, lean sets loft, loft sets rollout. A press that varies is a pace that varies. Rehearsing it at full size every time is how it stays the same size every time."
+          },
+          {
+            "t": "Two rules underneath it",
+            "b": "SAME BEAT COUNT, EVERY PUTT — routine length that varies is itself a pace variable; the putts where you take an extra look are the ones that come up short. And a VERBAL BACKSTOP is worth testing: say the pace intention right before the press ('die it a foot past', 'back of the cup'). Feel decays, a word doesn't."
+          },
+          {
+            "t": "Still to test — lags",
+            "b": "Past ~25 feet, try keeping your eyes ON THE HOLE through the actual stroke, not just the rehearsal. Feels absurd, works well — the ball isn't moving. Block test, not mid-round: 10 lags eyes-on-ball vs 10 eyes-on-hole, measure the spread of stopping points."
+          }
+        ]
+      }
+    },
+    {
+      "id": "golf-mind-20260728-2",
+      "type": "briefing",
+      "replaces": "golf-mind-20260728",
+      "briefing": {
+        "course": "Golf Mind",
+        "focus": "Jack's own swing thoughts & setup keys, in his words — the go-to reference before a round or a range session. Grip settled: conventional. Putting routine locked Jul 28.",
+        "sections": [
+          {
+            "t": "Driver — the big stick",
+            "b": "Aim the CENTER of the fairway — the start line tends to pull left, so center-aim leaves room. The straight ball comes from a LONGER, fuller swing — commit to that one. A tighter, shorter swing turns it into a cut, and when that goes wrong the miss is a PUSH-SLICE. So: full swing for straight; if you shorten it, expect the cut and know the push-slice is the bad one."
+          },
+          {
+            "t": "Mini driver",
+            "b": "Club setup: the r7 Quad's adjustable WEIGHTS are set in the BACK position. Tee it LOW for the piercing straight ball — NEVER at normal driver-tee height. From that setup you can work it both ways, draw or fade. This is the fairway-finder off the tee; weights back + low tee is what makes it behave."
+          },
+          {
+            "t": "Irons",
+            "b": "Ball position right of center, toward the trail (right) thigh. The new KING TECs fly HIGHER and longer than the old set — trust the extra height. When you need to flight it down or take something off, CHOKE DOWN and hit the control shot rather than just swinging soft."
+          },
+          {
+            "t": "Wedges",
+            "b": "(Open — fill in as you dial the Vokeys: your go-to feels for full vs. partial, and any open-face/flop keys. Ladder to stay honest: 60°→80 · 56°→95 · 50°→108 · PW→122.)"
+          },
+          {
+            "t": "Putting — DF3i",
+            "b": "Ball off the LEFT BREAST — chest reference, not foot: the arc centers on your sternum, so the cue survives a change in stance width. WEIGHT STACKED ON THE BALL — that's what pins the low point. Rock the SHOULDERS, no hands. LOOSE grip. AT ADDRESS the hands sit EVEN with the ball (the Press Pistol's 2° does the leaning, which is why it FEELS forward without being forward); the PRESS is a separate trigger that starts the stroke — same size every time or the loft changes and pace goes with it. Bend over MORE, stand CLOSE, eyes DOWN through the strike. ROUTINE: read and pick your spot from behind → step BESIDE the ball in full posture and take two rehearsals, eyes-on-ball then eyes-on-hole (the hole one is the PACE stroke — keep it last, and finish it with the press) → step in, face to the spot first, then stance → spot, ball, press, go. Grip settled: conventional / reverse-overlap."
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-routine-locked-action-20260728",
+      "type": "action-update",
+      "target": "putt-routine-pace-action-20260728",
+      "text": "PUTTING — Bed in the locked routine (Option 2): both rehearsals BESIDE the ball in posture, eyes-on-ball then eyes-on-hole, second one finishing with the press. Then validate: 10 lags at 30 ft old order vs 10 new, measure the spread of stopping points."
+    },
+    {
+      "id": "plan-swing-routine-20260728",
+      "type": "briefing",
+      "briefing": {
+        "course": "Swing Routine — Pre-Shot",
+        "discipline": "full-swing",
+        "focus": "A pre-shot routine built around YOUR pattern, not a generic one. Everything here is aimed at the single root cause the Jul 26 film found: an across-the-line top that forces a re-route, which shows up as sliding hips and the over-the-top slice. The routine's job is to stop you re-routing — and re-routing is something you do OVER the ball, so the routine gets the deciding done before you're standing there.",
+        "sections": [
+          {
+            "t": "The architecture — two zones",
+            "b": "BEHIND THE BALL is where every decision and every rehearsal happens. AT THE BALL is execution only — no thinking, no adjusting, no second guesses. This is the opposite of what we locked for putting, and deliberately so: in putting you rehearse beside the ball because stroke SIZE has to transfer exactly. In the full swing you're not calibrating magnitude, you're calibrating SHAPE and SEQUENCE — those transfer fine from behind the ball, and the commitment you buy is worth more. Different problem, different answer."
+          },
+          {
+            "t": "1 · Decide (behind the ball)",
+            "b": "Lie, wind, number, and where the trouble ISN'T. Then pick a SPECIFIC target — a tree, a bunker lip, a chimney — never 'the fairway'. DRIVER: aim the CENTER of the fairway, because your start line tends to pull left and center-aim leaves you room. Commit to ONE shape and say it out loud in your head. Then stop deciding — anything you reconsider later gets reconsidered over the ball, which is exactly where your swing falls apart."
+          },
+          {
+            "t": "2 · Rehearse (behind the ball, facing the target)",
+            "b": "ONE rehearsal swing. Not three. Feel the trail (right) elbow drop DOWN and stay IN FRONT of your trail-hip seam — that is the whole fix, and it's the one that repairs the top, the hips and the slice together. If the last swing felt across the line, make this a TRAIL-ARM-ONLY rehearsal instead: one hand, slow, feeling the drop into the slot. That's the feel that's been landing for you with the one-handed Miracle 201, and a normal club held trail-arm-only is a fine stand-in on the course."
+          },
+          {
+            "t": "3 · Aim (stepping in)",
+            "b": "Pick an intermediate spot a foot or two ahead of the ball on your start line. Set the CLUBFACE to that spot FIRST, then build the stance around the face — never the other way round. Feet shoulder-width (a touch wider for driver), lead foot flared 20–30° so the hips have somewhere to go. Ball off the lead heel for driver, center to just right of center for irons. Weight 50/50 irons, ~55/45 trail side for driver. Hinge from the hip SOCKETS, chin UP off the chest so the lead shoulder can turn under it."
+          },
+          {
+            "t": "4 · Go (no decisions left)",
+            "b": "One look at the target. One look back to the ball. Then a TRIGGER — a small waggle or a kick of the trail knee. Never start a swing from a frozen stand; a static start is where the snatch comes from, and the snatch is what lays the club off. Count it: 'one-and-… two.' Long patient load, unhurried transition, 3:1. Then hold the finish for THREE SECONDS. If you can't hold it, the sequence or the weight shift was off — that's free feedback on every single swing."
+          },
+          {
+            "t": "The one-thought rule",
+            "b": "ONE swing thought at a time. If you have two, you have none. Yours is the trail elbow — down and in front of the trail-hip seam. Everything else on your card (hip clearance, the slice, the laid-off top) is downstream of that one feel, which is exactly why you don't need a second thought. Rotate a different thought in only when the film says the root has moved."
+          },
+          {
+            "t": "The step-off rule",
+            "b": "If anything feels wrong once you're over the ball — alignment, the number, a gust, a stray thought — STEP OFF and restart from behind the ball. Do not fix it standing there. Over-the-ball corrections are precisely how a re-route gets built into a swing, and re-routing is your documented fault. Stepping off costs eight seconds; a re-route costs the shot."
+          },
+          {
+            "t": "Under pressure — longer, not shorter",
+            "b": "Your own note: the straight ball comes from a LONGER, fuller swing; a tighter, shorter swing turns into a cut, and when that goes wrong the miss is a PUSH-SLICE. Pressure makes everyone shorten and steer, so this is the rule that needs saying out loud before a tee shot that matters — when in doubt, commit to MORE swing, never less. Steering is the re-route wearing a disguise."
+          },
+          {
+            "t": "Warm-up primer — before the first tee",
+            "b": "A few slow ONE-HANDED reps with the Miracle 201, or trail-arm-only with a club, feeling the elbow lead down into the slot. Then blend into two-hand swings. This is your documented working feel — prime it before the round rather than hunting for it on the 4th hole. And keep the routine's beat count identical from the range to the 18th; a routine that shortens under pressure isn't a routine."
+          },
+          {
+            "t": "Wedges — one addition",
+            "b": "Everything above holds, plus: partial distances come from a CONTROLLED length and flight, not a full send with a soft grip. Choke down and hit the control shot. Your ladder off the 44° PW: 60°→80 · 56°→95 · 50°→108 · PW→122. Decide the NUMBER behind the ball like any other shot — the wedge swing on film is already good (spine held, ball-first, covering it); it's the distance decision that needs the routine."
+          }
+        ]
+      }
+    },
+    {
+      "id": "swing-routine-action-20260728",
+      "type": "action",
+      "pri": true,
+      "text": "SWING — Bed in the pre-shot routine: decide + ONE rehearsal behind the ball (trail elbow down & in front), face to the spot before the stance, trigger, 'one-and-two', hold the finish 3 sec. Step off and restart if anything feels wrong over the ball. (Plan: Swing Routine — Pre-Shot)"
+    },
+    {
+      "id": "plan-putt-weight-20260728-v2",
+      "type": "briefing",
+      "replaces": "plan-putt-weight-20260728",
+      "briefing": {
+        "course": "Putting Setup — Weight & Low Point",
+        "discipline": "putting",
+        "focus": "You feel better with the weight BACK while the ball sits off the front foot — and you've heard the weight is supposed to be forward. Here's what that combination actually costs you, why it lands squarely on the one putting fault still open on your card, and how to settle it with evidence instead of dogma.",
+        "sections": [
+          {
+            "t": "What 'weight forward' is actually for",
+            "b": "It isn't a rule for its own sake. Lead-side pressure does one job: it PINS THE LOW POINT of the stroke. Where your weight sits decides where the arc bottoms out, and where the arc bottoms out decides how the DF3i meets the ball. That's the whole mechanism — everything below follows from it."
+          },
+          {
+            "t": "The cost — loft, hop, skid, short",
+            "b": "Ball off the FRONT foot is correct. But weight back moves the bottom of the arc BEHIND the ball, so by the time the putter arrives the head is climbing hard and the shaft is leaning AWAY from the target. That adds loft you never asked for. The ball launches slightly, HOPS, SKIDS, and only then starts rolling. Every bit of that hop is energy that was supposed to become roll — so the putt arrives soft. Worse, the skid distance changes with green speed and grain, so your PACE stops being repeatable from green to green."
+          },
+          {
+            "t": "Why this is your fault, specifically",
+            "b": "Read the card. Path: settled. Face: settled. Start line: 10/10 clean, twice over. The ONE thing still open is pace — lags coming up short at Hudson Hills, arrivals dying on the mat, and both genuine misses in the Stage-0 4-footer block DIED at the hole. Hop-and-skid off a back-weighted low point is the textbook cause of exactly that signature. Your stroke is no longer the problem. Your strike quality might be."
+          },
+          {
+            "t": "The second cost — the pull",
+            "b": "Sitting back drops the trail shoulder and slides your EYELINE behind the ball. Eyes behind the ball make you see the line right of where it truly is, and you square it up with a whisker of pull. Both real misses in the Stage-0 block settled on the PULL side — logged there as a lean, not proof. This belongs on that candidate-cause list."
+          },
+          {
+            "t": "The third cost — the flip can come back",
+            "b": "Hanging back leaves the hands behind the ball through impact. Hands behind = the wrists want to save it = a flick. That flick was the engine of the old blow-through left miss. The DF3i's zero-torque head has buried that miss on film — but hands-behind is the one setup that can wake it up."
+          },
+          {
+            "t": "Before changing anything — feel isn't real",
+            "b": "Your own Golf Mind note states the principle: 'Hands over the ball: it FEELS like a forward press, but it isn't.' The same illusion runs in reverse. Weight that FEELS back is often pressure that's actually close to neutral — and neutral may be perfectly fine. Don't discard a setup you putt well from on the strength of a feel. FILM IT FACE-ON first. That single clip also closes the early-lift fault, the last open item from Session 8."
+          },
+          {
+            "t": "What has to be true (the real checklist)",
+            "b": "Forget 'weight forward' as a slogan. Four things actually matter, and you can keep your comfort as long as they hold. (1) STERNUM at or just ahead of the ball. (2) HANDS level with or a touch ahead of the ball at impact — never behind it. (3) LOW POINT at or just behind the ball, so the DF3i is a HAIR ascending at contact — that slight upstroke is what produces true roll. (4) PRESSURE around 55/45 lead — enough to anchor the low point, not so much that you start steering. If your weight-back feel still delivers 1 through 3, keep it."
+          },
+          {
+            "t": "Settle it with data — lag ladder PARKED",
+            "b": "PARKED Jul 28 at Jack's call — the 10-vs-10 lag ladder is off the card for now. It's also largely moot: the weight question resolved itself on the mat (ball off the left breast, weight stacked ON the ball, feels good), which is the answer the A/B was going to hunt for. Two zero-cost checks stay, because neither needs a block of balls. SOUND TEST: a purely rolling ball makes one clean click; a hopping ball adds a faint scuff a beat later — listen for the scuff on ordinary putts. FACE-ON CLIP: check shaft lean at impact and where the head bottoms out relative to the ball. Bring the ladder back if pace stops improving and you want a number instead of a feel."
+          },
+          {
+            "t": "One thing in your favor",
+            "b": "The DF3i at 34\" is zero-torque and heavy in the head — it squares itself and it wants to be swung, not steered. You can bias a touch more forward than feels natural without losing the feel you like. This putter absorbs the change better than a blade would."
+          }
+        ]
+      }
+    },
+    {
+      "id": "plan-putt-routine-20260728-v4",
+      "type": "briefing",
+      "replaces": "plan-putt-routine-20260728-v3",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "LOCKED Jul 28 (Option 2). Setup and full pre-putt routine, with the two rehearsal strokes moved beside the ball so the pace feel doesn't decay before delivery.",
+        "sections": [
+          {
+            "t": "The setup",
+            "b": "Ball off the LEFT BREAST. Weight stacked ON the ball — pressure over it, not on the trail foot. Hands EVEN with the ball at address; the Press Pistol's 2° supplies the lean. Rock the shoulders, no hands. Loose grip. Bend over more, stand close, eyes down through the strike."
+          },
+          {
+            "t": "THE ROUTINE — locked",
+            "b": "BEHIND THE BALL: read it, pick the line, pick an aiming spot a few inches ahead of the ball. BESIDE THE BALL (full putting posture, square to the line): rehearsal 1 — eyes on the ball spot, feel path and contact. Rehearsal 2 — eyes on the HOLE, feel the SIZE of the stroke, and finish that rehearsal WITH your forward press at full size. STEP IN: set the FACE to the spot first, then build the stance around it — feet, hands, normal address. DELIVER: look at the spot, look at the ball, forward press, putt."
+          },
+          {
+            "t": "Why beside the ball and not behind it",
+            "b": "Rehearsing in your true putting posture — same spine angle, same arm hang, same shoulder plane — means the stroke that FEELS like 30 feet is the stroke you actually make. Magnitude transfers one-to-one. Rehearsing from behind the ball reads the break better, but you're standing upright there, so the size you feel is only an approximation. Your open fault is pace magnitude, not reading: path ✓, face ✓, start lines 10/10 twice over. Optimise the thing that's broken."
+          },
+          {
+            "t": "What changed and why",
+            "b": "Nothing was added — the pace step was always there (the eyes-on-hole rehearsal IS the pace step, and it's the best distance-control device there is). It just used to sit BEFORE the whole aiming sequence, so the feel had to survive setup, three looks and a press before delivery. Feel is perishable. Now it's about three beats from the stroke instead of six. The old hole-look at step 3 is gone — folded into rehearsal 2, where you were already looking at the hole."
+          },
+          {
+            "t": "Keep the order of the two rehearsals",
+            "b": "Ball-look first (path and contact), hole-look second (pace). The last thing you feel is the thing you carry in — so the pace stroke must be the last one. If the hole stroke ever drifts to first, the pace feel gets overwritten by the contact feel and you're back to guessing distance."
+          },
+          {
+            "t": "The press gets rehearsed too",
+            "b": "Ending rehearsal 2 with the forward press is deliberate. The press was the one part of the stroke that never got a practice rep — and press sets shaft lean, lean sets loft, loft sets rollout. A press that varies is a pace that varies. Rehearsing it at full size every time is how it stays the same size every time."
+          },
+          {
+            "t": "Two rules underneath it",
+            "b": "SAME BEAT COUNT, EVERY PUTT — routine length that varies is itself a pace variable; the putts where you take an extra look are the ones that come up short. And a VERBAL BACKSTOP is worth testing: say the pace intention right before the press ('die it a foot past', 'back of the cup'). Feel decays, a word doesn't."
+          },
+          {
+            "t": "PARKED — the lag test",
+            "b": "Off the card for now at Jack's call. Keeping the idea on the shelf so it's not lost: past ~25 feet, keeping your eyes ON THE HOLE through the actual stroke — not just the rehearsal — is a real distance-control device. Feels absurd, works well; the ball isn't moving. If it comes back, run it as a block rather than mid-round. For now, just bed the locked routine in and putt."
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-weight-ab-drop-10x10-20260728",
+      "type": "action-update",
+      "target": "putt-weight-ab-action-20260728",
+      "text": "PUTTING — Film one face-on clip with the DF3i: check shaft lean at impact and where the head bottoms out relative to the ball. Also closes the early-lift fault. (Lag ladder parked.)"
+    },
+    {
+      "id": "putt-routine-drop-10x10-20260728",
+      "type": "action-update",
+      "target": "putt-routine-pace-action-20260728",
+      "text": "PUTTING — Bed in the locked routine (Option 2): both rehearsals BESIDE the ball in posture, eyes-on-ball then eyes-on-hole, the second one finishing with the press. Same beat count every putt."
+    },
+    {
+      "id": "plan-putt-weight-20260728-v3",
+      "type": "briefing",
+      "replaces": "plan-putt-weight-20260728-v2",
+      "briefing": {
+        "course": "Putting Setup — Weight & Low Point",
+        "discipline": "putting",
+        "focus": "You feel better with the weight BACK while the ball sits off the front foot — and you've heard the weight is supposed to be forward. Here's what that combination actually costs you, why it lands squarely on the one putting fault still open on your card, and how to settle it with evidence instead of dogma.",
+        "sections": [
+          {
+            "t": "What 'weight forward' is actually for",
+            "b": "It isn't a rule for its own sake. Lead-side pressure does one job: it PINS THE LOW POINT of the stroke. Where your weight sits decides where the arc bottoms out, and where the arc bottoms out decides how the DF3i meets the ball. That's the whole mechanism — everything below follows from it."
+          },
+          {
+            "t": "The cost — loft, hop, skid, short",
+            "b": "Ball off the FRONT foot is correct. But weight back moves the bottom of the arc BEHIND the ball, so by the time the putter arrives the head is climbing hard and the shaft is leaning AWAY from the target. That adds loft you never asked for. The ball launches slightly, HOPS, SKIDS, and only then starts rolling. Every bit of that hop is energy that was supposed to become roll — so the putt arrives soft. Worse, the skid distance changes with green speed and grain, so your PACE stops being repeatable from green to green."
+          },
+          {
+            "t": "Why this is your fault, specifically",
+            "b": "Read the card. Path: settled. Face: settled. Start line: 10/10 clean, twice over. The ONE thing still open is pace — lags coming up short at Hudson Hills, arrivals dying on the mat, and both genuine misses in the Stage-0 4-footer block DIED at the hole. Hop-and-skid off a back-weighted low point is the textbook cause of exactly that signature. Your stroke is no longer the problem. Your strike quality might be."
+          },
+          {
+            "t": "The second cost — the pull",
+            "b": "Sitting back drops the trail shoulder and slides your EYELINE behind the ball. Eyes behind the ball make you see the line right of where it truly is, and you square it up with a whisker of pull. Both real misses in the Stage-0 block settled on the PULL side — logged there as a lean, not proof. This belongs on that candidate-cause list."
+          },
+          {
+            "t": "The third cost — the flip can come back",
+            "b": "Hanging back leaves the hands behind the ball through impact. Hands behind = the wrists want to save it = a flick. That flick was the engine of the old blow-through left miss. The DF3i's zero-torque head has buried that miss on film — but hands-behind is the one setup that can wake it up."
+          },
+          {
+            "t": "Before changing anything — feel isn't real",
+            "b": "Your own Golf Mind note states the principle: 'Hands over the ball: it FEELS like a forward press, but it isn't.' The same illusion runs in reverse. Weight that FEELS back is often pressure that's actually close to neutral — and neutral may be perfectly fine. Don't discard a setup you putt well from on the strength of a feel. FILM IT FACE-ON first. That single clip also closes the early-lift fault, the last open item from Session 8."
+          },
+          {
+            "t": "What has to be true (the real checklist)",
+            "b": "Forget 'weight forward' as a slogan. Four things actually matter, and you can keep your comfort as long as they hold. (1) STERNUM at or just ahead of the ball. (2) HANDS level with or a touch ahead of the ball at impact — never behind it. (3) LOW POINT at or just behind the ball, so the DF3i is a HAIR ascending at contact — that slight upstroke is what produces true roll. (4) PRESSURE around 55/45 lead — enough to anchor the low point, not so much that you start steering. If your weight-back feel still delivers 1 through 3, keep it."
+          },
+          {
+            "t": "One thing in your favor",
+            "b": "The DF3i at 34\" is zero-torque and heavy in the head — it squares itself and it wants to be swung, not steered. You can bias a touch more forward than feels natural without losing the feel you like. This putter absorbs the change better than a blade would."
+          },
+          {
+            "t": "Settle it with data",
+            "b": "A/B LAG LADDER — 30 feet, two blocks of 10. Block A: your current feel. Block B: the change you're testing, everything else identical. Mark where each ball STOPS and measure the spread. Tighter spread wins — that's the answer, not anyone's opinion. SOUND TEST: a purely rolling ball makes one clean click; a hopping ball adds a faint scuff a beat later — listen for the scuff. FACE-ON CLIP: check shaft lean at impact and where the head bottoms out relative to the ball. Note the weight question itself is already settled on the mat (ball off the left breast, weight stacked ON the ball) — this ladder is here as the measuring protocol for any future change, not an open question."
+          }
+        ]
+      }
+    },
+    {
+      "id": "plan-putt-routine-20260728-v5",
+      "type": "briefing",
+      "replaces": "plan-putt-routine-20260728-v4",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "LOCKED Jul 28 (Option 2). Setup and full pre-putt routine, with the two rehearsal strokes moved beside the ball so the pace feel doesn't decay before delivery.",
+        "sections": [
+          {
+            "t": "The setup",
+            "b": "Ball off the LEFT BREAST. Weight stacked ON the ball — pressure over it, not on the trail foot. Hands EVEN with the ball at address; the Press Pistol's 2° supplies the lean. Rock the shoulders, no hands. Loose grip. Bend over more, stand close, eyes down through the strike."
+          },
+          {
+            "t": "THE ROUTINE — locked",
+            "b": "BEHIND THE BALL: read it, pick the line, pick an aiming spot a few inches ahead of the ball. BESIDE THE BALL (full putting posture, square to the line): rehearsal 1 — eyes on the ball spot, feel path and contact. Rehearsal 2 — eyes on the HOLE, feel the SIZE of the stroke, and finish that rehearsal WITH your forward press at full size. STEP IN: set the FACE to the spot first, then build the stance around it — feet, hands, normal address. DELIVER: look at the spot, look at the ball, forward press, putt."
+          },
+          {
+            "t": "Why beside the ball and not behind it",
+            "b": "Rehearsing in your true putting posture — same spine angle, same arm hang, same shoulder plane — means the stroke that FEELS like 30 feet is the stroke you actually make. Magnitude transfers one-to-one. Rehearsing from behind the ball reads the break better, but you're standing upright there, so the size you feel is only an approximation. Your open fault is pace magnitude, not reading: path ✓, face ✓, start lines 10/10 twice over. Optimise the thing that's broken."
+          },
+          {
+            "t": "What changed and why",
+            "b": "Nothing was added — the pace step was always there (the eyes-on-hole rehearsal IS the pace step, and it's the best distance-control device there is). It just used to sit BEFORE the whole aiming sequence, so the feel had to survive setup, three looks and a press before delivery. Feel is perishable. Now it's about three beats from the stroke instead of six. The old hole-look at step 3 is gone — folded into rehearsal 2, where you were already looking at the hole."
+          },
+          {
+            "t": "Keep the order of the two rehearsals",
+            "b": "Ball-look first (path and contact), hole-look second (pace). The last thing you feel is the thing you carry in — so the pace stroke must be the last one. If the hole stroke ever drifts to first, the pace feel gets overwritten by the contact feel and you're back to guessing distance."
+          },
+          {
+            "t": "The press gets rehearsed too",
+            "b": "Ending rehearsal 2 with the forward press is deliberate. The press was the one part of the stroke that never got a practice rep — and press sets shaft lean, lean sets loft, loft sets rollout. A press that varies is a pace that varies. Rehearsing it at full size every time is how it stays the same size every time."
+          },
+          {
+            "t": "Two rules underneath it",
+            "b": "SAME BEAT COUNT, EVERY PUTT — routine length that varies is itself a pace variable; the putts where you take an extra look are the ones that come up short. And a VERBAL BACKSTOP is worth testing: say the pace intention right before the press ('die it a foot past', 'back of the cup'). Feel decays, a word doesn't."
+          },
+          {
+            "t": "Still to test — lags",
+            "b": "Past ~25 feet, try keeping your eyes ON THE HOLE through the actual stroke, not just the rehearsal. Feels absurd, works well — the ball isn't moving, you don't need to watch it. Block test, not mid-round: 10 lags eyes-on-ball vs 10 eyes-on-hole, measure the spread of stopping points. Same protocol as the lag ladder in the Weight & Low Point plan."
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-weight-unpark-20260728",
+      "type": "action-update",
+      "target": "putt-weight-ab-action-20260728",
+      "text": "PUTTING — Film one face-on clip with the DF3i (shaft lean at impact, where the head bottoms out; also closes early-lift). Then the 30-ft lag ladder when you want a number instead of a feel: two blocks of 10, measure the spread of stopping points."
+    },
+    {
+      "id": "putt-routine-unpark-20260728",
+      "type": "action-update",
+      "target": "putt-routine-pace-action-20260728",
+      "text": "PUTTING — Bed in the locked routine (Option 2): both rehearsals BESIDE the ball in posture, eyes-on-ball then eyes-on-hole, the second finishing with the press. Same beat count every putt. Then validate: 10 lags at 30 ft old order vs 10 new, measure the spread."
+    },
+    {
+      "id": "wianno-mg-debrief-20260728",
+      "type": "briefing",
+      "briefing": {
+        "course": "Wianno Member-Guest — Debrief",
+        "discipline": "full-swing",
+        "focus": "Five 9-hole matches with your brother at Wianno Club (Osterville, MA), Jul 9–11 2026, Blue tees, par 35. 45 holes, 212 strokes, +37. Transcribed from the GHIN cards — every total reconciles against the hole-by-hole and the bogey/double markings.",
+        "sections": [
+          {
+            "t": "The five cards",
+            "b": "Jul 9 · FRONT · 46 (+11) · rating 35.4/125 — 6 6 5 6 4 4 6 5 4. Jul 10 · FRONT · 40 (+5) · 35.4/125 — 6 3 5 6 3 4 5 5 3. Jul 10 · BACK · 44 (+9) · 35.1/125 — 4 5 6 5 3 6 4 5 6. Jul 11 · FRONT · 41 (+6) · 35.4/125 — 5 5 4 5 4 5 4 5 4. Jul 11 · BACK · 41 (+6) · 35.1/125 — 6 3 6 5 3 5 4 4 5. Trend across the event: 46 → 40 → 44 → 41 → 41."
+          },
+          {
+            "t": "The scoring mix — 45 holes",
+            "b": "1 birdie · 16 pars · 18 bogeys · 10 DOUBLES. That's the whole story in one line. Ten doubles is ten strokes handed over, and it's more than a quarter of your +37. Paired as 18s: Jul 10 = 84, Jul 11 = 82 — differentials of roughly 12.2 and 10.4 against an 11.1 index, so you played about to your handicap, not above or below it."
+          },
+          {
+            "t": "THE FINDING — doubles are the entire gap",
+            "b": "Look at Jul 11 front: 41 with ZERO doubles and ZERO birdies — six bogeys and three pars, nothing else. Now Jul 9 front: 46 with FOUR doubles. Same golfer, same tees, two days apart, five shots apart, and the difference is entirely doubles. You do not need to make more putts or hit it further to shoot 38. You need to stop making 6s. The doubles line up almost perfectly with the score every round: 4 doubles → 46 · 3 → 44 · 2 → 40 · 1 → 41 · 0 → 41."
+          },
+          {
+            "t": "THE OPENING HOLE — +7 across five nines",
+            "b": "Your first hole of each nine: 6, 6, 5 on the front and 4, 6 on the back. Par 4 every time. That's 27 strokes on 20 par — SEVEN over, on five holes, before you've settled into anything. You never once made par on the opening hole of the front nine in three tries. This is the single most concentrated leak in the whole event, and it is not a swing problem — it's a not-warmed-up problem."
+          },
+          {
+            "t": "What that validates",
+            "b": "The Swing Routine plan already carries a 'Warm-up primer — before the first tee' section: a few slow one-handed Miracle 201 reps (or trail-arm-only with a club) feeling the elbow lead down into the slot, then blend into two-hand swings. Consider this the evidence for it. Prime the feel before the first tee rather than hunting for it on the 4th hole — on this card, hunting for it cost you a shot and a half per opening hole."
+          },
+          {
+            "t": "Par 3s are bleeding — and there's no driver involved",
+            "b": "13 par-3 plays, +11. That's +0.85 a hole, essentially the same rate as your par 4s (+0.92) — but on par 3s the tee shot is an iron and there's no driving miss to blame. That points at iron control and green-hitting, not the swing faults on your card. Worst offender: HOLE 3 (par 3) went 5, 5, 4 — five over in three plays, never a par. One hole, +5."
+          },
+          {
+            "t": "Hole 1 and Hole 3 together",
+            "b": "Those two holes alone account for +10 of your +37, across just 6 of 45 holes played. Roughly a quarter of everything you lost came from two holes you played six times. If you get another crack at Wianno, they are the entire prep list."
+          },
+          {
+            "t": "Par 5s — no offense at all",
+            "b": "8 par-5 plays: four bogeys, four pars, ZERO birdies. +4 total. Par 5s are supposed to be where a mid-single-digit makes his money, and you didn't convert one all week. Your wedge ladder off the 44° PW (60°→80 · 56°→95 · 50°→108 · PW→122) exists precisely so the third shot into a par 5 is a number rather than a guess — decide the lay-up yardage from the ladder rather than hitting it as far as it goes."
+          },
+          {
+            "t": "One caveat on the data",
+            "b": "These were matches, so some of these scores are most-likely-score postings rather than holed-out strokes. That mostly affects the doubles — a picked-up hole posts as a net double. The trend and the opening-hole pattern hold regardless, but don't read the double count as gospel on any single hole."
+          },
+          {
+            "t": "Handicap flag",
+            "b": "The GHIN cards show a Handicap Index of 11.1. Caddie HQ's profile still says 8.5. Update it in Settings so the app's math (and any future round prep) works off the real number — profile isn't something the coach feed can push."
+          }
+        ]
+      }
+    },
+    {
+      "id": "round-wianno-20260709-f",
+      "type": "round",
+      "round": {
+        "date": "2026-07-09",
+        "course": "Wianno Club",
+        "tees": "Blue",
+        "nine": "F",
+        "par": 35,
+        "rating": 35.4,
+        "slope": 125,
+        "score": 46,
+        "note": "Member-guest match with my brother",
+        "holes": [
+          {
+            "n": 1,
+            "par": 4,
+            "s": 6
+          },
+          {
+            "n": 2,
+            "par": 4,
+            "s": 6
+          },
+          {
+            "n": 3,
+            "par": 3,
+            "s": 5
+          },
+          {
+            "n": 4,
+            "par": 5,
+            "s": 6
+          },
+          {
+            "n": 5,
+            "par": 3,
+            "s": 4
+          },
+          {
+            "n": 6,
+            "par": 4,
+            "s": 4
+          },
+          {
+            "n": 7,
+            "par": 4,
+            "s": 6
+          },
+          {
+            "n": 8,
+            "par": 5,
+            "s": 5
+          },
+          {
+            "n": 9,
+            "par": 3,
+            "s": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "round-wianno-20260710-f",
+      "type": "round",
+      "round": {
+        "date": "2026-07-10",
+        "course": "Wianno Club",
+        "tees": "Blue",
+        "nine": "F",
+        "par": 35,
+        "rating": 35.4,
+        "slope": 125,
+        "score": 40,
+        "note": "",
+        "holes": [
+          {
+            "n": 1,
+            "par": 4,
+            "s": 6
+          },
+          {
+            "n": 2,
+            "par": 4,
+            "s": 3
+          },
+          {
+            "n": 3,
+            "par": 3,
+            "s": 5
+          },
+          {
+            "n": 4,
+            "par": 5,
+            "s": 6
+          },
+          {
+            "n": 5,
+            "par": 3,
+            "s": 3
+          },
+          {
+            "n": 6,
+            "par": 4,
+            "s": 4
+          },
+          {
+            "n": 7,
+            "par": 4,
+            "s": 5
+          },
+          {
+            "n": 8,
+            "par": 5,
+            "s": 5
+          },
+          {
+            "n": 9,
+            "par": 3,
+            "s": 3
+          }
+        ]
+      }
+    },
+    {
+      "id": "round-wianno-20260710-b",
+      "type": "round",
+      "round": {
+        "date": "2026-07-10",
+        "course": "Wianno Club",
+        "tees": "Blue",
+        "nine": "B",
+        "par": 35,
+        "rating": 35.1,
+        "slope": 125,
+        "score": 44,
+        "note": "",
+        "holes": [
+          {
+            "n": 10,
+            "par": 4,
+            "s": 4
+          },
+          {
+            "n": 11,
+            "par": 3,
+            "s": 5
+          },
+          {
+            "n": 12,
+            "par": 5,
+            "s": 6
+          },
+          {
+            "n": 13,
+            "par": 4,
+            "s": 5
+          },
+          {
+            "n": 14,
+            "par": 3,
+            "s": 3
+          },
+          {
+            "n": 15,
+            "par": 4,
+            "s": 6
+          },
+          {
+            "n": 16,
+            "par": 4,
+            "s": 4
+          },
+          {
+            "n": 17,
+            "par": 4,
+            "s": 5
+          },
+          {
+            "n": 18,
+            "par": 4,
+            "s": 6
+          }
+        ]
+      }
+    },
+    {
+      "id": "round-wianno-20260711-f",
+      "type": "round",
+      "round": {
+        "date": "2026-07-11",
+        "course": "Wianno Club",
+        "tees": "Blue",
+        "nine": "F",
+        "par": 35,
+        "rating": 35.4,
+        "slope": 125,
+        "score": 41,
+        "note": "",
+        "holes": [
+          {
+            "n": 1,
+            "par": 4,
+            "s": 5
+          },
+          {
+            "n": 2,
+            "par": 4,
+            "s": 5
+          },
+          {
+            "n": 3,
+            "par": 3,
+            "s": 4
+          },
+          {
+            "n": 4,
+            "par": 5,
+            "s": 5
+          },
+          {
+            "n": 5,
+            "par": 3,
+            "s": 4
+          },
+          {
+            "n": 6,
+            "par": 4,
+            "s": 5
+          },
+          {
+            "n": 7,
+            "par": 4,
+            "s": 4
+          },
+          {
+            "n": 8,
+            "par": 5,
+            "s": 5
+          },
+          {
+            "n": 9,
+            "par": 3,
+            "s": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "round-wianno-20260711-b",
+      "type": "round",
+      "round": {
+        "date": "2026-07-11",
+        "course": "Wianno Club",
+        "tees": "Blue",
+        "nine": "B",
+        "par": 35,
+        "rating": 35.1,
+        "slope": 125,
+        "score": 41,
+        "note": "",
+        "holes": [
+          {
+            "n": 10,
+            "par": 4,
+            "s": 6
+          },
+          {
+            "n": 11,
+            "par": 3,
+            "s": 3
+          },
+          {
+            "n": 12,
+            "par": 5,
+            "s": 6
+          },
+          {
+            "n": 13,
+            "par": 4,
+            "s": 5
+          },
+          {
+            "n": 14,
+            "par": 3,
+            "s": 3
+          },
+          {
+            "n": 15,
+            "par": 4,
+            "s": 5
+          },
+          {
+            "n": 16,
+            "par": 4,
+            "s": 4
+          },
+          {
+            "n": 17,
+            "par": 4,
+            "s": 4
+          },
+          {
+            "n": 18,
+            "par": 4,
+            "s": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "stats-archive-47rd",
+      "type": "stats",
+      "stats": {
+        "label": "Archive · 47 rounds",
+        "date": "2023-01-01",
+        "source": "older tracking app · cumulative stats",
+        "historical": true,
+        "rounds": 47,
+        "roundsScoring": 47,
+        "roundsAdvanced": 47,
+        "avgScore": 84,
+        "highScore": 94,
+        "lowScore": 77,
+        "scoring": {
+          "birdie": 4.4,
+          "par": 36.3,
+          "bogey": 41.1,
+          "double": 16.7,
+          "triple": 1.5
+        },
+        "scoringCounts": {
+          "birdie": 37,
+          "par": 307,
+          "bogey": 348,
+          "double": 141,
+          "triple": 13
+        },
+        "holes": 846,
+        "avgByPar": {
+          "3": 3.6,
+          "4": 4.8,
+          "5": 5.7
+        },
+        "gir": 37.1,
+        "driving": {
+          "fairway": 58.1,
+          "left": 16.8,
+          "right": 21.1,
+          "short": 3.0,
+          "long": 0.5,
+          "sand": 0.5
+        },
+        "putts": 34.2,
+        "puttsPerHole": 1.9,
+        "putting": {
+          "one": 19.5
+        },
+        "upDownPct": 20.5,
+        "upDownRaw": "9 of 44",
+        "sandSavePct": 11.1,
+        "sandSaveRaw": "1 of 9"
+      }
+    },
+    {
+      "id": "stats-ghin-20260729",
+      "type": "stats",
+      "stats": {
+        "label": "GHIN · now",
+        "date": "2026-07-29",
+        "source": "GHIN app · Stats tab",
+        "roundsScoring": 18,
+        "roundsAdvanced": 2,
+        "scoring": {
+          "birdie": 2,
+          "par": 33,
+          "bogey": 45,
+          "double": 19,
+          "triple": 1
+        },
+        "avgByPar": {
+          "3": 3.71,
+          "4": 4.91,
+          "5": 5.73
+        },
+        "gir": 28,
+        "approach": {
+          "long": 0,
+          "short": 44,
+          "left": 8,
+          "right": 3,
+          "other": 17
+        },
+        "driving": {
+          "fairway": 30,
+          "left": 15,
+          "right": 22,
+          "short": 22,
+          "long": 0
+        },
+        "putts": 30.0,
+        "upDownsPerRound": 2.0,
+        "putting": {
+          "one": 19,
+          "two": 68,
+          "three": 13
+        }
+      }
+    },
+    {
+      "id": "df3i-since-20260729",
+      "type": "club-update",
+      "target": "L.A.B. Golf DF3i",
+      "club": {
+        "since": "2026-07-18"
+      }
+    },
+    {
+      "id": "stats-archive-47rd-v2",
+      "type": "stats",
+      "replaces": "stats-archive-47rd",
+      "stats": {
+        "label": "Archive · 47 rounds",
+        "date": "2023-01-01",
+        "coversThrough": "2023-12-31",
+        "source": "older tracking app · cumulative stats",
+        "historical": true,
+        "putterEra": "pre-DF3i",
+        "rounds": 47,
+        "roundsScoring": 47,
+        "roundsAdvanced": 47,
+        "avgScore": 84,
+        "highScore": 94,
+        "lowScore": 77,
+        "scoring": {
+          "birdie": 4.4,
+          "par": 36.3,
+          "bogey": 41.1,
+          "double": 16.7,
+          "triple": 1.5
+        },
+        "scoringCounts": {
+          "birdie": 37,
+          "par": 307,
+          "bogey": 348,
+          "double": 141,
+          "triple": 13
+        },
+        "holes": 846,
+        "avgByPar": {
+          "3": 3.6,
+          "4": 4.8,
+          "5": 5.7
+        },
+        "gir": 37.1,
+        "driving": {
+          "fairway": 58.1,
+          "left": 16.8,
+          "right": 21.1,
+          "short": 3.0,
+          "long": 0.5,
+          "sand": 0.5
+        },
+        "putts": 34.2,
+        "puttsPerHole": 1.9,
+        "putting": {
+          "one": 19.5
+        },
+        "upDownPct": 20.5,
+        "upDownRaw": "9 of 44",
+        "sandSavePct": 11.1,
+        "sandSaveRaw": "1 of 9"
+      }
+    },
+    {
+      "id": "stats-ghin-20260729-v2",
+      "type": "stats",
+      "replaces": "stats-ghin-20260729",
+      "stats": {
+        "label": "GHIN · latest",
+        "date": "2026-07-29",
+        "coversThrough": "2026-07-17",
+        "source": "GHIN app · Stats tab",
+        "putterEra": "pre-DF3i",
+        "roundsScoring": 18,
+        "roundsAdvanced": 2,
+        "scoring": {
+          "birdie": 2,
+          "par": 33,
+          "bogey": 45,
+          "double": 19,
+          "triple": 1
+        },
+        "avgByPar": {
+          "3": 3.71,
+          "4": 4.91,
+          "5": 5.73
+        },
+        "gir": 28,
+        "approach": {
+          "long": 0,
+          "short": 44,
+          "left": 8,
+          "right": 3,
+          "other": 17
+        },
+        "driving": {
+          "fairway": 30,
+          "left": 15,
+          "right": 22,
+          "short": 22,
+          "long": 0
+        },
+        "putts": 30.0,
+        "upDownsPerRound": 2.0,
+        "putting": {
+          "one": 19,
+          "two": 68,
+          "three": 13
+        }
+      }
+    },
+    {
+      "id": "plan-putt-routine-20260729-v6",
+      "type": "briefing",
+      "replaces": "plan-putt-routine-20260728-v5",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "LOCKED Jul 28 (Option 2). Setup and full pre-putt routine, with the two rehearsal strokes moved beside the ball so the pace feel doesn't decay before delivery.",
+        "sections": [
+          {
+            "t": "The setup",
+            "b": "Ball off the LEFT BREAST. Weight stacked ON the ball — pressure over it, not on the trail foot. Hands EVEN with the ball at address; the Press Pistol's 2° supplies the lean. Rock the shoulders, no hands. Loose grip. Bend over more, stand close, eyes down through the strike."
+          },
+          {
+            "t": "Why beside the ball and not behind it",
+            "b": "Rehearsing in your true putting posture — same spine angle, same arm hang, same shoulder plane — means the stroke that FEELS like 30 feet is the stroke you actually make. Magnitude transfers one-to-one. Rehearsing from behind the ball reads the break better, but you're standing upright there, so the size you feel is only an approximation. Your open fault is pace magnitude, not reading: path ✓, face ✓, start lines 10/10 twice over. Optimise the thing that's broken."
+          },
+          {
+            "t": "What changed and why",
+            "b": "Nothing was added — the pace step was always there (the eyes-on-hole rehearsal IS the pace step, and it's the best distance-control device there is). It just used to sit BEFORE the whole aiming sequence, so the feel had to survive setup, three looks and a press before delivery. Feel is perishable. Now it's about three beats from the stroke instead of six. The old hole-look at step 3 is gone — folded into rehearsal 2, where you were already looking at the hole."
+          },
+          {
+            "t": "Keep the order of the two rehearsals",
+            "b": "Ball-look first (path and contact), hole-look second (pace). The last thing you feel is the thing you carry in — so the pace stroke must be the last one. If the hole stroke ever drifts to first, the pace feel gets overwritten by the contact feel and you're back to guessing distance."
+          },
+          {
+            "t": "The press gets rehearsed too",
+            "b": "Ending rehearsal 2 with the forward press is deliberate. The press was the one part of the stroke that never got a practice rep — and press sets shaft lean, lean sets loft, loft sets rollout. A press that varies is a pace that varies. Rehearsing it at full size every time is how it stays the same size every time."
+          },
+          {
+            "t": "Two rules underneath it",
+            "b": "SAME BEAT COUNT, EVERY PUTT — routine length that varies is itself a pace variable; the putts where you take an extra look are the ones that come up short. And a VERBAL BACKSTOP is worth testing: say the pace intention right before the press ('die it a foot past', 'back of the cup'). Feel decays, a word doesn't."
+          },
+          {
+            "t": "Still to test — lags",
+            "b": "Past ~25 feet, try keeping your eyes ON THE HOLE through the actual stroke, not just the rehearsal. Feels absurd, works well — the ball isn't moving, you don't need to watch it. Block test, not mid-round: 10 lags eyes-on-ball vs 10 eyes-on-hole, measure the spread of stopping points. Same protocol as the lag ladder in the Weight & Low Point plan."
+          }
+        ],
+        "steps": [
+          "Read it from BEHIND the ball — pick the line and a spot a few inches ahead of it",
+          "Step BESIDE the ball, into full putting posture",
+          "Rehearsal 1 — eyes on the BALL. Path and contact.",
+          "Rehearsal 2 — eyes on the HOLE. Pace. Finish it with the forward press.",
+          "Step in — set the FACE to the spot first, then build the stance around it",
+          "Spot → ball → forward press → putt"
+        ],
+        "rules": [
+          "Hole-look rehearsal is always LAST",
+          "Same beat count every putt",
+          "Hands EVEN at address — the press is the trigger"
+        ]
+      }
+    },
+    {
+      "id": "plan-swing-routine-20260729-v2",
+      "type": "briefing",
+      "replaces": "plan-swing-routine-20260728",
+      "briefing": {
+        "course": "Swing Routine — Pre-Shot",
+        "discipline": "full-swing",
+        "focus": "A pre-shot routine built around YOUR pattern, not a generic one. Everything here is aimed at the single root cause the Jul 26 film found: an across-the-line top that forces a re-route, which shows up as sliding hips and the over-the-top slice. The routine's job is to stop you re-routing — and re-routing is something you do OVER the ball, so the routine gets the deciding done before you're standing there.",
+        "sections": [
+          {
+            "t": "The architecture — two zones",
+            "b": "BEHIND THE BALL is where every decision and every rehearsal happens. AT THE BALL is execution only — no thinking, no adjusting, no second guesses. This is the opposite of what we locked for putting, and deliberately so: in putting you rehearse beside the ball because stroke SIZE has to transfer exactly. In the full swing you're not calibrating magnitude, you're calibrating SHAPE and SEQUENCE — those transfer fine from behind the ball, and the commitment you buy is worth more. Different problem, different answer."
+          },
+          {
+            "t": "1 · Decide (behind the ball)",
+            "b": "Lie, wind, number, and where the trouble ISN'T. Then pick a SPECIFIC target — a tree, a bunker lip, a chimney — never 'the fairway'. DRIVER: aim the CENTER of the fairway, because your start line tends to pull left and center-aim leaves you room. Commit to ONE shape and say it out loud in your head. Then stop deciding — anything you reconsider later gets reconsidered over the ball, which is exactly where your swing falls apart."
+          },
+          {
+            "t": "2 · Rehearse (behind the ball, facing the target)",
+            "b": "ONE rehearsal swing. Not three. Feel the trail (right) elbow drop DOWN and stay IN FRONT of your trail-hip seam — that is the whole fix, and it's the one that repairs the top, the hips and the slice together. If the last swing felt across the line, make this a TRAIL-ARM-ONLY rehearsal instead: one hand, slow, feeling the drop into the slot. That's the feel that's been landing for you with the one-handed Miracle 201, and a normal club held trail-arm-only is a fine stand-in on the course."
+          },
+          {
+            "t": "3 · Aim (stepping in)",
+            "b": "Pick an intermediate spot a foot or two ahead of the ball on your start line. Set the CLUBFACE to that spot FIRST, then build the stance around the face — never the other way round. Feet shoulder-width (a touch wider for driver), lead foot flared 20–30° so the hips have somewhere to go. Ball off the lead heel for driver, center to just right of center for irons. Weight 50/50 irons, ~55/45 trail side for driver. Hinge from the hip SOCKETS, chin UP off the chest so the lead shoulder can turn under it."
+          },
+          {
+            "t": "4 · Go (no decisions left)",
+            "b": "One look at the target. One look back to the ball. Then a TRIGGER — a small waggle or a kick of the trail knee. Never start a swing from a frozen stand; a static start is where the snatch comes from, and the snatch is what lays the club off. Count it: 'one-and-… two.' Long patient load, unhurried transition, 3:1. Then hold the finish for THREE SECONDS. If you can't hold it, the sequence or the weight shift was off — that's free feedback on every single swing."
+          },
+          {
+            "t": "The one-thought rule",
+            "b": "ONE swing thought at a time. If you have two, you have none. Yours is the trail elbow — down and in front of the trail-hip seam. Everything else on your card (hip clearance, the slice, the laid-off top) is downstream of that one feel, which is exactly why you don't need a second thought. Rotate a different thought in only when the film says the root has moved."
+          },
+          {
+            "t": "The step-off rule",
+            "b": "If anything feels wrong once you're over the ball — alignment, the number, a gust, a stray thought — STEP OFF and restart from behind the ball. Do not fix it standing there. Over-the-ball corrections are precisely how a re-route gets built into a swing, and re-routing is your documented fault. Stepping off costs eight seconds; a re-route costs the shot."
+          },
+          {
+            "t": "Under pressure — longer, not shorter",
+            "b": "Your own note: the straight ball comes from a LONGER, fuller swing; a tighter, shorter swing turns into a cut, and when that goes wrong the miss is a PUSH-SLICE. Pressure makes everyone shorten and steer, so this is the rule that needs saying out loud before a tee shot that matters — when in doubt, commit to MORE swing, never less. Steering is the re-route wearing a disguise."
+          },
+          {
+            "t": "Warm-up primer — before the first tee",
+            "b": "A few slow ONE-HANDED reps with the Miracle 201, or trail-arm-only with a club, feeling the elbow lead down into the slot. Then blend into two-hand swings. This is your documented working feel — prime it before the round rather than hunting for it on the 4th hole. And keep the routine's beat count identical from the range to the 18th; a routine that shortens under pressure isn't a routine."
+          },
+          {
+            "t": "Wedges — one addition",
+            "b": "Everything above holds, plus: partial distances come from a CONTROLLED length and flight, not a full send with a soft grip. Choke down and hit the control shot. Your ladder off the 44° PW: 60°→80 · 56°→95 · 50°→108 · PW→122. Decide the NUMBER behind the ball like any other shot — the wedge swing on film is already good (spine held, ball-first, covering it); it's the distance decision that needs the routine."
+          }
+        ],
+        "steps": [
+          "Behind the ball — lie, wind, number, and where the trouble ISN'T",
+          "Pick a SPECIFIC target (driver: centre of the fairway)",
+          "Commit to one shape — then stop deciding",
+          "ONE rehearsal — trail elbow DOWN and IN FRONT of the trail-hip seam",
+          "Step in — clubface to the spot FIRST, then stance around it",
+          "One look at the target, one look back at the ball",
+          "Trigger — small waggle or trail-knee kick. Never start frozen.",
+          "Count 'one-and-… two' → swing → hold the finish 3 seconds"
+        ],
+        "rules": [
+          "ONE swing thought: the trail elbow",
+          "Feels wrong over the ball? STEP OFF and restart",
+          "Under pressure: LONGER, never shorter"
+        ]
+      }
+    },
+    {
+      "id": "brief-beekman-scramble-20260801",
+      "type": "briefing",
+      "briefing": {
+        "course": "Beekman Golf Course — Scramble",
+        "date": "2026-08-01",
+        "focus": "Scramble, not stroke play. Your job is to be the team's SECOND ball — when someone's already safe, swing free and go at the flag. And on every lay-up, leave the team one of YOUR numbers (122 · 108 · 95 · 80), never a 70-yard guess.",
+        "sections": [
+          {
+            "t": "The course in one paragraph",
+            "b": "Beekman Golf Course, Hopewell Junction NY (11 Country Club Rd) — a 1964 Cortlandt Fish public 27-holer in the Berkshire foothills where they rise out of the Hudson Valley, about an hour's drive for you. Three nines — HIGHLAND (3,142 yds, par 36, ~124 slope), VALLEY (2,952, par 35, ~118), TACONIC (3,125, par 36, ~126) — played in three 18-hole pairings between 6,485 and 6,532 yards. Zoysia fairways, which is the detail worth knowing: zoysia sits the ball UP on a tight, firm cushion, so contact is clean and there's less grab than the bent/poa you're used to. Reviews are consistent — well-kept greens, all three nines hilly, and it doesn't drain well, so wet spots after rain."
+          },
+          {
+            "t": "Find out which two nines you're playing",
+            "b": "Ask at check-in, because the three nines are genuinely different golf courses. TACONIC is the hardest: narrowest fairways and the water — the par-5 6th has a pond fronting the green, which in a scramble is a decision hole, not a hero hole. HIGHLAND climbs over 500 feet to a panorama of Stormville Mountain: elevation change on nearly every shot, blind or semi-blind looks, and the yardage on the sprinkler head is a starting point, not the answer. VALLEY is the gentlest and flattest of the three — that's your birdie nine, and a scramble team that only pars the Valley holes has already lost the tournament."
+          },
+          {
+            "t": "Scramble math — where teams actually win",
+            "b": "You don't win a scramble by avoiding doubles; the format erases those for you. You win it by converting the 5–7 genuinely gettable holes and by never wasting a hole where all four of you miss. So the whole game is about SEQUENCING: get one ball safe, then let everyone else be aggressive off that safety net. The single biggest error you'll see all day is the team's last hitter playing conservatively when a ball is already in the fairway — that shot is completely free, and a free shot played safe is a shot thrown away."
+          },
+          {
+            "t": "Your role off the tee",
+            "b": "You have the perfect scramble bag for this: mini driver (~220) and the KING TEC 2-iron (~205) for when a ball simply has to be in the short grass, and the Stealth 2 for when one already is. Rule for the day: if nobody is safe yet, hit the club you'd bet $100 finds the fairway — on Taconic's tight holes and Highland's blind ones, that's the mini or the 2-iron, and nobody on your team will ever complain about a ball in play. If someone IS safe, take the driver and take the whole thing on. Your own note from the swing plan applies double here: the straight one comes from a LONGER, fuller swing; steering it is what turns it into the push-slice. In a scramble you have permission to make the fullest swing you own."
+          },
+          {
+            "t": "Approaches — the lay-up is the shot that scores",
+            "b": "This is the biggest edge you personally bring, and almost nobody uses it. In a scramble you CHOOSE the yardage for the next shot. On any par 5 you're laying up on — including Taconic's 6th over the water — pick the ball that leaves a full 95 (56°) or a full 108 (50°), not the one that's 18 yards closer and leaves a nervy three-quarter 70-yarder. Same on a punch-out. Your ladder off the 44° PW: PW 122 · 50° 108 · 56° 95 · 60° 80. Say the number out loud when the team is choosing the ball — it's the most useful sentence you can contribute all day. On approaches themselves: first player in plays to the CENTER of the green, everyone after that fires at the flag. Uphill into these hillside greens, club UP; anything short rolls back down to you."
+          },
+          {
+            "t": "The hill, the lies, and your free club-length",
+            "b": "All three nines are hilly, so you'll get very few flat lies — except that a scramble hands you a club-length of relief (confirm no-closer-to-the-hole at check-in). USE IT properly: don't just drop it where it's convenient, walk it to the flattest stance and the best ANGLE into the flag, and get out of any divot or wet spot. When you're stuck with a slope: ball above your feet turns it LEFT — with your strong lofts take one less and aim at the right edge; ball below the feet leaks right, so widen the stance and swing smooth. On the Highland especially, trust the elevation over the number."
+          },
+          {
+            "t": "Putting — the whole team's read is yours to use",
+            "b": "Best sequencing: whoever's least confident putts first and the best putter goes last, so the last ball has watched three balls take the line. Everyone marks the spot and putts from it. Two things that win scrambles on the green: the early putters should get the ball PAST the hole so the team learns the break and the speed — a putt left short teaches nothing — and the last putter plays the read that the first three just paid for. For you specifically: the DF3i handles the face, so your job is pace, and the routine still runs on every putt, including the 3-footer after a teammate has already stuffed it close. Your signature miss is left on the short ones, and 'gimme' tap-ins in a scramble are exactly where a stroke gets loose."
+          },
+          {
+            "t": "The opening hole — you have data on this",
+            "b": "Wianno told you the truth in numbers: across five opening holes you went 6, 6, 5, 4, 6 — SEVEN over par on five holes, and never a par on the first hole of a front nine. That's a not-warmed-up problem, not a swing problem, and you're driving an hour to a 7 AM-ish start. Get there early enough for the warm-up primer off the swing plan: a few slow ONE-HANDED reps (Miracle 201 or trail-arm-only), feeling the trail elbow lead down into the slot, then blend to two-handed swings. Then five minutes on the putting green for pace only — zoysia surrounds and well-kept greens mean you want the speed calibrated before the first putt counts for four people."
+          },
+          {
+            "t": "Confirm these at check-in",
+            "b": "Scramble formats vary and the details change your strategy: (1) is there a MINIMUM DRIVES rule — most events require each player's tee shot be used two or three times? If so, bank yours early on the wide holes rather than discovering on 17 that you owe two. (2) Net or gross, and how team handicap is figured. (3) Whether they're selling mulligans/skins — buy them for the tightest tee shots, not the first hole. (4) Cart path only? On a course this hilly, that changes club selection every hole. (5) Which nines, and shotgun or tee times."
+          },
+          {
+            "t": "Mindset for the day",
+            "b": "Early August, hilly, an hour in the car first — take the cart, drink more than you think, and load the weather tile at the first tee so the ladder's Today column adjusts your carries for the heat. This is the one round all year where your worst shot literally does not exist, so the risk-management instincts that serve you in stroke play are mostly wrong here: be the guy who takes on the flag once a teammate is safe. Log it in Coach afterward — score, the holes you converted, and any hole where all four of you missed — and I'll debrief it against this plan."
+          }
+        ]
+      }
     }
   ]
 }

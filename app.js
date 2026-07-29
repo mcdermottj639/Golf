@@ -100,6 +100,7 @@ function seed(){
       ],
     },
     fiveFt: [],           // {date, results:[...20 of make/L/R/S/Lg]}
+    stats: [],            // stat snapshots (GHIN etc), oldest first — see the `stats` feed type
     drillLog: [],         // {date, drill}
     tests: [],            // {date, putter, makes, note} — 10-ball demo tests
     shortlist: [
@@ -147,6 +148,7 @@ let S;
 function migrate(s){
   // Additive upgrades for states saved by older app versions.
   if(!s.feedApplied) s.feedApplied = [];
+  if(!s.stats) s.stats = [];
   if(!s.faults) s.faults = [
     { tag:'early-lift', why:'fault #1 in your filmed stroke sessions' },
     { tag:'tempo', why:'your filmed tempo runs ~1:1 (target 2:1)' },
@@ -265,10 +267,13 @@ function weekStreak(){
 const TITLES = {
   home:['Caddie HQ','Your bag, your stroke, your game — one book.'],
   bag:['My Bag','Every club, every spec, and the story of every change.'],
+  swing:['Swing Lab','Driver to wedge — film, plans, and speed work.'],
+  positions:['Swing Positions','Where the body goes, address to finish.'],
   putting:['Putting Lab','The left-miss project — tracked until it’s dead.'],
   coach:['Coach','Lessons that follow your game — not generic tips.'],
   courses:['Courses','Everywhere you’ve played, rated and remembered.'],
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
+  scores:['Scores','Every round, what it cost you, and what to fix.'],
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
@@ -281,9 +286,34 @@ function render(view, arg){
   $('#pageTag').textContent = tag;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === view));
-  const R = { home, bag, putting, coach, courses, decisions, data:dataView, shelf, lesson, session:sessionView, briefing }[view] || home;
+  const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing }[view] || home;
   $('#view').innerHTML = R(arg);
+  buildJumpBar();
   window.scrollTo(0,0);
+}
+
+// Every view is a stack of <h2> sections, so the in-page nav is built from the
+// rendered DOM rather than hand-maintained in each of the thirteen views —
+// add a section anywhere and it shows up here for free.
+function buildJumpBar(){
+  const view = $('#view');
+  if(!view) return;
+  const hs = [...view.querySelectorAll('h2')];
+  if(hs.length < 2) return;
+  const bar = document.createElement('div');
+  bar.className = 'jumpbar';
+  hs.forEach((h, i) => {
+    h.id = h.id || `sec${i}`;
+    const b = document.createElement('button');
+    b.className = 'jump';
+    b.dataset.jump = h.id;
+    // Headings read "Scoring mix · 45 holes" or "Shaft at the top (down-the-line)".
+    // Keep the half before the dot, drop a trailing parenthetical — a jump label
+    // only has to be recognisable, and short chips keep the bar to fewer rows.
+    b.textContent = h.textContent.split('·')[0].replace(/\s*\([^)]*\)\s*$/, '').trim();
+    bar.appendChild(b);
+  });
+  view.prepend(bar);
 }
 let current = { view:'home' };
 function rerender(){ render(current.view, current.arg); }
@@ -291,6 +321,7 @@ function rerender(){ render(current.view, current.arg); }
 // ----- Home -----
 function home(){
   const dl = daysLeft(S.settings.returnDeadline);
+  const idx = estIndex();
   const phantom = S.clubs.find(c => /phantom 7\.5/i.test(c.name));
   const returnDone = !phantom || phantom.status === 'returned';
   const last = latestFiveFt();
@@ -303,16 +334,12 @@ function home(){
     <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div></div>
     <div class="stat"><div class="v">${S.courses.filter(c=>!c.bucket).length}</div><div class="l">Courses</div></div>
     <div class="stat"><div class="v">${sc ? sc.makes+'/'+sc.total : '—'}</div><div class="l">5-ft makes</div></div>
-    <div class="stat ${!returnDone && dl!==null && dl<21 ? 'alert':''}"><div class="v">${returnDone ? '✓' : (dl===null?'—':dl+'d')}</div><div class="l">Return win.</div></div>
+    <div class="stat"><div class="v">${idx != null ? idx.toFixed(1) : '—'}</div><div class="l">Est. index</div></div>
   </div>
 
+  ${returnDone ? '' : `
   <div class="card">
     <h2>Putter return window</h2>
-    ${returnDone ? `
-    <h3 class="good">Closed ✓ — Phantom 7.5 returned</h3>
-    <p class="sm">The putter search is settled: the <b>L.A.B. DF3i</b> is the gamer, and the arc-suited Phantom 7.5 is officially returned. Nothing left on the clock.</p>
-    <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
-    ` : `
     <h3>${dl===null ? 'No deadline set' : dl + ' days left on the Phantom 7.5'}</h3>
     <p class="sm">${S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> — confirm the real one with the shop and update it below.' : 'Deadline confirmed.'}</p>
     <div class="formrow" style="margin-top:8px">
@@ -320,22 +347,20 @@ function home(){
       <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
     </div>
     <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
-    `}
-  </div>
+  </div>`}
 
   ${(() => {
     const today10 = today();
-    const up = S.briefings.filter(b => !b.date || b.date >= today10).sort((a,b) => (a.date||'').localeCompare(b.date||''));
-    const recent = S.briefings.filter(b => b.date && b.date < today10).slice(-1);
-    const recent3 = S.briefings.filter(b => b.date && b.date < today10 &&
-      (new Date(today10) - new Date(b.date)) < 4*86400000);
-    const rows = [...up, ...recent3.slice(-1)].slice(0, 3);
+    const up = S.briefings.filter(b => b.date && b.date >= today10).sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    const recent = S.briefings.filter(b => b.date && b.date < today10 &&
+      (new Date(today10) - new Date(b.date)) < 4*86400000).slice(-1);
+    const rows = [...up, ...recent].slice(0, 3);
     return `<div class="card">
-      <h2>Round prep & plans</h2>
+      <h2>Round prep</h2>
       ${rows.length ? rows.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-        <span><b>${esc(b.course)}</b><span class="sm faint"> · ${b.date ? fmtDate(b.date) + (b.date < today10 ? ' (played)' : '') : 'standing plan'}</span><br>
+        <span><b>${esc(b.course)}</b><span class="sm faint"> · ${fmtDate(b.date)}${b.date < today10 ? ' (played)' : ''}</span><br>
         <span class="sm">${esc(b.focus || 'Briefing ready')}</span></span><span class="arr">→</span></div>`).join('')
-      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round.</p>`}
+      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Golf Mind, Miracle 201) live in the <b>Swing</b> lab.</p>`}
     </div>`;
   })()}
 
@@ -522,30 +547,261 @@ function ladderHTML(wedges){
 }
 
 // ----- Putting Lab -----
+// A session belongs to the Swing Lab if its setup names the full swing or a
+// full-swing club; everything else (the putter project) stays in the Putting Lab.
+// Read setup only — putting findings mention "backswing", which must not match.
+function sessionDiscipline(s){
+  return /full[\s-]?swing|driver|\biron\b|\bwedge\b|mini/i.test(s.setup || '') ? 'swing' : 'putting';
+}
+
+// ----- Lab plan blocks -----
+// Pre-shot routines head every lab: they're what you read standing on the first tee,
+// so they sit above the diagnosis and the drills rather than buried under them.
+const isRoutine = b => /routine/i.test(b.course || '');
+function planLinks(list){
+  return list.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
+      <span><b>${esc(b.course)}</b><br><span class="sm">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('');
+}
+function routineBlock(plans){
+  const r = plans.filter(isRoutine);
+  return r.length ? `<h2>Pre-round · routine</h2>
+  <div class="card">${planLinks(r)}</div>` : '';
+}
+
+// ----- Swing Lab -----
+function swing(){
+  const sessions = S.sessions.map((s,i) => ({ s, i })).filter(o => sessionDiscipline(o.s) === 'swing').reverse();
+  const plans = S.briefings.filter(b => !b.date && (b.discipline || 'swing') !== 'putting');
+  const other = plans.filter(b => !isRoutine(b));
+  return `
+  ${routineBlock(plans)}
+
+  <div class="card flat"><div class="linkrow" data-action="go" data-view="positions">
+    <span><b>📐 Swing Positions · visual guide</b><br><span class="sm">Body checkpoints, address → finish, with a slide-vs-clear hip diagram</span></span><span class="arr">→</span></div></div>
+
+  ${other.length ? `<h2>Plans &amp; training</h2>
+  <div class="card">
+    ${planLinks(other)}
+  </div>` : ''}
+
+  <h2>Film room</h2>
+  <div class="card">
+    ${sessions.length ? `<p class="sm faint" style="margin-bottom:4px">Tap a session for the full breakdown.</p>
+    <table><tr><th>Date</th><th>Setup</th><th>Finding</th></tr>
+    ${sessions.map(({s,i}) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)} ${s.detail?'<span class="faint">▸</span>':''}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
+    </table>` : '<p class="sm">No swing sessions logged yet. Send Claude swing clips — down-the-line and face-on — and the breakdowns land here.</p>'}
+  </div>
+
+  <h2>Filming guide</h2>
+  <div class="card flat">
+    <p class="sm"><b>1 · Down-the-line</b> — behind the ball, camera at hand/hip height on the target line: plane, path, shaft position at the top.<br>
+    <b>2 · Face-on</b> — chest height, square to you: posture, weight shift, hip clearance, low point.<br>
+    Film 3 swings per angle in slo-mo (240fps), and grab the sim's numbers — path, attack angle, face-to-path, spin, carry.</p>
+  </div>`;
+}
+
+// ----- Swing Positions · visual guide (inline SVG, theme-aware) -----
+// Face-on figure, richer anatomy: shoe shapes (flat / flared / up on the toe),
+// pressure pills with % (green = loaded foot), pelvis belt + buckle, cap,
+// hip-clearing arc with degrees, and motion arrows (arms drop, foot press).
+// Trail side (right, for a RH golfer) draws on the viewer's LEFT; target is right.
+function posSvg(p, solid){
+  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)', CLB='var(--soft)', CARD='var(--card)';
+  const G=220; // ground line
+  const ln=(a,b,c,w=6)=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" style="stroke:${c};stroke-width:${w};stroke-linecap:round"/>`;
+  // In solid mode the figure is a filled silhouette: fat capsule limbs, solid
+  // torso & head, card-color underlays so arms/club/belt read on top of the body.
+  const legW=solid?11:6, armW=solid?8:4.5;
+  const under=(a,b,w)=>solid?ln(a,b,CARD,w+3.5):'';
+  const shT=[p.sh[0]-p.shW, p.sh[1]+(p.tiltT||0)], shL=[p.sh[0]+p.shW, p.sh[1]+(p.tiltL||0)];
+  const hipT=[p.hip[0]-p.hipW, p.hip[1]], hipL=[p.hip[0]+p.hipW, p.hip[1]];
+  const shoe=(x,mode)=>{
+    const r=`<rect x="${x-12}" y="${G-8}" width="25" height="9" rx="4.5" style="fill:${INK}"/>`;
+    if(mode==='flare') return `<g transform="rotate(-16 ${x} ${G-4})">${r}</g>`;
+    if(mode==='toe')   return `<g transform="rotate(55 ${x+10} ${G-2})">${r}</g>`;
+    return r;
+  };
+  const pill=(x,pct)=>{const hot=pct>=60;
+    return `<rect x="${x-14}" y="${G+7}" width="28" height="14" rx="7" style="fill:${hot?GRN:'none'};stroke:${hot?GRN:FNT};stroke-width:1.5"/>
+    <text x="${x}" y="${G+17.5}" text-anchor="middle" style="fill:${hot?CARD:FNT};font:800 9px var(--sans)">${pct}</text>`;};
+  const wl=Math.round(p.wtLead*100);
+  const legT = ln(hipT,p.kneeT,INK,legW)+ln(p.kneeT,[p.footT,G-6],INK,legW-1);
+  const legL = under(hipL,p.kneeL,legW)+under(p.kneeL,[p.footL,G-6],legW-1)
+    + ln(hipL,p.kneeL,p.post?GRN:INK,legW)+ln(p.kneeL,[p.footL,G-6],p.post?GRN:INK,legW-1);
+  const club = p.club?`${under(p.hands,p.club,3.5)}${ln(p.hands,p.club,CLB,3.5)}
+    <path d="M ${p.club[0]} ${p.club[1]} l ${p.blade[0]} ${p.blade[1]} l ${p.blade[2]} ${p.blade[3]}" style="fill:none;stroke:${CLB};stroke-width:5;stroke-linecap:round"/>`:'';
+  const cap = `<path d="M ${p.head[0]-8} ${p.head[1]-4} A 9 9 0 0 1 ${p.head[0]+8} ${p.head[1]-4}" style="fill:${INK}"/>
+    <line x1="${p.head[0]+5}" y1="${p.head[1]-5}" x2="${p.head[0]+(p.bill||8)+5}" y2="${p.head[1]-3}" style="stroke:${INK};stroke-width:4;stroke-linecap:round"/>`;
+  return `<svg viewBox="0 0 200 246" role="img" aria-label="${esc(p.name)}">
+    <line x1="10" y1="${G}" x2="182" y2="${G}" style="stroke:${FNT};stroke-width:1.5;opacity:.6"/>
+    <polygon points="190,${G} 181,${G-4.5} 181,${G+4.5}" style="fill:${FNT};opacity:.7"/>
+    <text x="164" y="${G-6}" style="fill:${FNT};font:italic 8.5px var(--sans)">target</text>
+    ${pill(p.footT,100-wl)}${pill(p.footL,wl)}
+    ${legT}${legL}
+    ${shoe(p.footT,p.toeT?'toe':'flat')}${shoe(p.footL,p.flareL?'flare':(p.toeL?'toe':'flat'))}
+    <polygon points="${hipT[0]},${hipT[1]} ${hipL[0]},${hipL[1]} ${shL[0]},${shL[1]} ${shT[0]},${shT[1]}" style="fill:${INK};opacity:${solid?1:.13}${solid?`;stroke:${INK};stroke-width:7;stroke-linejoin:round`:''}"/>
+    ${solid?'':`<line x1="${p.hip[0]}" y1="${p.hip[1]}" x2="${p.sh[0]}" y2="${p.sh[1]}" style="stroke:${INK};stroke-width:4;opacity:.5"/>`}
+    ${ln(shT,shL,INK,solid?11:6.5)}
+    ${under(shT,p.hands,armW)}${under(shL,p.hands,armW)}
+    ${ln(shT,p.hands,INK,armW)}${ln(shL,p.hands,INK,armW)}
+    ${club}
+    <circle cx="${p.hands[0]}" cy="${p.hands[1]}" r="${solid?4.5:3.5}" style="fill:${INK}${solid?`;stroke:${CARD};stroke-width:2`:''}"/>
+    ${solid?`<line x1="${hipT[0]}" y1="${hipT[1]}" x2="${hipL[0]}" y2="${hipL[1]}" style="stroke:${CARD};stroke-width:10;stroke-linecap:round"/>`:''}
+    <line x1="${hipT[0]}" y1="${hipT[1]}" x2="${hipL[0]}" y2="${hipL[1]}" style="stroke:${BURG};stroke-width:${solid?6:7};stroke-linecap:round"/>
+    ${p.hipOpen?`<circle cx="${hipL[0]}" cy="${hipL[1]}" r="4.5" style="fill:${BURG}"/>`:''}
+    <line x1="${p.sh[0]}" y1="${p.sh[1]}" x2="${p.head[0]}" y2="${p.head[1]+8}" style="stroke:${INK};stroke-width:${solid?7:4.5}"/>
+    ${solid?`<circle cx="${p.head[0]}" cy="${p.head[1]}" r="11.5" style="fill:${CARD};opacity:.92"/>`:''}
+    <circle cx="${p.head[0]}" cy="${p.head[1]}" r="8.5" style="fill:${solid?INK:CARD};stroke:${INK};stroke-width:4"/>
+    ${cap}
+    ${p.ball?`<ellipse cx="${p.ball[0]}" cy="${G-1.5}" rx="6" ry="2" style="fill:${FNT};opacity:.35"/><circle cx="${p.ball[0]}" cy="${p.ball[1]}" r="4.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>`:''}
+    ${p.hipOpen?`<path d="M ${hipL[0]+7} ${p.hip[1]-16} q 17 6 11 24" style="fill:none;stroke:${BURG};stroke-width:2.5"/><polygon points="${hipL[0]+15},${p.hip[1]+10} ${hipL[0]+24},${p.hip[1]+3} ${hipL[0]+25},${p.hip[1]+13}" style="fill:${BURG}"/>`:''}
+    ${p.deg?`<text x="${hipL[0]+16}" y="${p.hip[1]+26}" style="fill:${BURG};font:800 9px var(--sans)">${p.deg}</text>`:''}
+    ${p.drop?`<path d="M 50 92 q -6 26 8 44" style="fill:none;stroke:${INK};stroke-width:2.5;stroke-dasharray:4 3"/><polygon points="58,136 46,132 54,125" style="fill:${INK}"/><text x="30" y="88" style="fill:${INK};font:italic 800 9px var(--sans)">drop</text>`:''}
+    ${p.press?`<line x1="${p.footL}" y1="${G-40}" x2="${p.footL}" y2="${G-18}" style="stroke:${GRN};stroke-width:3"/><polygon points="${p.footL},${G-12} ${p.footL-5},${G-20} ${p.footL+5},${G-20}" style="fill:${GRN}"/>`:''}
+  </svg>`;
+}
+function posFig(p, solid){
+  return `<div class="posfig">${posSvg(p, solid)}<div class="posname">${p.n} · ${esc(p.name)}</div>
+  <div class="poschips">${p.chips.map(c=>`<span>${esc(c)}</span>`).join('')}</div></div>`;
+}
+// The six checkpoints, matched to the "Swing Positions — Body Checkpoints" plan.
+function posData(){
+  return [
+    {n:1, name:'Address', head:[96,95], bill:7, sh:[97,110], shW:17, tiltT:3, tiltL:-3, hip:[100,151], hipW:12,
+      kneeT:[82,184], kneeL:[118,184], footT:74, footL:126, flareL:true, hands:[105,163],
+      club:[96,211], blade:[7,2,2,-7], ball:[100,215], wtLead:0.5,
+      chips:['50/50 on the arches','hinge from the hip sockets','lead foot flared 20–30°','ball center (irons) · hands under chin']},
+    {n:2, name:'Takeaway', head:[95,95], bill:7, sh:[96,110], shW:17, tiltT:2, tiltL:-2, hip:[100,151], hipW:12,
+      kneeT:[82,184], kneeL:[118,184], footT:74, footL:126, flareL:true, hands:[79,159],
+      club:[38,153], blade:[-2,-10,0,0], ball:[100,215], wtLead:0.45,
+      chips:['one piece — chest & arms together','shaft parallel · toe up','trail hip turns behind — no sway']},
+    {n:3, name:'Top', head:[93,94], bill:6, sh:[97,108], shW:16, tiltT:-7, tiltL:7, hip:[99,151], hipW:11,
+      kneeT:[82,184], kneeL:[116,183], footT:74, footL:126, flareL:true, hands:[62,70],
+      club:[106,53], blade:[7,-3,0,0], wtLead:0.25,
+      chips:['shoulders ~90° · hips ~45°','loaded into the trail glute','trail knee holds flex','shaft points on line']},
+    {n:4, name:'Transition', head:[93,95], bill:6, sh:[98,109], shW:16, tiltT:-4, tiltL:4, hip:[101,150], hipW:11,
+      kneeT:[86,184], kneeL:[118,183], footT:76, footL:126, flareL:true, hands:[76,118],
+      club:[54,80], blade:[-2,-8,0,0], wtLead:0.6, hipOpen:true, drop:true, press:true,
+      chips:['1 · press the lead foot','2 · lead hip clears back & up','3 · arms DROP into the slot']},
+    {n:5, name:'Impact', head:[91,94], bill:7, sh:[96,108], shW:16, tiltT:-2, tiltL:2, hip:[102,149], hipW:11,
+      kneeT:[88,185], kneeL:[120,182], footT:76, footL:126, toeT:true, hands:[114,160],
+      club:[95,211], blade:[7,2,2,-7], ball:[100,215], wtLead:0.85, hipOpen:true, deg:'35–45°', post:true,
+      chips:['80–90% into the lead foot','lead leg posts up','hips open · buckle left of ball','hands ahead · head behind ball']},
+    {n:6, name:'Finish', head:[104,92], bill:8, sh:[102,106], shW:13, tiltT:0, tiltL:0, hip:[100,150], hipW:9,
+      kneeT:[90,186], kneeL:[118,183], footT:80, footL:122, toeT:true, hands:[120,70],
+      club:[84,52], blade:[-7,-4,0,0], wtLead:0.95, hipOpen:true, post:true,
+      chips:['belt buckle past the target','tall & stacked on the lead leg','trail laces to target · hold 3s']},
+  ];
+}
+// Top-down: the pelvis sliding at the target vs rotating (clearing).
+function hipTopDown(){
+  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)';
+  const stage=`<line x1="16" y1="132" x2="150" y2="132" style="stroke:${FNT};stroke-width:2;stroke-dasharray:4 4"/><polygon points="150,132 142,128 142,136" style="fill:${FNT}"/><text x="58" y="147" style="fill:${FNT};font:9px var(--sans)">target →</text><ellipse cx="50" cy="110" rx="15" ry="8" style="fill:none;stroke:${INK};stroke-width:3"/><ellipse cx="112" cy="110" rx="15" ry="8" style="fill:none;stroke:${INK};stroke-width:3"/>`;
+  const pelvis=(c)=>`<rect x="56" y="58" width="52" height="24" rx="11" style="fill:${c};opacity:.13"/><rect x="56" y="58" width="52" height="24" rx="11" style="fill:none;stroke:${c};stroke-width:4"/><circle cx="106" cy="70" r="4.5" style="fill:${c}"/>`;
+  const slide=`<svg viewBox="0 0 168 156" role="img" aria-label="Hips sliding sideways">
+    ${stage}${pelvis(BURG)}
+    <line x1="90" y1="40" x2="140" y2="40" style="stroke:${BURG};stroke-width:4"/><polygon points="140,40 131,35 131,45" style="fill:${BURG}"/>
+    <text x="10" y="19" style="fill:${BURG};font:bold 12px var(--sans)">✗ SLIDE</text>
+  </svg>`;
+  const clear=`<svg viewBox="0 0 168 156" role="img" aria-label="Hips rotating and clearing">
+    ${stage}
+    <!-- The wall sits BEHIND the golfer (up the panel, away from the target line),
+         because that is the direction the lead hip retreats into. Negative rotation
+         is counter-clockwise on screen: lead hip back and up, trail hip toward the ball. -->
+    <line x1="88" y1="34" x2="152" y2="34" style="stroke:${FNT};stroke-width:3;stroke-dasharray:3 3"/><text x="124" y="28" style="fill:${FNT};font:8px var(--sans)">wall</text>
+    <g transform="rotate(-34 82 70)">${pelvis(GRN)}</g>
+    <path d="M 112 78 q 10 -24 -4 -34" style="fill:none;stroke:${GRN};stroke-width:4"/><polygon points="108,38 102,49 114,48" style="fill:${GRN}"/>
+    <text x="10" y="19" style="fill:${GRN};font:bold 12px var(--sans)">✓ CLEAR</text>
+  </svg>`;
+  return `<div class="posfig">${slide}</div><div class="posfig">${clear}</div>`;
+}
+// Down-the-line: where the shaft points at the top — the across-the-line fault.
+function topShaft(){
+  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)';
+  return `<svg viewBox="0 0 270 100" role="img" aria-label="Shaft at the top: on line vs across the line">
+    <line x1="28" y1="66" x2="242" y2="66" style="stroke:${FNT};stroke-width:2;stroke-dasharray:5 4"/>
+    <polygon points="28,66 37,61 37,71" style="fill:${FNT}"/>
+    <text x="42" y="60" style="fill:${FNT};font:9px var(--sans)">target</text>
+    <circle cx="206" cy="66" r="5" style="fill:${INK}"/>
+    <text x="214" y="63" style="fill:${INK};font:8px var(--sans)">hands</text>
+    <line x1="206" y1="66" x2="60" y2="66" style="stroke:${GRN};stroke-width:5;stroke-linecap:round"/>
+    <circle cx="60" cy="66" r="5.5" style="fill:${GRN}"/>
+    <text x="58" y="86" style="fill:${GRN};font:bold 10px var(--sans)">✓ on line — points at the target</text>
+    <line x1="206" y1="66" x2="66" y2="30" style="stroke:${BURG};stroke-width:5;stroke-linecap:round;stroke-dasharray:2 3"/>
+    <circle cx="66" cy="30" r="5.5" style="fill:${BURG}"/>
+    <text x="30" y="20" style="fill:${BURG};font:bold 10px var(--sans)">✗ across the line — points right (your tendency)</text>
+  </svg>`;
+}
+// Top-down club path + ball flight: over-the-top slice vs from-the-inside.
+function pathDiagram(){
+  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)';
+  const stage=`<line x1="84" y1="150" x2="84" y2="34" style="stroke:${FNT};stroke-width:1.5;stroke-dasharray:4 4"/><polygon points="84,30 96,35 84,40" style="fill:${FNT}"/><text x="90" y="30" style="fill:${FNT};font:8px var(--sans)">target</text><circle cx="84" cy="150" r="4" style="fill:#fff;stroke:${INK};stroke-width:2"/>`;
+  const ott=`<svg viewBox="0 0 168 168" role="img" aria-label="Over the top, out-to-in, slice">
+    ${stage}
+    <line x1="120" y1="166" x2="52" y2="126" style="stroke:${BURG};stroke-width:5;stroke-linecap:round"/><polygon points="52,126 63,127 57,136" style="fill:${BURG}"/>
+    <text x="112" y="150" style="fill:${BURG};font:8px var(--sans)">out→in</text>
+    <path d="M 84 150 C 84 112 100 84 128 50" style="fill:none;stroke:${BURG};stroke-width:3;stroke-dasharray:5 4"/><polygon points="128,50 120,58 131,60" style="fill:${BURG}"/>
+    <text x="8" y="18" style="fill:${BURG};font:bold 11px var(--sans)">✗ Over the top → slice</text>
+  </svg>`;
+  const inside=`<svg viewBox="0 0 168 168" role="img" aria-label="From the inside, straight or draw">
+    ${stage}
+    <line x1="48" y1="166" x2="116" y2="126" style="stroke:${GRN};stroke-width:5;stroke-linecap:round"/><polygon points="116,126 105,127 111,136" style="fill:${GRN}"/>
+    <text x="40" y="150" style="fill:${GRN};font:8px var(--sans)">in→out</text>
+    <path d="M 84 150 C 84 112 80 84 74 50" style="fill:none;stroke:${GRN};stroke-width:3"/><polygon points="74,50 70,60 80,57" style="fill:${GRN}"/>
+    <text x="8" y="18" style="fill:${GRN};font:bold 11px var(--sans)">✓ From the inside</text>
+  </svg>`;
+  return `<div class="posfig">${ott}</div><div class="posfig">${inside}</div>`;
+}
+function swingPositions(){
+  const plan = S.briefings.find(b => /Swing Positions/i.test(b.course));
+  const F = posData();
+  const legend = `<div class="poslegend">
+    <span><i style="background:var(--burg)"></i>pelvis / belt line</span>
+    <span><i style="background:var(--gtext)"></i>lead leg posting up</span>
+    <span><i style="background:var(--gtext);border-radius:7px;height:10px"></i>pressure pill · % under foot</span>
+    <span><i class="arc"></i>hips clearing</span>
+  </div>`;
+  return `
+  <button class="backlink" data-action="go" data-view="swing">← Swing Lab</button>
+  <div class="card">
+    <h2>Swing Positions · visual guide</h2>
+    <p class="sm">The six face-on checkpoints, address to finish — freeze each one in a mirror and match it. The pill under each foot is pressure (green = the loaded foot); the burgundy belt is your pelvis. Trail side = right, lead = left, target to the right.</p>
+    ${legend}
+    <div class="posgrid">${F.map(p=>posFig(p,true)).join('')}</div>
+  </div>
+  <div class="card">
+    <h2>The hips · slide vs clear <span class="sm faint">(top-down)</span></h2>
+    <div class="hipcompare">${hipTopDown()}</div>
+    <p class="sm" style="margin-top:8px"><b class="warn">Slide</b> = the pelvis shifts sideways at the target and stays closed — no speed, hands flip to save the face. <b style="color:var(--gtext)">Clear</b> = the pelvis turns, the lead hip pulls back to the <b>wall</b> behind it and up, and the belt buckle ends left of the ball. Feet shift, hips spin.</p>
+  </div>
+  <div class="card">
+    <h2>Shaft at the top <span class="sm faint">(down-the-line)</span></h2>
+    <div class="posfig" style="padding:8px 6px">${topShaft()}</div>
+    <p class="sm" style="margin-top:8px">Your tendency is <b class="warn">across the line</b> — at the top the shaft points right of the target. The fix is Fix 1: feel the <b>trail elbow lead down</b> and the shaft drops back <b style="color:var(--gtext)">on line</b>. The one-handed Miracle 201 drop trains this directly.</p>
+  </div>
+  <div class="card">
+    <h2>Club path · your slice <span class="sm faint">(top-down)</span></h2>
+    <div class="hipcompare">${pathDiagram()}</div>
+    <p class="sm" style="margin-top:8px">Your slice is an <b class="warn">over-the-top</b> path — the upper body throws the club out, then across the ball <b>out-to-in</b>; an open face turns that into start-left, curve-right. <b>Same cure as everything above:</b> shallow the club (the one-handed drop) and let the hips CLEAR so the club falls behind you and swings from the <b style="color:var(--gtext)">inside</b>. Feel it: swing out toward right-center field; a headcover just <i>outside</i> the ball that you must miss forces the inside path. Fix the path first — then the face.</p>
+  </div>
+  ${plan ? `<div class="card flat"><div class="linkrow" data-action="open-briefing" data-id="${plan.id}"><b>Read the full checkpoint detail</b><span class="arr">→</span></div></div>` : ''}`;
+}
+
 function putting(){
   const entries = S.fiveFt.slice(-6);
   const mc = missCounts();
   const streak = weekStreak();
+  const plans = S.briefings.filter(b => !b.date && b.discipline === 'putting');
+  const other = plans.filter(b => !isRoutine(b));
   return `
+  ${routineBlock(plans)}
+
   <div class="card">
     <h2>The diagnosis</h2>
     <p class="sm"><b>Two levers behind the left miss:</b> (1) equipment — max-toe-flow putter + toe-up lie on a confirmed <b>straight SBST stroke</b>; (2) mechanics — face closes through impact, timing-dependent. Fix: zero-torque head at 34" + lie set flat + the two drills below.</p>
   </div>
 
-  <h2>5-footer scoreboard</h2>
-  <div class="card">
-    <p class="sm">Tap each ball: <b>green = make</b>, then cycle the miss — L, R, S (short), Lg (long). Tap again to clear.</p>
-    <div class="tapgrid" id="tapgrid">
-      ${Array.from({length:20}, (_,i)=>`<div class="tap" data-tap="${i}" data-state="">${i+1}</div>`).join('')}
-    </div>
-    <button class="btn" data-action="save-fiveft">Save today's 20</button>
-    ${entries.length ? `
-    <div class="spark">
-      ${entries.map(e => { const s=fiveFtScore(e); return `<div class="c"><div class="b ${e===latestFiveFt()?'hot':''}" style="height:${Math.max(4, s.total? s.makes/20*56 : 2)}px"></div><div class="t">${fmtDate(e.date)}</div></div>`; }).join('')}
-      <div class="c"><div class="b goal" style="height:${17/20*56}px"></div><div class="t">goal 17</div></div>
-    </div>
-    <p class="sm" style="margin-top:8px">All-time miss pattern: <b>${mc.L} left</b> · ${mc.R} right · ${mc.S} short · ${mc.Lg} long ${mc.L>mc.R?'— <span class="warn">the left miss is still the story</span>':'— <span class="good">left miss under control</span>'}</p>` : '<p class="sm faint" style="margin-top:8px">No entries yet — the first 20-ball test sets your baseline.</p>'}
-  </div>
+  ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
 
   <h2>Drills · this week</h2>
   <div class="card">
@@ -571,7 +827,7 @@ function putting(){
   <div class="card">
     <p class="sm faint" style="margin-bottom:4px">Tap a session for the full film breakdown.</p>
     <table><tr><th>Date</th><th>Setup</th><th>Finding</th></tr>
-    ${S.sessions.map((s,i) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)} ${s.detail?'<span class="faint">▸</span>':''}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
+    ${S.sessions.map((s,i) => ({s,i})).filter(o => sessionDiscipline(o.s) === 'putting').map(({s,i}) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)} ${s.detail?'<span class="faint">▸</span>':''}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
     </table>
     <details><summary>+ Log a session</summary>
       <label>Setup (angle · strokes)</label><input id="sesSetup" placeholder="e.g. 5 strokes · overhead, zero-torque demo">
@@ -586,30 +842,103 @@ function putting(){
     <b>2 · Down-the-line</b> — behind the ball at hip height: start line, face at address.<br>
     <b>3 · Face-on</b> — waist height: posture, eyeline, tempo.<br>
     Film 3–5 strokes per angle so rep-to-rep patterns show.</p>
+  </div>
+
+  <h2>5-footer scoreboard</h2>
+  <div class="card">
+    <p class="sm">Tap each ball: <b>green = make</b>, then cycle the miss — L, R, S (short), Lg (long). Tap again to clear.</p>
+    <div class="tapgrid" id="tapgrid">
+      ${Array.from({length:20}, (_,i)=>`<div class="tap" data-tap="${i}" data-state="">${i+1}</div>`).join('')}
+    </div>
+    <button class="btn" data-action="save-fiveft">Save today's 20</button>
+    ${entries.length ? `
+    <div class="spark">
+      ${entries.map(e => { const s=fiveFtScore(e); return `<div class="c"><div class="b ${e===latestFiveFt()?'hot':''}" style="height:${Math.max(4, s.total? s.makes/20*56 : 2)}px"></div><div class="t">${fmtDate(e.date)}</div></div>`; }).join('')}
+      <div class="c"><div class="b goal" style="height:${17/20*56}px"></div><div class="t">goal 17</div></div>
+    </div>
+    <p class="sm" style="margin-top:8px">All-time miss pattern: <b>${mc.L} left</b> · ${mc.R} right · ${mc.S} short · ${mc.Lg} long ${mc.L>mc.R?'— <span class="warn">the left miss is still the story</span>':'— <span class="good">left miss under control</span>'}</p>` : '<p class="sm faint" style="margin-top:8px">No entries yet — the first 20-ball test sets your baseline.</p>'}
   </div>`;
 }
 
 // ----- Coach -----
+// Find a standing plan by title so a finding can point at the page that fixes it.
+function planIdBy(re, disc){
+  const b = S.briefings.find(x => !x.date && re.test(x.course || '') &&
+    (disc ? (x.discipline || 'swing') === disc : true));
+  return b ? b.id : null;
+}
+// Everything Caddie HQ knows, ranked. Measured findings outrank standing faults,
+// which outrank to-dos — a number you can point at beats an opinion.
+function coachSignals(){
+  const st = scoreStats();
+  const out = scoreTips(st).map(t => ({ sev:t.s, src:t.src, h:t.h, b:t.b, link:null }));
+  out.forEach(t => {
+    if(/opening hole/i.test(t.h)){ const id = planIdBy(/routine/i, 'full-swing'); if(id) t.link = { a:'open-briefing', id, lab:'Open the swing routine' }; }
+    else if(/par 3/i.test(t.h)) t.link = { a:'go', view:'swing', lab:'Swing lab' };
+    else if(/par 5/i.test(t.h)) t.link = { a:'go', view:'bag', lab:'Check the wedge ladder' };
+    else if(/double/i.test(t.h)) t.link = { a:'go', view:'scores', lab:'See the full breakdown' };
+  });
+  const last = latestFiveFt();
+  if(last){
+    const s = fiveFtScore(last), mc = missCounts();
+    const id = planIdBy(/routine/i, 'putting');
+    out.push({ sev: s.makes >= 17 ? 'good' : 'warn', src:'Putting · measured',
+      h:`${s.makes}/${s.total} from 5 feet`,
+      b:`Last logged test${mc.L || mc.R ? ` · all-time misses ${mc.L} left / ${mc.R} right / ${mc.S} short / ${mc.Lg} long` : ''}. ${s.makes >= 17 ? 'At or past the goal of 17 — hold it there.' : 'Goal is 17. ' + (mc.L > mc.R ? 'The left miss is still the pattern.' : 'Miss pattern is balanced — this is pace and read, not face.')}`,
+      link: id ? { a:'open-briefing', id, lab:'Open the putting routine' } : { a:'go', view:'putting', lab:'Putting lab' } });
+  }
+  S.faults.forEach(f => out.push({ sev:'mid', src:'Open fault',
+    h:f.tag.replace(/-/g,' ').replace(/^./, c => c.toUpperCase()), b:f.why,
+    link:{ a:'go', view:'putting', lab:'Putting lab' } }));
+  const order = { warn:0, mid:1, good:2 };
+  return out.sort((a,b) => order[a.sev] - order[b.sev]);
+}
+
 function coach(){
+  const st = scoreStats();
+  const sig = coachSignals();
   const picks = pickedLessons();
-  const tags = struggles();
   const counts = shelfCounts();
   const streak = weekStreak();
+  const open = S.actions.filter(a => !a.done);
+  const blow = st.mix.double * 2 + st.mix.triple * 3;
+  const read = [];
+  if(st.holes) read.push(`<b>${st.holes} holes</b> on record at ${(st.over/st.holes).toFixed(2)} a hole over par`);
+  if(st.over > 0 && blow) read.push(`doubles and worse are <b>${Math.round(blow/st.over*100)}%</b> of everything you've lost`);
+  const lf = latestFiveFt();
+  if(lf) read.push(`<b>${fiveFtScore(lf).makes}/${fiveFtScore(lf).total}</b> from 5 feet last test`);
+  const plans = S.briefings.filter(b => !b.date).sort((a,b) => (isRoutine(b) ? 1 : 0) - (isRoutine(a) ? 1 : 0));
+  const linkFor = l => !l ? '' :
+    `<div class="linkrow" data-action="${l.a}"${l.id ? ` data-id="${esc(l.id)}"` : ''}${l.view ? ` data-view="${l.view}"` : ''}>
+       <span class="sm"><b>${esc(l.lab)}</b></span><span class="arr">→</span></div>`;
   return `
   <div class="card">
-    <h2>Reading your game</h2>
-    <p class="sm">Your logs decide what shows up here. Currently working on:</p>
-    <div class="chips">${[...tags.keys()].slice(0,5).map(t => {
-      const lab = (TROUBLES.find(x=>x[0]===t)||[])[1] || ({'early-lift':'Early lift (putting)','tempo':'Tempo 1:1'}[t]) || t;
-      return `<span class="chip on static">${esc(lab)}</span>`; }).join('')}</div>
+    <h2>The read</h2>
+    ${read.length ? `<p class="sm">${read.join(' · ')}.</p>`
+      : `<p class="sm">Nothing measured yet. Log a round below, or send Claude your GHIN summaries — the coaching on this page is built from your own numbers, so it stays blank until there are some.</p>`}
   </div>
 
-  <h2>Today's lessons · picked for you</h2>
+  ${sig.length ? `<h2>Work on this · ranked</h2>
   <div class="card">
-    ${picks.length ? picks.map(tipHTML).join('') : '<p class="sm">Log a round below and lessons will appear here.</p>'}
-    <button class="btn" data-action="drill-done">Mark today's work done · keep streak</button>
-    <div class="streak">${streak.map(d=>`<div class="day ${d.hit?'hit':''}">${d.lab}</div>`).join('')}</div>
-  </div>
+    ${sig.slice(0,6).map(t => `<div class="tipcard ${t.sev === 'good' ? 'green' : ''}">
+      <div class="src">${esc(t.src)}</div><h4>${t.h}</h4><p class="sm">${t.b}</p>
+      ${linkFor(t.link)}</div>`).join('')}
+    <p class="sm faint">Ranked from your rounds, your putting logs and your open faults — this reorders itself as the data moves.</p>
+  </div>` : ''}
+
+  ${open.length ? `<h2>Next actions</h2>
+  <div class="card">
+    <ul class="check">
+      ${open.slice(0,6).map(a => `<li data-action="toggle-action" data-id="${a.id}">
+        <span class="box"></span><span class="txt">${esc(a.text)}${a.pri ? '<span class="pri">HIGH</span>' : ''}</span></li>`).join('')}
+    </ul>
+  </div>` : ''}
+
+  ${plans.length ? `<h2>Your plans</h2>
+  <div class="card">
+    ${plans.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
+      <span><b>${esc(b.course)}</b><br><span class="sm">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('')}
+  </div>` : ''}
 
   <h2>Log a round · 60 seconds</h2>
   <div class="card">
@@ -628,15 +957,18 @@ function coach(){
     <label>Anything else</label>
     <textarea id="rdNote" rows="2" placeholder='"Wind got me on the back nine…"'></textarea>
     <div style="margin-top:10px"><button class="btn" data-action="save-round">Save round → Coach updates</button></div>
+    <p class="sm faint" style="margin-top:8px">Hole-by-hole detail is what powers the ranking above — send Claude a GHIN round summary and it lands with every hole.</p>
   </div>
 
-  ${S.rounds.length ? `<h2>Recent rounds</h2>
+  ${S.rounds.length ? `<div class="card flat"><div class="linkrow" data-action="go" data-view="scores">
+    <span><b>Score history &amp; analytics</b><br><span class="sm">${S.rounds.length} rounds · scoring mix, par splits, worst holes</span></span><span class="arr">→</span></div></div>` : ''}
+
+  <h2>Keep the streak</h2>
   <div class="card">
-    <table><tr><th>Date</th><th>Course</th><th>Score</th><th>Putts</th></tr>
-    ${S.rounds.slice(-5).reverse().map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${esc(r.course||'—')}</td><td><b>${esc(r.score??'—')}</b></td><td>${esc(r.putts??'—')}</td></tr>`).join('')}
-    </table>
-    ${S.rounds.slice(-1).map(r => r.note ? `<div class="note-preview">"${esc(r.note)}"</div>` : '').join('')}
-  </div>` : ''}
+    ${picks.length ? picks.map(tipHTML).join('') : '<p class="sm">Lessons matched to your struggles appear here as you log rounds.</p>'}
+    <button class="btn" data-action="drill-done">Mark today's work done · keep streak</button>
+    <div class="streak">${streak.map(d=>`<div class="day ${d.hit?'hit':''}">${d.lab}</div>`).join('')}</div>
+  </div>
 
   <h2>The library · always open</h2>
   <div class="shelf-grid">
@@ -646,8 +978,7 @@ function coach(){
         <div class="ct">${c.n} lessons</div>
         ${c.forYou ? `<span class="new">${c.forYou} FOR YOU</span>` : ''}
       </div>`).join('')}
-  </div>
-  <p class="sm" style="margin:10px 0">Every lesson is tagged to struggles — log a bad bunker day and the bunker shelf queues the right lesson.</p>`;
+  </div>`;
 }
 
 function shelf(name){
@@ -686,8 +1017,9 @@ function sessionView(i){
   if(!s) return putting();
   const d = s.detail;
   const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
+  const disc = sessionDiscipline(s);
   return `
-  <button class="backlink" data-action="go" data-view="putting">← Putting Lab</button>
+  <button class="backlink" data-action="go" data-view="${disc==='swing'?'swing':'putting'}">← ${disc==='swing'?'Swing Lab':'Putting Lab'}</button>
   <div class="card">
     <h2>${fmtDate(s.date)} · film breakdown</h2>
     <h3>${esc(s.setup)}</h3>
@@ -714,8 +1046,10 @@ function briefing(id){
   if(!b) return home();
   const played = S.courses.find(c => c.name.toLowerCase() === b.course.toLowerCase());
   const wx = playsFactor();
+  const backView = b.date ? 'home' : (b.discipline === 'putting' ? 'putting' : 'swing');
+  const backLabel = b.date ? 'Home' : (b.discipline === 'putting' ? 'Putting Lab' : 'Swing Lab');
   return `
-  <button class="backlink" data-action="go" data-view="home">← Home</button>
+  <button class="backlink" data-action="go" data-view="${backView}">← ${backLabel}</button>
   <div class="card">
     <h2>${b.date ? 'Round prep · ' + fmtDate(b.date) : 'Standing plan'}</h2>
     <h3 style="font-size:19px">${esc(b.course)}</h3>
@@ -723,6 +1057,11 @@ function briefing(id){
     ${played ? `<p class="sm faint" style="margin-top:6px">Your history: ${played.rating != null ? 'rated ' + Number(played.rating).toFixed(2) : 'unrated'}${played.pr != null ? ' · PR ' + esc(played.pr) : ''}${played.notes ? ' · "' + esc(played.notes) + '"' : ''}</p>` : ''}
     ${wx ? `<p class="sm faint">Conditions now: ${Math.round(S.weather.t)}°F — carries play ${wx>1?'+':''}${((wx-1)*100).toFixed(1)}% (see the ladder's Today column).</p>` : ''}
   </div>
+  ${b.steps && b.steps.length ? `<div class="card">
+    <h2>The routine</h2>
+    <ol class="steps">${b.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+    ${b.rules && b.rules.length ? `<div class="steprules">${b.rules.map(r => `<span>${esc(r)}</span>`).join('')}</div>` : ''}
+  </div>` : ''}
   ${(b.sections || []).map(s => `<div class="card">
     <h2>${esc(s.t)}</h2>
     <p class="lesson-body">${esc(s.b)}</p>
@@ -784,6 +1123,7 @@ let editingCourse = null;
 // ----- Decisions -----
 function decisions(){
   const dl = daysLeft(S.settings.returnDeadline);
+  const idx = estIndex();
   const decided = S.clubs.find(c => c.cat==='putter' && c.status==='gaming' && c.flow==='zt');
   const phantom = S.clubs.find(c => /phantom 7\.5/i.test(c.name));
   const returnDone = !phantom || phantom.status === 'returned';
@@ -822,6 +1162,301 @@ function decisions(){
       ${S.tests.slice().reverse().map(t=>`<tr><td>${fmtDate(t.date)}</td><td><b>${esc(t.putter)}</b></td><td><b>${esc(t.makes)}</b>/10</td><td class="sm">${esc(t.note||'')}</td></tr>`).join('')}</table>` : ''}
     <div class="tipcard" style="margin-top:12px"><div class="src">Decision rule</div>
       <p class="sm">The winner needs the left miss to visibly dry up vs. the control — then give it 2–3 weeks before final judgment. Get the lie set flat at pickup.</p></div>
+  </div>`;
+}
+
+// ----- Scores: history, analytics, tips -----
+// Rounds arrive two ways: logged in-app (a total only) and pushed through the
+// coach feed with hole-by-hole detail. Every analytic below degrades to nothing
+// when `holes` is missing, so old score-only rounds never break the page.
+function withHoles(){ return S.rounds.filter(r => Array.isArray(r.holes) && r.holes.length); }
+function roundPar(r){
+  if(r.par != null) return r.par;
+  if(Array.isArray(r.holes)) return r.holes.reduce((a,h) => a + (h.par || 0), 0);
+  return null;
+}
+function roundVsPar(r){ const p = roundPar(r); return (p != null && r.score != null) ? r.score - p : null; }
+// USGA score differential. On a 9-hole card the 9-hole rating/slope give a
+// 9-hole differential — doubling it is the 18-hole equivalent.
+function roundDiff(r){
+  if(r.rating == null || !r.slope || r.score == null) return null;
+  const d = (113 / r.slope) * (r.score - r.rating);
+  return (r.holes && r.holes.length <= 9) ? d * 2 : d;
+}
+
+// Stat snapshots pasted in from whatever app produced them (GHIN, older trackers).
+// Stored as a list so an old baseline and a current read can sit side by side —
+// the delta between them is worth more than either one alone. Snapshots carry
+// their own sample sizes, and everything here degrades when a field is absent.
+// The gamer putter's in-play date, so the app can tell which data predates it.
+function putterSince(){
+  const p = S.clubs.find(c => c.cat === 'putter' && c.status === 'gaming' && c.since);
+  return p ? p.since : null;
+}
+// A snapshot's `coversThrough` is the last round it includes — NOT the day it was
+// read off the phone, which is why the read date can't be used for this.
+function statsCoverPutter(){
+  const since = putterSince();
+  if(!since) return true;
+  return S.stats.some(s => (s.coversThrough || '') >= since)
+      || S.rounds.some(r => (r.date || '') >= since);
+}
+
+function latestStats(){ return S.stats && S.stats.length ? S.stats[S.stats.length-1] : null; }
+function baselineStats(){ return S.stats && S.stats.length > 1 ? S.stats[0] : null; }
+function parOrBetter(g){ const s = g && g.scoring; return s ? (s.birdie||0) + (s.par||0) : null; }
+function blowUps(g){ const s = g && g.scoring; return s ? (s.double||0) + (s.triple||0) : null; }
+// Up-and-down rate: some sources give a percentage, GHIN gives a per-round count
+// that only means something against how many greens were missed.
+function upDownPct(g){
+  if(!g) return null;
+  if(g.upDownPct != null) return g.upDownPct;
+  if(g.upDownsPerRound != null && g.gir != null){
+    const missed = 18 * (1 - g.gir / 100);
+    return missed > 0 ? (g.upDownsPerRound / missed) * 100 : null;
+  }
+  return null;
+}
+
+function statTips(){
+  const g = latestStats(), b = baselineStats();
+  const t = [];
+  if(!g) return t;
+  const a = g.approach, p = g.putting, ap = g.avgByPar || {}, d = g.driving;
+  const nAdv = g.roundsAdvanced || g.rounds || 0, nSc = g.roundsScoring || g.rounds || 0;
+  const thin = n => n < 5 ? ` (only ${n} round${n===1?'':'s'} behind this — indicative, not settled)` : '';
+
+  // The headline when there's a baseline: where the strokes actually moved.
+  if(b){
+    const dPutts = (b.putts != null && g.putts != null) ? b.putts - g.putts : null;
+    const dGir = (b.gir != null && g.gir != null) ? g.gir - b.gir : null;
+    if(dPutts != null && dPutts >= 1.5 && dGir != null && dGir <= -3)
+      t.push({ s:'warn', src:`Then vs now · ${b.rounds || b.roundsScoring} rds → ${nSc} rds`, h:'The leak is tee-to-green',
+        b:`Putts per round are DOWN ${dPutts.toFixed(1)} (${b.putts.toFixed(1)} → ${g.putts.toFixed(1)}), but greens in regulation fell ${Math.abs(dGir).toFixed(1)} points (${b.gir}% → ${g.gir}%)${b.driving && d ? ` and fairways ${b.driving.fairway}% → ${d.fairway}%` : ''}, and scoring barely moved: par-or-better ${parOrBetter(b)}% → ${parOrBetter(g)}%, doubles ${blowUps(b)}% → ${blowUps(g)}%. Whatever you saved on the greens you handed back before you got there. The strokes are tee-to-green.` });
+    const dOne = (b.putting && p && b.putting.one != null && p.one != null) ? p.one - b.putting.one : null;
+    if(dPutts != null && dPutts >= 1.5 && dOne != null && Math.abs(dOne) <= 2)
+      t.push({ s:'mid', src:'Read this one carefully', h:'The putting gain is partly an artefact',
+        b:`Putts per round dropped ${dPutts.toFixed(1)}, but the one-putt rate is flat (${b.putting.one}% → ${p.one}%). Missing more greens mechanically lowers putts per round — you chip on and putt once instead of lagging from forty feet. So the drop is at least partly fewer greens hit, not a better stroke.` });
+  }
+
+  if(!statsCoverPutter()){
+    const pn = (S.clubs.find(c => c.cat === 'putter' && c.status === 'gaming') || {}).name || 'the current putter';
+    t.push({ s:'warn', src:'Nothing measured yet', h:`No round data covers ${pn}`,
+      b:`Every stat here — and every round logged — predates it. The mat tests and the stroke film are promising, but they are not scoring. Until a round is played and logged with it, its effect on your score is unmeasured, and nothing in this list should be read as a verdict on it either way. Play one, log the putts, and it becomes answerable.` });
+  }
+
+  if(a && a.short != null){
+    const sides = (a.left || 0) + (a.right || 0);
+    if(a.short >= 30 && a.short >= sides)
+      t.push({ s:'warn', src:`Approach · ${nAdv} rounds`, h:'You miss short, not sideways',
+        b:`${a.short}% of approaches finish SHORT against ${a.left||0}% left, ${a.right||0}% right and ${a.long||0}% long. That is not dispersion — a scattergun misses every direction. A miss that only ever goes one way is a DISTANCE problem: the number you're clubbing to is longer than the club actually carries. Club up one when between clubs, and re-baseline your ladder to AVERAGE carry rather than your best strike. A yardage set built from your purest 7-iron comes up short all day${thin(nAdv)}.` });
+  }
+  const ud = upDownPct(g), udB = upDownPct(b);
+  if(ud != null && ud < 30)
+    t.push({ s:'warn', src:`Short game · ${nAdv} rounds`, h:`Scrambling around ${Math.round(ud)}%`,
+      b:`${g.gir != null ? `At ${g.gir}% greens you're missing about ${(18*(1-g.gir/100)).toFixed(0)} a round. ` : ''}Every miss you don't convert is a bogey at best.${udB != null ? ` And this isn't new — it was ${udB.toFixed(0)}% in the older data too, so it's a standing weakness rather than a bad patch.` : ''} With greens hit this low, up-and-down rate moves your score more than ball-striking does, and it's the cheapest thing here to practise${thin(nAdv)}.` });
+  if(p && p.three != null && p.three >= 10)
+    t.push({ s:'warn', src:`Putting · ${nAdv} rounds`, h:`${p.three}% three-putts or worse`,
+      b:`Roughly ${(p.three/100*18).toFixed(1)} a round, against ${p.one||0}% one-putts. Three-putts are a PACE fault, not a line fault — the first putt is finishing outside gimme range. Same signature as the lag work already on your card${thin(nAdv)}.` });
+  if(ap[5] != null && ap[4] != null && (ap[5] - 5) >= 0.6)
+    t.push({ s:'mid', src:`Scoring · ${nSc} rounds`, h:'Par 5s give you nothing',
+      b:`Averaging ${ap[5].toFixed(2)} on par 5s — barely better relative to par than your ${ap[4].toFixed(2)} on par 4s. A par 5 is the one hole where a mid-handicap gets a free run at birdie. Decide the lay-up off your wedge ladder so the third shot is a number you own.` });
+  const blow = blowUps(g);
+  if(blow != null && blow >= 15)
+    t.push({ s:'warn', src:`Scoring · ${nSc} rounds`, h:`${blow}% of holes are double or worse`,
+      b:`Across ${nSc} rounds, so this is the baseline rather than one bad week. Against ${g.scoring.birdie||0}% birdies, your score is decided by the bad holes, not the good ones. Taking the punch-out instead of the hero shot is worth more strokes than any swing change.` });
+  return t;
+}
+
+function statsCard(){
+  const g = latestStats(), b = baselineStats();
+  if(!g) return '';
+  const pc = v => v == null ? '—' : `${(+v).toFixed(v % 1 ? 1 : 0)}%`;
+  const nm = v => v == null ? '—' : (+v).toFixed(v % 1 ? 2 : 1);
+  const rows = [
+    ['Par or better', parOrBetter(b), parOrBetter(g), pc, 'up'],
+    ['Double or worse', blowUps(b), blowUps(g), pc, 'down'],
+    ['Birdies', b && b.scoring && b.scoring.birdie, g.scoring && g.scoring.birdie, pc, 'up'],
+    ['Avg · par 3', b && b.avgByPar && b.avgByPar[3], g.avgByPar && g.avgByPar[3], nm, 'down'],
+    ['Avg · par 4', b && b.avgByPar && b.avgByPar[4], g.avgByPar && g.avgByPar[4], nm, 'down'],
+    ['Avg · par 5', b && b.avgByPar && b.avgByPar[5], g.avgByPar && g.avgByPar[5], nm, 'down'],
+    ['Greens in reg.', b && b.gir, g.gir, pc, 'up'],
+    ['Fairways hit', b && b.driving && b.driving.fairway, g.driving && g.driving.fairway, pc, 'up'],
+    ['Putts / round', b && b.putts, g.putts, nm, 'down'],
+    ['One-putts', b && b.putting && b.putting.one, g.putting && g.putting.one, pc, 'up'],
+    ['Up & down', upDownPct(b), upDownPct(g), pc, 'up'],
+  ].filter(r => r[2] != null);
+  const arrow = (was, now, dir) => {
+    if(was == null || now == null) return '';
+    const d = now - was;
+    if(Math.abs(d) < 0.05) return '<span class="faint">—</span>';
+    const good = dir === 'up' ? d > 0 : d < 0;
+    return `<b style="color:${good ? 'var(--green)' : 'var(--burg)'}">${d > 0 ? '+' : ''}${d.toFixed(Math.abs(d) < 10 ? 1 : 0)}</b>`;
+  };
+  const a = g.approach;
+  return `
+  <h2>Tracked stats</h2>
+  <div class="card">
+    <table><tr><th>Metric</th>${b ? `<th>${esc(b.label || 'Then')}</th>` : ''}<th>${esc(g.label || 'Now')}</th>${b ? '<th>Δ</th>' : ''}</tr>
+      ${rows.map(([k, was, now, fmt, dir]) => `<tr><td class="sm"><b>${k}</b></td>
+        ${b ? `<td class="sm faint">${fmt(was)}</td>` : ''}<td><b>${fmt(now)}</b></td>
+        ${b ? `<td class="sm">${arrow(was, now, dir)}</td>` : ''}</tr>`).join('')}
+    </table>
+    ${a && a.short != null ? `<p class="sm" style="margin-top:8px">Approach misses: <b class="warn">${a.short}% short</b> · ${a.left||0}% left · ${a.right||0}% right · ${a.long||0}% long.</p>` : ''}
+    <p class="sm faint" style="margin-top:8px">
+      ${b ? `<b>${esc(b.label||'Then')}</b> — ${b.rounds || b.roundsScoring} rounds${b.avgScore ? `, averaging ${b.avgScore}` : ''}. ` : ''}
+      <b>${esc(g.label||'Now')}</b> — ${g.roundsScoring || g.rounds} rounds of scoring${g.roundsAdvanced && g.roundsAdvanced !== (g.roundsScoring || g.rounds) ? `, but only ${g.roundsAdvanced} with the shot-level detail, so treat greens, fairways and putts as indicative` : ''}.</p>
+  </div>`;
+}
+
+// Best 40% of score differentials, the way a handicap index is built. Needs a few
+// rounds behind it before it means anything, so it stays null until then.
+function estIndex(){
+  const d = S.rounds.map(roundDiff).filter(v => v != null).sort((a,b) => a - b);
+  if(d.length < 3) return null;
+  const n = Math.max(1, Math.round(d.length * 0.4));
+  return d.slice(0, n).reduce((a,b) => a + b, 0) / n;
+}
+
+function scoreStats(){
+  const rs = withHoles();
+  const mix = { eagle:0, birdie:0, par:0, bogey:0, double:0, triple:0 };
+  const byPar = { 3:{n:0,over:0,red:0}, 4:{n:0,over:0,red:0}, 5:{n:0,over:0,red:0} };
+  const opening = { n:0, over:0 };
+  const spots = new Map();
+  let holes = 0, over = 0;
+  rs.forEach(r => r.holes.forEach((h, i) => {
+    if(h.s == null || h.par == null) return;
+    const d = h.s - h.par;
+    holes++; over += d;
+    if(d <= -2) mix.eagle++; else if(d === -1) mix.birdie++; else if(d === 0) mix.par++;
+    else if(d === 1) mix.bogey++; else if(d === 2) mix.double++; else mix.triple++;
+    const p = byPar[h.par];
+    if(p){ p.n++; p.over += d; if(d < 0) p.red++; }
+    if(i === 0){ opening.n++; opening.over += d; }
+    const n = h.n ?? i + 1;
+    const k = `${r.course}|${n}`;
+    const e = spots.get(k) || { course:r.course, hole:n, par:h.par, n:0, over:0 };
+    e.n++; e.over += d; spots.set(k, e);
+  }));
+  const worst = [...spots.values()].filter(e => e.n >= 2)
+    .sort((a,b) => (b.over / b.n) - (a.over / a.n)).slice(0, 5);
+  return { rs, mix, byPar, opening, worst, holes, over };
+}
+
+// Tips fire off thresholds in the data, so they only appear once there's
+// enough of it to mean anything. Each one carries the number that triggered it.
+function scoreTips(st){
+  const t = statTips();
+  if(!st.holes) return t;
+  const blowN = st.mix.double + st.mix.triple;
+  const blowShots = st.mix.double * 2 + st.mix.triple * 3;
+  const share = st.over > 0 ? blowShots / st.over : 0;
+  if(blowN && share >= 0.25) t.push({ s:'warn', src:'Biggest single lever', h:'Doubles are your gap',
+    b:`${blowN} holes of double bogey or worse across ${st.holes} played — that's ${blowShots} strokes, ${Math.round(share*100)}% of everything you've lost to par. Eliminating blow-ups is worth more than any extra birdies: par golf with zero doubles beats birdie golf with four. On a hole that starts badly, take the punch-out and the bogey instead of the hero shot.` });
+  if(st.opening.n >= 3){
+    const avg = st.opening.over / st.opening.n;
+    if(avg >= 0.8) t.push({ s:'warn', src:'Cheapest fix on the list', h:'Your opening hole is a leak',
+      b:`${st.opening.over > 0 ? '+' : ''}${st.opening.over} across ${st.opening.n} opening holes — ${avg.toFixed(1)} a hole before you've settled. That's a warm-up problem, not a swing problem. Prime the feel before the first tee (slow one-handed reps, then blend to two hands) rather than hunting for it on the 4th.` });
+  }
+  const p3 = st.byPar[3], p4 = st.byPar[4], p5 = st.byPar[5];
+  // A par 3 takes the driver out of your hands, so it should be clearly your best
+  // scoring hole. Parity with the par 4s is itself the finding.
+  // A handful of par 3s at one course must not outvote a season of them.
+  const bp = (latestStats() || {}).avgByPar;
+  const bigSampleSaysFine = bp && bp[3] != null && bp[4] != null && (bp[3] - 3) < (bp[4] - 4) * 0.9;
+  if(!bigSampleSaysFine && p3.n >= 6 && p4.n >= 6 && (p3.over / p3.n) >= (p4.over / p4.n) * 0.9) t.push({ s:'warn', src:'Where it points', h:'Par 3s are no better than your par 4s',
+    b:`+${(p3.over/p3.n).toFixed(2)} a hole on par 3s against +${(p4.over/p4.n).toFixed(2)} on par 4s. There's no driver on a par 3 and no second shot to recover with, so it should be comfortably your best hole type — level with the par 4s means the tee shot itself isn't finding greens. That's iron control, not driving. Club to cover the front edge rather than to reach the pin.` });
+  if(p5.n >= 4 && p5.red === 0) t.push({ s:'mid', src:'Missing offense', h:'No birdies on par 5s',
+    b:`${p5.n} par-5 holes played, zero under par. Par 5s are where a mid-handicap makes his money. Decide the lay-up off your wedge ladder so the third shot is a NUMBER you own rather than whatever's left — 60°→80 · 56°→95 · 50°→108 · PW→122.` });
+  const w = st.worst[0];
+  if(w && (w.over / w.n) >= 1.5) t.push({ s:'warn', src:'One hole', h:`${esc(w.course)} hole ${w.hole} is eating you`,
+    b:`+${w.over} across ${w.n} plays on a par ${w.par} — ${(w.over/w.n).toFixed(1)} a go. One hole played a handful of times shouldn't cost this much. Next time you see it, play it as a bogey hole on purpose and take the trouble out of the equation.` });
+  const parRate = (st.mix.par + st.mix.birdie + st.mix.eagle) / st.holes;
+  if(parRate >= 0.4) t.push({ s:'good', src:'Protect this', h:'You make a lot of pars',
+    b:`${Math.round(parRate*100)}% of holes played at par or better. The base game is there — the scoring gap is the tail, not the average.` });
+  return t;
+}
+
+function scores(){
+  const all = S.rounds.slice().sort((a,b) => (a.date || '').localeCompare(b.date || ''));
+  if(!all.length) return `
+  <div class="card">
+    <h2>No rounds yet</h2>
+    <p class="sm">Log a round on the <b>Home</b> page, or send Claude your GHIN round summaries and they'll land here with the hole-by-hole detail — which is what unlocks the analytics below: scoring mix, par-3/4/5 splits, your worst holes, and tips built from your own numbers.</p>
+  </div>`;
+  const st = scoreStats();
+  const tips = scoreTips(st);
+  const idx = estIndex();
+  const vs = all.map(roundVsPar).filter(v => v != null);
+  const best = all.filter(r => roundVsPar(r) != null).sort((a,b) => roundVsPar(a) - roundVsPar(b))[0];
+  const pct = n => st.holes ? (n / st.holes * 100) : 0;
+  const bar = [['birdie','Birdie or better',st.mix.eagle+st.mix.birdie],['par','Par',st.mix.par],
+               ['bogey','Bogey',st.mix.bogey],['double','Double+',st.mix.double+st.mix.triple]];
+  return `
+  <div class="rowgrid g3">
+    <div class="stat"><div class="v">${all.length}</div><div class="l">Rounds</div></div>
+    <div class="stat"><div class="v">${st.holes || '—'}</div><div class="l">Holes analysed</div></div>
+    <div class="stat"><div class="v">${idx != null ? idx.toFixed(1) : '—'}</div><div class="l">Est. index</div></div>
+  </div>
+
+  ${vs.length > 1 ? `<div class="card">
+    <div class="charttile"><div class="lab">Score vs par · by round</div>
+      <div style="color:var(--gtext)">${spark(all.map(roundVsPar).filter(v => v != null))}</div>
+      <div class="sub">${best ? `Best: ${esc(best.course || 'round')} ${best.score} (${roundVsPar(best) > 0 ? '+' : ''}${roundVsPar(best)}) · ${fmtDate(best.date)}` : ''}</div></div>
+  </div>` : ''}
+
+  ${st.holes ? `
+  <h2>Scoring mix · ${st.holes} holes</h2>
+  <div class="card">
+    <div class="mixbar">${bar.filter(b => b[2]).map(b => `<span class="${b[0]}" style="width:${pct(b[2])}%"></span>`).join('')}</div>
+    <table style="margin-top:10px"><tr><th>Result</th><th>Holes</th><th>Share</th></tr>
+      ${bar.map(b => `<tr><td class="sm"><b>${b[1]}</b></td><td>${b[2]}</td><td class="sm">${pct(b[2]).toFixed(0)}%</td></tr>`).join('')}
+    </table>
+    <p class="sm faint" style="margin-top:8px">Total ${st.over > 0 ? '+' : ''}${st.over} over ${st.holes} holes · ${(st.over/st.holes).toFixed(2)} a hole.</p>
+  </div>
+
+  <h2>By par</h2>
+  <div class="card">
+    <table><tr><th>Par</th><th>Holes</th><th>Over</th><th>Per hole</th><th>Under</th></tr>
+      ${[3,4,5].filter(p => st.byPar[p].n).map(p => { const d = st.byPar[p]; return `<tr>
+        <td><b>Par ${p}</b></td><td>${d.n}</td><td>${d.over > 0 ? '+' : ''}${d.over}</td>
+        <td><b style="color:${d.over/d.n >= 1 ? 'var(--burg)' : d.over/d.n <= 0.5 ? 'var(--green)' : 'var(--ink)'}">${(d.over/d.n).toFixed(2)}</b></td>
+        <td class="sm">${d.red || '—'}</td></tr>`; }).join('')}
+    </table>
+    ${st.opening.n >= 2 ? `<p class="sm" style="margin-top:8px">Opening hole of each round: <b>${st.opening.over > 0 ? '+' : ''}${st.opening.over}</b> across ${st.opening.n} starts · ${(st.opening.over/st.opening.n).toFixed(1)} a hole.</p>` : ''}
+  </div>` : `<div class="card"><p class="sm faint">Hole-by-hole detail unlocks the scoring mix, the par splits and the tips. Send Claude your GHIN round summaries and they'll be filled in.</p></div>`}
+
+  ${st.worst.length ? `<h2>Holes that cost you most</h2>
+  <div class="card">
+    <table><tr><th>Course</th><th>Hole</th><th>Par</th><th>Plays</th><th>Avg</th></tr>
+      ${st.worst.map(w => `<tr><td class="sm">${esc(w.course || '—')}</td><td><b>${w.hole}</b></td><td>${w.par}</td><td>${w.n}</td>
+        <td><b style="color:var(--burg)">+${(w.over/w.n).toFixed(1)}</b></td></tr>`).join('')}
+    </table>
+    <p class="sm faint" style="margin-top:8px">Holes played at least twice, worst average first.</p>
+  </div>` : ''}
+
+  ${tips.length ? `<h2>How to improve</h2>
+  <div class="card">
+    ${tips.map(t => `<div class="tipcard ${t.s === 'good' ? 'green' : ''}">
+      <div class="src">${esc(t.src)}</div><h4>${t.h}</h4><p class="sm">${t.b}</p></div>`).join('')}
+    <p class="sm faint">Generated from your own rounds — these change as the data does.</p>
+  </div>` : ''}
+
+  ${statsCard()}
+
+  <h2>Every round</h2>
+  <div class="card">
+    <table><tr><th>Date</th><th>Course</th><th>Tees</th><th>Score</th><th>vs par</th><th>Putts</th></tr>
+      ${all.slice().reverse().map(r => { const v = roundVsPar(r); return `<tr>
+        <td style="white-space:nowrap">${fmtDate(r.date)}</td>
+        <td class="sm">${esc(r.course || '—')}${r.nine ? ` <span class="faint">${r.nine === 'F' ? 'front' : 'back'}</span>` : ''}</td>
+        <td class="sm">${esc(r.tees || '—')}</td>
+        <td><b>${esc(r.score ?? '—')}</b></td>
+        <td class="sm">${v == null ? '—' : `<b style="color:${v > 5 ? 'var(--burg)' : v <= 2 ? 'var(--green)' : 'var(--ink)'}">${v > 0 ? '+' : ''}${v}</b>`}</td>
+        <td class="sm">${esc(r.putts ?? '—')}</td></tr>`; }).join('')}
+    </table>
+    ${all.some(r => r.note) ? `<p class="sm faint" style="margin-top:8px">Latest note: "${esc(all.filter(r=>r.note).slice(-1)[0].note)}"</p>` : ''}
   </div>`;
 }
 
@@ -1010,6 +1645,13 @@ function fetchWeather(manual){
 }
 
 document.addEventListener('click', e => {
+  // in-page section jump
+  const jump = e.target.closest('[data-jump]');
+  if(jump){
+    document.getElementById(jump.dataset.jump)
+      ?.scrollIntoView({ behavior:'smooth', block:'start' });
+    return;
+  }
   // 5-ft tap grid
   const tap = e.target.closest('[data-tap]');
   if(tap){
@@ -1080,6 +1722,14 @@ function applyFeed(feed){
     else if(e.type === 'course-add' && e.course && !S.courses.some(c => c.name === e.course.name))
       S.courses.push({ id:e.id, rating:null, pr:null, bucket:false, notes:'', ...e.course });
     else if(e.type === 'course-remove') S.courses = S.courses.filter(c => c.name !== e.target);
+    else if(e.type === 'stats' && e.stats){
+      if(e.replaces) S.stats = S.stats.filter(x => x.id !== e.replaces);
+      if(!S.stats.some(x => x.id === e.id)) S.stats.push({ id:e.id, ...e.stats });
+      S.stats.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+    }
+    else if(e.type === 'round' && e.round){
+      if(!S.rounds.some(r => r.feedId === e.id)) S.rounds.push({ feedId:e.id, troubles:[], putts:null, note:'', ...e.round });
+    }
     else if(e.type === 'test' && e.test) S.tests.push({ date:e.test.date || null, putter:e.test.putter, makes:e.test.makes, note:e.test.note || '' });
     else if(e.type === 'briefing' && e.briefing){
       S.briefings = S.briefings.filter(b => b.id !== e.id && b.id !== e.replaces &&
