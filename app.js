@@ -1330,6 +1330,14 @@ function statsTrend(){
         <td class="sm">${nm(ap(s, 4))}</td>
         <td class="sm">${nm(ap(s, 5))}</td></tr>`).join('')}
     </table>
+    ${(() => {
+      // Posted scores are a wider net than the scoring summary — GHIN's donut only counts
+      // rounds entered hole-by-hole, so the two round counts rarely agree.
+      const posted = list.filter(s => s.avgScore != null);
+      return posted.length ? `<p class="sm">Posted scores — ${posted.map(s =>
+        `<b>${esc(s.label || fmtDate(s.date))}</b>: ${s.roundsPosted || s.roundsScoring || s.rounds || '—'} rds, avg ${s.avgScore}${
+          s.lowScore != null && s.highScore != null ? ` (${s.lowScore}–${s.highScore})` : ''}`).join(' · ')}.</p>` : '';
+    })()}
     <p class="sm faint">Par+ = par or better · Dbl+ = double or worse · P3/P4/P5 = scoring average by par.
     Sample sizes and course difficulty differ year to year, so read the direction rather than the decimals.</p>
   </div>`;

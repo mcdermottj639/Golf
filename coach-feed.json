@@ -3222,6 +3222,271 @@
           }
         ]
       }
+    },
+    {
+      "id": "add-poundridge-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Pound Ridge Golf Club",
+        "st": "NY"
+      }
+    },
+    {
+      "id": "add-vancortlandt-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Van Cortlandt Park Golf Course",
+        "st": "NY"
+      }
+    },
+    {
+      "id": "add-saxonwoods-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Saxon Woods Golf Course",
+        "st": "NY"
+      }
+    },
+    {
+      "id": "add-oakhillspark-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Oak Hills Park Golf Club",
+        "st": "CT"
+      }
+    },
+    {
+      "id": "add-richterpark-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Richter Park Golf Course",
+        "st": "CT"
+      }
+    },
+    {
+      "id": "add-bonitabay-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Bonita Bay Club",
+        "st": "FL"
+      }
+    },
+    {
+      "id": "add-shadowwood-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Shadow Wood Country Club",
+        "st": "FL"
+      }
+    },
+    {
+      "id": "add-oldcorkscrew-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Old Corkscrew Golf Club",
+        "st": "FL"
+      }
+    },
+    {
+      "id": "add-basinharbor-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Basin Harbor Club",
+        "st": "VT"
+      }
+    },
+    {
+      "id": "add-vermontnat-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Vermont National Country Club",
+        "st": "VT"
+      }
+    },
+    {
+      "id": "add-foxhollow-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Fox Hollow Golf Club",
+        "st": "NJ"
+      }
+    },
+    {
+      "id": "add-trentoncc-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Trenton Country Club",
+        "st": "NJ"
+      }
+    },
+    {
+      "id": "add-princetoncc-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Princeton Country Club",
+        "st": "NJ"
+      }
+    },
+    {
+      "id": "add-springlake-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Spring Lake Golf Club",
+        "st": "NJ"
+      }
+    },
+    {
+      "id": "add-makefield-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Makefield Highlands Golf Club",
+        "st": "PA"
+      }
+    },
+    {
+      "id": "add-granitelinks-20260729",
+      "type": "course-add",
+      "course": {
+        "name": "Granite Links Golf Club",
+        "st": "MA"
+      }
+    },
+    {
+      "id": "stats-ghin-2023-v2",
+      "type": "stats",
+      "replaces": "stats-ghin-2023",
+      "stats": {
+        "label": "2023 · GHIN",
+        "date": "2023-12-31",
+        "coversThrough": "2023-12-31",
+        "source": "GHIN app · Stats tab + Score History · 2023 Scores",
+        "historical": true,
+        "roundsScoring": 20,
+        "roundsAdvanced": 0,
+        "roundsPosted": 23,
+        "avgScore": 85.2,
+        "lowScore": 75,
+        "highScore": 96,
+        "scoring": {
+          "birdie": 5,
+          "par": 32,
+          "bogey": 41,
+          "double": 20,
+          "triple": 2
+        },
+        "avgByPar": {
+          "3": 3.88,
+          "4": 4.9,
+          "5": 5.46
+        }
+      }
+    },
+    {
+      "id": "stats-ghin-2024-v2",
+      "type": "stats",
+      "replaces": "stats-ghin-2024",
+      "stats": {
+        "label": "2024 · GHIN",
+        "date": "2024-12-31",
+        "coversThrough": "2024-12-31",
+        "source": "GHIN app · Stats tab + Score History · 2024 Scores",
+        "historical": true,
+        "roundsScoring": 8,
+        "roundsAdvanced": 0,
+        "roundsPosted": 9,
+        "avgScore": 83.6,
+        "lowScore": 79,
+        "highScore": 88,
+        "scoring": {
+          "birdie": 4,
+          "par": 39,
+          "bogey": 43,
+          "double": 13,
+          "triple": 1
+        },
+        "avgByPar": {
+          "3": 3.7,
+          "4": 4.65,
+          "5": 5.72
+        }
+      }
+    },
+    {
+      "id": "stats-ghin-2025-v2",
+      "type": "stats",
+      "replaces": "stats-ghin-2025",
+      "stats": {
+        "label": "2025 · GHIN",
+        "date": "2025-12-31",
+        "coversThrough": "2025-12-31",
+        "source": "GHIN app · Stats tab + Score History · 2025 Scores",
+        "historical": true,
+        "roundsScoring": 10,
+        "roundsAdvanced": 2,
+        "roundsPosted": 12,
+        "avgScore": 86.7,
+        "lowScore": 83,
+        "highScore": 90,
+        "scoring": {
+          "birdie": 2,
+          "par": 30,
+          "bogey": 47,
+          "double": 20,
+          "triple": 1
+        },
+        "avgByPar": {
+          "3": 3.74,
+          "4": 4.94,
+          "5": 5.88
+        }
+      }
+    },
+    {
+      "id": "ghin-3yr-debrief-20260729-v2",
+      "type": "briefing",
+      "briefing": {
+        "course": "2023–2025 GHIN — Three-Year Read",
+        "discipline": "full-swing",
+        "focus": "Three seasons of GHIN — 44 posted scores and 38 rounds of hole-by-hole detail. Scoring average went 85.2 → 83.6 → 86.7, and the one metric that has worsened every single year without exception is your par-5 average.",
+        "sections": [
+          {
+            "t": "The three seasons",
+            "b": "2023 · 23 posted scores, avg 85.2, range 75–96 · 20 rounds of detail — 5% birdies, 32% pars, 41% bogeys, 20% doubles, 2% triples, par-or-better 37%. 2024 · 9 posted, avg 83.6, range 79–88 · 8 rounds of detail — 4% birdies, 39% pars, 43% bogeys, 13% doubles, 1% triples, par-or-better 43%. 2025 · 12 posted, avg 86.7, range 83–90 · 10 rounds of detail — 2% birdies, 30% pars, 47% bogeys, 20% doubles, 1% triples, par-or-better 32%. (GHIN's two round counts differ because the scoring donut only counts rounds you entered hole-by-hole.)"
+          },
+          {
+            "t": "THE FINDING — par 5s have gotten worse every year",
+            "b": "5.46 → 5.72 → 5.88. It is the only number across three seasons that moves in one direction with no exceptions, and it has cost you about a stroke and a half a round from where it started. On a par-72 with four par 5s, 2023's average gave you +1.8 on them; 2025 gave you +3.5. Par 5s are the holes a mid-single-digit is SUPPOSED to feed on — you get a wedge in your hand on the third shot by design. Instead they've quietly become your worst holes relative to par."
+          },
+          {
+            "t": "It's the same finding Wianno gave you",
+            "b": "The member-guest cards said it independently: 8 par-5 plays, four pars and four bogeys, ZERO birdies, +4. Two completely different data sources, same conclusion. That's no longer a small-sample fluke — it's the standing pattern, and it's the single most concrete thing on your whole card to attack. The fix is already written down: decide the lay-up off the ladder (PW 122 · 50° 108 · 56° 95 · 60° 80) so the third shot is a NUMBER you own rather than whatever's left after hitting it as far as it goes."
+          },
+          {
+            "t": "2025 gave back everything 2024 gained",
+            "b": "Bogeys went 43% → 47% and pars fell 39% → 30% — nine points of pars converting almost one-for-one into bogeys. Doubles went back up too, 13% → 20%. So 2025 wasn't one blow-up round dragging an average down; it was the ordinary hole getting worse. The posted scoring average confirms it from the other direction: 83.6 → 86.7 is a three-shot round-for-round regression, and it lands you slightly worse than 2023 as well."
+          },
+          {
+            "t": "The range is the part nobody looks at",
+            "b": "2023 ran 75 to 96 — a 21-shot spread. 2025 ran 83 to 90 — seven. Read that carefully, because it cuts both ways. The bad days genuinely got better: no 96s, no blow-up rounds at all, which fits the doubles staying survivable. But the good days disappeared completely. You have not broken 83 in two seasons, and your best round in three years is a 75 that's now more than two years old. That is the profile of a player who has stopped making birdies — 5% → 4% → 2% — rather than one who has started making messes."
+          },
+          {
+            "t": "What 2024 proves you can do",
+            "b": "Don't dismiss 2024 as a fluke just because it's nine scores. 39% pars, 13% doubles and an 83.6 average is genuinely good golf, and the par-4 average — 4.65 — is nearly THREE TENTHS better than either year on either side of it. Ten par 4s a round makes that worth about three strokes on its own. Whatever you were doing in 2024 off the tee and into the green, that's the level, and it's yours; it's two years old, not theoretical."
+          },
+          {
+            "t": "The one thing that held up",
+            "b": "Par 3s: 3.88 → 3.70 → 3.74. They improved from 2023 and then stayed improved through the bad year. That's a real gain and worth knowing, because it means 2025 was not a general ball-striking collapse — one-shot holes held while the two- and three-shot holes fell apart. That points at what happens AFTER the tee shot, not at the swing itself."
+          },
+          {
+            "t": "Read the sample sizes honestly",
+            "b": "Nine posted scores in 2024 against twenty-three in 2023 — small samples move a lot, and none of this is adjusted for course difficulty, tees, or conditions, though the differentials on your score history run a wide 8.4 to 20.4 regardless. Only two rounds in three years carry GHIN's shot-level detail, so there's no fairways/greens/putts data behind any of it to explain WHY. Treat the year-over-year direction as real and the exact decimals as noisy. What survives that caveat is the par-5 line, because it moves the same way three years running and Wianno confirms it from a separate source."
+          },
+          {
+            "t": "The one job",
+            "b": "Don't try to fix all of this. Par 5s are the leak with the most evidence behind it, the clearest mechanism, and a fix that's already on your card and costs nothing to apply. Take the ladder number on every par-5 lay-up for the rest of this season and watch that 5.88. Everything else here is context."
+          }
+        ]
+      }
     }
   ]
 }
