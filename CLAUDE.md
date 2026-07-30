@@ -106,7 +106,8 @@ does nothing — double-check against `applyFeed()`.
 | Utility | Cobra KING TEC 2-iron · ~17° | |
 | Irons | Cobra KING TEC 4–PW | **44° PW** anchors the wedge ladder |
 | Wedges | **Vokey 50.08F · 56.10S · 60.08M** | 50 = F/8° sweeper · 56 = S/10° workhorse · 60 = M/8° creative |
-| Putter | **L.A.B. Golf DF3i · 34"** | zero-torque — the fix for the SBST stroke; bought Jul 18, 2026 |
+| Putter | **L.A.B. Golf LINK.2.1** | zero-torque (Lie Angle Balanced) narrow blade — gamed Jul 30, 2026; on a two-week evidence gate |
+| Backup putter | L.A.B. Golf DF3i · 34" | zero-torque mallet, gamed Jul 18–30, 2026 — the control for the LINK gate, hold don't sell |
 | Backup putter | Scotty Newport 2 | arc-suited blade, bullpen |
 | Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** — putter search closed |
 
