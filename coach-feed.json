@@ -4913,6 +4913,108 @@
           "Aim the FACE first, then build the stance to it"
         ]
       }
+    },
+    {
+      "id": "link21-specs-20260730",
+      "type": "club-update",
+      "target": "L.A.B. Golf LINK.2.1",
+      "club": {
+        "spec": "Zero-torque (Lie Angle Balanced) · narrow-body heel-shafted blade · 69° lie · 2° effective loft · 0° shaft lean · riser hosel · L.A.B. Pistol 0 grip",
+        "note": "Gamed from Jul 30. Stock spec confirmed by research: 69° lie, 2° effective loft, 0° SHAFT LEAN, Pistol 0 grip as standard — so the vertical, no-lean setup is what this putter is DESIGNED around, not a side-effect of the Press Pistol going back with the DF3i. Film corroborates both: lie presented ~68°, shaft dead vertical and repeatable to 0.3°. Heel shaft is made lie-angle-balanced by an aluminium riser hosel sized per lie angle, which means the shaft position is NOT a reliable guide to where the head's centre of gravity sits. Still confirm length 34\"."
+      }
+    },
+    {
+      "id": "sweetspot-action-20260730",
+      "type": "action",
+      "pri": true,
+      "text": "PUTTING — Two tests, one session, ~7 minutes. (1) Hang the LINK from the top of the grip and tap heel-to-toe with an eraser; the spot with NO twist is the true sweet spot — mark it, note where it sits vs the sight line. (2) Tape or foot-spray the face, hit 10 putts, photograph the strike pattern. A HEEL strike closes the face and starts the ball LEFT, which is exactly the 1.5–1.7° miss measured overhead — and strike location has never once been checked."
+    },
+    {
+      "id": "putt-faults-20260730-v6",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "start-line-left",
+          "why": "THE fault. Overhead film measured 1.5° and 1.7° LEFT on two of three putts — 1.3–1.4\" left at 4 ft, ~2\" at 6 ft — with the third dead straight and a neutral measured path. Not equipment (it survived a head change) and not the stance (toe line measured 0.6–3.6° CLOSED). Three candidates remain: aim, face-at-impact, and NOW strike location. Test it the way it was measured — overhead, five putts, roll versus the mat centre line — target a median inside 0.5°."
+        },
+        {
+          "tag": "strike-location",
+          "why": "NEW Jul 30 and the cheapest untested explanation for the left start. A strike toward the HEEL rotates the face closed and starts the ball LEFT — precisely the measured miss — and a narrow-body blade carries less MOI than a mallet, so it rotates MORE for the same distance off centre. Compounding it: the LINK's heel shaft is made lie-angle-balanced by a riser hosel, and L.A.B.'s own explanation notes the shaft base points at a spot on the head that is not necessarily the centre of gravity, so the hosel is a poor guide to where the middle really is. Never measured, not once. Tap test to find the sweet spot, tape test to find the strike, compare."
+        },
+        {
+          "tag": "pace-calibration",
+          "why": "Wide open — this putter has no distance baseline at all. Two properties drive its power curve: a narrow blade shows strike quality in ball speed more than a mallet would, and the stock 2° effective loft is delivered in full at the designed 0° shaft lean. Neither is a fault; both have to be learned. 30-ft lag ladder twice a week: log spread, how many finish SHORT, and whether each miss was pace or strike. Target no more than 1 in 10 short."
+        },
+        {
+          "tag": "delivery-unverified",
+          "why": "What the vertical address turns into at impact is still unmeasured. With the stock Pistol 0 and a 0° shaft-lean design there is no built-in lean to protect, so the question is simply repeatability. One slo-mo face-on set — white tape on the shaft, 240 fps, lights on — settles it."
+        },
+        {
+          "tag": "early-lift",
+          "why": "CLOSED Jul 30 ✓. At 120 fps and 37.5 px/inch the sole held within 0.05–0.08\" of its address height for the full 83 ms into impact, flat across ten consecutive frames, and never dropped below address height. The rise afterwards is the follow-through arc. Wants two more slo-mo strokes on sample size."
+        },
+        {
+          "tag": "stance-creep",
+          "why": "CLOSED Jul 30 ✓ — overhead film measured the toe line 0.6°, 2.9° and 3.6° CLOSED to the target line across three reps. Never open."
+        }
+      ]
+    },
+    {
+      "id": "plan-link-sweetspot-20260730",
+      "type": "briefing",
+      "briefing": {
+        "course": "The LINK.2.1 Sweet Spot — why the shaft lies to you",
+        "discipline": "putting",
+        "focus": "Jul 30, researched. Your hunch — that the real centre of this head sits closer to the heel than the shaft position suggests — has a genuine mechanism behind it, and it lands squarely on the one fault still open. Here is what L.A.B. actually publish, where the evidence stops, and the two five-minute tests that settle it for YOUR head.",
+        "sections": [
+          {
+            "t": "Your instinct is sound — here is the mechanism",
+            "b": "Lie Angle Balance has one requirement: the axis of the shaft has to point into the head's centre of gravity. That is geometrically awkward on a heel-shafted putter, because the shaft enters at the end of the head rather than the middle — which is exactly why the LINK uses an aluminium RISER HOSEL. L.A.B. build a different riser for every lie angle: flatter lies get a shorter riser, more upright lies a taller one, so the shaft axis keeps pointing at the same place inside the head no matter what lie you are fitted for. It also means they never have to bend the hosel or change its onset to hit a lie number.\n\nAnd here is the part that answers your question directly. L.A.B.'s own explanation of the riser system says they needed the base of the shaft to point at a position on the head that is — their words — NOT NECESSARILY AT THE CENTRE OF GRAVITY the way it is with other companies' putters. So on this putter the shaft's position genuinely is a poor guide to where the mass sits. Reading the centre off the hosel, the way you would with a Newport, does not transfer here. That instinct was right."
+          },
+          {
+            "t": "The trap they designed around — the 'graduated sweet spot'",
+            "b": "There is a counterweight to the hunch, and it is worth knowing because it cuts the other way. If you chase lie-angle balance purely by shuffling MASS around inside the head — adding weight until the thing passes the balance test — what you end up with is something L.A.B. call a GRADUATED SWEET SPOT: a sweet spot that is neither centred nor symmetrically shaped. That is the failure mode of the weight-placement approach, and the Riser Hosel System exists precisely to avoid it, by solving the balance problem with hosel geometry instead of with lead.\n\nSo L.A.B.'s position is that the LINK's sweet spot is NOT skewed — that is the whole point of building it their way. Take that as a design claim rather than a measurement of your particular head, but take it seriously: it is a specific, falsifiable answer to exactly the thing you were suspicious of."
+          },
+          {
+            "t": "Where the evidence stops",
+            "b": "What I could not find anywhere is a published figure for where the LINK.2.1's sweet spot actually sits relative to the sight line — no manufacturer diagram, no independent measurement, and several of the deeper technical write-ups were unreachable. So the honest position is: the mechanism you suspected is real and acknowledged, the manufacturer claims their design neutralises it, and nobody has published the number.\n\nWhich is fine, because this is one of the rare equipment questions you can settle yourself in five minutes, on your own head, to a precision that matters. Do not take a direction on faith in either direction — measure it."
+          },
+          {
+            "t": "TEST 1 — find the true sweet spot (2 minutes)",
+            "b": "Hold the putter loosely by the very top of the grip, pinched between finger and thumb so the head hangs completely free. Take a pencil eraser, or the edge of a ball, and tap gently along the face, working from heel to toe in small steps.\n\nAlmost everywhere you tap, the head will twist in your fingers. At one spot it will not — it rebounds straight back with no rotation at all, and the sound goes noticeably more solid. That point is the centre of percussion, and it is the true sweet spot: the one place where an impact produces no twist. Mark it with a dot of tape or a marker, then look at where it sits relative to the sight line and relative to where you have been setting the ball. Run it three times before you believe it."
+          },
+          {
+            "t": "TEST 2 — find where you ACTUALLY strike it (5 minutes)",
+            "b": "This is the one that matters more. Impact tape, a dry-erase marker scribbled across the face, or a light dusting of foot spray — any of them will show the strike. Hit ten putts at your normal length and photograph the pattern.\n\nThe sweet spot's location only costs you anything if your STRIKE does not match it. A head with a heel-biased centre is harmless if you happen to strike it there; a perfectly centred one is expensive if you are consistently missing it. Test 1 without Test 2 tells you nothing actionable. Do both in the same session and compare the two marks."
+          },
+          {
+            "t": "WHY THIS LANDS ON THE OPEN FAULT",
+            "b": "This is not a curiosity — it is a live candidate for the exact miss you have measured. On a right-handed putter, a strike toward the HEEL rotates the face CLOSED through impact and starts the ball LEFT. A strike toward the toe opens it and starts the ball right. Your measured miss is 1.5° and 1.7° LEFT on two of three overhead putts.\n\nNow add the head you chose. A narrow-body blade carries less MOI than a mallet, so for the same distance off centre it rotates MORE. The direction penalty for a miss-hit is amplified on this putter specifically — the same strike that a DF3i would have half-eaten shows up in your start line here.\n\nAnd strike location has never been measured. Not once. Your path is straight, your stance is square, your early lift is gone and your address is vertical and repeatable — every other candidate has been filmed. This one costs a strip of tape and it is the cheapest untested explanation left, sitting alongside aim and face-at-impact."
+          },
+          {
+            "t": "What each answer changes",
+            "b": "IF THE STRIKE IS HEEL-BIASED: that is very likely a large part of the left start line, and the fix is setup, not stroke — shift the ball a fraction toward the toe, or change where you set the head behind the ball at address, then re-run the overhead start-line test and watch the number move. Do not touch the stroke.\n\nIF THE STRIKE IS CENTRED: strike is cleared and eliminated, and the left start is aim or face-at-impact — which is where the overhead and slo-mo work goes next. Either way you have removed a variable from a list that is already short, which is the whole game now."
+          },
+          {
+            "t": "Confirmed build specs, while we are here",
+            "b": "The research turned up the stock LINK.2.1 numbers and they corroborate the film neatly. Stock spec is 69° LIE, 2° EFFECTIVE LOFT, 0° SHAFT LEAN, and — this is the one — a L.A.B. PISTOL 0 as the stock grip.\n\nTwo independent confirmations fall out of that. The face-on film measured your lie presentation at about 68° against a 69° spec, and measured the shaft dead vertical against a 0° shaft-lean spec. Both match. But the important one is the grip: the Pistol 0 is what this putter SHIPS with. The neutral, no-lean setup is not something that happened to you by accident when the Press Pistol went back with the DF3i — it is the configuration L.A.B. designed this head to be presented in. That is the strongest argument yet for leaving it alone and not manufacturing lean with your hands."
+          }
+        ],
+        "steps": [
+          "Hang the putter from the top of the grip, pinched loosely",
+          "Tap heel-to-toe with an eraser — find the spot with NO twist",
+          "Mark it, and note where it sits vs the sight line",
+          "Tape or spray the face, hit 10 putts, photograph the pattern",
+          "Compare the two marks — that gap is the thing that costs you"
+        ],
+        "rules": [
+          "The shaft is not a pointer to the centre — the riser breaks that link",
+          "Tap test finds the sweet spot; tape test finds where you hit it",
+          "HEEL strike closes the face and starts it LEFT — your exact miss",
+          "Narrow blade = less MOI = bigger penalty for the same miss-hit",
+          "Measure both before moving ball position"
+        ]
+      }
     }
   ]
 }
