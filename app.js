@@ -176,6 +176,47 @@ function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
 // ---------- Utils ----------
 const $ = sel => document.querySelector(sel);
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ---- Reading helpers: long-form coaching stays whole, but arrives in layers ----
+// Bodies are authored with blank-line paragraph breaks; HTML would eat them.
+function prose(t, cls){
+  return String(t ?? '').split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
+    .map(p => `<p class="${cls || 'lesson-body'}">${esc(p)}</p>`).join('');
+}
+// Split off the opening sentence so it can stand as the summary line.
+// lead + rest always reconstruct the whole text — nothing is dropped.
+function splitLead(t){
+  const s = String(t ?? '').trim();
+  const re = /[.!?](?=\s|$)/g;
+  let m;
+  while((m = re.exec(s))){
+    const end = m.index + 1;
+    if(end < 40) continue;                                  // too short to stand alone
+    const lead = s.slice(0, end);
+    if(/(^|\s)[A-Z]\.$/.test(lead)) continue;               // initials, L.A.B., etc.
+    if(/\b(vs|approx|Dr|Mr|Mrs|No|St|Jr|Sr|e\.g|i\.e)\.$/i.test(lead)) continue;
+    return [lead, s.slice(end).trim()];
+  }
+  return [s, ''];
+}
+// One scannable line for a section: an authored `k`, else its opening sentence.
+function gist(s){
+  if(s.k) return s.k;
+  const lead = splitLead(s.b)[0];
+  return lead.length > 190 ? lead.slice(0, 170).replace(/\s+\S*$/, '') + '…' : lead;
+}
+// Lead sentence up front, the rest one tap away.
+function expandable(t, cls){
+  const [lead, rest] = splitLead(t);
+  const c = cls || 'sm';
+  return rest ? `<p class="${c}">${esc(lead)}</p>
+    <details class="more"><summary>Read the rest</summary>${prose(rest, c)}</details>`
+    : `<p class="${c}">${esc(lead)}</p>`;
+}
+function readMins(b){
+  const w = (b.sections || []).reduce((n, s) => n + String(s.b || '').split(/\s+/).length, 0);
+  return Math.max(1, Math.round(w / 220));
+}
 function today(){ return new Date().toISOString().slice(0,10); }
 function fmtDate(iso){
   if(!iso) return '—';
@@ -560,7 +601,7 @@ function sessionDiscipline(s){
 const isRoutine = b => /routine/i.test(b.course || '');
 function planLinks(list){
   return list.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-      <span><b>${esc(b.course)}</b><br><span class="sm">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('');
+      <span><b>${esc(b.course)}</b><br><span class="sm clip2">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('');
 }
 function routineBlock(plans){
   const r = plans.filter(isRoutine);
@@ -921,7 +962,7 @@ function coach(){
   ${sig.length ? `<h2>Work on this · ranked</h2>
   <div class="card">
     ${sig.slice(0,6).map(t => `<div class="tipcard ${t.sev === 'good' ? 'green' : ''}">
-      <div class="src">${esc(t.src)}</div><h4>${t.h}</h4><p class="sm">${t.b}</p>
+      <div class="src">${esc(t.src)}</div><h4>${t.h}</h4>${expandable(t.b)}
       ${linkFor(t.link)}</div>`).join('')}
     <p class="sm faint">Ranked from your rounds, your putting logs and your open faults — this reorders itself as the data moves.</p>
   </div>` : ''}
@@ -937,7 +978,7 @@ function coach(){
   ${plans.length ? `<h2>Your plans</h2>
   <div class="card">
     ${plans.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-      <span><b>${esc(b.course)}</b><br><span class="sm">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('')}
+      <span><b>${esc(b.course)}</b><br><span class="sm clip2">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('')}
   </div>` : ''}
 
   <h2>Log a round · 60 seconds</h2>
@@ -1033,9 +1074,9 @@ function sessionView(i){
       </div>`).join('')}
     </div>
     <h2 style="margin-top:14px">What the film showed</h2>
-    <p class="lesson-body">${esc(d.story)}</p>
-    ${d.compare ? `<h2>Versus prior sessions</h2><p class="lesson-body">${esc(d.compare)}</p>` : ''}
-    ${d.limits ? `<div class="tipcard"><div class="src">What this angle couldn't see</div><p class="sm">${esc(d.limits)}</p></div>` : ''}
+    ${prose(d.story)}
+    ${d.compare ? `<details class="sect"><summary><b>Versus prior sessions</b><span class="gist">${esc(splitLead(d.compare)[0])}</span></summary>${prose(d.compare)}</details>` : ''}
+    ${d.limits ? `<details class="sect"><summary><b>What this angle couldn't see</b><span class="gist">${esc(splitLead(d.limits)[0])}</span></summary>${prose(d.limits)}</details>` : ''}
     `}
   </div>`;
 }
@@ -1053,19 +1094,29 @@ function briefing(id){
   <div class="card">
     <h2>${b.date ? 'Round prep · ' + fmtDate(b.date) : 'Standing plan'}</h2>
     <h3 style="font-size:19px">${esc(b.course)}</h3>
-    ${b.focus ? `<p class="sm" style="margin-top:4px"><b class="warn">Today's one focus:</b> ${esc(b.focus)}</p>` : ''}
+    ${b.focus ? `<p class="sm" style="margin-top:4px"><b class="warn">${b.date ? "Today's one focus:" : 'The short version:'}</b> ${esc(b.focus)}</p>` : ''}
     ${played ? `<p class="sm faint" style="margin-top:6px">Your history: ${played.rating != null ? 'rated ' + Number(played.rating).toFixed(2) : 'unrated'}${played.pr != null ? ' · PR ' + esc(played.pr) : ''}${played.notes ? ' · "' + esc(played.notes) + '"' : ''}</p>` : ''}
     ${wx ? `<p class="sm faint">Conditions now: ${Math.round(S.weather.t)}°F — carries play ${wx>1?'+':''}${((wx-1)*100).toFixed(1)}% (see the ladder's Today column).</p>` : ''}
   </div>
+  ${b.rules && b.rules.length ? `<div class="card flat">
+    <h2>If you read nothing else</h2>
+    <div class="steprules top">${b.rules.map(r => `<span>${esc(r)}</span>`).join('')}</div>
+  </div>` : ''}
   ${b.steps && b.steps.length ? `<div class="card">
     <h2>The routine</h2>
     <ol class="steps">${b.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
-    ${b.rules && b.rules.length ? `<div class="steprules">${b.rules.map(r => `<span>${esc(r)}</span>`).join('')}</div>` : ''}
   </div>` : ''}
-  ${(b.sections || []).map(s => `<div class="card">
-    <h2>${esc(s.t)}</h2>
-    <p class="lesson-body">${esc(s.b)}</p>
-  </div>`).join('')}
+  ${(b.sections || []).length ? `<div class="card">
+    <div class="secthead">
+      <h2>The detail</h2>
+      <button class="minibtn" data-action="toggle-sections">Expand all</button>
+    </div>
+    <p class="sm faint" style="margin:-4px 0 6px">${b.sections.length} sections · about ${readMins(b)} min end to end. Tap any one to open it.</p>
+    ${b.sections.map(s => `<details class="sect">
+      <summary><b>${esc(s.t)}</b><span class="gist">${esc(gist(s))}</span></summary>
+      ${prose(s.b)}
+    </details>`).join('')}
+  </div>` : ''}
   <p class="sm faint" style="margin:10px 0">Briefed by Claude from course research + your bag, carries, and stroke history.</p>`;
 }
 
@@ -1595,6 +1646,13 @@ const ACTIONS = {
     S.settings.gripRounds++;
     S.clubs.forEach(c => { if(c.cat==='wedge' && c.status==='gaming') c.rounds = (c.rounds||0)+1; });
     save(); rerender(); toast('Round saved — Coach updated');
+  },
+  'toggle-sections': el => {
+    const box = el.closest('.card');
+    const secs = [...box.querySelectorAll('details.sect')];
+    const opening = secs.some(d => !d.open);
+    secs.forEach(d => { d.open = opening; });
+    el.textContent = opening ? 'Collapse all' : 'Expand all';
   },
   'open-session': el => render('session', el.dataset.i),
   'open-briefing': el => render('briefing', el.dataset.id),

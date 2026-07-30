@@ -77,7 +77,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `course-add` / `course-remove` | Add/remove a course |
 | `test`           | Append a 10-ball putter test result |
 | `shortlist`      | Replace the putter shortlist (keeps prior `demoed` flags) |
-| `briefing` / `briefing-remove` | Round-prep briefings & standing plans |
+| `briefing` / `briefing-remove` | Round-prep briefings & standing plans (see *Writing briefings* below) |
 | `deadline`       | Set the return-window deadline (clears "estimated") |
 
 Unknown types are left unapplied on purpose (forward-compat), so a typo'd `type` silently
@@ -120,6 +120,25 @@ Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 �
 - **Log a filmed putting session**: append a `session` entry; update `evolution` /
   `faults` if the read changed.
 - **Close out a to-do**: append an `action-done` targeting the action's id.
+### Writing briefings (they render in layers — write for that)
+
+`briefing()` renders a plan as four layers, so depth is opt-in rather than a wall of text:
+
+1. `focus` — the whole plan in a sentence or two. Always visible.
+2. `rules[]` — the "If you read nothing else" chips. **Renders with or without `steps`**, so
+   every plan should carry them.
+3. `steps[]` — the numbered routine, if the plan has one.
+4. `sections[]` — a collapsed accordion. Each shows its title plus one summary line and
+   opens on tap; there's an Expand-all control.
+
+**Give every section a `k`** — one plain sentence saying what that section *concludes*, not
+what it's about ("Don't manufacture lean with your hands" beats "Two mechanisms sit under
+this"). Without `k` the app falls back to the section's opening sentence, which is why old
+briefings still read fine, but an authored `k` is much better. Bodies may use blank lines
+for paragraph breaks — `prose()` honours them (a single `\n` does nothing).
+
+Keep `h2`s few: the jump bar at the top of every view is built from them.
+
 - **Round-prep briefing**: append a `briefing` entry (dated = one round; undated =
   standing plan, singleton per course/title).
 - **Jack mentions a course he's playing** (standing instruction, Jul 29 2026): don't wait
