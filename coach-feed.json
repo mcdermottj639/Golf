@@ -4520,6 +4520,207 @@
       "type": "action",
       "pri": true,
       "text": "PUTTING — Before the next face-on set: wrap a strip of WHITE TAPE around the shaft ~6\" above the head, switch Slo-Mo to 240 fps (Settings › Camera › Record Slo-mo › 1080p/240), and put the lights on. The angle is already right — the only thing blocking the shaft-lean verdict is that a thin black shaft blurs out against a dim floor at impact speed."
+    },
+    {
+      "id": "link21-grip-20260730",
+      "type": "club-update",
+      "target": "L.A.B. Golf LINK.2.1",
+      "club": {
+        "note": "Gamed from Jul 30 — swapped in for the DF3i. Same zero-torque tech, blade instead of mallet, so the SBST fix is intact. GRIP: the Press Pistol 2° did NOT come across — it went back with the DF3i. Confirmed on face-on film Jul 30: shaft dead vertical at address, i.e. ZERO forward lean and full static loft, where the old setup delivered roughly static-minus-two. Lie presentation measured ~68°, as built. Still confirm length 34\" and lie set flat."
+      }
+    },
+    {
+      "id": "s11-faceon-fix-20260730",
+      "type": "session-update",
+      "target": "s11-faceon-20260730",
+      "finding": "EARLY LIFT LOOKS DEAD. On the 120 fps clip the sole sits within 0.05–0.08\" of its address height for the whole 83 ms into impact, then rises normally through the follow-through — that's an arc, not a lift. The shaft is dead vertical at address and repeats to a third of a degree. CORRECTED: with the Press Pistol 2° gone, a vertical shaft means ZERO forward lean and full static loft — not the 2° the old routine assumed. Same measurement, opposite meaning. Shaft lean AT IMPACT is still unresolved: the thin black shaft blurs out at impact speed and only one frame in the window survives a reliable fit. White tape on the shaft, 240 fps, more light."
+    },
+    {
+      "id": "putt-faults-20260730-v4",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "loft-at-impact",
+          "why": "NEW Jul 30, replacing the old held-press framing. The Press Pistol 2° grip went back with the DF3i, and face-on film confirms the LINK.2.1 sits with a DEAD VERTICAL shaft at address — zero forward lean, full static loft, where the old setup delivered roughly two degrees less. That is a real change in how the ball launches, and it landed in the same week as a new head, so the power curve is now shifting for TWO reasons at once. Recommendation is to keep the vertical address (it repeats to a third of a degree) and calibrate to it. Revisit only if the lag ladder shows balls hopping and finishing short."
+        },
+        {
+          "tag": "face-left-at-impact",
+          "why": "Unchanged and still number one. Two of three overhead putts started 1.5° and 1.7° LEFT — 1.3–1.4\" left at 4 ft, ~2\" at 6 ft — with a neutral path, so the face pointed left at impact. Face-on cannot see face angle, so nothing from Jul 30 touches this. Aimed left at address or closing through impact: still open, and it needs an OVERHEAD answer."
+        },
+        {
+          "tag": "pace-calibration",
+          "why": "Now the most urgent thing on the card, because two variables moved at once: a lighter, lower-MOI head AND about two degrees more loft at impact from the grip change. Nothing filmed so far touches pace — every clip has been a flat mat rep with no lag work. 30-ft lag ladder twice a week, logging spread and how many finish SHORT."
+        },
+        {
+          "tag": "press-release",
+          "why": "Still unverified, but LOWER stakes than it was. The old fear was a held press stacking lean on top of the grip's 2° and driving the ball into the turf; with a neutral grip that arithmetic is gone and a soft press can no longer push loft below zero. What still matters is that the press be the SAME SIZE every putt, because a varying press is a varying loft is a varying pace. Confirm on film once the tape-and-240fps setup is in place."
+        },
+        {
+          "tag": "blade-strike",
+          "why": "Watch-only, unchanged. The narrow blade has far less MOI than the DF3i mallet, so off-centre strikes cost more distance. Judge it off the lag-ladder spread at the two-week gate."
+        },
+        {
+          "tag": "early-lift",
+          "why": "ESSENTIALLY CLOSED Jul 30 ✓. At 120 fps and 37.5 px/inch the sole held within 0.05–0.08\" of its address height for the full 83 ms into impact, flat across ten consecutive frames, and never dropped below address height. The rise afterwards is the follow-through arc. Open only on sample size — one stroke."
+        },
+        {
+          "tag": "stance-creep",
+          "why": "CLOSED Jul 30 ✓ — overhead film measured the toe line 0.6°, 2.9° and 3.6° CLOSED to the target line across three reps. Never open."
+        }
+      ]
+    },
+    {
+      "id": "plan-putt-routine-20260730-v11",
+      "type": "briefing",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "UPDATED Jul 30 (twice). New head AND a new grip: the Press Pistol 2° is GONE with the DF3i, so 'hands even, the grip supplies the lean' no longer supplies anything. Face-on film confirms the shaft is dead vertical at address — meaning ZERO forward lean and full static loft. Three feels otherwise unchanged: GET LOW, TRAIL FOOT back, and a SOFT press moved with the body.",
+        "sections": [
+          {
+            "t": "THE HEADLINE — get low",
+            "b": "Your words, and they go at the top of the plan rather than the bottom of a setup list: bending over is the most massive thing, and getting low is where you feel most comfortable. That is the feel to remember when everything else has drifted. If you only carry one thought to the practice green, carry this one — not the press, not the rehearsals, not the pace word. Deep bend, stand close, eyes down."
+          },
+          {
+            "t": "Why the bend is more than comfort",
+            "b": "Two real mechanisms sit under that feel. FIRST — the LINK.2.1 is Lie Angle Balanced, exactly like the DF3i was, and that balance is only true when the shaft is presented at the lie angle it was built for. Stand too tall or too far away and the toe drops, the shaft leaves its designed lie, and the zero-torque property you switched putters for quietly degrades. Posture is what delivers the technology — and that is just as true of the blade as it was of the mallet. It also makes the build spec non-negotiable: your DF3i was 34\", set flat. Confirm the LINK is the same before you read anything into how it rolls. SECOND — more bend lets the arms hang freer and tilts the shoulders onto a STEEPER plane, and a steeper shoulder plane is what produces a straight-back-straight-through stroke. Standing tall flattens that plane and builds an arc into the stroke whether you want one or not. Your stroke is SBST on film. The deep bend is the posture that matches it."
+          },
+          {
+            "t": "The setup",
+            "b": "BEND OVER, stand close, eyes down through the strike. Ball off the LEFT BREAST. Weight stacked ON the ball — pressure over it, not on the trail foot. TRAIL FOOT a touch BACK — it creeps forward on its own and opens you. Rock the shoulders, no hands. Loose grip.\n\nTHE HANDS RULE HAS CHANGED. It used to read 'hands EVEN with the ball; the grip's built-in 2° supplies the lean.' That was a Press Pistol 2° rule and that grip went back with the DF3i. On the LINK.2.1, hands even with the ball produces a shaft that is dead VERTICAL — confirmed on face-on film Jul 30, repeating to a third of a degree across 59 frames. Vertical shaft means ZERO forward lean, which means you are now delivering the putter's FULL static loft instead of static-minus-two. Same address picture, completely different delivery."
+          },
+          {
+            "t": "WHICH WAY TO GO — the recommendation",
+            "b": "Two honest options, and they are not equal. OPTION A, keep it as it is: hands even, shaft vertical, full static loft, press used purely as a rhythm trigger. OPTION B: add a deliberate press to recreate the ~2° the old grip gave you, so the LINK delivers the effective loft you spent two weeks calibrating on the DF3i.\n\nTAKE OPTION A. Three reasons. First, the film says your vertical address repeats to a third of a degree across 59 frames — that is an exceptionally consistent starting position and consistency is the whole currency of pace. Second, you are rebuilding this putter's power curve from scratch regardless, so calibrate to what you actually deliver rather than trying to reconstruct a number from a putter that is now in the bullpen. Third, the entire Jul 29 mess was hand-press trouble; not needing the press to do a mechanical job removes a variable you have already proven you can wobble.\n\nThe trigger to revisit it: if the lag ladder shows balls hopping at launch and finishing SHORT, loft is the suspect and the press — or a grip with lean built back in — is the lever. Not before."
+          },
+          {
+            "t": "NEW HEAD — what the routine does about it (nothing)",
+            "b": "Deliberately nothing. Everything above was built from film of YOUR stroke — path, shoulder plane, stance line, trigger — and none of it was derived from the DF3i's shape. A putter change is not a reason to rebuild a routine; it's a reason to hold the routine still so you can actually see what the putter did. The only two things the swap legitimately touches are the SPEC (length, lie, grip — check them) and your AIM PICTURE (new topline, new sight line — re-check it with a stick). Both are setup checks, not stroke changes. If pace is still erratic after two calibrated sessions with everything else frozen, then it's the head's power curve and we adjust head weight. That's the order."
+          },
+          {
+            "t": "THE TRAIL FOOT — the alignment leak",
+            "b": "Self-reported Jul 29 and worth taking seriously: your right foot creeps UP — forward, toward the target line — and it drags the stance line open with it. Open the feet and the shoulders follow, so you end up aimed LEFT of where you think you are. The fix is exactly what you said: set that trail foot a touch further back than feels natural. Expect it to feel CLOSED, like you're aimed right. That feeling is the correction, not an error — you're recalibrating off an open baseline, so square will read as closed until it beds in. Trust the line you set, not the feel, for the first few sessions."
+          },
+          {
+            "t": "Why it wrecks the takeaway specifically",
+            "b": "Because in an SBST stroke the shoulder line IS the track. There's no arc to absorb a misaligned setup — 'straight back' is straight back along whatever line your shoulders are on, so an open stance doesn't just aim you left, it points the whole stroke left. Then one of two things happens, and both are bad: you feel it immediately and manipulate the takeaway to save it, which puts the HANDS back in charge of a stroke built to have no hands in it — or you don't, and the ball starts left. That's why a stance error shows up as a takeaway problem. The takeaway is fine; it's obeying a line that's wrong."
+          },
+          {
+            "t": "This is the miss the putter can't fix",
+            "b": "Your signature miss is LEFT on short putts — the through-line of the entire putter saga, and it showed up AGAIN on the course Jul 29 with a zero-torque putter in your hands. That is the most useful data point you've generated in weeks, because it rules the head out. A perfectly square face aimed at a target that's left of the hole produces precisely that miss, and no putter ever built will save you from it. Zero-torque guarantees the FACE stays square; it cannot guarantee the face is square TO THE RIGHT THING. Note the split that makes the case: your last two 10-ball blocks started 10/10 on line on the mat, and then you pulled it on grass. Stance creep is a course-and-pressure fault — mat reps are exactly where it wouldn't show. And one thing to redo with the new putter: you changed sight lines. A narrow blade topline frames the target differently from a wide mallet, so re-run the alignment-stick check in your first LINK session and don't assume your aim carried over."
+          },
+          {
+            "t": "The check that costs nothing",
+            "b": "Lay a club or an alignment stick down the target line just outside the ball on the practice green and set up to it — your toes should run PARALLEL to it, not converging toward it. Ten seconds, and it recalibrates the feel. The structural safeguard is already in your routine: aim the FACE to the spot FIRST, then build the stance around it. Keep that order religiously. If you build the stance first, the face gets aimed to a crooked body; if you aim the face first and the stance then creeps, the mismatch shows up as discomfort — and discomfort you can feel is information you can act on."
+          },
+          {
+            "t": "THE TRIGGER — settled: soft press, moved with the body",
+            "b": "Keep the soft press — a genuinely small one, made as the body starts to move. But understand that its JOB has changed. With the Press Pistol it was pure rhythm, because the grip was already supplying the lean and any extra was double-counting; that is why 'keep it tiny' was such a hard rule and why a held press was such a problem on Jul 29. With a neutral grip there is no lean coming from anywhere else, so a soft press is now the ONLY forward lean in the stroke rather than a surplus on top of it. The old warning relaxes accordingly: a small press can no longer stack loft off the bottom of the scale. It still wants to be soft and it still wants to move with the body — that is what makes it release instead of being held — but it is no longer a thing to be afraid of."
+          },
+          {
+            "t": "The one rule — softness IS the safeguard",
+            "b": "REWRITTEN Jul 30. The old rule existed because the press was adding lean on top of a grip that already had 2° built in, so a firm press pushed the effective loft below zero and the ball got driven into the turf. That arithmetic is gone. Starting from vertical, a soft press moves you toward the loft you used to deliver, not past it.\n\nSo the rule now is CONSISTENCY rather than smallness: same press, same size, every putt. A press that varies is a loft that varies, which is a PACE that varies — and pace is the fault with the least evidence against it. The two drift signals still apply: if it starts to feel FIRM, or like a POSITION you sit in rather than a motion you pass through, it has crept back toward a hold."
+          },
+          {
+            "t": "If it creeps back into a hold",
+            "b": "The alternatives stay on the shelf rather than getting deleted, because you may want one later: THE FLOAT — lift the head a hair off the turf before takeaway; no hand action at all and it removes ground friction. THE WHOLE-PUTTER WAGGLE — small forward-and-back from the shoulders, wrists silent. THE LEAD-SHOULDER SETTLE — a soft downward press of the shoulder that already runs the stroke. THE TRAIL-KNEE KICK — furthest from the hands, and the same trigger your full-swing routine uses. Any of them will break inertia without the hands touching shaft lean. You don't need one right now."
+          },
+          {
+            "t": "How to tell it's releasing",
+            "b": "One face-on clip settles it: compare shaft lean at ADDRESS with shaft lean at IMPACT. Close to equal means the soft press is passing through the way it should. Meaningfully more at impact means it's being carried in, whatever it felt like — and feel is exactly what got this wrong the first time. The free check needs no camera: a purely rolling ball makes one clean click, a ball driven down into the green adds a faint scuff a beat later. Listen for the scuff."
+          },
+          {
+            "t": "Stop shopping",
+            "b": "Straight talk, because you called it yourself. That's three putters in a month, and the DF3i got 12 days and not one calibrated lag session before you convicted it. Twelve days isn't enough to convict a putter — it's enough to convict a power curve you never built. The swap itself is defensible: you kept zero-torque and you changed shape, which is a real preference and not a mistake. What isn't survivable is doing it again in two weeks. So the LINK gets a gate: two weeks, a 20-ball 5-footer test and a 30-foot lag ladder each week, and the verdict comes off those numbers rather than off an afternoon's feel. Keep the DF3i in the bullpen until then — don't sell it. And keep the stroke frozen while the head is the variable: the deep bend and the soft press were both decided from clear feel and both are mechanically sound. One variable at a time."
+          },
+          {
+            "t": "Why beside the ball and not behind it",
+            "b": "Rehearsing in your true putting posture — same deep bend, same arm hang, same shoulder plane — means the stroke that FEELS like 30 feet is the stroke you actually make. Magnitude transfers one-to-one. Rehearsing from behind the ball reads the break better, but you're standing upright there, so the size you feel is only an approximation. Your open fault is pace magnitude, not reading: path ✓, face ✓, start lines 10/10 twice over. Optimise the thing that's broken."
+          },
+          {
+            "t": "Keep the order of the two rehearsals",
+            "b": "Ball-look first (path and contact), hole-look second (pace). The last thing you feel is the thing you carry in — so the pace stroke must be the last one. If the hole stroke ever drifts to first, the pace feel gets overwritten by the contact feel and you're back to guessing distance. Finish rehearsal 2 WITH the soft press, at its real size: it's the one part of the stroke that never used to get a practice rep, which is how it drifted last time without you noticing."
+          },
+          {
+            "t": "Two rules underneath it",
+            "b": "SAME BEAT COUNT, EVERY PUTT — a routine that varies in length is itself a pace variable, and the putts where you take an extra look are the ones that come up short. And a VERBAL BACKSTOP is worth testing: say the pace intention right before the press ('die it a foot past', 'back of the cup'). Feel decays, a word doesn't."
+          },
+          {
+            "t": "Still to test — lags",
+            "b": "This is no longer a someday item — it's the top of the card. Yesterday's round was lags coming up SHORT and short putts running HOT, which is not two faults but one: a power curve you haven't learned, so you under-hit the long ones and over-hit the short ones. A new head resets that curve to zero, so the reps have to be deliberate. The block test, twice a week: 10 balls from 30 feet, and measure the SPREAD of stopping points plus how many finish short. Then the experiment worth running while you're there — past ~25 feet, keep your eyes ON THE HOLE through the actual stroke, not just the rehearsal. Feels absurd, works well; the ball isn't moving, you don't need to watch it. 10 eyes-on-ball vs 10 eyes-on-hole, same session, compare the spreads."
+          }
+        ],
+        "steps": [
+          "Read it from BEHIND the ball — pick the line and a spot a few inches ahead of it",
+          "Step BESIDE the ball — BEND OVER, stand close, full putting posture",
+          "Rehearsal 1 — eyes on the BALL. Path and contact.",
+          "Rehearsal 2 — eyes on the HOLE. Pace. Finish it with the soft press.",
+          "Step in — set the FACE to the spot first, then build the stance around it (trail foot a touch BACK)",
+          "Spot → ball → soft press with the body → putt"
+        ],
+        "rules": [
+          "GET LOW — the deep bend is the anchor feel",
+          "TRAIL FOOT back — square will feel closed",
+          "Hands EVEN — and know that now means ZERO lean, full loft",
+          "The press is a TRIGGER now, not a lean source — same size every putt",
+          "Aim the FACE first, then build the stance to it"
+        ]
+      }
+    },
+    {
+      "id": "plan-link-swap-20260730-v2",
+      "type": "briefing",
+      "replaces": "plan-link-swap-20260730",
+      "briefing": {
+        "course": "The LINK.2.1 Swap — What Changes, What Travels",
+        "discipline": "putting",
+        "focus": "Jul 30. DF3i out, L.A.B. LINK.2.1 in, after a round of short lags, hot short putts and a pull left. What the new head genuinely changes, what follows you across any putter, and the two-week gate that ends the shopping. UPDATED Jul 30: the grip changed too — no more Press Pistol 2°, so the head is not the only thing moving the power curve.",
+        "sections": [
+          {
+            "t": "First — this is a legal move",
+            "b": "You didn't undo the fix. The LINK.2.1 is Lie Angle Balanced — the same zero-torque technology as the DF3i, in L.A.B.'s narrow-body heel-shafted blade. The thing that made the Phantom 7.5 wrong for you (toe flow fighting a straight-back-straight-through stroke) is still absent from your bag. So this is a SHAPE change, not a technology change, and it doesn't reopen the mismatch that started this whole saga. Worth saying clearly because it looks like a step back toward a blade: it isn't. You've got the blade LOOK you've always been drawn to sitting on top of the mechanics your stroke actually needs. That's about the best outcome available here."
+          },
+          {
+            "t": "\"It felt like a lot\" is real information",
+            "b": "The DF3i is a wide, deep, high-MOI mallet. The LINK.2.1 is a narrow blade. That's a large change in what sits behind the ball, and it changes the sight line, the perceived weight, and how much the head seems to be asking for. Don't apologise for it or file it under 'being crazy' — putter feel drives COMMITMENT, and commitment is worth measurable strokes on short putts. A putter you trust at address is not a soft consideration. The mistake would be acting on feel and then never measuring; the feel itself is fine."
+          },
+          {
+            "t": "What you gave up — and it lands on your open fault",
+            "b": "Forgiveness. A narrow blade has far less MOI than that mallet, so off-centre strikes lose more distance than they used to. Your one remaining open fault is PACE. So you've moved to a head that is less tolerant of exactly the thing you're already struggling with, and you should know that going in. The counter-argument is real too: a forgiving head HIDES strike quality, a blade reports it. If your contact is good, the blade will teach you its power curve faster and give you better feedback while you learn. If your contact is patchy, it'll cost you distance control. Which one is true for you is an empirical question, and the gate below answers it."
+          },
+          {
+            "t": "Yesterday's round, read properly",
+            "b": "Lags finishing SHORT and short putts BLOWN BY look like two contradictory faults. They're one. It's the signature of an uncalibrated power curve: with no reliable mapping from stroke size to distance, you default to too-small when the number is big and too-big when the number is small — and both errors show up in the same round. That is not a defect in the DF3i. It's what 12 days with any new head looks like when none of those days included a lag session. The lesson transfers directly: the LINK will have its own curve, and you'll get the same round again unless you build it deliberately."
+          },
+          {
+            "t": "The pull left travels with you",
+            "b": "The left miss appeared again on the course while you were holding a zero-torque putter. That's the cleanest evidence yet that the head was never the cause. It points at the alignment leak already on your card: the trail foot creeping forward, opening the stance line, aiming you left — and in an SBST stroke the shoulder line IS the track, so an open stance doesn't just aim you left, it points the whole stroke left. Zero-torque protects the face; it can't protect where the face is pointing. Trail foot a touch back, aim the FACE to the spot before you build the stance, and expect square to feel closed for a few sessions."
+          },
+          {
+            "t": "The spec — one answered, one still open",
+            "b": "Lie Angle Balanced is only TRUE at the length and lie the putter was built for — that is not marketing, it is the whole mechanism. Your DF3i was 34\" and set flat. STILL CONFIRM the LINK's numbers match, because a putter a degree or two off your fitted lie has its headline technology partly switched off. Encouraging sign: face-on film Jul 30 measured the shaft presented at about 68° of lie, which is the window L.A.B. builds these in.\n\nTHE GRIP QUESTION IS ANSWERED, AND THE ANSWER MATTERS. The Press Pistol 2° went back with the DF3i. Your old setup rule — 'hands even with the ball, the grip's 2° supplies the lean' — no longer supplies anything, and film confirms it: the shaft now sits DEAD VERTICAL at address, repeating to a third of a degree. Vertical means zero forward lean, which means you are delivering the putter's FULL static loft where you used to deliver roughly static-minus-two. Same address picture, different launch. So the LINK's power curve is moving for TWO reasons at once — a lighter, lower-MOI head AND about two degrees more loft at impact — which is exactly why the lag ladder is the thing to run before drawing any conclusion about this putter."
+          },
+          {
+            "t": "Head weight is the adjustable variable — later",
+            "b": "L.A.B. builds static head weight to the putter's length, and a blade generally carries a different weight from a mallet. Head weight is the most direct lever on distance control there is: a heavier head produces a shorter, more repeatable stroke for a given distance, which usually helps lag control; a lighter head asks for a longer stroke and gives more feel on short ones. If pace is still scattered after two properly calibrated weeks, this is the dial to turn — and it's a cheap change compared to another putter. But don't touch it before you have baseline numbers, or you'll be changing two things at once and learn nothing."
+          },
+          {
+            "t": "THE GATE — how the LINK gets judged",
+            "b": "Two weeks, then a verdict on numbers rather than on an afternoon. (1) THE 20-BALL 5-FOOTER, once a week, logged in the Putting Lab with miss directions — the pass mark is the same one the grip experiment used: 2 or fewer LEFT misses per 20. That tests aim and face, not the head. (2) THE 30-FOOT LAG LADDER, twice a week: 10 balls, and record two things — the SPREAD of stopping points and how many finished SHORT. Short is the fault to kill; a ball that finishes two feet past is a made putt that missed, a ball that finishes two feet short was never in. (3) ONE FACE-ON CLIP in the first session — it closes the early-lift fault and checks the soft press is releasing, and it's now the oldest open item on your card."
+          },
+          {
+            "t": "No fourth head without evidence",
+            "b": "Keep the DF3i in the bullpen — don't sell it while the LINK is unproven. Hold the stroke exactly where it is: the deep bend and the soft press were both decided from clear feel in the last week and both are mechanically sound, so freezing them is what makes the head readable as a variable. And if the LINK's numbers at two weeks aren't better than the DF3i's, the conclusion is NOT a fourth putter. It's that pace is a reps-and-calibration problem that was never going to be solved by hardware — at which point the cheapest fix on the board is the lag ladder you already own."
+          }
+        ],
+        "rules": [
+          "Confirm the build: 34\", set flat (lie presentation measured ~68° ✓)",
+          "Grip: Press Pistol 2° is GONE — hands even now = zero lean, full loft",
+          "Re-check aim with a stick — new topline, new sight picture",
+          "20-ball 5-footer weekly · 30-ft lag ladder twice a week",
+          "Verdict in two weeks, off the numbers"
+        ]
+      }
     }
   ]
 }
