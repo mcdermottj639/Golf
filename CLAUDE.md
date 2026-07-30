@@ -68,6 +68,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `history-edit`   | Rewrite a history row containing `match` |
 | `session`        | Add a filmed putting session (`date`, `setup`, `finding`, `detail`) |
 | `session-update` | Patch a session by `target` (its feed id) or `setupMatch` prefix |
+| `session-remove` | Drop a session by `target` (its feed id) — used to fold duplicates together |
 | `evolution`      | Replace the metric-evolution grid |
 | `faults`         | Replace the current faults list |
 | `action`         | Add an open action item |
@@ -141,6 +142,12 @@ Keep `h2`s few: the jump bar at the top of every view is built from them.
 
 - **Round-prep briefing**: append a `briefing` entry (dated = one round; undated =
   standing plan, singleton per course/title).
+- **Filming sessions — ONE entry per day** (standing instruction, Jul 30 2026): all clips Jack
+  sends on the same day belong in a SINGLE `session` entry, however many angles or batches
+  they arrive in. Don't create a second session because a new clip turns up hours later —
+  `session-update` the day's entry and widen its `setup` to list every angle. If separate
+  entries already exist for one day, fold them with `session-remove`.
+
 - **Jack mentions a course he's playing** (standing instruction, Jul 29 2026): don't wait
   to be asked — append a `course-add` for it alongside whatever else the message calls
   for, so it's already in Courses for him to rate afterward. Use the plain course name

@@ -5881,6 +5881,78 @@
           "The blade reports the strike — feel isn't evidence, film it"
         ]
       }
+    },
+    {
+      "id": "s9-consolidate-20260730",
+      "type": "session-update",
+      "target": "s9-link21-session-20260730",
+      "setup": "21 clips · 3× overhead + 5× ground DTL + 5× target-side + 6× face-on (1 at 120 fps) + 2× elevated overhead · L.A.B. LINK.2.1 · first full day on the new putter",
+      "finding": "The day in one line: tempo 2.0:1 ✓, path straight ✓, stance square ✓, early lift CLOSED ✓, address shaft dead vertical and matching the 0° design spec ✓ — and one red, the ball starting 1.5–1.7° LEFT on two of three measured putts. Path is neutral and the feet are square, so the face is pointing left at impact; aim versus closing is still unseparated. Lean at impact remains unmeasured (shaft blurs out) and pace remains untested (all mat reps, no lag work).",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Tempo",
+            "v": "2.0 : 1",
+            "n": "7 of 8 down-the-line clips 1.9–2.1",
+            "s": "good"
+          },
+          {
+            "k": "Path",
+            "v": "Straight",
+            "n": "¼–½\" inside at the top, on line by impact",
+            "s": "good"
+          },
+          {
+            "k": "Start line",
+            "v": "2 of 3 LEFT",
+            "n": "1.5° and 1.7° — 1.3–1.4\" left at 4 ft",
+            "s": "warn"
+          },
+          {
+            "k": "Stance",
+            "v": "Square",
+            "n": "toe line 0.6–3.6° CLOSED, never open",
+            "s": "good"
+          },
+          {
+            "k": "Early lift",
+            "v": "Not there",
+            "n": "sole within 0.05–0.08\" for 83 ms into impact",
+            "s": "good"
+          },
+          {
+            "k": "Address shaft",
+            "v": "Vertical",
+            "n": "sd 0.3° over 59 frames — the 0° design spec",
+            "s": "good"
+          },
+          {
+            "k": "Lie presented",
+            "v": "~68°",
+            "n": "against a 69° build spec",
+            "s": "good"
+          },
+          {
+            "k": "Lean at impact",
+            "v": "Still open",
+            "n": "shaft blurs out; needs tape + 240 fps",
+            "s": "warn"
+          }
+        ],
+        "story": "Twenty-one clips across five camera positions, all in one day. Overhead (3), ground-level down-the-line (5), target-side down-the-line (5), face-on (6, one of them genuine 120 fps slow motion), and an elevated overhead showing the hands (2). This is the single record for the day.\n\nWHAT IS NOW SETTLED. Tempo is 2.0:1 and repeatable — seven of eight down-the-line clips landed between 1.9 and 2.1, measured two independent ways that agreed. Path is straight: the head works a quarter to a half inch inside at the top and is back on the line by impact, which is SBST confirmed on the new head. The stance is square to slightly CLOSED (toe line 0.6°, 2.9°, 3.6°), so the trail-foot creep that headed the fault list for two days is fixed and closed. Early lift — open since Session 1 — is gone: at 120 fps and 37.5 px/inch the sole held within 0.05–0.08\" of its address height for the full 83 ms into impact, flat across ten consecutive frames, and never dropped below address height. And the address shaft is dead vertical, repeating to a third of a degree across 59 frames, which is exactly the LINK.2.1's published 0° shaft-lean spec with the Pistol 0 grip. Lie presented at about 68° against a 69° build. The setup is doing what the putter was designed for.\n\nTHE ONE RED. Two of three overhead putts started 1.5° and 1.7° LEFT of the mat's centre line — 1.3–1.4 inches left at four feet, about two inches at six — with the third dead straight. The third putt is the control: same fixed camera, same measurement, no drift, so the left reading is real. Path measured neutral and start direction on a putt is dominated by the face, so the face was pointing left at impact. The feet are ruled out. It is aim or it is the face closing, and neither has been separated yet.\n\nWHAT THE ELEVATED OVERHEAD ADDED. The last two clips look down from in front and catch the hands, shaft and ball together. Ball position reads correct — well forward, toward the lead foot, matching the off-the-left-breast cue — and the hands sit over the ball line with the shaft running essentially straight down, consistent with the face-on measurement. Note these two also contain practice strokes before the real one, which is worth knowing when reading them back.",
+        "compare": "Against Session 5 on the DF3i: that session showed 5 of 5 balls starting on the centre line by eye, and two mat blocks ran 10/10. This is the first time start line has been MEASURED in degrees, and 1.5° is small enough to have looked fine on those earlier clips — 1.3\" at four feet still finds the middle of a 4.25\" hole. That is exactly why it hid on the mat and showed on the course: a make at four feet, an edge at six, a miss at ten. Tempo also moved, 2.4:1 with the DF3i to 2.0:1 with the LINK — both inside the window, the blade perhaps wanting a slightly quicker transition.",
+        "limits": "Lean AT impact is still not measured, and that is a measurement failure rather than a finding: the thin black shaft blurs against a dim floor at impact speed, only one frame in the window fit reliably, and two independent methods disagreed on it by 1.6° — the size of the effect itself. White tape on the shaft, 240 fps and more light fixes it.\n\nThe two elevated-overhead clips could not be measured numerically at all. They are dim (mean brightness 78 of 255), not slow motion (22.6 and 25.7 fps), and shot from an angle where a vertical object's projection depends on where it sits relative to the camera — so absolute shaft lean cannot be recovered from them. They are a good qualitative check on ball position and a poor instrument for hands and shaft. Face-on remains the angle for that question.\n\nAlso untouched: face ANGLE, which no face-on camera can see and which is what separates aimed-left from closing-through-impact. That needs the overhead. And pace — every clip today was a flat mat rep with no lag work, so the fault with the least evidence against it still has none."
+      }
+    },
+    {
+      "id": "s10-fold-20260730",
+      "type": "session-remove",
+      "target": "s10-targetside-20260730"
+    },
+    {
+      "id": "s11-fold-20260730",
+      "type": "session-remove",
+      "target": "s11-faceon-20260730"
     }
   ]
 }

@@ -1799,6 +1799,7 @@ function applyFeed(feed){
                 S.sessions.find(x => e.setupMatch && (x.setup||'').startsWith(e.setupMatch));
       if(s){ if(e.setup) s.setup = e.setup; if(e.finding) s.finding = e.finding; if(e.detail) s.detail = e.detail; }
     }
+    else if(e.type === 'session-remove') S.sessions = S.sessions.filter(x => x._fid !== e.target);
     else if(e.type === 'evolution' && e.evolution) S.evolution = e.evolution;
     else if(e.type === 'club-add' && e.club) S.clubs.push({ id:e.id, rounds:0, ...e.club });
     else if(e.type === 'club-update'){
