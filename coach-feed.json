@@ -4398,6 +4398,43 @@
       "type": "action-update",
       "target": "putt-weight-ab-action-20260728",
       "text": "PUTTING — The 30-ft LAG LADDER, twice a week: 10 balls, log the SPREAD of stopping points and how many finish SHORT. This is the LINK.2.1's power curve and it's the only fault with no evidence either way. (Face-on filming is now its own item.)"
+    },
+    {
+      "id": "s10-targetside-20260730",
+      "type": "session",
+      "date": "2026-07-30",
+      "setup": "5 clips · target-side down-the-line (camera on the mat at the hole end, looking back) · L.A.B. LINK.2.1",
+      "finding": "Posture confirmed — the deep bend is real and repeatable. Lie presentation measured ~22° from vertical (≈68° lie), right where L.A.B. builds these, so the Lie Angle Balanced tech is being delivered by the setup rather than defeated by it. BUT this angle looks ALONG the target line, so it still cannot see shaft lean: the held-press question, the early-lift verdict and the aim-vs-closing-face question are all still open. Face-on is the only angle that closes them.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Posture",
+            "v": "Deep bend ✓",
+            "n": "anchor feel is being executed",
+            "s": "good"
+          },
+          {
+            "k": "Lie presentation",
+            "v": "~22° from vertical",
+            "n": "≈68° lie — as built",
+            "s": "good"
+          },
+          {
+            "k": "Shaft lean",
+            "v": "Still unseen",
+            "n": "wrong axis for it",
+            "s": "warn"
+          },
+          {
+            "k": "Eye / shoulder line",
+            "v": "Not measurable",
+            "n": "geometry too coarse from here",
+            "s": "mid"
+          }
+        ],
+        "story": "Five clips from the hole end of the mat looking back up the line. Worth logging what this angle settles and what it can't, so it doesn't get shot again expecting a different answer.\n\nWHAT IT CONFIRMS. The deep bend is genuinely there — torso well forward from the hips, head out over the ball, arms hanging. That's the anchor feel from the locked routine, and it's being executed, not just written down. And the putter is being presented at about 22° from vertical, which works out to roughly a 68° lie — exactly the window L.A.B. builds these in. That matters more than it sounds: Lie Angle Balanced is only TRUE at the lie the putter was built for, and standing it up would quietly switch off the zero-torque property you changed putters to get. It isn't being switched off. Measured across 14 address frames on the one clip that gave a clean fit, the reading was rock steady (±0.1°), so the presentation is repeatable too.\n\nWHY IT CAN'T ANSWER THE OPEN QUESTION. Shaft lean is a tilt toward the target — it lives in the vertical plane that CONTAINS the target line. This camera sits on that same line and looks straight down it, so lean points directly at the lens and projects to nothing. It is the same blind spot the ground-level down-the-line clips have, just from the opposite end. No amount of resolution fixes it; it's the axis that's wrong.\n\nSo the three questions that were open this morning are still open: is the press releasing or being held, is early lift gone, and — the big one — is the face AIMED left at address or CLOSING through impact. All three are answered by one clip shot from the SIDE.",
+        "limits": "Beyond shaft lean: eye position over the line and shoulder alignment were both attempted from this angle and neither survived the error budget. Locating a point 'directly above the target line' from here depends on the mat's lines converging to a vanishing point, and across the five clips that point landed anywhere in a 60-pixel band — about four inches at his distance from the camera. That is far too coarse to call a two-inch eye offset, so nothing is claimed about either. Shoulder line remains the untested suspect now that the feet have been cleared."
+      }
     }
   ]
 }
