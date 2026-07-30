@@ -4435,6 +4435,91 @@
         "story": "Five clips from the hole end of the mat looking back up the line. Worth logging what this angle settles and what it can't, so it doesn't get shot again expecting a different answer.\n\nWHAT IT CONFIRMS. The deep bend is genuinely there — torso well forward from the hips, head out over the ball, arms hanging. That's the anchor feel from the locked routine, and it's being executed, not just written down. And the putter is being presented at about 22° from vertical, which works out to roughly a 68° lie — exactly the window L.A.B. builds these in. That matters more than it sounds: Lie Angle Balanced is only TRUE at the lie the putter was built for, and standing it up would quietly switch off the zero-torque property you changed putters to get. It isn't being switched off. Measured across 14 address frames on the one clip that gave a clean fit, the reading was rock steady (±0.1°), so the presentation is repeatable too.\n\nWHY IT CAN'T ANSWER THE OPEN QUESTION. Shaft lean is a tilt toward the target — it lives in the vertical plane that CONTAINS the target line. This camera sits on that same line and looks straight down it, so lean points directly at the lens and projects to nothing. It is the same blind spot the ground-level down-the-line clips have, just from the opposite end. No amount of resolution fixes it; it's the axis that's wrong.\n\nSo the three questions that were open this morning are still open: is the press releasing or being held, is early lift gone, and — the big one — is the face AIMED left at address or CLOSING through impact. All three are answered by one clip shot from the SIDE.",
         "limits": "Beyond shaft lean: eye position over the line and shoulder alignment were both attempted from this angle and neither survived the error budget. Locating a point 'directly above the target line' from here depends on the mat's lines converging to a vanishing point, and across the five clips that point landed anywhere in a 60-pixel band — about four inches at his distance from the camera. That is far too coarse to call a two-inch eye offset, so nothing is claimed about either. Shoulder line remains the untested suspect now that the feet have been cleared."
       }
+    },
+    {
+      "id": "s11-faceon-20260730",
+      "type": "session",
+      "date": "2026-07-30",
+      "setup": "Face-on · 1 clip at 120 fps slo-mo + 5 at 30 fps · L.A.B. LINK.2.1 · camera beside the mat at ball height",
+      "finding": "EARLY LIFT LOOKS DEAD. On the 120 fps clip the sole sits within 0.05–0.08\" of its address height for the whole 83 ms into impact, then rises normally through the follow-through — that's an arc, not a lift. Address shaft position is essentially vertical and repeatable to a third of a degree, exactly as the routine specifies. Shaft lean AT IMPACT is still NOT resolved: the thin black shaft blurs out against a dim floor at impact speed, only one frame in the window survives a reliable fit, and two independent detection methods disagreed by 1.6° — the same size as the effect. Fix is cheap: white tape on the shaft, 240 fps, more light.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Early lift",
+            "v": "Not there",
+            "n": "within 0.05–0.08\" of address to impact",
+            "s": "good"
+          },
+          {
+            "k": "Address shaft",
+            "v": "Vertical",
+            "n": "sd 0.3° over 59 frames",
+            "s": "good"
+          },
+          {
+            "k": "Lean at impact",
+            "v": "Still unresolved",
+            "n": "shaft blurs out; 1 usable frame",
+            "s": "warn"
+          },
+          {
+            "k": "Low point",
+            "v": "No digging",
+            "n": "head never drops below address height",
+            "s": "good"
+          },
+          {
+            "k": "Ball launch",
+            "v": "No visible hop",
+            "n": "first 17 ms only — indicative",
+            "s": "mid"
+          },
+          {
+            "k": "Capture rate",
+            "v": "120 fps",
+            "n": "341 frames over 11.4 s at 4× slow",
+            "s": "good"
+          }
+        ],
+        "story": "The angle is finally right: camera beside the mat at ball height, mat lines flat across the frame, head in profile. One of the clips is genuine slow motion — 341 frames across 11.4 seconds at 4× playback, which works out to a 120 fps capture, or 8.3 ms per frame. That is what made the measurement below possible.\n\nEARLY LIFT — the last unverified fault from Session 1 — IS NOT THERE. Scale on this clip is 37.5 pixels per inch, so one pixel is 27 thousandths of an inch, and the address sole row was identical across all 59 address frames. From 83 ms before impact all the way in, the sole sits 0.05 to 0.08 inches above its address height and does not move — two to three pixels, dead flat. It never drops below address height either, so there is no digging and the low point is where it should be. After impact it rises steadily: +0.45\" at 25 ms, +0.8\" at 67 ms, +1.1\" at 100 ms. That is the follow-through arc doing what a follow-through arc does. A lift would show as the head leaving the turf BEFORE the ball, and it simply doesn't.\n\nTHE ADDRESS POSITION CHECKS OUT. The shaft sits essentially vertical at address and repeats to about a third of a degree across 59 frames. That is exactly what the locked routine asks for — hands even with the ball, the grip's built-in 2° supplying the lean rather than the hands. Whatever else is going on, the starting position is right and it is consistent.\n\nWHAT STILL ISN'T ANSWERED, AND WHY. Lean at impact — the held-press question — did not survive the error budget. The shaft is a thin black line against a dim wooden floor; at impact speed it blurs and its contrast collapses, so it drops below detection in most frames. The clean stretch of shaft is only about 1.8 inches long, boxed in by a shoe above and the head below. Only one frame in the impact window fit reliably, and when the same frame was measured two independent ways the answers differed by 1.6° — which is the size of the thing being measured. So it is not called either way. That is a measurement failure, not a finding, and it is worth being clear about the difference.",
+        "limits": "One stroke at 120 fps. The early-lift read is strong within that stroke — ten consecutive frames, no scatter — but it is still one stroke, so it wants a couple more before it goes in the book as settled. The other five face-on clips are 30 fps, which puts only about two frames in the same window, so they can corroborate but not add precision. The ball's launch was flat for the first 17 ms after impact, consistent with a clean roll rather than a hop, but the blob tracking degrades after that so it is indicative only. And face-on cannot see face ANGLE, so the aim-versus-closing question from the overhead session is untouched by this."
+      }
+    },
+    {
+      "id": "putt-faults-20260730-v3",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "face-left-at-impact",
+          "why": "Unchanged and still number one. Two of three overhead putts started 1.5° and 1.7° LEFT — 1.3–1.4\" left at 4 ft, ~2\" at 6 ft — with a neutral path, so the face was pointing left at impact. Face-on filming cannot see face angle, so this is untouched by the Jul 30 slo-mo work. Aimed left at address or closing through impact: still the open question, and it needs an overhead answer, not a face-on one."
+        },
+        {
+          "tag": "held-press",
+          "why": "STILL UNVERIFIED — and now for a specific, fixable reason. The face-on clip was shot at 120 fps and the address position measured beautifully (shaft vertical, sd 0.3° across 59 frames), but at impact the thin black shaft blurs against a dim floor and drops below detection. One frame in the window fit; two independent methods disagreed on it by 1.6°, the same size as the effect. Fix, in order: a strip of WHITE TAPE on the shaft just above the head, then 240 fps, then more light."
+        },
+        {
+          "tag": "pace-calibration",
+          "why": "Untouched again — every clip so far has been a mat rep with no lag work. Still the fault with the least evidence against it, and the LINK.2.1's power curve is still unbuilt. 30-ft lag ladder twice a week, logging spread and how many finish SHORT."
+        },
+        {
+          "tag": "blade-strike",
+          "why": "Watch-only, unchanged. The narrow blade has far less MOI than the DF3i mallet, so off-centre strikes cost more distance. Judge it off the lag-ladder spread at the two-week gate."
+        },
+        {
+          "tag": "early-lift",
+          "why": "ESSENTIALLY CLOSED Jul 30 ✓ — measured at last. At 120 fps and 37.5 px/inch, the sole held within 0.05–0.08\" of its address height for the full 83 ms into impact, dead flat across ten consecutive frames, and never dropped below address height. The rise afterwards (+1.1\" by 100 ms) is the follow-through arc, not a lift. Open only on sample size: one stroke. Two more slo-mo strokes and it comes off the card for good."
+        },
+        {
+          "tag": "stance-creep",
+          "why": "CLOSED Jul 30 ✓ — the overhead frames measured the toe line 0.6°, 2.9° and 3.6° CLOSED to the target line across three reps. Never open. Keep setting it where you're setting it."
+        }
+      ]
+    },
+    {
+      "id": "tape-action-20260730",
+      "type": "action",
+      "pri": true,
+      "text": "PUTTING — Before the next face-on set: wrap a strip of WHITE TAPE around the shaft ~6\" above the head, switch Slo-Mo to 240 fps (Settings › Camera › Record Slo-mo › 1080p/240), and put the lights on. The angle is already right — the only thing blocking the shaft-lean verdict is that a thin black shaft blurs out against a dim floor at impact speed."
     }
   ]
 }
