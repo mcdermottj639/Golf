@@ -4197,6 +4197,207 @@
           }
         ]
       }
+    },
+    {
+      "id": "s9-link21-session-20260730",
+      "type": "session",
+      "date": "2026-07-30",
+      "setup": "8 clips · 3× overhead + 5× ground-level DTL · L.A.B. LINK.2.1 — first filmed reps · lined return mat",
+      "finding": "Tempo 2.0:1 across 7 of 8 clips ✓. Path straight (SBST) ✓. Stance measured SQUARE to slightly closed — the trail-foot creep is FIXED ✓. But 2 of 3 overhead putts started 1.5–1.7° LEFT (1.3–1.4\" left at 4 ft, ~2\" at 6 ft); the third was dead straight. Path is neutral, so the face was left at impact on those two — aimed there, or closed on the way through. Feet are ruled out; the leak has moved up to the face or the shoulders.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Tempo",
+            "v": "2.0 : 1",
+            "n": "7 of 8 clips 1.9–2.1",
+            "s": "good"
+          },
+          {
+            "k": "Path",
+            "v": "Straight",
+            "n": "¼–½\" inside at the top, back on line by impact",
+            "s": "good"
+          },
+          {
+            "k": "Start line",
+            "v": "2 of 3 LEFT",
+            "n": "1.5° and 1.7° — 1.3–1.4\" left at 4 ft",
+            "s": "warn"
+          },
+          {
+            "k": "Stance",
+            "v": "Square",
+            "n": "0.6–3.6° CLOSED — never open",
+            "s": "good"
+          },
+          {
+            "k": "Stroke length",
+            "v": "7\" back / 15\" thru",
+            "n": "strongly accelerating",
+            "s": "mid"
+          },
+          {
+            "k": "Shaft lean",
+            "v": "Not filmed",
+            "n": "still needs one face-on clip",
+            "s": "warn"
+          }
+        ],
+        "story": "Eight clips, two angles, first filmed reps with the LINK.2.1 — three overhead (the gold-standard angle for path and start line) and five ground-level down-the-line. Measured frame by frame against the mat's own printed lines, with the ball's 1.68\" diameter as the ruler.\n\nTHE MACHINERY IS GOOD. Tempo came out at 2.0 : 1 — seven of the eight clips landed between 1.9 and 2.1, one outlier at 1.6. That is tour-window and it is repeatable, measured two independent ways (head travel overhead, apparent head size down-the-line) that agreed with each other. Path is straight: the head worked a quarter to a half inch inside on the backstroke and was back on the line by impact — that is SBST, confirmed again, and the new head hasn't disturbed it. Stroke shape was 7–8 inches back and 15–16 inches through, a strongly accelerating stroke.\n\nAND THE STANCE IS NOT THE PROBLEM. Your feet are visible in the overhead frames, so the trail-foot creep — the prime suspect on the card since Jul 29 — got measured directly for the first time. The toe line came out 0.6°, 2.9° and 3.6° CLOSED relative to the target line across the three putts. Never open, not once. You fixed that. If anything you have over-corrected a touch, which is the expected overshoot when 'square feels closed'.\n\nBUT THE BALL STILL STARTED LEFT. Two of the three overhead putts left the face 1.5° and 1.7° left of the mat's centre line — that is 1.3 and 1.4 inches left of target at 4 feet, and about 2 inches at 6 feet. The third was dead straight (0.2°). The control matters here: all three were shot from the same fixed camera and run through the same measurement, and one of them showed zero drift, so the left reading on the other two is real and not an artefact of the method.\n\nWHAT THAT MEANS. On a putt, start direction is dominated by the face, not the path — and your path measured neutral. So on those two putts the face was pointing left at impact. There are only two ways that happens: the face was AIMED left at address, or it CLOSED on the way through. Your feet are now ruled out as the cause, so if it is aim, the leak has moved UP — to the face itself, or to the shoulder line. And the fact that one putt of three was perfect says this is variability, not a fixed bias baked into the setup.\n\nThis is your signature miss — left on short putts — appearing on film for the first time since the switch to zero-torque. Worth saying plainly: it is not the putter. It happened with the DF3i on the course Jul 29 and it is happening with the LINK.2.1 on the mat now. Two different zero-torque heads, same miss. The head was never the variable.",
+        "compare": "Session 5 (DF3i, overhead) had 5 of 5 balls starting dead on the centre line, and two 10-ball mat blocks ran 10/10 on line. Those were eyeball reads of whether the ball looked on line; this is the first time the start line has been MEASURED in degrees, and at 1.5° the drift is small enough that it would have looked fine on those earlier clips — 1.3\" at 4 feet still finds the middle of a 4.25\" hole. That is why it never showed on the mat and did show on the course: at 4 feet it is a make, at 6 feet it is an edge, at 10 feet it is a miss. Tempo is the other continuity — 2.4:1 measured in Session 5 with the DF3i, 2.0:1 now with the LINK. Both inside the window; the blade may simply want a slightly quicker transition.",
+        "limits": "Neither angle can see shaft lean, so the held-press question is still open and the early-lift fault still has no verdict — both need ONE face-on clip, which is now the oldest item on your card and the single most valuable thing you can film. Face-on is also what separates the two remaining explanations for the left start: aimed left at address versus closing through impact. The overhead can measure your feet but not your shoulders — your upper body is out of frame — so shoulder alignment is unmeasured. And every one of these was a flat mat rep: nothing here says anything about pace, which is still the fault with the least evidence against it."
+      }
+    },
+    {
+      "id": "evolution-v5",
+      "type": "evolution",
+      "evolution": {
+        "updated": "2026-07-30",
+        "sessions": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "BL",
+          "S5",
+          "L21"
+        ],
+        "metrics": [
+          {
+            "name": "Path",
+            "marks": [
+              "?",
+              "~",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "SETTLED — straight (SBST) across 20+ clips and four putters. Measured again Jul 30 on the LINK.2.1: ¼–½\" inside at the top, back on the line by impact. Path is yours, not the putter's.",
+            "s": "good"
+          },
+          {
+            "name": "Tempo / load",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "✓",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "SETTLED — 2.0:1 on the LINK.2.1, seven of eight clips between 1.9 and 2.1, measured two independent ways. Was 2.4:1 with the DF3i. Both in the window; stop checking this one.",
+            "s": "good"
+          },
+          {
+            "name": "Face at impact",
+            "marks": [
+              "✗",
+              "~",
+              "—",
+              "✓",
+              "?",
+              "✓",
+              "✗"
+            ],
+            "verdict": "REOPENED Jul 30 — the design guarantees the face won't TWIST, and it doesn't. It cannot guarantee where the face POINTS, and on 2 of 3 measured putts it pointed ~1.5° left at impact. Aimed there or closed through: only a face-on clip separates them.",
+            "s": "warn"
+          },
+          {
+            "name": "Early lift",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "?",
+              "✗",
+              "?",
+              "—"
+            ],
+            "verdict": "THE OLDEST OPEN ITEM — still no angle has re-tested it. Overhead can't see height and down-the-line can't see lean. One face-on clip closes it and doubles as the press-release check.",
+            "s": "warn"
+          },
+          {
+            "name": "Start line / aim",
+            "marks": [
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✗"
+            ],
+            "verdict": "THE FAULT, now measured. 1.5° and 1.7° LEFT on two of three overhead putts — 1.3–1.4\" left at 4 ft, ~2\" at 6 ft — with one dead straight. Small enough to hide on the mat, big enough to miss from 6 feet out. Exactly the signature miss.",
+            "s": "warn"
+          },
+          {
+            "name": "Stance line",
+            "marks": [
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "✓"
+            ],
+            "verdict": "NEW and CLOSED on arrival. Measured off the overhead frames: the toe line ran 0.6°, 2.9° and 3.6° CLOSED to the target line — never open on any rep. The trail-foot creep is fixed. Look higher for the aim leak.",
+            "s": "good"
+          }
+        ]
+      }
+    },
+    {
+      "id": "putt-faults-20260730-v2",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "face-left-at-impact",
+          "why": "MEASURED Jul 30, and now the number-one fault. Two of three overhead putts started 1.5° and 1.7° LEFT of the mat's centre line — 1.3–1.4\" left at 4 ft, ~2\" at 6 ft — while the third was dead straight. Path measured neutral, and start direction on a putt is dominated by the face, so the face was pointing left at impact. Two candidates remain and only ONE face-on clip separates them: the face was AIMED left at address, or it CLOSED through impact. Note it happened with the DF3i on grass and the LINK.2.1 on the mat — two zero-torque heads, same miss. This is not the putter."
+        },
+        {
+          "tag": "held-press",
+          "why": "Still UNVERIFIED and now the blocker. The Jul 29 fix — a much softer press moved with the body — has never been checked, because neither the overhead nor the down-the-line angle can see shaft lean. It matters more than it did: a press that is still being HELD delivers a de-lofted, closed-ish face, which is one of the two live explanations for the left start line above. One face-on clip, lean at address vs lean at impact."
+        },
+        {
+          "tag": "pace-calibration",
+          "why": "Untouched by this session — every clip was a flat mat rep with no lag work, so nothing here counts as evidence either way. Still the fault with the least data against it, and the LINK.2.1's power curve is still unbuilt. 30-ft lag ladder twice a week, logging spread and how many finish SHORT."
+        },
+        {
+          "tag": "blade-strike",
+          "why": "Watch-only, unchanged. The LINK.2.1's narrow blade has far less MOI than the DF3i mallet, so off-centre strikes cost more distance. Judge it off the lag-ladder spread at the two-week gate, not off feel."
+        },
+        {
+          "tag": "stance-creep",
+          "why": "CLOSED Jul 30 ✓ — measured, not assumed. The overhead frames show your feet, and the toe line ran 0.6°, 2.9° and 3.6° CLOSED to the target line across three reps. Never open. The trail-foot fix worked, and you may even be a touch past square. Keep setting it where you're setting it; the aim leak, if there is one, is now above the feet — face aim or shoulder line."
+        }
+      ]
+    },
+    {
+      "id": "faceon-action-20260730",
+      "type": "action",
+      "pri": true,
+      "text": "PUTTING — ONE FACE-ON CLIP. It is now the only thing standing between you and a diagnosis: it separates 'face aimed left' from 'face closing through impact', closes the held-press question (lean at address vs at impact) and closes early-lift. Camera at ball height, square to the target line, 2–3 strokes."
+    },
+    {
+      "id": "aim-check-action-20260730",
+      "type": "action",
+      "pri": true,
+      "text": "PUTTING — Aim check above the feet. Your stance measured SQUARE on film, so the left start line isn't coming from your feet. Set up to an alignment stick, have someone lay a second club across your SHOULDERS, and check the face against the line with a mirror or a phone from directly above the ball."
+    },
+    {
+      "id": "link-aim-done-20260730",
+      "type": "action-done",
+      "target": "link-aim-action-20260730"
+    },
+    {
+      "id": "putt-weight-ab-update-20260730-v2",
+      "type": "action-update",
+      "target": "putt-weight-ab-action-20260728",
+      "text": "PUTTING — The 30-ft LAG LADDER, twice a week: 10 balls, log the SPREAD of stopping points and how many finish SHORT. This is the LINK.2.1's power curve and it's the only fault with no evidence either way. (Face-on filming is now its own item.)"
     }
   ]
 }
