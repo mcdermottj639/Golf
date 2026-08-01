@@ -159,6 +159,11 @@ Keep `h2`s few: the jump bar at the top of every view is built from them.
 After any feed change: `python3 -c "import json; json.load(open('coach-feed.json'))"`,
 `node --check app.js`, bump `"updated"`, commit, push.
 
+**Always merge to `main` when the work is done** (standing instruction, Aug 1 2026): Jack
+doesn't review PRs on this repo — GitHub Pages serves from `main`, so work that stops on a
+feature branch never reaches his phone. Develop on the assigned branch, then fast-forward
+`main` and push it. No PR needed unless he asks for one.
+
 ## Gotchas
 
 - Do **not** hand-edit `S.feedApplied` or expect `seed()` edits to reach existing installs.
