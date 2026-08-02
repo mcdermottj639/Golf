@@ -107,8 +107,8 @@ does nothing — double-check against `applyFeed()`.
 | Utility | Cobra KING TEC 2-iron · ~17° | |
 | Irons | Cobra KING TEC 4–PW | **44° PW** anchors the wedge ladder |
 | Wedges | **Vokey 50.08F · 56.10S · 60.08M** | 50 = F/8° sweeper · 56 = S/10° workhorse · 60 = M/8° creative |
-| Putter | **L.A.B. Golf LINK.2.1** | zero-torque (Lie Angle Balanced) narrow blade — gamed Jul 30, 2026; on a two-week evidence gate |
-| Backup putter | L.A.B. Golf DF3i · 34" | zero-torque mallet, gamed Jul 18–30, 2026 — the control for the LINK gate, hold don't sell |
+| Putter | **L.A.B. Golf DF3i · 34"** | zero-torque (Lie Angle Balanced) high-MOI mallet — gamed Jul 18–30 and again from Aug 1, 2026. **Press Pistol 2° grip** = the grip supplies the lean, so "hands even with the ball" is the live cue |
+| Backup putter | L.A.B. Golf LINK.2.1 | zero-torque narrow blade, gamed Jul 30 – Aug 1, 2026 — in storage, likely being returned (redundant, not faulty). Carries a **Pistol 0** grip: zero built-in lean, vertical shaft, hands ~1.35" behind the ball — that geometry is the LINK's, not the DF3i's |
 | Backup putter | Scotty Newport 2 | arc-suited blade, bullpen |
 | Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** — putter search closed |
 
