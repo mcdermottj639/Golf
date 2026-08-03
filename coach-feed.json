@@ -6873,6 +6873,74 @@
           }
         ]
       }
+    },
+    {
+      "id": "plan-tape-test-20260802",
+      "type": "briefing",
+      "briefing": {
+        "course": "The Tape Test — Where You Actually Hit It",
+        "discipline": "putting",
+        "focus": "Twelve minutes, at home, on the DF3i. Strike location is the last cheap thing on your card that has NEVER been measured — not on this putter, not on any putter you own — and it is the one candidate that could explain BOTH open faults at once. Two tests: a tap test to find the true sweet spot, then a marked face over 20 putts to find where you actually hit it. Photograph both and log the result.",
+        "rules": [
+          "Find the sweet spot FIRST — you can't read a strike pattern without it",
+          "20 putts total: 10 from 5 ft, 10 from 30 ft — stroke length changes the pattern",
+          "Don't wipe between putts; the accumulated cluster IS the data",
+          "Photograph square-on, in good light, with the sweet-spot mark visible",
+          "Read the cluster's CENTRE, not its worst outlier"
+        ],
+        "steps": [
+          "TAP TEST — hold the putter loosely by the very top of the grip so it hangs free. Tap the face heel-to-toe with a pencil eraser. Where it swings straight back with NO twist is the true sweet spot.",
+          "Mark that spot with a sliver of tape on the TOPLINE, and photograph it next to the putter's sight line. Note whether they agree.",
+          "Coat the face — foot-powder spray is best (Dr. Scholl's or similar), dry-erase marker second. Light, even coat.",
+          "10 putts from 5 ft, full routine on each. Do not wipe the face.",
+          "Photograph the face square-on, then re-coat.",
+          "10 putts from 30 ft — the lag stroke. Photograph again.",
+          "Log it: put the two photos and a one-line read in the Putting Lab."
+        ],
+        "sections": [
+          {
+            "t": "Why this is the test worth running now",
+            "k": "One heel bias would explain the left start line AND the short lags — two faults, one root cause.",
+            "b": "Here is the hypothesis this test is built to kill or confirm, and it's the most interesting idea on your card right now.\n\nA strike toward the HEEL does two things at once. It rotates the face closed at impact, which starts the ball LEFT. And it bleeds ball speed, because you've missed the middle, which makes putts finish SHORT.\n\nNow look at what you've actually complained about. On the DF3i, Jul 29: lags coming up short. On the LINK, Jul 30: the ball starting 1.5–1.7° left. Two different faults on two different putters — or one heel bias showing up differently on each head. The DF3i is a wide, high-MOI mallet: it resists the twist, so a heel strike costs you mostly SPEED. The LINK is a narrow blade with far less MOI: the same strike twists it more, so it costs you mostly DIRECTION.\n\nThat is a single root cause producing exactly the two symptoms you reported, on exactly the heads you reported them on. It might be wrong. But it's testable in twelve minutes, and nothing else on the card explains both."
+          },
+          {
+            "t": "The tap test — find the sweet spot before you read anything",
+            "k": "Hang it from the grip and tap heel-to-toe; the spot with no twist is the real centre. Check it against the sight line.",
+            "b": "You cannot read a strike pattern without knowing what you're reading it against, and the putter's SIGHT LINE is not automatically the answer.\n\nHold the putter loosely by the very top of the grip and let it hang. Tap the face with a pencil eraser, working heel to toe. Most taps make the head twist. One spot makes it swing straight back with no rotation at all — that's the sweet spot, and it's a physical property of the head, not a decoration on the topline. Mark it with a sliver of tape.\n\nThen check it against the sight line. On the DF3i — a mallet with the shaft entering near the middle — I'd expect them to agree closely. This mattered far more on the LINK, where a heel-entry shaft is made lie-angle-balanced by a riser hosel, and L.A.B.'s own explanation says the shaft base points at a spot that is not necessarily the centre of gravity. If the DF3i's sweet spot and sight line DO agree, that's one less variable and worth knowing for certain rather than assuming."
+          },
+          {
+            "t": "Marking the face — what to use",
+            "k": "Foot-powder spray is the right tool: no thickness, clean marks, wipes off.",
+            "b": "FOOT-POWDER SPRAY (Dr. Scholl's or any odour spray) is the best option and the one to buy if you don't have it. It leaves a thin white coat, the ball wipes a clean mark, it adds no thickness, and it comes off with a cloth.\n\nDRY-ERASE MARKER works nearly as well — colour the face, the ball lifts the ink off where it touches.\n\nBABY POWDER over a lightly damp face is the free version and it's fussier but fine.\n\nWhat to avoid: thick impact TAPE. It's designed for this, but it adds a layer between face and ball, which changes both the sound and the roll slightly. For finding a cluster that's tolerable; for anything you also want to feel, it isn't. And don't use anything on the BALL — you want the mark on the face, where the sweet spot is."
+          },
+          {
+            "t": "Do it at both lengths — this is the part people skip",
+            "k": "Short-putt and lag strokes can strike differently, and each maps to a different fault.",
+            "b": "10 from 5 feet and 10 from 30 feet, photographed separately. This matters more than it sounds.\n\nA short-putt stroke and a lag stroke are different motions — different length, different speed, different amount of body in it. Strike patterns often differ between them, and in your case the two lengths map onto the two different faults. The 5-footers are where the LEFT MISS lives. The 30-footers are where the SHORT LAGS live.\n\nIf the heel bias shows up at both lengths, it's a setup fault — where you're standing, where your eyes are. If it only shows up on the long stroke, it's a motion fault that appears when the stroke gets big. Those have different fixes, and one photo of one length can't tell them apart."
+          },
+          {
+            "t": "How to read the two photos",
+            "k": "Read the cluster's centre against your tape mark — bias tells you the fault, scatter tells you a different one.",
+            "b": "Look at where the CENTRE of the cluster sits relative to the tape mark, and separately at how tight the cluster is. They answer different questions.\n\nTIGHT CLUSTER ON THE MARK — strike location is not your problem. Cross it off, and the left start line is down to aim or face-at-impact, which is what the face-on clip settles. That's a clean, useful result: it eliminates the cheapest candidate and puts everything on the one clip you already owe.\n\nCLUSTER BIASED TOWARD THE HEEL — the hypothesis is live, and you've found something that explains both faults at once.\n\nCLUSTER BIASED TOWARD THE TOE — real too, and it pushes the ball the other way (toe strike opens the face, starts it right). That would NOT explain a left miss, so it'd mean the left miss is aim or face and you've found a separate pace leak.\n\nWIDE SCATTER, NO BIAS — that's a different fault with a different name: not a strike bias but strike CONSISTENCY, and it usually traces to a distance-from-the-ball that varies, or eye line drifting. Also worth knowing, also fixable.\n\nOne honesty note on magnitude: how many degrees a given miss costs depends on the head's MOI, and I'm not going to hand you a degrees-per-inch number I can't stand behind for this specific putter. What the test gives you cleanly is DIRECTION and CONSISTENCY of the bias. That's enough to act on."
+          },
+          {
+            "t": "If it comes back heel-biased",
+            "k": "Usually a setup cause — eye line inside the ball or standing too close. Change one thing, re-shoot.",
+            "b": "Don't jump to the stroke. The usual causes are geometric and dull.\n\nEYE LINE INSIDE THE BALL is the most common. Eyes set inside the target line tend to pull the strike toward the heel. Never measured on you — drop a ball from the bridge of your nose at address and see where it lands relative to the ball. That's a ten-second check and it belongs in the same session.\n\nSTANDING TOO CLOSE crowds the hands and brings the heel in.\n\nSETUP FIX WORTH TRYING FIRST: address the ball off the CENTRE of the face deliberately — you may currently be setting up with the ball slightly toward the heel and delivering exactly what you aimed at.\n\nThen re-shoot the test after the change. That's the whole loop, and it's fast: measure, change one thing, measure again. Ten more putts tells you whether the fix took."
+          },
+          {
+            "t": "What this does and doesn't settle",
+            "k": "It removes or confirms a candidate. It doesn't replace the face-on clip.",
+            "b": "Be clear about the scope so the result doesn't get over-read, because that's been the pattern this month.\n\nWhat it settles: whether strike location is a live candidate for the left start line, and whether you have a hidden pace leak that no amount of tempo work would fix.\n\nWhat it does NOT settle: where the face is POINTING. A perfectly centred strike with the face aimed 1.5° left produces the same miss and this test can't see it. The face-on clip is still owed and still the item that closes the most faults at once.\n\nAnd it doesn't replace the lag ladder. Strike quality and pace calibration are different things — you can strike it perfectly and still not know how hard 30 feet is on an 11 stimp."
+          }
+        ]
+      }
+    },
+    {
+      "id": "sweetspot-update-20260802-v2",
+      "type": "action-update",
+      "target": "sweetspot-action-20260730",
+      "text": "PUTTING — RUN THE TAPE TEST on the DF3i (~12 min, at home). Full protocol is in the 'Tape Test — Where You Actually Hit It' plan. Short version: (1) hang the putter from the top of the grip and tap the face heel-to-toe with an eraser — the spot with NO twist is the true sweet spot, mark it with tape and check it against the sight line. (2) Coat the face with foot-powder spray, hit 10 from 5 ft, photograph; re-coat, hit 10 from 30 ft, photograph. Don't wipe between putts. This is the last cheap untested thing on your card and it's the only candidate that explains BOTH open faults — a heel strike closes the face (starts it LEFT) and bleeds ball speed (lags SHORT). Send the two photos."
     }
   ]
 }
