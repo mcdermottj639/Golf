@@ -6806,6 +6806,73 @@
           }
         ]
       }
+    },
+    {
+      "id": "link21-storage-20260802-v2",
+      "type": "club-update",
+      "target": "L.A.B. Golf LINK.2.1",
+      "club": {
+        "note": "IN STORAGE from Aug 1 — out of the bag after the DF3i's scramble. CORRECTED Aug 2: an earlier note here said this head 'produced the best measured numbers of the whole project.' That was wrong and the grid says so — the LINK's column is the only one carrying TWO reds (face at impact, start line), and the DF3i's first filmed column carries none. What's true is narrower: individual metrics posted their best values on it (tempo 2.0:1 against the DF3i's 2.4:1, address repeating to 0.3° over 59 frames), and early lift and stance line were closed during its fortnight — but those two are stroke properties, and Jul 30 was simply the most heavily filmed day of the project, so that's measurement effort rather than a putter effect. Honest read: the numbers on this head are ambiguous, not favourable, and it never got a lag ladder or a 10-ball test either. It goes to storage on REDUNDANCY — two zero-torque L.A.B. putters do one job — which is a reason that holds however the numbers are read. LIKELY RETURNING: find the receipt, confirm the window before it lapses. If it goes back, the Pistol 0 grip goes with it."
+      }
+    },
+    {
+      "id": "plan-putter-decision-20260802-v3",
+      "type": "briefing",
+      "replaces": "plan-putter-decision-20260802-v2",
+      "briefing": {
+        "course": "The Putter Decision — DF3i Confirmed",
+        "discipline": "putting",
+        "focus": "Aug 1, Beekman scramble. The DF3i went back in and delivered: pace dialled all day, a clutch 5-footer made on the 1st, a 25-footer holed, and the line true on every putt. The gate closes early in the mallet's favour — the DF3i is the putter going forward and the LINK.2.1 goes to storage. This plan is the record of what got decided, the one setup change that comes back with it, what the round does and doesn't prove, and the two things left to do before the decision is actually finished.",
+        "rules": [
+          "The DF3i is the putter — the head is settled, stop shopping",
+          "The LINK didn't fail; it lost on redundancy",
+          "Press Pistol 2° is back: hands EVEN with the ball, press stays tiny",
+          "Your pace is calibrated to 8–9 stimp — log the speed, expect to recalibrate",
+          "Find the LINK's return window before it lapses"
+        ],
+        "sections": [
+          {
+            "t": "What actually got decided",
+            "k": "The right head, and now with real evidence behind it — just evidence from friendly conditions.",
+            "b": "The scramble was the DF3i's first round back and it delivered on the two things that were open: pace felt dialled all day, and the line was true on every putt. Add a clutch 5-footer made on the 1st and a 25-footer holed. That settles which head goes in the bag, and it's a good landing — you're back on the putter you've rolled your best with, it's still zero-torque, and the SBST mismatch that started this entire saga stays buried.\n\nBe clear-eyed about what that evidence is, though, because being clear-eyed is what was missing when the DF3i got benched twelve days ago on an equally thin read. It's one round, unmeasured, in a scramble — where you're often putting after a teammate has already shown you the line and the pace — on greens you put at 8–9 on the stimp. That is the friendliest putting environment that exists. It doesn't make the decision wrong. It means the decision is right and the FAULTS aren't closed, which are two different things that are easy to collapse into one."
+          },
+          {
+            "t": "What the LINK's numbers actually say",
+            "k": "Ambiguous, not favourable — its column carries the only two reds on the grid. It goes on redundancy, which holds either way.",
+            "b": "CORRECTED Aug 2. An earlier version of this plan said the LINK.2.1 'produced the best measured numbers of the whole project' and that nothing on the card convicted it. That was too generous, and the evolution grid contradicts it directly: the LINK's column is the ONLY one carrying two reds — face at impact and start line — and the DF3i's first filmed column carries none. The single hard red on your card, the 1.5–1.7° left start line, was measured on the LINK.\n\nThe narrower true version: some individual metrics did post their best values during its fortnight. Tempo came in at 2.0:1 across seven of eight clips against the DF3i's 2.4:1, and 2:1 is the target. Address repeatability measured 0.3° over 59 frames. Early lift and stance line both got closed. But the last two are properties of your stroke rather than the head, and the reason they closed on Jul 30 is that Jul 30 was by far the most filmed day of this project — three sessions, fourteen clips, the first face-on at 120 fps. That is measurement effort, not a putter effect. Read fairly, the LINK's numbers are AMBIGUOUS, not favourable.\n\nWhat genuinely holds is that it was never properly tested either — no lag ladder, no 10-ball test, the same gap that got the DF3i benched. So neither head has a real scoreboard, and the only one that exists is the DF3i's 8/10 from four feet on Jul 20.\n\nNone of which changes the decision, and that's the point worth keeping: it goes to storage on REDUNDANCY. You like the putter and you shouldn't own two zero-torque L.A.B. heads. That reason stands however the numbers are read, which is exactly why it's the right reason to decide on."
+          },
+          {
+            "t": "What the round did to the left miss",
+            "k": "First clean round in the whole saga — and the Jul 30 measurement was taken on the blade, which is worth a second look.",
+            "b": "The left miss on short putts is the through-line of this entire project, and Aug 1 is the first full round it didn't show up. That's worth something on its own.\n\nIt's also worth a question nobody has asked yet. The hard measurement — 1.5° and 1.7° LEFT on two of three overhead putts — was taken on Jul 30, on the LINK. A narrow blade carries less MOI than a mallet, so a strike toward the heel twists the face closed MORE for the same distance off centre, and the LINK's riser hosel means the shaft isn't a reliable pointer to where the head's mass actually sits. Meanwhile strike location has never been measured on any putter you own.\n\nThe standing conclusion has been 'not equipment, because it survived three putters.' That still holds for the history. But a clean round on a high-MOI mallet is exactly what you'd expect if part of the Jul 30 number was the blade punishing a heel strike. Two tests settle it and both are cheap: re-measure overhead on the DF3i (five putts, roll versus the mat centre line, median inside 0.5°), and run the tape test to see where you're actually hitting it. Don't cross the fault off on the strength of a good afternoon — measure it off."
+          },
+          {
+            "t": "The grip change comes back with it",
+            "k": "Press Pistol 2° means hands EVEN with the ball again — the vertical-shaft geometry was the LINK's, not yours.",
+            "b": "This is the one thing that quietly changes your setup, and it's easy to miss because it looks like nothing.\n\nThe LINK ships with a L.A.B. Pistol 0 — zero built-in press — and the Jul 30 film measured exactly what that produces: a dead vertical shaft at address with your hands about 1.35\" BEHIND the ball. Correct geometry for that putter, and the routine plan was rewritten around it.\n\nThe DF3i carries the Press Pistol 2°, and that grip leans the shaft for you. So the cue reverts: HANDS EVEN with the ball, and the grip supplies the lean. Do not carry the 'hands over the clubhead' feel across — on this grip it would be lean on top of lean.\n\nAnd the rule that travelled with it is live again: keep any forward press genuinely TINY. With 2° already built in, a firm press pushes effective loft off the bottom of the scale and drives the ball into the turf. On the Pistol 0 there was no lean to double-count and that warning relaxed. On the DF3i it doesn't."
+          },
+          {
+            "t": "What the mallet gives you back",
+            "k": "High MOI means an off-centre strike costs less — the strike question drops down the list, it doesn't disappear.",
+            "b": "The DF3i is a wide, deep, high-MOI mallet; the LINK.2.1 is a narrow blade. In practice that means an off-centre strike on the mallet bleeds less ball speed and twists the head less than the same miss on the blade. That takes real pressure off the strike-location question that opened on Jul 30.\n\nIt does not close it. A heel strike still closes the face and still starts the ball left, which is still your signature miss, and strike location has never once been measured on any putter you own. The tap test and the tape test are seven minutes. Run them on the mallet.\n\nThe flip side is the honest cost of the swap: a blade REPORTS a bad strike where a mallet muffles it. The DF3i is more forgiving and less informative. That raises the value of measuring rather than feeling — which, given how this month has gone, is the theme."
+          },
+          {
+            "t": "The one thing that has to happen this time",
+            "k": "One good round at one green speed isn't a power curve. Build it, and log the speed.",
+            "b": "The DF3i was convicted on Jul 30 for lags coming up short and short putts running hot. That is not two faults — it's one power curve you hadn't learned, so you under-hit the long ones and over-hit the short ones. And it got convicted without a single calibrated lag session.\n\nAug 1 is the first evidence in the other direction and it's genuinely encouraging. It is also one round at one speed. Those greens ran an estimated 8–9 on the stimp, which is slow-to-medium — a well-kept public number, where tour setups run 11 to 13. Slow greens flatter you twice over: you swing bigger, which forgives a strike that's off the middle, and you hit putts firmer, and firm takes the break out, so a mediocre read still finds the hole. Your line looking perfect all day is partly the greens doing it for you.\n\nSo the standing item, twice a week: 10 balls from 30 feet, log the SPREAD of the stopping points, how many finish SHORT, and the GREEN SPEED. Target no more than 1 in 10 short. And build the curve at more than one speed — the stroke that finished perfectly at Beekman runs four to six feet past from 30 feet on an 11."
+          },
+          {
+            "t": "Before the window closes",
+            "k": "Find the receipt and the deadline, then decide keep-or-return on purpose.",
+            "b": "You're leaning return, and the reasoning holds. Make it a decision rather than a lapse: find the receipt, confirm the return window, and put the date somewhere you will actually see it.\n\nIf it goes back, the Pistol 0 goes with it. If the window has already closed the answer changes on its own — you keep it, it sits in storage as the control, and you don't game it.\n\nOne caution either way: don't clear the shelf to make room. The Newport 2 is the bullpen blade and the DF3i is the gamer; one spare is enough, and that slot is already filled."
+          },
+          {
+            "t": "Stop shopping — the version that applies now",
+            "k": "The head is settled. From here the next thing that changes should be a number, not a putter.",
+            "b": "The line from the routine plan, updated for where you actually are: that was three putters in a month, and the head has now settled on the one you've putted best with. The rule from here is simple — the next thing that changes is a NUMBER on the card, not a head in the bag.\n\nPath: settled. Tempo: settled. Stance line: square. Early lift: closed. What's open is start line and pace, and neither of those has ever been a shopping problem."
+          }
+        ]
+      }
     }
   ]
 }
