@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-08-02",
+  "updated": "2026-08-10",
   "entries": [
     {
       "id": "s4-session",
@@ -6941,6 +6941,26 @@
       "type": "action-update",
       "target": "sweetspot-action-20260730",
       "text": "PUTTING — RUN THE TAPE TEST on the DF3i (~12 min, at home). Full protocol is in the 'Tape Test — Where You Actually Hit It' plan. Short version: (1) hang the putter from the top of the grip and tap the face heel-to-toe with an eraser — the spot with NO twist is the true sweet spot, mark it with tape and check it against the sight line. (2) Coat the face with foot-powder spray, hit 10 from 5 ft, photograph; re-coat, hit 10 from 30 ft, photograph. Don't wipe between putts. This is the last cheap untested thing on your card and it's the only candidate that explains BOTH open faults — a heel strike closes the face (starts it LEFT) and bleeds ball speed (lags SHORT). Send the two photos."
+    },
+    {
+      "id": "link21-kept-20260810",
+      "type": "club-update",
+      "target": "L.A.B. Golf LINK.2.1",
+      "club": {
+        "status": "backup",
+        "note": "KEPT — decided Aug 10. The return-window question is closed by decision rather than by expiry. This stays out of the 14 as the INDOOR / AWAY-FROM-THE-BAG PRACTICE PUTTER. Be honest about why: the training-specificity case for practising on the LINK does not hold — it points at the DF3i, which is its own best practice putter — and the blade-feedback case is answered for $8 of foot-powder spray on the gamer. What does hold is AVAILABILITY: a putter that lives inside collects more reps than one locked in the car, and reps actually taken beat better reps that aren't. Kept because it's liked and it'll get used, not because it trains anything the DF3i can't. ROLE SPLIT — LINK: motion and volume only (path, tempo, keeping the face passive). DF3i: anything carrying a measurement or a setup component — the alignment-tape work, the tap test, gate work, filmed sessions, pre-round reps. NOT BEING REGRIPPED: the Pistol 0 stays. Lie Angle Balance is a property of the assembled club, grip included, so a local-shop swap to a Press Pistol 2° risks putting the head out of spec with no way to verify it. If they're ever to be matched, that's a job for L.A.B. themselves. GUARD: the two grips ask for different hand positions — Pistol 0 sets the hands ~1.35\" behind the ball, the DF3i's Press Pistol 2° sets them even with it — so don't go straight from LINK reps into a round or a filmed DF3i set. Roll a handful on the DF3i first to reset the hands. WATCH: Jul 30 measured tempo at 2.0:1 on the LINK against 2.4:1 on the DF3i, so transfer between the two heads is NOT proven. If the LINK becomes a regular tool, film one DF3i set before and after a LINK session and confirm it isn't dragging the gamer's tempo around."
+      }
+    },
+    {
+      "id": "link-return-decide-done-20260810",
+      "type": "action-done",
+      "target": "link-return-decide-20260802"
+    },
+    {
+      "id": "history-link21-kept-20260810",
+      "type": "history",
+      "date": "2026-08",
+      "text": "L.A.B. LINK.2.1 KEPT, not returned — settled Aug 10 by decision rather than by the window lapsing. Stays out of the 14 as the indoor practice putter, on availability rather than any training advantage over the DF3i. Pistol 0 grip stays with it: no regrip, since Lie Angle Balance includes the grip."
     }
   ]
 }
