@@ -7017,6 +7017,56 @@
       "type": "action-update",
       "target": "faceon-action-20260730",
       "text": "PUTTING — ONE FACE-ON CLIP. Still the only thing standing between you and a diagnosis: it separates 'face aimed left' from 'face closing through impact', closes the held-press question (lean at address vs at impact) and confirms early-lift. NOT TICKED BY AUG 10 — that session ran 23 clips from five camera positions and every one of them was oblique, which is why it read pace beautifully and settled nothing else. The spec is narrow on purpose: camera at BALL HEIGHT, square to the target line (stand it behind the ball, walk to a spot 90° off the line, phone on the ground), white tape on the shaft ~6\" above the head, 240 fps, 2–3 strokes, on the DF3i. Do it indoors if that's what it takes to get the camera square and left alone — this clip does not need a green. One good clip beats twenty from the wrong angle."
+    },
+    {
+      "id": "s13-outcomes-20260810",
+      "type": "session-update",
+      "target": "s13-putter-ab-20260810",
+      "setup": "23 clips · 120 fps slo-mo · outdoor practice green with ABOVE-GROUND cups, 14:26–14:58 · L.A.B. DF3i (10 clips) + LINK.2.1 (13 clips) · five ground-level camera positions · two balls per rep (one blue, one white)",
+      "finding": "Re-scored the whole session once the key fact about this green was in: the cups are above-ground bases, so the ball can never drop — which means the FINAL FRAME OF EVERY CLIP shows the true outcome, and the session went from two measurable putts to seventeen. The scoring is lopsided in the right direction: 7 putts finished DEAD — touching the base or inside ~6 inches — another ~5 inside a foot and a half, and the worst putt of the entire day was about 4 feet. Nothing raced past; no ricochets off the base; every arrival that could be tracked came in at dying speed. Both heads posted dead finishes: DF3i from long range and from 5 feet, LINK from long range and repeatedly from 6–8 feet, including three of the last four putts of the day parked against the base. The left-miss story gets nothing here — the camera angles still can't score direction against a line — but as a PACE session this is the best evidence yet, and it's measured, not remembered. One oddity worth answering: in all five closing clips the WHITE ball dies at the base and the BLUE ball finishes 1.2–1.5 ft away on the same side, five times in a row — deliberate second target, or is that ball doing something?",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Clips filmed",
+            "v": "23",
+            "n": "120 fps · 5 camera positions",
+            "s": "mid"
+          },
+          {
+            "k": "Putts scored",
+            "v": "17",
+            "n": "above-ground cups — every finish visible",
+            "s": "good"
+          },
+          {
+            "k": "Dead finishes",
+            "v": "7",
+            "n": "touching base or inside ~6 in",
+            "s": "good"
+          },
+          {
+            "k": "Worst putt",
+            "v": "~4 ft",
+            "n": "one, set D · zero blow-bys all day",
+            "s": "good"
+          },
+          {
+            "k": "Tempo",
+            "v": "~2.0 : 1",
+            "n": "2 clean traces, one per head",
+            "s": "good"
+          },
+          {
+            "k": "Angles owed",
+            "v": "0 of 2",
+            "n": "no overhead, no square face-on — direction unscored",
+            "s": "warn"
+          }
+        ],
+        "story": "WHY THE RE-SCORE. These cups sit ON the green, not in it. A ball can't disappear, so the last frame of every clip is a scorecard — and that turns a 23-clip session shot from diagnostic-useless angles into a seventeen-putt pace ledger. All distances below were measured against the ball's own diameter at rest (1.68\"), the one scale in a golf video that can't lie.\n\nTHE LEDGER, SET BY SET. Set A — DF3i, 14:26–14:47, medium-to-long range, five camera-visible finishes: one long putt rolled the width of the green and stopped touching the base; a second finished dead against it from mid-range; one rep left both balls 2.5–3.5 ft short; one putt never reached the two-foot circle; one finished about a foot away. Set B — LINK, 14:48–14:49, the long right-to-left putt tracked ball-to-rest arrived at dying speed and stopped AT the base, with a second ball sitting 4–6 inches off it a clip later. Set C — DF3i, 14:51, five-footers: blue dead against the base, the whites inside 8–14 inches, whole cluster inside 2.5 ft. Set D — LINK, ~20 ft: one dead (2–4 in), one ~2 ft, one ~3.5–4 ft — the day's worst. Set E — LINK, 14:56–14:58, 6–8 ft, the closing five clips: white dead at the base in clips 20, 22 and 23, white at ~5 in in 21, and the blue ball 1.2–1.5 ft off the base in every single one.\n\nWHAT THE TALLY SAYS. 7 of 17 dead, ~12 of 17 inside a foot and a half, worst ~4 ft, ZERO long. For a player whose pace card carries 'lags come up short' as the open conviction, a day with no blow-bys reads at first like more of the same lean — but look at where the short ones died: the misses cluster AROUND the base, not three feet before it. This is what calibrated-but-conservative looks like, and on the two speeds now sampled (Beekman's 8–9 stimp and this practice green) the curve is holding.\n\nTHE HONEST CAVEATS. First: an above-ground base STOPS a ball that touches it. Some of those seven dead finishes would have trickled a foot or two past on a real green — the bases mask the long tail. The tracked arrivals came in soft, with no visible ricochet, so none of them were hot; but 'dead at the base' here means 'make-or-tap-in', not 'perfect dying weight', and the distinction matters for the lag-ladder numbers, where a base won't save you. Second: ball attribution. He collects balls between most clips, but where a ball may have carried over from the previous clip (the blue in set B), it's counted once, not twice. Third: direction is still unscored — these angles can't measure start line against anything, so left/right of the base in a given frame is camera geometry, not a miss pattern, and no left-miss conclusion is drawn from any of it.\n\nTHE BLUE-BALL QUESTION. Five closing clips, same result five times: white dies at the base, blue stops 1.2–1.5 ft off it, same side. Three explanations fit: the blue putt was aimed at a different spot on purpose; the blue is the first, feel-finding rep each time; or that ball behaves differently (a colored range-type ball can run differently off the face). If the blue was aimed at the same base — say so, because a repeating 1.5-ft error on one ball and none on the other is worth one foot-powder session on its own.",
+        "compare": "Beekman (Aug 1) said pace felt dialled; it was a feeling, from a scramble, on slow greens, with no camera. This is seventeen measured finishes and it lands on the same side: the pace curve on the DF3i is real, and the LINK matched it from every distance sampled today. What today adds that Beekman couldn't: the short game — three of the last four putts of the day parked dead from 6–8 feet, plus a five-foot set clustered inside 2.5 ft on the DF3i.\n\nAgainst the Jul 30 indoor sessions, same trade as before: the mat gave a reference line and measured DIRECTION but no green; today gives real roll and measured DISTANCE but no line. The two halves of the diagnosis still haven't been in the same shot.\n\nOn the head-to-head, the sets still never played the same putt from the same spot, so nothing here ranks the putters — but both heads posting dead finishes at every distance they were given means neither head is the variable that matters today. The stroke behind them is doing the work.",
+        "limits": "What re-scoring could NOT rescue: START LINE and FACE still need overhead or square face-on — nothing here touches the 1.5–1.7° left measurement from Jul 30, in either direction. SHAFT LEAN is still unreadable from oblique angles (and still looks misleadingly negative in every one of these clips — that's projection, ignore it). STRIKE LOCATION is still unmeasured on any putter; the blue-ball question above is one more reason to finally run the foot-powder test. And the base-stop caveat means today's dead finishes UNDERSTATE roll-out slightly — for the lag ladder, keep logging actual stopping distance on putts that miss the base, because those are the honest ones. The white tape for the face-on clip is still not on the shaft."
+      }
     }
   ]
 }
