@@ -107,10 +107,12 @@ does nothing — double-check against `applyFeed()`.
 | Utility | Cobra KING TEC 2-iron · ~17° | |
 | Irons | Cobra KING TEC 4–PW | **44° PW** anchors the wedge ladder |
 | Wedges | **Vokey 50.08F · 56.10S · 60.08M** | 50 = F/8° sweeper · 56 = S/10° workhorse · 60 = M/8° creative |
-| Putter | **L.A.B. Golf LINK.2.1** | zero-torque (Lie Angle Balanced) narrow blade — gamed Jul 30 – Aug 1 and again from **Aug 10, 2026**. Carries a **Pistol 0** grip: zero built-in lean, shaft vertical, hands ~1.35" behind the ball — that's the live cue. Its column holds the only two reds on the evolution grid (face at impact, 1.5–1.7° left start line, both measured Jul 30) |
-| Backup putter | L.A.B. Golf DF3i · 34" | zero-torque high-MOI mallet, gamed Jul 18–30 and Aug 1–10, 2026 — bullpen from Aug 10, **held not sold** (only measured scoreboard in the project: 8/10 from four feet, Jul 20; and the high-MOI control). **Press Pistol 2° grip** = the grip supplies the lean, so "hands even with the ball" is the DF3i's cue only — don't carry it to the LINK |
-| Backup putter | Scotty Newport 2 | arc-suited blade, bullpen |
-| Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** — putter search closed |
+| Putter | **L.A.B. Golf LINK.2.1** | the only zero-torque head left. Narrow blade, gamed Jul 30 – Aug 1 and again from **Aug 10, 2026** — and **still inside its own return window** (`returnWindow:true`, deadline unknown). Carries a **Pistol 0** grip: zero built-in lean, shaft vertical, hands ~1.35" behind the ball — that's the live cue. Its column holds the only two reds on the evolution grid (face at impact, 1.5–1.7° left start line, both measured Jul 30) |
+| Backup putter | Scotty Newport 2 | arc-suited toe-hang blade — renders a **MISMATCH** flag against the SBST stroke. If the LINK goes back this is all that's left, i.e. the mismatch the whole saga opened with |
+| Returned | ~~L.A.B. Golf DF3i · 34"~~ | **returned Aug 10, 2026 — distance control.** Gamed Jul 18–30 and Aug 1–10. Its Press Pistol 2° went with it, so the "hands even with the ball" cue is **retired** — don't carry it to the LINK. Lost with it: the only measured scoreboard in the project (8/10 from four feet, Jul 20) and the high-MOI control head |
+| Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** |
+
+**Live putting priority: distance control.** Pace has now decided the fate of two putters (DF3i benched Jul 30, reprieved Aug 1, returned Aug 10) and has never been measured once. The grind is the 30-ft ladder twice a week on the LINK, logging *shorts · spread · green speed*, plus the unrun tape test — an off-centre strike bleeds ball speed, so it's a distance fault before it's a line fault. Tempo is **not** the problem (2.0:1 on this head vs a 2:1 target).
 
 Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 · 60° 80.
 
@@ -167,7 +169,13 @@ feature branch never reaches his phone. Develop on the assigned branch, then fas
 ## Gotchas
 
 - Do **not** hand-edit `S.feedApplied` or expect `seed()` edits to reach existing installs.
-- Some UI copy is hardcoded around specific gear (e.g. the Home "Putter return window"
-  card keys off a club named *Phantom 7.5* being `returned`). If the marquee gear changes,
-  grep `app.js` for the old name and update the render branch too — data alone won't cover it.
+- Some UI copy is hardcoded around specific gear. If the marquee gear changes, grep
+  `app.js` for the old name and update the render branch too — data alone won't cover it.
+  The Home "Putter return window" card and the Decisions "putter call" used to key off a
+  club literally named *Phantom 7.5*; **fixed Aug 10, 2026** — both now use
+  `pendingReturn()`, which finds any non-`returned` club carrying `returnWindow:true`.
+  So putting a club in a return window is a data change (`club-update` with
+  `returnWindow:true`) plus a `deadline` entry for the date. The deadline is a single
+  global setting, so pass `"date": ""` to clear a stale one belonging to a different club —
+  the card then renders "Deadline unknown" instead of a wrong countdown.
 - `design-options/` and `mockup/` are frozen pre-launch artifacts; leave them be.

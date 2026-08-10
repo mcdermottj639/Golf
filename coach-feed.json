@@ -7192,6 +7192,268 @@
           }
         ]
       }
+    },
+    {
+      "id": "df3i-returned-20260810",
+      "type": "club-update",
+      "target": "L.A.B. Golf DF3i",
+      "club": {
+        "status": "returned",
+        "note": "RETURNED Aug 10, 2026. Reason given: distance control — too hard to get the pace under control with it. Bought Jul 18, gamed Jul 18–30 and Aug 1–10. Gone from the bag for good; the Press Pistol 2° went back with it, so the 'hands EVEN with the ball' cue is dead — do not carry it to the LINK. WHAT THIS COSTS, so it's on the record: the DF3i owned the only measured scoreboard in the entire project (8/10 from four feet, Jul 20), and it was the high-MOI control head — the one clean way to test whether a wide mallet fixed the left start line that a narrow blade was measured producing. Both of those are now unavailable. It also means the pace complaint has now decided this putter twice, in opposite directions, without one calibrated lag session behind either verdict."
+      }
+    },
+    {
+      "id": "link21-return-window-20260810",
+      "type": "club-update",
+      "target": "L.A.B. Golf LINK.2.1",
+      "club": {
+        "returnWindow": true,
+        "note": "THE PUTTER, and the ONLY zero-torque head left — the DF3i went back Aug 10 for distance control. This one is still inside its own return window (deadline unknown, find the receipt), so it is being ground on purpose rather than kept by default. SETUP: L.A.B. Pistol 0, zero built-in press — shaft DEAD VERTICAL at address, hands ~1.35\" BEHIND the ball, measured on film Jul 30 and repeatable to 0.3°. That is this putter's designed geometry (69° lie, 2° effective loft, 0° lean), not a flaw. The Press Pistol 2° 'hands even' cue left with the DF3i. Don't manufacture lean. THE GRIND: distance control. Pace is what returned the last putter and it has never once been measured — the 30-ft ladder twice a week, logging shorts, spread and green speed, is the whole job. Tempo is already where it needs to be on this head: 2.0:1 measured across seven of eight clips against 2.4:1 on the DF3i, and 2:1 is the target, so the curve is buildable. WATCH: narrow blade, lower MOI than the mallet, so an off-centre strike bleeds more ball speed here than it did there — strike is a distance fault before it's a line fault, and the tape test is still unrun. Its column also carries the only two reds on the grid (face at impact, 1.5–1.7° left start line, both Jul 30, both on this head), and there is no control putter left to cross-check them against. If this one goes back too, what's left in the bag is the Newport 2 — a toe-hang blade against a confirmed SBST stroke, i.e. the exact mismatch that started the saga."
+      }
+    },
+    {
+      "id": "history-df3i-returned-20260810",
+      "type": "history",
+      "date": "2026-08",
+      "text": "L.A.B. DF3i RETURNED Aug 10, 2026 — distance control, too hard to get the pace under control. Gamed Jul 18–30 and Aug 1–10. The LINK.2.1 is now the only zero-torque putter in the bag and is itself still inside a return window. Lost with it: the only measured scoreboard in the project (8/10 from four feet, Jul 20) and the high-MOI control head."
+    },
+    {
+      "id": "deadline-link-unknown-20260810",
+      "type": "deadline",
+      "date": ""
+    },
+    {
+      "id": "link-return-window-action-20260810",
+      "type": "action",
+      "pri": true,
+      "text": "EQUIPMENT — FIND THE LINK.2.1's RETURN DEADLINE. It is the only putter in the bag and it is still returnable, and right now nothing knows until when — the app is showing 'deadline unknown' because the old date belonged to the Phantom. Find the receipt, confirm the window with the shop, and set it on the Home card. Then treat it as a gate, not a countdown: two weeks of the 30-ft ladder at two different green speeds gives the keep-or-return call an actual scoreboard. Decide it on purpose — this is the second putter in three weeks to be judged on a feeling, and the first one that got sent back on one."
+    },
+    {
+      "id": "lag-ladder-link-20260810",
+      "type": "action-update",
+      "target": "putt-weight-ab-action-20260728",
+      "text": "PUTTING — THE 30-ft LAG LADDER on the LINK.2.1, twice a week. This is now the main event: distance control is what sent the DF3i back on Aug 10, and in three weeks and four putters it has never once been measured. 10 balls from 30 feet. Log THREE numbers every time: (1) how many finish SHORT — target no more than 1 in 10, because a short putt has zero chance; (2) the SPREAD front-to-back of the ten stopping points — this is the actual measure of distance control, target inside 6 feet; (3) the GREEN SPEED or surface (that mat, this practice green, estimated stimp). The speed field is not optional — Aug 1 felt dialled on greens estimated 8–9 stimp, which is slow-to-medium, and the same stroke runs four to six feet past from 30 feet on an 11. Build the curve on at least TWO different speeds before trusting it. Then add the calibration set: 20, 30 and 40 feet, three balls each, and note where the BACKSTROKE ends for each one — that written-down mapping is the curve. Two weeks of this is what turns the LINK's keep-or-return call into a decision instead of a feeling."
+    },
+    {
+      "id": "putt-trigger-pistol0-20260810",
+      "type": "action-update",
+      "target": "putt-trigger-action-20260729",
+      "text": "PUTTING — Bed in the settled stroke on the LINK.2.1: deep bend / stand close, and the SOFT press moved with the body. GRIP CUE REVERTS AGAIN — the DF3i and its Press Pistol 2° went back Aug 10, so the 'hands EVEN with the ball, the grip supplies the lean' rule is retired. On the LINK's Pistol 0 there is no built-in lean: the shaft stands DEAD VERTICAL and your hands sit ~1.35\" BEHIND the ball. Don't add lean by hand — with 2° of effective loft there is nothing to deloft before you're driving the ball into the turf, and a driven ball skids before it rolls, which costs you on exactly the long putts you're trying to control. Add ONE thing to this: fix your BALL POSITION with a mark and keep it there. Launch is sensitive to where the ball sits relative to the low point, and a ball position that wanders reads as bad distance control even when the stroke is fine. Confirm both on the face-on clip you already owe: shaft lean at address versus at impact, and the ball in the same place every rep. The stroke does NOT change because the head did."
+    },
+    {
+      "id": "session5-link-20260810",
+      "type": "action-update",
+      "target": "act-session5",
+      "text": "Overhead filmed ✓ (Jul 30, on the LINK) — remaining: face-on clips for the lift and delivery verdicts + the 20-ball 5-footer baseline. Both now run on the LINK.2.1, since the DF3i went back Aug 10 and there is no second head to compare against. That makes the baseline more valuable, not less: it is the only scoreboard this putter would have before its return window closes."
+    },
+    {
+      "id": "sweetspot-distance-20260810",
+      "type": "action-update",
+      "target": "sweetspot-action-20260730",
+      "text": "PUTTING — RUN THE TAPE TEST on the LINK.2.1 (~12 min, at home). Promoted Aug 10: with the DF3i returned for distance control, strike location is the single best explanation left for the fault that just cost you a putter. An off-centre hit bleeds ball speed, so the same stroke comes up short — that is a DISTANCE fault before it is a line fault, and it explains both open faults with one cause, since a heel strike also closes the face and starts the ball LEFT. It matters more on this head than it did on the mallet: a narrow blade carries less MOI, so the same miss costs more speed and more face angle. Protocol: (1) hang the putter from the top of the grip and tap the face heel-to-toe with an eraser — the spot with NO twist is the true sweet spot; mark it with tape and check it against the sight line. (2) Coat the face with foot-powder spray, hit 10 from 5 ft, photograph; re-coat, hit 10 from 30 ft, photograph. Don't wipe between putts. The 30-footer sheet is the important one now — that's where a speed leak shows. Send both photos. Run this BEFORE the return window closes: if the strike is centred and the ladder spread is still wide, the head is a fair suspect; if it's heel-biased, the head isn't the problem and sending it back buys you nothing."
+    },
+    {
+      "id": "putt-faults-20260810",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "pace-calibration",
+          "why": "NOW THE FAULT, and it has a receipt: it just cost you a putter. The DF3i went back Aug 10 because distance was too hard to control with it. Look at the run — benched Jul 30 for lags coming up short and short putts running hot; reprieved Aug 1 because pace felt dialled for a round; returned Aug 10 for distance control. Three verdicts on pace in eleven days, in two directions, and not one calibrated lag session behind any of them. That is the whole problem: a fault diagnosed only on feel can't be fixed, and it can't be ruled out either, so it follows you into the next head. It also has an unexamined asterisk — the one round it 'passed' was on greens estimated 8–9 on the stimp, slow-to-medium, where you swing bigger and hit firmer, and the same stroke runs four to six feet past from 30 feet on an 11. Fix: the 30-ft ladder on the LINK, twice a week, logging shorts, spread and green speed, plus the 20/30/40 calibration set that maps distance to BACKSTROKE LENGTH at a fixed tempo. Tempo is not the missing piece — 2.0:1 measured on this head, against a 2:1 target. Stroke length and strike are."
+        },
+        {
+          "tag": "strike-location",
+          "why": "PROMOTED — still never measured on any putter, not once, and now it is the leading single explanation for the fault that just returned a putter. A strike off the middle bleeds ball speed, so the same stroke finishes short and the spread widens; a strike toward the HEEL also rotates the face closed and starts the ball LEFT. One cause, both open faults. The head swap raises the stakes rather than lowering them: the LINK is a narrow blade with less MOI than the mallet that just left, so the same miss costs more speed and more face angle here, and its riser hosel makes the true centre hard to find by eye. Twelve minutes settles it — tap test for the sweet spot, foot-powder sheets from 5 ft and 30 ft. The 30-ft sheet is the one that matters now. Run it before the return window closes, because it is the difference between 'the head is a fair suspect' and 'the head was never the problem'."
+        },
+        {
+          "tag": "start-line-left",
+          "why": "OPEN, and harder to settle than it was a week ago. The hard number — 1.5° and 1.7° LEFT on two of three overhead putts, 1.3–1.4\" at 4 ft, ~2\" at 6 ft — was measured Jul 30 on the LINK, which is the putter now in the bag. The Aug 1 round that softened this fault was on the DF3i, unmeasured, on slow greens, and that head has now been returned, so the cleanest test available a week ago — re-measure overhead on a high-MOI mallet and compare — is gone. What's left is the direct version, and it's still cheap: overhead, five putts, roll versus the mat centre line, on the LINK. Median inside 0.5° and this comes off the card. Note the honest read on the equipment question: the miss outlived three putters, which says it isn't the head; strike location has never been measured, which is the one way it still could be."
+        },
+        {
+          "tag": "delivery-unverified",
+          "why": "Reverted with the grip, and now it feeds the pace fault directly. The Press Pistol 2° left with the DF3i, so the LINK's Pistol 0 is back: no built-in lean, shaft vertical at address, hands ~1.35\" behind the ball. The old 'don't double-count the lean' warning goes quiet again — but a new one replaces it. On a 2°-effective-loft face with the hands behind, launch is sensitive to ball position and to any press you add by hand: too far back or too much press and the ball is driven into the turf, skids before it rolls, and finishes short of where the stroke said it should. That is a distance-control leak hiding inside a delivery fault, which makes this worth measuring now rather than later. One slo-mo face-on set — white tape on the shaft, 240 fps, lights on — gives lean at address versus at impact AND ball position rep to rep, in the same clips."
+        },
+        {
+          "tag": "early-lift",
+          "why": "CLOSED Jul 30 ✓. At 120 fps and 37.5 px/inch the sole held within 0.05–0.08\" of its address height for the full 83 ms into impact, flat across ten consecutive frames, and never dropped below address height. The rise afterwards is the follow-through arc. Measured on the LINK, which is the head still in play, so this one carries cleanly. Wants two more slo-mo strokes on sample size, and the owed face-on set gives them for free."
+        },
+        {
+          "tag": "stance-creep",
+          "why": "CLOSED Jul 30 ✓ — overhead film measured the toe line 0.6°, 2.9° and 3.6° CLOSED to the target line across three reps. Never open. Measured on the LINK, so it stands unchanged by the DF3i going back."
+        }
+      ]
+    },
+    {
+      "id": "evolution-v8",
+      "type": "evolution",
+      "evolution": {
+        "updated": "2026-08-10",
+        "sessions": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "BL",
+          "S5",
+          "L21"
+        ],
+        "metrics": [
+          {
+            "name": "Distance control",
+            "marks": [
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—"
+            ],
+            "verdict": "NEVER MEASURED — a full row of dashes, and that is the finding. Pace has now decided the fate of two putters and been quantified zero times: the DF3i was benched for it Jul 30, reprieved for it Aug 1, and RETURNED for it Aug 10. Every one of those calls was made on feel. This row fills in the moment the 30-ft ladder starts logging shorts, spread and green speed on the LINK. Until then, the most expensive fault on the card is also the only one with no data behind it.",
+            "s": "warn"
+          },
+          {
+            "name": "Path",
+            "marks": [
+              "?",
+              "~",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "SETTLED — straight (SBST) across 20+ clips and four putters. Measured again Jul 30 on the LINK: ¼–½\" inside at the top, back on the line by impact. Path is yours, not the putter's, which is why none of the head changes have reopened it.",
+            "s": "good"
+          },
+          {
+            "name": "Tempo / load",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "✓",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "SETTLED — 2.0:1 measured on the LINK.2.1, seven of eight clips between 1.9 and 2.1, two independent ways, against a 2:1 target. It was 2.4:1 on the DF3i, but that head has gone back, so the number that counts is the one on the putter in the bag and it's the better of the two. Worth stating plainly for the pace grind: tempo is NOT your distance problem. Stroke length and strike are.",
+            "s": "good"
+          },
+          {
+            "name": "Face at impact",
+            "marks": [
+              "✗",
+              "~",
+              "—",
+              "✓",
+              "?",
+              "✓",
+              "✗"
+            ],
+            "verdict": "REOPENED Jul 30 — zero-torque guarantees the face won't TWIST, and it doesn't. It cannot guarantee where the face POINTS, and on 2 of 3 measured putts it pointed ~1.5° left at impact. Aimed there or closed through: only a face-on clip separates them, and that clip is owed on the LINK — the head it was measured on and the only one left.",
+            "s": "warn"
+          },
+          {
+            "name": "Start line / aim",
+            "marks": [
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✗"
+            ],
+            "verdict": "OPEN. Measured 1.5° and 1.7° LEFT on two of three overhead putts Jul 30 (1.3–1.4\" at 4 ft, ~2\" at 6 ft), one dead straight — on the LINK, which is the putter now in the bag. The Aug 1 round that softened this was on the DF3i and that head has been returned, so the mallet-versus-blade cross-check is no longer available. Re-measure directly: overhead, five putts, roll versus the mat centre line, on the LINK. Median inside 0.5° and this comes off the card.",
+            "s": "warn"
+          },
+          {
+            "name": "Early lift",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "?",
+              "✗",
+              "?",
+              "✓"
+            ],
+            "verdict": "CLOSED Jul 30 ✓ — the sole held within 0.05–0.08\" of address height for the full 83 ms into impact, flat across ten consecutive frames. The oldest open item on the card, finally shut, and measured on the head still in the bag. Take two more slo-mo strokes on sample size when the face-on set happens.",
+            "s": "good"
+          },
+          {
+            "name": "Stance line",
+            "marks": [
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "✓"
+            ],
+            "verdict": "CLOSED on arrival. Measured off the overhead frames: the toe line ran 0.6°, 2.9° and 3.6° CLOSED to the target line — never open on any rep. The trail-foot creep is fixed. Look higher for the aim leak.",
+            "s": "good"
+          }
+        ]
+      }
+    },
+    {
+      "id": "plan-distance-grind-20260810",
+      "type": "briefing",
+      "replaces": "plan-putter-swap-20260810",
+      "briefing": {
+        "course": "The Distance Grind — LINK.2.1",
+        "discipline": "putting",
+        "focus": "The DF3i went back on Aug 10 because distance was too hard to control with it. That makes pace the fault that has now decided two putters — and it has still never been measured, not one calibrated lag session in three weeks and four heads. The LINK.2.1 is the only zero-torque putter left and it is still inside its own return window. So the next two weeks are a grind with a number attached: build the pace curve on this head, and if it ends up going back too, let a scoreboard send it rather than a feeling.",
+        "rules": [
+          "Pace has decided two putters and been measured zero times — that ends here",
+          "The ladder IS the grind: 10 balls from 30 ft, twice a week, three numbers logged",
+          "Log the green speed every session — a curve at one speed is one data point",
+          "Distance comes from stroke LENGTH at a fixed tempo, not from hitting it harder",
+          "Tempo is already right on this head (2.0:1) — stop looking there",
+          "Strike is the hidden speed leak — run the tape test before you judge the putter",
+          "Pistol 0 again: shaft vertical, hands ~1.35\" behind, don't add lean by hand",
+          "Find the return deadline, then decide on numbers before it lapses"
+        ],
+        "sections": [
+          {
+            "t": "Why the DF3i actually went back",
+            "k": "The complaint was pace — the one thing this project has never once measured.",
+            "b": "Distance control is a completely fair reason to send a putter back. You have to trust the thing you're holding, and if the pace never came, it never came.\n\nBut look at the run before you carry the reasoning into this head. Jul 30: the DF3i gets benched after twelve days for lags coming up short and short putts running hot. Aug 1: it comes back in and gets reprieved because pace felt dialled for a full round. Aug 10: it gets returned for distance control. Three verdicts on the same fault in eleven days, in two different directions, and not one calibrated lag session behind any of them.\n\nThat's the thing worth naming. A fault judged only on feel can't be fixed, because there's nothing to move; and it can't be ruled out either, so it travels to the next putter. Pace is the most expensive item on your card — it has now cost you a head — and it's the only one with no data whatsoever behind it.\n\nSo this isn't a lecture about the return. The return is done. It's the reason the next two weeks look the way they do."
+          },
+          {
+            "t": "The ladder — this is the grind",
+            "k": "Ten balls from thirty feet, twice a week, three numbers written down. That's the whole protocol.",
+            "b": "Ten balls, 30 feet, on the LINK. Twice a week. Log three things every single time:\n\nSHORTS — how many of the ten finish short of the hole. Target: no more than 1 in 10. A putt that finishes short had a zero per cent chance, and coming up short is the specific complaint that started all of this.\n\nSPREAD — the front-to-back distance between the nearest and furthest of the ten stopping points. This is the actual measurement of distance control, and it's the number that will tell you whether anything is improving. Target: inside 6 feet.\n\nGREEN SPEED — estimated stimp, or just name the surface honestly (that mat, this practice green). This field is not optional and it's the one most likely to get skipped. Aug 1 felt perfect on greens estimated 8–9 on the stimp, which is slow-to-medium; the same stroke runs four to six feet past from 30 feet on an 11. A curve built at one speed isn't a curve, it's a data point.\n\nThen add the calibration set, five minutes: 20, 30 and 40 feet, three balls each, and note where the BACKSTROKE ENDS for each distance — inside the trail toe, at the toe, outside it, whatever landmark you can repeat. Written down, that mapping is your curve. It's the thing you've never had."
+          },
+          {
+            "t": "Where distance control actually comes from",
+            "k": "Stroke length at a fixed tempo — if tempo moves with distance, the curve never stabilises.",
+            "b": "Here's the good news, and it's genuinely good: the ingredient most people are missing, you already have. Tempo measured 2.0:1 on this putter across seven of eight clips, two independent ways, against a 2:1 target. Tempo is not your distance problem. Stop looking there.\n\nWhat produces distance on a putt is how far back you take it while the tempo stays the same. The failure mode is the opposite — keeping the backstroke roughly constant and varying how hard you hit it. That works for one distance and falls apart everywhere else, because effort and tempo move together, and a stroke that accelerates differently every time can't have a curve.\n\nSo the discipline in every ladder session: same tempo, always. Count it, hum it, whatever gets it stable. Change the LENGTH. If you catch yourself hitting AT a long one, that rep is the fault showing up, and it's worth noting on the sheet.\n\nThis is also why the 20/30/40 calibration set matters more than it looks. Once three distances have a repeatable backstroke landmark attached, everything in between is interpolation, and lag putting turns into a reference you can consult instead of a feeling you have to summon."
+          },
+          {
+            "t": "The hidden speed leak: strike",
+            "k": "An off-centre hit bleeds ball speed — that's a distance fault before it's ever a line fault.",
+            "b": "This is the part that ties the whole card together, and it's twelve minutes of work you've now been carrying for eleven days.\n\nA putt struck off the middle loses ball speed, so the same stroke finishes shorter — and inconsistently, because the miss isn't the same every time. That is exactly the symptom that just sent a putter back. And a strike toward the HEEL does a second thing: it rotates the face closed, which starts the ball LEFT, which is the signature miss of this entire project. One cause, both open faults. Nothing else on the card explains that much at once.\n\nStrike location has never been measured on any putter you own. Not once, across four heads.\n\nAnd the swap raises the stakes rather than lowering them. The DF3i was a wide, deep, high-MOI mallet — forgiving, and quiet about your misses. The LINK is a narrow blade with less MOI, so the same distance off centre costs more ball speed and more face angle. If strike is your leak, this head punishes it harder than the one that just went back, and the ladder will show it as a wide spread.\n\nSo run the tape test, and run it early: tap test for the true sweet spot, then foot-powder sheets from 5 feet and 30 feet. The 30-foot sheet is the one that matters now — a speed leak shows up on long putts, not short ones."
+          },
+          {
+            "t": "Ball position, and the grip that came back",
+            "k": "Hands behind the ball is correct here — as long as ball position doesn't wander.",
+            "b": "The Press Pistol 2° went back with the DF3i, so the cue reverts one more time and this is the last flip: the LINK's Pistol 0 has zero built-in press. Shaft DEAD VERTICAL at address, hands about 1.35\" BEHIND the ball. Film measured exactly that on Jul 30, repeatable to 0.3° over 59 frames. It is the geometry this putter was designed around — 69° lie, 2° effective loft, 0° shaft lean — not something to correct. Don't add lean by hand.\n\nThe reason it belongs in a distance plan: with only 2° of effective loft and the hands behind, launch is sensitive. Ball creeping back in the stance delofts it further and drives it into the turf; the ball skids before it rolls, and a skidding putt finishes short of where the stroke said it should. Ball too far forward adds hop. Both read as bad distance control even when the stroke was fine.\n\nSo fix ball position with a mark and keep it there — same spot every rep, every session. And you can verify all of it in one set of clips: the face-on set you already owe gives you lean at address versus at impact AND ball position rep to rep, in the same footage."
+          },
+          {
+            "t": "Before you send this one back too",
+            "k": "Give it a scoreboard first — and know what's actually behind it in the bag.",
+            "b": "The LINK is still inside its own return window and nobody currently knows until when — the date the app was holding belonged to the Phantom, so it's been cleared and the Home card now says so. Find the receipt and set the real one. That's the first job this week, because everything else here is on a clock.\n\nThen two things to hold while the ladder runs.\n\nFirst, know what returning it would leave you. The only other putter in the bag is the Scotty Newport 2 — a toe-hang blade against your confirmed SBST stroke. That's the exact mismatch this whole project opened with, flagged as the equipment half of the left miss. That is NOT an argument for keeping the LINK. It's an argument for knowing what replaces it BEFORE the window closes, rather than after.\n\nSecond, set the gate now, while you're not deciding anything. Two weeks of the ladder at two different green speeds, plus the tape test. If the spread is still wide AND the tape shows a centred strike, the head is a fair suspect and you send it back with actual evidence — the first equipment decision in this project that would have any. If the tape shows a heel bias, the head was never the problem, and returning it buys you a fifth putter and the same fault."
+          },
+          {
+            "t": "What none of this changes",
+            "k": "Path, tempo, lift and stance are settled — they belong to you, not to whatever is in the bag.",
+            "b": "Worth keeping in view while the pace work runs, because four putters in a month makes it feel like everything is unstable. It isn't.\n\nPath: settled, straight SBST across 20+ clips and four different heads. Tempo: 2.0:1 on this putter, inside the window. Early lift: closed Jul 30, measured, and measured on the head still in your hands. Stance line: square, never open across three reps.\n\nAll four of those were measured on the LINK, which means none of them walked out the door with the DF3i. What's open is start line, delivery, strike and pace — and the last two are the same twelve minutes and the same ladder away from having numbers.\n\nThe rule survives intact, and it's earned its keep: the next thing that changes should be a NUMBER on the card, not a head in the bag."
+          }
+        ]
+      }
     }
   ]
 }

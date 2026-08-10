@@ -363,8 +363,7 @@ function rerender(){ render(current.view, current.arg); }
 function home(){
   const dl = daysLeft(S.settings.returnDeadline);
   const idx = estIndex();
-  const phantom = S.clubs.find(c => /phantom 7\.5/i.test(c.name));
-  const returnDone = !phantom || phantom.status === 'returned';
+  const pending = pendingReturn();
   const last = latestFiveFt();
   const sc = last ? fiveFtScore(last) : null;
   const picks = pickedLessons().slice(0,1);
@@ -378,11 +377,13 @@ function home(){
     <div class="stat"><div class="v">${idx != null ? idx.toFixed(1) : '—'}</div><div class="l">Est. index</div></div>
   </div>
 
-  ${returnDone ? '' : `
+  ${!pending ? '' : `
   <div class="card">
     <h2>Putter return window</h2>
-    <h3>${dl===null ? 'No deadline set' : dl + ' days left on the Phantom 7.5'}</h3>
-    <p class="sm">${S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> — confirm the real one with the shop and update it below.' : 'Deadline confirmed.'}</p>
+    <h3>${dl===null ? 'Deadline not set' : dl + ' days left on the ' + esc(pending.name)}</h3>
+    <p class="sm">${dl===null
+      ? `<span class="warn">Deadline unknown</span> — the ${esc(pending.name)} is still returnable and nothing here knows until when. Find the receipt, confirm the window with the shop, and set it below.`
+      : S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> — confirm the real one with the shop and update it below.' : 'Deadline confirmed.'}</p>
     <div class="formrow" style="margin-top:8px">
       <div><label>Deadline</label><input type="date" id="deadlineInput" value="${esc(S.settings.returnDeadline||'')}"></div>
       <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
@@ -1176,16 +1177,17 @@ function decisions(){
   const dl = daysLeft(S.settings.returnDeadline);
   const idx = estIndex();
   const decided = S.clubs.find(c => c.cat==='putter' && c.status==='gaming' && c.flow==='zt');
-  const phantom = S.clubs.find(c => /phantom 7\.5/i.test(c.name));
-  const returnDone = !phantom || phantom.status === 'returned';
+  const pending = pendingReturn();
   return `
   <button class="backlink" data-action="go" data-view="home">← Home</button>
   <div class="card">
     <h2>The putter call</h2>
-    ${decided ? `<p class="sm"><b class="good">DECIDED ✓ — ${esc(decided.name)} is in the bag.</b> ${returnDone
-        ? 'The Phantom 7.5 is officially returned — the equipment half of the left miss is settled. Next: film Session 5 and run the 20-ball baseline to confirm the miss is gone.'
-        : `Remaining: return the Phantom 7.5 before the window closes (<b>${dl===null?'deadline not set':dl+' days left'}</b>), then film Session 5 and run the 20-ball baseline to confirm the left miss is gone.`}</p>`
-    : `<p class="sm">Exchange the Phantom 7.5 for a <b>zero-torque at 34"</b>. Demo → 10-ball test → decide. <b>${dl===null?'Deadline not set':dl+' days left'}.</b></p>`}
+    ${decided ? `<p class="sm"><b class="good">DECIDED ✓ — ${esc(decided.name)} is in the bag.</b> ${!pending
+        ? 'The equipment half of the left miss is settled. Next: the face-on clip and the 20-ball baseline to confirm the miss is gone.'
+        : pending === decided
+          ? `Not final though — <b>the gamer itself is still inside its return window</b> (${dl===null?'deadline unknown':dl+' days left'}). Grind it on the numbers and decide on purpose, rather than letting the window lapse or sending it back on a feeling.`
+          : `Still open: the return window on the ${esc(pending.name)} (<b>${dl===null?'deadline unknown':dl+' days left'}</b>).`}</p>`
+    : `<p class="sm">Exchange for a <b>zero-torque at 34"</b>. Demo → 10-ball test → decide. <b>${dl===null?'Deadline not set':dl+' days left'}.</b></p>`}
   </div>
 
   <h2>Shortlist · from your fitted top-10</h2>
@@ -1243,6 +1245,12 @@ function roundDiff(r){
 function putterSince(){
   const p = S.clubs.find(c => c.cat === 'putter' && c.status === 'gaming' && c.since);
   return p ? p.since : null;
+}
+// Whatever is currently sittable-in-a-return-window. The flag lives on the club so the
+// countdown follows the gear rather than one hardcoded head — the gamer itself can be
+// the thing on the clock, which is exactly the case the old Phantom-only check missed.
+function pendingReturn(){
+  return S.clubs.find(c => c.returnWindow && c.status !== 'returned') || null;
 }
 // A snapshot's `coversThrough` is the last round it includes — NOT the day it was
 // read off the phone, which is why the read date can't be used for this.
