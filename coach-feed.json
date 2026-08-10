@@ -6961,6 +6961,62 @@
       "type": "history",
       "date": "2026-08",
       "text": "L.A.B. LINK.2.1 KEPT, not returned — settled Aug 10 by decision rather than by the window lapsing. Stays out of the 14 as the indoor practice putter, on availability rather than any training advantage over the DF3i. Pistol 0 grip stays with it: no regrip, since Lie Angle Balance includes the grip."
+    },
+    {
+      "id": "s13-putter-ab-20260810",
+      "type": "session",
+      "date": "2026-08-10",
+      "setup": "23 clips · 120 fps slo-mo · outdoor practice green, 14:26–14:58 · L.A.B. DF3i (10 clips, 2 sets) + LINK.2.1 (13 clips, 3 sets) · five ground-level camera positions — front-quarter and rear-quarter, none overhead, none square face-on",
+      "finding": "First outdoor film since the LINK was kept, and the pace news is genuinely good: on the two long putts where the ball, the cup and the whole roll are all in frame — one DF3i at 14:45, one LINK at 14:49 — the ball came to rest 2–4 INCHES from the hole. Dead-weight lags on a real green, which is exactly the evidence the pace card has been short of since Beekman. The diagnostic news is that none of the five camera positions is one of the two angles you owe. Every clip is ground-level and oblique, so start line, face and shaft lean all stay exactly where they were — and be careful reading these back yourself: the shaft LOOKS leaned away from the target in every clip, including clips where the putt goes the other way, which is projection from a low side-on camera, not a position. Third thing, and it matters for the comparison you were trying to run: the two putters never played the same putt. DF3i took the first two sets, LINK the last three, different holes and different lengths, so nothing here compares the heads.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Clips filmed",
+            "v": "23",
+            "n": "120 fps · 5 camera positions",
+            "s": "mid"
+          },
+          {
+            "k": "Head split",
+            "v": "DF3i 10 / LINK 13",
+            "n": "2 sets vs 3 sets, never the same putt",
+            "s": "mid"
+          },
+          {
+            "k": "Lag finish",
+            "v": "2–4 in",
+            "n": "2 long putts tracked ball-to-rest",
+            "s": "good"
+          },
+          {
+            "k": "Angles owed",
+            "v": "0 of 2",
+            "n": "no overhead, no square face-on",
+            "s": "warn"
+          },
+          {
+            "k": "Shaft lean",
+            "v": "Unreadable",
+            "n": "oblique camera — projection, not position",
+            "s": "warn"
+          },
+          {
+            "k": "Tempo",
+            "v": "~2.0 : 1",
+            "n": "2 clean traces, one per head",
+            "s": "good"
+          }
+        ],
+        "story": "WHAT WAS SHOT. Twenty-three clips over thirty-two minutes on the practice green, all 120 fps, in five sets that each moved the camera. The heads alternate: DF3i for the first six clips (14:26–14:46) and again at 14:51, LINK.2.1 at 14:48–14:49, 14:53–14:55 and 14:56–14:58. That's ten clips on the gamer and thirteen on the backup, and it means the session finished on the LINK — nine clips, the last seven minutes, and the shortest putts of the day.\n\nTHE GOOD NEWS IS PACE. Two putts could be measured properly, because the ball, the cup and the entire roll all stayed in one frame: the 14:45 DF3i putt and the 14:49 LINK putt, both long — 20-plus feet by eye. Both finished 2–4 inches from the cup, measured against the ball's own diameter at rest, which is the one scale in a golf video you can always trust. Neither went in. Both were the dead-weight speed that leaves a tap-in. That is the first pace evidence on a real green since Beekman, and unlike Beekman it is measured rather than remembered.\n\nWHAT THE STROKE TRACES SHOW. Two clips — one on each head — gave a clean enough read on the head through the stroke to time the parts: the DF3i clip ran about 0.40 s back and 0.20 s down, the LINK about 0.52 s back and 0.28 s down. Both land inside the 1.9–2.1 window that got tempo marked SETTLED, and both peak in head speed at the ball rather than before it. So nothing in today's film says the LINK is dragging the gamer's tempo around, which was the explicit worry when it was kept eight hours ago. Two clips is not a verdict — that watch item stays open — but it points the right way.\n\nTHE PROBLEM IS THE ANGLES. Five camera positions and not one of them is square to anything. Every clip sits low and oblique — either in front of you and off to the side, or behind you and off to the side. That view can see roll, pace and the timing of the stroke, and it does. It cannot see where the face points, how far the ball starts off line, or where the hands sit relative to the ball, and no amount of frame-by-frame work on this footage changes that.\n\nONE TRAP WORTH NAMING. In these clips the shaft appears to lean AWAY from the target at address. It appears that way in clips where the putt runs left across the frame and in clips where it runs right — which is the giveaway. A low camera off to one side projects a shaft that leans toward or away from it onto the image the same way regardless of which way the putt is aimed. If you scrub these back on your phone and read hands-behind-the-ball off them, you'll be reading the lens. That question is still only answerable from square-on, and it is still open.",
+        "compare": "Every measured angle before this was indoors on the mat; this is the first film outdoors. That is a real gain and a real loss at once.\n\nTHE GAIN: green speed and roll-out are things a mat cannot show you at all, and the two tracked putts give the pace card its first measured outdoor point. Jul 30 gave path, tempo and early-lift, all indoors, none of which needed a green. Aug 1 at Beekman gave pace, on a green, but by feel and with no camera. Today is the first time those two halves have overlapped — measured, on grass.\n\nTHE LOSS: the mat gave a straight reference line to measure start line against, controlled light, and a camera you could square up and leave. Outdoors you got sunshine, a moving handheld camera and five positions in thirty-two minutes, none of them repeated exactly. The Jul 30 overhead measured 1.5–1.7° left because there was a printed line to measure against. There is nothing to measure against here.\n\nON THE HEAD-TO-HEAD: the alternating sets look like an A/B and aren't one. The DF3i took the long putts from the far side of the green in the first half, the LINK took the short ones from close range at the end. Different lengths, different holes, different camera. To compare the heads you have to alternate them ball-for-ball from the SAME spot to the SAME hole — five with one, five with the other, then swap back — or the comparison measures the putt, not the putter.",
+        "limits": "This set cannot close a single open item on the card, and it is worth being precise about why.\n\nSTART LINE needs the ball's first two feet of roll measured against a known straight line, from above. No clip here is overhead, and there is no reference line on a practice green. Not answerable.\n\nFACE AT IMPACT needs the camera square to the target line at ball height. Every clip is oblique. Not answerable.\n\nSHAFT LEAN needs the same square angle plus white tape on the shaft at 240 fps — that was the prescription after Jul 30, and the tape still isn't on the shaft. Not answerable, and actively misleading from this angle, as above.\n\nSTRIKE LOCATION needs foot-powder spray on the face, not video. Still never measured on any putter.\n\nPACE is the one that moved, and even there, two putts is two putts. The lag ladder asks for ten balls from 30 ft with the SPREAD and the green speed logged; what you have is two long putts that both finished stone dead. Encouraging, not calibration — and note that both of them finished a couple of inches SHORT of the cup rather than past it, which is the direction this fault has always leaned."
+      }
+    },
+    {
+      "id": "faceon-update-20260810",
+      "type": "action-update",
+      "target": "faceon-action-20260730",
+      "text": "PUTTING — ONE FACE-ON CLIP. Still the only thing standing between you and a diagnosis: it separates 'face aimed left' from 'face closing through impact', closes the held-press question (lean at address vs at impact) and confirms early-lift. NOT TICKED BY AUG 10 — that session ran 23 clips from five camera positions and every one of them was oblique, which is why it read pace beautifully and settled nothing else. The spec is narrow on purpose: camera at BALL HEIGHT, square to the target line (stand it behind the ball, walk to a spot 90° off the line, phone on the ground), white tape on the shaft ~6\" above the head, 240 fps, 2–3 strokes, on the DF3i. Do it indoors if that's what it takes to get the camera square and left alone — this clip does not need a green. One good clip beats twenty from the wrong angle."
     }
   ]
 }
