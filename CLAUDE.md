@@ -97,6 +97,13 @@ does nothing — double-check against `applyFeed()`.
 - Putting stroke: **SBST** (straight-back-straight-through) — confirmed on overhead film.
   This is why arc/toe-flow putters get flagged as a mismatch.
 - Signature miss: **left on short putts** — the through-line of the whole putter saga.
+  **Aug 10, 2026: likely reclassified as an AIM error, not a delivery error.** Jack found
+  that setting the face *barely open* at address is the sweet spot. A zero-torque head
+  doesn't twist — it delivers the angle you set — so the 1.5–1.7° left measured at
+  *impact* was almost certainly 1.5–1.7° left at *address*. Unconfirmed until the overhead
+  five is run. Two guards live in the plans: don't stack the feel-fix with an aim-picture
+  retrain (that applies the correction twice and misses right), and put a number on
+  "barely" so it can't drift.
 
 ## Current bag (source-of-truth summary — keep in sync with the feed)
 

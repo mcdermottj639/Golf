@@ -7454,6 +7454,304 @@
           }
         ]
       }
+    },
+    {
+      "id": "plan-putt-routine-20260810-v15",
+      "type": "briefing",
+      "replaces": "plan-putt-routine-20260802-v14",
+      "briefing": {
+        "course": "Putting Routine — Locked",
+        "discipline": "putting",
+        "focus": "UPDATED Aug 10, and this is the last grip flip — the DF3i and its Press Pistol 2° have been RETURNED, so 'hands even with the ball' is retired for good. The LINK.2.1's Pistol 0 has no built-in lean: shaft VERTICAL, hands ~1.35\" BEHIND the ball. New this update and the biggest thing on the card in weeks — you've found that setting the face BARELY OPEN at address is the sweet spot. That is very likely not a compensation but a correction, and it points straight at the fault this project opened with. Everything that came off film of YOUR stroke is unchanged: GET LOW, TRAIL FOOT back, rock the shoulders.",
+        "sections": [
+          {
+            "t": "THE HEADLINE — get low",
+            "b": "Your words, and they go at the top of the plan rather than the bottom of a setup list: bending over is the most massive thing, and getting low is where you feel most comfortable. That is the feel to remember when everything else has drifted. If you only carry one thought to the practice green, carry this one — not the press, not the rehearsals, not the pace word. Deep bend, stand close, eyes down.",
+            "k": "Bend over and get low — that's the anchor feel everything else hangs off."
+          },
+          {
+            "t": "Why the bend is more than comfort",
+            "b": "Two real mechanisms sit under that feel. FIRST — the LINK.2.1 is Lie Angle Balanced, and that balance is only true when the shaft is presented at the lie angle it was built for. Stand too tall or too far away and the toe drops, the shaft leaves its designed lie, and the zero-torque property this whole project was built on quietly degrades. Posture is what delivers the technology. On this head the built spec is 69° lie, 2° effective loft and 0° shaft lean, with an aluminium riser hosel sized to the lie angle — still confirm the length is 34\". SECOND — more bend lets the arms hang freer and tilts the shoulders onto a STEEPER plane, and a steeper shoulder plane is what produces a straight-back-straight-through stroke. Standing tall flattens that plane and builds an arc into the stroke you don't want.\n\nThis one carried across every head change, because it's a property of you and your posture rather than of whatever is in your hands.",
+            "k": "The bend isn't comfort: it presents the lie the putter needs, and steepens the shoulder plane that makes the stroke straight."
+          },
+          {
+            "t": "The setup",
+            "b": "BEND OVER, stand close, eyes down through the strike. Ball off the LEFT BREAST. Weight stacked ON the ball — pressure over it, not on the trail foot. TRAIL FOOT a touch BACK — it creeps forward on its own and opens you. Rock the shoulders, no hands. Loose grip. Face set BARELY OPEN — see the section below.\n\nTHE HANDS CUE, FINAL VERSION. HANDS ~1.35\" BEHIND THE BALL, shaft DEAD VERTICAL. The DF3i went back on Aug 10 and its Press Pistol 2° went with it, so the 'hands even with the ball, the grip supplies the lean' rule is retired — there is no longer a grip in your bag that it describes.\n\nThe LINK's Pistol 0 has zero built-in press, and this is measured rather than assumed: overhead stills on Jul 30 put the shaft essentially vertical and repeatable to 0.3° across 59 frames, with the hands about 1.35\" behind the ball. That is the geometry L.A.B. built this putter around — 69° lie, 2° effective loft, 0° lean — not a flaw in your address to be corrected. Don't manufacture lean with your hands to make it look like a normal putter. With only 2° of effective loft there is almost nothing to deloft before you're driving the ball into the turf, and a driven ball skids before it rolls, which costs you most on exactly the long putts you're trying to control.\n\nONE ADDITION, because pace is the live priority: fix your BALL POSITION with a mark and keep it there. Launch is sensitive to where the ball sits relative to the low point, and a ball position that wanders reads as bad distance control even when the stroke was fine.",
+            "k": "Hands ~1.35\" BEHIND the ball and the shaft vertical — the Pistol 0 has no lean to borrow, and none to add."
+          },
+          {
+            "t": "THE PRESS — settled from first principles",
+            "b": "Start from what you are actually holding. The Pistol 0 is an UNPRESSED grip — zero built-in forward lean, shaft vertical, hands behind the ball. So unlike the DF3i era, the soft press is now the ONLY source of shaft lean in your stroke.\n\nThat changes the arithmetic in your favour and it's worth being precise about why, because the old rule was reasoned from real numbers. On the Press Pistol 2° there was already lean built in, so any press you added STACKED on top of it and could push effective loft below zero — a putter delivering negative loft drives the ball down into the green instead of rolling it. That is why 'keep it tiny' was a hard rule for the whole DF3i era.\n\nWith the Pistol 0 there is nothing to stack on. A small press cannot drive loft below zero, because it is starting from zero lean and 2° of loft. So the hard 'tiny or else' rule is genuinely suspended.\n\nWhat replaces it is a softer rule with a different reason, and the reason is pace — see below. Do not read 'suspended' as 'manufacture some lean'. The putter is designed around 0° and there is very little loft to give away.",
+            "k": "The Pistol 0 has no lean to stack on, so the hard 'tiny or else' rule is suspended — but consistency replaces it, for pace."
+          },
+          {
+            "t": "What this putter needs from the setup",
+            "b": "A lie-angle-balanced putter makes one demand of you and it is not a stroke demand: present the shaft at the lie it was built for. Get that wrong — stand tall, reach for it — and the toe drops, the shaft leaves its designed lie, and the self-squaring property you bought degrades. That is why the deep bend matters mechanically here and not just for comfort.\n\nEverything else in this routine came from film of YOUR stroke — path, shoulder plane, stance line, trigger — so none of it is putter-specific and none of it changed when the mallet went back. Two things ARE this head's business. The lie presentation above. And your AIM PICTURE: a narrow blade topline frames the target very differently from the wide mallet you spent nine days looking at, which is one reason the barely-open find is worth nailing down with a number now rather than trusting the eye through another head change.\n\nOne more that is specific to this head: the riser hosel. The shaft is NOT a reliable pointer to where the head's mass sits, so don't use it to judge the sweet spot by eye — that's what the tap test is for.",
+            "k": "Present the shaft at its built lie and re-check your aim picture. Leave the stroke alone."
+          },
+          {
+            "t": "THE FACE — barely open is your square",
+            "k": "On a zero-torque head the face points where you set it, so this reads as an aim correction, not a compensation — which would make it the answer to the oldest fault on the card.",
+            "b": "Your find, Aug 10: setting the face BARELY OPEN at address is the sweet spot. Take it seriously, because there is a clean mechanism underneath it and it lines up with everything already measured.\n\nStart from what a zero-torque putter can and cannot do. Lie Angle Balance means the face does not TWIST during the stroke — and Jul 30 film confirmed exactly that, the face held. What it cannot do is decide where the face POINTS. A zero-torque head faithfully delivers whatever angle you set at address. So on this putter, face-at-impact is very close to face-at-address, by design.\n\nNow put the two facts together. Overhead film measured the face pointing 1.5° and 1.7° LEFT at impact on two of three putts — the only hard number behind your signature miss. On a head that doesn't twist, a face pointing left at impact was almost certainly pointing left AT ADDRESS. That reframes the whole fault: it is an AIM error, not a delivery error. Nothing is closing through impact — you were aiming there the whole time.\n\nAnd that is precisely what 'barely open feels right' means. What reads as barely open to your eyes is, on the actual target line, square. You are not compensating for a moving face; you are correcting a perception. That matters enormously for whether this holds up: compensations for timing drift and have to be re-found every week, but an aim offset is stable. This one should keep working.\n\nIt also answers the aim-check item directly. Your stance measured SQUARE on overhead film — the toe line ran 0.6°, 2.9° and 3.6° CLOSED across three reps, never open — so the leak was never in your feet. The instruction was to look higher. The face itself is higher, and here it is."
+          },
+          {
+            "t": "The trap — don't stack the two fixes",
+            "k": "'Barely open' is a feel calibrated to your current aim picture; retrain the picture as well and you'll start missing right.",
+            "b": "This is the one way the discovery goes wrong, and it's worth reading before the next practice green.\n\n'Barely open' is not a measurement. It is a FEEL, and it works because it is calibrated against your current, slightly-left aim perception. Which means there are two different fixes available for the same fault, and they do not combine:\n\nLANE A — keep the feel. Aim what feels barely open, verify ONCE that it actually produces a square start line, then stop thinking about it. Cheap, fast, and it's already working.\n\nLANE B — retrain the aim picture with a mirror or a laser until genuinely square LOOKS square, and drop the 'barely open' language entirely.\n\nDo BOTH and you have applied the correction twice: a face that is genuinely open, and a new miss to the RIGHT. Pick a lane. Lane A is the recommendation — you found it yourself, on the course, and the cheapest fix is the one that's already in your hands.\n\nThe second hazard is drift, and this project has a documented history with it. A feel with no number attached wanders, and it wanders toward the exaggeration — 'barely open' quietly becomes 'open' over a few weeks, and the miss reappears on the other side without an obvious cause. So put a number on it once, then re-check it monthly. That's the new action item, and it's five putts long."
+          },
+          {
+            "t": "THE TRAIL FOOT — the alignment leak",
+            "b": "Self-reported Jul 29 and worth taking seriously: your right foot creeps UP — forward, toward the target line — and it drags the stance line open with it. Open the feet and the shoulders follow, so you end up aimed LEFT of where you think you are. The fix is exactly what you said: set that trail foot a touch further back than feels natural. Expect it to feel CLOSED, like you're aimed right. That feeling is the correction, not an error — you're recalibrating off an open baseline, so square will read as closed until it beds in. Trust the line you set, not the feel, for the first few sessions.",
+            "k": "Your trail foot creeps forward, opens the stance and aims you left. Set it back — square will feel closed."
+          },
+          {
+            "t": "Why it wrecks the takeaway specifically",
+            "b": "Because in an SBST stroke the shoulder line IS the track. There's no arc to absorb a misaligned setup — 'straight back' is straight back along whatever line your shoulders are on, so an open stance doesn't just aim you left, it points the whole stroke left. Then one of two things happens, and both are bad: you feel it immediately and manipulate the takeaway to save it, which puts the HANDS back in charge of a stroke built to have no hands in it — or you don't, and the ball starts left. That's why a stance error shows up as a takeaway problem. The takeaway is fine; it's obeying a line that's wrong.",
+            "k": "In a straight stroke the shoulder line IS the track, so an open stance points the whole stroke left."
+          },
+          {
+            "t": "This is the miss the putter can't fix",
+            "b": "Your signature miss is LEFT on short putts — the through-line of the entire putter saga, and it has now outlived four putters. That history is what rules the HEAD out: a fault that survives four different putters was never about the putter.\n\nWhat it never ruled out was aim. A perfectly square face aimed at a target left of the hole produces exactly this miss, and no putter ever built will save you from it. Zero-torque guarantees the FACE stays square; it cannot guarantee the face is square TO THE RIGHT THING. That has been the standing line in this plan for two weeks, and the barely-open find is the first thing to actually act on it.\n\nNote the split that always made the case: your 10-ball blocks started 10/10 on line on the MAT, where an alignment aid is doing the aiming for you, while the miss kept showing up on the COURSE, where nothing is. That pattern is an aim signature, not a stroke signature. It has been sitting in the data the whole time.",
+            "k": "A square face aimed at the wrong target still misses left — and the mat-versus-course split says that's exactly what's been happening."
+          },
+          {
+            "t": "The check that costs nothing",
+            "b": "Lay a club or an alignment stick down the target line just outside the ball on the practice green and set up to it — your toes should run PARALLEL to it, not converging toward it. Ten seconds, and it recalibrates the feel. The structural safeguard is already in your routine: aim the FACE to the spot FIRST, then build the stance around it. Keep that order religiously. If you build the stance first, the face gets aimed to a crooked body; if you aim the face first and the stance then creeps, the mismatch shows up as discomfort — and discomfort you can feel is information you can act on.",
+            "k": "Alignment stick on the practice green: toes parallel, not converging. Ten seconds, recalibrates the feel."
+          },
+          {
+            "t": "THE TRIGGER — settled: soft press, moved with the body",
+            "b": "Keep the soft press — a genuinely small one, made as the body starts to move. Its JOB is rhythm: it breaks inertia so the stroke starts as a motion rather than a decision.\n\nOn the Pistol 0 it is also the only lean in the stroke, since the grip supplies none. That makes it more honest than it was during the DF3i era — what you feel is what the shaft is doing, with nothing built in underneath it — and it makes repeatability the whole game. Nothing is masking a press that grows.\n\nIt should pass THROUGH, not be held. Held presses were a real problem on Jul 29 and the mechanism that made them dangerous is gone, but the habit isn't, and on this grip a held press drags your hands forward out of the hands-behind address the putter is built around.",
+            "k": "Keep the soft press for rhythm — on this grip it's the only lean in the stroke, so make it the same size every time."
+          },
+          {
+            "t": "The one rule — softness IS the safeguard",
+            "b": "REWRITTEN Aug 10. The old version of this rule was arithmetic: the Press Pistol's 2° meant a firm press pushed effective loft below zero. That grip has gone back with the DF3i, so that specific danger is gone.\n\nThe rule survives anyway, for a better reason. SAME PRESS, SAME SIZE, EVERY PUTT. A press that varies is a shaft lean that varies, which is a launch that varies, which is a PACE that varies — and pace is now the priority fault on the card, the one that just cost you a putter. Consistency is no longer about protecting loft from going negative; it's about not injecting a random variable into the exact thing you're trying to measure on the ladder.\n\nTwo drift signals to watch, unchanged: if the press starts to feel FIRM, or like a POSITION you sit in rather than a motion you pass through, it has crept back toward a hold. A held press also quietly moves your hands forward of the 1.35\"-behind address this putter wants.",
+            "k": "Same press, same size, every putt — a varying press is a varying pace, and pace is the fault that just cost you a putter."
+          },
+          {
+            "t": "If it creeps back into a hold",
+            "b": "The alternatives stay on the shelf rather than getting deleted, because you may want one later: THE FLOAT — lift the head a hair off the turf before takeaway; no hand action at all and it removes ground friction. THE WHOLE-PUTTER WAGGLE — small forward-and-back from the shoulders, wrists silent. THE LEAD-SHOULDER SETTLE — a soft downward press of the shoulder that already runs the stroke. THE TRAIL-KNEE KICK — furthest from the hands, and the same trigger your full-swing routine uses. Any of them will break inertia without the hands touching shaft lean. You don't need one right now.",
+            "k": "Alternatives on the shelf if the press ever creeps back into a hold — float, waggle, shoulder settle, knee kick."
+          },
+          {
+            "t": "How to tell it's releasing",
+            "b": "One face-on clip settles it: compare shaft lean at ADDRESS with shaft lean at IMPACT. Close to equal means the soft press is passing through the way it should. Meaningfully more at impact means it's being carried in, whatever it felt like — and feel is exactly what got this wrong the first time. The free check needs no camera: a purely rolling ball makes one clean click, a ball driven down into the green adds a faint scuff a beat later. Listen for the scuff.",
+            "k": "One face-on clip settles it: shaft lean at address versus at impact. No camera? Listen for the scuff."
+          },
+          {
+            "t": "Stop shopping",
+            "b": "Straight talk, because you called it yourself. Four putters in a month: the Phantom 7.5 returned Jul 20, the DF3i in Jul 18, out Jul 30, back in Aug 1, returned Aug 10, and the LINK.2.1 in and out and in again around it.\n\nThe LINK is now the only zero-torque head you own, and it is still inside its own return window. So 'stop shopping' is not quite available as advice — there is a real decision still to make. What IS available is the standard for making it: the DF3i was benched on a feeling, reprieved on a feeling, and returned on a feeling, without a single calibrated lag session behind any of the three. That is the pattern to break, not the putter.\n\nSo the rule from here, unchanged in spirit and sharper in practice: the next thing that changes should be a NUMBER on the card, not a head in the bag. And if this head does go back, let a scoreboard send it — two weeks of ladder data and a tape sheet — rather than a feeling. That would be the first equipment decision in this whole project with evidence under it.",
+            "k": "Four putters in a month, all judged on feel — break the pattern, not the putter: the next thing that changes should be a number."
+          },
+          {
+            "t": "Why beside the ball and not behind it",
+            "b": "Rehearsing in your true putting posture — same deep bend, same arm hang, same shoulder plane — means the stroke that FEELS like 30 feet is the stroke you actually make. Magnitude transfers one-to-one. Rehearsing from behind the ball reads the break better, but you're standing upright there, so the size you feel is only an approximation. Your open fault is pace magnitude, not reading: path ✓, face ✓, start lines 10/10 twice over. Optimise the thing that's broken.",
+            "k": "Rehearse in your real posture beside the ball, because magnitude transfers one-to-one that way."
+          },
+          {
+            "t": "Keep the order of the two rehearsals",
+            "b": "Ball-look first (path and contact), hole-look second (pace). The last thing you feel is the thing you carry in — so the pace stroke must be the last one. If the hole stroke ever drifts to first, the pace feel gets overwritten by the contact feel and you're back to guessing distance. Finish rehearsal 2 WITH the soft press, at its real size: it's the one part of the stroke that never used to get a practice rep, which is how it drifted last time without you noticing.",
+            "k": "Ball-look first, hole-look second — the last thing you feel is what you carry in."
+          },
+          {
+            "t": "Two rules underneath it",
+            "b": "SAME BEAT COUNT, EVERY PUTT — a routine that varies in length is itself a pace variable, and the putts where you take an extra look are the ones that come up short. And a VERBAL BACKSTOP is worth testing: say the pace intention right before the press ('die it a foot past', 'back of the cup'). Feel decays, a word doesn't.",
+            "k": "Same beat count every putt, and try saying the pace intention out loud before the press."
+          },
+          {
+            "t": "Still to test — lags",
+            "b": "This is the top of the card, and it is the single thing that would have prevented the entire detour. The Jul 29 round was lags coming up SHORT and short putts running HOT, which is not two faults but one: a power curve you hadn't learned, so you under-hit the long ones and over-hit the short ones. That got the DF3i benched. It was never once tested. And on Aug 10 the same untested complaint sent that putter back for good.\n\nSo the curve gets built on the LINK, deliberately. The block test, twice a week: 10 balls from 30 feet. Log THREE numbers — how many finish SHORT (target no more than 1 in 10), the SPREAD front-to-back of the ten stopping points (target inside 6 feet), and the GREEN SPEED. Then the calibration set: 20, 30 and 40 feet, three balls each, noting where the BACKSTROKE ends for each distance. Written down, that mapping is the curve you have never had.\n\nTwo things make this more promising than it sounds. Tempo is already right on this head — 2.0:1 measured against a 2:1 target — so the missing ingredient is stroke LENGTH, not rhythm. And strike location has never been measured on any putter you own, which matters here because an off-centre hit bleeds ball speed and shows up as exactly this fault. The tape test is twelve minutes and it belongs at the front of this queue.\n\nONE WATCH ITEM from the barely-open find: if you were unconsciously steering the stroke to save a face aimed left, then fixing the aim removes the need for the steer — and a stroke that no longer steers can deliver different pace. So take a ladder reading EARLY, before the new aim beds in, and don't confuse a pace change caused by the aim fix with one caused by the putter.",
+            "k": "Build the power curve on the LINK — and take a reading early, because fixing the aim may move your pace too."
+          }
+        ],
+        "steps": [
+          "Read it from BEHIND the ball — pick the line and a spot a few inches ahead of it",
+          "Step BESIDE the ball — BEND OVER, stand close, full putting posture",
+          "Rehearsal 1 — eyes on the BALL. Path and contact.",
+          "Rehearsal 2 — eyes on the HOLE. Pace. Finish it with the soft press.",
+          "Step in — set the FACE to the spot first and set it BARELY OPEN, then build the stance around it (trail foot a touch BACK)",
+          "Spot → ball → soft press with the body → putt"
+        ],
+        "rules": [
+          "GET LOW — the deep bend is what presents the lie this putter needs",
+          "Set the face BARELY OPEN — that's your square, and it's the first thing to move the left miss",
+          "Aim the FACE first, then build the stance to it",
+          "TRAIL FOOT back — square will feel closed",
+          "Hands ~1.35\" BEHIND the ball — the Pistol 0 has no lean, so don't add any",
+          "Press SMALL and the SAME SIZE every putt — a varying press is a varying pace"
+        ]
+      }
+    },
+    {
+      "id": "openface-action-20260810",
+      "type": "action",
+      "pri": true,
+      "text": "PUTTING — PUT A NUMBER ON 'BARELY OPEN'. You've found that setting the face barely open at address is the sweet spot, and on a zero-torque head that most likely means your aim picture reads square as slightly left — i.e. it's a real correction, not a compensation. Two jobs. (1) VERIFY, five putts: phone directly overhead the ball, set the face at what now feels barely open, roll five and measure the start line against the mat centre line. Median inside 0.5° and the oldest fault on the card comes off it. (2) QUANTIFY, so it can't drift: with the face set at your new 'barely open', photograph it against an alignment stick from directly above and note how open it actually is. A feel with no number attached wanders toward the exaggeration — 'barely open' quietly becomes 'open' and the miss reappears on the RIGHT. Re-check monthly. DON'T STACK FIXES: either keep the feel and verify it, OR retrain the aim picture with a mirror until square looks square — never both, or you'll apply the same correction twice."
+    },
+    {
+      "id": "aim-check-openface-20260810",
+      "type": "action-update",
+      "target": "aim-check-action-20260730",
+      "text": "PUTTING — Aim check above the feet. LIKELY ANSWERED Aug 10, pending measurement: your stance measured SQUARE on film (toe line 0.6°, 2.9°, 3.6° CLOSED across three reps, never open), so the left start line was never coming from your feet — the instruction was to look higher, and the barely-open find says the leak is the FACE, at address. On a zero-torque head the face points where you set it, so a face measured 1.5–1.7° left at impact was pointing there at address too. What's left is confirmation, not diagnosis: set up to an alignment stick, check the face against the line from directly above the ball, and see whether what feels 'barely open' is actually square. Keep the shoulder check in your pocket — a second club laid across the SHOULDERS — in case the face measures square and the ball still starts left."
+    },
+    {
+      "id": "faceon-link-20260810",
+      "type": "action-update",
+      "target": "faceon-action-20260730",
+      "text": "PUTTING — ONE FACE-ON CLIP, on the LINK.2.1 (the DF3i went back Aug 10; this spec used to say the mallet). Its job has narrowed and got easier: the barely-open find already argues that the face was AIMED left rather than closing through impact, so this clip is now confirmation plus two things only it can give — shaft lean at address versus at impact on the Pistol 0 (expect ~0° at address, hands 1.35\" behind, and the question is whether the press adds any), and ball position rep to rep, which feeds the distance grind. It also banks two more strokes of sample size on the closed early-lift verdict. NOT TICKED BY AUG 10 — that session ran 23 clips from five camera positions and every one was oblique, which is why it read pace beautifully and settled nothing else. The spec is narrow on purpose: camera at BALL HEIGHT, square to the target line (stand it behind the ball, walk to a spot 90° off the line, phone on the ground), white tape on the shaft ~6\" above the head, 240 fps, 2–3 strokes. Indoors is fine — this clip does not need a green. One good clip beats twenty from the wrong angle. For the START LINE question, the overhead five is the test, not this one."
+    },
+    {
+      "id": "tape-shaft-link-20260810",
+      "type": "action-update",
+      "target": "tape-action-20260730",
+      "text": "PUTTING — Before the next face-on set: wrap WHITE TAPE around the shaft ~6\" above the head, switch Slo-Mo to 240 fps (Settings › Camera › Record Slo-mo › 1080p/240), lights on. The angle is already right — the only thing blocking the shaft-lean verdict is that a thin black shaft blurs out against a dim floor at impact speed. WHAT YOU'RE MEASURING CHANGED AGAIN on Aug 10: the DF3i and its Press Pistol 2° have been returned, so on the LINK's Pistol 0 expect roughly ZERO lean at address — shaft vertical, hands ~1.35\" behind the ball — and the question is whether the soft press adds any by impact. Unlike the DF3i era there's no built-in 2° to subtract, so whatever the tape shows IS the press."
+    },
+    {
+      "id": "putt-faults-20260810-v2",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "start-line-left",
+          "why": "BEST NEWS OF THE PROJECT, Aug 10 — and it needs five putts to confirm. Jack found that setting the face BARELY OPEN at address is the sweet spot. There is a clean mechanism under it: a zero-torque head does not TWIST (Jul 30 film confirmed the face held), but it cannot control where the face POINTS — it delivers whatever you set. So the 1.5° and 1.7° LEFT measured at impact were almost certainly 1.5–1.7° left AT ADDRESS. That reclassifies the whole fault from a DELIVERY error to an AIM error, which is the better of the two outcomes by a distance: aim offsets are stable, timing compensations drift. It also fits the oldest unexplained split in the data — 10/10 start lines on the MAT, where an alignment aid aims you, against a miss that kept appearing on the COURSE, where nothing does. And it fits the stance measurement: toes 0.6°, 2.9°, 3.6° CLOSED, never open, so the leak was never the feet. CONFIRM IT: overhead, five putts, face set at the new barely-open, roll versus the mat centre line. Median inside 0.5° and this comes off the card for the first time since the project began. TWO WARNINGS. Don't stack fixes — keep the feel OR retrain the aim picture with a mirror, never both, or you'll apply the correction twice and start missing RIGHT. And put a number on 'barely', because an unquantified feel drifts toward the exaggeration."
+        },
+        {
+          "tag": "pace-calibration",
+          "why": "THE priority, and it has a receipt: it just cost you a putter. The DF3i went back Aug 10 because distance was too hard to control with it. Look at the run — benched Jul 30 for lags coming up short and short putts running hot; reprieved Aug 1 because pace felt dialled for a round; returned Aug 10 for distance control. Three verdicts on the same fault in eleven days, in two directions, and not one calibrated lag session behind any of them. A fault judged only on feel can't be fixed, because there's nothing to move, and it can't be ruled out either, so it follows you into the next head. It also has an asterisk: the one round it 'passed' was on greens estimated 8–9 on the stimp, where you swing bigger and hit firmer, and the same stroke runs four to six feet past from 30 feet on an 11. Fix: the 30-ft ladder on the LINK, twice a week, logging shorts, spread and green speed, plus the 20/30/40 set that maps distance to BACKSTROKE LENGTH at a fixed tempo. Tempo is not the missing piece — 2.0:1 measured on this head against a 2:1 target. Stroke length and strike are. NEW WATCH ITEM: if you were steering the stroke to rescue a face aimed left, fixing the aim removes the steer and may move your pace too — take a ladder reading early so the two don't get confused."
+        },
+        {
+          "tag": "strike-location",
+          "why": "Still never measured on any putter, not once, across four heads — and now the last cheap thing standing between you and a complete diagnosis. A strike off the middle bleeds ball speed, so the same stroke finishes short and the spread widens; a strike toward the HEEL also rotates the face closed and starts the ball LEFT. With the aim question likely answered, this is the remaining candidate that could still be contributing to BOTH open faults. The head raises the stakes: the LINK is a narrow blade with less MOI than the mallet that just left, so the same miss costs more speed and more face angle here, and its riser hosel makes the true centre hard to find by eye. Twelve minutes — tap test for the sweet spot, foot-powder sheets from 5 ft and 30 ft, and the 30-ft sheet is the one that matters. RUN IT WITH THE NEW BARELY-OPEN ADDRESS, not the old one, since that's the setup you'll actually be using. Do it before the return window closes: centred strike plus a wide ladder spread makes the head a fair suspect; a heel bias means the head was never the problem."
+        },
+        {
+          "tag": "delivery-unverified",
+          "why": "Downgraded but still open, and now it feeds pace rather than line. The Press Pistol 2° left with the DF3i, so the LINK's Pistol 0 is back: no built-in lean, shaft vertical at address, hands ~1.35\" behind the ball. The old 'don't double-count the lean' arithmetic is retired — there is nothing to stack on, so a small press can no longer push effective loft below zero. What remains is consistency: the press is now the ONLY lean in the stroke, so a press that varies is a launch that varies, which is a pace that varies, feeding straight into the priority fault. Same size every putt. One slo-mo face-on set — white tape on the shaft, 240 fps, lights on — gives lean at address versus at impact AND ball position rep to rep in the same clips. Whatever the tape shows IS the press now, with no built-in 2° to subtract."
+        },
+        {
+          "tag": "early-lift",
+          "why": "CLOSED Jul 30 ✓. At 120 fps and 37.5 px/inch the sole held within 0.05–0.08\" of its address height for the full 83 ms into impact, flat across ten consecutive frames, and never dropped below address height. The rise afterwards is the follow-through arc. Measured on the LINK, which is the head still in play, so it carries cleanly. Wants two more slo-mo strokes on sample size, and the owed face-on set gives them for free."
+        },
+        {
+          "tag": "stance-creep",
+          "why": "CLOSED Jul 30 ✓ — overhead film measured the toe line 0.6°, 2.9° and 3.6° CLOSED to the target line across three reps. Never open. Worth re-reading in light of the Aug 10 find: this measurement is what ruled the feet out and sent the search higher, which is exactly where the face turned out to be."
+        }
+      ]
+    },
+    {
+      "id": "evolution-v9",
+      "type": "evolution",
+      "evolution": {
+        "updated": "2026-08-10",
+        "sessions": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "BL",
+          "S5",
+          "L21"
+        ],
+        "metrics": [
+          {
+            "name": "Start line / aim",
+            "marks": [
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✗"
+            ],
+            "verdict": "OPEN — but for the first time there is a candidate fix, found Aug 10: setting the face BARELY OPEN at address. The measured fault is 1.5° and 1.7° LEFT on two of three overhead putts Jul 30 (1.3–1.4\" at 4 ft, ~2\" at 6 ft), one dead straight. Because a zero-torque head delivers the angle you set rather than twisting, a face pointing left at impact was pointing left at address — so this is an AIM error, and 'barely open' is you correcting it. Confirm the same way it was raised: overhead, five putts, new address, roll versus the mat centre line. Median inside 0.5° and this finally comes off the card.",
+            "s": "warn"
+          },
+          {
+            "name": "Face at impact",
+            "marks": [
+              "✗",
+              "~",
+              "—",
+              "✓",
+              "?",
+              "✓",
+              "✗"
+            ],
+            "verdict": "REOPENED Jul 30, and Aug 10 supplies the likely answer. Zero-torque guarantees the face won't TWIST, and it doesn't. It cannot guarantee where the face POINTS, and on 2 of 3 measured putts it pointed ~1.5° left at impact. The two candidates were 'aimed there' and 'closed through' — and the barely-open find lands hard on AIMED THERE, since an address offset is exactly what a non-twisting head would carry to impact unchanged. Not confirmed until the overhead five says so, but this is no longer a coin flip.",
+            "s": "warn"
+          },
+          {
+            "name": "Distance control",
+            "marks": [
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—"
+            ],
+            "verdict": "NEVER MEASURED — a full row of dashes, and that is the finding. Pace has now decided the fate of two putters and been quantified zero times: the DF3i was benched for it Jul 30, reprieved for it Aug 1, and RETURNED for it Aug 10. Every one of those calls was made on feel. This row fills in the moment the 30-ft ladder starts logging shorts, spread and green speed on the LINK. Until then, the most expensive fault on the card is also the only one with no data behind it.",
+            "s": "warn"
+          },
+          {
+            "name": "Path",
+            "marks": [
+              "?",
+              "~",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "SETTLED — straight (SBST) across 20+ clips and four putters. Measured again Jul 30 on the LINK: ¼–½\" inside at the top, back on the line by impact. Path is yours, not the putter's, which is why none of the head changes have reopened it — and why the left miss was never going to be explained by the stroke's shape.",
+            "s": "good"
+          },
+          {
+            "name": "Tempo / load",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "✓",
+              "✓",
+              "✓",
+              "✓"
+            ],
+            "verdict": "SETTLED — 2.0:1 measured on the LINK.2.1, seven of eight clips between 1.9 and 2.1, two independent ways, against a 2:1 target. It was 2.4:1 on the DF3i, but that head has gone back, so the number that counts is the one on the putter in the bag and it's the better of the two. Worth stating plainly for the pace grind: tempo is NOT your distance problem. Stroke length and strike are.",
+            "s": "good"
+          },
+          {
+            "name": "Early lift",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "?",
+              "✗",
+              "?",
+              "✓"
+            ],
+            "verdict": "CLOSED Jul 30 ✓ — the sole held within 0.05–0.08\" of address height for the full 83 ms into impact, flat across ten consecutive frames. The oldest open item on the card, finally shut, and measured on the head still in the bag. Take two more slo-mo strokes on sample size when the face-on set happens.",
+            "s": "good"
+          },
+          {
+            "name": "Stance line",
+            "marks": [
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "✓"
+            ],
+            "verdict": "CLOSED on arrival — the toe line ran 0.6°, 2.9° and 3.6° CLOSED to the target line, never open on any rep. The trail-foot creep is fixed. This is the measurement that ruled the feet out and sent the search higher for the aim leak, and on Aug 10 that search found the face.",
+            "s": "good"
+          }
+        ]
+      }
     }
   ]
 }
