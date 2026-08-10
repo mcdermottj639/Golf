@@ -7067,6 +7067,55 @@
         "compare": "Beekman (Aug 1) said pace felt dialled; it was a feeling, from a scramble, on slow greens, with no camera. This is seventeen measured finishes and it lands on the same side: the pace curve on the DF3i is real, and the LINK matched it from every distance sampled today. What today adds that Beekman couldn't: the short game — three of the last four putts of the day parked dead from 6–8 feet, plus a five-foot set clustered inside 2.5 ft on the DF3i.\n\nAgainst the Jul 30 indoor sessions, same trade as before: the mat gave a reference line and measured DIRECTION but no green; today gives real roll and measured DISTANCE but no line. The two halves of the diagnosis still haven't been in the same shot.\n\nOn the head-to-head, the sets still never played the same putt from the same spot, so nothing here ranks the putters — but both heads posting dead finishes at every distance they were given means neither head is the variable that matters today. The stroke behind them is doing the work.",
         "limits": "What re-scoring could NOT rescue: START LINE and FACE still need overhead or square face-on — nothing here touches the 1.5–1.7° left measurement from Jul 30, in either direction. SHAFT LEAN is still unreadable from oblique angles (and still looks misleadingly negative in every one of these clips — that's projection, ignore it). STRIKE LOCATION is still unmeasured on any putter; the blue-ball question above is one more reason to finally run the foot-powder test. And the base-stop caveat means today's dead finishes UNDERSTATE roll-out slightly — for the lag ladder, keep logging actual stopping distance on putts that miss the base, because those are the honest ones. The white tape for the face-on clip is still not on the shaft."
       }
+    },
+    {
+      "id": "s13-blueball-20260810",
+      "type": "session-update",
+      "target": "s13-putter-ab-20260810",
+      "finding": "Re-scored with the above-ground cups in mind, then closed the blue-ball question with Jack's answer that both balls were aimed at the same base. About 20 putts scored across the day: NINE finished dead — touching the base or inside ~6 inches — the worst putt was ~4 feet, and nothing went long. Both heads posted dead finishes at every distance sampled: DF3i from long range and from 5 feet, LINK from 20 feet and repeatedly from 6–8, where the closing set ran 2.3 ft, dead, 5 in, dead, dead on the white ball — dialling in and then repeating. The film also corrected the first read of the closing set: the blue ball sat PARKED in the same spot across three clips while only the white was re-putted, so the blue took three putts, not five — and all three finished 1.2–1.5 ft from the base (left, right, left) on putts the white kept killing. Same putter, same distance, same target, minutes apart: one ball dies, the other scatters to three times the distance, on both sides. With aim ruled out, that's either the ball itself or small-sample noise — and either way the blue has no business in a pace-calibration rep. Direction against a line remains unscored; nothing today touches the left-miss measurement in either direction.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Clips filmed",
+            "v": "23",
+            "n": "120 fps · 5 camera positions",
+            "s": "mid"
+          },
+          {
+            "k": "Putts scored",
+            "v": "~20",
+            "n": "above-ground cups — every finish visible",
+            "s": "good"
+          },
+          {
+            "k": "Dead finishes",
+            "v": "9",
+            "n": "touching base or inside ~6 in",
+            "s": "good"
+          },
+          {
+            "k": "Worst putt",
+            "v": "~4 ft",
+            "n": "one, set D · zero long all day",
+            "s": "good"
+          },
+          {
+            "k": "Blue-ball spread",
+            "v": "1.2–1.5 ft ×3",
+            "n": "same base target — white died on same putts",
+            "s": "warn"
+          },
+          {
+            "k": "Angles owed",
+            "v": "0 of 2",
+            "n": "no overhead, no square face-on",
+            "s": "warn"
+          }
+        ],
+        "story": "WHY THE RE-SCORE. These cups sit ON the green, not in it. A ball can't disappear, so the last frame of every clip is a scorecard — and that turned a session shot from diagnostic-useless angles into a ~20-putt pace ledger. Distances measured against the ball's own diameter at rest (1.68\"), the one scale in a golf video that can't lie.\n\nTHE LEDGER, SET BY SET. Set A — DF3i, 14:26–14:47, medium-to-long: one long putt rolled the width of the green and stopped touching the base; a second finished dead from mid-range; one rep left both balls 2.5–3.5 ft short; one putt never reached the two-foot circle; one finished about a foot away. Set B — LINK, 14:48–14:49: the long right-to-left putt tracked ball-to-rest arrived at dying speed and stopped AT the base. Set C — DF3i, 14:51, five-footers: blue dead against the base, whites inside 8–14 inches, the whole cluster inside 2.5 ft. Set D — LINK, ~20 ft: one dead (2–4 in), one ~2 ft, one ~3.5–4 ft — the day's worst. Set E — LINK, 14:56–14:58, 6–8 ft: the white ball ran 2.3 ft, dead, 5 in, dead, dead across five putts; the blue took three putts and finished 1.2–1.5 ft every time.\n\nWHAT THE TALLY SAYS. Nine of ~20 dead, most of the rest inside a foot and a half, worst ~4 ft, zero long. For a player whose pace card carries 'lags come up short' as the open conviction, the telling part is WHERE the short ones died: clustered around the base, not three feet before it. That is what calibrated-but-conservative looks like, and on the two speeds now sampled — Beekman's 8–9 stimp and this practice green — the curve is holding.\n\nTHE BLUE BALL, CLOSED AND REOPENED. The original oddity — 'blue finishes 1.2–1.5 ft in five straight finals' — was half camera artifact: frame-by-frame comparison shows the blue parked in the identical spot across clips 19–21, so it was putted three times, not five. The corrected fact is stranger: three blue putts, three finishes at 1.2–1.5 ft, spread across BOTH sides of the base, while the white died on the same putts from the same distance with the same putter. Jack confirms both were aimed at the same base, which rules out the easy explanation. Two remain. Small sample — three putts is three putts. Or the ball: a colored ball of a different model comes off the face at a different speed, and a repeating ~1.4 ft distance error at 7 feet is exactly what a firmer or softer cover does. Either way the operational rule is the same and it's cheap: pace work and the lag ladder happen with the gamer ball model only. And if that blue IS the same model as the white — then the scatter has no ball excuse, and the foot-powder strike test just became more interesting.\n\nTHE HONEST CAVEATS. An above-ground base STOPS a ball that touches it — some of the nine dead finishes would have trickled a foot past on a real green, so 'dead at base' means make-or-tap-in, not perfect dying weight; the tracked arrivals all came in soft with no ricochet, so none were hot. Balls can carry over between clips, and every parked ball was counted once — the set-E correction above is exactly that rule doing its job. And direction is still unscored: left/right of the base in any frame here is camera geometry, not a miss pattern.",
+        "compare": "Beekman (Aug 1) said pace felt dialled; it was a feeling, from a scramble, on slow greens, with no camera. This is ~20 measured finishes landing on the same side: the pace curve is real, and the LINK matched the DF3i from every distance it was given. What today adds that Beekman couldn't: the short range — the closing 6–8 ft set went dead three times out of five with a 5-incher besides, and the five-foot DF3i set clustered inside 2.5 ft.\n\nAgainst the Jul 30 indoor sessions, the same trade as before: the mat measured DIRECTION but had no green; today measured DISTANCE but has no line. The two halves of the diagnosis still haven't been in the same shot.\n\nOn the head-to-head, the sets never played the same putt from the same spot, so nothing ranks the putters — but both heads posting dead finishes everywhere means neither head is the variable that mattered today. The stroke behind them did the work. The one variable that DID separate results was the ball.",
+        "limits": "What re-scoring could not rescue: START LINE and FACE still need overhead or square face-on — nothing here touches the 1.5–1.7° left measurement from Jul 30, in either direction. SHAFT LEAN is still unreadable from oblique angles (it looks misleadingly negative in every clip — projection, ignore it). STRIKE LOCATION is still unmeasured on any putter, and the blue-ball scatter is now a second reason to run the foot-powder test. The base-stop caveat means the dead finishes slightly UNDERSTATE roll-out — on the lag ladder, log actual stopping distance on putts that miss the base, because those are the honest ones. White tape for the face-on clip: still not on the shaft."
+      }
     }
   ]
 }
