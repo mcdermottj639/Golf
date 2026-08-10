@@ -7752,6 +7752,252 @@
           }
         ]
       }
+    },
+    {
+      "id": "s13-mat-session-20260810",
+      "type": "session-update",
+      "target": "s13-putter-ab-20260810",
+      "setup": "TWO BATCHES, ONE DAY. (1) AFTERNOON, 14:26–14:58 — 23 clips · 120 fps slo-mo · outdoor practice green with ABOVE-GROUND cups · L.A.B. DF3i (10 clips) + LINK.2.1 (13) · five ground-level camera positions, all oblique · two balls per rep (one blue, one white). (2) EVENING, ~19:54 — 5 clips · indoor mat with a printed centre line · 3 putts on the LINK.2.1 from TWO ANGLES, both ALONG the target line: down-the-line from floor level behind the ball (img0015/16/17, one per putt) and reverse down-the-line from the hole end (IMG_3476, img3478, slow-mo). A sixth clip — the third putt from the hole end — still to come.",
+      "finding": "TWO SESSIONS, AND BETWEEN THEM THE FIRST START-LINE NUMBERS SINCE JUL 30. Afternoon, outdoors: about 20 putts scored off above-ground cups — NINE finished dead (touching the base or inside ~6 inches), the worst was ~4 feet, nothing went long, and both heads posted dead finishes at every distance sampled. The blue-ball question closed with Jack's answer that both balls were aimed at the same base: the blue sat parked across three clips, so it took three putts not five, and all three finished 1.2–1.5 ft from the base on both sides while the white died on the same putts — so pace work runs with the gamer ball model only. Direction went unscored, because every one of those 23 clips was oblique.\n\nEVENING, INDOORS — and this is the new part. Five clips off a lined mat, three putts on the LINK, shot from two angles that are both ON the target line. Those are the right angles, and they make start line measurable for the first time since the barely-open find. Two putts tracked frame by frame against the mat's printed centre line, scaled by the ball's own 1.68\" diameter; a stationary printed dash on that line reads 0.00\" offset in both clips, which says the reference is unbiased. PUTT A rolled dead straight — inside ~0.1\" of the line the whole way, about 0.8° and within the noise. PUTT B started on the line and drifted steadily LEFT, about 1.0–1.3\" by the hole, call it 1°. One square, one a degree left, no consistent bias.\n\nAgainst Jul 30's 1.5–1.7° LEFT on two of three, that is real improvement — with two large asterisks. It is two putts at roughly ±0.5° uncertainty. And it is a MAT WITH A PRINTED LINE, which is the one condition Jack has always passed: 10/10 start lines on the mat is the oldest line in this file, and the miss only ever appears on the course. A printed line does the aiming, so this tests the stroke, not the aim — and the aim is what the barely-open discovery is about. Consistent with the hypothesis; nowhere near confirming it. Face angle itself is not measurable here at all: the head spans ~70 pixels, where 1.5° is under two pixels.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Clips filmed",
+            "v": "23",
+            "n": "120 fps · 5 camera positions",
+            "s": "mid"
+          },
+          {
+            "k": "Putts scored",
+            "v": "~20",
+            "n": "above-ground cups — every finish visible",
+            "s": "good"
+          },
+          {
+            "k": "Dead finishes",
+            "v": "9",
+            "n": "touching base or inside ~6 in",
+            "s": "good"
+          },
+          {
+            "k": "Worst putt",
+            "v": "~4 ft",
+            "n": "one, set D · zero long all day",
+            "s": "good"
+          },
+          {
+            "k": "Blue-ball spread",
+            "v": "1.2–1.5 ft ×3",
+            "n": "same base target — white died on same putts",
+            "s": "warn"
+          },
+          {
+            "k": "Mat clips",
+            "v": "5",
+            "n": "3 putts · 2 angles · 1 still to come",
+            "s": "mid"
+          },
+          {
+            "k": "Start lines measured",
+            "v": "2",
+            "n": "first since Jul 30",
+            "s": "good"
+          },
+          {
+            "k": "Putt A",
+            "v": "≈0.1\"",
+            "n": "off the printed line, whole roll",
+            "s": "good"
+          },
+          {
+            "k": "Putt B",
+            "v": "≈1.3\" left",
+            "n": "at the hole · about 1°",
+            "s": "warn"
+          },
+          {
+            "k": "Face angle",
+            "v": "not measurable",
+            "n": "head ~70 px · 1.5° ≈ 2 px",
+            "s": "warn"
+          },
+          {
+            "k": "Angles owed",
+            "v": "face-on",
+            "n": "both cameras were ON the line",
+            "s": "warn"
+          }
+        ],
+        "story": "WHY THE RE-SCORE. These cups sit ON the green, not in it. A ball can't disappear, so the last frame of every clip is a scorecard — and that turned a session shot from diagnostic-useless angles into a ~20-putt pace ledger. Distances measured against the ball's own diameter at rest (1.68\"), the one scale in a golf video that can't lie.\n\nTHE LEDGER, SET BY SET. Set A — DF3i, 14:26–14:47, medium-to-long: one long putt rolled the width of the green and stopped touching the base; a second finished dead from mid-range; one rep left both balls 2.5–3.5 ft short; one putt never reached the two-foot circle; one finished about a foot away. Set B — LINK, 14:48–14:49: the long right-to-left putt tracked ball-to-rest arrived at dying speed and stopped AT the base. Set C — DF3i, 14:51, five-footers: blue dead against the base, whites inside 8–14 inches, the whole cluster inside 2.5 ft. Set D — LINK, ~20 ft: one dead (2–4 in), one ~2 ft, one ~3.5–4 ft — the day's worst. Set E — LINK, 14:56–14:58, 6–8 ft: the white ball ran 2.3 ft, dead, 5 in, dead, dead across five putts; the blue took three putts and finished 1.2–1.5 ft every time.\n\nWHAT THE TALLY SAYS. Nine of ~20 dead, most of the rest inside a foot and a half, worst ~4 ft, zero long. For a player whose pace card carries 'lags come up short' as the open conviction, the telling part is WHERE the short ones died: clustered around the base, not three feet before it. That is what calibrated-but-conservative looks like, and on the two speeds now sampled — Beekman's 8–9 stimp and this practice green — the curve is holding.\n\nTHE BLUE BALL, CLOSED AND REOPENED. The original oddity — 'blue finishes 1.2–1.5 ft in five straight finals' — was half camera artifact: frame-by-frame comparison shows the blue parked in the identical spot across clips 19–21, so it was putted three times, not five. The corrected fact is stranger: three blue putts, three finishes at 1.2–1.5 ft, spread across BOTH sides of the base, while the white died on the same putts from the same distance with the same putter. Jack confirms both were aimed at the same base, which rules out the easy explanation. Two remain. Small sample — three putts is three putts. Or the ball: a colored ball of a different model comes off the face at a different speed, and a repeating ~1.4 ft distance error at 7 feet is exactly what a firmer or softer cover does. Either way the operational rule is the same and it's cheap: pace work and the lag ladder happen with the gamer ball model only. And if that blue IS the same model as the white — then the scatter has no ball excuse, and the foot-powder strike test just became more interesting.\n\nTHE HONEST CAVEATS. An above-ground base STOPS a ball that touches it — some of the nine dead finishes would have trickled a foot past on a real green, so 'dead at base' means make-or-tap-in, not perfect dying weight; the tracked arrivals all came in soft with no ricochet, so none were hot. Balls can carry over between clips, and every parked ball was counted once — the set-E correction above is exactly that rule doing its job. And direction is still unscored: left/right of the base in any frame here is camera geometry, not a miss pattern.\n\nTHE EVENING MAT SESSION — DIRECTION, AT LAST. Five clips arrived from an indoor lined mat (19:54), three putts on the LINK.2.1 shot from two angles, both ALONG the target line: down-the-line from floor level behind the ball (img0015/16/17, one clip per putt) and reverse down-the-line from the hole end (IMG_3476, img3478). A sixth clip is still to come.\n\nThese are the RIGHT angles, and that is worth saying after a session of 23 oblique clips settled nothing. A camera on the target line is what makes start line measurable, and the mat supplies a printed centre line to measure against. Two putts were tracked frame by frame, with the ball's own 1.68\" diameter setting the scale at every depth. The reference checks out: a stationary printed dash ON the centre line reads 0.00\" offset in both clips, so the method is unbiased to about a thirtieth of an inch.\n\nPUTT A (IMG_3476) rolled DEAD STRAIGHT — within about 0.1\" of the printed line for its entire visible roll, which is roughly 0.8° and inside the measurement noise. PUTT B (img3478) started on the line and drifted steadily to the LEFT, reaching about 1.0–1.3\" left by the time it got to the hole — call it 1°. So: one square, one a degree left, no consistent bias across the two.\n\nSet that against the Jul 30 baseline of 1.5–1.7° LEFT on two of three overhead putts and it is a genuine improvement. It is also two putts, with an uncertainty of roughly ±0.5° once lens distortion and motion blur are allowed for, so it is encouraging rather than conclusive.",
+        "compare": "Beekman (Aug 1) said pace felt dialled; it was a feeling, from a scramble, on slow greens, with no camera. This is ~20 measured finishes landing on the same side: the pace curve is real, and the LINK matched the DF3i from every distance it was given. What today adds that Beekman couldn't: the short range — the closing 6–8 ft set went dead three times out of five with a 5-incher besides, and the five-foot DF3i set clustered inside 2.5 ft.\n\nAgainst the Jul 30 indoor sessions, the same trade as before: the mat measured DIRECTION but had no green; today measured DISTANCE but has no line. The two halves of the diagnosis still haven't been in the same shot.\n\nOn the head-to-head, the sets never played the same putt from the same spot, so nothing ranks the putters — but both heads posting dead finishes everywhere means neither head is the variable that mattered today. The stroke behind them did the work. The one variable that DID separate results was the ball.\n\nAND THE HALVES MET — partly. The line above about the two halves of the diagnosis never being in the same shot is now half-answered: Jul 30 measured direction indoors, the Aug 10 afternoon measured distance outdoors, and the Aug 10 evening measured direction again, on the first putts filmed since the barely-open discovery. What is still true is that direction has only ever been measured INDOORS, on a mat with a printed line, and distance has only ever been measured OUTDOORS. Neither session has yet measured both at once, and the mat is the reason the direction half keeps looking better than the scorecard does.",
+        "limits": "THE CAVEAT THAT DECIDES WHAT THIS IS WORTH: this was a mat with a printed target line, and a printed line does the AIMING for you. The oldest unexplained split in this whole project is 10/10 start lines on the mat against a left miss that only ever shows up on the course, and the barely-open discovery is an explanation for exactly that split — an AIM error, not a stroke error. So this session tests whether the stroke can send the ball down a line it has been handed. It cannot test whether Jack aims correctly when nothing is drawn on the ground, which is the open question. Two straight-ish putts on a lined mat are consistent with the aim hypothesis and do not confirm it.\n\nFACE ANGLE IS NOT MEASURABLE IN THIS FOOTAGE. The putter head spans about 70 pixels in the reverse clip; a 1.5° rotation of the face would move its ends by under two pixels, well below the noise. So these clips cannot say what 'barely open' actually is in degrees — that still needs a close-up, phone directly above the ball with the head filling the frame, against a drawn line.\n\nSTILL OWED, and now the ONLY unshot angle: FACE-ON, square to the target line. Both cameras this evening were ON the line — excellent for start line, useless for shaft lean, because lean lives in the plane those cameras are looking down. So lean at address versus impact, the hands-behind-the-ball position the Pistol 0 wants, and ball position rep-to-rep are all still unmeasured. White tape on the shaft: still not on.\n\nALSO UNTOUCHED: strike location (foot-powder, still unrun) and pace — a 6-to-10-foot indoor mat cannot hold a 30-ft lag ladder, and distance control is the live priority and the reason the last putter went back."
+      }
+    },
+    {
+      "id": "openface-verify-20260810b",
+      "type": "action-update",
+      "target": "openface-action-20260810",
+      "text": "PUTTING — PUT A NUMBER ON 'BARELY OPEN'. PART-SERVED Aug 10 pm and the important half is still open. The mat clips gave the first start-line numbers since Jul 30 — one putt dead straight (inside 0.1\" of the printed line), one about 1° left — which is better than Jul 30's 1.5–1.7° left but was measured on a mat WITH A PRINTED LINE. That line does the aiming for you, and 10/10 start lines on a mat is the one test you have always passed while the miss shows up on the course. So it does not test the aim hypothesis. TWO THINGS LEFT, both cheap. (1) VERIFY WITHOUT A LINE: five putts at a real target — a coin or a tee on the practice green, nothing drawn on the ground — filmed from directly behind the ball on the line. That is the test the mat cannot give you, and it is the one that decides whether 'barely open' is a genuine aim correction. (2) QUANTIFY THE FACE: the evening clips cannot measure it — the head is ~70 pixels wide and 1.5° is under two pixels — so shoot ONE close-up, phone directly above the ball, zoomed until the head fills the frame, face set at your new 'barely open', against a drawn line. Then re-check monthly, because an unquantified feel drifts toward the exaggeration. DON'T STACK FIXES: keep the feel and verify it, OR retrain the aim picture with a mirror — never both."
+    },
+    {
+      "id": "faceon-still-owed-20260810b",
+      "type": "action-update",
+      "target": "faceon-action-20260730",
+      "text": "PUTTING — ONE FACE-ON CLIP, on the LINK.2.1. STILL NOT SHOT, and Aug 10 missed it twice in one day. The afternoon ran 23 clips from five positions, all oblique. The evening ran five clips from two positions, both ON the target line — genuinely the right angles for start line, and they delivered it, but lean lives in the plane those cameras look straight down, so they cannot see it. Face-on is now the ONLY angle you have never shot, and it is the only one left that can give you: shaft lean at ADDRESS versus at IMPACT on the Pistol 0 (expect ~0° at address, hands ~1.35\" behind — the question is whether the press adds any), BALL POSITION rep to rep, which feeds the distance grind, and two more strokes of sample on the closed early-lift verdict. The spec is narrow on purpose: camera at BALL HEIGHT, square to the target line — stand it behind the ball, walk to a spot 90° off the line, phone on the ground — white tape on the shaft ~6\" above the head, 240 fps, 2–3 strokes. Indoors is fine; this clip does not need a green. One good clip beats twenty from the wrong angle."
+    },
+    {
+      "id": "putt-faults-20260810-v3",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "start-line-left",
+          "why": "FIRST MEASUREMENT SINCE JUL 30, and it moved the right way. Two putts filmed Aug 10 evening on an indoor lined mat, tracked against the printed centre line and scaled by the ball's own 1.68\" diameter: one rolled dead straight (inside ~0.1\" the whole way, about 0.8°, within the noise), the other started on the line and drifted about 1.0–1.3\" LEFT by the hole, call it 1°. One square, one a degree left, no consistent bias — against a Jul 30 baseline of 1.5–1.7° LEFT on two of three. Encouraging. NOT CLOSED, for three reasons and the third is the one that matters. It is two putts at roughly ±0.5° uncertainty. Face angle itself was not measurable — the head spans ~70 pixels, where 1.5° is under two pixels — so nothing here confirms what 'barely open' actually is. And it was a MAT WITH A PRINTED LINE, which does the aiming for you: 10/10 start lines on a mat is the oldest line in this file, sitting alongside a miss that only ever appears on the course. The barely-open find is an explanation for exactly that split, so the test that decides it is five putts at a real target with NOTHING drawn on the ground, filmed from behind the ball. Until that exists, this fault is improving on the evidence available and untested where it actually lives."
+        },
+        {
+          "tag": "pace-calibration",
+          "why": "THE priority, and it has a receipt: it cost you a putter. The DF3i went back Aug 10 because distance was too hard to control with it — after being benched for pace Jul 30, reprieved for pace Aug 1, and returned for pace Aug 10, three verdicts in eleven days without one calibrated lag session. The Aug 10 afternoon is the first real evidence in the other direction: ~20 putts scored off above-ground cups, NINE dead, worst ~4 ft, nothing long, and the short ones dying AROUND the base rather than feet before it — that is what calibrated-but-conservative looks like, on a second green speed. Still missing: a proper 30-ft ladder with shorts, spread and green speed logged, and the 20/30/40 set mapping distance to BACKSTROKE LENGTH at fixed tempo. Note the evening session could not touch this — a 6-to-10-foot indoor mat cannot hold a lag ladder, so the priority fault got no data from the clips that arrived. Tempo is not the missing piece: 2.0:1 on this head against a 2:1 target. Stroke length and strike are. And run the ladder with the gamer ball model only — the blue ball scattered to 1.2–1.5 ft on putts the white killed."
+        },
+        {
+          "tag": "strike-location",
+          "why": "Still never measured on any putter, not once, across four heads — and now the biggest cheap thing left on the card. An off-centre hit bleeds ball speed, so the same stroke finishes short and the spread widens; a heel strike also rotates the face closed and starts the ball LEFT. One cause, both open faults. Two independent nudges from Aug 10 make it more interesting, not less: the blue-ball scatter (1.2–1.5 ft on putts the white ball killed from the same spot) has no aim explanation left, and the evening mat putts showed one straight roll and one drifting a degree left with no visible change in the stroke — which is what a strike moving around on the face looks like. The LINK punishes it harder than the mallet did: narrow blade, less MOI, and a riser hosel that makes the true centre impossible to find by eye. Twelve minutes — tap test for the sweet spot, foot-powder sheets from 5 ft and 30 ft, the 30-ft sheet being the one that matters. Run it with the new barely-open address, since that is the setup you will actually use."
+        },
+        {
+          "tag": "delivery-unverified",
+          "why": "Open, and Aug 10 could not touch it — twice. The afternoon's 23 clips were all oblique; the evening's five were all ON the target line, which is right for start line and blind to shaft lean, because lean lives in the plane those cameras look down. So face-on is now the only angle never shot. What it has to settle: the Press Pistol 2° went back with the DF3i, so the LINK's Pistol 0 supplies no lean at all — shaft vertical at address, hands ~1.35\" behind the ball — and the soft press is now the ONLY lean in the stroke. The old 'don't double-count the lean' arithmetic is retired; what replaces it is consistency, because a press that varies is a launch that varies, which is a pace that varies, feeding straight into the priority fault. One slo-mo face-on set gives lean at address versus impact AND ball position rep to rep in the same clips. Whatever the tape shows IS the press now, with no built-in 2° to subtract."
+        },
+        {
+          "tag": "early-lift",
+          "why": "CLOSED Jul 30 ✓. At 120 fps and 37.5 px/inch the sole held within 0.05–0.08\" of its address height for the full 83 ms into impact, flat across ten consecutive frames, and never dropped below address height. Measured on the LINK, which is the head still in play, so it carries cleanly. Wants two more slo-mo strokes on sample size — and the owed face-on set gives them for free, which is one more reason to shoot it."
+        },
+        {
+          "tag": "stance-creep",
+          "why": "CLOSED Jul 30 ✓ — overhead film measured the toe line 0.6°, 2.9° and 3.6° CLOSED to the target line across three reps. Never open. Worth re-reading in light of the Aug 10 find: this measurement is what ruled the feet out and sent the search higher, which is exactly where the face turned out to be."
+        }
+      ]
+    },
+    {
+      "id": "evolution-v10",
+      "type": "evolution",
+      "evolution": {
+        "updated": "2026-08-10",
+        "sessions": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "BL",
+          "S5",
+          "L21",
+          "MAT"
+        ],
+        "metrics": [
+          {
+            "name": "Start line / aim",
+            "marks": [
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✗",
+              "~"
+            ],
+            "verdict": "OPEN — but for the first time there is a candidate fix, found Aug 10: setting the face BARELY OPEN at address. The measured fault is 1.5° and 1.7° LEFT on two of three overhead putts Jul 30 (1.3–1.4\" at 4 ft, ~2\" at 6 ft), one dead straight. Because a zero-torque head delivers the angle you set rather than twisting, a face pointing left at impact was pointing left at address — so this is an AIM error, and 'barely open' is you correcting it. Confirm the same way it was raised: overhead, five putts, new address, roll versus the mat centre line. Median inside 0.5° and this finally comes off the card. MEASURED AGAIN Aug 10 pm, first time since Jul 30: two putts on an indoor lined mat, tracked against the printed centre line — one dead straight (inside ~0.1\", about 0.8°, within noise), one drifting about 1° LEFT by the hole. One square, one a degree left, no consistent bias, against a 1.5–1.7° left baseline. Real improvement, two big asterisks: n=2 at roughly ±0.5°, and a printed line does the aiming for you. The test that counts is five putts at a real target with nothing drawn on the ground.",
+            "s": "warn"
+          },
+          {
+            "name": "Face at impact",
+            "marks": [
+              "✗",
+              "~",
+              "—",
+              "✓",
+              "?",
+              "✓",
+              "✗",
+              "~"
+            ],
+            "verdict": "REOPENED Jul 30, and Aug 10 supplies the likely answer. Zero-torque guarantees the face won't TWIST, and it doesn't. It cannot guarantee where the face POINTS, and on 2 of 3 measured putts it pointed ~1.5° left at impact. The two candidates were 'aimed there' and 'closed through' — and the barely-open find lands hard on AIMED THERE, since an address offset is exactly what a non-twisting head would carry to impact unchanged. Not confirmed until the overhead five says so, but this is no longer a coin flip. Aug 10 pm adds indirect evidence only. Start line is the best available proxy for face at impact on a putt, and it came back close to square on a lined mat. The face ITSELF was not measurable: the head spans ~70 pixels in those clips and 1.5° is under two pixels. A close-up from directly above the ball is what would put a number on 'barely open'.",
+            "s": "warn"
+          },
+          {
+            "name": "Distance control",
+            "marks": [
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—"
+            ],
+            "verdict": "NEVER MEASURED — a full row of dashes, and that is the finding. Pace has now decided the fate of two putters and been quantified zero times: the DF3i was benched for it Jul 30, reprieved for it Aug 1, and RETURNED for it Aug 10. Every one of those calls was made on feel. This row fills in the moment the 30-ft ladder starts logging shorts, spread and green speed on the LINK. Until then, the most expensive fault on the card is also the only one with no data behind it.",
+            "s": "warn"
+          },
+          {
+            "name": "Path",
+            "marks": [
+              "?",
+              "~",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "—"
+            ],
+            "verdict": "SETTLED — straight (SBST) across 20+ clips and four putters. Measured again Jul 30 on the LINK: ¼–½\" inside at the top, back on the line by impact. Path is yours, not the putter's, which is why none of the head changes have reopened it — and why the left miss was never going to be explained by the stroke's shape.",
+            "s": "good"
+          },
+          {
+            "name": "Tempo / load",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "—"
+            ],
+            "verdict": "SETTLED — 2.0:1 measured on the LINK.2.1, seven of eight clips between 1.9 and 2.1, two independent ways, against a 2:1 target. It was 2.4:1 on the DF3i, but that head has gone back, so the number that counts is the one on the putter in the bag and it's the better of the two. Worth stating plainly for the pace grind: tempo is NOT your distance problem. Stroke length and strike are.",
+            "s": "good"
+          },
+          {
+            "name": "Early lift",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "?",
+              "✗",
+              "?",
+              "✓",
+              "—"
+            ],
+            "verdict": "CLOSED Jul 30 ✓ — the sole held within 0.05–0.08\" of address height for the full 83 ms into impact, flat across ten consecutive frames. The oldest open item on the card, finally shut, and measured on the head still in the bag. Take two more slo-mo strokes on sample size when the face-on set happens.",
+            "s": "good"
+          },
+          {
+            "name": "Stance line",
+            "marks": [
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "✓",
+              "—"
+            ],
+            "verdict": "CLOSED on arrival — the toe line ran 0.6°, 2.9° and 3.6° CLOSED to the target line, never open on any rep. The trail-foot creep is fixed. This is the measurement that ruled the feet out and sent the search higher for the aim leak, and on Aug 10 that search found the face.",
+            "s": "good"
+          }
+        ]
+      }
     }
   ]
 }
