@@ -8232,6 +8232,166 @@
           }
         ]
       }
+    },
+    {
+      "id": "putt-faults-20260810-v5",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "pace-calibration",
+          "why": "THE priority, and it has a receipt: it cost you a putter. The DF3i went back Aug 10 because distance was too hard to control with it — after being benched for pace Jul 30, reprieved Aug 1 and returned Aug 10, three verdicts in eleven days without one calibrated lag session. The Aug 10 afternoon is the first evidence the other way: ~20 putts off above-ground cups, NINE dead, worst ~4 ft, nothing long, and the short ones dying AROUND the base rather than feet before it — calibrated-but-conservative, on a second green speed. Still missing: a 30-ft ladder logging shorts, spread and green speed, plus the 20/30/40 set mapping distance to BACKSTROKE LENGTH at fixed tempo. The evening clips could not touch this — a 6-to-10-ft indoor mat cannot hold a lag ladder — so the priority fault got no data from the session that arrived. Tempo is not the missing piece: 2.0:1 against a 2:1 target. Stroke length and strike are, and strike now has a second reason to be measured first. Run the ladder with the gamer ball model only."
+        },
+        {
+          "tag": "strike-location",
+          "why": "The remaining candidate — but sized honestly now. Never measured on any putter, not once, across four heads. The Aug 10 evening start lines scattered ~0.8° either side of the line with no bias, and on a head that cannot twist, a face pointing a different way each rep is a face being MOVED by contact: heel closes it, toe opens it. That fits. What has changed is the STAKES: a 0.8° scatter still holes out to nearly eight feet, so as a LINE fault this is no longer costing strokes and does not need chasing. The reason to run the test anyway is PACE — an off-centre hit bleeds ball speed, so the same stroke finishes short and the lag spread widens, and pace is the fault that just cost a putter and has never been measured. Second nudge from the same day, also about pace, not line: the blue ball scattered 1.2–1.5 ft on putts the white killed from the same spot with the same putter. Twelve minutes — tap test for the sweet spot, foot-powder sheets from 5 ft and 30 ft, and the 30-footer is the one that matters. Run it with the barely-open address. Read the result as distance-control data."
+        },
+        {
+          "tag": "delivery-unverified",
+          "why": "Open, and Aug 10 could not touch it — twice in one day. The afternoon's 23 clips were all oblique; the evening's six were all ON the target line, which is right for start line and blind to shaft lean, because lean lives in the plane those cameras look straight down. Face-on is now the ONLY angle never shot. What it has to settle: the Press Pistol 2° went back with the DF3i, so the LINK's Pistol 0 supplies no lean at all — shaft vertical at address, hands ~1.35\" behind the ball — and the soft press is now the ONLY lean in the stroke. The 'don't double-count the lean' arithmetic is retired; consistency replaces it, because a press that varies is a launch that varies, which is a pace that varies. One slo-mo face-on set gives lean at address versus impact AND ball position rep to rep in the same clips. Whatever the tape shows IS the press now, with no built-in 2° to subtract."
+        },
+        {
+          "tag": "start-line-left",
+          "why": "DOWNGRADED Aug 10 — off the top of the card, and the reasoning is worth keeping because the old gate on this line was wrong. THE CRUX IS THE SIGN, NOT THE SIZE. Jul 30: 1.5° LEFT, 1.7° LEFT, one straight — three putts pulling the SAME way. Aug 10 pm: 0.8° right, 1.0° left, 0.6° right — mean bias ≈0.1°, i.e. zero. Aim doesn't change between reps, so a one-way pull is what an aim error looks like, and it did not reproduce on any of the three. The founding premise of this entire putter saga was a DIRECTIONAL claim — 'signature miss: left on short putts' — and a directional claim is a claim about bias. On the evidence available, that bias is gone, and it went away after a setup change Jack found himself, not after any of the four putters.\n\nIN STROKES, WHICH IS THE ONLY UNIT THAT MATTERS. Capture at the hole is ±1.29\" (4.25\" cup, 1.68\" ball, dying speed). A 1.6° bias puts the ball outside that from 3.8 ft — so the old miss started costing strokes at four feet, which is exactly where the 'left on SHORT putts' signature came from. A 0.8° miss holes out to 7.7 ft. At 0.6° it's 10.2 ft. So the residual has moved start line out of the range where an 8.5 handicap loses shots to it: beyond eight feet, make rates are governed by pace and read, not by a degree of face angle.\n\nTHE 0.5° GATE IS RETIRED — it was a bad standard and it was mine. Half a degree is around the level tour putters hold, it was being applied to a phone-on-a-mat measurement carrying ±0.5° of its own error, and it implied a precision nobody should be chasing. Worse, it pointed at the wrong quantity: it gated on magnitude when the thing that was actually broken was direction.\n\nAND THE RESIDUAL IS AN UPPER BOUND, not an estimate. Measurement noise can only ever INFLATE apparent dispersion — it cannot hide scatter that exists. So with ±0.5° of method error sitting inside an observed ~0.8°, the true dispersion is 0.8° or better, quite possibly nearer 0.6°. Jack's read that these are small numbers is correct and, if anything, understated.\n\nWHAT'S LEFT TO DO, and it is small: confirm the bias stays gone away from a printed line — five putts at a coin on a real green, filmed from behind. That is a check, not an investigation. If the pull is still absent, this fault closes and start line stops being a thing this project tracks."
+        },
+        {
+          "tag": "early-lift",
+          "why": "CLOSED Jul 30 ✓. At 120 fps and 37.5 px/inch the sole held within 0.05–0.08\" of its address height for the full 83 ms into impact, flat across ten consecutive frames, and never dropped below address height. Measured on the LINK, the head still in play, so it carries cleanly. Wants two more slo-mo strokes on sample size — the owed face-on set gives them for free, which is one more reason to shoot it."
+        },
+        {
+          "tag": "stance-creep",
+          "why": "CLOSED Jul 30 ✓ — overhead film measured the toe line 0.6°, 2.9° and 3.6° CLOSED to the target line across three reps. Never open. Worth re-reading against the Aug 10 find: this measurement is what ruled the feet out and sent the search higher, which is exactly where the answer turned out to be."
+        }
+      ]
+    },
+    {
+      "id": "evolution-v12",
+      "type": "evolution",
+      "evolution": {
+        "updated": "2026-08-10",
+        "sessions": [
+          "S1",
+          "S2",
+          "S3",
+          "S4",
+          "BL",
+          "S5",
+          "L21",
+          "MAT"
+        ],
+        "metrics": [
+          {
+            "name": "Start line / aim",
+            "marks": [
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✗",
+              "✓"
+            ],
+            "verdict": "THE ONE-WAY PULL IS GONE — the headline result of the project so far. Jul 30: 1.5° LEFT, 1.7° LEFT, one straight, all pulling the same way. Aug 10 pm: 0.8° right, 1.0° left, 0.6° right, mean bias ≈0.1°. Aim doesn't vary between reps, so a bias is what an aim error looks like — and it didn't reproduce once. In strokes: a 1.6° bias misses from 3.8 ft, which is where the whole 'left on short putts' signature came from; a 0.8° scatter holes out to 7.7 ft. The old 0.5° gate is retired as too strict for the player and for a phone-on-a-mat method carrying ±0.5° of its own error — and it gated on magnitude when the broken thing was direction. Remaining: confirm the pull stays gone away from a printed line. That's a check, not an investigation.",
+            "s": "good"
+          },
+          {
+            "name": "Face at impact",
+            "marks": [
+              "✗",
+              "~",
+              "—",
+              "✓",
+              "?",
+              "✓",
+              "✗",
+              "~"
+            ],
+            "verdict": "Zero-torque guarantees the face won't TWIST, and it doesn't. It cannot guarantee where the face POINTS. Jul 30 measured it ~1.5° left at impact on 2 of 3. Aug 10 pm adds the best indirect evidence available — start line is the closest proxy for face at impact on a putt, and across three putts it came back scattered around square rather than consistently left. The face ITSELF is still unmeasured: the head spans ~70 pixels in those clips, where 1.5° is under two pixels. A close-up from directly above the ball is what would put a number on 'barely open'.",
+            "s": "warn"
+          },
+          {
+            "name": "Distance control",
+            "marks": [
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—"
+            ],
+            "verdict": "NEVER MEASURED — a full row of dashes, and that is the finding. Pace has now decided the fate of two putters and been quantified zero times: the DF3i was benched for it Jul 30, reprieved for it Aug 1, and RETURNED for it Aug 10. Every one of those calls was made on feel. This row fills in the moment the 30-ft ladder starts logging shorts, spread and green speed on the LINK. Until then, the most expensive fault on the card is also the only one with no data behind it.",
+            "s": "warn"
+          },
+          {
+            "name": "Path",
+            "marks": [
+              "?",
+              "~",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "—"
+            ],
+            "verdict": "SETTLED — straight (SBST) across 20+ clips and four putters. Measured again Jul 30 on the LINK: ¼–½\" inside at the top, back on the line by impact. Path is yours, not the putter's, which is why none of the head changes have reopened it — and why the left miss was never going to be explained by the stroke's shape.",
+            "s": "good"
+          },
+          {
+            "name": "Tempo / load",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "✓",
+              "✓",
+              "✓",
+              "✓",
+              "—"
+            ],
+            "verdict": "SETTLED — 2.0:1 measured on the LINK.2.1, seven of eight clips between 1.9 and 2.1, two independent ways, against a 2:1 target. It was 2.4:1 on the DF3i, but that head has gone back, so the number that counts is the one on the putter in the bag and it's the better of the two. Worth stating plainly for the pace grind: tempo is NOT your distance problem. Stroke length and strike are.",
+            "s": "good"
+          },
+          {
+            "name": "Early lift",
+            "marks": [
+              "✗",
+              "✗",
+              "—",
+              "?",
+              "✗",
+              "?",
+              "✓",
+              "—"
+            ],
+            "verdict": "CLOSED Jul 30 ✓ — the sole held within 0.05–0.08\" of address height for the full 83 ms into impact, flat across ten consecutive frames. The oldest open item on the card, finally shut, and measured on the head still in the bag. Take two more slo-mo strokes on sample size when the face-on set happens.",
+            "s": "good"
+          },
+          {
+            "name": "Stance line",
+            "marks": [
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "—",
+              "✓",
+              "—"
+            ],
+            "verdict": "CLOSED on arrival — the toe line ran 0.6°, 2.9° and 3.6° CLOSED to the target line, never open on any rep. The trail-foot creep is fixed. This is the measurement that ruled the feet out and sent the search higher for the aim leak, and on Aug 10 that search found the face.",
+            "s": "good"
+          }
+        ]
+      }
+    },
+    {
+      "id": "openface-confirm-20260810c",
+      "type": "action-update",
+      "target": "openface-action-20260810",
+      "text": "PUTTING — CONFIRM THE PULL STAYS GONE, then stop working on this. Scope cut Aug 10 after the three mat putts came back with no directional bias (0.8° right, 1.0° left, 0.6° right against Jul 30's 1.5–1.7° LEFT). The barely-open setup did what it was supposed to do. ONE CHECK LEFT: five putts at a real target — a coin or a tee on a practice green, nothing drawn on the ground — filmed from directly behind the ball on the line. You are looking for ONE thing: do the misses still fall on both sides? If yes, this closes and start line stops being tracked. Do NOT chase magnitude — a 0.8° miss still holes out to nearly eight feet, the old 0.5° target was too strict for a phone measurement carrying ±0.5° of its own error, and it has been retired. KEEP THE FEEL AS IT IS: don't retrain the aim picture with a mirror on top of it, or you apply the correction twice and the miss reappears on the right. Worth re-checking the feel monthly so it doesn't drift, but it is no longer a priority item — pace is."
     }
   ]
 }
