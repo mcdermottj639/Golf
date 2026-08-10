@@ -7116,6 +7116,82 @@
         "compare": "Beekman (Aug 1) said pace felt dialled; it was a feeling, from a scramble, on slow greens, with no camera. This is ~20 measured finishes landing on the same side: the pace curve is real, and the LINK matched the DF3i from every distance it was given. What today adds that Beekman couldn't: the short range — the closing 6–8 ft set went dead three times out of five with a 5-incher besides, and the five-foot DF3i set clustered inside 2.5 ft.\n\nAgainst the Jul 30 indoor sessions, the same trade as before: the mat measured DIRECTION but had no green; today measured DISTANCE but has no line. The two halves of the diagnosis still haven't been in the same shot.\n\nOn the head-to-head, the sets never played the same putt from the same spot, so nothing ranks the putters — but both heads posting dead finishes everywhere means neither head is the variable that mattered today. The stroke behind them did the work. The one variable that DID separate results was the ball.",
         "limits": "What re-scoring could not rescue: START LINE and FACE still need overhead or square face-on — nothing here touches the 1.5–1.7° left measurement from Jul 30, in either direction. SHAFT LEAN is still unreadable from oblique angles (it looks misleadingly negative in every clip — projection, ignore it). STRIKE LOCATION is still unmeasured on any putter, and the blue-ball scatter is now a second reason to run the foot-powder test. The base-stop caveat means the dead finishes slightly UNDERSTATE roll-out — on the lag ladder, log actual stopping distance on putts that miss the base, because those are the honest ones. White tape for the face-on clip: still not on the shaft."
       }
+    },
+    {
+      "id": "link21-gaming-20260810",
+      "type": "club-update",
+      "target": "L.A.B. Golf LINK.2.1",
+      "club": {
+        "status": "gaming",
+        "since": "2026-08-10",
+        "note": "THE PUTTER from Aug 10 — back in the bag by choice, one day after the keep decision that had it down as the indoor practice head. The DF3i goes to the bullpen; do NOT sell either until this one has an actual scoreboard. GRIP CUE FLIPS BACK: this carries the L.A.B. Pistol 0, zero built-in press, so the shaft stands DEAD VERTICAL at address and your hands sit about 1.35\" BEHIND the ball — measured on film Jul 30, repeatable to 0.3°. That is the correct geometry for this putter. The 'hands EVEN with the ball' cue belongs to the DF3i's Press Pistol 2° and must not be carried across: on a 0°-lean, 2°-effective-loft build it is lean you are adding by hand, and it delofts a face that has almost nothing to give. Don't manufacture lean — let the putter sit where it was designed to sit. WHAT COMES WITH IT: the only two reds on the evolution grid — face at impact and the 1.5–1.7° LEFT start line — were both measured on THIS head on Jul 30, and the DF3i's first filmed column carried none. So the swap re-opens the start-line question rather than settling it. Narrow blade means less MOI than the mallet, so a heel strike twists the face closed harder for the same miss — which is exactly your signature miss — and strike location has still never been measured on any putter you own. That makes the tape test MORE urgent, not less. In its favour: tempo measured 2.0:1 on this head against 2.4:1 on the DF3i, and 2:1 is the target. Every measurement from here runs on this putter."
+      }
+    },
+    {
+      "id": "df3i-to-bullpen-20260810",
+      "type": "club-update",
+      "target": "L.A.B. Golf DF3i",
+      "club": {
+        "status": "backup",
+        "note": "OUT OF THE BAG Aug 10 — the LINK.2.1 goes back in and this becomes the bullpen mallet. HOLD IT, don't sell: it has the only real scoreboard either head owns (8/10 from four feet, Jul 20), it was never convicted of anything measured, and it is the high-MOI control if the blade's start line misbehaves again. The Press Pistol 2° stays on it and is NOT to be swapped — Lie Angle Balance is a property of the assembled club, grip included. GUARD, and this is the live one: the two putters ask for different hands. Press Pistol 2° = hands EVEN with the ball, the grip supplies the lean. Pistol 0 on the LINK = shaft vertical, hands ~1.35\" behind. Don't roll a set on this head and walk straight to the gamer, or the other way — reset the hands on whichever one you're about to play. If the LINK gets filmed, film a DF3i set alongside it: tempo ran 2.4:1 here against 2.0:1 on the blade, so transfer between the two is still not proven in either direction."
+      }
+    },
+    {
+      "id": "history-link21-gaming-20260810",
+      "type": "history",
+      "date": "2026-08",
+      "text": "L.A.B. LINK.2.1 back in the bag Aug 10 — gamer again, one day after being kept as the indoor practice putter. DF3i to the bullpen (held, not sold: it owns the only measured scoreboard, 8/10 from four feet on Jul 20). Setup reverts with the head: Pistol 0 means shaft vertical and hands ~1.35\" behind the ball; the 'hands even' cue stays with the DF3i's Press Pistol 2°."
+    },
+    {
+      "id": "sweetspot-update-20260810",
+      "type": "action-update",
+      "target": "sweetspot-action-20260730",
+      "text": "PUTTING — RUN THE TAPE TEST on the LINK.2.1 (~12 min, at home). Moved to the LINK on Aug 10 with the bag change, and it matters MORE on this head: a narrow blade carries less MOI than the DF3i mallet, so a heel strike twists the face closed harder for the same distance off centre — and the 1.5–1.7° LEFT start line on the grid was measured on this putter. Full protocol is in the 'Tape Test — Where You Actually Hit It' plan. Short version: (1) hang the putter from the top of the grip and tap the face heel-to-toe with an eraser — the spot with NO twist is the true sweet spot, mark it with tape and check it against the sight line. (2) Coat the face with foot-powder spray, hit 10 from 5 ft, photograph; re-coat, hit 10 from 30 ft, photograph. Don't wipe between putts. This is the last cheap untested thing on your card and it's the only candidate that explains BOTH open faults — a heel strike closes the face (starts it LEFT) and bleeds ball speed (lags SHORT). Send the two photos. If you want the comparison that settles the head question, run the same two sheets on the DF3i afterwards."
+    },
+    {
+      "id": "plan-putter-swap-20260810",
+      "type": "briefing",
+      "replaces": "plan-putter-decision-20260802-v3",
+      "briefing": {
+        "course": "The Putter Swap — LINK.2.1 In",
+        "discipline": "putting",
+        "focus": "Aug 10. The LINK.2.1 goes back in the bag and the DF3i goes to the bullpen — one day after the keep decision had the LINK down as the indoor practice head. This replaces the 'DF3i Confirmed' plan, which is now wrong in the one place it mattered most: the setup cue. The grip changes with the head, the start-line question re-opens with it, and the measurement work moves across. Nothing else about the project changes — the head is a preference call, the faults are still open, and the next thing that changes should be a number.",
+        "rules": [
+          "LINK.2.1 is the gamer from Aug 10 — DF3i to the bullpen, and don't sell it",
+          "Pistol 0: shaft VERTICAL, hands ~1.35\" BEHIND the ball",
+          "The 'hands EVEN' cue was the DF3i's — leave it with the DF3i",
+          "Don't manufacture lean: this head is built around 0° shaft lean",
+          "Both reds on the grid were measured on THIS putter — start line is open again",
+          "Tape test, overhead five, 10-ball: all of it runs on the LINK now"
+        ],
+        "sections": [
+          {
+            "t": "The setup change that comes with the head",
+            "k": "Hands go BACK behind the ball again — carrying the DF3i's cue across would add lean this putter isn't built for.",
+            "b": "This is the one thing in the swap that can actually cost you strokes, and it looks like nothing.\n\nThe LINK ships with a L.A.B. Pistol 0 — zero built-in press. The Jul 30 film measured exactly what that produces: shaft dead vertical at address, hands about 1.35\" BEHIND the ball, repeatable to 0.3° across 59 frames. That is not a flaw in your setup. That is the geometry this putter is designed around: 69° lie, 2° effective loft, 0° shaft lean.\n\nThe DF3i's Press Pistol 2° leans the shaft for you, which is why the cue while it was in the bag was 'hands EVEN with the ball, the grip supplies the lean.' Leave that cue with the DF3i. On a Pistol 0 build, hands even with the ball is lean YOU are adding by hand, on a face carrying 2° of effective loft — there is almost nothing there to deloft before you're driving the ball into the turf.\n\nSo: let the shaft stand up. Hands behind the ball. Don't manufacture lean, and don't fight the vertical look — it's correct here.\n\nThe practical guard: don't roll a set on one head and walk straight to the other. Whichever one you're about to play, reset the hands on it first."
+          },
+          {
+            "t": "What the swap re-opens",
+            "k": "The two reds on the grid were both measured on this head — going back to it puts start line back in play.",
+            "b": "Read the evolution grid honestly before you take this putter to a card. The LINK's column is the ONLY one carrying two reds — face at impact, and the 1.5–1.7° LEFT start line — and both were measured on Jul 30, on this head. The DF3i's first filmed column carried none.\n\nThat is not a verdict against the LINK. The Jul 30 numbers came from by far the most-filmed day of this project, so some of what shows up there is measurement effort rather than a putter effect, and the DF3i's clean column is partly a clean column because less was measured in it. But it does mean the swap re-opens the start-line question instead of settling it. You are going back to the head the only hard left number was ever taken on.\n\nThe geometry gives that a mechanism, too. A narrow blade carries less MOI than a wide mallet, so a strike toward the heel twists the face closed MORE for the same distance off centre — and a closed face starts the ball LEFT, which is the signature miss of this entire project. The riser hosel means the shaft position isn't a reliable pointer to where the head's mass actually sits, so you can't eyeball it.\n\nIn the LINK's favour, and it's real: tempo measured 2.0:1 across seven of eight clips on this head against 2.4:1 on the DF3i, and 2:1 is the target."
+          },
+          {
+            "t": "What the evidence actually supports",
+            "k": "This is a preference call, not a measurement call — own that, and it stays a good decision.",
+            "b": "Neither head has a real scoreboard. The only one that exists in the whole project is the DF3i's 8/10 from four feet on Jul 20. No lag ladder, no 10-ball test on the LINK. The Aug 10 outdoor session was 23 clips, but with above-ground cups, no face-on angle and nothing overhead — good for feel and finish quality, not for face numbers.\n\nSo be straight about what this swap is: you like the putter, you roll it confidently, and nine of about twenty putts on Aug 10 finished dead. That's a preference call. Preference calls are allowed — a putter you want to look at gets rolled more, and reps taken beat better reps that aren't. What isn't allowed is calling it settled evidence, because that is the exact mistake that benched the DF3i on Jul 30 and then un-benched it on Aug 1, both times on one unmeasured round.\n\nThe decision stands. The FAULTS are still open. Those are two different things."
+          },
+          {
+            "t": "The work moves with the head",
+            "k": "Every open measurement now runs on the LINK — same protocols, new putter.",
+            "b": "Three things were queued on the DF3i. All of them move.\n\nTAPE TEST — the tap test for the true sweet spot, then foot-powder spray, 10 from five feet and 10 from thirty, photographed. This is still the last cheap untested thing on your card and the only single candidate that explains BOTH open faults: a heel strike closes the face (starts it left) and bleeds ball speed (lags short). It matters more on a blade than it did on the mallet.\n\nOVERHEAD FIVE — five putts, roll versus the mat centre line, median inside 0.5°. This is the direct re-measure of the 1.5–1.7° left number, on the head it was taken on. That makes it a genuine like-for-like this time.\n\nFACE-ON CLIP — still not filmed, still the one angle that separates 'face aimed left' from 'face closing through impact', and now it also has to confirm the hands-behind address is holding through the stroke rather than pressing forward under pressure. White tape on the shaft.\n\nIf you want the comparison that would actually settle the head question rather than the preference question, run the tape test on both and put the two sheets side by side."
+          },
+          {
+            "t": "The DF3i stays on the shelf, not on the market",
+            "k": "Hold it — it's the high-MOI control and the only head with a measured result behind it.",
+            "b": "The redundancy argument that sent the LINK to storage on Aug 2 — you shouldn't own two zero-torque L.A.B. heads — now points the other way, and the answer is the same: don't act on it yet. Keep both.\n\nThe DF3i is worth holding for three reasons. It owns the only measured result in the project. It's the high-MOI control — if the blade's start line goes left again, swapping heads for a filmed set is the cleanest test you can run without buying anything. And it was never actually convicted: the pace complaint that benched it on Jul 30 was never tested against a single calibrated lag session.\n\nNo regrips on either. Lie Angle Balance is a property of the assembled club, grip included, so a local-shop swap risks putting a head out of spec with no way to verify it. If they're ever to be matched, that's a job for L.A.B.\n\nAnd the standing rule survives the swap intact: that's now four putter movements in a month. The next thing that changes should be a NUMBER on the card, not a head in the bag."
+          }
+        ]
+      }
     }
   ]
 }
