@@ -152,6 +152,14 @@ Keep `h2`s few: the jump bar at the top of every view is built from them.
 - **Round-prep briefing**: append a `briefing` entry (dated = one round; undated =
   standing plan, singleton per course/title).
 
+### Forward plans only (standing instruction, Aug 10 2026)
+
+Main sections of a briefing say what Jack does **now** — no dwelling on old setups,
+putters, retired rules, or how a section used to read. Condense all history into one
+trailing **`Notes — the paper trail`** section per plan; a changed instruction gets a
+line there, not a main section explaining what it replaced. "REWRITTEN", "reverts",
+"the old rule was" are smells in a main section.
+
 ### Film is king (standing instruction, Aug 10 2026)
 
 Jack's words are **feel**; the film is **real**. In tabs, plans and session copy, weight
