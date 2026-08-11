@@ -151,6 +151,26 @@ Keep `h2`s few: the jump bar at the top of every view is built from them.
 
 - **Round-prep briefing**: append a `briefing` entry (dated = one round; undated =
   standing plan, singleton per course/title).
+
+### Film is king (standing instruction, Aug 10 2026)
+
+Jack's words are **feel**; the film is **real**. In tabs, plans and session copy, weight
+measurement over self-report — and say which one you're using.
+
+- **Authoritative from Jack:** intent and actions — what he's doing, changing, trying,
+  or has decided ("the press is out", "trialling a claw", "the DF3i went back"). Nobody
+  else can report those, and they are never overridden by film.
+- **Subordinate to film:** claimed *positions* and *sensations* — how open the face is,
+  where his hands sit, whether pace "felt dialled". Where film contradicts a feel, the
+  film wins and the plan says so. Where there is **no** measurement, say that explicitly
+  rather than repeating the feel as if it were established.
+- Worked example, Aug 10: "hands over the ball" → corrected by Jack to "hands over the
+  **head of the putter**". Those are different positions (forward lean vs vertical shaft),
+  and the corrected one matches the Jul 30 stills exactly — a vertical shaft *is* hands
+  ~1.35" behind the ball centre (half a ball, 0.84", plus ~0.5" from shaft axis to face
+  on a riser-hosel blade). Prefer his wording, note that it agrees with the film.
+- Counter-example to keep visible: "pace felt dialled" (Aug 1) un-benched a putter that
+  was returned nine days later, and "barely open" still has no number on it.
 - **Filming sessions — ONE entry per day** (standing instruction, Jul 30 2026): all clips Jack
   sends on the same day belong in a SINGLE `session` entry, however many angles or batches
   they arrive in. Don't create a second session because a new clip turns up hours later —
