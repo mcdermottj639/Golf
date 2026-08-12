@@ -242,9 +242,14 @@ course he's playing:
    so match every tip against the pars and shapes on Jack's own card (or the official
    scorecard) before attaching it to a hole — and DROP any tip that can't be pinned. A
    floating tip on the wrong hole is worse than no tip.
-4. **Every note traceable.** A yardage or hazard means it was researched; a score, miss
-   or stroke index means it came off his card. **Never describe a hole you haven't got a
-   source for** — holes with no source get only his own record, which needs no briefing.
+4. **Every note traceable, and say when it's an inference.** A yardage or hazard means it
+   was researched; a score, miss or stroke index means it came off his card. **Never
+   describe a hole you haven't got a source for** — holes with no source get only his own
+   record, which needs no briefing. Where a line is REASONED from a sourced fact rather
+   than sourced itself ("dogleg right, so a ball started left runs through the fairway"),
+   the note has to admit it and name what's still unknown. A confident tee line built on
+   nothing but a hole's shape reads exactly like a researched one, and that is the failure
+   worth guarding against.
 5. **Centre of the green, always.** Never build a plan around a pin position — you can't
    know where the flag is on the day, and a plan written for one sends him at an edge on
    a course where his standing miss is already short. Every approach and par-3 note
