@@ -207,11 +207,13 @@ box, one-handed:
   "why": ["337 and *downhill* — the shortest hole out here"] }
 ```
 
-`play` is the one line to act on and renders big. `leaves` and `avoid` are optional fixed
-slots that render as labelled rows — their value is that LEAVES sits in the same place on
-every hole that has one, so the eye finds it without reading. Omit either where there is
-nothing true to put in it; a padded slot is worse than a missing one. `why[]` are the
-bullets underneath and carry everything the slots don't.
+`play` is the one line to act on: it renders as the FIRST labelled row, tagged **TEE** by
+default, with `playAs` overriding the label where the decision isn't a tee-shot call
+("Play" on a lay-up or a damage-control hole). `leaves` and `avoid` are optional rows after
+it — their value is that LEAVES sits in the same place on every hole that has one, so the
+eye finds it without reading. Omit any of them where there is nothing true to put in it; a
+padded slot is worse than a missing one. `why[]` are the bullets underneath and carry
+everything the slots don't.
 
 `yds` rides in the header, the hole's own record renders as a LAST row under a rule, and
 `*asterisks*` bold a phrase (applied after escaping, so the markup is author-only). A

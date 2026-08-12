@@ -1214,7 +1214,12 @@ function briefing(id){
     <table><tr><th>Hole</th><th>The play</th></tr>
       ${b.holes.filter(h => h && h.n && (h.play || h.note || (h.why || []).length)).map(h =>
         `<tr><td><b>${h.n}</b>${h.yds ? `<br><span class="sm faint">${h.yds}y</span>` : ''}</td>
-        <td class="sm">${h.play ? `<div class="hi-play" style="font-size:13.5px;margin-bottom:5px">${emph(h.play)}</div>` : ''}
+        <td class="sm">${(() => {
+          const rows = [[h.playAs || 'Tee', h.play], ['Leaves', h.leaves],
+                        ['Green', h.green], ['Avoid', h.avoid]].filter(r => r[1]);
+          return rows.length ? `<dl class="hi-grid">${rows.map(([k, v], i) =>
+            `<dt>${esc(k)}</dt><dd class="${k === 'Avoid' ? 'hot' : i === 0 && h.play ? 'lead' : ''}">${emph(v)}</dd>`).join('')}</dl>` : '';
+        })()}
         ${h.note ? emph(h.note) : ''}
         ${(h.why || []).length ? `<ul class="hi-why">${h.why.map(w => `<li>${emph(w)}</li>`).join('')}</ul>` : ''}</td></tr>`).join('')}
     </table>
@@ -2449,18 +2454,19 @@ function livePlay(L){
       .concat(hn ? ['from your prep'] : ['your record']);
     return `<div class="card flat holeintel">
       <div class="lvlab">${head.join(' · ')}</div>
-      ${hn && hn.play ? `<div class="hi-play">${emph(hn.play)}</div>` : ''}
       ${hn && !hn.play && hn.note ? `<p class="sm" style="margin-top:2px">${emph(hn.note)}</p>` : ''}
       ${(() => {
         // Fixed labels in a fixed order, each one rendered only if the hole has it. The
         // value is that LEAVES is always in the same place on every hole that has one —
         // which is exactly what a four-slot template gets right and a paragraph doesn't.
+        // The decision is the first row rather than a headline: same grid, read first.
         if(!hn) return '';
-        const rows = [['Leaves', hn.leaves], ['Green', hn.green], ['Avoid', hn.avoid]]
-          .filter(r => r[1]);
+        const rows = [[hn.playAs || 'Tee', hn.play], ['Leaves', hn.leaves],
+                      ['Green', hn.green], ['Avoid', hn.avoid]].filter(r => r[1]);
         if(!rows.length && !rec) return '';
         return `<dl class="hi-grid">
-          ${rows.map(([k, v]) => `<dt>${k}</dt><dd${k === 'Avoid' ? ' class="hot"' : ''}>${emph(v)}</dd>`).join('')}
+          ${rows.map(([k, v], i) => `<dt>${esc(k)}</dt><dd class="${
+            k === 'Avoid' ? 'hot' : i === 0 && hn.play ? 'lead' : ''}">${emph(v)}</dd>`).join('')}
           ${rec ? `${rows.length ? '<div class="hi-sep"></div>' : ''}
             <dt class="was">Last</dt><dd class="was">${line}${
             eating ? ' — <b class="hot">play it as a bogey hole</b>' : ''}</dd>` : ''}

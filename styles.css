@@ -373,9 +373,7 @@ h2{scroll-margin-top:14px}
 /* What this hole has cost you before, and what the prep says about it — read with a club
    already in your hand, so it sits above the card and ahead of the taps. */
 .holeintel{margin:8px 0 0;padding:11px 13px;border-left:3px solid var(--green)}
-/* The decision, then the reasons. Read the top line on the tee and you can stop there. */
-.hi-play{font-family:var(--sans);font-size:15.5px;font-weight:800;color:var(--gtext);
-  line-height:1.25;margin:1px 0 8px}
+/* The reasons, under the labelled decision rows. */
 .hi-why{list-style:none;margin:0}
 .hi-why li{position:relative;padding-left:15px;font-size:12.5px;line-height:1.5;
   color:var(--soft);margin-bottom:5px}
@@ -391,6 +389,8 @@ h2{scroll-margin-top:14px}
   text-transform:uppercase;color:var(--faint);padding-top:3px;white-space:nowrap}
 .hi-grid dd{font-size:13px;line-height:1.4;color:var(--ink)}
 .hi-grid dd.hot{color:var(--btext)}
+/* The decision row: same grid as the rest, just carries a little more weight. */
+.hi-grid dd.lead{font-size:14px;color:var(--gtext);font-weight:600}
 /* Full-width rule: a border on the two cells would break across the column gap. */
 .hi-sep{grid-column:1/-1;border-top:1px dotted #c9bd9d;margin:3px 0 0}
 .hi-grid dd.was{color:var(--faint);font-size:12.5px}
