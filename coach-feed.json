@@ -9292,6 +9292,29 @@
           "why": "CLOSED Jul 30 ✓ — overhead film measured the toe line 0.6°, 2.9° and 3.6° CLOSED to the target line across three reps. Never open. Worth re-reading against the Aug 10 find: this measurement is what ruled the feet out and sent the search higher, which is exactly where the answer turned out to be."
         }
       ]
+    },
+    {
+      "id": "round-update-sterlingfarms-20260812-noshot",
+      "type": "round-update",
+      "round": {
+        "date": "2026-08-12",
+        "course": "Sterling Farms Golf Course",
+        "note": "First 18 with full stats. 43/44, +15. 6/18 greens — of the 12 misses, THREE were conceded off the tee (1, 6, 10: no realistic play at the green once he got to the ball, +4 between them), and 4 of the 9 playable ones were SHORT. 6/14 fairways, five of the eight misses left. 38 putts: one 1-putt all day (the birdie on 3), fifteen holes at two putts or better, three 3-putts (9, 14, 16). Holes 14–17 cost +6.",
+        "holes": [
+          {
+            "n": 1,
+            "noshot": true
+          },
+          {
+            "n": 6,
+            "noshot": true
+          },
+          {
+            "n": 10,
+            "noshot": true
+          }
+        ]
+      }
     }
   ]
 }
