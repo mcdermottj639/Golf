@@ -9382,6 +9382,26 @@
       "type": "history",
       "date": "2026-08",
       "text": "Titleist TSR2 7-wood (used demo, HZRDUS Red CB regular) picked up and shelved — owned, not gamed. Sits behind the 4-iron on loft if it's stock."
+    },
+    {
+      "id": "round-update-sterlingfarms-20260812-5wood",
+      "type": "round-update",
+      "round": {
+        "date": "2026-08-12",
+        "course": "Sterling Farms Golf Course",
+        "holes": [
+          {
+            "n": 4,
+            "tee": "5-wood"
+          }
+        ]
+      }
+    },
+    {
+      "id": "history-edit-5wood-debut-20260812",
+      "type": "history-edit",
+      "match": "Mini driver (13.5°) OUT",
+      "text": "Mini driver (13.5°) OUT, Cobra Darkspeed X 5-wood IN at 16.5° — a club he already owned, back after a year. Same job: find the fairway off the tee. Debut swing was hole 4 at Sterling Farms, STROKE INDEX 1: fairway hit, green in regulation, two putts, par. One swing proves nothing, but it is the right one to have made."
     }
   ]
 }

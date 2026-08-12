@@ -1646,7 +1646,7 @@ function clubTables(st){
         const n = par3 ? e.girN : e.fwN, hit = par3 ? e.girHit : e.fwHit;
         return `<tr>
         <td class="sm"><b>${esc(clubName(e.key))}</b>${par3 ? '<br><span class="sm faint">par 3s</span>' : ''}
-          <br><span class="sm faint">${missSplit(par3 ? e.girMiss : e.fwMiss) || '—'}</span></td>
+          ${(m => m ? `<br><span class="sm faint">${m}</span>` : '')(missSplit(par3 ? e.girMiss : e.fwMiss))}</td>
         <td>${e.n}</td>
         <td>${n ? `<b>${pct(hit, n)}</b><span class="sm faint"> ${hit}/${n}${par3 ? ' grn' : ''}</span>` : '<span class="faint">—</span>'}</td>
         <td>${e.noshot ? `<b style="color:var(--burg)">${e.noshot}</b><span class="sm faint"> ${pct(e.noshot, e.n)}</span>` : '<span class="faint">—</span>'}</td>
