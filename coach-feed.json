@@ -9402,6 +9402,97 @@
       "type": "history-edit",
       "match": "Mini driver (13.5°) OUT",
       "text": "Mini driver (13.5°) OUT, Cobra Darkspeed X 5-wood IN at 16.5° — a club he already owned, back after a year. Same job: find the fairway off the tee. Debut swing was hole 4 at Sterling Farms, STROKE INDEX 1: fairway hit, green in regulation, two putts, par. One swing proves nothing, but it is the right one to have made."
+    },
+    {
+      "id": "briefing-sterlingfarms-standing-20260812",
+      "type": "briefing",
+      "briefing": {
+        "course": "Sterling Farms Golf Course",
+        "focus": "Two clubs decide this round: a wood on the par 3s, which average 203 yards, and something that isn't driver on the short par 4s. Your last card here lost more strokes to tee shots that left you no play than to anything you did with an iron.",
+        "rules": [
+          "1st is 337 downhill — not driver",
+          "Par 3s average 203: take the wood",
+          "8 plays uphill — club up",
+          "14–17: bogey is a good score",
+          "Cover the middle, never the flag"
+        ],
+        "holes": [
+          {
+            "n": 1,
+            "note": "337 yards, DOWNHILL — the shortest hole out here. Driver is not the club: a 5-wood or the 2-iron still leaves you a full wedge. Last time you missed right off the tee and had no play at the green at all, on the one hole that owes you a birdie look."
+          },
+          {
+            "n": 2,
+            "note": "500-yard par 5 from an elevated tee, and the green is well protected — the long second is the trap, not the tee shot. Lay up to a NUMBER off your wedge ladder (108 · 95 · 80) rather than chasing it. You found this fairway last time and still came up short of the green."
+          },
+          {
+            "n": 4,
+            "note": "Sharp dogleg LEFT, and stroke index 1 — the hardest hole on the card. The 5-wood already answered this one: fairway, green in regulation, par. The only par you made on the six hardest holes."
+          },
+          {
+            "n": 5,
+            "note": "221 YARDS. That is past your 2-iron (205), so it is a 5-wood or driver off the tee and there is no shame in it. Aim at the front-middle, take two putts, walk off with bogey and no argument. Trying to reach a back pin here is how a 4 becomes a 6."
+          },
+          {
+            "n": 7,
+            "note": "Dogleg RIGHT. Your miss was left, which on this shape costs you the angle and the length at once. Favour the right half off the tee."
+          },
+          {
+            "n": 8,
+            "note": "UPHILL par 3, stroke index 3 — it plays longer than the yardage on the post, and you missed it short last time. Short is your standing miss anyway. Take at least one more club than the number says, and club to cover the middle of the green rather than the flag."
+          },
+          {
+            "n": 9,
+            "note": "Short, straight par 4 — position, not power. You hit this green in regulation last time and three-putted it, which is the whole round in one hole."
+          },
+          {
+            "n": 12,
+            "note": "Stroke index 4. Fairway found and still short of the green — this is the hole to test the 'club up one' rule on, because the tee shot is not the problem here."
+          },
+          {
+            "n": 13,
+            "note": "Par 5 you already parred. Lay up to a wedge number and this is a birdie look, not a survival hole."
+          },
+          {
+            "n": 14,
+            "note": "Stroke index 2, and the start of the stretch that decided your last round — 14 through 17 played +6. Bogey is a good score here. Take the punch-out if the tee shot goes."
+          },
+          {
+            "n": 16,
+            "note": "Stroke index 16 and you made SIX. This is a giveaway hole that gave nothing back: fairway, middle of the green, two putts, move on. Nothing here is worth attacking."
+          },
+          {
+            "n": 17,
+            "note": "Par 3, stroke index 6, missed short last time. Same rule as 8 — cover the middle of the green. Three of your four par-3 misses here finished short or long, none of them close."
+          },
+          {
+            "n": 18,
+            "note": "Par 5, stroke index 18, and you parred it. The clearest birdie chance on the card — decide the lay-up off the wedge ladder so the third shot is a number you own."
+          }
+        ],
+        "sections": [
+          {
+            "t": "The par 3s are the round",
+            "k": "They average 203 yards — these are wood holes, and bogey on all four is a par-72 round of 76.",
+            "b": "Sterling Farms' par 3s average 203 YARDS. That is not a normal set of par 3s: it is four holes where a mid-handicapper is hitting the club he would hit into a par 4.\n\nYou bogeyed all four last time — 5, 8, 15 and 17 — and three of those misses finished short or long rather than beside the green. That is not a strike problem. It is a club problem: 221 on the 5th is past your 2-iron, and the 8th plays uphill on top of its number.\n\nThe rule for all four: club to cover the MIDDLE of the green, not the flag, and treat two putts as the plan. Four bogeys on these is +4 — that is a perfectly good outcome and it beats the double you get from short-siding yourself trying to make three."
+          },
+          {
+            "t": "Driver is optional here",
+            "k": "Three of your green misses last time were tee shots that left you nothing, and the short holes don't need the big stick.",
+            "b": "Your last card here lost more to tee shots than to any swing fault. On holes 1, 6 and 10 the drive left you with no realistic play at the green — three holes, +4 between them, and the approach club never had a say.\n\nThis is a 6,308-yard par 72 on 144 rolling acres. It is not long. The 1st is 337 downhill. A 5-wood or 2-iron off the tee on the short par 4s still leaves a wedge, and it takes the 'no play' outcome off the table entirely.\n\nThe 5-wood's carry is still unmeasured — this is a good round to learn it. Log the tee club on every hole and the by-club table will tell you whether it is actually finding more fairways than the driver, and whether those fairways are worth anything."
+          },
+          {
+            "t": "14 through 17",
+            "k": "One four-hole stretch cost +6 last time; playing it for bogeys would have saved four shots.",
+            "b": "14 (SI 2) · 15 (par 3) · 16 (SI 16) · 17 (par 3) played +6 and turned a 41-ish back nine into 44.\n\nThe damaging pair are the ones that should have been easy: 16 is stroke index SIXTEEN and you made a six on it. A giveaway hole that gives nothing back is worth more than any birdie you chase on the hard ones.\n\nPlan for this stretch: fairway, middle of the green, two putts, four bogeys at worst. +4 through there instead of +6 is two shots for no better ball-striking at all."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "Where the course facts come from, and where your own card does.",
+            "b": "Course facts here are researched: Geoffrey Cornish design opened 1972, renovated by Robert McNeil in 2005, 6,308 yards, par 72, 71.1/118, 144 acres of a former dairy farm. The hole-specific research covers the FRONT nine only — 1 (337, downhill), 2 (500, elevated tee, protected green), 4 (sharp dogleg left), 5 (221-yard par 3), 7 (dogleg right), 8 (uphill par 3), 9 (short straightaway par 4) — plus the 203-yard par-3 average.\n\nEverything said about holes 10-18 comes from YOUR card of Aug 12, 2026 (87, 43/44, +15) and nothing else. Where a note names a yardage it is researched; where it names a score, a miss or a stroke index it is measured off your own round. No hole here has been described from imagination.\n\nAug 12 also swapped the mini driver out for the Cobra Darkspeed X 5-wood at 16.5°, which made its debut on the 4th: fairway, green, par, on stroke index 1."
+          }
+        ]
+      }
     }
   ]
 }

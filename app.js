@@ -1148,8 +1148,11 @@ function briefing(id){
   if(!b) return home();
   const played = S.courses.find(c => c.name.toLowerCase() === b.course.toLowerCase());
   const wx = playsFactor();
-  const backView = b.date ? 'home' : (b.discipline === 'putting' ? 'putting' : 'swing');
-  const backLabel = b.date ? 'Home' : (b.discipline === 'putting' ? 'Putting Lab' : 'Swing Lab');
+  // An undated plan is usually a lab routine, but a COURSE plan is undated too — course
+  // knowledge doesn't expire — and sending that one back to the Swing Lab is nonsense.
+  const isCourse = !!played || S.rounds.some(r => courseMatches(r.course, b.course));
+  const backView = b.date || isCourse ? 'home' : (b.discipline === 'putting' ? 'putting' : 'swing');
+  const backLabel = b.date || isCourse ? 'Home' : (b.discipline === 'putting' ? 'Putting Lab' : 'Swing Lab');
   return `
   <button class="backlink" data-action="go" data-view="${backView}">← ${backLabel}</button>
   <div class="card">
