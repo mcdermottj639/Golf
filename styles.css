@@ -368,6 +368,11 @@ h2{scroll-margin-top:14px}
   background:var(--card2);color:var(--faint);cursor:pointer;user-select:none}
 .hstrip.done{background:#dfe8dc;color:var(--green);border-color:#a8c0ad}
 .hstrip.cur{background:var(--green);color:var(--green-ink);border-color:var(--green)}
+/* The plan, and what this hole has cost you before — the two things worth reading with
+   a club already in your hand. Both sit above the card so they're seen before the taps. */
+.planbar{margin:8px 0 0;padding:11px 13px}
+.planbar .secthead{align-items:center}
+.holeintel{margin:8px 0 0;padding:11px 13px;border-left:3px solid var(--green)}
 .lvcard{padding:2px 13px 11px}
 .lvrow{padding:8px 0;border-bottom:1px dotted #c9bd9d}
 .lvrow:last-child{border-bottom:none;padding-bottom:2px}

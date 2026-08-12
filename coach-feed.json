@@ -9315,6 +9315,73 @@
           }
         ]
       }
+    },
+    {
+      "id": "club-minidriver-out-20260812",
+      "type": "club-update",
+      "target": "add-minidriver",
+      "club": {
+        "status": "backup",
+        "note": "OUT OF THE BAG Aug 12 2026 — replaced in the fairway-finder slot by the Cobra Darkspeed X 5-wood Jack already owned. Kept, not sold. Its tee-shot record stays in the Off-the-tee table as history: whatever it says about fairways found and holes left dead is still true, it just stops accumulating."
+      }
+    },
+    {
+      "id": "add-darkspeed-5w-20260812",
+      "type": "club-add",
+      "club": {
+        "name": "Cobra Darkspeed X 5-wood",
+        "cat": "wood",
+        "loft": 16.5,
+        "spec": "16.5° (bumped DOWN from stock) · UST Mamiya LIN-Q M40X Blue 6 graphite · Regular flex",
+        "status": "gaming",
+        "note": "Back in the bag Aug 12 2026 after a year out, straight into the fairway-finder slot the mini driver held. Bumped down to 16.5°, which makes it a strong 5-wood rather than a 5-wood — and puts it within about half a degree of the KING TEC 2-iron utility (~17°). Two clubs at the same loft is the classic gapping trap, EXCEPT that a fairway wood at 16.5° on a longer shaft should carry meaningfully further than an iron at 17°, so the question is how much. That number is unmeasured: the ladder row is deliberately blank rather than estimated. Get a real carry on it before deciding whether the 2-iron still has a job."
+      }
+    },
+    {
+      "id": "carry-remove-minidriver-20260812",
+      "type": "carry-update",
+      "target": "Mini Driver",
+      "remove": true
+    },
+    {
+      "id": "carry-add-5wood-20260812",
+      "type": "carry-update",
+      "target": "5 wood",
+      "after": "Driver",
+      "club": {
+        "club": "5 wood",
+        "loft": "16.5°",
+        "carry": null
+      }
+    },
+    {
+      "id": "history-5wood-20260812",
+      "type": "history",
+      "date": "2026-08",
+      "text": "Mini driver (13.5°) OUT, Cobra Darkspeed X 5-wood IN at 16.5° — a club he already owned, back after a year. Same job: find the fairway off the tee. First used off the tee on hole 4."
+    },
+    {
+      "id": "action-5wood-carry-20260812",
+      "type": "action",
+      "pri": true,
+      "text": "Get a real carry on the 5-wood at 16.5° — it sits ~0.5° off the 2-iron utility, and until it has a number the ladder can't say whether both belong in the bag"
+    },
+    {
+      "id": "add-tsr2-7w-20260812",
+      "type": "club-add",
+      "club": {
+        "name": "Titleist TSR2 7-wood",
+        "cat": "wood",
+        "spec": "7 wood · Project X HZRDUS Red CB graphite · Regular flex · used demo",
+        "status": "backup",
+        "note": "On the shelf as of Aug 12 2026 — owned, not in the 14, so it stays OUT of the carry ladder until it earns a slot (the ladder is what the live logger offers off the tee, and it should only hold what's actually in the bag). LOFT UNCONFIRMED: stock on a TSR2 7-wood is around 21°, but nothing on the receipt says so and the 5-wood next to it is already bent off stock — check the hosel before trusting any number here. If it IS ~21° it lands exactly on the 4-iron (21°, 190), which is the second loft collision in the long end of this bag: the 5-wood at 16.5° already sits about half a degree off the 2-iron utility. Two fairway woods each duplicating an iron already in the bag is a real question, not a coincidence — but it is a question the rounds can now answer rather than a feel. Log tee shots and approaches with the 5-wood and the 2-iron, and the by-club tables will say which one actually finds fairways and greens. Bench the loser."
+      }
+    },
+    {
+      "id": "history-tsr2-7w-20260812",
+      "type": "history",
+      "date": "2026-08",
+      "text": "Titleist TSR2 7-wood (used demo, HZRDUS Red CB regular) picked up and shelved — owned, not gamed. Sits behind the 4-iron on loft if it's stock."
     }
   ]
 }

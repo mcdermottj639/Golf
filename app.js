@@ -312,6 +312,8 @@ function clubAbbr(name){
   if(iron) return iron[1] + 'i';
   const wedge = n.match(/(\d{2})\s*°?\s*wedge/i);
   if(wedge) return wedge[1] + '°';
+  const wood = n.match(/(\d+)\s*wood/i);
+  if(wood) return wood[1] + 'W';        // "5 wood" wraps in a chip; "5W" is what he'd write
   if(/^pw/i.test(n)) return 'PW';
   return n.length > 6 ? n.slice(0, 6) : n;
 }
@@ -320,8 +322,16 @@ function bagClubs(){
     wedge: /wedge/i.test(c.club) }));
 }
 function clubBy(key){ return bagClubs().find(c => c.key === key) || null; }
-function clubName(key){ const c = clubBy(key); return c ? c.name : String(key || ''); }
-function clubTag(key){ const c = clubBy(key); return c ? c.abbr : String(key || ''); }
+// A club that has left the ladder still has to render on every old card it hit a shot on,
+// so an unknown key gets turned back into something readable rather than printing a slug.
+function clubFallback(key){
+  return String(key || '').replace(/-/g, ' ')
+    .replace(/\b(\d+)\s*(wedge)\b/i, '$1°')
+    .replace(/\b(pw|sw|lw)\b/i, m => m.toUpperCase())
+    .replace(/\b[a-z]/g, c => c.toUpperCase());
+}
+function clubName(key){ const c = clubBy(key); return c ? c.name : clubFallback(key); }
+function clubTag(key){ const c = clubBy(key); return c ? c.abbr : clubAbbr(clubFallback(key)); }
 
 function groovePct(club){ return Math.max(0, Math.round(100 - (club.rounds||0)/GROOVE_LIFE*100)); }
 function weekStreak(){
@@ -417,19 +427,7 @@ function home(){
     <div class="stat"><div class="v">${idx != null ? idx.toFixed(1) : '—'}</div><div class="l">Est. index</div></div>
   </div>
 
-  ${!pending ? '' : `
-  <div class="card">
-    <h2>Putter return window</h2>
-    <h3>${dl===null ? 'Deadline not set' : dl + ' days left on the ' + esc(pending.name)}</h3>
-    <p class="sm">${dl===null
-      ? `<span class="warn">Deadline unknown</span> — the ${esc(pending.name)} is still returnable and nothing here knows until when. Find the receipt, confirm the window with the shop, and set it below.`
-      : S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> — confirm the real one with the shop and update it below.' : 'Deadline confirmed.'}</p>
-    <div class="formrow" style="margin-top:8px">
-      <div><label>Deadline</label><input type="date" id="deadlineInput" value="${esc(S.settings.returnDeadline||'')}"></div>
-      <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
-    </div>
-    <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
-  </div>`}
+
 
   ${(() => {
     const today10 = today();
@@ -495,6 +493,20 @@ function home(){
       <button class="btn ghost" data-action="add-action">Add</button>
     </div>
   </div>
+
+  ${!pending ? '' : `
+  <div class="card">
+    <h2>Putter return window</h2>
+    <h3>${dl===null ? 'Deadline not set' : dl + ' days left on the ' + esc(pending.name)}</h3>
+    <p class="sm">${dl===null
+      ? `<span class="warn">Deadline unknown</span> — the ${esc(pending.name)} is still returnable and nothing here knows until when. Find the receipt, confirm the window with the shop, and set it below.`
+      : S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> — confirm the real one with the shop and update it below.' : 'Deadline confirmed.'}</p>
+    <div class="formrow" style="margin-top:8px">
+      <div><label>Deadline</label><input type="date" id="deadlineInput" value="${esc(S.settings.returnDeadline||'')}"></div>
+      <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
+    </div>
+    <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
+  </div>`}
 
   <div class="card flat">
     <div class="linkrow" data-action="go" data-view="decisions"><b>Decisions</b><span class="arr">→</span></div>
@@ -1154,6 +1166,14 @@ function briefing(id){
   ${b.steps && b.steps.length ? `<div class="card">
     <h2>The routine</h2>
     <ol class="steps">${b.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+  </div>` : ''}
+  ${(b.holes || []).length ? `<div class="card">
+    <h2>Hole by hole</h2>
+    <table><tr><th>Hole</th><th>The play</th></tr>
+      ${b.holes.filter(h => h && h.n && h.note).map(h =>
+        `<tr><td><b>${h.n}</b></td><td class="sm">${esc(h.note)}</td></tr>`).join('')}
+    </table>
+    <p class="sm faint" style="margin-top:8px">Each of these surfaces on its own hole while you're logging a live round — that's the point of writing them.</p>
   </div>` : ''}
   ${(b.sections || []).length ? `<div class="card">
     <div class="secthead">
@@ -2141,6 +2161,43 @@ function coursesWithLayout(){
   return [...seen.keys()];
 }
 
+// ----- Round prep, on the hole you're standing on -----
+// A briefing is worth most with a club in your hand, not the night before, so the live
+// logger carries it onto the course: the one-line focus and the "read nothing else" rules
+// on every hole, plus whatever the plan says about THIS hole.
+// Briefing course names sometimes carry an event suffix ("Beekman Golf Course — Scramble")
+// while the round gets logged under the plain name, so the match tolerates that.
+function courseMatches(a, b){
+  const base = s => (s || '').trim().toLowerCase().replace(/\s+[—–]\s+.*$/, '');
+  return (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase() || base(a) === base(b);
+}
+function liveBriefing(L){
+  const all = S.briefings.filter(b => b.course && courseMatches(b.course, L.course));
+  if(!all.length) return null;
+  const dated = all.filter(b => b.date).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  return dated.find(b => b.date === L.date) || dated[0] || all.find(b => !b.date) || null;
+}
+function holeNote(b, n){
+  const h = b && Array.isArray(b.holes) ? b.holes.find(x => x && x.n === n) : null;
+  return h && h.note ? h.note : null;
+}
+// What his own card says about this hole — course knowledge he generated himself, and
+// the only kind available at a course nobody has written a briefing for.
+function holeRecord(course, n){
+  const key = (course || '').trim().toLowerCase();
+  const plays = [];
+  S.rounds.forEach(r => {
+    if((r.course || '').trim().toLowerCase() !== key || !Array.isArray(r.holes)) return;
+    const h = r.holes.find(x => x && x.n === n && x.s != null && x.par != null);
+    if(h) plays.push({ d:h.s - h.par, s:h.s, tee:h.tee });
+  });
+  if(!plays.length) return null;
+  const over = plays.reduce((a, p) => a + p.d, 0);
+  const clubs = [...new Set(plays.map(p => p.tee).filter(Boolean))];
+  return { n:plays.length, over, avg:over / plays.length,
+    best:plays.reduce((a, p) => Math.min(a, p.s), Infinity), clubs };
+}
+
 // ----- Cutting the tee tap -----
 // The club off a given tee is one of the most predictable things in a round: the same
 // hole asks the same question every time, and inside one round he tends to keep reaching
@@ -2323,6 +2380,39 @@ function livePlay(L){
   <div class="hstriprow">${L.holes.map((x, i) =>
     `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>
 
+  ${(() => {
+    const brief = liveBriefing(L);
+    if(!brief) return '';
+    return `<div class="card flat planbar">
+      <div class="secthead">
+        <div class="lvlab">Your plan${brief.date ? '' : ' · standing'}</div>
+        <button class="minibtn" data-action="live-plan">${L.planOpen ? 'Hide' : 'Show'}</button>
+      </div>
+      ${brief.focus ? `<p class="sm${L.planOpen ? '' : ' clip2'}" style="margin-top:2px">${esc(brief.focus)}</p>` : ''}
+      ${L.planOpen ? `${brief.rules && brief.rules.length
+        ? `<div class="steprules top">${brief.rules.map(r => `<span>${esc(r)}</span>`).join('')}</div>` : ''}
+        <div class="linkrow" data-action="open-briefing" data-id="${brief.id}" style="border-bottom:none;padding-bottom:0">
+          <span class="sm"><b>Open the full briefing</b></span><span class="arr">→</span></div>` : ''}
+    </div>`;
+  })()}
+
+  ${(() => {
+    const note = holeNote(liveBriefing(L), h.n);
+    const rec = holeRecord(L.course, h.n);
+    if(!note && !rec) return '';
+    const line = !rec ? '' : rec.n === 1
+      ? `Last time here: <b>${rec.best}</b> (${rec.over > 0 ? '+' : ''}${rec.over})`
+      : `${rec.n} plays · <b>${rec.avg > 0 ? '+' : ''}${rec.avg.toFixed(1)}</b> a hole · best ${rec.best}`;
+    const club = rec && rec.clubs.length === 1 ? ` · ${esc(clubName(rec.clubs[0]))} off the tee` : '';
+    const eating = rec && rec.n >= 2 && rec.avg >= 1.5;
+    return `<div class="card flat holeintel">
+      ${note ? `<div class="lvlab">Hole ${h.n} · from your prep</div>
+        <p class="sm" style="margin-top:2px">${esc(note)}</p>` : ''}
+      ${rec ? `<p class="sm${note ? ' faint' : ''}" style="margin-top:${note ? '7px' : '0'}">
+        <b>Your record here:</b> ${line}${club}.${eating ? ' <span class="warn">This one has been eating you — play it as a bogey hole on purpose.</span>' : ''}</p>` : ''}
+    </div>`;
+  })()}
+
   <div class="card lvcard">
     ${row('Off the tee', clubRow('tee', teeClubs),
       h.teeAuto ? 'carried over — tap to keep or change' : '')}
@@ -2449,6 +2539,7 @@ const ACTIONS = {
   // ----- Live round -----
   'live-new': () => render('live'),
   'live-pick': el => { const i = $('#lvCourse'); if(i) i.value = el.dataset.course; },
+  'live-plan': () => { if(S.live){ S.live.planOpen = !S.live.planOpen; save(); rerender(); } },
   'live-start': () => {
     const typed = $('#lvCourse').value.trim();
     if(!typed) return toast('Name the course first');
@@ -2811,6 +2902,23 @@ function applyFeed(feed){
       if(h && e.text) h.text = e.text;
     }
     else if(e.type === 'carries' && Array.isArray(e.carries) && !S.carriesCalibrated) S.carries = e.carries;
+    else if(e.type === 'carry-update' && e.target){
+      // Row-level, and deliberately NOT gated on carriesCalibrated. The ladder doubles as
+      // the club ROSTER — it is what the live logger offers off the tee — so which clubs
+      // are in it must stay maintainable after Jack has calibrated the numbers. He owns
+      // the carries; what's in the bag is a coaching update. A whole-ladder `carries`
+      // entry would silently do nothing here and leave a retired club on the tee chips.
+      const i = S.carries.findIndex(c => c.club === e.target);
+      if(e.remove){ if(i >= 0) S.carries.splice(i, 1); }
+      else if(e.club){
+        if(i >= 0) Object.assign(S.carries[i], e.club);
+        else {
+          const at = e.after ? S.carries.findIndex(c => c.club === e.after) : -1;
+          S.carries.splice(at >= 0 ? at + 1 : S.carries.length, 0,
+            { club:e.target, loft:'', carry:null, ...e.club });
+        }
+      }
+    }
     else if(e.type === 'course-add' && e.course && !S.courses.some(c => c.name === e.course.name))
       S.courses.push({ id:e.id, rating:null, pr:null, bucket:false, notes:'', ...e.course });
     else if(e.type === 'course-remove') S.courses = S.courses.filter(c => c.name !== e.target);

@@ -76,6 +76,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `action-done`    | Mark action `target` done |
 | `action-update`  | Rewrite action `target` text |
 | `carries`        | Replace the distance ladder (ignored once the user calibrates) |
+| `carry-update`   | Patch ONE ladder row by `target` name: `club` to add/patch (`after` names the row to insert behind), `remove:true` to drop it. **Not** gated on calibration — see below |
 | `course-add` / `course-remove` | Add/remove a course |
 | `round`          | Add a played round (see *Logging a round* below). Skipped if a round with the same `date` + `course` + `nine` is already there, whatever put it there |
 | `round-update`   | Patch a round matched by `date` + `course` (+ `nine`): `Object.assign` of the top level, per-hole merge by hole `n`. **The way to backfill `rating`/`slope` onto a live-logged card**, or fix a hole after the fact |
@@ -114,11 +115,12 @@ does nothing — double-check against `applyFeed()`.
 | Slot | Club | Notes |
 |------|------|-------|
 | Driver | TaylorMade Stealth 2 · 9° | |
-| Mini driver | 13.5° | fairway-finder / 3-wood slot (model TBC) |
+| 5-wood | **Cobra Darkspeed X · 16.5°** | bumped DOWN from stock; back in Aug 12 2026 after a year out, taking the mini driver's fairway-finder slot. **Carry unmeasured** — and at 16.5° it sits ~0.5° off the 2-iron utility, so whether both belong in the bag is an open question |
 | Utility | Cobra KING TEC 2-iron · ~17° | |
 | Irons | Cobra KING TEC 4–PW | **44° PW** anchors the wedge ladder |
 | Wedges | **Vokey 50.08F · 56.10S · 60.08M** | 50 = F/8° sweeper · 56 = S/10° workhorse · 60 = M/8° creative |
 | Putter | **L.A.B. Golf LINK.2.1** | the only zero-torque head left. Narrow blade, gamed Jul 30 – Aug 1 and again from **Aug 10, 2026** — and **still inside its own return window** (`returnWindow:true`, deadline unknown). Carries a **Pistol 0** grip: zero built-in lean, shaft vertical, hands ~1.35" behind the ball — that's the live cue. Its column holds the only two reds on the evolution grid (face at impact, 1.5–1.7° left start line, both measured Jul 30) |
+| Benched | ~~TaylorMade r7 Quad Mini Driver · 13.5°~~ | **out Aug 12 2026**, kept not sold. Its tee-shot record stays in the Off-the-tee table as history |
 | Backup putter | Scotty Newport 2 | arc-suited toe-hang blade — renders a **MISMATCH** flag against the SBST stroke. If the LINK goes back this is all that's left, i.e. the mismatch the whole saga opened with |
 | Returned | ~~L.A.B. Golf DF3i · 34"~~ | **returned Aug 10, 2026 — distance control.** Gamed Jul 18–30 and Aug 1–10. Its Press Pistol 2° went with it, so the "hands even with the ball" cue is **retired** — don't carry it to the LINK. Lost with it: the only measured scoreboard in the project (8/10 from four feet, Jul 20) and the high-MOI control head |
 | Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** |
@@ -159,6 +161,16 @@ par splits, miss directions, round-scoped coaching, and a comparison against the
 still opens; it just shows less. `troubles[]` must use the keys in `TROUBLES` (`app.js`
 top) — they also feed lesson matching for the next three rounds.
 
+**The carry ladder is the club roster.** `S.carries` is what the live logger offers off
+the tee, so a club leaving or joining the bag is a ladder change as much as a `S.clubs`
+change — miss it and the logger keeps offering a club he no longer carries. Use
+`carry-update`, never `carries`: a whole-ladder replace is ignored once he has calibrated
+his numbers and would silently do nothing. He owns the carry figures; bag membership is a
+coaching update, which is why only one of the two is gated. Leave a new club's `carry`
+**null** rather than estimating it into a calibrated ladder — blank reads as unknown, a
+guess reads as measured. A key that has left the ladder still renders on old cards via
+`clubFallback()`, so retiring a club never orphans the rounds it played.
+
 **Club keys** are slugs of the **carry-ladder** row names, not `S.clubs` ids — the bag holds
 the irons as one "KING TEC 4–PW" entry and so can't name the club that hit a shot, while
 `S.carries` is the real 13-club list: `driver`, `mini-driver`, `2-iron`, `4-iron`…`9-iron`,
@@ -172,6 +184,17 @@ saving to `S.live` on every tap (iOS kills suspended PWAs, so nothing may live i
 Finishing writes an ordinary round — same schema as above, plus `live:true` — and drops him
 straight into its `roundView`. Par and stroke index prefill from the newest card at that
 course, so a repeat course needs no typing at all.
+
+**Round prep reaches the course.** A briefing whose `course` matches the round (suffix-
+tolerant, so "Beekman Golf Course — Scramble" matches a round logged as "Beekman Golf
+Course") shows up on every hole as a collapsible strip: the `focus` line always, `rules[]`
+and a link to the full plan when opened. A briefing may also carry **`holes: [{n, note}]`**
+— per-hole course knowledge that surfaces on that exact hole while he's standing on it,
+which is the highest-value thing a briefing can contain and worth writing whenever the
+course research supports it. It renders in `briefing()` as a "Hole by hole" table too.
+Underneath that, `holeRecord()` shows what his own cards say about the hole (plays, average
+against par, best, the club he's used) — that one needs no briefing at all and flags a hole
+averaging +1.5 or worse as one to play for bogey on purpose.
 
 **The tee club is suggested, never assumed.** On arriving at a hole the logger pre-fills
 the club from what he hit off *that hole at that course* last time, else from the last club
