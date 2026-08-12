@@ -431,15 +431,23 @@ function home(){
 
   ${(() => {
     const today10 = today();
+    // Every course prep lives here for good: what's coming up first, then the standing
+    // course plans (they don't expire — that's the point of them), then the played ones
+    // as an archive. Lab routines (Swing Focus, Golf Mind…) stay in their labs — a
+    // standing plan only counts as ROUND prep if its course is one Jack actually has.
+    const known = [...S.courses.map(c => c.name), ...S.rounds.map(r => r.course)].filter(Boolean);
+    const isCoursePlan = b => !b.date && b.course && known.some(n => courseMatches(b.course, n));
     const up = S.briefings.filter(b => b.date && b.date >= today10).sort((a,b) => (a.date||'').localeCompare(b.date||''));
-    const recent = S.briefings.filter(b => b.date && b.date < today10 &&
-      (new Date(today10) - new Date(b.date)) < 4*86400000).slice(-1);
-    const rows = [...up, ...recent].slice(0, 3);
+    const standing = S.briefings.filter(isCoursePlan);
+    const past = S.briefings.filter(b => b.date && b.date < today10)
+      .sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 3);
+    const tag = b => !b.date ? 'standing plan' : b.date < today10 ? `played · ${fmtDate(b.date)}` : fmtDate(b.date);
+    const rows = [...up, ...standing, ...past];
     return `<div class="card">
       <h2>Round prep</h2>
       ${rows.length ? rows.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-        <span><b>${esc(b.course)}</b><span class="sm faint"> · ${fmtDate(b.date)}${b.date < today10 ? ' (played)' : ''}</span><br>
-        <span class="sm">${esc(b.focus || 'Briefing ready')}</span></span><span class="arr">→</span></div>`).join('')
+        <span><b>${esc(b.course)}</b><span class="sm faint"> · ${tag(b)}</span><br>
+        <span class="sm clip2">${esc(b.focus || 'Briefing ready')}</span></span><span class="arr">→</span></div>`).join('')
       : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Golf Mind, Miracle 201) live in the <b>Swing</b> lab.</p>`}
       ${S.live ? '' : `<div class="linkrow" data-action="live-new" style="border-bottom:none;padding-bottom:0">
         <span><b>Play a live round</b><br><span class="sm">Tap each hole in as you go — clubs, fairways, greens, putts</span></span><span class="arr">→</span></div>`}
@@ -2392,6 +2400,10 @@ function livePlay(L){
     `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>
 
   ${(() => {
+    // The whole-round plan is a first-tee read. After that it's the same text on every
+    // screen — noise above the thing that changes, which is the hole note below it. The
+    // full briefing stays a tap away on Home for mid-round doubts.
+    if(L.cur !== 0) return '';
     const brief = liveBriefing(L);
     if(!brief) return '';
     return `<div class="card flat planbar">

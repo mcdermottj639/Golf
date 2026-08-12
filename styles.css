@@ -361,10 +361,12 @@ h2{scroll-margin-top:14px}
 .lvh1 span{font-size:13px;font-weight:400;color:var(--faint);font-family:var(--sans)}
 .lvh2{font-family:var(--sans);font-size:12px;color:var(--soft);margin-top:2px}
 .lvh2 b{font-size:14px;color:var(--btext)}
-/* Jump strip: every hole reachable, current one obvious, scored ones filled in. */
-.hstriprow{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 2px}
-.hstrip{flex:1 0 auto;min-width:26px;text-align:center;font-family:var(--sans);font-size:10.5px;
-  font-weight:700;padding:4px 0;border-radius:5px;border:1px solid var(--line);
+/* Jump strip: every hole reachable, current one obvious, scored ones filled in.
+   Nine to a row on purpose — the top row IS the front nine, the bottom the back — and
+   sized for a thumb on a tee box, not a cursor. */
+.hstriprow{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin:8px 0 2px}
+.hstrip{text-align:center;font-family:var(--sans);font-size:14px;
+  font-weight:700;padding:10px 0;border-radius:9px;border:1px solid var(--line);
   background:var(--card2);color:var(--faint);cursor:pointer;user-select:none}
 .hstrip.done{background:#dfe8dc;color:var(--green);border-color:#a8c0ad}
 .hstrip.cur{background:var(--green);color:var(--green-ink);border-color:var(--green)}
