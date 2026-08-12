@@ -352,7 +352,7 @@ const TITLES = {
   live:['Live Round','Tap it in as you play — it scores itself.'],
 };
 
-function render(view, arg){
+function render(view, arg, keepScroll){
   current = { view, arg };
   const [title, tag] = TITLES[view] || TITLES.home;
   $('#pageTitle').textContent = title;
@@ -362,7 +362,7 @@ function render(view, arg){
   const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live }[view] || home;
   $('#view').innerHTML = R(arg);
   buildJumpBar();
-  window.scrollTo(0,0);
+  if(!keepScroll) window.scrollTo(0,0);
 }
 
 // Every view is a stack of <h2> sections, so the in-page nav is built from the
@@ -389,7 +389,14 @@ function buildJumpBar(){
   view.prepend(bar);
 }
 let current = { view:'home' };
-function rerender(){ render(current.view, current.arg); }
+// Redrawing the view you're already on is an UPDATE, not a navigation — jumping to the
+// top on every tap made the live logger unusable, since scoring a hole meant scrolling
+// back down six times. Navigation (nav bar, links, back) still resets to the top.
+function rerender(){
+  const y = window.scrollY;
+  render(current.view, current.arg, true);
+  if(window.scrollY !== y) window.scrollTo(0, y);
+}
 
 // ----- Home -----
 function home(){
@@ -948,7 +955,7 @@ function planIdBy(re, disc){
 // which outrank to-dos — a number you can point at beats an opinion.
 function coachSignals(){
   const st = scoreStats();
-  const out = scoreTips(st).map(t => ({ sev:t.s, src:t.src, h:t.h, b:t.b, link:null }));
+  const out = scoreTips(st).map(t => ({ sev:t.s, src:t.src, h:t.h, b:t.b, ev:t.ev, link:null }));
   out.forEach(t => {
     if(/opening hole/i.test(t.h)){ const id = planIdBy(/routine/i, 'full-swing'); if(id) t.link = { a:'open-briefing', id, lab:'Open the swing routine' }; }
     else if(/par 3/i.test(t.h)) t.link = { a:'go', view:'swing', lab:'Swing lab' };
@@ -959,16 +966,20 @@ function coachSignals(){
   if(last){
     const s = fiveFtScore(last), mc = missCounts();
     const id = planIdBy(/routine/i, 'putting');
-    out.push({ sev: s.makes >= 17 ? 'good' : 'warn', src:'Putting · measured',
+    out.push({ sev: s.makes >= 17 ? 'good' : 'warn', src:'Putting · measured', ev:'measured',
       h:`${s.makes}/${s.total} from 5 feet`,
       b:`Last logged test${mc.L || mc.R ? ` · all-time misses ${mc.L} left / ${mc.R} right / ${mc.S} short / ${mc.Lg} long` : ''}. ${s.makes >= 17 ? 'At or past the goal of 17 — hold it there.' : 'Goal is 17. ' + (mc.L > mc.R ? 'The left miss is still the pattern.' : 'Miss pattern is balanced — this is pace and read, not face.')}`,
       link: id ? { a:'open-briefing', id, lab:'Open the putting routine' } : { a:'go', view:'putting', lab:'Putting lab' } });
   }
-  S.faults.forEach(f => out.push({ sev:'mid', src:'Open fault',
+  S.faults.forEach(f => out.push({ sev:'mid', src:'Open fault', ev:'measured',
     h:f.tag.replace(/-/g,' ').replace(/^./, c => c.toUpperCase()), b:f.why,
     link:{ a:'go', view:'putting', lab:'Putting lab' } }));
+  // Severity decides the band, evidence decides the order inside it — so the warnings
+  // still lead, but within them his own rounds speak before a pasted season average.
+  // Array.sort is stable, so scoreTips' evidence order survives this pass.
   const order = { warn:0, mid:1, good:2 };
-  return out.sort((a,b) => order[a.sev] - order[b.sev]);
+  return out.sort((a,b) => order[a.sev] - order[b.sev]
+    || EV_RANK[a.ev || 'snapshot'] - EV_RANK[b.ev || 'snapshot']);
 }
 
 function coach(){
@@ -998,9 +1009,9 @@ function coach(){
   ${sig.length ? `<h2>Work on this · ranked</h2>
   <div class="card">
     ${sig.slice(0,6).map(t => `<div class="tipcard ${t.sev === 'good' ? 'green' : ''}">
-      <div class="src">${esc(t.src)}</div><h4>${t.h}</h4>${expandable(t.b)}
+      <div class="src">${esc(t.src)}${evTag(t.ev)}</div><h4>${t.h}</h4>${expandable(t.b)}
       ${linkFor(t.link)}</div>`).join('')}
-    <p class="sm faint">Ranked from your rounds, your putting logs and your open faults — this reorders itself as the data moves.</p>
+    <p class="sm faint">Ranked by how good the evidence is: rounds you logged hole by hole lead, then what you've measured, then the GHIN summaries — those are somebody else's arithmetic over a season, so they speak last. Within that, the warnings come first.</p>
   </div>` : ''}
 
   ${open.length ? `<h2>Next actions</h2>
@@ -1332,39 +1343,39 @@ function statTips(live){
     const dPutts = (b.putts != null && g.putts != null) ? b.putts - g.putts : null;
     const dGir = (b.gir != null && g.gir != null) ? g.gir - b.gir : null;
     if(dPutts != null && dPutts >= 1.5 && dGir != null && dGir <= -3)
-      t.push({ s:'warn', src:`Then vs now · ${b.rounds || b.roundsScoring} rds → ${nSc} rds`, h:'The leak is tee-to-green',
+      t.push({ ev:'snapshot', s:'warn', src:`Then vs now · ${b.rounds || b.roundsScoring} rds → ${nSc} rds`, h:'The leak is tee-to-green',
         b:`Putts per round are DOWN ${dPutts.toFixed(1)} (${b.putts.toFixed(1)} → ${g.putts.toFixed(1)}), but greens in regulation fell ${Math.abs(dGir).toFixed(1)} points (${b.gir}% → ${g.gir}%)${b.driving && d ? ` and fairways ${b.driving.fairway}% → ${d.fairway}%` : ''}, and scoring barely moved: par-or-better ${parOrBetter(b)}% → ${parOrBetter(g)}%, doubles ${blowUps(b)}% → ${blowUps(g)}%. Whatever you saved on the greens you handed back before you got there. The strokes are tee-to-green.` });
     const dOne = (b.putting && p && b.putting.one != null && p.one != null) ? p.one - b.putting.one : null;
     if(dPutts != null && dPutts >= 1.5 && dOne != null && Math.abs(dOne) <= 2)
-      t.push({ s:'mid', src:'Read this one carefully', h:'The putting gain is partly an artefact',
+      t.push({ ev:'snapshot', s:'mid', src:'Read this one carefully', h:'The putting gain is partly an artefact',
         b:`Putts per round dropped ${dPutts.toFixed(1)}, but the one-putt rate is flat (${b.putting.one}% → ${p.one}%). Missing more greens mechanically lowers putts per round — you chip on and putt once instead of lagging from forty feet. So the drop is at least partly fewer greens hit, not a better stroke.` });
   }
 
   if(!statsCoverPutter()){
     const pn = (S.clubs.find(c => c.cat === 'putter' && c.status === 'gaming') || {}).name || 'the current putter';
-    t.push({ s:'warn', src:'Nothing measured yet', h:`No round data covers ${pn}`,
+    t.push({ ev:'snapshot', s:'warn', src:'Nothing measured yet', h:`No round data covers ${pn}`,
       b:`Every stat here — and every round logged — predates it. The mat tests and the stroke film are promising, but they are not scoring. Until a round is played and logged with it, its effect on your score is unmeasured, and nothing in this list should be read as a verdict on it either way. Play one, log the putts, and it becomes answerable.` });
   }
 
   if(a && a.short != null && !live.approach){
     const sides = (a.left || 0) + (a.right || 0);
     if(a.short >= 30 && a.short >= sides)
-      t.push({ s:'warn', src:`Approach · ${nAdv} rounds`, h:'You miss short, not sideways',
+      t.push({ ev:'snapshot', s:'warn', src:`Approach · ${nAdv} rounds`, h:'You miss short, not sideways',
         b:`${a.short}% of approaches finish SHORT against ${a.left||0}% left, ${a.right||0}% right and ${a.long||0}% long. That is not dispersion — a scattergun misses every direction. A miss that only ever goes one way is a DISTANCE problem: the number you're clubbing to is longer than the club actually carries. Club up one when between clubs, and re-baseline your ladder to AVERAGE carry rather than your best strike. A yardage set built from your purest 7-iron comes up short all day${thin(nAdv)}.` });
   }
   const ud = upDownPct(g), udB = upDownPct(b);
   if(ud != null && ud < 30)
-    t.push({ s:'warn', src:`Short game · ${nAdv} rounds`, h:`Scrambling around ${Math.round(ud)}%`,
+    t.push({ ev:'snapshot', s:'warn', src:`Short game · ${nAdv} rounds`, h:`Scrambling around ${Math.round(ud)}%`,
       b:`${g.gir != null ? `At ${g.gir}% greens you're missing about ${(18*(1-g.gir/100)).toFixed(0)} a round. ` : ''}Every miss you don't convert is a bogey at best.${udB != null ? ` And this isn't new — it was ${udB.toFixed(0)}% in the older data too, so it's a standing weakness rather than a bad patch.` : ''} With greens hit this low, up-and-down rate moves your score more than ball-striking does, and it's the cheapest thing here to practise${thin(nAdv)}.` });
   if(p && p.three != null && p.three >= 10 && !live.putting)
-    t.push({ s:'warn', src:`Putting · ${nAdv} rounds`, h:`${p.three}% three-putts or worse`,
+    t.push({ ev:'snapshot', s:'warn', src:`Putting · ${nAdv} rounds`, h:`${p.three}% three-putts or worse`,
       b:`Roughly ${(p.three/100*18).toFixed(1)} a round, against ${p.one||0}% one-putts. Three-putts are a PACE fault, not a line fault — the first putt is finishing outside gimme range. Same signature as the lag work already on your card${thin(nAdv)}.` });
   if(ap[5] != null && ap[4] != null && (ap[5] - 5) >= 0.6)
-    t.push({ s:'mid', src:`Scoring · ${nSc} rounds`, h:'Par 5s give you nothing',
+    t.push({ ev:'snapshot', s:'mid', src:`Scoring · ${nSc} rounds`, h:'Par 5s give you nothing',
       b:`Averaging ${ap[5].toFixed(2)} on par 5s — barely better relative to par than your ${ap[4].toFixed(2)} on par 4s. A par 5 is the one hole where a mid-handicap gets a free run at birdie. Decide the lay-up off your wedge ladder so the third shot is a number you own.` });
   const blow = blowUps(g);
   if(blow != null && blow >= 15)
-    t.push({ s:'warn', src:`Scoring · ${nSc} rounds`, h:`${blow}% of holes are double or worse`,
+    t.push({ ev:'snapshot', s:'warn', src:`Scoring · ${nSc} rounds`, h:`${blow}% of holes are double or worse`,
       b:`Across ${nSc} rounds, so this is the baseline rather than one bad week. Against ${g.scoring.birdie||0}% birdies, your score is decided by the bad holes, not the good ones. Taking the punch-out instead of the hero shot is worth more strokes than any swing change.` });
   return t;
 }
@@ -1501,6 +1512,15 @@ function scoreStats(){
   return { rs, mix, byPar, opening, worst, holes, over, tee, app, fw, green, putts };
 }
 
+// Every finding carries WHERE IT CAME FROM, and the strength of that source decides the
+// order it's read in. Rounds Jack logged hole by hole are the strongest thing he owns:
+// he was there, he recorded it, and it is his own current game. A pasted GHIN summary is
+// somebody else's arithmetic over a season that may predate the bag he's playing — still
+// worth having, but it goes last. Same rule as "film is king", applied to the numbers.
+const EV_RANK = { round:0, measured:1, snapshot:2 };
+const EV_LAB = { round:'from your rounds', measured:'measured', snapshot:'GHIN summary' };
+const evTag = ev => ev ? ` <span class="ev ${ev}">${EV_LAB[ev]}</span>` : '';
+
 // Tips fire off thresholds in the data, so they only appear once there's
 // enough of it to mean anything. Each one carries the number that triggered it.
 function scoreTips(st){
@@ -1518,7 +1538,7 @@ function scoreTips(st){
     if(rate(straight) - rate(wild) >= 15){
       const sPer = straight.over / straight.n, wPer = wild.over / wild.n;
       const scoresBetter = wPer < sPer - 0.1;
-      t.push({ s: scoresBetter ? 'mid' : 'warn', src:`Off the tee · ${straight.fwN + wild.fwN} tee shots`,
+      t.push({ ev:'round', s: scoresBetter ? 'mid' : 'warn', src:`Off the tee · ${straight.fwN + wild.fwN} tee shots`,
         h:`${clubName(straight.key)} finds ${Math.round(rate(straight))}% of fairways · ${clubName(wild.key)} ${Math.round(rate(wild))}%`,
         b:`Across ${straight.fwN} and ${wild.fwN} recorded tee shots. The holes score ${sPer > 0 ? '+' : ''}${sPer.toFixed(2)} a hole with the ${clubName(straight.key)} against ${wPer > 0 ? '+' : ''}${wPer.toFixed(2)} with the ${clubName(wild.key)}. ${scoresBetter
           ? `So the wilder club is still the one that scores — the extra length is paying for the misses. Keep hitting it; this is the case AGAINST clubbing down out of fear.`
@@ -1534,7 +1554,7 @@ function scoreTips(st){
     const real = missed - st.green.noshot;
     const top = Object.entries(st.green.miss).sort((x, y) => y[1] - x[1])[0];
     if(real >= 8 && top && top[1] / real >= 0.4)
-      t.push({ s:'warn', src:`Approach · ${real} playable misses`, h:`${Math.round(top[1] / real * 100)}% of your playable green misses go ${MISS_LAB[top[0]] || top[0]}`,
+      t.push({ ev:'round', s:'warn', src:`Approach · ${real} playable misses`, h:`${Math.round(top[1] / real * 100)}% of your playable green misses go ${MISS_LAB[top[0]] || top[0]}`,
         b:`${top[1]} of ${real}${st.green.noshot ? `, after setting aside ${st.green.noshot} green${st.green.noshot === 1 ? '' : 's'} the tee shot took away` : ''}, off ${st.green.hit}/${st.green.n} greens hit. A miss that only ever goes one way is not dispersion — dispersion sprays every direction. ${top[0] === 'S'
           ? 'Short is a DISTANCE fault: the number you are clubbing to is longer than the club actually carries. Club to cover the middle-to-back of the green, and re-baseline the ladder to average carry rather than your purest strike.'
           : top[0] === 'Lg' ? 'Long is usually adrenaline or an overcorrection off a run of short ones — worth checking whether these follow your good drives.'
@@ -1544,7 +1564,7 @@ function scoreTips(st){
     // approach numbers are a symptom and the driving is the disease.
     if(st.green.noshot >= 4 && st.green.noshot / missed >= 0.25){
       const worst = [...st.tee.values()].filter(e => e.noshot).sort((x, y) => y.noshot - x.noshot)[0];
-      t.push({ s:'warn', src:`Off the tee · ${st.green.noshot} of ${missed} green misses`, h:`${Math.round(st.green.noshot / missed * 100)}% of your green misses were lost at the tee`,
+      t.push({ ev:'round', s:'warn', src:`Off the tee · ${st.green.noshot} of ${missed} green misses`, h:`${Math.round(st.green.noshot / missed * 100)}% of your green misses were lost at the tee`,
         b:`${st.green.noshot} of ${missed} missed greens came from holes where you had no realistic play once you reached the ball — the stroke was gone before the approach club came out of the bag. Approach practice cannot touch these${worst ? `, and ${clubName(worst.key)} accounts for ${worst.noshot} of them across ${worst.n} tee shots` : ''}. Compare that against the fairway percentages above: finding the short grass matters less than never being dead, and those are different bets.` });
     }
   }
@@ -1552,18 +1572,18 @@ function scoreTips(st){
   if(st.putts.holes >= 36){
     const rate = st.putts.three / st.putts.holes;
     if(rate >= 0.08)
-      t.push({ s:'warn', src:`Putting · ${st.putts.holes} holes recorded`, h:`${st.putts.three} three-putts in ${st.putts.holes} holes`,
+      t.push({ ev:'round', s:'warn', src:`Putting · ${st.putts.holes} holes recorded`, h:`${st.putts.three} three-putts in ${st.putts.holes} holes`,
         b:`${(rate * 18).toFixed(1)} a round, against ${st.putts.one} one-putts and ${(st.putts.total / st.putts.holes).toFixed(2)} putts a hole overall. Three-putts are a PACE fault, not a line fault — the first putt is finishing outside gimme range. This is the live-round evidence for the standing distance-control priority, and the 30-ft ladder is what turns it into a number you can move.` });
   }
 
   const blowN = st.mix.double + st.mix.triple;
   const blowShots = st.mix.double * 2 + st.mix.triple * 3;
   const share = st.over > 0 ? blowShots / st.over : 0;
-  if(blowN && share >= 0.25) t.push({ s:'warn', src:'Biggest single lever', h:'Doubles are your gap',
+  if(blowN && share >= 0.25) t.push({ ev:'round', s:'warn', src:'Biggest single lever', h:'Doubles are your gap',
     b:`${blowN} holes of double bogey or worse across ${st.holes} played — that's ${blowShots} strokes, ${Math.round(share*100)}% of everything you've lost to par. Eliminating blow-ups is worth more than any extra birdies: par golf with zero doubles beats birdie golf with four. On a hole that starts badly, take the punch-out and the bogey instead of the hero shot.` });
   if(st.opening.n >= 3){
     const avg = st.opening.over / st.opening.n;
-    if(avg >= 0.8) t.push({ s:'warn', src:'Cheapest fix on the list', h:'Your opening hole is a leak',
+    if(avg >= 0.8) t.push({ ev:'round', s:'warn', src:'Cheapest fix on the list', h:'Your opening hole is a leak',
       b:`${st.opening.over > 0 ? '+' : ''}${st.opening.over} across ${st.opening.n} opening holes — ${avg.toFixed(1)} a hole before you've settled. That's a warm-up problem, not a swing problem. Prime the feel before the first tee (slow one-handed reps, then blend to two hands) rather than hunting for it on the 4th.` });
   }
   const p3 = st.byPar[3], p4 = st.byPar[4], p5 = st.byPar[5];
@@ -1572,17 +1592,17 @@ function scoreTips(st){
   // A handful of par 3s at one course must not outvote a season of them.
   const bp = (latestStats() || {}).avgByPar;
   const bigSampleSaysFine = bp && bp[3] != null && bp[4] != null && (bp[3] - 3) < (bp[4] - 4) * 0.9;
-  if(!bigSampleSaysFine && p3.n >= 6 && p4.n >= 6 && (p3.over / p3.n) >= (p4.over / p4.n) * 0.9) t.push({ s:'warn', src:'Where it points', h:'Par 3s are no better than your par 4s',
+  if(!bigSampleSaysFine && p3.n >= 6 && p4.n >= 6 && (p3.over / p3.n) >= (p4.over / p4.n) * 0.9) t.push({ ev:'round', s:'warn', src:'Where it points', h:'Par 3s are no better than your par 4s',
     b:`+${(p3.over/p3.n).toFixed(2)} a hole on par 3s against +${(p4.over/p4.n).toFixed(2)} on par 4s. There's no driver on a par 3 and no second shot to recover with, so it should be comfortably your best hole type — level with the par 4s means the tee shot itself isn't finding greens. That's iron control, not driving. Club to cover the front edge rather than to reach the pin.` });
-  if(p5.n >= 4 && p5.red === 0) t.push({ s:'mid', src:'Missing offense', h:'No birdies on par 5s',
+  if(p5.n >= 4 && p5.red === 0) t.push({ ev:'round', s:'mid', src:'Missing offense', h:'No birdies on par 5s',
     b:`${p5.n} par-5 holes played, zero under par. Par 5s are where a mid-handicap makes his money. Decide the lay-up off your wedge ladder so the third shot is a NUMBER you own rather than whatever's left — 60°→80 · 56°→95 · 50°→108 · PW→122.` });
   const w = st.worst[0];
-  if(w && (w.over / w.n) >= 1.5) t.push({ s:'warn', src:'One hole', h:`${esc(w.course)} hole ${w.hole} is eating you`,
+  if(w && (w.over / w.n) >= 1.5) t.push({ ev:'round', s:'warn', src:'One hole', h:`${esc(w.course)} hole ${w.hole} is eating you`,
     b:`+${w.over} across ${w.n} plays on a par ${w.par} — ${(w.over/w.n).toFixed(1)} a go. One hole played a handful of times shouldn't cost this much. Next time you see it, play it as a bogey hole on purpose and take the trouble out of the equation.` });
   const parRate = (st.mix.par + st.mix.birdie + st.mix.eagle) / st.holes;
-  if(parRate >= 0.4) t.push({ s:'good', src:'Protect this', h:'You make a lot of pars',
+  if(parRate >= 0.4) t.push({ ev:'round', s:'good', src:'Protect this', h:'You make a lot of pars',
     b:`${Math.round(parRate*100)}% of holes played at par or better. The base game is there — the scoring gap is the tail, not the average.` });
-  return t;
+  return t.sort((a, b) => EV_RANK[a.ev || 'snapshot'] - EV_RANK[b.ev || 'snapshot']);
 }
 
 const missSplit = m => Object.entries(m).sort((x, y) => y[1] - x[1])
@@ -1708,8 +1728,8 @@ function scores(){
   ${tips.length ? `<h2>How to improve</h2>
   <div class="card">
     ${tips.map(t => `<div class="tipcard ${t.s === 'good' ? 'green' : ''}">
-      <div class="src">${esc(t.src)}</div><h4>${t.h}</h4><p class="sm">${t.b}</p></div>`).join('')}
-    <p class="sm faint">Generated from your own rounds — these change as the data does.</p>
+      <div class="src">${esc(t.src)}${evTag(t.ev)}</div><h4>${t.h}</h4><p class="sm">${t.b}</p></div>`).join('')}
+    <p class="sm faint">Strongest evidence first: what your own logged rounds say, then the GHIN summaries. These change as the data does.</p>
   </div>` : ''}
 
   ${statsCard()}
@@ -2452,7 +2472,8 @@ const ACTIONS = {
     h.s = Math.max(1, (h.s ?? h.par) + (+el.dataset.d));
     save(); rerender();
   },
-  'live-goto': el => { if(S.live){ S.live.cur = +el.dataset.i; save(); rerender(); } },
+  // Changing hole IS a navigation — that one should land at the top of the new hole.
+  'live-goto': el => { if(S.live){ S.live.cur = +el.dataset.i; save(); render('live'); } },
   'live-nav': el => {
     const L = S.live; if(!L) return;
     const to = L.cur + (+el.dataset.d);
@@ -2463,7 +2484,7 @@ const ACTIONS = {
       L.troubles = liveTroubles(roundAnalysis(liveRound(L)));
       save(); return render('live');
     }
-    L.cur = to; save(); rerender();
+    L.cur = to; save(); render('live');
   },
   'live-save': () => {
     const L = S.live; if(!L) return;

@@ -213,11 +213,28 @@ tells you which holes.
 ### Hole data outranks a stats snapshot
 
 An extension of *film is king* to the numbers: a hole Jack recorded himself is **measured**,
-a pasted GHIN average is **summarized**, a feel is **feel**. Once the hole-logged sample is
-real (36+ recorded greens or putting holes), `statTips()` stands its snapshot versions of
-the approach-miss and three-putt findings down and the live ones on **Scores** speak instead
-— see the `live` argument to `statTips()`. Don't reintroduce a snapshot claim that the hole
-data now answers better; do keep saying which one a number came from.
+a pasted GHIN average is **summarized**, a feel is **feel**. This works two ways:
+
+1. **Ranking.** Every tip carries an `ev` provenance — `round` (hole-by-hole cards he
+   logged) → `measured` (5-ft tests, filmed faults) → `snapshot` (pasted GHIN summaries),
+   ranked by `EV_RANK` and badged in the UI by `evTag()`. Coach sorts severity first, then
+   evidence, so the warnings still lead but his own rounds speak before a season average
+   somebody else computed. **Any new tip must carry an `ev`** or it sorts as a snapshot.
+2. **Suppression.** Once the hole-logged sample is real (36+ recorded greens or putting
+   holes), `statTips()` stands its snapshot versions of the approach-miss and three-putt
+   findings down and the live ones speak instead — see its `live` argument.
+
+Don't reintroduce a snapshot claim the hole data now answers better; do keep saying which
+one a number came from.
+
+### Re-rendering must not move the page
+
+`render()` resets scroll to the top — that's right for navigation. `rerender()` **preserves
+the scroll position**, because redrawing the view you're already on is an update, not a
+navigation. Every chip tap in the live logger re-renders, and jumping to the top each time
+made scoring a hole mean scrolling back down six times. Use `rerender()` for in-place
+changes and `render()` only when the user has actually gone somewhere (including moving to
+the next hole, which is a navigation).
 
 ### Writing briefings (they render in layers — write for that)
 
