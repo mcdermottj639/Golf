@@ -225,24 +225,33 @@ course he's playing:
 
 1. **Research the course first.** Hunt the course's own hole-by-hole pro tips (most
    course sites carry a tour; search snippets work when the site itself is blocked), then
-   reviews for hazards, doglegs, elevation, green complexes, and per-hole yardages.
+   reviews for doglegs, elevation, green complexes, and per-hole yardages.
    *What the course demands* leads every note; *what happened last time* backs it up
    underneath. Aim for a note on every hole the sources can support — the per-hole
    `holes[]` notes are the highest-value part of the plan.
-2. **Pin before you write.** Syndicated copies of a course tour shift the hole numbering,
+2. **Hunt the water and the bunkers specifically (standing instruction, Aug 12 2026).**
+   Hazards are the single most valuable researched fact, because unlike a pin they do not
+   move: where the water sits on the 13th is true every round forever. Chase them
+   deliberately rather than taking whatever a review happens to mention — which hole has
+   water, which greens are bunkered and on which side, what guards the fairway. Each one
+   goes in that hole's **`avoid`**, named plainly ("the *water*", "*large bunkers* right of
+   the fairway AND the green"), and the big ones earn a `rules[]` chip so they are on the
+   first-tee read too. List every hazard found in the paper-trail section so the next
+   session doesn't have to rediscover it — and say which are unconfirmed.
+3. **Pin before you write.** Syndicated copies of a course tour shift the hole numbering,
    so match every tip against the pars and shapes on Jack's own card (or the official
    scorecard) before attaching it to a hole — and DROP any tip that can't be pinned. A
    floating tip on the wrong hole is worse than no tip.
-3. **Every note traceable.** A yardage or hazard means it was researched; a score, miss
+4. **Every note traceable.** A yardage or hazard means it was researched; a score, miss
    or stroke index means it came off his card. **Never describe a hole you haven't got a
    source for** — holes with no source get only his own record, which needs no briefing.
-4. **Centre of the green, always.** Never build a plan around a pin position — you can't
+5. **Centre of the green, always.** Never build a plan around a pin position — you can't
    know where the flag is on the day, and a plan written for one sends him at an edge on
    a course where his standing miss is already short. Every approach and par-3 note
    targets the **middle**, club chosen off the yardage to the middle. *Back pin*, *front
    pin*, *tucked* and *short-side* are smells. Hazard and green-complex facts are fine —
    where the trouble sits doesn't move; where the flag sits does.
-5. **Say where it came from.** Close the plan with a paper-trail section splitting
+6. **Say where it came from.** Close the plan with a paper-trail section splitting
    researched facts from card facts, source by source.
 Underneath that, `holeRecord()` shows what his own cards say about the hole (plays, average
 against par, best, the club he's used) — that one needs no briefing at all and flags a hole
