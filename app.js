@@ -360,6 +360,7 @@ const TITLES = {
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
   round:['Round Detail','One card, hole by hole, and what it cost you.'],
   live:['Live Round','Tap it in as you play — it scores itself.'],
+  preps:['Round Prep','Every course plan, kept for the next time.'],
 };
 
 function render(view, arg, keepScroll){
@@ -369,7 +370,7 @@ function render(view, arg, keepScroll){
   $('#pageTag').textContent = tag;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === view));
-  const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live }[view] || home;
+  const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
   $('#view').innerHTML = R(arg);
   buildJumpBar();
   if(!keepScroll) window.scrollTo(0,0);
@@ -408,6 +409,46 @@ function rerender(){
   if(window.scrollY !== y) window.scrollTo(0, y);
 }
 
+// ----- Round prep: every course plan, kept -----
+// What's coming up first, then the standing course plans (they don't expire — that's the
+// point of them), then the played ones as an archive. Lab routines (Swing Focus, Golf
+// Mind…) stay in their labs: a standing plan only counts as ROUND prep if its course is
+// one Jack actually has.
+function coursePlans(){
+  const t = today();
+  const known = [...S.courses.map(c => c.name), ...S.rounds.map(r => r.course)].filter(Boolean);
+  return {
+    up: S.briefings.filter(b => b.date && b.date >= t)
+      .sort((a, b) => (a.date || '').localeCompare(b.date || '')),
+    standing: S.briefings.filter(b => !b.date && b.course && known.some(n => courseMatches(b.course, n))),
+    past: S.briefings.filter(b => b.date && b.date < t)
+      .sort((a, b) => (b.date || '').localeCompare(a.date || '')),
+  };
+}
+function planRow(b){
+  const t = today();
+  const tag = !b.date ? 'standing plan' : b.date < t ? `played · ${fmtDate(b.date)}` : fmtDate(b.date);
+  const holes = (b.holes || []).filter(h => h && (h.play || h.note || (h.why || []).length)).length;
+  return `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
+    <span><b>${esc(b.course)}</b><span class="sm faint"> · ${tag}${holes ? ` · ${holes} hole notes` : ''}</span><br>
+    <span class="sm clip2">${esc(b.focus || 'Briefing ready')}</span></span><span class="arr">→</span></div>`;
+}
+function preps(){
+  const p = coursePlans();
+  const block = (title, list, note) => !list.length ? '' : `
+    <h2>${title}</h2>
+    <div class="card">${list.map(planRow).join('')}
+      ${note ? `<p class="sm faint" style="margin-top:8px">${note}</p>` : ''}</div>`;
+  const any = p.up.length + p.standing.length + p.past.length;
+  return `
+  <button class="backlink" data-action="go" data-view="home">← Home</button>
+  ${!any ? `<div class="card"><p class="sm">No course plans yet. Tell Claude where you're playing and one lands here — tee strategy, the holes that cost you, lay-up numbers off your ladder, and a note on every hole the research can support.</p></div>` : ''}
+  ${block('Coming up', p.up)}
+  ${block('Standing course plans', p.standing,
+    "These don't expire — course knowledge keeps. Each one's hole notes surface on that hole while you're logging a live round there.")}
+  ${block('Played', p.past, 'Kept for the next time you go back.')}`;
+}
+
 // ----- Home -----
 function home(){
   const dl = daysLeft(S.settings.returnDeadline);
@@ -430,25 +471,15 @@ function home(){
 
 
   ${(() => {
-    const today10 = today();
-    // Every course prep lives here for good: what's coming up first, then the standing
-    // course plans (they don't expire — that's the point of them), then the played ones
-    // as an archive. Lab routines (Swing Focus, Golf Mind…) stay in their labs — a
-    // standing plan only counts as ROUND prep if its course is one Jack actually has.
-    const known = [...S.courses.map(c => c.name), ...S.rounds.map(r => r.course)].filter(Boolean);
-    const isCoursePlan = b => !b.date && b.course && known.some(n => courseMatches(b.course, n));
-    const up = S.briefings.filter(b => b.date && b.date >= today10).sort((a,b) => (a.date||'').localeCompare(b.date||''));
-    const standing = S.briefings.filter(isCoursePlan);
-    const past = S.briefings.filter(b => b.date && b.date < today10)
-      .sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 3);
-    const tag = b => !b.date ? 'standing plan' : b.date < today10 ? `played · ${fmtDate(b.date)}` : fmtDate(b.date);
-    const rows = [...up, ...standing, ...past];
+    const p = coursePlans();
+    const next = [...p.up, ...p.standing, ...p.past][0];
+    const rest = p.up.length + p.standing.length + p.past.length - (next ? 1 : 0);
     return `<div class="card">
       <h2>Round prep</h2>
-      ${rows.length ? rows.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-        <span><b>${esc(b.course)}</b><span class="sm faint"> · ${tag(b)}</span><br>
-        <span class="sm clip2">${esc(b.focus || 'Briefing ready')}</span></span><span class="arr">→</span></div>`).join('')
+      ${next ? planRow(next)
       : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Golf Mind, Miracle 201) live in the <b>Swing</b> lab.</p>`}
+      ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="preps">
+        <span class="sm"><b>All round prep</b> · ${rest} more plan${rest === 1 ? '' : 's'} on file</span><span class="arr">→</span></div>` : ''}
       ${S.live ? '' : `<div class="linkrow" data-action="live-new" style="border-bottom:none;padding-bottom:0">
         <span><b>Play a live round</b><br><span class="sm">Tap each hole in as you go — clubs, fairways, greens, putts</span></span><span class="arr">→</span></div>`}
     </div>`;
@@ -1159,8 +1190,8 @@ function briefing(id){
   // An undated plan is usually a lab routine, but a COURSE plan is undated too — course
   // knowledge doesn't expire — and sending that one back to the Swing Lab is nonsense.
   const isCourse = !!played || S.rounds.some(r => courseMatches(r.course, b.course));
-  const backView = b.date || isCourse ? 'home' : (b.discipline === 'putting' ? 'putting' : 'swing');
-  const backLabel = b.date || isCourse ? 'Home' : (b.discipline === 'putting' ? 'Putting Lab' : 'Swing Lab');
+  const backView = b.date || isCourse ? 'preps' : (b.discipline === 'putting' ? 'putting' : 'swing');
+  const backLabel = b.date || isCourse ? 'Round Prep' : (b.discipline === 'putting' ? 'Putting Lab' : 'Swing Lab');
   return `
   <button class="backlink" data-action="go" data-view="${backView}">← ${backLabel}</button>
   <div class="card">
