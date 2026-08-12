@@ -210,23 +210,35 @@ every hole that has one, so the eye finds it without reading. Omit either where 
 nothing true to put in it; a padded slot is worse than a missing one. `why[]` are the
 bullets underneath and carry everything the slots don't.
 
-**Centre of the green, always (standing instruction, Aug 12 2026).** Never build a plan
-around a pin position. You cannot know where the flag is on the day, and a plan written
-for one is worse than no plan — it sends him at an edge on a course where his standing
-miss is already short. Every approach and par-3 note targets the **middle of the green**,
-and the club is chosen off the yardage to the middle. "Cover the middle, not the flag" is
-the house line; *back pin*, *front pin*, *tucked* and *short-side* are smells. Hazard and
-green-complex facts are fine when researched — where the trouble sits doesn't move; where
-the flag sits does. `yds` rides in the header, and the
-hole's own record renders as a LAST row under a rule. `*asterisks*` bold a phrase (applied after escaping, so the markup is
-author-only). A prose `note` still renders for older plans, but don't write new ones that
-way. Every note must be traceable: a yardage means it was researched, a score or a miss
-means it came off his card. **Never describe a hole you haven't got a source for.** The best source is the
-course's own pro tips (most course sites carry a hole-by-hole tour) — that's *what the
-course demands*, which outranks *what happened last time* as the lead of a note. One trap,
-learned at Sterling Farms: syndicated copies of a course tour shift the hole numbering, so
-pin every tip against the pars and shapes on Jack's own card before attaching it to a hole
-— and drop any tip that can't be pinned.
+`yds` rides in the header, the hole's own record renders as a LAST row under a rule, and
+`*asterisks*` bold a phrase (applied after escaping, so the markup is author-only). A
+prose `note` still renders for older plans, but don't write new ones that way.
+
+**The Sterling Farms standard (standing instruction, Aug 12 2026) — every round prep
+works this way now.** Jack approved the Sterling Farms plan as the model. When he names a
+course he's playing:
+
+1. **Research the course first.** Hunt the course's own hole-by-hole pro tips (most
+   course sites carry a tour; search snippets work when the site itself is blocked), then
+   reviews for hazards, doglegs, elevation, green complexes, and per-hole yardages.
+   *What the course demands* leads every note; *what happened last time* backs it up
+   underneath. Aim for a note on every hole the sources can support — the per-hole
+   `holes[]` notes are the highest-value part of the plan.
+2. **Pin before you write.** Syndicated copies of a course tour shift the hole numbering,
+   so match every tip against the pars and shapes on Jack's own card (or the official
+   scorecard) before attaching it to a hole — and DROP any tip that can't be pinned. A
+   floating tip on the wrong hole is worse than no tip.
+3. **Every note traceable.** A yardage or hazard means it was researched; a score, miss
+   or stroke index means it came off his card. **Never describe a hole you haven't got a
+   source for** — holes with no source get only his own record, which needs no briefing.
+4. **Centre of the green, always.** Never build a plan around a pin position — you can't
+   know where the flag is on the day, and a plan written for one sends him at an edge on
+   a course where his standing miss is already short. Every approach and par-3 note
+   targets the **middle**, club chosen off the yardage to the middle. *Back pin*, *front
+   pin*, *tucked* and *short-side* are smells. Hazard and green-complex facts are fine —
+   where the trouble sits doesn't move; where the flag sits does.
+5. **Say where it came from.** Close the plan with a paper-trail section splitting
+   researched facts from card facts, source by source.
 Underneath that, `holeRecord()` shows what his own cards say about the hole (plays, average
 against par, best, the club he's used) — that one needs no briefing at all and flags a hole
 averaging +1.5 or worse as one to play for bogey on purpose.
