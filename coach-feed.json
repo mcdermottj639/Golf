@@ -10312,6 +10312,26 @@
           }
         ]
       }
+    },
+    {
+      "id": "link21-kept-for-good-20260812",
+      "type": "club-update",
+      "target": "L.A.B. Golf LINK.2.1",
+      "club": {
+        "returnWindow": false,
+        "note": "THE PUTTER — KEPT. The return window was closed on purpose Aug 12, 2026: this is the gamer, not a trial, and the equipment half of the left miss is now settled. The only zero-torque head in the bag and the last one standing after the DF3i went back Aug 10. SETUP: L.A.B. Pistol 0, zero built-in press — shaft DEAD VERTICAL at address, hands ~1.35\" BEHIND the ball, measured on film Jul 30 and repeatable to 0.3°. That is this putter's designed geometry (69° lie, 2° effective loft, 0° lean), not a flaw. Don't manufacture lean. THE GRIND: distance control. Pace is what returned the last putter and it has never once been measured — the 30-ft ladder twice a week, logging shorts, spread and green speed, is the whole job. Tempo is already where it needs to be on this head: 2.0:1 measured across seven of eight clips against a 2:1 target. WATCH: narrow blade, lower MOI than a mallet, so an off-centre strike bleeds more ball speed here — strike is a distance fault before it's a line fault, and the tape test is still unrun. Its column carries the only two reds on the grid (face at impact, 1.5–1.7° left start line, both Jul 30, both on this head), and with no control putter left, re-measuring them on THIS head is the only thing that can move them. WHAT KEEPING IT MEANS: every remaining explanation for the left miss is aim or stroke, not gear."
+      }
+    },
+    {
+      "id": "history-link21-keeping-20260812",
+      "type": "history",
+      "date": "2026-08",
+      "text": "L.A.B. LINK.2.1 KEPT FOR GOOD — Aug 12, 2026. Return window closed by decision, not by lapsing. The putter search that ran from the Phantom 7.5 through the DF3i is over: one zero-torque narrow blade, gamed on purpose. Backup stays the Scotty Newport 2, a toe-hang blade against a confirmed SBST stroke — owned, not in the 14. What's left of the left miss is aim and pace, not gear."
+    },
+    {
+      "id": "link-return-window-action-done-20260812",
+      "type": "action-done",
+      "target": "link-return-window-action-20260810"
     }
   ]
 }
