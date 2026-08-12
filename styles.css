@@ -376,6 +376,12 @@ h2{scroll-margin-top:14px}
 .parpick .chip{padding:4px 11px;font-size:11px}
 .parpick em{font-family:var(--sans);font-size:9.5px;font-style:normal;font-weight:700;
   letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-right:2px}
+/* Not a direction — a qualifier on the miss, so it reads as its own kind of tap. */
+.chip.ns{background:transparent;border:1px dashed var(--burg);color:var(--btext);padding:8px 14px}
+.chip.ns.on{background:var(--burg);color:var(--burg-ink);border-style:solid}
+.res.ns{font-size:9.5px;letter-spacing:-.01em}
+body.night .chip.ns{background:transparent;border-color:var(--burg);color:var(--btext)}
+body.night .chip.ns.on{background:var(--burg);color:var(--burg-ink)}
 .chip.sc{display:inline-flex;flex-direction:column;align-items:center;gap:1px;padding:7px 13px;line-height:1.1}
 .chip.sc b{font-size:16px}
 .chip.sc i{font-size:8.5px;font-style:normal;letter-spacing:.05em;text-transform:uppercase;opacity:.75}

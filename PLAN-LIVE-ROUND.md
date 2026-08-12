@@ -303,6 +303,13 @@ record (a phone-thumbed "sterling farms" must not fork the season stats), a new 
 added to Courses on start, a tap-anywhere hole strip for navigation, and `bumpGearCounters()`
 rather than `finalizeRound(r)` since the shared block is exactly the gear counters.
 
+**Follow-on the same day — the `noshot` flag.** Jack noticed that some of his short green
+misses were holes where the drive left him no way to reach, which is a driving fault
+wearing an approach fault's clothes — and the app was telling him to re-baseline his carry
+ladder because of them. One chip on the Green row (par 4/5 only) now separates the two; see
+*Two ways to miss a green* in CLAUDE.md for what it changes and, just as importantly, what
+it deliberately leaves alone.
+
 **Testing.** No test suite exists, so validation was a Playwright harness driving a real
 Chromium at 390×844: an 18-hole round tapped in end to end, re-tap-to-clear, par switching
 dropping the fairway/approach rows, the score stepper past the chip range, a partial nine, a

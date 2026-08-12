@@ -151,6 +151,7 @@ differential — omit rather than guess). The value is in `holes[]`, one object 
 | `fmiss` | where a missed tee shot finished, same codes |
 | `tee` | **club key** hit off the tee — drives the *Off the tee · by club* table |
 | `app` | **club key** hit into the green on a par 4/5. Omit on par 3s: there the tee shot *is* the approach |
+| `noshot` | `true` when the tee shot left **no realistic play at the green** — see *Two ways to miss a green* below. Par 4/5 only |
 
 Tapping a round in **Scores** opens `roundView()` — the hole-by-hole card, scoring mix,
 par splits, miss directions, round-scoped coaching, and a comparison against the latest
@@ -179,6 +180,35 @@ Two things follow for anyone writing feed entries:
 - A live card carries **no `rating`/`slope`** at a course he hasn't played with a full card
   before, and none at all if he scored fewer than 9 or 18 holes (a part-round can't produce
   a differential). Backfill with `round-update` when he tells you the tees.
+
+### Two ways to miss a green (the `noshot` flag, Aug 12 2026)
+
+A green missed from a playable position asks a **club** question — was the number right?
+A green the tee shot already took away asks a **driving** one, and the stroke was gone
+before the approach club came out of the bag. Both used to land in the same bucket, which
+made the app's loudest finding ("you miss short → re-baseline your carry ladder") point at
+the wrong club whenever the real cause was the drive.
+
+`noshot:true` separates them. It is one chip on the live logger's Green row (par 4/5 only —
+on a par 3 the tee shot *is* the approach, so there is always a shot), independent of the
+direction chips: a hole can be both `gmiss:'S'` **and** `noshot:true`, and only the second
+fact says who to blame. Tapping it implies `gir:false`; tapping *Hit* clears it.
+
+What it changes, and what it deliberately doesn't:
+
+- **Miss directions** (round card, Scores, and the tips) compute over *playable* misses
+  only, and report the conceded ones alongside. `liveTroubles()` charges them to `off-tee`.
+- **The tee-club table gains a "Dead" column** — how often that club left him with no play.
+  It convicts a club far better than a fairway percentage does: most rough is playable and
+  none of these are, which is the real driver-vs-mini question.
+- **GIR% is unchanged.** A miss is a miss; the flag explains it, it does not erase it.
+- **Scrambling is unchanged.** Every missed green stays in the up-and-down denominator —
+  you scramble from where the ball is, not from where you meant to be.
+
+Only Jack can set this: a missed fairway is *not* the same thing, since plenty of rough
+leaves a clean look. Never infer it from `fw:false`. Rounds logged before this existed
+carry no flag, so their misses all read as playable — backfill with `round-update` if he
+tells you which holes.
 
 ### Hole data outranks a stats snapshot
 

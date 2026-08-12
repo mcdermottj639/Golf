@@ -1460,7 +1460,7 @@ function scoreStats(){
   const opening = { n:0, over:0 };
   const spots = new Map();
   const tee = new Map(), app = new Map();
-  const fw = { n:0, hit:0, miss:{} }, green = { n:0, hit:0, miss:{} };
+  const fw = { n:0, hit:0, miss:{} }, green = { n:0, hit:0, miss:{}, noshot:0 };
   const putts = { holes:0, total:0, one:0, three:0 };
   let holes = 0, over = 0;
   rs.forEach(r => r.holes.forEach((h, i) => {
@@ -1485,6 +1485,7 @@ function scoreStats(){
     if(h.gir != null){
       green.n++;
       if(h.gir) green.hit++;
+      else if(h.noshot) green.noshot++;      // charged to the tee, not the approach
       else { const g = h.gmiss || 'X'; green.miss[g] = (green.miss[g] || 0) + 1; }
     }
     if(h.fw != null){
@@ -1526,16 +1527,26 @@ function scoreTips(st){
   }
 
   // The hole-measured twin of the snapshot's "you miss short". This one counts greens
-  // you recorded yourself rather than an average computed elsewhere.
+  // you recorded yourself rather than an average computed elsewhere — and only the ones
+  // you had a play at, because a green the drive took away can't answer a club question.
   if(st.green.n >= 18){
     const missed = st.green.n - st.green.hit;
+    const real = missed - st.green.noshot;
     const top = Object.entries(st.green.miss).sort((x, y) => y[1] - x[1])[0];
-    if(missed >= 8 && top && top[1] / missed >= 0.4)
-      t.push({ s:'warn', src:`Approach · ${st.green.n} greens recorded`, h:`${Math.round(top[1] / missed * 100)}% of your green misses go ${MISS_LAB[top[0]] || top[0]}`,
-        b:`${top[1]} of ${missed} misses, off ${st.green.hit}/${st.green.n} greens hit. A miss that only ever goes one way is not dispersion — dispersion sprays every direction. ${top[0] === 'S'
+    if(real >= 8 && top && top[1] / real >= 0.4)
+      t.push({ s:'warn', src:`Approach · ${real} playable misses`, h:`${Math.round(top[1] / real * 100)}% of your playable green misses go ${MISS_LAB[top[0]] || top[0]}`,
+        b:`${top[1]} of ${real}${st.green.noshot ? `, after setting aside ${st.green.noshot} green${st.green.noshot === 1 ? '' : 's'} the tee shot took away` : ''}, off ${st.green.hit}/${st.green.n} greens hit. A miss that only ever goes one way is not dispersion — dispersion sprays every direction. ${top[0] === 'S'
           ? 'Short is a DISTANCE fault: the number you are clubbing to is longer than the club actually carries. Club to cover the middle-to-back of the green, and re-baseline the ladder to average carry rather than your purest strike.'
           : top[0] === 'Lg' ? 'Long is usually adrenaline or an overcorrection off a run of short ones — worth checking whether these follow your good drives.'
           : 'A one-sided miss this consistent is face-and-path, not club selection. That one belongs in the Swing lab.'}` });
+
+    // The other half of the split: when enough greens are conceded at the tee, the
+    // approach numbers are a symptom and the driving is the disease.
+    if(st.green.noshot >= 4 && st.green.noshot / missed >= 0.25){
+      const worst = [...st.tee.values()].filter(e => e.noshot).sort((x, y) => y.noshot - x.noshot)[0];
+      t.push({ s:'warn', src:`Off the tee · ${st.green.noshot} of ${missed} green misses`, h:`${Math.round(st.green.noshot / missed * 100)}% of your green misses were lost at the tee`,
+        b:`${st.green.noshot} of ${missed} missed greens came from holes where you had no realistic play once you reached the ball — the stroke was gone before the approach club came out of the bag. Approach practice cannot touch these${worst ? `, and ${clubName(worst.key)} accounts for ${worst.noshot} of them across ${worst.n} tee shots` : ''}. Compare that against the fairway percentages above: finding the short grass matters less than never being dead, and those are different bets.` });
+    }
   }
 
   if(st.putts.holes >= 36){
@@ -1588,20 +1599,21 @@ function clubTables(st){
   return `
   ${tee.length ? `<h2>Off the tee · by club</h2>
   <div class="card">
-    <table><tr><th>Club</th><th>Tees</th><th>Found it</th><th>Misses</th><th>Per hole</th></tr>
+    <table><tr><th>Club</th><th>Tees</th><th>Found it</th><th>Dead</th><th>Per hole</th></tr>
       ${tee.map(e => {
         // Par 3s have no fairway to hit, so the green is that tee shot's own result.
         const par3 = !e.fwN && e.girN;
         const n = par3 ? e.girN : e.fwN, hit = par3 ? e.girHit : e.fwHit;
         return `<tr>
-        <td class="sm"><b>${esc(clubName(e.key))}</b>${par3 ? '<br><span class="sm faint">par 3s</span>' : ''}</td>
+        <td class="sm"><b>${esc(clubName(e.key))}</b>${par3 ? '<br><span class="sm faint">par 3s</span>' : ''}
+          <br><span class="sm faint">${missSplit(par3 ? e.girMiss : e.fwMiss) || '—'}</span></td>
         <td>${e.n}</td>
         <td>${n ? `<b>${pct(hit, n)}</b><span class="sm faint"> ${hit}/${n}${par3 ? ' grn' : ''}</span>` : '<span class="faint">—</span>'}</td>
-        <td class="sm">${missSplit(par3 ? e.girMiss : e.fwMiss) || '—'}</td>
+        <td>${e.noshot ? `<b style="color:var(--burg)">${e.noshot}</b><span class="sm faint"> ${pct(e.noshot, e.n)}</span>` : '<span class="faint">—</span>'}</td>
         <td><b style="color:${e.over / e.n >= 1 ? 'var(--burg)' : e.over / e.n <= 0.5 ? 'var(--green)' : 'var(--ink)'}">${e.over > 0 ? '+' : ''}${(e.over / e.n).toFixed(2)}</b></td></tr>`;
       }).join('')}
     </table>
-    <p class="sm faint" style="margin-top:8px">"Found it" is fairways for a club hit off a par 4 or 5, and greens for one hit off a par 3 — on a par 3 the tee shot is the approach, so the green is its own result. "Per hole" is your score against par on the holes you hit that club. A club that finds more fairways but scores no better is not saving you anything, and that comparison is the whole point of this table.</p>
+    <p class="sm faint" style="margin-top:8px">"Found it" is fairways for a club hit off a par 4 or 5, and greens for one hit off a par 3 — on a par 3 the tee shot is the approach, so the green is its own result. <b>"Dead"</b> is the holes it left you no play at the green, which convicts a club far better than a fairway percentage: most rough is playable and none of these were. "Per hole" is your score against par on the holes you hit that club — a club that finds more fairways but scores no better is not saving you anything, and that comparison is the whole point of this table.</p>
   </div>` : ''}
 
   ${appTotal >= 10 ? `<h2>Into the green · by club</h2>
@@ -1679,6 +1691,7 @@ function scores(){
         <td><b>${Math.round(st.green.hit / st.green.n * 100)}%</b></td>
         <td class="sm">${missSplit(st.green.miss) || '—'}</td></tr>` : ''}
     </table>
+    ${st.green.noshot ? `<p class="sm" style="margin-top:8px"><b>${st.green.noshot} of the ${st.green.n - st.green.hit} missed greens were conceded at the tee</b> — no play at the green by the time you reached the ball. They're left out of the miss directions above, because they answer a driving question rather than a club one.</p>` : ''}
     ${st.putts.holes ? `<p class="sm" style="margin-top:8px"><b>Putting</b> — ${st.putts.one} one-putts and ${st.putts.three} three-putts across ${st.putts.holes} recorded holes · ${(st.putts.total / st.putts.holes).toFixed(2)} a hole, ${(st.putts.total / st.putts.holes * 18).toFixed(1)} a round.</p>` : ''}
     <p class="sm faint" style="margin-top:8px">Counted hole by hole from your own cards — not an average computed somewhere else.</p>
   </div>` : ''}
@@ -1736,7 +1749,7 @@ const MISS_KEY = { S:'short', L:'left', R:'right', Lg:'long' };  // → the stat
 // its 7-iron hit would make every tee-club number meaningless.
 function bagShot(map, key, h, d, own){
   let e = map.get(key);
-  if(!e){ e = { key, n:0, over:0, fwN:0, fwHit:0, fwMiss:{}, girN:0, girHit:0, girMiss:{} }; map.set(key, e); }
+  if(!e){ e = { key, n:0, over:0, fwN:0, fwHit:0, fwMiss:{}, girN:0, girHit:0, girMiss:{}, noshot:0 }; map.set(key, e); }
   e.n++;
   if(d != null) e.over += d;
   if(own.fw && h.fw != null){
@@ -1747,10 +1760,14 @@ function bagShot(map, key, h, d, own){
     e.girN++;
     if(h.gir) e.girHit++; else { const k = h.gmiss || 'X'; e.girMiss[k] = (e.girMiss[k] || 0) + 1; }
   }
+  // Leaving no play at the green is the tee shot's doing, so it lands on the tee club —
+  // and it convicts a club far better than a fairway percentage does, because plenty of
+  // rough is perfectly playable and none of this is.
+  if(own.tee && h.noshot) e.noshot++;
   return e;
 }
-const TEE_OWNS = h => ({ fw:true, green: h.par === 3 });
-const APP_OWNS = { fw:false, green:true };
+const TEE_OWNS = h => ({ fw:true, green: h.par === 3, tee:true });
+const APP_OWNS = { fw:false, green:true, tee:false };
 
 function roundAnalysis(r){
   const H = (Array.isArray(r.holes) ? r.holes : []).filter(h => h && h.par != null && h.s != null);
@@ -1758,7 +1775,7 @@ function roundAnalysis(r){
     mix:{ eagle:0, birdie:0, par:0, bogey:0, double:0, triple:0 },
     byPar:{ 3:{n:0,over:0}, 4:{n:0,over:0}, 5:{n:0,over:0} },
     putts:{ n:0, total:0, one:0, two:0, three:0, girN:0, girTot:0, offN:0, offTot:0, threes:[] },
-    gir:{ n:0, hit:0, miss:{} }, fw:{ n:0, hit:0, miss:{} },
+    gir:{ n:0, hit:0, miss:{}, noshot:0, noshotHoles:[] }, fw:{ n:0, hit:0, miss:{} },
     tee:new Map(), app:new Map(),
     scramble:{ chances:0, saved:0 }, blowups:[], nines:[] };
   H.forEach(h => {
@@ -1778,8 +1795,14 @@ function roundAnalysis(r){
       a.gir.n++;
       if(h.gir) a.gir.hit++;
       else {
-        const k = h.gmiss || 'X'; a.gir.miss[k] = (a.gir.miss[k] || 0) + 1;
-        // A missed green is an up-and-down chance; par or better means you got it.
+        // Two different faults wear the same result. A green missed from a playable
+        // position asks a club question; a green the tee shot already took away asks a
+        // driving one. Only the first belongs in the miss-direction read — but BOTH stay
+        // in gir.n, because a miss is a miss and the flag explains it, it doesn't erase it.
+        if(h.noshot){ a.gir.noshot++; a.gir.noshotHoles.push(h.n); }
+        else { const k = h.gmiss || 'X'; a.gir.miss[k] = (a.gir.miss[k] || 0) + 1; }
+        // A missed green is an up-and-down chance however you got there, so every miss
+        // counts here: you scramble from where the ball is, not from where you meant to be.
         a.scramble.chances++; if(d <= 0) a.scramble.saved++;
       }
     }
@@ -1813,12 +1836,18 @@ function roundTips(r, a){
   const pct = (n, d) => d ? Math.round(n / d * 100) : null;
   const missed = a.gir.n - a.gir.hit;
 
+  // Only greens you had a real play at can answer a club question.
+  const real = missed - a.gir.noshot;
+  if(a.gir.noshot >= 2)
+    t.push({ s:'warn', src:'Off the tee → approach', h:`${a.gir.noshot} green${a.gir.noshot === 1 ? '' : 's'} the drive took away`,
+      b:`Hole${a.gir.noshot === 1 ? '' : 's'} ${a.gir.noshotHoles.join(', ')} — no realistic play at the green once you got to the ball. These are NOT approach misses, whatever the shot that followed them looked like: the stroke was lost at the tee and only showed up one shot later. They stay out of the miss-direction read below${real ? `, which is computed over the ${real} green${real === 1 ? '' : 's'} you did have a shot at` : ''}. If this keeps recurring, the fix is a club off the tee that leaves you playing, not a different number into the green.` });
+
   const gm = Object.entries(a.gir.miss).sort((x,y) => y[1] - x[1])[0];
-  if(gm && missed >= 4 && gm[1] / missed >= 0.4 && gm[1] >= 3){
+  if(gm && real >= 4 && gm[1] / real >= 0.4 && gm[1] >= 3){
     const [dir, n] = gm;
     const base = g.approach && MISS_KEY[dir] ? g.approach[MISS_KEY[dir]] : null;
-    const holes = a.holes.filter(h => h.gir === false && (h.gmiss || 'X') === dir).map(h => h.n).join(', ');
-    t.push({ s:'warn', src:'Approach', h:`${n} of your ${missed} green misses went ${MISS_LAB[dir] || dir}`,
+    const holes = a.holes.filter(h => h.gir === false && !h.noshot && (h.gmiss || 'X') === dir).map(h => h.n).join(', ');
+    t.push({ s:'warn', src:'Approach', h:`${n} of your ${real} playable green misses went ${MISS_LAB[dir] || dir}`,
       b: `Holes ${holes}.${base != null ? ` Your tracked average is ${base}% ${MISS_LAB[dir]}, so this is the pattern rather than a bad day.` : ''} ${
         dir === 'S' ? 'Short is the one miss that can never finish close — it is where the bunkers and the false fronts live. Club to cover the BACK of the green: take the number to the flag, add the flag-to-back yardage, and pick the club that carries the middle of that window. And stop clubbing off your best strike — the ladder numbers are carries, and a three-quarter strike out of rough is 8–10 short of them.'
         : dir === 'Lg' ? 'Long is usually a club-selection overcorrection or an adrenaline strike. Note whether these were the holes you had a good drive on.'
@@ -1951,9 +1980,12 @@ function roundView(i){
   };
   // The club sits under the result, so one column answers both "what did you hit" and
   // "where did it finish" without a sixth column on a phone-width card.
-  const res = (v, missKey, club) => {
+  const res = (v, missKey, club, noshot) => {
     const out = v === true ? '<span class="res ok">✓</span>'
-      : v === false ? `<span class="res no">${MISS_LAB[missKey] || '✗'}</span>` : '<span class="faint">·</span>';
+      // On a conceded green the direction is beside the point — the headline fact about
+      // the hole is that the tee shot ended it.
+      : v === false ? `<span class="res no${noshot ? ' ns' : ''}">${noshot ? 'no shot' : (MISS_LAB[missKey] || '✗')}</span>`
+      : '<span class="faint">·</span>';
     return club ? `${out}<span class="cl">${esc(clubTag(club))}</span>` : out;
   };
   const subRow = n => `<tr class="sub"><td>${n.lab}</td><td>${n.par}</td><td>${n.score}</td>
@@ -1963,7 +1995,7 @@ function roundView(i){
     rows.push(`<tr><td><b>${h.n ?? idx + 1}</b>${h.si ? `<span class="si"> ${h.si}</span>` : ''}</td>
       <td class="sm">${h.par}</td><td>${mark(h)}</td>
       <td class="sm">${h.putts ?? '·'}</td>
-      <td>${res(h.gir, h.gmiss, h.par === 3 ? null : h.app)}</td>
+      <td>${res(h.gir, h.gmiss, h.par === 3 ? null : h.app, h.noshot)}</td>
       <td>${res(h.fw, h.fmiss, h.tee)}</td></tr>`);
     if(a.nines.length === 2 && idx === 8) rows.push(subRow(a.nines[0]));
   });
@@ -2029,7 +2061,8 @@ function roundView(i){
   <h2>Where the misses went</h2>
   <div class="card">
     ${a.gir.n ? `<p class="sm"><b>Greens</b> — ${a.gir.hit} of ${a.gir.n} hit${
-      a.gir.hit < a.gir.n ? `. Misses: ${missSplit(a.gir.miss)}.` : '.'}</p>` : ''}
+      a.gir.hit < a.gir.n ? `. Misses: ${missSplit(a.gir.miss) || '—'}${
+        a.gir.noshot ? `, plus <b class="warn">${a.gir.noshot} with no shot at it</b> (hole${a.gir.noshot === 1 ? '' : 's'} ${a.gir.noshotHoles.join(', ')})` : ''}.` : '.'}</p>` : ''}
     ${a.fw.n ? `<p class="sm" style="margin-top:6px"><b>Fairways</b> — ${a.fw.hit} of ${a.fw.n} hit${
       a.fw.hit < a.fw.n ? `. Misses: ${missSplit(a.fw.miss)}.` : '.'}</p>` : ''}
     ${a.putts.n ? `<p class="sm" style="margin-top:6px"><b>Putting</b> — ${a.putts.one} one-putt${
@@ -2110,6 +2143,7 @@ function liveRound(L){
     if(h.par !== 3){
       if(h.fw != null){ o.fw = h.fw; if(h.fw === false && h.fmiss) o.fmiss = h.fmiss; }
       if(h.app) o.app = h.app;
+      if(h.noshot) o.noshot = true;
     }
     return o;
   });
@@ -2133,9 +2167,9 @@ function fullCard(r){ return r.holes.length === 9 || r.holes.length === 18; }
 function liveTroubles(a){
   const out = [];
   if(a.putts.three >= 2) out.push('three-putts');
-  if(a.fw.n >= 6 && a.fw.hit / a.fw.n < 0.45) out.push('off-tee');
-  const missed = a.gir.n - a.gir.hit;
-  if(missed >= 4 && (a.gir.miss.S || 0) / missed >= 0.4) out.push('approach');
+  if((a.fw.n >= 6 && a.fw.hit / a.fw.n < 0.45) || a.gir.noshot >= 2) out.push('off-tee');
+  const real = a.gir.n - a.gir.hit - a.gir.noshot;
+  if(real >= 4 && (a.gir.miss.S || 0) / real >= 0.4) out.push('approach');
   return out;
 }
 
@@ -2238,7 +2272,12 @@ function livePlay(L){
       ${chip('green', 'S', 'Short', h.gir === false && h.gmiss === 'S')}
       ${chip('green', 'L', 'Left', h.gir === false && h.gmiss === 'L')}
       ${chip('green', 'R', 'Right', h.gir === false && h.gmiss === 'R')}
-      ${chip('green', 'Lg', 'Long', h.gir === false && h.gmiss === 'Lg')}</div>`)}
+      ${chip('green', 'Lg', 'Long', h.gir === false && h.gmiss === 'Lg')}</div>${
+      // Separate toggle, not a sixth direction: a short one you had no play at is both
+      // short AND conceded, and only the second fact tells you which club to blame.
+      par3 ? '' : `<div class="chips"><span class="chip big ns${h.noshot ? ' on' : ''}"
+        data-action="live-set" data-k="noshot" data-v="1">No shot at it</span></div>`}`,
+      par3 ? '' : 'the drive left you nothing')}
     ${row('Putts', `<div class="chips">${[0,1,2,3,4,5].map(p =>
       chip('putts', p, p === 5 ? '5+' : p, h.putts === p)).join('')}</div>`)}
     ${row('Score', `<div class="chips">${scores}${outlier}
@@ -2382,7 +2421,8 @@ const ACTIONS = {
     const lit = el.classList.contains('on');   // re-tapping a lit chip clears it
     if(k === 'par'){
       h.par = +v;
-      if(h.par === 3){ delete h.fw; delete h.fmiss; delete h.app; }
+      // A par 3 has no fairway, no separate approach, and always a shot at the green.
+      if(h.par === 3){ delete h.fw; delete h.fmiss; delete h.app; delete h.noshot; }
     }
     else if(k === 'tee' || k === 'app'){ if(lit) delete h[k]; else h[k] = v; }
     else if(k === 'fw'){
@@ -2392,8 +2432,15 @@ const ACTIONS = {
     }
     else if(k === 'green'){
       if(lit){ delete h.gir; delete h.gmiss; }
-      else if(v === 'hit'){ h.gir = true; delete h.gmiss; }
+      else if(v === 'hit'){ h.gir = true; delete h.gmiss; delete h.noshot; }  // on it = you had a shot
       else { h.gir = false; h.gmiss = v; }
+    }
+    else if(k === 'noshot'){
+      if(lit) delete h.noshot;
+      // You cannot have no play at the green and still hit it in regulation, so this
+      // settles the green result too — but it leaves any direction alone, because a
+      // conceded green can still be a factual "finished short".
+      else { h.noshot = true; if(h.gir !== false){ h.gir = false; delete h.gmiss; } }
     }
     else if(k === 'putts'){ if(lit) delete h.putts; else h.putts = +v; }
     else if(k === 's'){ h.s = lit ? null : +v; }
