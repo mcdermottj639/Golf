@@ -1,7 +1,8 @@
-# Plan — Live Round mode (workshop draft, not built)
+# Plan — Live Round mode (workshop draft v2, not built)
 
-*Drafted 2026-08-12 on `claude/live-round-updater-plan-911qg0`. This is the build spec for a
-follow-up session. Nothing here is implemented yet.*
+*Drafted 2026-08-12 on `claude/live-round-updater-plan-911qg0`; revised the same day after
+the round deep-dive commit (`ec84539`) landed and Jack answered the open questions. This
+is the build spec for a follow-up session. Nothing here is implemented yet.*
 
 ## What Jack asked for
 
@@ -10,40 +11,51 @@ follow-up session. Nothing here is implemented yet.*
 
 So: an **on-course, hole-by-hole logger** — not another after-the-round form. Tap the tee
 club, tap the result, tap the putts, next hole. On finish it becomes a normal round in
-`S.rounds` and every existing analytic picks it up with zero glue.
+`S.rounds` and lands directly on that round's own analysis page.
 
-## Why the app is already 80% ready
+Decisions from Jack (2026-08-12): keep the fairway row; **approach club is in v1 as an
+optional row** ("we'll see how much I use it"); **saving jumps straight to the round's
+analysis in Scores** — i.e. `roundView`, not the Scores list.
 
-1. **The hole schema already exists.** The Sterling Farms feed round
-   (`round-sterlingfarms-20260812`) carries per-hole
-   `{ n, par, si, s, putts, gir, gmiss, fw, fmiss }` — green misses as `L/R/S/Lg`,
-   fairway misses as `L/R`. A live round should emit **exactly this schema** plus one new
-   field, and everything downstream (`withHoles()`, `scoreStats()`, `roundPar()`,
-   `estIndex()`, worst-holes, par splits) works untouched.
-2. **The analytics funnel exists.** `scores()` → `scoreStats()` → `scoreTips()` +
-   `statTips()` already turns hole data into coaching copy, and `statsCoverPutter()`
-   already counts logged rounds as evidence covering the gamer putter.
-3. **What's missing** is (a) a capture UI usable mid-round, (b) the tee-club field, and
-   (c) aggregation of the per-hole detail fields — today `gir/fw/gmiss/fmiss/putts` at
-   hole level are *stored but never read*; only pasted GHIN `stats` snapshots drive the
-   direction/putting tips.
+## Why the app is now ~90% ready
 
-## The one new data field
+1. **The hole schema exists and is documented.** CLAUDE.md ("Logging a round") specifies
+   per-hole `{ n, par, s, si, putts, gir, gmiss, fw, fmiss }` — miss codes
+   `S / L / R / Lg / X`, and **`fw` omitted entirely on par 3s** (not `false`) so they
+   don't count against the fairway rate. A live round must emit exactly this schema plus
+   the two new club fields below.
+2. **The per-round analysis engine already exists** (`ec84539`): tapping a round in
+   Scores opens `roundView(i)` — traditional scorecard with circle/square marks,
+   scoring mix, par splits, miss directions, scramble rate, SI-tier split, putts
+   on-GIR-vs-off, `roundTips()` coaching with per-hole callouts, and `roundVsBaseline()`
+   against the latest GHIN snapshot. **Every block self-hides when its data is absent —
+   which means a live-logged round, arriving with full detail on every hole, lights the
+   whole page up.** The "goes right into the analysis" ask is mostly *already built*;
+   the live logger is the missing input side.
+3. **Season-level aggregation of the detail fields is still missing.** `scoreStats()`
+   reads only score-vs-par; `gir/fw/gmiss/fmiss/putts` are analysed per-round by
+   `roundAnalysis()` but never summed across rounds. And nothing anywhere records
+   **which club** was hit — the thing Jack asked for by name.
+
+## The two new data fields
 
 ```js
 // per hole, alongside n/par/si/s/putts/gir/gmiss/fw/fmiss:
-tee: 'driver'        // club id (S.clubs id) of the club hit from the tee
+tee: 'driver',   // club id (S.clubs id) hit from the tee
+app: 'i7'        // OPTIONAL — club id of the approach shot (par 4/5); skip freely
 ```
 
-Club *id*, not name — names change (`club-update`), ids don't. Render via a lookup with a
-graceful fallback to the raw string so an id that has left the bag still displays.
-On par 3s the tee club is the approach club; that's fine — `tee` + `gir/gmiss` on a par 3
-*is* the iron-control record, no extra field needed.
+Club *ids*, not names — names change (`club-update`), ids don't. Render via lookup with
+graceful fallback to the raw string so an id that leaves the bag still displays. On a
+par 3 the tee club *is* the approach club — `tee` + `gir/gmiss` there is the
+iron-control record; `app` stays par-4/5 only.
 
-The finished round object: `{ date, course, tees, par, rating, slope, score, putts,
-troubles, note, holes:[...], live:true }` — same shape `save-round` and the feed's
-`round` type produce today, so the Every-round table, sparkline, and differential math
-need no changes. `putts` at round level = sum of hole putts.
+The finished round object: `{ date, course, tees, nine?, par, rating?, slope?, score,
+putts, troubles, note, holes:[...], live:true }` — the documented shape, so the rounds
+table, sparkline, differential math and `roundView` need no schema work. Round `putts` =
+sum of hole putts. `rating`/`slope` only when actually known (both or neither, per
+CLAUDE.md); `troubles` keys strictly from `TROUBLES` since they drive lesson matching
+for the next three rounds.
 
 ## State & flow
 
@@ -51,184 +63,205 @@ need no changes. `putts` at round level = sum of hole putts.
 
 ```js
 S.live = null | {
-  date, course, tees,
-  cur: 0,                       // index of the hole being edited
-  holes: [ {n, par, si, tee, fw, fmiss, gir, gmiss, putts, s}, ... ],
-  prevLayout: true|false        // whether par/si were prefilled from history
+  date, course, tees, nine,      // nine: 'F' | 'B' | null (full 18)
+  cur: 0,                        // index of the hole being edited
+  holes: [ {n, par, si, tee, app, fw, fmiss, gir, gmiss, putts, s}, ... ],
+  prevLayout: true|false         // par/si prefilled from history?
 }
 ```
 
 - Add `s.live = s.live ?? null` in `migrate()`.
 - **`save()` after every single tap.** iOS suspends and kills PWAs constantly;
-  localStorage is the only thing that survives. A round in progress must be losable only
-  by explicit discard.
+  localStorage is what survives. A round in progress must be losable only by explicit
+  discard.
 - New view `live` in `TITLES` + the `render()` map. **Not** in the bottom nav — entry is
-  from Home (below) and the view renders its own exit affordances.
+  from Home; the view renders its own exit affordances.
 
 ### Entry points (Home)
 
 - A **"Start a live round"** card: course input (reuse `courseList` datalist + the
-  courses-db autofill that's already wired into the `input` listener), date defaulting to
-  `today()`, and — when a dated briefing exists for today — a one-tap chip with that
-  briefing's course name. 9 vs 18 choice (sets `nine:'F'/'B'` or full 18).
-- When `S.live` exists, the start card is replaced by a **resume banner** at the very top
-  of Home: "Round in progress — Sterling Farms · hole 7 · +6 → Resume / Discard".
-  Discard confirms first.
+  courses-db autofill already wired into the `input` listener), date defaulting to
+  `today()`, 9 (front/back) vs 18 choice, and — when a dated briefing exists for today —
+  a one-tap chip with that briefing's course.
+- When `S.live` exists, the start card becomes a **resume banner** at the very top of
+  Home: "Round in progress — Sterling Farms · hole 7 · +6 → Resume / Discard". Discard
+  confirms first.
 
 ### Prefill from history — the big speed win
 
-On start, find the most recent round in `S.rounds` at the same course that has `holes`:
-copy its `par`, `si`, `n` layout and its `tees/rating/slope`. Wianno and Sterling Farms
-already have full layouts on record, so at a repeat course Jack never types par — he only
-taps club/result/putts/score. At a new course, par defaults to 4 and gets tapped per hole.
-If no history gives rating/slope, leave them `null` (see feed backfill below).
+On start, find the most recent round in `S.rounds` at the same course with `holes`
+(matching `nine` when set): copy its `n/par/si` layout and its `tees/rating/slope`.
+Wianno and Sterling Farms already have full layouts on record, so at a repeat course
+Jack never types a par — only club/result/putts/score. At a new course, par defaults to
+4 and gets tapped per hole; rating/slope stay null (see feed backfill below).
 
 ### The hole screen — one screen per hole, thumbs only, zero keyboard
 
-Sticky header: **Hole 7 · Par 4 · SI 11** + running total ("+6 thru 6"). Then, top to
-bottom:
+Sticky header: **Hole 7 · Par 4 · SI 11** + running total ("+6 thru 6"). Then:
 
-1. **Par** — chips `3 / 4 / 5` (pre-selected from layout when known).
-2. **Off the tee** — club chips built from `S.clubs` where `status==='gaming'` and
-   `cat` is not `wedge`/`putter`, longest first (driver, mini, 2-iron utility, then
-   irons). Wedges excluded from v1 — no par 3 on his card plays at 80–122 yds often
-   enough to earn the row space; revisit if one does. Most-recently-used club sorts
-   first within its slot so the common pattern is tap-top-chip.
-3. **Fairway** — `Hit / L / R` (row hidden entirely on par 3) → `fw:true` or
-   `fw:false, fmiss:'L'|'R'`.
-4. **Green** — `Hit / L / R / S / Lg` → `gir` + `gmiss`. Same vocabulary as
-   `MISS_CYCLE` in the 5-ft putting test, on purpose — one miss language across the app.
-5. **Putts** — stepper `0 – 5+`, default 2.
-6. **Score** — stepper, default = par; big `− n +`.
-7. **Prev / Next hole** — free navigation both ways (fixing hole 3 while walking hole 5
-   must work). On the last hole, Next becomes **Finish round**.
+1. **Par** — chips `3 / 4 / 5` (pre-selected when the layout is known).
+2. **Off the tee** — club chips from `S.clubs` where `status==='gaming'` and `cat` not
+   `wedge`/`putter`, longest first (driver, mini, 2-iron utility, then irons); the
+   most-recently-used club sorts first within its slot so the common case is
+   tap-top-chip. Wedges excluded from the tee row in v1.
+3. **Fairway** — `Hit / L / R` (row hidden entirely on par 3; the field is *omitted*,
+   never `false`, on par 3s) → `fw` + `fmiss`.
+4. **Approach club** *(par 4/5 only, optional)* — same chip builder as the tee row but
+   **including gaming wedges** and nothing pre-selected; skipping it is the expected
+   default. This is the "we'll see how much I use it" row: it must never gate Next, and
+   if it goes untouched for a few rounds it can be demoted behind a toggle without a
+   schema change.
+5. **Green** — `Hit / L / R / S / Lg` → `gir` + `gmiss`. Same miss vocabulary as
+   `MISS_LAB`/`MISS_CYCLE` — one miss language across the app. (No `X` chip; a skipped
+   direction on a missed green just stores `gir:false` with no `gmiss`, which
+   `roundAnalysis()` already buckets as `X`.)
+6. **Putts** — stepper `0 – 5+`, default 2.
+7. **Score** — stepper, default = par; big `− n +`.
+8. **Prev / Next** — free navigation both ways (fixing hole 3 while walking hole 5 must
+   work). On the last hole, Next becomes **Finish round**.
 
-Every control is a re-tappable toggle (tap again to clear), matching the existing chip
-behavior. Target: ~5 taps on a typical hole, under 15 seconds while walking off the green.
-
-All fields except score are skippable — a half-logged hole (score only) is valid and the
-aggregations must treat every detail field as optional, exactly as `scoreStats()` already
-guards `h.s == null`.
+Every control is a re-tappable toggle (tap again to clear), matching existing chip
+behavior. Target: ~5 taps on a typical hole, under 15 seconds walking off the green.
+All fields except score are skippable — a half-logged hole is valid, and every consumer
+already treats detail fields as optional.
 
 ### Finish flow
 
-Review screen: front/back/total, putts total, editable `tees` text, one whole-round note
-field (`troubles`-style chips too — see auto-derive below, chips arrive pre-lit and Jack
-can adjust). **Save** then:
+Review screen: front/back/total, putts total, editable `tees` text, one whole-round
+note, and the `troubles` chips **pre-lit from the data** — compute `roundAnalysis()` on
+the draft round and light `three-putts` (≥2 three-putt holes), `off-tee` (fairways
+< 45%), `approach` (green misses mostly `S`); Jack confirms or untaps. **Save** then:
 
 1. Builds the round object, `S.rounds.push(r)`, clears `S.live`.
-2. Advances gear counters exactly as `save-round` does today (grip rounds, gaming-wedge
-   grooves). **Factor that block into a shared `finalizeRound(r)`** used by both paths
-   rather than duplicating it.
-3. **Auto-derives `troubles` from the hole data** so `struggles()`/`coachSignals()` and
-   the Coach lesson picker keep working without being asked: ≥2 three-putt holes →
-   `three-putts`; fairways < 45% → `off-tee`; GIR misses mostly `S` → `approach` — each
-   pre-lights its chip on the review screen, Jack confirms or untaps.
-4. `save(); render('scores')` + toast "Round saved — Coach updated" — landing on Scores
-   *is* the "goes right into the analysis" moment; he should see the tables move.
+2. Advances gear counters exactly as `save-round` does (grip rounds, gaming-wedge
+   grooves) — **factor that block into a shared `finalizeRound(r)`** used by both paths.
+3. `save()` then **`render('round', S.rounds.length - 1)`** — straight into the new
+   round's own `roundView` deep dive, per Jack's call. Toast: "Round saved — tap Scores
+   for the season view." The full page of round-scoped tips lighting up *is* the reward
+   loop.
 
-## Analysis & coaching integration (the actual point)
+## Analysis & coaching integration
 
-Extend `scoreStats()` to aggregate the detail fields it currently ignores — sourced from
-**all** rounds with holes, so the Sterling Farms feed round contributes on day one:
+### Per-round: `roundView` (mostly free, two additions)
+
+A live round feeds the existing engine with zero glue. Two small extensions:
+
+- **Show the clubs.** The hole-by-hole table's Tee column currently shows only the
+  fairway result; when `tee` exists, show the club short-name with it (e.g. `Dr ✓`,
+  `Mini left`), and likewise `app` beside the Green column when recorded. Short-name via
+  a small `clubAbbr(id)` helper with raw-string fallback.
+- **One new `roundTips()` entry — tee-club pattern within the round:** when ≥2 clubs
+  have ≥3 tee shots each in this round and their fairway rates split hard, say so
+  ("Driver 1/6 fairways today; the mini went 4/4 — tomorrow's tee plan writes itself"),
+  threshold-gated like every other tip so it stays silent on thin data.
+
+### Season-level: `scoreStats()` + `scores()` (the new build)
+
+Extend `scoreStats()` to aggregate what `roundAnalysis()` computes per round, across all
+rounds with holes — the Sterling Farms feed round contributes on day one:
 
 ```js
 tee:   Map(clubId → { n, fwN, fwHit, missL, missR, over }),  // over = strokes vs par on those holes
-fw:    { n, hit, L, R },
-green: { n, hit, L, R, S, Lg },
-putts: { holes, total, one, three }                          // three = 3-putt-or-worse count
+app:   Map(clubId → { n, girHit, miss:{} }),                 // renders only once data exists
+fw:    { n, hit, miss:{} },
+green: { n, hit, miss:{} },
+putts: { holes, total, one, three }
 ```
 
-New `scores()` sections (each renders only when its data exists, like everything else on
-that page):
+(Reuse the `MISS_LAB` vocabulary and the same omit-vs-false conventions; don't duplicate
+`roundAnalysis()` — either call it per round and sum, or share a fold helper.)
 
-- **Off the tee** — table: club · tee shots · fairway % · miss split · score vs par per
-  hole. This is the section Jack asked for by name, and it's where the
-  driver-vs-mini-driver question (the mini is literally in the bag as the
-  "fairway-finder") finally gets a number instead of a vibe.
-- **Where approaches finish** — GIR % and a miss-direction bar from `gmiss`. This is the
-  live-data twin of the GHIN "misses short" snapshot stat.
-- **Putting, from your own holes** — putts/round, one-putt and three-putt counts.
+New `scores()` sections, each rendering only when its data exists:
 
-New `scoreTips()` entries, threshold-gated with sample-size guards exactly in the style
-of `thin()` / the existing tips (each carries its number):
+- **Off the tee** — table: club · tee shots · fairway % · miss split · score vs par on
+  those holes. The section Jack asked for by name — where driver-vs-mini (the mini is in
+  the bag *as* the fairway-finder) finally gets a number instead of a vibe.
+- **Approaches by club** — GIR % and miss split per approach club, only once `app` has
+  been logged enough to say anything (≥10 recorded approaches). If Jack never uses the
+  row, this section simply never appears.
+- **Where misses go & putting, season view** — GIR %, fairway %, miss-direction bars,
+  one-putt/three-putt counts across live-logged holes: the hole-measured twin of the
+  GHIN snapshot numbers.
 
-- **Tee-club verdict** — only when ≥2 clubs have ≥8 tee shots each and fairway % differs
-  by ≥15 points: "The mini finds 71% of fairways; the driver 38% — and the holes score
-  the same. The driver is costing position without buying strokes." (Or the reverse —
-  the tip argues whichever way the data points, including "the driver misses cost
-  nothing, keep hitting it.")
-- **Live miss-direction** — the hole-level version of `statTips()`'s "You miss short,
-  not sideways", firing from `green.S` share instead of a pasted snapshot.
-- **Three-putt pace** — ties hole-counted 3-putts to the standing distance-control
-  priority and the 30-ft ladder drill already on the card.
+New season `scoreTips()`, threshold-gated with sample guards in the house style (each
+carries its number):
+
+- **Tee-club verdict** — ≥2 clubs with ≥8 tee shots each and fairway % apart by ≥15
+  points; argues whichever way the data points, including "the driver misses cost
+  nothing, keep hitting it."
+- **Live miss-direction** — hole-level version of `statTips()`'s "You miss short, not
+  sideways", firing from the season `green.miss` share.
+- **Three-putt pace** — hole-counted 3-putts across rounds, tied to the standing
+  distance-control priority and the 30-ft ladder.
 
 **Precedence rule (extends "film is king"):** hole-logged data is *measured*; a GHIN
-snapshot is *summarized*; feel is *feel*. Where a live-derived tip and a `statTips()`
-snapshot tip would say the same thing, the live one wins and the snapshot version yields
-(same pattern as the existing `bigSampleSaysFine` guard, pointed the other way once live
-sample size passes the snapshot's). Until then both may show with their sample sizes —
-the tips already carry `src` labels for exactly this.
+snapshot is *summarized*; feel is *feel*. Where a season live-derived tip and a
+`statTips()` snapshot tip would say the same thing, the live one wins once its sample
+passes the snapshot's (same pattern as the existing `bigSampleSaysFine` guard, pointed
+the other way). Until then both may show — tips already carry `src` labels with sample
+sizes for exactly this. `roundVsBaseline()` already handles the per-round comparison and
+needs nothing.
 
-`statsCoverPutter()` needs nothing: it already treats any round dated after the gamer's
-`since` as coverage, so the first live round with the LINK automatically retires the
-"nothing measured yet" warning — and its 38-putt cousin becomes real putter evidence.
+`statsCoverPutter()` needs nothing: any round dated after the gamer's `since` counts as
+coverage, so the first live round with the LINK automatically retires the "nothing
+measured yet" warning — and its putt count becomes real putter evidence.
 
 ## Feed-side changes (two small ones)
 
 1. **Dedupe guard in `applyFeed`'s `round` handler:** skip when `S.rounds` already has a
-   round with the same `date + course + nine`. Today the only guard is `feedId`, so if
-   Jack live-logs a round and later sends me the GHIN summary (or I log it from his
-   message out of habit), the round double-counts in every stat. The convention "don't
-   feed rounds he live-logged" isn't enough on its own — the guard makes the mistake
-   harmless, same philosophy as `course-add`'s name check.
-2. **New `round-update` feed type:** match a round by `date + course` (+ optional
-   `nine`), `Object.assign` round-level fields, and merge per-hole fields by hole `n`.
-   Live rounds will land without `rating`/`slope` at new courses (breaking `roundDiff()`
-   → est. index for that round) and Jack won't type slope mid-round — this lets me
-   backfill it, or correct a fat-fingered hole, from the feed afterward. Follows the
-   existing `session-update`/`club-update` pattern. Remember: unknown types are skipped
-   forward-compatibly, so this must ship in app.js *before or with* any feed entry that
-   uses it.
+   round with the same `date + course + nine`. Today the only guard is `feedId`, so a
+   live-logged round plus a later GHIN feed entry for the same round double-counts every
+   stat. The guard makes the mistake harmless — same philosophy as `course-add`'s name
+   check.
+2. **New `round-update` feed type:** match by `date + course` (+ optional `nine`),
+   `Object.assign` round-level fields, merge per-hole fields by hole `n`. Live rounds
+   land without `rating`/`slope` at new courses (killing `roundDiff()` → est. index for
+   that round), and Jack won't type slope mid-round — this lets Claude backfill it, or
+   correct a fat-fingered hole, afterward. Follows the `session-update`/`club-update`
+   pattern. Ship it in app.js *before or with* any feed entry that uses it (unknown
+   types are skipped forward-compatibly).
 
 ## Not in v1 (deliberately)
 
-- **Approach-club tracking on par 4/5** — the obvious phase 2. One more chip row per
-  hole doubles the input cost on every hole; ship the tee version, and add it only if
-  Jack still wants it after a few live rounds. The schema slot (`app` field) costs
-  nothing to reserve mentally; don't build the UI yet.
-- Penalty strokes as a field (goes in the round note), GPS/rangefinder anything,
-  strokes-gained, shot-by-shot, editing past rounds in the UI (that's what
-  `round-update` is for), any backend.
+- Penalty strokes as a field (round note covers it), GPS/rangefinder anything,
+  strokes-gained, shot-by-shot beyond tee/approach, editing past rounds in the UI
+  (that's `round-update`'s job), any backend.
 
 ## Build checklist (for the implementing session)
 
 1. `migrate()`: `s.live = s.live ?? null`.
-2. `TITLES.live` + entry in `render()`'s map; `live()` view function (start screen /
-   hole screen / finish screen off `S.live` state).
+2. `TITLES.live` + `render()` map entry; `live()` view (start / hole / finish screens
+   off `S.live`).
 3. Home: start card + resume banner.
-4. `ACTIONS`: `live-start`, `live-set` (one delegated handler reading `data-*`, not ten),
-   `live-prev/next`, `live-finish`, `live-discard`. Persist on every mutation.
-5. Factor gear-counter block out of `save-round` into `finalizeRound(r)`; both paths use it.
-6. `scoreStats()` aggregation + three `scores()` sections + three `scoreTips()` entries
-   + snapshot-yield guard.
-7. `applyFeed`: round dedupe guard + `round-update` type.
-8. `styles.css`: large-tap chip variant + stepper (~40 lines; stay inside the existing
+4. `ACTIONS`: `live-start`, one delegated `live-set` handler reading `data-*` (not ten
+   handlers), `live-prev/next`, `live-finish`, `live-discard`. Persist on every mutation.
+5. Factor gear-counter block out of `save-round` into `finalizeRound(r)`; both paths use
+   it. Pre-light finish-screen troubles from `roundAnalysis()` of the draft.
+6. `roundView`: club names in the hole table (`clubAbbr` helper) + the within-round
+   tee-club tip.
+7. `scoreStats()` season aggregation + the new `scores()` sections + season tips +
+   snapshot-yield guard.
+8. `applyFeed`: round dedupe guard + `round-update` type.
+9. `styles.css`: large-tap chip variant + stepper (~40 lines; stay inside the existing
    chip/btn language).
-9. `sw.js`: bump `CACHE` to v22 — **the phone doesn't get new app code without this.**
-10. CLAUDE.md: document `tee` field, `round-update`, the dedupe guard, and the
-    live-vs-snapshot precedence rule.
-11. Validate (`node --check app.js`, JSON check if the feed changed), commit, push,
+10. `sw.js`: the fetch handler is network-first (`cache:'no-store'` with cache
+    fallback), so changed files reach the phone on the next online open without a bump —
+    bump `CACHE` only if a new file is added to `ASSETS` (none planned). A courtesy bump
+    is harmless.
+11. CLAUDE.md: document `tee`/`app` fields, `round-update`, the dedupe guard, the
+    live-vs-snapshot precedence rule, and that live rounds are user-layer data (never in
+    the feed).
+12. Validate (`node --check app.js`; JSON check if the feed changed), commit, push,
     **fast-forward `main`** per the standing instruction.
 
-Estimated footprint: ~300 lines in `app.js`, ~40 in `styles.css`, one-line `sw.js` bump.
-No new files, no framework, still offline-first — the live view needs zero network.
+Estimated footprint: ~350 lines in `app.js`, ~40 in `styles.css`. No new files, no
+framework, still offline-first — the live view needs zero network.
 
-## Open questions for Jack (defaults chosen so building can start without answers)
+## Decisions log (was: open questions)
 
-1. **Input depth per hole** — the six-row screen above, or a leaner four-row version
-   (drop the fairway row, keep tee club + green + putts + score)? *Default: six rows;
-   fairway data is what makes the tee-club table say something.*
-2. **Approach club in v1?** *Default: no — phase 2 after the tee version proves itself.*
-3. **Should finishing a live round land on Scores or back on Home?** *Default: Scores —
-   seeing the analysis move is the reward loop.*
+1. **Fairway row** — kept. It's what makes the tee-club table mean something: "driver
+   6/14 fairways" needs the per-hole hit/miss, and it's one tap.
+2. **Approach club** — in v1 as an optional, never-blocking row (Jack, 2026-08-12).
+   Usage will decide whether it stays prominent, gets demoted behind a toggle, or earns
+   deeper analytics.
+3. **After save** — jump straight to the new round's `roundView` (Jack, 2026-08-12).
