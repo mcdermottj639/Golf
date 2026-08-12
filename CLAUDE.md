@@ -76,6 +76,8 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `action-update`  | Rewrite action `target` text |
 | `carries`        | Replace the distance ladder (ignored once the user calibrates) |
 | `course-add` / `course-remove` | Add/remove a course |
+| `round`          | Add a played round (see *Logging a round* below) |
+| `stats`          | Add/replace a cumulative stats snapshot (GHIN summaries); `replaces` swaps one out |
 | `test`           | Append a 10-ball putter test result |
 | `shortlist`      | Replace the putter shortlist (keeps prior `demoed` flags) |
 | `briefing` / `briefing-remove` | Round-prep briefings & standing plans (see *Writing briefings* below) |
@@ -130,6 +132,28 @@ Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 �
 - **Log a filmed putting session**: append a `session` entry; update `evolution` /
   `faults` if the read changed.
 - **Close out a to-do**: append an `action-done` targeting the action's id.
+### Logging a round (the hole array is the whole point)
+
+A `round` entry carries `date`, `course`, `par`, `score`, `putts`, `troubles[]`, `note`, and
+optionally `tees`, `nine` (`'F'`/`'B'`), `rating` + `slope` (both needed for a handicap
+differential — omit rather than guess). The value is in `holes[]`, one object per hole:
+
+| Field | Meaning |
+|---|---|
+| `n` · `par` · `s` | hole number, par, score — the minimum; everything else is optional |
+| `si` | stroke index. Unlocks the hardest-six / easiest-six split |
+| `putts` | putts on that hole. Unlocks 1/2/3-putt counts and putts-on-GIR-vs-off |
+| `gir` | `true`/`false` — green in regulation |
+| `gmiss` | where a missed green finished: `S` `L` `R` `Lg` `X` (short/left/right/long/other) |
+| `fw` | `true`/`false` — fairway hit. **Omit entirely on par 3s** so they don't count against the fairway rate |
+| `fmiss` | where a missed tee shot finished, same codes |
+
+Tapping a round in **Scores** opens `roundView()` — the hole-by-hole card, scoring mix,
+par splits, miss directions, round-scoped coaching, and a comparison against the latest
+`stats` snapshot. Every block hides itself when its data is absent, so a score-only round
+still opens; it just shows less. `troubles[]` must use the keys in `TROUBLES` (`app.js`
+top) — they also feed lesson matching for the next three rounds.
+
 ### Writing briefings (they render in layers — write for that)
 
 `briefing()` renders a plan as four layers, so depth is opt-in rather than a wall of text:

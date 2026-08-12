@@ -321,3 +321,20 @@ h2{scroll-margin-top:14px}
 .steprules{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;padding-top:11px;border-top:1px solid var(--line2)}
 .steprules span{font-family:var(--sans);font-size:10.5px;font-weight:700;padding:5px 10px;
   border-radius:20px;background:var(--burg);color:var(--burg-ink)}
+
+/* ---- Hole-by-hole card: one row per hole, tight enough to read on a phone ---- */
+.scard th,.scard td{padding:6px 3px;text-align:center}
+.scard th:first-child,.scard td:first-child{text-align:left;padding-left:2px}
+.scard tr.sub td{background:var(--card2);font-weight:700;font-size:12.5px}
+.scard .si{font-size:9px;color:var(--faint);font-family:var(--sans);font-weight:600}
+/* Traditional markers: circle under par, square over, doubled for two clear of it. */
+.mark{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;
+  font-weight:700;font-size:13.5px;line-height:1}
+.mark.par{color:var(--ink)}
+.mark.bird{border:1.5px solid var(--gtext);border-radius:50%;color:var(--gtext)}
+.mark.eag{border:3px double var(--gtext);border-radius:50%;color:var(--gtext)}
+.mark.bog{border:1.5px solid var(--btext);color:var(--btext)}
+.mark.dbl{border:3px double var(--btext);color:var(--btext)}
+.res{font-family:var(--sans);font-size:10px;font-weight:700}
+.res.ok{color:var(--gtext);font-size:13px}
+.res.no{color:var(--btext)}

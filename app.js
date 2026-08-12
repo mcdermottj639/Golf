@@ -318,6 +318,7 @@ const TITLES = {
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
+  round:['Round Detail','One card, hole by hole, and what it cost you.'],
 };
 
 function render(view, arg){
@@ -327,7 +328,7 @@ function render(view, arg){
   $('#pageTag').textContent = tag;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === view));
-  const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing }[view] || home;
+  const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView }[view] || home;
   $('#view').innerHTML = R(arg);
   buildJumpBar();
   window.scrollTo(0,0);
@@ -1541,16 +1542,300 @@ function scores(){
   <h2>Every round</h2>
   <div class="card">
     <table><tr><th>Date</th><th>Course</th><th>Tees</th><th>Score</th><th>vs par</th><th>Putts</th></tr>
-      ${all.slice().reverse().map(r => { const v = roundVsPar(r); return `<tr>
-        <td style="white-space:nowrap">${fmtDate(r.date)}</td>
+      ${all.slice().reverse().map(r => { const v = roundVsPar(r); return `<tr data-action="open-round" data-i="${S.rounds.indexOf(r)}" style="cursor:pointer">
+        <td style="white-space:nowrap">${fmtDate(r.date)} <span class="faint">▸</span></td>
         <td class="sm">${esc(r.course || '—')}${r.nine ? ` <span class="faint">${r.nine === 'F' ? 'front' : 'back'}</span>` : ''}</td>
         <td class="sm">${esc(r.tees || '—')}</td>
         <td><b>${esc(r.score ?? '—')}</b></td>
         <td class="sm">${v == null ? '—' : `<b style="color:${v > 5 ? 'var(--burg)' : v <= 2 ? 'var(--green)' : 'var(--ink)'}">${v > 0 ? '+' : ''}${v}</b>`}</td>
         <td class="sm">${esc(r.putts ?? '—')}</td></tr>`; }).join('')}
     </table>
-    ${all.some(r => r.note) ? `<p class="sm faint" style="margin-top:8px">Latest note: "${esc(all.filter(r=>r.note).slice(-1)[0].note)}"</p>` : ''}
+    <p class="sm faint" style="margin-top:8px">Tap any round for the hole-by-hole card and its own breakdown.${
+      all.some(r => r.note) ? ` Latest note: "${esc(all.filter(r=>r.note).slice(-1)[0].note)}"` : ''}</p>
   </div>`;
+}
+
+// ----- Single round deep dive -----
+// Rounds arrive with wildly different detail. The early cards are par-and-score only;
+// the Aug 12 card is the first carrying a putt count, a green result and a tee result
+// on every hole. Everything below is computed from whatever a round actually has, and
+// each block hides itself when the data behind it isn't there — so a 60-second logged
+// round still opens, it just shows less.
+const MISS_LAB = { S:'short', L:'left', R:'right', Lg:'long', X:'other' };
+const MISS_KEY = { S:'short', L:'left', R:'right', Lg:'long' };  // → the stats-baseline field
+
+function roundAnalysis(r){
+  const H = (Array.isArray(r.holes) ? r.holes : []).filter(h => h && h.par != null && h.s != null);
+  const a = { holes:H, par:roundPar(r), score:r.score ?? null, vs:roundVsPar(r),
+    mix:{ eagle:0, birdie:0, par:0, bogey:0, double:0, triple:0 },
+    byPar:{ 3:{n:0,over:0}, 4:{n:0,over:0}, 5:{n:0,over:0} },
+    putts:{ n:0, total:0, one:0, two:0, three:0, girN:0, girTot:0, offN:0, offTot:0, threes:[] },
+    gir:{ n:0, hit:0, miss:{} }, fw:{ n:0, hit:0, miss:{} },
+    scramble:{ chances:0, saved:0 }, blowups:[], nines:[] };
+  H.forEach(h => {
+    const d = h.s - h.par;
+    if(d <= -2) a.mix.eagle++; else if(d === -1) a.mix.birdie++; else if(d === 0) a.mix.par++;
+    else if(d === 1) a.mix.bogey++; else if(d === 2) a.mix.double++; else a.mix.triple++;
+    if(a.byPar[h.par]){ a.byPar[h.par].n++; a.byPar[h.par].over += d; }
+    if(d >= 2) a.blowups.push(h);
+    if(h.putts != null){
+      a.putts.n++; a.putts.total += h.putts;
+      if(h.putts <= 1) a.putts.one++; else if(h.putts === 2) a.putts.two++;
+      else { a.putts.three++; a.putts.threes.push(h); }
+      if(h.gir === true){ a.putts.girN++; a.putts.girTot += h.putts; }
+      else if(h.gir === false){ a.putts.offN++; a.putts.offTot += h.putts; }
+    }
+    if(h.gir != null){
+      a.gir.n++;
+      if(h.gir) a.gir.hit++;
+      else {
+        const k = h.gmiss || 'X'; a.gir.miss[k] = (a.gir.miss[k] || 0) + 1;
+        // A missed green is an up-and-down chance; par or better means you got it.
+        a.scramble.chances++; if(d <= 0) a.scramble.saved++;
+      }
+    }
+    if(h.fw != null){
+      a.fw.n++;
+      if(h.fw) a.fw.hit++;
+      else { const k = h.fmiss || 'X'; a.fw.miss[k] = (a.fw.miss[k] || 0) + 1; }
+    }
+  });
+  if(!a.putts.n && r.putts != null) a.putts.total = r.putts;   // round-level count only
+  if(H.length > 9) [['Out',0,9],['In',9,18]].forEach(([lab,s,e]) => {
+    const seg = H.slice(s,e); if(!seg.length) return;
+    a.nines.push({ lab, par:seg.reduce((x,h)=>x+h.par,0), score:seg.reduce((x,h)=>x+h.s,0),
+      putts: seg.every(h => h.putts != null) ? seg.reduce((x,h)=>x+h.putts,0) : null,
+      gir: seg.filter(h => h.gir === true).length,
+      girN: seg.filter(h => h.gir != null).length,
+      fw: seg.filter(h => h.fw === true).length,
+      fwN: seg.filter(h => h.fw != null).length });
+  });
+  a.blowups.sort((x,y) => (y.s - y.par) - (x.s - x.par));
+  return a;
+}
+
+// Round-scoped coaching. Same rule as the season tips: every card carries the number
+// that triggered it, and nothing fires without enough data behind it to mean something.
+function roundTips(r, a){
+  const t = [];
+  const g = latestStats() || {};
+  const pct = (n, d) => d ? Math.round(n / d * 100) : null;
+  const missed = a.gir.n - a.gir.hit;
+
+  const gm = Object.entries(a.gir.miss).sort((x,y) => y[1] - x[1])[0];
+  if(gm && missed >= 4 && gm[1] / missed >= 0.4 && gm[1] >= 3){
+    const [dir, n] = gm;
+    const base = g.approach && MISS_KEY[dir] ? g.approach[MISS_KEY[dir]] : null;
+    const holes = a.holes.filter(h => h.gir === false && (h.gmiss || 'X') === dir).map(h => h.n).join(', ');
+    t.push({ s:'warn', src:'Approach', h:`${n} of your ${missed} green misses went ${MISS_LAB[dir] || dir}`,
+      b: `Holes ${holes}.${base != null ? ` Your tracked average is ${base}% ${MISS_LAB[dir]}, so this is the pattern rather than a bad day.` : ''} ${
+        dir === 'S' ? 'Short is the one miss that can never finish close — it is where the bunkers and the false fronts live. Club to cover the BACK of the green: take the number to the flag, add the flag-to-back yardage, and pick the club that carries the middle of that window. And stop clubbing off your best strike — the ladder numbers are carries, and a three-quarter strike out of rough is 8–10 short of them.'
+        : dir === 'Lg' ? 'Long is usually a club-selection overcorrection or an adrenaline strike. Note whether these were the holes you had a good drive on.'
+        : 'A one-sided miss on this many greens is a face-and-path pattern, not bad luck. It is a swing item — take it to the Swing lab rather than to club selection.' }` });
+  }
+
+  const fm = Object.entries(a.fw.miss).sort((x,y) => y[1] - x[1])[0];
+  const fwMissed = a.fw.n - a.fw.hit;
+  if(fm && fwMissed >= 4 && fm[1] / fwMissed >= 0.5 && fm[1] >= 3)
+    t.push({ s:'warn', src:'Off the tee', h:`${fm[1]} of your ${fwMissed} tee misses went ${MISS_LAB[fm[0]] || fm[0]}`,
+      b:`${a.fw.hit} of ${a.fw.n} fairways${g.driving && g.driving.fairway != null ? ` against a tracked ${g.driving.fairway}%` : ''}. A miss that repeats to one side is a start-line pattern you can aim around for a round and fix in practice — set the tee shot up to bring the ${MISS_LAB[fm[0]] === 'left' ? 'left' : 'right'} side into play and let the miss finish in the short grass.` });
+
+  if(a.putts.three >= 2)
+    t.push({ s:'warn', src:'Putting · pace', h:`${a.putts.three} three-putts — ${a.putts.three} strokes`,
+      b:`Holes ${a.putts.threes.map(h => h.n).join(', ')}.${a.putts.threes.some(h => h.gir === true) ? ' At least one came from a green hit in regulation, which is a par turned into a bogey by pace alone.' : ''} This is distance control, the open fault, and it is what the 30-ft ladder exists to measure. A round gives you the total; it cannot give you the spread or the green speed.` });
+
+  if(a.putts.girN >= 3 && a.putts.offN >= 3){
+    const on = a.putts.girTot / a.putts.girN, off = a.putts.offTot / a.putts.offN;
+    t.push({ s: on > 2.05 ? 'warn' : 'good', src:'Putting · split', h:`${on.toFixed(2)} putts on greens hit · ${off.toFixed(2)} on greens missed`,
+      b:`${on > 2.05 ? `Over two putts a green when you hit it in regulation is the putter, not the short game — ${a.putts.girN} greens hit and you did not convert one of them into a one-putt beyond the birdie.`
+        : `At or under two putts a green when you hit it, which is where it should be.`} Off the green, ${off.toFixed(2)} means your chips are finishing at two-putt range rather than tap-in range — every tenth you take off that number is a shot a round.` });
+  }
+
+  if(a.putts.n >= 9){
+    const onePc = pct(a.putts.one, a.putts.n), base = g.putting && g.putting.one;
+    t.push({ s: a.putts.one <= 1 ? 'mid' : 'good', src:'Putting · conversion', h:`${a.putts.one} one-putt${a.putts.one === 1 ? '' : 's'} in ${a.putts.n} holes`,
+      b:`${onePc}% of holes${base != null ? ` against a tracked ${base}%` : ''}. ${a.putts.one <= 1
+        ? `Holing out is where the strokes are: two-putting everything from everywhere still costs you the round. If the come-backers are going in but nothing from range is, that is a pace-and-read problem, not a stroke problem — and it matches "not dropping the 10–20 footers".`
+        : `Converting at this rate is what keeps a scrambling round respectable.`}` });
+  }
+
+  if(a.scramble.chances >= 6){
+    const sp = pct(a.scramble.saved, a.scramble.chances);
+    const base = g.upDownsPerRound != null && g.gir != null
+      ? Math.round(g.upDownsPerRound / (18 * (1 - g.gir / 100)) * 100) : null;
+    t.push({ s: sp >= 30 ? 'good' : 'warn', src:'Scrambling', h:`${a.scramble.saved} of ${a.scramble.chances} greens missed and still saved · ${sp}%`,
+      b:`With ${a.gir.hit} greens hit, the short game played ${a.scramble.chances} holes of this round${base != null ? `. Your tracked rate is about ${base}%` : ''}. At this green rate, up-and-down percentage moves your score more than ball-striking does — it is the cheapest thing on the list to practise.` });
+  }
+
+  if(a.nines.length === 2){
+    const [o, i] = a.nines, d = (i.score - i.par) - (o.score - o.par);
+    if(Math.abs(d) >= 4) t.push({ s:'mid', src:'Shape of the round', h:`The ${d > 0 ? 'back' : 'front'} nine cost you ${Math.abs(d)} more`,
+      b:`Out ${o.score} (${o.score - o.par > 0 ? '+' : ''}${o.score - o.par}) · In ${i.score} (${i.score - i.par > 0 ? '+' : ''}${i.score - i.par}). A gap this size inside one round is usually fitness, focus or a swing thought that drifted — not a different golfer. Worth noting what changed at the turn.` });
+  }
+
+  if(a.blowups.length){
+    const cost = a.blowups.reduce((x,h) => x + (h.s - h.par - 1), 0);
+    t.push({ s:'warn', src:'Biggest single lever', h:`${a.blowups.length} hole${a.blowups.length === 1 ? '' : 's'} of double or worse · ${cost} stroke${cost === 1 ? '' : 's'} over bogey`,
+      b:`${a.blowups.map(h => `hole ${h.n} (par ${h.par}, ${h.s})`).join(' · ')}. Turning each of these into a bogey is ${cost} shots without hitting one better shot. On a hole that starts badly, take the punch-out.` });
+  }
+
+  // Stroke index tiers. A card where the easy holes cost as much as the hard ones is
+  // a scoring problem rather than a ball-striking one — the course offered and you passed.
+  if(a.holes.length >= 18 && a.holes.every(h => h.si)){
+    const tier = lo => a.holes.filter(h => h.si >= lo && h.si <= lo + 5)
+      .reduce((x,h) => x + (h.s - h.par), 0);
+    const hard = tier(1), mid = tier(7), easy = tier(13);
+    t.push({ s: easy >= hard ? 'warn' : 'mid', src:'By stroke index',
+      h:`Hardest six +${hard} · middle six +${mid} · easiest six +${easy}`,
+      b:`${easy >= hard
+        ? `The six holes the card says are easiest cost you as much as the six hardest. That is not ball-striking — the hard holes are being played about as well as they can be. It is scoring: the give-away holes are not giving anything back, and those are where a round gets better without a better swing.`
+        : `The gradient runs the right way — the easy holes are cheaper than the hard ones, which is what a stroke index is supposed to produce.`} On the six easiest, the plan is a fairway, a middle-of-the-green number and a two-putt; there is nothing to attack.` });
+  }
+
+  const good = a.mix.par + a.mix.birdie + a.mix.eagle;
+  if(a.holes.length >= 9 && good / a.holes.length >= 0.28)
+    t.push({ s:'good', src:'Protect this', h:`${good} holes at par or better`,
+      b:`${Math.round(good / a.holes.length * 100)}% of the card${a.mix.birdie + a.mix.eagle ? `, including ${a.mix.birdie + a.mix.eagle} under par` : ''}. The base game showed up — the gap in this round is the tail, not the average.` });
+
+  const order = { warn:0, mid:1, good:2 };
+  return t.sort((x,y) => order[x.s] - order[y.s]);
+}
+
+// This round's rates against whatever tracked baseline exists, so a number has
+// something to be good or bad against.
+function roundVsBaseline(a){
+  const g = latestStats();
+  if(!g) return '';
+  const pct = (n, d) => d ? n / d * 100 : null;
+  const rows = [
+    ['Greens in reg.', a.gir.n ? pct(a.gir.hit, a.gir.n) : null, g.gir, 'up'],
+    ['Fairways hit', a.fw.n ? pct(a.fw.hit, a.fw.n) : null, g.driving && g.driving.fairway, 'up'],
+    ['Putts', a.putts.total || null, g.putts, 'down'],
+    ['One-putts', a.putts.n ? pct(a.putts.one, a.putts.n) : null, g.putting && g.putting.one, 'up'],
+    ['Three-putts', a.putts.n ? pct(a.putts.three, a.putts.n) : null, g.putting && g.putting.three, 'down'],
+    ['Par or better', a.holes.length ? pct(a.mix.par + a.mix.birdie + a.mix.eagle, a.holes.length) : null, parOrBetter(g), 'up'],
+    ['Double or worse', a.holes.length ? pct(a.mix.double + a.mix.triple, a.holes.length) : null, blowUps(g), 'down'],
+  ].filter(r => r[1] != null && r[2] != null);
+  if(rows.length < 3) return '';
+  const fmt = (k, v) => k === 'Putts' ? (+v).toFixed(v % 1 ? 1 : 0) : `${(+v).toFixed(0)}%`;
+  return `
+  <h2>This round vs your baseline</h2>
+  <div class="card">
+    <table><tr><th>Metric</th><th>This round</th><th>${esc(g.label || 'Tracked')}</th><th>Δ</th></tr>
+      ${rows.map(([k, now, was, dir]) => {
+        const d = now - was, better = dir === 'up' ? d > 0 : d < 0;
+        return `<tr><td class="sm"><b>${k}</b></td><td><b>${fmt(k, now)}</b></td>
+          <td class="sm faint">${fmt(k, was)}</td>
+          <td class="sm"><b style="color:${Math.abs(d) < 0.5 ? 'var(--faint)' : better ? 'var(--green)' : 'var(--burg)'}">${
+            Math.abs(d) < 0.5 ? '—' : `${d > 0 ? '+' : ''}${d.toFixed(Math.abs(d) < 10 ? 1 : 0)}`}</b></td></tr>`;
+      }).join('')}
+    </table>
+    <p class="sm faint" style="margin-top:8px">One round against ${g.roundsScoring || g.rounds || 'the'} tracked rounds — read the direction, not the decimals.</p>
+  </div>`;
+}
+
+function roundView(i){
+  const r = S.rounds[+i];
+  if(!r) return scores();
+  const a = roundAnalysis(r);
+  const tips = roundTips(r, a);
+  const played = S.courses.find(c => (c.name || '').toLowerCase() === (r.course || '').toLowerCase());
+  // Traditional card markers: circle under par, square over.
+  const mark = h => {
+    const d = h.s - h.par;
+    const cls = d <= -2 ? 'eag' : d === -1 ? 'bird' : d === 0 ? 'par' : d === 1 ? 'bog' : 'dbl';
+    return `<span class="mark ${cls}">${h.s}</span>`;
+  };
+  const res = (v, missKey) => v === true ? '<span class="res ok">✓</span>'
+    : v === false ? `<span class="res no">${MISS_LAB[missKey] || '✗'}</span>` : '<span class="faint">·</span>';
+  const subRow = n => `<tr class="sub"><td>${n.lab}</td><td>${n.par}</td><td>${n.score}</td>
+    <td>${n.putts ?? ''}</td><td>${n.girN ? n.gir : ''}</td><td>${n.fwN ? n.fw : ''}</td></tr>`;
+  const rows = [];
+  a.holes.forEach((h, idx) => {
+    rows.push(`<tr><td><b>${h.n ?? idx + 1}</b>${h.si ? `<span class="si"> ${h.si}</span>` : ''}</td>
+      <td class="sm">${h.par}</td><td>${mark(h)}</td>
+      <td class="sm">${h.putts ?? '·'}</td><td>${res(h.gir, h.gmiss)}</td><td>${res(h.fw, h.fmiss)}</td></tr>`);
+    if(a.nines.length === 2 && idx === 8) rows.push(subRow(a.nines[0]));
+  });
+  if(a.nines.length === 2) rows.push(subRow(a.nines[1]));
+  const bar = [['birdie','Birdie or better',a.mix.eagle+a.mix.birdie],['par','Par',a.mix.par],
+               ['bogey','Bogey',a.mix.bogey],['double','Double+',a.mix.double+a.mix.triple]];
+  const tiles = [
+    ['Score', a.score ?? '—'],
+    ['vs par', a.vs == null ? '—' : `${a.vs > 0 ? '+' : ''}${a.vs}`],
+    ['Putts', a.putts.total || '—'],
+  ];
+  if(a.gir.n) tiles.push(['Greens', `${a.gir.hit}/${a.gir.n}`]);
+  if(a.fw.n) tiles.push(['Fairways', `${a.fw.hit}/${a.fw.n}`]);
+  if(a.scramble.chances) tiles.push(['Up & down', `${a.scramble.saved}/${a.scramble.chances}`]);
+  const missLine = m => Object.entries(m).sort((x,y) => y[1] - x[1])
+    .map(([k,v]) => `${v} ${MISS_LAB[k] || k}`).join(' · ');
+  return `
+  <button class="backlink" data-action="go" data-view="scores">← Scores</button>
+  <div class="card">
+    <h2>${esc(r.course || 'Round')}</h2>
+    <p class="sm faint">${fmtDate(r.date)}${r.tees ? ` · ${esc(r.tees)} tees` : ''}${
+      r.nine ? ` · ${r.nine === 'F' ? 'front' : 'back'} nine` : ''}${
+      a.par != null ? ` · par ${a.par}` : ''}${r.rating != null && r.slope ? ` · ${r.rating}/${r.slope}` : ''}</p>
+    <div class="rowgrid ${tiles.length === 4 ? '' : 'g3'}" style="margin-bottom:4px">
+      ${tiles.map(([l,v]) => `<div class="stat"><div class="v">${esc(v)}</div><div class="l">${l}</div></div>`).join('')}
+    </div>
+    ${r.note ? `<p class="sm" style="margin-top:8px">"${esc(r.note)}"</p>` : ''}
+    ${r.troubles && r.troubles.length ? `<div class="chips">${r.troubles.map(k => {
+      const lab = (TROUBLES.find(t => t[0] === k) || [null, k])[1];
+      return `<span class="chip static on">${esc(lab)}</span>`; }).join('')}</div>` : ''}
+    ${played ? `<div class="linkrow" data-action="edit-course" data-id="${played.id}">
+      <span class="sm"><b>${played.rating ? `You rated this course ${played.rating}/10` : 'Rate this course'}</b></span><span class="arr">→</span></div>` : ''}
+  </div>
+
+  ${a.holes.length ? `
+  <h2>Hole by hole</h2>
+  <div class="card">
+    <table class="scard">
+      <tr><th>Hole</th><th>Par</th><th>Score</th><th>Putts</th><th>Green</th><th>Tee</th></tr>
+      ${rows.join('')}
+    </table>
+    <p class="sm faint">Small grey number is the stroke index. Circle = under par, square = over.
+    ${a.gir.n ? 'Green and Tee show the miss direction where it was recorded; a dot means it was not.' : ''}</p>
+  </div>
+
+  <h2>Scoring mix</h2>
+  <div class="card">
+    <div class="mixbar">${bar.filter(b => b[2]).map(b =>
+      `<span class="${b[0]}" style="width:${b[2] / a.holes.length * 100}%"></span>`).join('')}</div>
+    <table style="margin-top:10px"><tr><th>Result</th><th>Holes</th><th>Share</th></tr>
+      ${bar.map(b => `<tr><td class="sm"><b>${b[1]}</b></td><td>${b[2]}</td>
+        <td class="sm">${Math.round(b[2] / a.holes.length * 100)}%</td></tr>`).join('')}
+    </table>
+    ${[3,4,5].some(p => a.byPar[p].n) ? `<table style="margin-top:10px"><tr><th>Par</th><th>Holes</th><th>Over</th><th>Per hole</th></tr>
+      ${[3,4,5].filter(p => a.byPar[p].n).map(p => { const d = a.byPar[p]; return `<tr>
+        <td><b>Par ${p}</b></td><td>${d.n}</td><td>${d.over > 0 ? '+' : ''}${d.over}</td>
+        <td><b style="color:${d.over/d.n >= 1 ? 'var(--burg)' : d.over/d.n <= 0.5 ? 'var(--green)' : 'var(--ink)'}">${(d.over/d.n).toFixed(2)}</b></td></tr>`; }).join('')}
+    </table>` : ''}
+    ${a.nines.length === 2 ? `<p class="sm" style="margin-top:8px">Out <b>${a.nines[0].score}</b> · In <b>${a.nines[1].score}</b>${
+      a.nines[0].putts != null ? ` · putts ${a.nines[0].putts}/${a.nines[1].putts}` : ''}.</p>` : ''}
+  </div>` : `<div class="card"><p class="sm faint">No hole-by-hole detail on this round — send Claude the card and it lands here with every hole, which is what fills in everything below.</p></div>`}
+
+  ${(a.gir.n && a.gir.hit < a.gir.n) || (a.fw.n && a.fw.hit < a.fw.n) ? `
+  <h2>Where the misses went</h2>
+  <div class="card">
+    ${a.gir.n ? `<p class="sm"><b>Greens</b> — ${a.gir.hit} of ${a.gir.n} hit${
+      a.gir.hit < a.gir.n ? `. Misses: ${missLine(a.gir.miss)}.` : '.'}</p>` : ''}
+    ${a.fw.n ? `<p class="sm" style="margin-top:6px"><b>Fairways</b> — ${a.fw.hit} of ${a.fw.n} hit${
+      a.fw.hit < a.fw.n ? `. Misses: ${missLine(a.fw.miss)}.` : '.'}</p>` : ''}
+    ${a.putts.n ? `<p class="sm" style="margin-top:6px"><b>Putting</b> — ${a.putts.one} one-putt${
+      a.putts.one === 1 ? '' : 's'} · ${a.putts.two} two-putts · ${a.putts.three} three-putt${
+      a.putts.three === 1 ? '' : 's'} · ${(a.putts.total / a.putts.n).toFixed(2)} a hole.</p>` : ''}
+  </div>` : ''}
+
+  ${tips.length ? `<h2>What this round says</h2>
+  <div class="card">
+    ${tips.map(t => `<div class="tipcard ${t.s === 'good' ? 'green' : ''}">
+      <div class="src">${esc(t.src)}</div><h4>${t.h}</h4>${expandable(t.b)}</div>`).join('')}
+    <p class="sm faint">Computed from this card alone — every line carries the number that triggered it.</p>
+  </div>` : ''}
+
+  ${roundVsBaseline(a)}`;
 }
 
 // ----- Data / backup -----
@@ -1583,6 +1868,7 @@ function dataView(){
 // ---------- Actions ----------
 const ACTIONS = {
   'go': el => { editingCourse = null; render(el.dataset.view); },
+  'open-round': el => render('round', +el.dataset.i),
   'save-deadline': () => {
     const v = $('#deadlineInput').value;
     if(!v) return toast('Pick a date first');
@@ -1668,7 +1954,7 @@ const ACTIONS = {
   'open-lesson': el => render('lesson', el.dataset.id),
   'edit-course': el => {
     editingCourse = S.courses.find(c=>c.id===el.dataset.id) || null;
-    rerender();
+    render('courses');   // reachable from the round view too, so go there rather than rerender
     $('#courseFormAnchor')?.scrollIntoView({behavior:'smooth'});
   },
   'cancel-edit-course': () => { editingCourse = null; rerender(); },
