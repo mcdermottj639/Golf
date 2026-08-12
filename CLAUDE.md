@@ -188,10 +188,26 @@ course, so a repeat course needs no typing at all.
 **Round prep reaches the course.** A briefing whose `course` matches the round (suffix-
 tolerant, so "Beekman Golf Course — Scramble" matches a round logged as "Beekman Golf
 Course") shows up on every hole as a collapsible strip: the `focus` line always, `rules[]`
-and a link to the full plan when opened. A briefing may also carry **`holes: [{n, note}]`**
-— per-hole course knowledge that surfaces on that exact hole while he's standing on it,
-which is the highest-value thing a briefing can contain and worth writing whenever the
-course research supports it. It renders in `briefing()` as a "Hole by hole" table too.
+and a link to the full plan when opened. A briefing may also carry **`holes[]`** — per-hole course
+knowledge that surfaces on that exact hole while he's standing on it, which is the
+highest-value thing a briefing can contain and worth writing whenever the research
+supports it. It renders in `briefing()` as a "Hole by hole" table too.
+
+Write a hole as a **decision plus its reasons**, never a paragraph — it gets read on a tee
+box, one-handed:
+
+```json
+{ "n": 1, "yds": 337,
+  "play": "*5-wood or 2-iron* — not driver",
+  "why": ["Downhill, and the shortest hole out here. A wood still leaves a *full wedge*",
+          "Missed *right* last time and had *no play* at the green"] }
+```
+
+`play` is the one line to act on and renders big; `why[]` are the bullets under it; `yds`
+rides in the header. `*asterisks*` bold a phrase (applied after escaping, so the markup is
+author-only). A prose `note` still renders for older plans, but don't write new ones that
+way. Every note must be traceable: a yardage means it was researched, a score or a miss
+means it came off his card. **Never describe a hole you haven't got a source for.**
 Underneath that, `holeRecord()` shows what his own cards say about the hole (plays, average
 against par, best, the club he's used) — that one needs no briefing at all and flags a hole
 averaging +1.5 or worse as one to play for bogey on purpose.

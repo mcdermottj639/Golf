@@ -1173,8 +1173,11 @@ function briefing(id){
   ${(b.holes || []).length ? `<div class="card">
     <h2>Hole by hole</h2>
     <table><tr><th>Hole</th><th>The play</th></tr>
-      ${b.holes.filter(h => h && h.n && h.note).map(h =>
-        `<tr><td><b>${h.n}</b></td><td class="sm">${esc(h.note)}</td></tr>`).join('')}
+      ${b.holes.filter(h => h && h.n && (h.play || h.note || (h.why || []).length)).map(h =>
+        `<tr><td><b>${h.n}</b>${h.yds ? `<br><span class="sm faint">${h.yds}y</span>` : ''}</td>
+        <td class="sm">${h.play ? `<div class="hi-play" style="font-size:13.5px;margin-bottom:5px">${emph(h.play)}</div>` : ''}
+        ${h.note ? emph(h.note) : ''}
+        ${(h.why || []).length ? `<ul class="hi-why">${h.why.map(w => `<li>${emph(w)}</li>`).join('')}</ul>` : ''}</td></tr>`).join('')}
     </table>
     <p class="sm faint" style="margin-top:8px">Each of these surfaces on its own hole while you're logging a live round — that's the point of writing them.</p>
   </div>` : ''}
@@ -2180,10 +2183,15 @@ function liveBriefing(L){
   const dated = all.filter(b => b.date).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   return dated.find(b => b.date === L.date) || dated[0] || all.find(b => !b.date) || null;
 }
-function holeNote(b, n){
+// A hole note is a DECISION plus its reasons: `play` is the one line to act on, `why[]`
+// the bullets under it. Prose `note` still renders, so older plans don't break.
+function briefHole(b, n){
   const h = b && Array.isArray(b.holes) ? b.holes.find(x => x && x.n === n) : null;
-  return h && h.note ? h.note : null;
+  return h && (h.play || h.note || (h.why || []).length) ? h : null;
 }
+// Emphasis inside a note: *like this*. Applied AFTER escaping, so nothing in the source
+// can inject markup — only the asterisk pairs the author actually wrote become tags.
+const emph = s => esc(s).replace(/\*([^*]+)\*/g, '<b>$1</b>');
 // What his own card says about this hole — course knowledge he generated himself, and
 // the only kind available at a course nobody has written a briefing for.
 function holeRecord(course, n){
@@ -2400,19 +2408,33 @@ function livePlay(L){
   })()}
 
   ${(() => {
-    const note = holeNote(liveBriefing(L), h.n);
+    const hn = briefHole(liveBriefing(L), h.n);
     const rec = holeRecord(L.course, h.n);
-    if(!note && !rec) return '';
-    const line = !rec ? '' : rec.n === 1
-      ? `Last time here: <b>${rec.best}</b> (${rec.over > 0 ? '+' : ''}${rec.over})`
-      : `${rec.n} plays · <b>${rec.avg > 0 ? '+' : ''}${rec.avg.toFixed(1)}</b> a hole · best ${rec.best}`;
-    const club = rec && rec.clubs.length === 1 ? ` · ${esc(clubName(rec.clubs[0]))} off the tee` : '';
+    if(!hn && !rec) return '';
+    // One phrasing for both slots: the header already says whose record it is, so the
+    // line never has to repeat "here" after a label that just said it.
+    const line = !rec ? '' : (rec.n === 1
+      ? `<b>${rec.best}</b> (${rec.over > 0 ? '+' : ''}${rec.over}) · 1 play`
+      : `<b>${rec.n} plays</b> · ${rec.avg > 0 ? '+' : ''}${rec.avg.toFixed(1)} a hole · best ${rec.best}`)
+      + (rec.clubs.length === 1 ? ` · ${esc(clubName(rec.clubs[0]))} off the tee` : '');
     const eating = rec && rec.n >= 2 && rec.avg >= 1.5;
+    const why = hn && Array.isArray(hn.why) ? hn.why : [];
+    // With a plan, the record is a quiet footer. Without one it IS the content, so it
+    // becomes the bullets rather than a footnote to nothing.
+    const head = ['Hole ' + h.n]
+      .concat(hn && hn.yds ? [hn.yds + ' yds'] : [])
+      .concat(hn ? ['from your prep'] : ['your record']);
     return `<div class="card flat holeintel">
-      ${note ? `<div class="lvlab">Hole ${h.n} · from your prep</div>
-        <p class="sm" style="margin-top:2px">${esc(note)}</p>` : ''}
-      ${rec ? `<p class="sm${note ? ' faint' : ''}" style="margin-top:${note ? '7px' : '0'}">
-        <b>Your record here:</b> ${line}${club}.${eating ? ' <span class="warn">This one has been eating you — play it as a bogey hole on purpose.</span>' : ''}</p>` : ''}
+      <div class="lvlab">${head.join(' · ')}</div>
+      ${hn && hn.play ? `<div class="hi-play">${emph(hn.play)}</div>` : ''}
+      ${hn && !hn.play && hn.note ? `<p class="sm" style="margin-top:2px">${emph(hn.note)}</p>` : ''}
+      ${why.length || !hn ? `<ul class="hi-why">
+        ${why.map(w => `<li>${emph(w)}</li>`).join('')}
+        ${!hn && rec ? `<li>${line}</li>` : ''}
+        ${!hn && eating ? `<li class="hot"><b>This one has been eating you</b> — play it as a bogey hole on purpose</li>` : ''}
+      </ul>` : ''}
+      ${hn && rec ? `<div class="hi-rec">Your record here: ${line}${
+        eating ? ' · <b class="warn">play it as a bogey hole</b>' : ''}</div>` : ''}
     </div>`;
   })()}
 
