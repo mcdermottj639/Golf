@@ -221,7 +221,12 @@ the flag sits does. `yds` rides in the header, and the
 hole's own record renders as a LAST row under a rule. `*asterisks*` bold a phrase (applied after escaping, so the markup is
 author-only). A prose `note` still renders for older plans, but don't write new ones that
 way. Every note must be traceable: a yardage means it was researched, a score or a miss
-means it came off his card. **Never describe a hole you haven't got a source for.**
+means it came off his card. **Never describe a hole you haven't got a source for.** The best source is the
+course's own pro tips (most course sites carry a hole-by-hole tour) — that's *what the
+course demands*, which outranks *what happened last time* as the lead of a note. One trap,
+learned at Sterling Farms: syndicated copies of a course tour shift the hole numbering, so
+pin every tip against the pars and shapes on Jack's own card before attaching it to a hole
+— and drop any tip that can't be pinned.
 Underneath that, `holeRecord()` shows what his own cards say about the hole (plays, average
 against par, best, the club he's used) — that one needs no briefing at all and flags a hole
 averaging +1.5 or worse as one to play for bogey on purpose.
