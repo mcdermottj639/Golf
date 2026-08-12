@@ -185,10 +185,13 @@ Finishing writes an ordinary round — same schema as above, plus `live:true` �
 straight into its `roundView`. Par and stroke index prefill from the newest card at that
 course, so a repeat course needs no typing at all.
 
-**Round prep reaches the course.** A briefing whose `course` matches the round (suffix-
-tolerant, so "Beekman Golf Course — Scramble" matches a round logged as "Beekman Golf
-Course") shows up on every hole as a collapsible strip: the `focus` line always, `rules[]`
-and a link to the full plan when opened. A briefing may also carry **`holes[]`** — per-hole course
+**Round prep reaches the course, one hole at a time.** A briefing whose `course` matches
+the round (suffix-tolerant, so "Beekman Golf Course — Scramble" matches a round logged as
+"Beekman Golf Course") reaches the logger through its **per-hole notes only** — the
+whole-round `focus`/`rules` deliberately do NOT ride along on every hole, because they are
+a first-tee read and repeating them on all eighteen screens just pushes the hole note down.
+The full plan lives in Home → Round Prep, which keeps every course plan permanently.
+A briefing carries **`holes[]`** — per-hole course
 knowledge that surfaces on that exact hole while he's standing on it, which is the
 highest-value thing a briefing can contain and worth writing whenever the research
 supports it. It renders in `briefing()` as a "Hole by hole" table too.

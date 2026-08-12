@@ -370,10 +370,8 @@ h2{scroll-margin-top:14px}
   background:var(--card2);color:var(--faint);cursor:pointer;user-select:none}
 .hstrip.done{background:#dfe8dc;color:var(--green);border-color:#a8c0ad}
 .hstrip.cur{background:var(--green);color:var(--green-ink);border-color:var(--green)}
-/* The plan, and what this hole has cost you before — the two things worth reading with
-   a club already in your hand. Both sit above the card so they're seen before the taps. */
-.planbar{margin:8px 0 0;padding:11px 13px}
-.planbar .secthead{align-items:center}
+/* What this hole has cost you before, and what the prep says about it — read with a club
+   already in your hand, so it sits above the card and ahead of the taps. */
 .holeintel{margin:8px 0 0;padding:11px 13px;border-left:3px solid var(--green)}
 /* The decision, then the reasons. Read the top line on the tee and you can stop there. */
 .hi-play{font-family:var(--sans);font-size:15.5px;font-weight:800;color:var(--gtext);

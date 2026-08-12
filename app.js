@@ -2400,26 +2400,6 @@ function livePlay(L){
     `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>
 
   ${(() => {
-    // The whole-round plan is a first-tee read. After that it's the same text on every
-    // screen — noise above the thing that changes, which is the hole note below it. The
-    // full briefing stays a tap away on Home for mid-round doubts.
-    if(L.cur !== 0) return '';
-    const brief = liveBriefing(L);
-    if(!brief) return '';
-    return `<div class="card flat planbar">
-      <div class="secthead">
-        <div class="lvlab">Your plan${brief.date ? '' : ' · standing'}</div>
-        <button class="minibtn" data-action="live-plan">${L.planOpen ? 'Hide' : 'Show'}</button>
-      </div>
-      ${brief.focus ? `<p class="sm${L.planOpen ? '' : ' clip2'}" style="margin-top:2px">${esc(brief.focus)}</p>` : ''}
-      ${L.planOpen ? `${brief.rules && brief.rules.length
-        ? `<div class="steprules top">${brief.rules.map(r => `<span>${esc(r)}</span>`).join('')}</div>` : ''}
-        <div class="linkrow" data-action="open-briefing" data-id="${brief.id}" style="border-bottom:none;padding-bottom:0">
-          <span class="sm"><b>Open the full briefing</b></span><span class="arr">→</span></div>` : ''}
-    </div>`;
-  })()}
-
-  ${(() => {
     const hn = briefHole(liveBriefing(L), h.n);
     const rec = holeRecord(L.course, h.n);
     if(!hn && !rec) return '';
@@ -2589,7 +2569,6 @@ const ACTIONS = {
   // ----- Live round -----
   'live-new': () => render('live'),
   'live-pick': el => { const i = $('#lvCourse'); if(i) i.value = el.dataset.course; },
-  'live-plan': () => { if(S.live){ S.live.planOpen = !S.live.planOpen; save(); rerender(); } },
   'live-start': () => {
     const typed = $('#lvCourse').value.trim();
     if(!typed) return toast('Name the course first');
