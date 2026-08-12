@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-08-10",
+  "updated": "2026-08-12",
   "entries": [
     {
       "id": "s4-session",
@@ -8989,6 +8989,247 @@
           }
         ]
       }
+    },
+    {
+      "id": "add-sterlingfarms-20260812",
+      "type": "course-add",
+      "course": {
+        "name": "Sterling Farms Golf Course",
+        "st": "CT"
+      }
+    },
+    {
+      "id": "round-sterlingfarms-20260812",
+      "type": "round",
+      "round": {
+        "date": "2026-08-12",
+        "course": "Sterling Farms Golf Course",
+        "par": 72,
+        "score": 87,
+        "putts": 38,
+        "troubles": [
+          "approach",
+          "three-putts",
+          "off-tee"
+        ],
+        "note": "First 18 with full stats. 43/44, +15. 6/18 greens — 7 of the 12 misses SHORT. 6/14 fairways, five of the eight misses left. 38 putts: one 1-putt all day (the birdie on 3), fifteen holes at two putts or better, three 3-putts (9, 14, 16). Holes 14–17 cost +6.",
+        "holes": [
+          {
+            "n": 1,
+            "par": 4,
+            "si": 11,
+            "s": 6,
+            "putts": 2,
+            "gir": false,
+            "gmiss": "S",
+            "fw": false,
+            "fmiss": "R"
+          },
+          {
+            "n": 2,
+            "par": 5,
+            "si": 15,
+            "s": 6,
+            "putts": 2,
+            "gir": false,
+            "gmiss": "S",
+            "fw": true
+          },
+          {
+            "n": 3,
+            "par": 4,
+            "si": 17,
+            "s": 3,
+            "putts": 1,
+            "gir": true,
+            "fw": true
+          },
+          {
+            "n": 4,
+            "par": 4,
+            "si": 1,
+            "s": 4,
+            "putts": 2,
+            "gir": true,
+            "fw": true
+          },
+          {
+            "n": 5,
+            "par": 3,
+            "si": 7,
+            "s": 4,
+            "putts": 2,
+            "gir": false,
+            "gmiss": "L"
+          },
+          {
+            "n": 6,
+            "par": 5,
+            "si": 13,
+            "s": 6,
+            "putts": 2,
+            "gir": false,
+            "gmiss": "S",
+            "fw": false,
+            "fmiss": "L"
+          },
+          {
+            "n": 7,
+            "par": 4,
+            "si": 9,
+            "s": 5,
+            "putts": 2,
+            "gir": false,
+            "gmiss": "L",
+            "fw": false,
+            "fmiss": "L"
+          },
+          {
+            "n": 8,
+            "par": 3,
+            "si": 3,
+            "s": 4,
+            "putts": 2,
+            "gir": false,
+            "gmiss": "S"
+          },
+          {
+            "n": 9,
+            "par": 4,
+            "si": 5,
+            "s": 5,
+            "putts": 3,
+            "gir": true,
+            "fw": false,
+            "fmiss": "L"
+          },
+          {
+            "n": 10,
+            "par": 4,
+            "si": 12,
+            "s": 5,
+            "putts": 2,
+            "gir": false,
+            "gmiss": "S",
+            "fw": false,
+            "fmiss": "R"
+          },
+          {
+            "n": 11,
+            "par": 4,
+            "si": 10,
+            "s": 4,
+            "putts": 2,
+            "gir": true,
+            "fw": true
+          },
+          {
+            "n": 12,
+            "par": 4,
+            "si": 4,
+            "s": 5,
+            "putts": 2,
+            "gir": false,
+            "gmiss": "S",
+            "fw": true
+          },
+          {
+            "n": 13,
+            "par": 5,
+            "si": 8,
+            "s": 5,
+            "putts": 2,
+            "gir": true,
+            "fw": false,
+            "fmiss": "L"
+          },
+          {
+            "n": 14,
+            "par": 4,
+            "si": 2,
+            "s": 6,
+            "putts": 3,
+            "gir": false,
+            "gmiss": "X",
+            "fw": false,
+            "fmiss": "S"
+          },
+          {
+            "n": 15,
+            "par": 3,
+            "si": 14,
+            "s": 4,
+            "putts": 2,
+            "gir": false,
+            "gmiss": "R"
+          },
+          {
+            "n": 16,
+            "par": 4,
+            "si": 16,
+            "s": 6,
+            "putts": 3,
+            "gir": false,
+            "gmiss": "Lg",
+            "fw": false,
+            "fmiss": "L"
+          },
+          {
+            "n": 17,
+            "par": 3,
+            "si": 6,
+            "s": 4,
+            "putts": 2,
+            "gir": false,
+            "gmiss": "S"
+          },
+          {
+            "n": 18,
+            "par": 5,
+            "si": 18,
+            "s": 5,
+            "putts": 2,
+            "gir": true,
+            "fw": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "approach-short-action-20260812",
+      "type": "action",
+      "pri": true,
+      "text": "APPROACH — CLUB UP. Sterling Farms is the first round with a miss direction on every green, and it is not ambiguous: 12 greens missed, SEVEN of them short (1, 2, 6, 8, 10, 12, 17), against two left, one right, one long. That is the same pattern the GHIN archive shows (short 44 against long 0), now confirmed hole by hole, and it is the biggest tee-to-green lever you have — short is where the bunkers and the false fronts live, and a short miss is the one miss that can never end up close. TWO FIXES, both free. (1) Club to cover the BACK of the green, not the pin: take the number to the flag, add the yardage from flag to back edge, and pick the club that carries the middle of that window. (2) Stop clubbing off your best strike — your ladder numbers (PW 122 · 50° 108 · 56° 95 · 60° 80) are carries, and a 60% strike from the rough is 8–10 short of them. THE CHECK, next round: log the miss direction on every green again. If short drops under half the misses, this is working."
+    },
+    {
+      "id": "putt-faults-20260812-v6",
+      "type": "faults",
+      "faults": [
+        {
+          "tag": "pace-calibration",
+          "why": "THE priority — and Aug 12 is the first time it has been measured anywhere near a real green, by accident rather than by design. STERLING FARMS, 18 holes on the LINK.2.1: 38 putts, THREE 3-PUTTS (holes 9, 14 and 16), and exactly ONE 1-putt all day — the birdie on 3. Read it honestly in both directions. THE GOOD HALF IS REAL: with only 6 greens in regulation, twelve holes were chip-and-putt, and fifteen of eighteen still finished in two putts or fewer. That is the card's version of Jack's 'made a lot of 5 footers' — they were SECOND putts, holed come-backers, and they are what kept 87 from being 92. THE BAD HALF IS ALSO REAL: three 3-putts is three strokes handed back, and hole 9 was a green hit in regulation turned into a bogey. Jack's report was 'good lags, not dropping 10–20 feet yet'; the card agrees with the second half exactly (one 1-putt) and only partly with the first — lags good enough to two-putt from most places, not good enough to stop three of them running away. WHAT THIS DOES NOT REPLACE: the 30-ft ladder, still unrun. A round tells you the total; it cannot tell you the SPREAD, the green speed, or whether the misses were short or long — the three numbers the ladder exists to capture. Prior evidence stands: the DF3i went back Aug 10 for distance control after three verdicts in eleven days without one calibrated lag session, and the Aug 10 afternoon (~20 putts, nine dead, worst ~4 ft) said calibrated-but-conservative on a second green speed. Tempo is not the missing piece (2.0:1 against a 2:1 target). Stroke length and strike are. Run the ladder with the gamer ball model only."
+        },
+        {
+          "tag": "strike-location",
+          "why": "The remaining candidate — but sized honestly now. Never measured on any putter, not once, across four heads. The Aug 10 evening start lines scattered ~0.8° either side of the line with no bias, and on a head that cannot twist, a face pointing a different way each rep is a face being MOVED by contact: heel closes it, toe opens it. That fits. What has changed is the STAKES: a 0.8° scatter still holes out to nearly eight feet, so as a LINE fault this is no longer costing strokes and does not need chasing. The reason to run the test anyway is PACE — an off-centre hit bleeds ball speed, so the same stroke finishes short and the lag spread widens, and pace is the fault that just cost a putter and has never been measured. Second nudge from the same day, also about pace, not line: the blue ball scattered 1.2–1.5 ft on putts the white killed from the same spot with the same putter. Twelve minutes — tap test for the sweet spot, foot-powder sheets from 5 ft and 30 ft, and the 30-footer is the one that matters. Run it with the barely-open address. Read the result as distance-control data. \n\nAug 12 adds a reason to hurry: 38 putts and three 3-putts over 18 holes is the pace fault showing up on a scorecard, and the twelve-minute test is still the cheapest thing that could explain it. The LINK's return window is open and the deadline is still unknown."
+        },
+        {
+          "tag": "delivery-unverified",
+          "why": "Open, and Aug 10 could not touch it — twice in one day. The afternoon's 23 clips were all oblique; the evening's six were all ON the target line, which is right for start line and blind to shaft lean, because lean lives in the plane those cameras look straight down. Face-on is now the ONLY angle never shot. What it has to settle: the Press Pistol 2° went back with the DF3i, so the LINK's Pistol 0 supplies no lean at all — shaft vertical at address, hands ~1.35\" behind the ball — and the soft press is now the ONLY lean in the stroke. The 'don't double-count the lean' arithmetic is retired; consistency replaces it, because a press that varies is a launch that varies, which is a pace that varies. One slo-mo face-on set gives lean at address versus impact AND ball position rep to rep in the same clips. Whatever the tape shows IS the press now, with no built-in 2° to subtract."
+        },
+        {
+          "tag": "start-line-left",
+          "why": "DOWNGRADED Aug 10 — off the top of the card, and the reasoning is worth keeping because the old gate on this line was wrong. THE CRUX IS THE SIGN, NOT THE SIZE. Jul 30: 1.5° LEFT, 1.7° LEFT, one straight — three putts pulling the SAME way. Aug 10 pm: 0.8° right, 1.0° left, 0.6° right — mean bias ≈0.1°, i.e. zero. Aim doesn't change between reps, so a one-way pull is what an aim error looks like, and it did not reproduce on any of the three. The founding premise of this entire putter saga was a DIRECTIONAL claim — 'signature miss: left on short putts' — and a directional claim is a claim about bias. On the evidence available, that bias is gone, and it went away after a setup change Jack found himself, not after any of the four putters.\n\nIN STROKES, WHICH IS THE ONLY UNIT THAT MATTERS. Capture at the hole is ±1.29\" (4.25\" cup, 1.68\" ball, dying speed). A 1.6° bias puts the ball outside that from 3.8 ft — so the old miss started costing strokes at four feet, which is exactly where the 'left on SHORT putts' signature came from. A 0.8° miss holes out to 7.7 ft. At 0.6° it's 10.2 ft. So the residual has moved start line out of the range where an 8.5 handicap loses shots to it: beyond eight feet, make rates are governed by pace and read, not by a degree of face angle.\n\nTHE 0.5° GATE IS RETIRED — it was a bad standard and it was mine. Half a degree is around the level tour putters hold, it was being applied to a phone-on-a-mat measurement carrying ±0.5° of its own error, and it implied a precision nobody should be chasing. Worse, it pointed at the wrong quantity: it gated on magnitude when the thing that was actually broken was direction.\n\nAND THE RESIDUAL IS AN UPPER BOUND, not an estimate. Measurement noise can only ever INFLATE apparent dispersion — it cannot hide scatter that exists. So with ±0.5° of method error sitting inside an observed ~0.8°, the true dispersion is 0.8° or better, quite possibly nearer 0.6°. Jack's read that these are small numbers is correct and, if anything, understated.\n\nWHAT'S LEFT TO DO, and it is small: confirm the bias stays gone away from a printed line — five putts at a coin on a real green, filmed from behind. That is a check, not an investigation. If the pull is still absent, this fault closes and start line stops being a thing this project tracks."
+        },
+        {
+          "tag": "early-lift",
+          "why": "CLOSED Jul 30 ✓. At 120 fps and 37.5 px/inch the sole held within 0.05–0.08\" of its address height for the full 83 ms into impact, flat across ten consecutive frames, and never dropped below address height. Measured on the LINK, the head still in play, so it carries cleanly. Wants two more slo-mo strokes on sample size — the owed face-on set gives them for free, which is one more reason to shoot it."
+        },
+        {
+          "tag": "stance-creep",
+          "why": "CLOSED Jul 30 ✓ — overhead film measured the toe line 0.6°, 2.9° and 3.6° CLOSED to the target line across three reps. Never open. Worth re-reading against the Aug 10 find: this measurement is what ruled the feet out and sent the search higher, which is exactly where the answer turned out to be."
+        }
+      ]
     }
   ]
 }
