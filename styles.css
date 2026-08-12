@@ -385,9 +385,18 @@ h2{scroll-margin-top:14px}
 .hi-why li b{color:var(--ink)}
 .hi-why li.hot{color:var(--btext)}
 .hi-why li.hot b{color:var(--btext)}
-.hi-rec{font-family:var(--sans);font-size:11.5px;color:var(--faint);margin-top:8px;
-  padding-top:7px;border-top:1px dotted #c9bd9d}
-.hi-rec b{color:var(--ink)}
+/* Same label in the same place on every hole that has one — that's the whole value. */
+.hi-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 11px;margin:2px 0 0}
+.hi-grid dt{font-family:var(--sans);font-size:9.5px;font-weight:800;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--faint);padding-top:3px;white-space:nowrap}
+.hi-grid dd{font-size:13px;line-height:1.4;color:var(--ink)}
+.hi-grid dd.hot{color:var(--btext)}
+/* Full-width rule: a border on the two cells would break across the column gap. */
+.hi-sep{grid-column:1/-1;border-top:1px dotted #c9bd9d;margin:3px 0 0}
+.hi-grid dd.was{color:var(--faint);font-size:12.5px}
+.hi-grid dd.was b{color:var(--ink)}
+.hi-grid dd.was b.hot{color:var(--btext)}
+.hi-why + .hi-grid, .hi-grid + .hi-why{margin-top:9px}
 .lvcard{padding:2px 13px 11px}
 .lvrow{padding:8px 0;border-bottom:1px dotted #c9bd9d}
 .lvrow:last-child{border-bottom:none;padding-bottom:2px}

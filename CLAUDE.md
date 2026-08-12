@@ -199,12 +199,26 @@ box, one-handed:
 ```json
 { "n": 1, "yds": 337,
   "play": "*5-wood or 2-iron* — not driver",
-  "why": ["Downhill, and the shortest hole out here. A wood still leaves a *full wedge*",
-          "Missed *right* last time and had *no play* at the green"] }
+  "leaves": "A *full wedge* in",
+  "avoid": "*Right*. That is where you had *no play* at the green",
+  "why": ["337 and *downhill* — the shortest hole out here"] }
 ```
 
-`play` is the one line to act on and renders big; `why[]` are the bullets under it; `yds`
-rides in the header. `*asterisks*` bold a phrase (applied after escaping, so the markup is
+`play` is the one line to act on and renders big. `leaves` and `avoid` are optional fixed
+slots that render as labelled rows — their value is that LEAVES sits in the same place on
+every hole that has one, so the eye finds it without reading. Omit either where there is
+nothing true to put in it; a padded slot is worse than a missing one. `why[]` are the
+bullets underneath and carry everything the slots don't.
+
+**Centre of the green, always (standing instruction, Aug 12 2026).** Never build a plan
+around a pin position. You cannot know where the flag is on the day, and a plan written
+for one is worse than no plan — it sends him at an edge on a course where his standing
+miss is already short. Every approach and par-3 note targets the **middle of the green**,
+and the club is chosen off the yardage to the middle. "Cover the middle, not the flag" is
+the house line; *back pin*, *front pin*, *tucked* and *short-side* are smells. Hazard and
+green-complex facts are fine when researched — where the trouble sits doesn't move; where
+the flag sits does. `yds` rides in the header, and the
+hole's own record renders as a LAST row under a rule. `*asterisks*` bold a phrase (applied after escaping, so the markup is
 author-only). A prose `note` still renders for older plans, but don't write new ones that
 way. Every note must be traceable: a yardage means it was researched, a score or a miss
 means it came off his card. **Never describe a hole you haven't got a source for.**

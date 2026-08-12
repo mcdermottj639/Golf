@@ -2428,13 +2428,26 @@ function livePlay(L){
       <div class="lvlab">${head.join(' · ')}</div>
       ${hn && hn.play ? `<div class="hi-play">${emph(hn.play)}</div>` : ''}
       ${hn && !hn.play && hn.note ? `<p class="sm" style="margin-top:2px">${emph(hn.note)}</p>` : ''}
+      ${(() => {
+        // Fixed labels in a fixed order, each one rendered only if the hole has it. The
+        // value is that LEAVES is always in the same place on every hole that has one —
+        // which is exactly what a four-slot template gets right and a paragraph doesn't.
+        if(!hn) return '';
+        const rows = [['Leaves', hn.leaves], ['Green', hn.green], ['Avoid', hn.avoid]]
+          .filter(r => r[1]);
+        if(!rows.length && !rec) return '';
+        return `<dl class="hi-grid">
+          ${rows.map(([k, v]) => `<dt>${k}</dt><dd${k === 'Avoid' ? ' class="hot"' : ''}>${emph(v)}</dd>`).join('')}
+          ${rec ? `${rows.length ? '<div class="hi-sep"></div>' : ''}
+            <dt class="was">Last</dt><dd class="was">${line}${
+            eating ? ' — <b class="hot">play it as a bogey hole</b>' : ''}</dd>` : ''}
+        </dl>`;
+      })()}
       ${why.length || !hn ? `<ul class="hi-why">
         ${why.map(w => `<li>${emph(w)}</li>`).join('')}
         ${!hn && rec ? `<li>${line}</li>` : ''}
         ${!hn && eating ? `<li class="hot"><b>This one has been eating you</b> — play it as a bogey hole on purpose</li>` : ''}
       </ul>` : ''}
-      ${hn && rec ? `<div class="hi-rec">Your record here: ${line}${
-        eating ? ' · <b class="warn">play it as a bogey hole</b>' : ''}</div>` : ''}
     </div>`;
   })()}
 
