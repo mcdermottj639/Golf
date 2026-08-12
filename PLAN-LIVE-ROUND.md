@@ -1,8 +1,9 @@
-# Plan — Live Round mode (workshop draft v2, not built)
+# Plan — Live Round mode — **BUILT 2026-08-12**
 
-*Drafted 2026-08-12 on `claude/live-round-updater-plan-911qg0`; revised the same day after
-the round deep-dive commit (`ec84539`) landed and Jack answered the open questions. This
-is the build spec for a follow-up session. Nothing here is implemented yet.*
+*Drafted 2026-08-12; revised after the round deep-dive commit (`ec84539`) and Jack's
+answers; **built the same day**. Kept as the design record. Where the build departed from
+the plan, the reason is in "Built — what changed" at the bottom; `app.js` and the CLAUDE.md
+sections on live rounds are the authority now.*
 
 ## What Jack asked for
 
@@ -265,3 +266,46 @@ framework, still offline-first — the live view needs zero network.
    Usage will decide whether it stays prominent, gets demoted behind a toggle, or earns
    deeper analytics.
 3. **After save** — jump straight to the new round's `roundView` (Jack, 2026-08-12).
+
+## Built — what changed, and why
+
+Everything above shipped. Seven departures, all found while building or testing:
+
+1. **Club keys come from the carry ladder, not `S.clubs`.** The plan said club ids. It
+   can't work: the bag holds the irons as a single "KING TEC 4–PW" entry, so `S.clubs`
+   cannot name the club that hit a par-3 tee shot. `S.carries` is the real 13-club list
+   and is already ordered longest-first. Keys are slugs of the ladder row (`7-iron`,
+   `mini-driver`, `50-wedge`); an unknown key prints itself.
+2. **Par 3s offer the whole bag off the tee**, wedges included — a short par 3 *is* a
+   wedge. Par 4/5 tee rows exclude the three Vokeys. The plan excluded wedges everywhere.
+3. **A club is only credited with results it produced.** The fairway belongs to the tee
+   shot; the green belongs to whatever hit at it — the approach club, except on a par 3
+   where the tee shot is the approach. Crediting a driver with the green its 7-iron hit
+   would make every tee-club number meaningless. So the *Off the tee* table's one rate
+   column reads fairways for par 4/5 clubs and greens for par-3 clubs, labelled as such.
+4. **Score and putts are chip rows, not steppers, and nothing is pre-filled.** A stepper
+   costs up to three taps where a chip costs one, and a default score of par would let a
+   skipped hole record a par he never made. Score chips run birdie→triple off the hole's
+   par, with `±1` buttons for anything outside that.
+5. **The par row rides small in the sticky header.** Six full-size rows made the hole
+   2,600px tall — three phone screens, with the score off the bottom. Par is right nine
+   times in ten off a prefilled layout, so it shrank; club grids went to seven across.
+   A par 4 is now ~1,130px and a par 3 ~920px, which is one screen and a nudge.
+6. **A part-round gets no course rating.** Scoring 4 holes of a nine and saving would
+   otherwise attach the nine's rating and hand `roundDiff()` a wildly wrong differential —
+   it dragged the estimated index from 9.2 to somewhere false in testing. Under a full 9
+   or 18 the rating fields don't render, and the screen says why.
+7. **`round-update` recomputes the total after a hole edit** (unless the entry sets one),
+   so the card header can't disagree with its own hole-by-hole table.
+
+Also added beyond the plan, all cheap: the course name snaps to the spelling already on
+record (a phone-thumbed "sterling farms" must not fork the season stats), a new course is
+added to Courses on start, a tap-anywhere hole strip for navigation, and `bumpGearCounters()`
+rather than `finalizeRound(r)` since the shared block is exactly the gear counters.
+
+**Testing.** No test suite exists, so validation was a Playwright harness driving a real
+Chromium at 390×844: an 18-hole round tapped in end to end, re-tap-to-clear, par switching
+dropping the fairway/approach rows, the score stepper past the chip range, a partial nine, a
+back nine, case-mismatched course names, discard, both feed changes, and every view
+rendering. Zero page or console errors. The harness lives in the session scratchpad, not the
+repo — there's no runner here to keep it honest.

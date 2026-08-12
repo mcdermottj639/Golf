@@ -155,6 +155,7 @@ function migrate(s){
   ];
   if(!s.carries){ const fresh = seed(); s.carries = fresh.carries; s.carriesCalibrated = false; }
   if(!s.briefings) s.briefings = [];
+  if(s.live === undefined) s.live = null;   // a round being logged hole-by-hole
   if(!s.evolution || s.sessions.every(x => !x.detail)){
     const fresh = seed();
     if(!s.evolution) s.evolution = fresh.evolution;
@@ -293,6 +294,35 @@ function shelfCounts(){
   });
   return by;
 }
+// ----- The playable club list -----
+// This comes from the CARRY LADDER, not S.clubs: the bag holds the irons as a single
+// "KING TEC 4–PW" entry, so it can't name the club that actually hit a shot. The ladder
+// is the real 13-club list and is already ordered longest to shortest. A hole stores the
+// key, never the label, so renaming a ladder row can't orphan old cards — an unknown key
+// falls back to printing itself.
+function clubKey(name){
+  return String(name).toLowerCase().replace(/\(.*?\)/g, '').replace(/°/g, '')
+    .trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+function clubAbbr(name){
+  const n = String(name || '');
+  if(/mini/i.test(n)) return 'Mini';
+  if(/driver/i.test(n)) return 'Dr';
+  const iron = n.match(/(\d+)\s*-?\s*iron/i);
+  if(iron) return iron[1] + 'i';
+  const wedge = n.match(/(\d{2})\s*°?\s*wedge/i);
+  if(wedge) return wedge[1] + '°';
+  if(/^pw/i.test(n)) return 'PW';
+  return n.length > 6 ? n.slice(0, 6) : n;
+}
+function bagClubs(){
+  return S.carries.map(c => ({ key:clubKey(c.club), name:c.club, abbr:clubAbbr(c.club),
+    wedge: /wedge/i.test(c.club) }));
+}
+function clubBy(key){ return bagClubs().find(c => c.key === key) || null; }
+function clubName(key){ const c = clubBy(key); return c ? c.name : String(key || ''); }
+function clubTag(key){ const c = clubBy(key); return c ? c.abbr : String(key || ''); }
+
 function groovePct(club){ return Math.max(0, Math.round(100 - (club.rounds||0)/GROOVE_LIFE*100)); }
 function weekStreak(){
   // Mon..Sun of current week
@@ -319,6 +349,7 @@ const TITLES = {
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
   round:['Round Detail','One card, hole by hole, and what it cost you.'],
+  live:['Live Round','Tap it in as you play — it scores itself.'],
 };
 
 function render(view, arg){
@@ -328,7 +359,7 @@ function render(view, arg){
   $('#pageTag').textContent = tag;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === view));
-  const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView }[view] || home;
+  const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live }[view] || home;
   $('#view').innerHTML = R(arg);
   buildJumpBar();
   window.scrollTo(0,0);
@@ -371,6 +402,7 @@ function home(){
   const wedges = S.clubs.filter(c => c.cat==='wedge' && c.status==='gaming');
   const worstWedge = wedges.sort((a,b)=>groovePct(a)-groovePct(b))[0];
   return `
+  ${liveBanner()}
   <div class="rowgrid">
     <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div></div>
     <div class="stat"><div class="v">${S.courses.filter(c=>!c.bucket).length}</div><div class="l">Courses</div></div>
@@ -404,6 +436,8 @@ function home(){
         <span><b>${esc(b.course)}</b><span class="sm faint"> · ${fmtDate(b.date)}${b.date < today10 ? ' (played)' : ''}</span><br>
         <span class="sm">${esc(b.focus || 'Briefing ready')}</span></span><span class="arr">→</span></div>`).join('')
       : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Golf Mind, Miracle 201) live in the <b>Swing</b> lab.</p>`}
+      ${S.live ? '' : `<div class="linkrow" data-action="live-new" style="border-bottom:none;padding-bottom:0">
+        <span><b>Play a live round</b><br><span class="sm">Tap each hole in as you go — clubs, fairways, greens, putts</span></span><span class="arr">→</span></div>`}
     </div>`;
   })()}
 
@@ -1001,6 +1035,8 @@ function coach(){
     <textarea id="rdNote" rows="2" placeholder='"Wind got me on the back nine…"'></textarea>
     <div style="margin-top:10px"><button class="btn" data-action="save-round">Save round → Coach updates</button></div>
     <p class="sm faint" style="margin-top:8px">Hole-by-hole detail is what powers the ranking above — send Claude a GHIN round summary and it lands with every hole.</p>
+    <div class="linkrow" data-action="live-new" style="border-bottom:none">
+      <span class="sm"><b>${S.live ? 'Resume your live round' : 'Or play it live, hole by hole'}</b> — every detail, no typing</span><span class="arr">→</span></div>
   </div>
 
   ${S.rounds.length ? `<div class="card flat"><div class="linkrow" data-action="go" data-view="scores">
@@ -1278,10 +1314,15 @@ function upDownPct(g){
   return null;
 }
 
-function statTips(){
+// `live` names the areas where hole-by-hole cards now carry a bigger, better-measured
+// sample than this pasted snapshot does. Film is king; by the same rule, a hole you
+// recorded beats a season average somebody else computed — so those tips stand down and
+// the live ones on the Scores page speak instead.
+function statTips(live){
   const g = latestStats(), b = baselineStats();
   const t = [];
   if(!g) return t;
+  live = live || {};
   const a = g.approach, p = g.putting, ap = g.avgByPar || {}, d = g.driving;
   const nAdv = g.roundsAdvanced || g.rounds || 0, nSc = g.roundsScoring || g.rounds || 0;
   const thin = n => n < 5 ? ` (only ${n} round${n===1?'':'s'} behind this — indicative, not settled)` : '';
@@ -1305,7 +1346,7 @@ function statTips(){
       b:`Every stat here — and every round logged — predates it. The mat tests and the stroke film are promising, but they are not scoring. Until a round is played and logged with it, its effect on your score is unmeasured, and nothing in this list should be read as a verdict on it either way. Play one, log the putts, and it becomes answerable.` });
   }
 
-  if(a && a.short != null){
+  if(a && a.short != null && !live.approach){
     const sides = (a.left || 0) + (a.right || 0);
     if(a.short >= 30 && a.short >= sides)
       t.push({ s:'warn', src:`Approach · ${nAdv} rounds`, h:'You miss short, not sideways',
@@ -1315,7 +1356,7 @@ function statTips(){
   if(ud != null && ud < 30)
     t.push({ s:'warn', src:`Short game · ${nAdv} rounds`, h:`Scrambling around ${Math.round(ud)}%`,
       b:`${g.gir != null ? `At ${g.gir}% greens you're missing about ${(18*(1-g.gir/100)).toFixed(0)} a round. ` : ''}Every miss you don't convert is a bogey at best.${udB != null ? ` And this isn't new — it was ${udB.toFixed(0)}% in the older data too, so it's a standing weakness rather than a bad patch.` : ''} With greens hit this low, up-and-down rate moves your score more than ball-striking does, and it's the cheapest thing here to practise${thin(nAdv)}.` });
-  if(p && p.three != null && p.three >= 10)
+  if(p && p.three != null && p.three >= 10 && !live.putting)
     t.push({ s:'warn', src:`Putting · ${nAdv} rounds`, h:`${p.three}% three-putts or worse`,
       b:`Roughly ${(p.three/100*18).toFixed(1)} a round, against ${p.one||0}% one-putts. Three-putts are a PACE fault, not a line fault — the first putt is finishing outside gimme range. Same signature as the lag work already on your card${thin(nAdv)}.` });
   if(ap[5] != null && ap[4] != null && (ap[5] - 5) >= 0.6)
@@ -1418,6 +1459,9 @@ function scoreStats(){
   const byPar = { 3:{n:0,over:0,red:0}, 4:{n:0,over:0,red:0}, 5:{n:0,over:0,red:0} };
   const opening = { n:0, over:0 };
   const spots = new Map();
+  const tee = new Map(), app = new Map();
+  const fw = { n:0, hit:0, miss:{} }, green = { n:0, hit:0, miss:{} };
+  const putts = { holes:0, total:0, one:0, three:0 };
   let holes = 0, over = 0;
   rs.forEach(r => r.holes.forEach((h, i) => {
     if(h.s == null || h.par == null) return;
@@ -1432,17 +1476,75 @@ function scoreStats(){
     const k = `${r.course}|${n}`;
     const e = spots.get(k) || { course:r.course, hole:n, par:h.par, n:0, over:0 };
     e.n++; e.over += d; spots.set(k, e);
+    // Shot detail. Recorded per hole since the live logger existed; absent on the older
+    // score-only cards, which is why every consumer below gates on its own sample size.
+    if(h.putts != null){
+      putts.holes++; putts.total += h.putts;
+      if(h.putts <= 1) putts.one++; else if(h.putts >= 3) putts.three++;
+    }
+    if(h.gir != null){
+      green.n++;
+      if(h.gir) green.hit++;
+      else { const g = h.gmiss || 'X'; green.miss[g] = (green.miss[g] || 0) + 1; }
+    }
+    if(h.fw != null){
+      fw.n++;
+      if(h.fw) fw.hit++;
+      else { const g = h.fmiss || 'X'; fw.miss[g] = (fw.miss[g] || 0) + 1; }
+    }
+    if(h.tee) bagShot(tee, h.tee, h, d, TEE_OWNS(h));
+    if(h.app) bagShot(app, h.app, h, d, APP_OWNS);
   }));
   const worst = [...spots.values()].filter(e => e.n >= 2)
     .sort((a,b) => (b.over / b.n) - (a.over / a.n)).slice(0, 5);
-  return { rs, mix, byPar, opening, worst, holes, over };
+  return { rs, mix, byPar, opening, worst, holes, over, tee, app, fw, green, putts };
 }
 
 // Tips fire off thresholds in the data, so they only appear once there's
 // enough of it to mean anything. Each one carries the number that triggered it.
 function scoreTips(st){
-  const t = statTips();
+  // Two rounds' worth of recorded greens/putts is enough to outrank a pasted average.
+  const t = statTips({ approach: st.green.n >= 36, putting: st.putts.holes >= 36 });
   if(!st.holes) return t;
+
+  // The tee-club verdict. This is the question a bag with both a driver and a mini
+  // driver in it exists to answer, and it needs both clubs to have had a real run.
+  const teeRun = [...st.tee.values()].filter(e => e.fwN >= 8);
+  if(teeRun.length >= 2){
+    const rate = e => e.fwHit / e.fwN * 100;
+    const rank = teeRun.slice().sort((x, y) => rate(y) - rate(x));
+    const straight = rank[0], wild = rank[rank.length - 1];
+    if(rate(straight) - rate(wild) >= 15){
+      const sPer = straight.over / straight.n, wPer = wild.over / wild.n;
+      const scoresBetter = wPer < sPer - 0.1;
+      t.push({ s: scoresBetter ? 'mid' : 'warn', src:`Off the tee · ${straight.fwN + wild.fwN} tee shots`,
+        h:`${clubName(straight.key)} finds ${Math.round(rate(straight))}% of fairways · ${clubName(wild.key)} ${Math.round(rate(wild))}%`,
+        b:`Across ${straight.fwN} and ${wild.fwN} recorded tee shots. The holes score ${sPer > 0 ? '+' : ''}${sPer.toFixed(2)} a hole with the ${clubName(straight.key)} against ${wPer > 0 ? '+' : ''}${wPer.toFixed(2)} with the ${clubName(wild.key)}. ${scoresBetter
+          ? `So the wilder club is still the one that scores — the extra length is paying for the misses. Keep hitting it; this is the case AGAINST clubbing down out of fear.`
+          : `So the ${clubName(wild.key)} is costing you position and buying nothing back. On the tight holes that is a free ${(wPer - sPer).toFixed(2)} a hole for taking the ${clubName(straight.key)} instead — the fairway-finder earning its slot in the bag.`}` });
+    }
+  }
+
+  // The hole-measured twin of the snapshot's "you miss short". This one counts greens
+  // you recorded yourself rather than an average computed elsewhere.
+  if(st.green.n >= 18){
+    const missed = st.green.n - st.green.hit;
+    const top = Object.entries(st.green.miss).sort((x, y) => y[1] - x[1])[0];
+    if(missed >= 8 && top && top[1] / missed >= 0.4)
+      t.push({ s:'warn', src:`Approach · ${st.green.n} greens recorded`, h:`${Math.round(top[1] / missed * 100)}% of your green misses go ${MISS_LAB[top[0]] || top[0]}`,
+        b:`${top[1]} of ${missed} misses, off ${st.green.hit}/${st.green.n} greens hit. A miss that only ever goes one way is not dispersion — dispersion sprays every direction. ${top[0] === 'S'
+          ? 'Short is a DISTANCE fault: the number you are clubbing to is longer than the club actually carries. Club to cover the middle-to-back of the green, and re-baseline the ladder to average carry rather than your purest strike.'
+          : top[0] === 'Lg' ? 'Long is usually adrenaline or an overcorrection off a run of short ones — worth checking whether these follow your good drives.'
+          : 'A one-sided miss this consistent is face-and-path, not club selection. That one belongs in the Swing lab.'}` });
+  }
+
+  if(st.putts.holes >= 36){
+    const rate = st.putts.three / st.putts.holes;
+    if(rate >= 0.08)
+      t.push({ s:'warn', src:`Putting · ${st.putts.holes} holes recorded`, h:`${st.putts.three} three-putts in ${st.putts.holes} holes`,
+        b:`${(rate * 18).toFixed(1)} a round, against ${st.putts.one} one-putts and ${(st.putts.total / st.putts.holes).toFixed(2)} putts a hole overall. Three-putts are a PACE fault, not a line fault — the first putt is finishing outside gimme range. This is the live-round evidence for the standing distance-control priority, and the 30-ft ladder is what turns it into a number you can move.` });
+  }
+
   const blowN = st.mix.double + st.mix.triple;
   const blowShots = st.mix.double * 2 + st.mix.triple * 3;
   const share = st.over > 0 ? blowShots / st.over : 0;
@@ -1470,6 +1572,50 @@ function scoreTips(st){
   if(parRate >= 0.4) t.push({ s:'good', src:'Protect this', h:'You make a lot of pars',
     b:`${Math.round(parRate*100)}% of holes played at par or better. The base game is there — the scoring gap is the tail, not the average.` });
   return t;
+}
+
+const missSplit = m => Object.entries(m).sort((x, y) => y[1] - x[1])
+  .map(([k, v]) => `${v} ${MISS_LAB[k] || k}`).join(' · ');
+
+// The club tables. These are the sections the live logger exists to fill: they stay
+// invisible until a round has actually been logged with the club recorded, and the
+// approach table waits for a bigger sample because that row is optional to fill in.
+function clubTables(st){
+  const tee = [...st.tee.values()].sort((a, b) => b.n - a.n);
+  const app = [...st.app.values()].filter(e => e.girN).sort((a, b) => b.n - a.n);
+  const appTotal = app.reduce((a, e) => a + e.n, 0);
+  const pct = (n, d) => d ? `${Math.round(n / d * 100)}%` : '—';
+  return `
+  ${tee.length ? `<h2>Off the tee · by club</h2>
+  <div class="card">
+    <table><tr><th>Club</th><th>Tees</th><th>Found it</th><th>Misses</th><th>Per hole</th></tr>
+      ${tee.map(e => {
+        // Par 3s have no fairway to hit, so the green is that tee shot's own result.
+        const par3 = !e.fwN && e.girN;
+        const n = par3 ? e.girN : e.fwN, hit = par3 ? e.girHit : e.fwHit;
+        return `<tr>
+        <td class="sm"><b>${esc(clubName(e.key))}</b>${par3 ? '<br><span class="sm faint">par 3s</span>' : ''}</td>
+        <td>${e.n}</td>
+        <td>${n ? `<b>${pct(hit, n)}</b><span class="sm faint"> ${hit}/${n}${par3 ? ' grn' : ''}</span>` : '<span class="faint">—</span>'}</td>
+        <td class="sm">${missSplit(par3 ? e.girMiss : e.fwMiss) || '—'}</td>
+        <td><b style="color:${e.over / e.n >= 1 ? 'var(--burg)' : e.over / e.n <= 0.5 ? 'var(--green)' : 'var(--ink)'}">${e.over > 0 ? '+' : ''}${(e.over / e.n).toFixed(2)}</b></td></tr>`;
+      }).join('')}
+    </table>
+    <p class="sm faint" style="margin-top:8px">"Found it" is fairways for a club hit off a par 4 or 5, and greens for one hit off a par 3 — on a par 3 the tee shot is the approach, so the green is its own result. "Per hole" is your score against par on the holes you hit that club. A club that finds more fairways but scores no better is not saving you anything, and that comparison is the whole point of this table.</p>
+  </div>` : ''}
+
+  ${appTotal >= 10 ? `<h2>Into the green · by club</h2>
+  <div class="card">
+    <table><tr><th>Club</th><th>Shots</th><th>Greens</th><th>Misses</th><th>Per hole</th></tr>
+      ${app.map(e => `<tr>
+        <td class="sm"><b>${esc(clubName(e.key))}</b></td>
+        <td>${e.n}</td>
+        <td><b>${pct(e.girHit, e.girN)}</b><span class="sm faint"> ${e.girHit}/${e.girN}</span></td>
+        <td class="sm">${missSplit(e.girMiss) || '—'}</td>
+        <td><b>${e.over > 0 ? '+' : ''}${(e.over / e.n).toFixed(2)}</b></td></tr>`).join('')}
+    </table>
+    <p class="sm faint" style="margin-top:8px">Approach club is the optional row in the live logger, so this counts only the shots where you tapped it in.</p>
+  </div>` : ''}`;
 }
 
 function scores(){
@@ -1521,6 +1667,22 @@ function scores(){
     ${st.opening.n >= 2 ? `<p class="sm" style="margin-top:8px">Opening hole of each round: <b>${st.opening.over > 0 ? '+' : ''}${st.opening.over}</b> across ${st.opening.n} starts · ${(st.opening.over/st.opening.n).toFixed(1)} a hole.</p>` : ''}
   </div>` : `<div class="card"><p class="sm faint">Hole-by-hole detail unlocks the scoring mix, the par splits and the tips. Send Claude your GHIN round summaries and they'll be filled in.</p></div>`}
 
+  ${clubTables(st)}
+
+  ${st.green.n || st.fw.n || st.putts.holes ? `<h2>Where the misses go</h2>
+  <div class="card">
+    <table><tr><th>Recorded</th><th>Hit</th><th>Rate</th><th>Misses</th></tr>
+      ${st.fw.n ? `<tr><td class="sm"><b>Fairways</b></td><td>${st.fw.hit}/${st.fw.n}</td>
+        <td><b>${Math.round(st.fw.hit / st.fw.n * 100)}%</b></td>
+        <td class="sm">${missSplit(st.fw.miss) || '—'}</td></tr>` : ''}
+      ${st.green.n ? `<tr><td class="sm"><b>Greens</b></td><td>${st.green.hit}/${st.green.n}</td>
+        <td><b>${Math.round(st.green.hit / st.green.n * 100)}%</b></td>
+        <td class="sm">${missSplit(st.green.miss) || '—'}</td></tr>` : ''}
+    </table>
+    ${st.putts.holes ? `<p class="sm" style="margin-top:8px"><b>Putting</b> — ${st.putts.one} one-putts and ${st.putts.three} three-putts across ${st.putts.holes} recorded holes · ${(st.putts.total / st.putts.holes).toFixed(2)} a hole, ${(st.putts.total / st.putts.holes * 18).toFixed(1)} a round.</p>` : ''}
+    <p class="sm faint" style="margin-top:8px">Counted hole by hole from your own cards — not an average computed somewhere else.</p>
+  </div>` : ''}
+
   ${st.worst.length ? `<h2>Holes that cost you most</h2>
   <div class="card">
     <table><tr><th>Course</th><th>Hole</th><th>Par</th><th>Plays</th><th>Avg</th></tr>
@@ -1564,6 +1726,32 @@ function scores(){
 const MISS_LAB = { S:'short', L:'left', R:'right', Lg:'long', X:'other' };
 const MISS_KEY = { S:'short', L:'left', R:'right', Lg:'long' };  // → the stats-baseline field
 
+// One shot's worth of club record, shared by the per-round card and the season roll-up so
+// the two can never disagree about what a club did. `over` is strokes against par on the
+// holes that club was hit — a fairway finder that scores no better is worth knowing about.
+//
+// A club only gets credited with the results it actually produced: the fairway belongs to
+// the tee shot, and the green belongs to whatever hit at it — which is the approach club,
+// except on a par 3, where the tee shot IS the approach. Crediting a driver with the green
+// its 7-iron hit would make every tee-club number meaningless.
+function bagShot(map, key, h, d, own){
+  let e = map.get(key);
+  if(!e){ e = { key, n:0, over:0, fwN:0, fwHit:0, fwMiss:{}, girN:0, girHit:0, girMiss:{} }; map.set(key, e); }
+  e.n++;
+  if(d != null) e.over += d;
+  if(own.fw && h.fw != null){
+    e.fwN++;
+    if(h.fw) e.fwHit++; else { const k = h.fmiss || 'X'; e.fwMiss[k] = (e.fwMiss[k] || 0) + 1; }
+  }
+  if(own.green && h.gir != null){
+    e.girN++;
+    if(h.gir) e.girHit++; else { const k = h.gmiss || 'X'; e.girMiss[k] = (e.girMiss[k] || 0) + 1; }
+  }
+  return e;
+}
+const TEE_OWNS = h => ({ fw:true, green: h.par === 3 });
+const APP_OWNS = { fw:false, green:true };
+
 function roundAnalysis(r){
   const H = (Array.isArray(r.holes) ? r.holes : []).filter(h => h && h.par != null && h.s != null);
   const a = { holes:H, par:roundPar(r), score:r.score ?? null, vs:roundVsPar(r),
@@ -1571,6 +1759,7 @@ function roundAnalysis(r){
     byPar:{ 3:{n:0,over:0}, 4:{n:0,over:0}, 5:{n:0,over:0} },
     putts:{ n:0, total:0, one:0, two:0, three:0, girN:0, girTot:0, offN:0, offTot:0, threes:[] },
     gir:{ n:0, hit:0, miss:{} }, fw:{ n:0, hit:0, miss:{} },
+    tee:new Map(), app:new Map(),
     scramble:{ chances:0, saved:0 }, blowups:[], nines:[] };
   H.forEach(h => {
     const d = h.s - h.par;
@@ -1599,6 +1788,8 @@ function roundAnalysis(r){
       if(h.fw) a.fw.hit++;
       else { const k = h.fmiss || 'X'; a.fw.miss[k] = (a.fw.miss[k] || 0) + 1; }
     }
+    if(h.tee) bagShot(a.tee, h.tee, h, d, TEE_OWNS(h));
+    if(h.app) bagShot(a.app, h.app, h, d, APP_OWNS);
   });
   if(!a.putts.n && r.putts != null) a.putts.total = r.putts;   // round-level count only
   if(H.length > 9) [['Out',0,9],['In',9,18]].forEach(([lab,s,e]) => {
@@ -1639,6 +1830,18 @@ function roundTips(r, a){
   if(fm && fwMissed >= 4 && fm[1] / fwMissed >= 0.5 && fm[1] >= 3)
     t.push({ s:'warn', src:'Off the tee', h:`${fm[1]} of your ${fwMissed} tee misses went ${MISS_LAB[fm[0]] || fm[0]}`,
       b:`${a.fw.hit} of ${a.fw.n} fairways${g.driving && g.driving.fairway != null ? ` against a tracked ${g.driving.fairway}%` : ''}. A miss that repeats to one side is a start-line pattern you can aim around for a round and fix in practice — set the tee shot up to bring the ${MISS_LAB[fm[0]] === 'left' ? 'left' : 'right'} side into play and let the miss finish in the short grass.` });
+
+  // Two clubs off the tee on the same card is a controlled comparison: same day, same
+  // wind, same swing. It only speaks when both got a real run at it.
+  const teeRun = [...a.tee.values()].filter(e => e.fwN >= 3).sort((x, y) => y.fwHit / y.fwN - x.fwHit / x.fwN);
+  if(teeRun.length >= 2){
+    const best = teeRun[0], worst = teeRun[teeRun.length - 1];
+    const rate = e => Math.round(e.fwHit / e.fwN * 100);
+    if(rate(best) - rate(worst) >= 25)
+      t.push({ s:'mid', src:'Off the tee · this card', h:`${clubName(best.key)} found ${best.fwHit}/${best.fwN} fairways · ${clubName(worst.key)} ${worst.fwHit}/${worst.fwN}`,
+        b:`On the same day, in the same wind. ${clubName(worst.key)} holes played to ${worst.over > 0 ? '+' : ''}${(worst.over / worst.n).toFixed(1)} a hole against ${best.over > 0 ? '+' : ''}${(best.over / best.n).toFixed(1)} with the ${clubName(best.key)}${
+          worst.over / worst.n > best.over / best.n ? ' — so the extra length bought nothing here' : ' — so the misses cost less than the position gained, which is the case FOR keeping it in hand'}. One round is one round; the season table on Scores is where this either holds up or dissolves.` });
+  }
 
   if(a.putts.three >= 2)
     t.push({ s:'warn', src:'Putting · pace', h:`${a.putts.three} three-putts — ${a.putts.three} strokes`,
@@ -1746,15 +1949,22 @@ function roundView(i){
     const cls = d <= -2 ? 'eag' : d === -1 ? 'bird' : d === 0 ? 'par' : d === 1 ? 'bog' : 'dbl';
     return `<span class="mark ${cls}">${h.s}</span>`;
   };
-  const res = (v, missKey) => v === true ? '<span class="res ok">✓</span>'
-    : v === false ? `<span class="res no">${MISS_LAB[missKey] || '✗'}</span>` : '<span class="faint">·</span>';
+  // The club sits under the result, so one column answers both "what did you hit" and
+  // "where did it finish" without a sixth column on a phone-width card.
+  const res = (v, missKey, club) => {
+    const out = v === true ? '<span class="res ok">✓</span>'
+      : v === false ? `<span class="res no">${MISS_LAB[missKey] || '✗'}</span>` : '<span class="faint">·</span>';
+    return club ? `${out}<span class="cl">${esc(clubTag(club))}</span>` : out;
+  };
   const subRow = n => `<tr class="sub"><td>${n.lab}</td><td>${n.par}</td><td>${n.score}</td>
     <td>${n.putts ?? ''}</td><td>${n.girN ? n.gir : ''}</td><td>${n.fwN ? n.fw : ''}</td></tr>`;
   const rows = [];
   a.holes.forEach((h, idx) => {
     rows.push(`<tr><td><b>${h.n ?? idx + 1}</b>${h.si ? `<span class="si"> ${h.si}</span>` : ''}</td>
       <td class="sm">${h.par}</td><td>${mark(h)}</td>
-      <td class="sm">${h.putts ?? '·'}</td><td>${res(h.gir, h.gmiss)}</td><td>${res(h.fw, h.fmiss)}</td></tr>`);
+      <td class="sm">${h.putts ?? '·'}</td>
+      <td>${res(h.gir, h.gmiss, h.par === 3 ? null : h.app)}</td>
+      <td>${res(h.fw, h.fmiss, h.tee)}</td></tr>`);
     if(a.nines.length === 2 && idx === 8) rows.push(subRow(a.nines[0]));
   });
   if(a.nines.length === 2) rows.push(subRow(a.nines[1]));
@@ -1768,8 +1978,6 @@ function roundView(i){
   if(a.gir.n) tiles.push(['Greens', `${a.gir.hit}/${a.gir.n}`]);
   if(a.fw.n) tiles.push(['Fairways', `${a.fw.hit}/${a.fw.n}`]);
   if(a.scramble.chances) tiles.push(['Up & down', `${a.scramble.saved}/${a.scramble.chances}`]);
-  const missLine = m => Object.entries(m).sort((x,y) => y[1] - x[1])
-    .map(([k,v]) => `${v} ${MISS_LAB[k] || k}`).join(' · ');
   return `
   <button class="backlink" data-action="go" data-view="scores">← Scores</button>
   <div class="card">
@@ -1796,7 +2004,8 @@ function roundView(i){
       ${rows.join('')}
     </table>
     <p class="sm faint">Small grey number is the stroke index. Circle = under par, square = over.
-    ${a.gir.n ? 'Green and Tee show the miss direction where it was recorded; a dot means it was not.' : ''}</p>
+    ${a.gir.n ? 'Green and Tee show the miss direction where it was recorded; a dot means it was not.' : ''}
+    ${a.tee.size ? 'The club under each result is what you hit.' : ''}</p>
   </div>
 
   <h2>Scoring mix</h2>
@@ -1820,9 +2029,9 @@ function roundView(i){
   <h2>Where the misses went</h2>
   <div class="card">
     ${a.gir.n ? `<p class="sm"><b>Greens</b> — ${a.gir.hit} of ${a.gir.n} hit${
-      a.gir.hit < a.gir.n ? `. Misses: ${missLine(a.gir.miss)}.` : '.'}</p>` : ''}
+      a.gir.hit < a.gir.n ? `. Misses: ${missSplit(a.gir.miss)}.` : '.'}</p>` : ''}
     ${a.fw.n ? `<p class="sm" style="margin-top:6px"><b>Fairways</b> — ${a.fw.hit} of ${a.fw.n} hit${
-      a.fw.hit < a.fw.n ? `. Misses: ${missLine(a.fw.miss)}.` : '.'}</p>` : ''}
+      a.fw.hit < a.fw.n ? `. Misses: ${missSplit(a.fw.miss)}.` : '.'}</p>` : ''}
     ${a.putts.n ? `<p class="sm" style="margin-top:6px"><b>Putting</b> — ${a.putts.one} one-putt${
       a.putts.one === 1 ? '' : 's'} · ${a.putts.two} two-putts · ${a.putts.three} three-putt${
       a.putts.three === 1 ? '' : 's'} · ${(a.putts.total / a.putts.n).toFixed(2)} a hole.</p>` : ''}
@@ -1836,6 +2045,262 @@ function roundView(i){
   </div>` : ''}
 
   ${roundVsBaseline(a)}`;
+}
+
+// ---------- Live round: log it on the course, hole by hole ----------
+// Thumbs only, between shots: every control is a chip, nothing needs the keyboard, and
+// S.live is written to localStorage on EVERY tap because iOS kills suspended PWAs without
+// warning. A round in progress is losable only by an explicit discard.
+//
+// The output is an ordinary round object — the documented hole schema plus `tee`/`app` —
+// so the moment it saves, roundView, the season analytics and the coaching all read it
+// with no glue at all.
+
+// The most recent cards played here, folded into a par/SI layout keyed by hole number so
+// a repeat course needs no typing. Newest card wins per hole; older ones fill anything it
+// didn't cover, which is how two nines played on different days add up to a full 18.
+// Rating/slope only carry from a card covering the SAME number of holes — a nine-hole
+// rating on an eighteen-hole round would poison the handicap differential.
+function priorLayout(course, nine){
+  const key = (course || '').trim().toLowerCase();
+  if(!key) return null;
+  const cards = S.rounds.filter(r => (r.course || '').trim().toLowerCase() === key
+      && Array.isArray(r.holes) && r.holes.some(h => h && h.par))
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  if(!cards.length) return null;
+  const by = new Map();
+  cards.slice().reverse().forEach(r => r.holes.forEach((h, i) => {
+    if(!h || !h.par) return;
+    by.set(h.n ?? (r.nine === 'B' ? i + 10 : i + 1), { par:h.par, si:h.si ?? null });
+  }));
+  const want = nine ? 9 : 18;
+  const exact = cards.find(r => r.holes.length === want && (!nine || (r.nine || 'F') === nine));
+  return { by, from:cards[0].date, tees:cards[0].tees || '',
+    rating: exact ? (exact.rating ?? null) : null,
+    slope: exact ? (exact.slope ?? null) : null };
+}
+function coursesWithLayout(){
+  const seen = new Map();
+  S.rounds.forEach(r => {
+    if(!r.course || !Array.isArray(r.holes) || !r.holes.some(h => h && h.par)) return;
+    seen.set(r.course, Math.max(seen.get(r.course) || 0, r.holes.length));
+  });
+  return [...seen.keys()];
+}
+
+function liveThru(L){
+  const played = L.holes.filter(h => h.s != null);
+  return { n:played.length,
+    over: played.reduce((a, h) => a + (h.s - h.par), 0),
+    score: played.reduce((a, h) => a + h.s, 0),
+    putts: played.length && played.every(h => h.putts != null)
+      ? played.reduce((a, h) => a + h.putts, 0) : null };
+}
+
+// Draft → the documented round shape. Holes with no score never happened: they are
+// dropped rather than counted as par, so quitting after twelve logs a twelve-hole card.
+function liveRound(L){
+  const holes = L.holes.filter(h => h.s != null).map(h => {
+    const o = { n:h.n, par:h.par, s:h.s };
+    if(h.si != null) o.si = h.si;
+    if(h.putts != null) o.putts = h.putts;
+    if(h.tee) o.tee = h.tee;
+    if(h.gir != null){ o.gir = h.gir; if(h.gir === false && h.gmiss) o.gmiss = h.gmiss; }
+    // A par 3 carries no fairway and no separate approach — the tee shot IS the approach.
+    if(h.par !== 3){
+      if(h.fw != null){ o.fw = h.fw; if(h.fw === false && h.fmiss) o.fmiss = h.fmiss; }
+      if(h.app) o.app = h.app;
+    }
+    return o;
+  });
+  const r = { date:L.date, course:L.course, live:true,
+    par: holes.reduce((a, h) => a + h.par, 0),
+    score: holes.reduce((a, h) => a + h.s, 0),
+    // A partial putt count would read as a real one in the rounds table, so it's all or nothing.
+    putts: holes.length && holes.every(h => h.putts != null)
+      ? holes.reduce((a, h) => a + h.putts, 0) : null,
+    troubles: L.troubles || [], note: L.note || '', holes };
+  if(L.tees) r.tees = L.tees;
+  if(L.nine && holes.length <= 9) r.nine = L.nine;
+  return r;
+}
+
+// A handicap differential needs a whole nine or eighteen behind it.
+function fullCard(r){ return r.holes.length === 9 || r.holes.length === 18; }
+
+// The finish screen pre-lights these from what the card actually says, rather than asking
+// Jack to remember. They drive lesson matching, so they use the TROUBLES keys exactly.
+function liveTroubles(a){
+  const out = [];
+  if(a.putts.three >= 2) out.push('three-putts');
+  if(a.fw.n >= 6 && a.fw.hit / a.fw.n < 0.45) out.push('off-tee');
+  const missed = a.gir.n - a.gir.hit;
+  if(missed >= 4 && (a.gir.miss.S || 0) / missed >= 0.4) out.push('approach');
+  return out;
+}
+
+function liveBanner(){
+  const L = S.live;
+  if(!L) return '';
+  const t = liveThru(L);
+  return `<div class="card livebar">
+    <div class="lvtag">Round in progress</div>
+    <h3>${esc(L.course)}</h3>
+    <p class="sm">${t.n ? `${t.over > 0 ? '+' : ''}${t.over} thru ${t.n}` : 'Nothing scored yet'} · on hole ${L.holes[L.cur] ? L.holes[L.cur].n : 1}</p>
+    <div class="formrow" style="margin-top:10px">
+      <button class="btn" data-action="live-new">Resume →</button>
+      <button class="btn ghost" data-action="live-discard">Discard</button>
+    </div>
+  </div>`;
+}
+
+function live(){
+  const L = S.live;
+  if(!L) return liveStart();
+  return L.stage === 'finish' ? liveFinish(L) : livePlay(L);
+}
+
+function liveStart(){
+  const d = today();
+  const soon = S.briefings.filter(b => b.date && b.date >= d)
+    .sort((a, b) => (a.date || '').localeCompare(b.date || '')).slice(0, 3);
+  const known = coursesWithLayout();
+  return `
+  <button class="backlink" data-action="go" data-view="home">← Home</button>
+  <div class="card">
+    <h2>Start a live round</h2>
+    <p class="sm">One screen per hole — tee club, fairway, green, putts, score. It saves after every tap, so you can lock the phone between shots and pick it up on the next tee. Nothing here needs the keyboard once you've started.</p>
+    <label>Course</label>
+    <input id="lvCourse" list="courseList" placeholder="Start typing…">
+    <datalist id="courseList">${S.courses.map(c => `<option value="${esc(c.name)}">`).join('')}</datalist>
+    ${soon.length ? `<div class="chips">${soon.map(b =>
+      `<span class="chip" data-action="live-pick" data-course="${esc(b.course)}">${esc(b.course)} · ${fmtDate(b.date)}</span>`).join('')}</div>` : ''}
+    <div class="formrow">
+      <div><label>Date</label><input id="lvDate" type="date" value="${d}"></div>
+      <div><label>Holes</label><select id="lvNine">
+        <option value="">Full 18</option><option value="F">Front 9</option><option value="B">Back 9</option>
+      </select></div>
+    </div>
+    <div style="margin-top:12px"><button class="btn" data-action="live-start">Start the round →</button></div>
+    ${known.length ? `<p class="sm faint" style="margin-top:10px">Par and stroke index prefill automatically at ${known.map(esc).join(' · ')} — you've played them with a full card before.</p>` : ''}
+  </div>
+
+  <div class="card flat">
+    <p class="sm"><b>What it records.</b> Which club you hit off every tee (and optionally into every green), whether you found the fairway and the green and where the miss went, putts, and the score. That's the input side of every number on the Scores page — and the tee-club table can't exist without it.</p>
+  </div>`;
+}
+
+function livePlay(L){
+  const h = L.holes[L.cur];
+  const t = liveThru(L);
+  const par3 = h.par === 3;
+  const clubs = bagClubs();
+  // Nobody tees off a par 4 with a 56°, but a short par 3 is exactly a wedge — so the
+  // tee row carries the whole bag only where that's a real shot.
+  const teeClubs = par3 ? clubs : clubs.filter(c => !c.wedge);
+  const chip = (k, v, lab, on) =>
+    `<span class="chip big${on ? ' on' : ''}" data-action="live-set" data-k="${k}" data-v="${esc(v)}">${lab}</span>`;
+  const row = (lab, body, hint) => `<div class="lvrow"><div class="lvlab">${lab}${
+    hint ? `<span>${hint}</span>` : ''}</div>${body}</div>`;
+  const clubRow = (k, list) => `<div class="clubgrid">${list.map(c =>
+    `<span class="chip big${h[k] === c.key ? ' on' : ''}" data-action="live-set" data-k="${k}" data-v="${c.key}">${esc(c.abbr)}</span>`).join('')}</div>`;
+
+  const SC = { '-1':'Birdie', 0:'Par', 1:'Bogey', 2:'Double', 3:'Triple' };
+  const scores = [-1, 0, 1, 2, 3].map(d => {
+    const v = h.par + d;
+    return `<span class="chip big sc${h.s === v ? ' on' : ''}" data-action="live-set" data-k="s" data-v="${v}">
+      <b>${v}</b><i>${SC[d]}</i></span>`;
+  }).join('');
+  const outlier = h.s != null && (h.s < h.par - 1 || h.s > h.par + 3)
+    ? `<span class="chip big sc on" data-action="live-set" data-k="s" data-v="${h.s}"><b>${h.s}</b><i>${h.s - h.par > 0 ? '+' + (h.s - h.par) : h.s - h.par}</i></span>` : '';
+
+  const last = L.cur === L.holes.length - 1;
+  return `
+  <div class="lvhead">
+    <div class="lvh1">Hole ${h.n}<span> · par ${h.par}${h.si ? ` · SI ${h.si}` : ''}</span></div>
+    <div class="lvh2">${t.n ? `<b>${t.over > 0 ? '+' : ''}${t.over}</b> thru ${t.n}` : esc(L.course)}</div>
+    <div class="parpick"><em>Par</em>${[3,4,5].map(p => chip('par', p, p, h.par === p)).join('')}</div>
+  </div>
+  <div class="hstriprow">${L.holes.map((x, i) =>
+    `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>
+
+  <div class="card lvcard">
+    ${row('Off the tee', clubRow('tee', teeClubs))}
+    ${par3 ? '' : row('Fairway', `<div class="chips">
+      ${chip('fw', 'hit', 'Hit', h.fw === true)}
+      ${chip('fw', 'L', 'Left', h.fw === false && h.fmiss === 'L')}
+      ${chip('fw', 'R', 'Right', h.fw === false && h.fmiss === 'R')}
+      ${chip('fw', 'X', 'Other', h.fw === false && !h.fmiss)}</div>`,
+      'a topped one or a penalty is "other"')}
+    ${par3 ? '' : row('Into the green', clubRow('app', clubs), 'optional')}
+    ${row('Green', `<div class="chips">
+      ${chip('green', 'hit', 'Hit', h.gir === true)}
+      ${chip('green', 'S', 'Short', h.gir === false && h.gmiss === 'S')}
+      ${chip('green', 'L', 'Left', h.gir === false && h.gmiss === 'L')}
+      ${chip('green', 'R', 'Right', h.gir === false && h.gmiss === 'R')}
+      ${chip('green', 'Lg', 'Long', h.gir === false && h.gmiss === 'Lg')}</div>`)}
+    ${row('Putts', `<div class="chips">${[0,1,2,3,4,5].map(p =>
+      chip('putts', p, p === 5 ? '5+' : p, h.putts === p)).join('')}</div>`)}
+    ${row('Score', `<div class="chips">${scores}${outlier}
+      <span class="chip big" data-action="live-bump" data-d="1">+1</span>
+      <span class="chip big" data-action="live-bump" data-d="-1">−1</span></div>`)}
+  </div>
+
+  <div class="formrow">
+    <button class="btn ghost"${L.cur === 0 ? ' disabled' : ''} data-action="live-nav" data-d="-1">← ${L.cur === 0 ? 'Start' : 'Hole ' + L.holes[L.cur - 1].n}</button>
+    <button class="btn" data-action="live-nav" data-d="1">${last ? 'Finish round →' : 'Hole ' + L.holes[L.cur + 1].n + ' →'}</button>
+  </div>
+  <p class="sm faint" style="margin-top:10px">Everything except the score is optional — skip a row and it simply isn't recorded, rather than being guessed. Tap a lit chip again to clear it.</p>
+  <div class="formrow" style="margin-top:6px">
+    <button class="btn ghost tiny" data-action="go" data-view="home">Pause · back to Home</button>
+    <button class="btn ghost tiny" data-action="live-discard">Discard round</button>
+  </div>`;
+}
+
+function liveFinish(L){
+  const r = liveRound(L);
+  const a = roundAnalysis(r);
+  const t = liveThru(L);
+  const lit = new Set(L.troubles || []);
+  const skipped = L.holes.length - r.holes.length;
+  return `
+  <button class="backlink" data-action="live-nav" data-d="-1">← Back to the card</button>
+  <div class="card">
+    <h2>${esc(L.course)}</h2>
+    <p class="sm faint">${fmtDate(L.date)}${L.nine ? ` · ${L.nine === 'F' ? 'front' : 'back'} nine` : ''} · ${r.holes.length} holes${
+      skipped ? ` · ${skipped} not scored, they won't be counted` : ''}</p>
+    <div class="rowgrid g3" style="margin-bottom:4px">
+      <div class="stat"><div class="v">${r.score || '—'}</div><div class="l">Score</div></div>
+      <div class="stat"><div class="v">${t.over > 0 ? '+' : ''}${t.over}</div><div class="l">vs par</div></div>
+      <div class="stat"><div class="v">${r.putts ?? '—'}</div><div class="l">Putts</div></div>
+    </div>
+    ${a.nines.length === 2 ? `<p class="sm">Out <b>${a.nines[0].score}</b> · In <b>${a.nines[1].score}</b>.</p>` : ''}
+    ${a.gir.n || a.fw.n ? `<p class="sm">${a.gir.n ? `Greens <b>${a.gir.hit}/${a.gir.n}</b>` : ''}${
+      a.gir.n && a.fw.n ? ' · ' : ''}${a.fw.n ? `Fairways <b>${a.fw.hit}/${a.fw.n}</b>` : ''}.</p>` : ''}
+  </div>
+
+  <div class="card">
+    ${fullCard(r) ? `<div class="formrow g3">
+      <div><label>Tees</label><input id="lvTees" value="${esc(L.tees || '')}" placeholder="Blue"></div>
+      <div><label>Rating</label><input id="lvRating" inputmode="decimal" value="${L.rating ?? ''}" placeholder="—"></div>
+      <div><label>Slope</label><input id="lvSlope" inputmode="numeric" value="${L.slope ?? ''}" placeholder="—"></div>
+    </div>
+    <p class="sm faint">Rating and slope are what turn this into a handicap differential. Both or neither — leave them blank and Claude can backfill them later.</p>`
+    : `<div><label>Tees</label><input id="lvTees" value="${esc(L.tees || '')}" placeholder="Blue"></div>
+    <p class="sm faint" style="margin-top:8px">${r.holes.length} holes isn't a full nine or eighteen, so this card gets no course rating — a part-round can't produce a handicap differential, and forcing one would drag your estimated index somewhere false. Everything else about it still counts.</p>`}
+    <label>What gave you trouble? (pre-ticked from your card — adjust it)</label>
+    <div class="chips" id="troubleChips">
+      ${TROUBLES.map(([k, lab]) => `<span class="chip${lit.has(k) ? ' on' : ''}" data-trouble="${k}">${lab}</span>`).join('')}
+    </div>
+    <label>Anything else</label>
+    <textarea id="lvNote" rows="2" placeholder='"Wind got me on the back nine…"'>${esc(L.note || '')}</textarea>
+    <div style="margin-top:12px"><button class="btn" data-action="live-save">Save round → see the breakdown</button></div>
+  </div>
+
+  <div class="card flat">
+    <p class="sm">Saving drops you straight into this round's own card, where the hole-by-hole detail you just logged turns into the miss patterns, the scrambling rate and the coaching. Everything also folds into the season numbers on <b>Scores</b>.</p>
+    <button class="btn ghost tiny" data-action="live-discard" style="margin-top:8px">Discard this round</button>
+  </div>`;
 }
 
 // ----- Data / backup -----
@@ -1865,10 +2330,119 @@ function dataView(){
   </div>`;
 }
 
+// Wear advances once per round played, whichever way the round was logged.
+function bumpGearCounters(){
+  S.settings.gripRounds++;
+  S.clubs.forEach(c => { if(c.cat === 'wedge' && c.status === 'gaming') c.rounds = (c.rounds || 0) + 1; });
+}
+
 // ---------- Actions ----------
 const ACTIONS = {
   'go': el => { editingCourse = null; render(el.dataset.view); },
   'open-round': el => render('round', +el.dataset.i),
+
+  // ----- Live round -----
+  'live-new': () => render('live'),
+  'live-pick': el => { const i = $('#lvCourse'); if(i) i.value = el.dataset.course; },
+  'live-start': () => {
+    const typed = $('#lvCourse').value.trim();
+    if(!typed) return toast('Name the course first');
+    // Snap to the spelling already on record. Course name is the join key for prior
+    // layouts, the worst-holes table and a briefing's history link, so "sterling farms"
+    // thumbed in on the first tee must not fork off from "Sterling Farms Golf Course".
+    const known = [...S.courses.map(c => c.name), ...S.rounds.map(r => r.course)]
+      .find(n => n && n.toLowerCase() === typed.toLowerCase());
+    const course = known || typed;
+    const date = $('#lvDate').value || today();
+    const nine = $('#lvNine').value || null;
+    const prior = priorLayout(course, nine);
+    const first = nine === 'B' ? 10 : 1;
+    const holes = [];
+    for(let i = 0; i < (nine ? 9 : 18); i++){
+      const n = first + i;
+      const p = prior && prior.by.get(n);
+      holes.push({ n, par: p ? p.par : 4, si: p ? p.si : null, s:null });
+    }
+    // He's playing it, so it belongs in Courses whether or not he's rated it yet.
+    if(!S.courses.some(c => (c.name || '').toLowerCase() === course.toLowerCase())){
+      const db = typeof COURSE_DB !== 'undefined'
+        ? COURSE_DB.find(c => c.n.toLowerCase() === course.toLowerCase()) : null;
+      S.courses.push({ id:uid(), name:course, st: db ? db.st : '', rating:null, pr:null, bucket:false, notes:'' });
+    }
+    S.live = { date, course, nine, cur:0, holes, stage:'play', prevLayout: !!prior,
+      tees: prior ? prior.tees : '', rating: prior ? prior.rating : null,
+      slope: prior ? prior.slope : null, troubles:[], note:'' };
+    save(); render('live');
+    toast(prior ? `Card prefilled from ${fmtDate(prior.from)}` : 'Round started — good luck');
+  },
+  'live-set': el => {
+    const L = S.live, h = L && L.holes[L.cur];
+    if(!h) return;
+    const k = el.dataset.k, v = el.dataset.v;
+    const lit = el.classList.contains('on');   // re-tapping a lit chip clears it
+    if(k === 'par'){
+      h.par = +v;
+      if(h.par === 3){ delete h.fw; delete h.fmiss; delete h.app; }
+    }
+    else if(k === 'tee' || k === 'app'){ if(lit) delete h[k]; else h[k] = v; }
+    else if(k === 'fw'){
+      if(lit){ delete h.fw; delete h.fmiss; }
+      else if(v === 'hit'){ h.fw = true; delete h.fmiss; }
+      else { h.fw = false; if(v === 'X') delete h.fmiss; else h.fmiss = v; }
+    }
+    else if(k === 'green'){
+      if(lit){ delete h.gir; delete h.gmiss; }
+      else if(v === 'hit'){ h.gir = true; delete h.gmiss; }
+      else { h.gir = false; h.gmiss = v; }
+    }
+    else if(k === 'putts'){ if(lit) delete h.putts; else h.putts = +v; }
+    else if(k === 's'){ h.s = lit ? null : +v; }
+    save(); rerender();
+  },
+  'live-bump': el => {
+    const L = S.live, h = L && L.holes[L.cur];
+    if(!h) return;
+    h.s = Math.max(1, (h.s ?? h.par) + (+el.dataset.d));
+    save(); rerender();
+  },
+  'live-goto': el => { if(S.live){ S.live.cur = +el.dataset.i; save(); rerender(); } },
+  'live-nav': el => {
+    const L = S.live; if(!L) return;
+    const to = L.cur + (+el.dataset.d);
+    if(L.stage === 'finish'){ L.stage = 'play'; save(); return render('live'); }
+    if(to < 0) return;
+    if(to >= L.holes.length){
+      L.stage = 'finish';
+      L.troubles = liveTroubles(roundAnalysis(liveRound(L)));
+      save(); return render('live');
+    }
+    L.cur = to; save(); rerender();
+  },
+  'live-save': () => {
+    const L = S.live; if(!L) return;
+    const r = liveRound(L);
+    if(!r.holes.length) return toast('Score at least one hole first');
+    const tees = $('#lvTees').value.trim();
+    if(tees) r.tees = tees;
+    // A course rating covers a whole nine or eighteen. On a card that stops early it
+    // would produce a wildly wrong differential and drag the estimated index with it, so
+    // a part-round gets no rating at all — see the note on the review screen.
+    const rt = parseFloat($('#lvRating')?.value), sl = parseInt($('#lvSlope')?.value, 10);
+    if(fullCard(r) && !isNaN(rt) && !isNaN(sl)){ r.rating = rt; r.slope = sl; }
+    r.note = $('#lvNote').value.trim();
+    r.troubles = [...document.querySelectorAll('#troubleChips .chip.on')].map(c => c.dataset.trouble);
+    S.rounds.push(r);
+    bumpGearCounters();
+    S.live = null; save();
+    render('round', S.rounds.length - 1);
+    toast('Round saved — this is your card');
+  },
+  'live-discard': () => {
+    if(!S.live) return;
+    if(!confirm(`Discard the live round at ${S.live.course}? Everything logged for it is lost.`)) return;
+    S.live = null; save(); render('home'); toast('Live round discarded');
+  },
+
   'save-deadline': () => {
     const v = $('#deadlineInput').value;
     if(!v) return toast('Pick a date first');
@@ -1936,9 +2510,7 @@ const ACTIONS = {
       troubles, note: $('#rdNote').value.trim() };
     if(r.score===null && !r.course && !troubles.length && !r.note) return toast('Log something first');
     S.rounds.push(r);
-    // advance gear counters
-    S.settings.gripRounds++;
-    S.clubs.forEach(c => { if(c.cat==='wedge' && c.status==='gaming') c.rounds = (c.rounds||0)+1; });
+    bumpGearCounters();
     save(); rerender(); toast('Round saved — Coach updated');
   },
   'toggle-sections': el => {
@@ -2083,6 +2655,13 @@ function syncWedgeCarries(source){
 // Claude analyzes filmed sessions and pushes findings to coach-feed.json in the
 // repo; the app merges any entries it hasn't applied yet. Jack's own logs stay
 // local — this is a one-way inbox for coaching updates.
+// Same date, same course, same nine = the same round, however it got here.
+function sameRound(list, r){
+  const key = (r.course || '').trim().toLowerCase();
+  return list.find(x => x.date === r.date
+    && (x.course || '').trim().toLowerCase() === key
+    && (x.nine || null) === (r.nine || null)) || null;
+}
 function applyFeed(feed){
   let changed = false;
   (feed.entries || []).forEach(e => {
@@ -2115,7 +2694,33 @@ function applyFeed(feed){
       S.stats.sort((a,b) => (a.date||'').localeCompare(b.date||''));
     }
     else if(e.type === 'round' && e.round){
-      if(!S.rounds.some(r => r.feedId === e.id)) S.rounds.push({ feedId:e.id, troubles:[], putts:null, note:'', ...e.round });
+      // Two guards, because there are two ways to get the same round twice: the same feed
+      // entry re-applying, and a round Jack already logged live arriving again as a feed
+      // entry. The second one silently double-counts every stat, so it matches on the
+      // round itself rather than on the entry id.
+      if(!S.rounds.some(r => r.feedId === e.id) && !sameRound(S.rounds, e.round))
+        S.rounds.push({ feedId:e.id, troubles:[], putts:null, note:'', ...e.round });
+    }
+    else if(e.type === 'round-update' && e.round){
+      // Backfills a live-logged card with what the phone couldn't know on the course —
+      // course rating and slope, most of all, without which there's no differential.
+      const r = sameRound(S.rounds, e.round);
+      if(r){
+        const { holes, ...rest } = e.round;
+        Object.assign(r, rest);
+        if(Array.isArray(holes) && Array.isArray(r.holes)){
+          holes.forEach(h => {
+            const hit = r.holes.find(x => x.n === h.n);
+            if(hit) Object.assign(hit, h); else r.holes.push(h);
+          });
+          // Correcting a hole has to move the card's total with it, or the header and the
+          // hole-by-hole table start telling different stories. An explicit total wins.
+          if(rest.score == null && r.holes.every(h => h.s != null))
+            r.score = r.holes.reduce((a, h) => a + h.s, 0);
+          if(rest.par == null && r.holes.every(h => h.par != null))
+            r.par = r.holes.reduce((a, h) => a + h.par, 0);
+        }
+      }
     }
     else if(e.type === 'test' && e.test) S.tests.push({ date:e.test.date || null, putter:e.test.putter, makes:e.test.makes, note:e.test.note || '' });
     else if(e.type === 'briefing' && e.briefing){

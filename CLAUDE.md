@@ -12,6 +12,7 @@ Hosted on GitHub Pages; installs to the phone home screen via the service worker
 ```
 index.html            App shell + nav + service-worker registration
 app.js                The whole app: seed data, state, all views, render logic
+                      (incl. the live-round logger — see "Live rounds" below)
 styles.css            "Scorecard Heritage" theme (cream paper, Masters green, burgundy)
 lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
@@ -76,7 +77,8 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `action-update`  | Rewrite action `target` text |
 | `carries`        | Replace the distance ladder (ignored once the user calibrates) |
 | `course-add` / `course-remove` | Add/remove a course |
-| `round`          | Add a played round (see *Logging a round* below) |
+| `round`          | Add a played round (see *Logging a round* below). Skipped if a round with the same `date` + `course` + `nine` is already there, whatever put it there |
+| `round-update`   | Patch a round matched by `date` + `course` (+ `nine`): `Object.assign` of the top level, per-hole merge by hole `n`. **The way to backfill `rating`/`slope` onto a live-logged card**, or fix a hole after the fact |
 | `stats`          | Add/replace a cumulative stats snapshot (GHIN summaries); `replaces` swaps one out |
 | `test`           | Append a 10-ball putter test result |
 | `shortlist`      | Replace the putter shortlist (keeps prior `demoed` flags) |
@@ -147,12 +149,45 @@ differential — omit rather than guess). The value is in `holes[]`, one object 
 | `gmiss` | where a missed green finished: `S` `L` `R` `Lg` `X` (short/left/right/long/other) |
 | `fw` | `true`/`false` — fairway hit. **Omit entirely on par 3s** so they don't count against the fairway rate |
 | `fmiss` | where a missed tee shot finished, same codes |
+| `tee` | **club key** hit off the tee — drives the *Off the tee · by club* table |
+| `app` | **club key** hit into the green on a par 4/5. Omit on par 3s: there the tee shot *is* the approach |
 
 Tapping a round in **Scores** opens `roundView()` — the hole-by-hole card, scoring mix,
 par splits, miss directions, round-scoped coaching, and a comparison against the latest
 `stats` snapshot. Every block hides itself when its data is absent, so a score-only round
 still opens; it just shows less. `troubles[]` must use the keys in `TROUBLES` (`app.js`
 top) — they also feed lesson matching for the next three rounds.
+
+**Club keys** are slugs of the **carry-ladder** row names, not `S.clubs` ids — the bag holds
+the irons as one "KING TEC 4–PW" entry and so can't name the club that hit a shot, while
+`S.carries` is the real 13-club list: `driver`, `mini-driver`, `2-iron`, `4-iron`…`9-iron`,
+`pw`, `50-wedge`, `56-wedge`, `60-wedge` (`clubKey()` in `app.js` is the authority). An
+unrecognised key still renders — it just prints itself.
+
+### Live rounds (Jack logs these himself — do not feed them)
+
+Home → **Play a live round** opens the hole-by-hole logger: one screen per hole, chips only,
+saving to `S.live` on every tap (iOS kills suspended PWAs, so nothing may live in memory).
+Finishing writes an ordinary round — same schema as above, plus `live:true` — and drops him
+straight into its `roundView`. Par and stroke index prefill from the newest card at that
+course, so a repeat course needs no typing at all.
+
+Two things follow for anyone writing feed entries:
+
+- **Never send a `round` entry for a round he logged live.** The dedupe guard above makes it
+  harmless if you do, but the round is already there.
+- A live card carries **no `rating`/`slope`** at a course he hasn't played with a full card
+  before, and none at all if he scored fewer than 9 or 18 holes (a part-round can't produce
+  a differential). Backfill with `round-update` when he tells you the tees.
+
+### Hole data outranks a stats snapshot
+
+An extension of *film is king* to the numbers: a hole Jack recorded himself is **measured**,
+a pasted GHIN average is **summarized**, a feel is **feel**. Once the hole-logged sample is
+real (36+ recorded greens or putting holes), `statTips()` stands its snapshot versions of
+the approach-miss and three-putt findings down and the live ones on **Scores** speak instead
+— see the `live` argument to `statTips()`. Don't reintroduce a snapshot claim that the hole
+data now answers better; do keep saying which one a number came from.
 
 ### Writing briefings (they render in layers — write for that)
 

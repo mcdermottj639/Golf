@@ -338,3 +338,49 @@ h2{scroll-margin-top:14px}
 .res{font-family:var(--sans);font-size:10px;font-weight:700}
 .res.ok{color:var(--gtext);font-size:13px}
 .res.no{color:var(--btext)}
+/* The club that hit the shot, tucked under its result so the card stays six columns. */
+.scard .cl{display:block;font-family:var(--sans);font-size:9px;font-weight:700;color:var(--faint);
+  letter-spacing:.02em;margin-top:1px}
+
+/* ---- Live round: built for one thumb, walking, in sunlight ---- */
+.livebar{border-left:4px solid var(--burg)}
+.livebar .lvtag{font-family:var(--sans);font-size:9.5px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--btext);margin-bottom:3px}
+.lvhead{position:sticky;top:0;z-index:20;background:var(--paper);padding:10px 0 8px;
+  border-bottom:2px solid var(--green);margin-bottom:2px}
+.lvh1{font-size:21px;font-weight:700;color:var(--gtext);line-height:1.1}
+.lvh1 span{font-size:13px;font-weight:400;color:var(--faint);font-family:var(--sans)}
+.lvh2{font-family:var(--sans);font-size:12px;color:var(--soft);margin-top:2px}
+.lvh2 b{font-size:14px;color:var(--btext)}
+/* Jump strip: every hole reachable, current one obvious, scored ones filled in. */
+.hstriprow{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0 2px}
+.hstrip{flex:1 0 auto;min-width:26px;text-align:center;font-family:var(--sans);font-size:10.5px;
+  font-weight:700;padding:4px 0;border-radius:5px;border:1px solid var(--line);
+  background:var(--card2);color:var(--faint);cursor:pointer;user-select:none}
+.hstrip.done{background:#dfe8dc;color:var(--green);border-color:#a8c0ad}
+.hstrip.cur{background:var(--green);color:var(--green-ink);border-color:var(--green)}
+.lvcard{padding:2px 13px 11px}
+.lvrow{padding:8px 0;border-bottom:1px dotted #c9bd9d}
+.lvrow:last-child{border-bottom:none;padding-bottom:2px}
+.lvlab{font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--faint)}
+.lvlab span{text-transform:none;letter-spacing:0;font-weight:400;font-style:italic;margin-left:6px}
+.lvrow .chips{margin:6px 0 0}
+/* Big chips: a 44px-ish target is the difference between logging a hole and giving up. */
+.chip.big{font-size:13px;padding:10px 15px;border-radius:22px;min-width:44px;text-align:center}
+/* Seven across fits the full bag in two rows, so the whole hole stays on one screen. */
+.clubgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:6px 0 0}
+.clubgrid .chip{padding:11px 1px;min-width:0;font-size:12px}
+/* Par is right nine times in ten off a saved layout, so it rides small in the header. */
+.parpick{display:flex;gap:5px;align-items:center;margin-top:5px}
+.parpick .chip{padding:4px 11px;font-size:11px}
+.parpick em{font-family:var(--sans);font-size:9.5px;font-style:normal;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-right:2px}
+.chip.sc{display:inline-flex;flex-direction:column;align-items:center;gap:1px;padding:7px 13px;line-height:1.1}
+.chip.sc b{font-size:16px}
+.chip.sc i{font-size:8.5px;font-style:normal;letter-spacing:.05em;text-transform:uppercase;opacity:.75}
+.btn[disabled]{opacity:.4}
+body.night .hstrip{background:#22292e;border-color:var(--line);color:var(--faint)}
+body.night .hstrip.done{background:#1c2b22;color:#8fd0a8;border-color:#33503f}
+body.night .hstrip.cur{background:var(--green);color:var(--green-ink);border-color:var(--green)}
+body.night .lvhead{background:#0b0e11}
