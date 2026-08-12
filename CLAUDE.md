@@ -173,6 +173,15 @@ Finishing writes an ordinary round — same schema as above, plus `live:true` �
 straight into its `roundView`. Par and stroke index prefill from the newest card at that
 course, so a repeat course needs no typing at all.
 
+**The tee club is suggested, never assumed.** On arriving at a hole the logger pre-fills
+the club from what he hit off *that hole at that course* last time, else from the last club
+he hit off a tee earlier in the same round (never onto a par 3 — a par 3's club belongs to
+the hole). A suggested chip renders **half-lit**, a confirmed one solid, and tapping the
+suggestion confirms it rather than clearing it. On a repeat course that is 18 taps saved.
+The half-lit state has to stay visible: a silent "driver" default would swallow every hole
+he actually hit the mini on, which is precisely the comparison the club tables exist for.
+`teeAuto`/`teeTouched` are UI state on `S.live` only and never reach the saved round.
+
 Two things follow for anyone writing feed entries:
 
 - **Never send a `round` entry for a round he logged live.** The dedupe guard above makes it

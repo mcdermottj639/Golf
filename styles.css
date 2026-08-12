@@ -385,6 +385,10 @@ h2{scroll-margin-top:14px}
 .parpick .chip{padding:4px 11px;font-size:11px}
 .parpick em{font-family:var(--sans);font-size:9.5px;font-style:normal;font-weight:700;
   letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-right:2px}
+/* A carried-over suggestion: half-lit. Tinted rather than dashed, because dashed is
+   already spoken for by the no-shot toggle's off state and one language per shape. */
+.chip.on.auto{background:#f0dbde;color:var(--burg);border:1.5px solid var(--burg)}
+body.night .chip.on.auto{background:rgba(163,51,68,.3);color:#eab4bd;border-color:var(--burg)}
 /* Not a direction — a qualifier on the miss, so it reads as its own kind of tap. */
 .chip.ns{background:transparent;border:1px dashed var(--burg);color:var(--btext);padding:8px 14px}
 .chip.ns.on{background:var(--burg);color:var(--burg-ink);border-style:solid}

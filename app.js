@@ -2141,6 +2141,48 @@ function coursesWithLayout(){
   return [...seen.keys()];
 }
 
+// ----- Cutting the tee tap -----
+// The club off a given tee is one of the most predictable things in a round: the same
+// hole asks the same question every time, and inside one round he tends to keep reaching
+// for the same club. So the logger suggests one — but it never pretends the suggestion is
+// a record. A suggested chip renders differently from a confirmed one, and the whole
+// driver-vs-mini comparison depends on that distinction being real: a blanket "driver"
+// default would quietly swallow every hole he actually hit the mini on, which is exactly
+// the question the table exists to answer.
+function priorTee(course, n){
+  const key = (course || '').trim().toLowerCase();
+  const cards = S.rounds.filter(r => (r.course || '').trim().toLowerCase() === key && Array.isArray(r.holes))
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  for(const r of cards){
+    const h = r.holes.find(x => x && x.n === n && x.tee);
+    if(h) return h.tee;
+  }
+  return null;
+}
+function teeSuggestion(L, h){
+  // What he hit off this exact hole here last time — the strongest guess available.
+  const prior = priorTee(L.course, h.n);
+  if(prior) return prior;
+  // A par 3's club is a property of that hole; carrying another hole's club to it is noise.
+  if(h.par === 3) return null;
+  // Otherwise: whatever he's been hitting off the tee so far this round.
+  for(let i = L.cur - 1; i >= 0; i--){
+    const x = L.holes[i];
+    if(x.par !== 3 && x.tee) return x.tee;
+  }
+  return null;
+}
+// Lands when he arrives at a hole, never on a hole he's already had his hands on.
+function suggestTee(L){
+  const h = L.holes[L.cur];
+  if(!h || h.tee || h.teeTouched) return;
+  const key = teeSuggestion(L, h);
+  const club = key && clubBy(key);
+  if(!club) return;
+  if(club.wedge && h.par !== 3) return;   // wedges aren't offered off a par 4/5 tee
+  h.tee = key; h.teeAuto = true;
+}
+
 function liveThru(L){
   const played = L.holes.filter(h => h.s != null);
   return { n:played.length,
@@ -2256,8 +2298,11 @@ function livePlay(L){
     `<span class="chip big${on ? ' on' : ''}" data-action="live-set" data-k="${k}" data-v="${esc(v)}">${lab}</span>`;
   const row = (lab, body, hint) => `<div class="lvrow"><div class="lvlab">${lab}${
     hint ? `<span>${hint}</span>` : ''}</div>${body}</div>`;
-  const clubRow = (k, list) => `<div class="clubgrid">${list.map(c =>
-    `<span class="chip big${h[k] === c.key ? ' on' : ''}" data-action="live-set" data-k="${k}" data-v="${c.key}">${esc(c.abbr)}</span>`).join('')}</div>`;
+  const clubRow = (k, list) => `<div class="clubgrid">${list.map(c => {
+    const on = h[k] === c.key;
+    const auto = on && k === 'tee' && h.teeAuto;
+    return `<span class="chip big${on ? (auto ? ' on auto' : ' on') : ''}" data-action="live-set" data-k="${k}" data-v="${c.key}">${esc(c.abbr)}</span>`;
+  }).join('')}</div>`;
 
   const SC = { '-1':'Birdie', 0:'Par', 1:'Bogey', 2:'Double', 3:'Triple' };
   const scores = [-1, 0, 1, 2, 3].map(d => {
@@ -2279,7 +2324,8 @@ function livePlay(L){
     `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>
 
   <div class="card lvcard">
-    ${row('Off the tee', clubRow('tee', teeClubs))}
+    ${row('Off the tee', clubRow('tee', teeClubs),
+      h.teeAuto ? 'carried over — tap to keep or change' : '')}
     ${par3 ? '' : row('Fairway', `<div class="chips">
       ${chip('fw', 'hit', 'Hit', h.fw === true)}
       ${chip('fw', 'L', 'Left', h.fw === false && h.fmiss === 'L')}
@@ -2309,7 +2355,7 @@ function livePlay(L){
     <button class="btn ghost"${L.cur === 0 ? ' disabled' : ''} data-action="live-nav" data-d="-1">← ${L.cur === 0 ? 'Start' : 'Hole ' + L.holes[L.cur - 1].n}</button>
     <button class="btn" data-action="live-nav" data-d="1">${last ? 'Finish round →' : 'Hole ' + L.holes[L.cur + 1].n + ' →'}</button>
   </div>
-  <p class="sm faint" style="margin-top:10px">Everything except the score is optional — skip a row and it simply isn't recorded, rather than being guessed. Tap a lit chip again to clear it.</p>
+  <p class="sm faint" style="margin-top:10px">Everything except the score is optional — skip a row and it simply isn't recorded, rather than being guessed. Tap a lit chip again to clear it. A <b>half-lit</b> tee club is one carried over from the last time you played this hole, or from earlier in this round: leave it if it's right, tap another club if it isn't.</p>
   <div class="formrow" style="margin-top:6px">
     <button class="btn ghost tiny" data-action="go" data-view="home">Pause · back to Home</button>
     <button class="btn ghost tiny" data-action="live-discard">Discard round</button>
@@ -2431,6 +2477,7 @@ const ACTIONS = {
     S.live = { date, course, nine, cur:0, holes, stage:'play', prevLayout: !!prior,
       tees: prior ? prior.tees : '', rating: prior ? prior.rating : null,
       slope: prior ? prior.slope : null, troubles:[], note:'' };
+    suggestTee(S.live);
     save(); render('live');
     toast(prior ? `Card prefilled from ${fmtDate(prior.from)}` : 'Round started — good luck');
   },
@@ -2443,8 +2490,19 @@ const ACTIONS = {
       h.par = +v;
       // A par 3 has no fairway, no separate approach, and always a shot at the green.
       if(h.par === 3){ delete h.fw; delete h.fmiss; delete h.app; delete h.noshot; }
+      // A suggestion made for a par 4 isn't valid for a par 3, so re-derive it.
+      if(h.teeAuto){ delete h.tee; delete h.teeAuto; suggestTee(L); }
     }
-    else if(k === 'tee' || k === 'app'){ if(lit) delete h[k]; else h[k] = v; }
+    else if(k === 'tee'){
+      // Tapping the suggested club CONFIRMS it rather than clearing it — clearing a chip
+      // he never chose would be a confusing way to spend the tap this feature just saved.
+      const confirming = h.teeAuto && h.tee === v;
+      h.teeTouched = true; delete h.teeAuto;
+      if(confirming){ /* keep h.tee */ }
+      else if(lit) delete h.tee;
+      else h.tee = v;
+    }
+    else if(k === 'app'){ if(lit) delete h[k]; else h[k] = v; }
     else if(k === 'fw'){
       if(lit){ delete h.fw; delete h.fmiss; }
       else if(v === 'hit'){ h.fw = true; delete h.fmiss; }
@@ -2473,7 +2531,7 @@ const ACTIONS = {
     save(); rerender();
   },
   // Changing hole IS a navigation — that one should land at the top of the new hole.
-  'live-goto': el => { if(S.live){ S.live.cur = +el.dataset.i; save(); render('live'); } },
+  'live-goto': el => { if(S.live){ S.live.cur = +el.dataset.i; suggestTee(S.live); save(); render('live'); } },
   'live-nav': el => {
     const L = S.live; if(!L) return;
     const to = L.cur + (+el.dataset.d);
@@ -2484,7 +2542,7 @@ const ACTIONS = {
       L.troubles = liveTroubles(roundAnalysis(liveRound(L)));
       save(); return render('live');
     }
-    L.cur = to; save(); render('live');
+    L.cur = to; suggestTee(L); save(); render('live');
   },
   'live-save': () => {
     const L = S.live; if(!L) return;
