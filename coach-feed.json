@@ -11063,6 +11063,139 @@
       "id": "mental-debrief-action-20260813",
       "type": "action",
       "text": "MENTAL — run the first debrief the evening after your next round. Mental tab → Round debrief: focus out of five, what fired, one line on what happened, one job for next time. Two minutes. The trigger counts and the focus trend need three rounds before they say anything, so the only way to get there is to start."
+    },
+    {
+      "id": "debrief-wianno-m1-20260709",
+      "type": "debrief",
+      "debrief": {
+        "date": "2026-07-09",
+        "round": {
+          "course": "Wianno Club",
+          "date": "2026-07-09",
+          "nine": "F"
+        },
+        "focus": null,
+        "triggers": [
+          "partner"
+        ],
+        "when": [
+          "open"
+        ],
+        "note": "Member-guest, first match. A guy in the group I thought was annoying got into my head and threw me off. (Recounted Aug 13; the card is the Jul 9 front nine, 46.)",
+        "next": ""
+      }
+    },
+    {
+      "id": "debrief-wianno-m3-20260710b",
+      "type": "debrief",
+      "debrief": {
+        "date": "2026-07-10",
+        "round": {
+          "course": "Wianno Club",
+          "date": "2026-07-10",
+          "nine": "B"
+        },
+        "focus": null,
+        "triggers": [
+          "closing"
+        ],
+        "when": [
+          "close"
+        ],
+        "note": "Second match of the day, back nine. Crumbled over the last two — 17 bogey, 18 double, after playing 10 through 16 at +6. (Recounted Aug 13; card confirmed as the Jul 10 back nine, 44.)",
+        "next": ""
+      }
+    },
+    {
+      "id": "debrief-sterling-20260813",
+      "type": "debrief",
+      "debrief": {
+        "date": "2026-08-13",
+        "round": {
+          "course": "Sterling Farms Golf Course",
+          "date": "2026-08-13",
+          "nine": null
+        },
+        "focus": null,
+        "triggers": [
+          "slow",
+          "partner"
+        ],
+        "when": [],
+        "note": "Paired with randoms who were slow the whole way round.",
+        "next": "Wait AWAY from the ball. Pick club and target while waiting; the routine only starts when it is my turn."
+      }
+    },
+    {
+      "id": "plan-locked-in-20260813-v2",
+      "type": "briefing",
+      "replaces": "plan-locked-in-20260813",
+      "briefing": {
+        "course": "Locked In — The Mental Round",
+        "discipline": "mental",
+        "focus": "The mental side, decided at the kitchen table so there is nothing left to decide on the 14th tee. Updated Aug 13 2026 with your first three worked examples — slow randoms today at Sterling Farms, an opponent who got into your head in the first Wianno match, and the crumble on 17 and 18 in the Jul 10 back-nine match. Two of the three now have a number against them, and they point in a direction you would not have guessed: the partner damage lands on holes 1–3, and the crumble is real but is one card in six.",
+        "rules": [
+          "Attention ON for the 30 seconds a shot takes — OFF on the walk",
+          "A person in your head costs you EARLY — guard holes 1–3, not the finish",
+          "Anger gets ten yards, then the hole is filed",
+          "One target, named out loud, every tee",
+          "Still hot? The club goes DOWN, never up",
+          "Closing: the last TWO holes are the window, and the answer is to change nothing",
+          "Food at the turn, water from the 10th, before you diagnose your head"
+        ],
+        "steps": [
+          "Before you leave: read the trigger list in the Mental tab and name the ONE most likely today — who you are playing with, what the pace looks like, how hot it is. Naming it in advance is most of the work.",
+          "First tee: say your one job out loud. It is the line you wrote in your last debrief, and it is the only swing-or-head thought you carry.",
+          "Every shot: attention ON when you start the read, OFF at the finish. You are not trying to concentrate for four hours — nobody can, and trying is what leaves you empty by the 15th.",
+          "Every dropped shot: ten yards of walking, then the club goes in the bag and the hole is filed. The anger is allowed. It just gets a container with an end you can see.",
+          "Every hole that starts badly: the club goes DOWN and the target moves to the fat of the green. This is the one that has your money on it.",
+          "The turn: eat something and drink, whether or not you want to, and say the one job again.",
+          "Last three holes: change nothing. Same routine, same target selection, one more club, middle of the green.",
+          "That evening: two minutes in the Mental tab — how locked in you were, what fired, and the one job for next time."
+        ],
+        "sections": [
+          {
+            "t": "The on/off switch",
+            "k": "Attention is a battery and the walk is where you spend it — so don't.",
+            "b": "You do not have to concentrate for four hours, and the attempt is what leaves you flat on the back nine. A round is roughly 70 shots of about 30 seconds each: half an hour of actual golf inside a five-hour walk.\n\nSo the switch has two positions and a hard edge between them. ON starts when you begin the read and ends at the finish of the swing. OFF is everything else — talk, look at the trees, be somewhere else entirely. What breaks a round is not being distracted on the walk; it is standing over the ball with the walk still running, and standing over it early while you wait for the group ahead is the commonest way that happens.\n\nThe edge is what makes it work, and the edge is your routine. It has a fixed number of beats — read, one rehearsal, step in, go — so it is also a clock. If the beats are there, you were ON. If the rehearsal went missing, you were rushed, and that is the first thing to disappear every time."
+          },
+          {
+            "t": "What your own cards say",
+            "k": "Neither the anger tax nor the fade shows up as strokes yet — the doubles do, and they are half of everything you have lost.",
+            "b": "This is the honest part, and it points the work somewhere different from where you would have put it.\n\nAcross 63 holes logged hole by hole (six cards, Wianno and Sterling Farms, as of Aug 13 2026), you average +0.83 a hole. The hole AFTER a dropped shot plays +0.62 — BETTER than your average, with par or better on 43% of them. The closing three play +0.67 against +0.89 for everything before them. So on the evidence available, you do not tilt into the next tee, and you fade at the finish once in six cards — see 'Your three examples' below for that one.\n\nWhat IS there: 13 holes of double bogey or worse, costing 26 strokes — 50% of everything you have lost to par. And the worst third of your rounds is the FIRST one (+1.05 a hole, against +0.71 for the middle and +0.71 for the closing), which is a warm-up problem, not a focus problem.\n\nTwo honest limits. Six rounds at two courses is a first read, not a verdict, and every one of those cards is stroke play — MATCH play is not in the data at all, so 'got to a lead and did not close it' is a claim these numbers cannot test either way. The Mental tab recomputes all of this on every card you log, so the read moves as the evidence does. Until it does: do not spend practice on a reset problem the scorecard cannot find."
+          },
+          {
+            "t": "Your three examples, against the cards",
+            "k": "The partner damage lands on holes 1–3; the crumble is real and is one card in six.",
+            "b": "You gave three on Aug 13 2026. Two of them are attached to cards you had already logged hole by hole, so they can be checked rather than just recorded. Both are now in the debrief log.\n\nWIANNO MATCH 1 (Jul 9, front, 46) — the opponent you found annoying. This is the worst card of the event by five shots, with four doubles on it. The part that matters: holes 1, 2 and 3 went +2, +2, +2 — SIX over in three holes. The other four Wianno nines cost +3 over their first three, every single one of them. Same course, same Blue tees, same week, same format, and the opening three cost double on the card where you say a person got into your head.\n\nThat also moves an existing finding. The Mental tab has been reporting that your worst stretch is the opening third (+1.05 a hole). Take this one card out and the opening third falls to +0.89 against a +0.76 baseline — the gap roughly halves. So a chunk of what has been filed as a warm-up problem may be a getting-into-my-head problem.\n\nTHE HONEST CAVEAT, and it is a big one: that card was ALSO the first nine of the whole event — the coldest start you had all week. Cold warm-up and an irritating opponent are perfectly confounded on a single card, and one card cannot separate them. The Swing Routine plan's warm-up primer is not refuted by this and neither is the trigger. What separates them is future data: log the trigger, and note whether you actually warmed up.\n\nWIANNO MATCH ON JUL 10 (back, 44) — the crumble. Confirmed on the card. You played 10 through 16 at +6, which is +0.86 a hole and right on your average, then went bogey-double on 17 and 18: +1.50 a hole over the last two. That is a real fade and it is the first one in your data.\n\nAnd it is one card in six. Across everything you have logged, the last two holes play +0.58 a hole against +0.88 for everything before them, and the Jul 10 back nine is the ONLY card above +0.50 on its closing two. Every other round finishes at or below that. So the crumble you remember is real, and it is the exception rather than the pattern — which is worth saying plainly, because it is exactly how one bad finish becomes a settled belief about how you play.\n\nOne measurement note that came out of this: your fade was the last TWO holes. A three-hole window misses it completely — holes 16, 17 and 18 on that card average +1.00, identical to holes 10–15. When you say '8 and 9' you mean the last two, so that is the window to look in.\n\nTODAY, STERLING FARMS — slow randoms. Logged with the card attached. Nothing to conclude from one round; it is the first entry in what makes the slow-play trigger answerable at all."
+          },
+          {
+            "t": "The hot decision — where the anger actually costs you",
+            "k": "The stroke anger costs you is the club you pick while still angry, during the hole, not the tee shot afterwards.",
+            "b": "If the next tee is fine and the doubles are half your losses, then the damage is landing INSIDE the bad hole. That is where the hero recovery lives: the 3-wood out of the trees, the second aggressive club after a bad drive, the flop you would bet against. Every one of those is a decision made while hot, and every one turns a bogey into a double.\n\nSo the rule that matters is not about calming down afterwards. It is: from any recovery position, pick the club and the line you would bet a hundred dollars you can execute nine times out of ten. From trouble, that is nearly always the punch-out. When you are hot the club goes DOWN, never up.\n\nA bogey is not an emergency. Par golf with no doubles beats birdie golf with four, and you already make par or better on a third of your holes — the base game is there. The tail is what costs you."
+          },
+          {
+            "t": "Slow play and random partners",
+            "k": "Both are conditions, the only response either allows is where you stand — and the partner damage lands on holes 1–3.",
+            "b": "You cannot speed up the group ahead and you cannot change how a stranger behaves. Treating either as something to be resolved is what converts an annoyance into four holes of stewing.\n\nSLOW PLAY. The failure is standing over the ball early, because then the wait happens INSIDE your routine and the routine is the thing keeping you ON. So: wait away from the ball. Pick the club and the target while you wait — that is useful and it is not the routine. Start the routine only when it is genuinely your turn, and then run it at its normal speed. It has a fixed length; the waiting goes outside it.\n\nPARTNERS. This one now has the best evidence of any trigger you have, and it says the danger window is the START of the round: on the Jul 9 card the first three holes cost +6 against +3 on every other nine you played that week. Which means the pre-round naming matters most on the 1st tee, not the 15th. You get one comment in your head, and then it is a course condition — you do not argue with wind either. The one response available is physical: move so they are out of your eyeline and out of earshot for the thirty seconds the shot takes. On gimmes and rules noise, decide before the first tee what you are playing and say it once, pleasantly, on the tee. A thing agreed on the 1st is not an argument on the 9th."
+          },
+          {
+            "t": "Closing",
+            "k": "Closing is the refusal to change anything, plus exactly one club — and the window is the last two holes.",
+            "b": "There is no closing skill separate from playing. Everything that goes wrong with a lead is a CHANGE: a shorter routine because you want it over with, a smaller target because you are protecting, a bigger one because you want to finish it. Same routine, same target selection you used on the 2nd hole.\n\nThe single legitimate change is one more club, aimed at the middle of the green. That is what protecting a lead actually looks like — it takes the short-side miss out of play, which is your standing miss anyway. Steering is not protecting.\n\nAnd if you catch yourself doing the arithmetic, convert it to the hole in front of you: what number makes THIS hole fine? Play that. The addition still works in the car park.\n\nWhere the evidence now stands: one measured crumble, Jul 10 back nine, bogey-double on 17 and 18 after seven holes at your average. Every other card you have finishes its last two at +0.50 a hole or better. So this is a real failure mode with one instance, not a standing pattern — and the honest limit still applies, because these are stroke-play cards and losing a MATCH from in front does not have to show up as strokes at all. Log the matches and this can start answering the question you are actually asking."
+          },
+          {
+            "t": "The debrief loop",
+            "k": "One job per round, chosen at the kitchen table, is the entire system.",
+            "b": "The evening after you play — not on the drive home, when it is still a mood — spend two minutes in the Mental tab: how locked in you were out of five, which triggers fired and roughly when, one line on what actually happened, and one job for next round.\n\nONE job. A list of five is the same as none, and the tab shows the newest one at the top of the page so you read it before you play again.\n\nWhat this buys you over time is the thing you cannot get from a single round: whether 'slow play gets me' is true every round or was true once, loudly. Eight triggers with counts against them turn a mood into a pattern, and a pattern is something you can rehearse against. It stays the softest evidence on the page — your own read, written after the fact — which is why it is ranked below everything your scorecard says, and why it is still the only witness for the parts a scorecard cannot see."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "Where every claim on this page came from.",
+            "b": "FROM YOU (Aug 13 2026), and authoritative because nobody else can report it: you struggle to stay locked in for a full round; slow play and random partners set you off; you get to a lead or a good position and do not close it; and you let yourself get angry or distracted. You asked for this to be an OFF-COURSE tool, which is why nothing here is written to be tapped mid-round and why the live logger was left alone.\n\nFROM YOUR CARDS (63 holes over 6 hole-by-hole rounds, Wianno Club and Sterling Farms, Jul 9 – Aug 12 2026): +0.83 a hole overall; +0.62 on the hole after a bogey or worse (37 holes, 43% par or better); +0.75 after a double or worse (12 holes); closing three +0.67 against +0.89 before them (18 vs 45 holes); thirds +1.05 / +0.71 / +0.71; 13 holes of double or worse costing 26 strokes, 50% of total strokes lost. All of it recomputes live in the Mental tab, so treat the figures quoted here as the Aug 13 snapshot.\n\nNOT MEASURED, and said plainly rather than assumed: match play appears nowhere in these cards, so the closing claim is untested; six rounds at two courses is a thin sample; and the focus rating in the debrief is self-report, ranked below every number on the page.\n\nSTANDING CONTENT: the 10-yard reset, one-target-one-thought, practice-like-it-counts and 'bogey is not an emergency' already lived in the Coach lessons — this plan points at them rather than restating them. The if-then form (deciding the response in advance and attaching it to a named trigger) is the mechanism the trigger list is built on.\n\nADDED Aug 13 2026 — the three worked examples. FROM YOU: slow randoms at Sterling Farms today; an opponent you found annoying in the first Wianno match; crumbling on 17 and 18 in the Jul 10 back-nine match, which you identified from the two candidate cards when asked. FROM THE CARDS: Jul 9 front holes 1–3 = +6 against +3 on each of the other four Wianno nines; opening third +1.05 a hole with that card, +0.89 against a +0.76 baseline without it; Jul 10 back holes 10–16 = +6 (+0.86 a hole) then +1.50 a hole over 17–18; closing two across all six cards +0.58 against +0.88 for everything before, with Jul 10 back the only card above +0.50. NOT SEPARABLE: the Jul 9 card is both the annoying-opponent match AND the coldest start of the event, so cold warm-up and partner disruption are confounded on it and neither is established as the cause. NOT RATED: you did not give a focus score for any of the three, so all three are logged without one rather than with a guessed one."
+          }
+        ]
+      }
     }
   ]
 }

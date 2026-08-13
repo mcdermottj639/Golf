@@ -85,6 +85,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `test`           | Append a 10-ball putter test result |
 | `shortlist`      | Replace the putter shortlist (keeps prior `demoed` flags) |
 | `briefing` / `briefing-remove` | Round-prep briefings & standing plans (see *Writing briefings* below). `discipline` routes a standing plan to its lab: `putting`, `mental`, `full-swing`/absent |
+| `debrief` / `debrief-update` | Add/patch a mental-game debrief Jack **recounted** rather than typed (see *The Mental tab*). Entry `id` becomes the debrief id |
 | `deadline`       | Set the return-window deadline (clears "estimated") |
 
 Unknown types are left unapplied on purpose (forward-compat), so a typo'd `type` silently
@@ -364,20 +365,46 @@ Four moving parts, all in `app.js`:
 - **`MENTAL_TRIGGERS`** — a fixed eight-trigger vocabulary in his own words, each with an
   **if-then** response. Fixed so it can be *counted*; the whole value is turning "stupid
   stuff got me" into a tally across rounds. Editing a trigger's `k` orphans past debriefs.
-- **`S.mental`** — post-round debriefs, `{id, date, round:{course,date}|null, focus:1–5,
-  triggers:[], when:[], note, next}`. Self-report, so it ranks `self` — below every number
-  on the page and still the only witness for match play, mood and pace-of-play, none of
-  which appear on a scorecard. The newest `next` renders as the **"Next round · one job"**
-  card at the top: one job, never a list.
+- **`S.mental`** — post-round debriefs, `{id, date, round:{course,date,nine}|null,
+  focus:1–5|null, triggers:[], when:[], note, next}`. Self-report, so it ranks `self` —
+  below every number on the page and still the only witness for match play, mood and
+  pace-of-play, none of which appear on a scorecard. The newest `next` renders as the
+  **"Next round · one job"** card at the top: one job, never a list.
+
+  He usually types these himself, but he often just *tells* you about a round instead —
+  push those with a **`debrief` feed entry**. Two rules when you do. **`round` needs
+  `nine`** where the course has two cards on one date, or `debriefRound()` matches the
+  wrong one. And **leave `focus` null unless he actually rated it** — "he sounded
+  frustrated" is not a 2 out of 5, and inventing his self-report is the one thing this
+  page cannot survive.
+
+  A linked debrief renders the card underneath it (`debriefCard()`): the round's total and
+  the thirds he flagged, against his average hole. That cross-reference is the point of
+  linking at all — and at 3+ linked cards a trigger's rounds get compared to his baseline
+  in `mentalTips()`, which is the only route by which a self-reported trigger becomes a
+  measured cost. The selection stays his, so the tip stays `self`.
 
 **Mental plans are briefings with `"discipline": "mental"`.** That keys them to this tab
 (`swing()` excludes them explicitly — the swing lab is the default home for any plan that
 doesn't name a discipline, so a new discipline must be added to its exclusion list and to
 `briefing()`'s back-link map). The standing plan is *Locked In — The Mental Round*.
 
-Two honesty guards worth keeping: the sample is thin (63 holes at two courses), and
-**every card is stroke play**, so "got to a lead and didn't close" is untested rather than
-disproved — say so rather than letting the closing number answer a match-play question.
+Two honesty guards worth keeping: the sample is thin, and **every card is stroke play**,
+so "got to a lead and didn't close" is untested rather than disproved — say so rather than
+letting the closing number answer a match-play question.
+
+**Worked examples (Aug 13 2026)** — Jack gave three, and they set the standard for how to
+handle the rest. Two were checkable against cards he'd already logged, so they were checked
+rather than just recorded: the match where an opponent got into his head cost **+6 over
+holes 1–3** against +3 on each of the other four Wianno nines (partner disruption lands
+EARLY, not at the finish), and the crumble he remembered was confirmed — bogey-double on
+17 and 18 — but is **one card in six**, with every other round finishing its last two at
++0.50 a hole or better. Both readings are in the *Locked In* plan with their caveats: the
++6 card was also the coldest start of the event, so warm-up and partner are confounded on
+it and neither is established. Two lessons for next time: **check a recounted example
+against the card before writing it up** — it can invert the conclusion — and **ask which
+card he means** when the date is ambiguous (Jul 10 had a front and a back; front finished
+par-par, back finished bogey-double, and the answer changes the whole finding).
 
 ### Re-rendering must not move the page
 

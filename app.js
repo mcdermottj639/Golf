@@ -18,7 +18,7 @@ const MENTAL_TRIGGERS = [
   { k:'slow', lab:'Slow play', blurb:'Waiting on every shot; the group ahead never moves.',
     then:'Do not stand over the ball early. Wait AWAY from it — pick the club and the target while you wait, and start the routine only when it is actually your turn. Your routine has a fixed length; let the waiting happen outside it, never inside it.' },
   { k:'partner', lab:'Random partners', blurb:'Chatter, gimmes, someone standing in your eyeline.',
-    then:'The only response available is where you stand. Move so they are out of your eyeline for the ten seconds the shot takes. You get one comment in your head, then it is a course condition — you do not argue with wind either.' },
+    then:'The only response available is where you stand. Move so they are out of your eyeline for the ten seconds the shot takes. You get one comment in your head, then it is a course condition — you do not argue with wind either. Watch the FIRST THREE HOLES specifically: on the one card where you logged this, that is where the damage went.' },
   { k:'closing', lab:'Did not close', blurb:'Up in the match, or a good score going, and it slipped.',
     then:'Same routine, same target selection as the 2nd hole — closing is not a different skill, it is the refusal to change anything. The one legitimate change: one more club, aimed at the middle. That is protecting a lead correctly; steering is not.' },
   { k:'anger', lab:'Anger at a shot', blurb:'It was gone, and you carried it to the next one.',
@@ -293,7 +293,10 @@ function missCounts(){
 function struggles(){
   // Struggle tags from the last 3 rounds + standing stroke faults
   const tags = new Map(); // tag -> reason
-  S.rounds.slice(-3).forEach(r => r.troubles.forEach(t =>
+  // `troubles` is defaulted on every write path, but an imported backup or a hand-built
+  // round can arrive without it — and this renders on Home, so an undefined here is a
+  // white screen on app open.
+  S.rounds.slice(-3).forEach(r => (r.troubles || []).forEach(t =>
     tags.set(t, `logged at ${r.course || 'your round'} on ${fmtDate(r.date)}`)));
   const mc = missCounts();
   if (mc.L > mc.R) tags.set('short-putts', `${mc.L} left misses in your 5-ft logs`);
@@ -1131,7 +1134,51 @@ function mentalTips(m){
       h:`"${esc(tr.lab)}" is your most-logged trigger`,
       b:`Logged after ${top[1]} of ${d.length} rounds. Your plan for it: ${tr.then} A trigger this repeatable is worth rehearsing off the course rather than meeting fresh every time.` });
   }
+
+  // Does a trigger actually COST anything? Only answerable where a debrief is tied to a
+  // card with holes on it: WHICH rounds go in the bucket is his own read, but what they
+  // cost is measured. That hybrid is why it still ranks `self` — the arithmetic is only
+  // ever as good as the label on the bucket.
+  MENTAL_TRIGGERS.forEach(x => {
+    // Three separate cards AND 27 holes: an 18-hole round and a nine would otherwise clear
+    // a hole-count gate on two rounds, and two rounds cannot carry a claim this loud.
+    const cards = d.filter(e => (e.triggers || []).includes(x.k)).map(debriefRound).filter(Boolean);
+    const v = cards.flat();
+    if(cards.length < 3 || v.length < 27) return;
+    const a = v.reduce((p, q) => p + q, 0) / v.length, gap = a - base;
+    if(gap >= 0.2) t.push({ ev:'self', s:'warn', src:`"${x.lab}" · ${cards.length} rounds`,
+      h:`Rounds where "${x.lab.toLowerCase()}" fired cost you ${sgn(gap)} a hole`,
+      b:`They play ${sgn(a)} across ${v.length} holes against ${sgn(base)} for everything you've logged — about ${(gap * 18).toFixed(1)} strokes a round. Which rounds belong in that bucket is your own read, so this is only ever as good as the labelling; the strokes themselves are off the cards. Your plan for it: ${x.then}` });
+  });
   return t.sort((a, b) => EV_RANK[a.ev || 'snapshot'] - EV_RANK[b.ev || 'snapshot']);
+}
+
+// What the card says about the part of the round a debrief flagged. A diary entry sitting
+// next to its own numbers is worth more than either alone — and it is the only route by
+// which a self-reported trigger ever earns, or loses, its credibility.
+const WHEN_THIRD = { open:0, mid:1, close:2 };
+function debriefRound(d){
+  if(!d.round) return null;
+  // Two nines at the same course on the same day are two different cards, so `nine`
+  // is part of the key wherever the debrief carries it.
+  const r = S.rounds.find(x => x.date === d.round.date && x.course === d.round.course
+    && (d.round.nine == null || (x.nine || null) === d.round.nine)
+    && Array.isArray(x.holes) && x.holes.length >= 6);
+  if(!r) return null;
+  const v = r.holes.filter(h => h && h.par != null && h.s != null).map(h => h.s - h.par);
+  return v.length >= 6 ? v : null;
+}
+function debriefCard(d, base){
+  const v = debriefRound(d);
+  if(!v) return '';
+  const th = [[], [], []];
+  v.forEach((x, i) => th[Math.min(2, Math.floor(i * 3 / v.length))].push(x));
+  const LAB = ['opening third', 'middle third', 'closing third'];
+  const parts = (d.when || []).filter(k => WHEN_THIRD[k] != null)
+    .map(k => { const s = th[WHEN_THIRD[k]]; return `${LAB[WHEN_THIRD[k]]} ${sgn(s.reduce((a, b) => a + b, 0) / s.length)}`; });
+  const tot = v.reduce((a, b) => a + b, 0);
+  return `<br><span class="sm faint">That card: ${tot > 0 ? '+' : ''}${tot} over ${v.length} holes${
+    parts.length ? ` · ${parts.join(' · ')} a hole` : ''}${base != null ? ` · you average ${sgn(base)}` : ''}</span>`;
 }
 
 function mentalCounts(){
@@ -1215,7 +1262,7 @@ function mental(){
       <div><label>Date</label><input type="date" id="mtDate" value="${today()}"></div>
       <div><label>Round</label><select id="mtRound">
         <option value="">Not logged / practice</option>
-        ${rounds.map((r, i) => `<option value="${i}">${fmtDate(r.date)} · ${esc(r.course || 'round')}${r.score != null ? ` (${r.score})` : ''}</option>`).join('')}
+        ${rounds.map((r, i) => `<option value="${i}">${fmtDate(r.date)} · ${esc(r.course || 'round')}${r.nine ? ` ${r.nine === 'B' ? 'back' : 'front'}` : ''}${r.score != null ? ` (${r.score})` : ''}</option>`).join('')}
       </select></div>
     </div>
     <label>How locked in were you?</label>
@@ -1239,6 +1286,7 @@ function mental(){
       <span><b>${fmtDate(d.date)}${d.round ? ` · ${esc(d.round.course)}` : ''}</b>${d.focus ? ` <span class="sm faint">${d.focus}/5 ${FOCUS_LAB[d.focus]}</span>` : ''}
       ${(d.triggers || []).length ? `<br><span class="sm">${d.triggers.map(k => esc((MENTAL_TRIGGERS.find(x => x.k === k) || {}).lab || k)).join(' · ')}${(d.when || []).length ? ` <span class="faint">— ${d.when.map(k => esc((MENTAL_WHEN.find(w => w[0] === k) || [])[1] || k)).join(', ')}</span>` : ''}</span>` : ''}
       ${d.note ? `<br><span class="sm faint">${esc(d.note)}</span>` : ''}
+      ${debriefCard(d, perHole(m.all))}
       ${d.next ? `<br><span class="sm"><b>Next:</b> ${esc(d.next)}</span>` : ''}</span>
       <button class="minibtn" data-action="del-debrief" data-id="${esc(d.id)}">×</button></div>`).join('')}
   </div>` : ''}
@@ -3072,7 +3120,7 @@ const ACTIONS = {
     const rounds = S.rounds.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10);
     const r = ri === '' ? null : rounds[+ri];
     S.mental.push({ id:uid(), date: $('#mtDate').value || today(),
-      round: r ? { course:r.course, date:r.date } : null,
+      round: r ? { course:r.course, date:r.date, nine:r.nine || null } : null,
       focus: f ? +f.dataset.focus : null, triggers, when, note, next:nx });
     save(); rerender(); toast('Debrief saved');
   },
@@ -3332,6 +3380,14 @@ function applyFeed(feed){
       S.briefings.push({ id:e.id, ...e.briefing });
     }
     else if(e.type === 'briefing-remove') S.briefings = S.briefings.filter(b => b.id !== e.target);
+    // A debrief Jack RECOUNTED rather than typed. Same schema as the in-app form, and the
+    // entry id becomes the debrief id so the × still deletes it and an update can find it.
+    else if(e.type === 'debrief' && e.debrief){
+      if(!S.mental.some(d => d.id === e.id)) S.mental.push({ id:e.id, triggers:[], when:[], ...e.debrief });
+    }
+    else if(e.type === 'debrief-update'){
+      const d = S.mental.find(x => x.id === e.target); if(d && e.debrief) Object.assign(d, e.debrief);
+    }
     else if(e.type === 'shortlist' && Array.isArray(e.shortlist)){
       const demoed = new Set(S.shortlist.filter(p=>p.demoed).map(p=>p.name));
       S.shortlist = e.shortlist.map(p => ({ ...p, demoed: demoed.has(p.name) }));
