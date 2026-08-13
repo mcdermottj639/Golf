@@ -13455,6 +13455,40 @@
           }
         ]
       }
+    },
+    {
+      "id": "faults-swing-20260813",
+      "type": "faults",
+      "discipline": "swing",
+      "faults": [
+        {
+          "tag": "laid-off-top",
+          "why": "Open — filmed Jul 26, both clubs. At the top the shaft points RIGHT of target (across the line / laid off), and the fix is one thought: the trail elbow points DOWN and stays IN FRONT of the hip seam. This is not a separate fault from the two below — the laid-off top, the stalling hips and the lifelong over-the-top slice are one story, which is why one fix-feel addresses all three. WORKING (Jul 27): one-handed Miracle 201 swings land the drop into the slot, and that is the confirmed fix-feel rather than a theory. NOT MEASURED: no sim numbers. Video shows a position; it cannot give club path or face-to-path, and until those exist the root cause is reasoned rather than established."
+        },
+        {
+          "tag": "hips-stall",
+          "why": "Open — the same root, seen from the other end. Your own read is 'great at the top, lose it through contact', and on film that is hip clearance in transition: the hips SLIDE toward the target instead of clearing BACK and UP, which stalls the rotation and throws the arms over the top. Fix: lead hip clears back and up while the chest stays over the ball a beat longer. What the Jul 26 film says is GOOD and must be protected: the coil, the head staying behind the ball, and a lower-body-led transition. Those three are why this is a sequencing fault and not a rebuild."
+        },
+        {
+          "tag": "over-the-top-slice",
+          "why": "Open — the lifelong miss, and the reason the two above matter. Same root: arms come over the top when the hips stall, producing an out-to-in path and the slice. Drill that isolates it: a headcover just outside the ball forces an in-to-out path. NOT MEASURED, and this is the honest limit — no launch monitor session exists, so path and face-to-path are inferred from video and from the shape of the miss. The next sim session settles it; until then this is the best-supported explanation rather than a measurement."
+        }
+      ]
+    },
+    {
+      "id": "faults-shortgame-20260813",
+      "type": "faults",
+      "discipline": "short-game",
+      "faults": [
+        {
+          "tag": "up-and-down",
+          "why": "Open, and it is the worst number on record: 0 up-and-downs from 12 missed greens. That is one round — Sterling Farms, Aug 12, 18 holes — so treat it as a flag rather than a rate; twelve chances cannot separate a bad short game from a bad day. But it is the only scrambling data that exists, and at 6 greens in regulation the short game had twelve chances to save the round and saved none of them. What would settle it: greens and misses logged on the next two live rounds. At 36 recorded holes this stops being an anecdote."
+        },
+        {
+          "tag": "missing-short",
+          "why": "Open — 7 of 12 green misses finished SHORT, against 2 left, 1 right and 1 long. Short is the miss that leaves the least: no green to work with, and usually the longest of the recovery shots. Two candidate causes and they need separating, because the fix is different. CLUB: taking enough club and aiming at the middle rather than the flag — the standing rule already, and the cheapest thing to try. STRIKE: if approaches are coming off thin or low, the number was right and the contact was not. Same one-round caveat as above."
+        }
+      ]
     }
   ]
 }

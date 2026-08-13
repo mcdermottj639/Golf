@@ -259,6 +259,27 @@ function expandable(t, cls){
 const faultState = f => /^\s*CLOSED\b/i.test(f.why || '') ? 'closed'
   : /^\s*DOWNGRADED\b/i.test(f.why || '') ? 'downgraded' : 'open';
 const faultLabel = t => String(t).replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
+// Faults are per-discipline. Everything logged before Aug 13 was putting, so an entry
+// without a `discipline` is putting — that keeps the six existing faults where they are.
+const faultDisc = f => f.discipline || 'putting';
+const faultsFor = disc => S.faults.filter(f => faultDisc(f) === disc);
+// The shared diagnosis card, used by every lab: open faults with their detail, settled
+// ones collapsed to a line. One renderer so a new lab gets a real diagnosis for free.
+function diagnosisCard(disc, emptyMsg){
+  const all = faultsFor(disc);
+  if(!all.length) return `<div class="card"><h2>The diagnosis</h2><p class="sm">${esc(emptyMsg || 'Nothing measured yet for this part of the game.')}</p></div>`;
+  const open = all.filter(f => faultState(f) === 'open');
+  const settled = all.filter(f => faultState(f) !== 'open');
+  return `<div class="card">
+    <h2>The diagnosis</h2>
+    ${open.length
+      ? `<p class="sm"><b class="warn">Open: ${open.map(f => esc(faultLabel(f.tag))).join(' · ')}</b></p>
+         ${open.map(f => `<div class="tipcard"><h4>${esc(faultLabel(f.tag))}</h4>${expandable(f.why)}</div>`).join('')}`
+      : `<p class="sm">No open faults on the card — everything tracked here has been measured shut.</p>`}
+    ${settled.length ? `<p class="sm faint" style="margin-top:8px"><b>Settled:</b> ${settled.map(f =>
+        esc(faultLabel(f.tag)) + (faultState(f) === 'downgraded' ? ' (downgraded)' : ' ✓')).join(' · ')}</p>` : ''}
+  </div>`;
+}
 function readMins(b){
   const w = (b.sections || []).reduce((n, s) => n + String(s.b || '').split(/\s+/).length, 0);
   return Math.max(1, Math.round(w / 220));
@@ -410,7 +431,9 @@ const TITLES = {
   bag:['My Bag','Every club, every spec, and the story of every change.'],
   swing:['Swing Lab','Driver to wedge — film, plans, and speed work.'],
   positions:['Swing Positions','Where the body goes, address to finish.'],
-  putting:['Putting Lab','The left-miss project — tracked until it’s dead.'],
+  game:['The Labs','Four parts of the game, each with its own workbench.'],
+  shortgame:['Short Game','Around the green — where the strokes hide.'],
+  putting:['Putting Lab','Stroke, pace, and the short ones.'],
   mental:['Mental Game','Staying locked in for eighteen — decided off the course.'],
   coach:['Coach','Lessons that follow your game — not generic tips.'],
   courses:['Courses','Everywhere you’ve played, rated and remembered.'],
@@ -429,9 +452,13 @@ function render(view, arg, keepScroll){
   const [title, tag] = TITLES[view] || TITLES.home;
   $('#pageTitle').textContent = title;
   $('#pageTag').textContent = tag;
+  // The four labs live behind one nav button, so they all light it.
+  const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game' };
+  const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
-    b.classList.toggle('on', b.dataset.view === view));
-  const R = { home, bag, swing, positions:swingPositions, putting, mental, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
+    b.classList.toggle('on', b.dataset.view === navView));
+  if(LABS.some(l => l.view === view) && S.settings.lastLab !== view){ S.settings.lastLab = view; save(); }
+  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
   $('#view').innerHTML = R(arg);
   buildJumpBar();
   if(!keepScroll) window.scrollTo(0,0);
@@ -747,7 +774,9 @@ function ladderHTML(wedges){
 // full-swing club; everything else (the putter project) stays in the Putting Lab.
 // Read setup only — putting findings mention "backswing", which must not match.
 function sessionDiscipline(s){
-  return /full[\s-]?swing|driver|\biron\b|\bwedge\b|mini/i.test(s.setup || '') ? 'swing' : 'putting';
+  const t = s.setup || '';
+  if(/chip|pitch|bunker|short[\s-]?game|greenside/i.test(t)) return 'short-game';
+  return /full[\s-]?swing|driver|\biron\b|\bwedge\b|mini/i.test(t) ? 'swing' : 'putting';
 }
 
 // ----- Lab plan blocks -----
@@ -769,10 +798,12 @@ function swing(){
   const sessions = S.sessions.map((s,i) => ({ s, i })).filter(o => sessionDiscipline(o.s) === 'swing').reverse();
   // Anything not explicitly claimed by another lab lands here — the swing lab is the
   // default home for a standing plan, so new disciplines have to be named to stay out.
-  const plans = S.briefings.filter(b => !b.date && !['putting','mental'].includes(b.discipline || 'swing'));
+  const plans = S.briefings.filter(b => !b.date && !['putting','mental','short-game'].includes(b.discipline || 'swing'));
   const other = plans.filter(b => !isRoutine(b));
   return `
   ${routineBlock(plans)}
+
+  ${diagnosisCard('swing', 'No swing faults on the card yet — send film and they land here.')}
 
   <div class="card flat"><div class="linkrow" data-action="go" data-view="positions">
     <span><b>📐 Swing Positions · visual guide</b><br><span class="sm">Body checkpoints, address → finish, with a slide-vs-clear hip diagram</span></span><span class="arr">→</span></div></div>
@@ -994,19 +1025,7 @@ function putting(){
   return `
   ${routineBlock(plans)}
 
-  <div class="card">
-    <h2>The diagnosis</h2>
-    ${(() => {
-      const open = S.faults.filter(f => faultState(f) === 'open');
-      const settled = S.faults.filter(f => faultState(f) !== 'open');
-      return `${open.length
-        ? `<p class="sm"><b class="warn">Open: ${open.map(f => esc(faultLabel(f.tag))).join(' · ')}</b></p>
-           ${open.map(f => `<div class="tipcard"><h4>${esc(faultLabel(f.tag))}</h4>${expandable(f.why)}</div>`).join('')}`
-        : `<p class="sm">No open faults on the card — everything tracked here has been measured shut.</p>`}
-      ${settled.length ? `<p class="sm faint" style="margin-top:8px"><b>Settled:</b> ${settled.map(f =>
-          esc(faultLabel(f.tag)) + (faultState(f) === 'downgraded' ? ' (downgraded)' : ' ✓')).join(' · ')} — the grid below has the measurements.</p>` : ''}`;
-    })()}
-  </div>
+  ${diagnosisCard('putting')}
 
   ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
 
@@ -1593,8 +1612,9 @@ function sessionView(i){
   const d = s.detail;
   const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
   const disc = sessionDiscipline(s);
+  const SESSION_LAB = { swing:['swing','Swing Lab'], 'short-game':['shortgame','Short Game'], putting:['putting','Putting Lab'] };
   return `
-  <button class="backlink" data-action="go" data-view="${disc==='swing'?'swing':'putting'}">← ${disc==='swing'?'Swing Lab':'Putting Lab'}</button>
+  <button class="backlink" data-action="go" data-view="${SESSION_LAB[disc][0]}">← ${SESSION_LAB[disc][1]}</button>
   <div class="card">
     <h2>${fmtDate(s.date)} · film breakdown</h2>
     <h3>${esc(s.setup)}</h3>
@@ -1624,7 +1644,7 @@ function briefing(id){
   // An undated plan is usually a lab routine, but a COURSE plan is undated too — course
   // knowledge doesn't expire — and sending that one back to the Swing Lab is nonsense.
   const isCourse = !!played || S.rounds.some(r => courseMatches(r.course, b.course));
-  const LAB = { putting:['putting','Putting Lab'], mental:['mental','Mental Game'] };
+  const LAB = { putting:['putting','Putting Lab'], mental:['mental','Mental Game'], 'short-game':['shortgame','Short Game'] };
   const lab = LAB[b.discipline] || ['swing','Swing Lab'];
   const [backView, backLabel] = b.date || isCourse ? ['preps','Round Prep'] : lab;
   return `
@@ -1672,6 +1692,103 @@ function briefing(id){
     </details>`).join('')}
   </div>` : ''}
   <p class="sm faint" style="margin:10px 0">Briefed by Claude from course research + your bag, carries, and stroke history.</p>`;
+}
+
+// ----- Short game -----
+// Nothing new is logged for this: it is the green-miss and up-and-down data already sitting
+// in the hole arrays, asked as a short-game question instead of a scoring one.
+function shortGameStats(){
+  const a = { holes:0, gir:0, miss:{}, chances:0, saved:0, noshot:0, rounds:0 };
+  withHoles().forEach(r => {
+    let counted = false;
+    r.holes.forEach(h => {
+      if(h.gir === undefined || h.gir === null) return;
+      if(!counted){ a.rounds++; counted = true; }
+      a.holes++;
+      if(h.gir){ a.gir++; return; }
+      if(h.noshot) a.noshot++;
+      const k = h.gmiss || 'X';
+      a.miss[k] = (a.miss[k] || 0) + 1;
+      // You scramble from where the ball IS — a conceded green still counts, same rule the
+      // round card uses, so the two numbers can never disagree.
+      a.chances++;
+      if(h.s != null && h.par != null && h.s - h.par <= 0) a.saved++;
+    });
+  });
+  return a;
+}
+function shortgame(){
+  const pc = (n, d) => d ? Math.round(n / d * 100) : 0;
+  const plans = S.briefings.filter(b => !b.date && b.discipline === 'short-game');
+  const other = plans.filter(b => !isRoutine(b));
+  const a = shortGameStats();
+  const sessions = S.sessions.map((x,i) => ({ s:x, i })).filter(o => sessionDiscipline(o.s) === 'short-game').reverse();
+  const missRow = Object.entries(a.miss).sort((x,y) => y[1]-x[1])
+    .map(([k,v]) => `${v} ${MISS_LAB[k] || k}`).join(' · ');
+  return `
+  ${routineBlock(plans)}
+
+  ${a.holes ? `<div class="rowgrid g3">
+    <div class="stat"><div class="v">${pc(a.gir, a.holes)}%</div><div class="l">Greens hit</div></div>
+    <div class="stat"><div class="v">${pc(a.saved, a.chances)}%</div><div class="l">Up &amp; down</div></div>
+    <div class="stat"><div class="v">${a.chances}</div><div class="l">Greens missed</div></div>
+  </div>
+  <div class="card">
+    <h2>Around the green · what the cards say</h2>
+    <p class="sm"><b>${a.saved} of ${a.chances}</b> missed greens saved, over ${a.holes} recorded holes${a.rounds ? ` in ${a.rounds} round${a.rounds>1?'s':''}` : ''}.
+    ${missRow ? `Where they finished: ${esc(missRow)}.` : ''}</p>
+    ${a.holes < 36 ? `<p class="sm faint" style="margin-top:6px">Thin sample — ${a.holes} of the 36 recorded holes this starts speaking confidently at. Log greens and misses on the live round and this fills itself.</p>` : ''}
+  </div>` : `<div class="card"><h2>Around the green</h2>
+    <p class="sm">Nothing logged yet. Every green you mark missed on a live round — and where it finished — lands here as scrambling data.</p></div>`}
+
+  ${diagnosisCard('short-game', 'No short-game faults on the card yet. Log a few rounds with green misses, or send chipping film, and they land here.')}
+
+  ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>`
+    : `<h2>Plans</h2><div class="card"><p class="sm">No short-game plan yet — ask Claude for one and it lands here.</p></div>`}
+
+  <h2>Film room</h2>
+  <div class="card">
+    ${sessions.length ? `<table><tr><th>Date</th><th>Setup</th><th>Finding</th></tr>
+    ${sessions.map(({s,i}) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
+    </table>` : '<p class="sm">No short-game film yet. Send chipping, pitching or bunker clips — name the shot in the message and they file themselves here.</p>'}
+  </div>
+
+  <h2>Train it</h2>
+  <div class="card flat">
+    <div class="linkrow" data-action="open-shelf" data-shelf="Wedges &amp; Short Game"><span><b>Wedges &amp; Short Game</b><br><span class="sm">Clock system, bounce, chip vs pitch, landing spots</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="open-shelf" data-shelf="Bunker Play" style="border-bottom:none"><span><b>Bunker Play</b><br><span class="sm">Splash, distance by follow-through, plugged lies</span></span><span class="arr">→</span></div>
+  </div>`;
+}
+
+// ----- The labs hub -----
+// Four labs behind one nav button. The bar was at eight tabs and a short-game lab would
+// have made nine; these four are the same KIND of thing — a discipline with faults, film,
+// plans and drills — so they belong behind one door.
+const LABS = [
+  { view:'swing',     disc:'swing',       ic:'🏌', name:'Full Swing',  sub:'Driver to wedge — film, plans, speed work.' },
+  { view:'shortgame', disc:'short-game',  ic:'⛳', name:'Short Game',  sub:'Around the green — chipping, pitching, bunkers.' },
+  { view:'putting',   disc:'putting',     ic:'◎', name:'Putting',     sub:'Stroke, pace and the short ones.' },
+  { view:'mental',    disc:'mental',      ic:'🧠', name:'Mental',      sub:'Staying locked in — decided off the course.' },
+];
+function labRow(l){
+  const open = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;
+  const plans = S.briefings.filter(b => !b.date && (l.disc === 'swing'
+    ? !['putting','mental','short-game'].includes(b.discipline || 'swing')
+    : b.discipline === l.disc)).length;
+  return `<div class="linkrow" data-action="go" data-view="${l.view}">
+    <span><b>${l.ic} ${esc(l.name)}</b><br><span class="sm">${esc(l.sub)}</span>
+    <br><span class="sm faint">${open ? `${open} open fault${open>1?'s':''}` : 'no open faults'} · ${plans} plan${plans===1?'':'s'}</span></span>
+    <span class="arr">→</span></div>`;
+}
+function game(){
+  const last = LABS.find(l => l.view === S.settings.lastLab);
+  const rest = LABS.filter(l => l !== last);
+  return `
+  ${last ? `<h2>Pick up where you were</h2><div class="card flat">${labRow(last)}</div>` : ''}
+  <h2>${last ? 'The other labs' : 'The labs'}</h2>
+  <div class="card flat">${rest.map(labRow).join('')}</div>
+  <div class="card flat"><div class="linkrow" data-action="go" data-view="preps" style="border-bottom:none">
+    <span><b>🗒 Round Prep</b><br><span class="sm">Every course plan, kept for the next time.</span></span><span class="arr">→</span></div></div>`;
 }
 
 // ----- Courses -----
@@ -3530,7 +3647,13 @@ function applyFeed(feed){
     else if(e.type === 'action') S.actions.push({ id:e.id, text:e.text, done:false, pri:!!e.pri });
     else if(e.type === 'action-done'){ const a = S.actions.find(x => x.id === e.target); if(a) a.done = true; }
     else if(e.type === 'action-update'){ const a = S.actions.find(x => x.id === e.target); if(a && e.text) a.text = e.text; }
-    else if(e.type === 'faults' && Array.isArray(e.faults)) S.faults = e.faults;
+    else if(e.type === 'faults' && Array.isArray(e.faults)){
+      // A discipline-scoped entry replaces only that discipline's faults, so pushing swing
+      // faults can't wipe the putting ones. No discipline = replace everything (old entries).
+      const disc = e.discipline;
+      const tagged = e.faults.map(f => disc ? { discipline:disc, ...f } : f);
+      S.faults = disc ? S.faults.filter(f => faultDisc(f) !== disc).concat(tagged) : tagged;
+    }
     else if(e.type === 'deadline'){ S.settings.returnDeadline = e.date; S.settings.deadlineEstimated = false; }
     else return; // unknown type: leave unapplied so a newer app version can pick it up
     S.feedApplied.push(e.id);
