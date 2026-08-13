@@ -252,6 +252,13 @@ function expandable(t, cls){
     <details class="more"><summary>Read the rest</summary>${prose(rest, c)}</details>`
     : `<p class="${c}">${esc(lead)}</p>`;
 }
+// A fault's `why` opens with its own status word — the feed writes CLOSED or DOWNGRADED as
+// the first token when one is settled. Deriving status from that keeps ONE source of truth,
+// so a fault closing in the feed drops off the diagnosis card and out of Coach's to-do list
+// on its own. The old hardcoded diagnosis card is exactly what this replaces.
+const faultState = f => /^\s*CLOSED\b/i.test(f.why || '') ? 'closed'
+  : /^\s*DOWNGRADED\b/i.test(f.why || '') ? 'downgraded' : 'open';
+const faultLabel = t => String(t).replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
 function readMins(b){
   const w = (b.sections || []).reduce((n, s) => n + String(s.b || '').split(/\s+/).length, 0);
   return Math.max(1, Math.round(w / 220));
@@ -989,8 +996,16 @@ function putting(){
 
   <div class="card">
     <h2>The diagnosis</h2>
-    <p class="sm"><b>The left miss is largely solved.</b> Equipment closed — zero-torque head, kept for good Aug 12. And the one-way pull didn't reproduce on Aug 10: mean bias ≈0.1°, small enough to hole out past eight feet. Line turned out to be the part that was fine.</p>
-    <p class="sm" style="margin-top:6px"><b class="warn">What's open: PACE and STRIKE.</b> Neither has ever been measured — no calibrated ladder session, and no strike test on any of four putters. Both are below.</p>
+    ${(() => {
+      const open = S.faults.filter(f => faultState(f) === 'open');
+      const settled = S.faults.filter(f => faultState(f) !== 'open');
+      return `${open.length
+        ? `<p class="sm"><b class="warn">Open: ${open.map(f => esc(faultLabel(f.tag))).join(' · ')}</b></p>
+           ${open.map(f => `<div class="tipcard"><h4>${esc(faultLabel(f.tag))}</h4>${expandable(f.why)}</div>`).join('')}`
+        : `<p class="sm">No open faults on the card — everything tracked here has been measured shut.</p>`}
+      ${settled.length ? `<p class="sm faint" style="margin-top:8px"><b>Settled:</b> ${settled.map(f =>
+          esc(faultLabel(f.tag)) + (faultState(f) === 'downgraded' ? ' (downgraded)' : ' ✓')).join(' · ')} — the grid below has the measurements.</p>` : ''}`;
+    })()}
   </div>
 
   ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
@@ -1438,8 +1453,11 @@ function coachSignals(){
   // it" card is the point of the Mental tab and pointless as a Coach to-do.
   mentalTips(mentalStats()).filter(t => t.s !== 'good' && t.coach !== false).forEach(t => out.push({
     sev:t.s, src:t.src, h:t.h, b:t.b, ev:t.ev, link:{ a:'go', view:'mental', lab:'Mental Game' } }));
-  S.faults.forEach(f => out.push({ sev:'mid', src:'Open fault', ev:'measured',
-    h:f.tag.replace(/-/g,' ').replace(/^./, c => c.toUpperCase()), b:f.why,
+  // Open ones only — a closed fault is a record, not a to-do, and listing it under
+  // "Open fault" was telling him to work on early lift and stance creep months after both
+  // were measured shut.
+  S.faults.filter(f => faultState(f) === 'open').forEach(f => out.push({ sev:'mid', src:'Open fault', ev:'measured',
+    h:faultLabel(f.tag), b:f.why,
     link:{ a:'go', view:'putting', lab:'Putting lab' } }));
   // Severity decides the band, evidence decides the order inside it — so the warnings
   // still lead, but within them his own rounds speak before a pasted season average.

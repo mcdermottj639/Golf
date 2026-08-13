@@ -72,7 +72,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `session-update` | Patch a session by `target` (its feed id) or `setupMatch` prefix |
 | `session-remove` | Drop a session by `target` (its feed id) — used to fold duplicates together |
 | `evolution`      | Replace the metric-evolution grid |
-| `faults`         | Replace the current faults list |
+| `faults`         | Replace the current faults list. **Start a `why` with `CLOSED` or `DOWNGRADED`** to settle one — `faultState()` reads that first word, which is what drops it off the Putting tab's diagnosis card and out of Coach's open-fault to-dos. Anything else reads as open |
 | `action`         | Add an open action item |
 | `action-done`    | Mark action `target` done |
 | `action-update`  | Rewrite action `target` text |
