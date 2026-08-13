@@ -86,6 +86,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `shortlist`      | Replace the putter shortlist (keeps prior `demoed` flags) |
 | `briefing` / `briefing-remove` | Round-prep briefings & standing plans (see *Writing briefings* below). `discipline` routes a standing plan to its lab: `putting`, `mental`, `full-swing`/absent |
 | `debrief` / `debrief-update` | Add/patch a mental-game debrief Jack **recounted** rather than typed (see *The Mental tab*). Entry `id` becomes the debrief id |
+| *(round fields)* | A round may carry `result` (`W`/`L`/`T`), `margin` (holes, signed from Jack's side) and `matchNo` — set them with `round-update`. See *Match play* |
 | `deadline`       | Set the return-window deadline (clears "estimated") |
 
 Unknown types are left unapplied on purpose (forward-compat), so a typo'd `type` silently
@@ -383,6 +384,23 @@ Four moving parts, all in `app.js`:
   linking at all — and at 3+ linked cards a trigger's rounds get compared to his baseline
   in `mentalTips()`, which is the only route by which a self-reported trigger becomes a
   measured cost. The selection stays his, so the tip stays `self`.
+
+### Match play is the only witness for "I don't close"
+
+A stroke-play card cannot see a match: Jack shot his best score of the Wianno week and won,
+shot 41 twice and went halved / 1 down, and none of that is visible in strokes. So rounds
+carry **`result`** (`W`/`L`/`T`), **`margin`** (holes, signed from his side) and **`matchNo`**,
+set via `round-update`, and `matchStats()` reads them into the tab's Match play block.
+
+Two rules learned from the Wianno backfill. **`matchNo` is not optional where an event
+plays out of date order** — Jul 10 and Jul 11 were both played back nine first, so numbering
+the table by date silently renames his own matches. And **"live at the finish" is the whole
+point of the block**: only a halve or a one-hole margin can carry a closing story; a match
+lost 2 down was decided by scoring, and saying otherwise invents a nerve problem out of a
+bad round. Of five Wianno matches, two were live — and both were the ones he lost short
+putts on, with the arc-suited Phantom 7.5 in the bag. That reframe (his closing problem is,
+on his own record, a short-putt problem) is the most useful thing the tab has produced;
+don't let a later edit quietly turn it back into a mental-toughness story.
 
 **Mental plans are briefings with `"discipline": "mental"`.** That keys them to this tab
 (`swing()` excludes them explicitly — the swing lab is the default home for any plan that

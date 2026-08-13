@@ -15,6 +15,8 @@ const MISS_CYCLE = ['', 'make', 'L', 'R', 'S', 'Lg']; // 5-ft tap states
 // off the course, which is the whole point of deciding it in advance: on the 14th tee
 // there is no deciding, only doing whatever was already decided.
 const MENTAL_TRIGGERS = [
+  { k:'opener', lab:'Opening tee shot', blurb:'Threw the first one away and it rattled you.',
+    then:'The recovery needs no fixing — your second hole plays at your season average and a bad opening does not predict the round. What the opening hole costs is the opening hole, which makes this a WARM-UP and first-swing problem, not a resilience one. Prime the feel before the tee rather than hunting for it on the 4th, and commit to the fuller swing on the 1st instead of the safe short one — your own Golf Mind note says the straight driver ball needs the LONGER swing. If the miss is going somewhere your usual miss does not, that is a swing question and it needs film of a COLD swing, not a warmed-up one.' },
   { k:'slow', lab:'Slow play', blurb:'Waiting on every shot; the group ahead never moves.',
     then:'Do not stand over the ball early. Wait AWAY from it — pick the club and the target while you wait, and start the routine only when it is actually your turn. Your routine has a fixed length; let the waiting happen outside it, never inside it.' },
   { k:'partner', lab:'Random partners', blurb:'Chatter, gimmes, someone standing in your eyeline.',
@@ -1050,19 +1052,29 @@ function mentalStats(){
   const m = { rounds:cards.length, all:{n:0,over:0}, blow:{n:0,shots:0},
     afterBog:{n:0,over:0,save:0}, afterDbl:{n:0,over:0},
     thirds:[{n:0,over:0},{n:0,over:0},{n:0,over:0}],
-    close:{n:0,over:0}, before:{n:0,over:0}, inPos:{n:0,over:0,rounds:0} };
+    close:{n:0,over:0}, before:{n:0,over:0}, inPos:{n:0,over:0,rounds:0},
+    open:{n:0,over:0}, second:{n:0,over:0}, badOpen:{n:0,over:0,rounds:0}, okOpen:{n:0,over:0,rounds:0} };
   const acc = (o, v) => { o.n++; o.over += v; };
-  cards.forEach(d => d.forEach((v, i) => {
-    acc(m.all, v);
-    if(v >= 2){ m.blow.n++; m.blow.shots += v; }
-    acc(m.thirds[Math.min(2, Math.floor(i * 3 / d.length))], v);
-    if(i >= d.length - 3) acc(m.close, v); else acc(m.before, v);
-    if(i){
-      // The reset test: what the hole AFTER a dropped shot costs, against his own average.
-      if(d[i-1] >= 1){ acc(m.afterBog, v); if(v <= 0) m.afterBog.save++; }
-      if(d[i-1] >= 2) acc(m.afterDbl, v);
-    }
-  }));
+  cards.forEach(d => {
+    // The first tee is its own event, and the two holes after it are the rattle test:
+    // does the opening hole cost you the hole, or does it cost you the round?
+    acc(m.open, d[0]);
+    if(d.length > 1) acc(m.second, d[1]);
+    const rest = d[0] >= 2 ? m.badOpen : m.okOpen;
+    rest.rounds++;
+    d.slice(1).forEach(v => acc(rest, v));
+    d.forEach((v, i) => {
+      acc(m.all, v);
+      if(v >= 2){ m.blow.n++; m.blow.shots += v; }
+      acc(m.thirds[Math.min(2, Math.floor(i * 3 / d.length))], v);
+      if(i >= d.length - 3) acc(m.close, v); else acc(m.before, v);
+      if(i){
+        // The reset test: what the hole AFTER a dropped shot costs, against his own average.
+        if(d[i-1] >= 1){ acc(m.afterBog, v); if(v <= 0) m.afterBog.save++; }
+        if(d[i-1] >= 2) acc(m.afterDbl, v);
+      }
+    });
+  });
   // Closing when there was something to close. A fade only counts as a fade if the round
   // was going at least as well as usual when he got to the last three.
   const base = perHole(m.all);
@@ -1108,6 +1120,19 @@ function mentalTips(m){
           b:`The closing three play ${sgn(c)} a hole against ${sgn(b)} for everything before them${m.inPos.rounds >= 3 ? `, and ${sgn(perHole(m.inPos))} across the ${m.inPos.rounds} rounds that were going well when you got there` : ''}. That is the shape you described, measured. The counter is deliberately boring: same routine, same target selection, one more club, aimed at the middle. ${thin}` }
       : { ev:'round', s:'good', src:`Closing · ${m.close.n} holes`, h:'The closing stretch is not where your strokes go',
           b:`The last three holes play ${sgn(c)} a hole against ${sgn(b)} for everything before them${m.inPos.rounds >= 3 ? `, and ${sgn(perHole(m.inPos))} across the ${m.inPos.rounds} rounds that were going well when you reached them` : ''}. So "not closing" is so far a MATCH feeling rather than a scoring one — which is worth knowing, because it means the fix is about how the last three feel, not about a swing that leaves you. ${thin} Match play doesn't live in these cards at all: log the ones that matter and this line can start answering the question you're actually asking.` });
+  }
+
+  // The rattle test. Two separate questions that get answered as one thing in the retelling:
+  // what does the opening hole cost, and does it cost you anything AFTER it? They can come
+  // out opposite ways, and they point at completely different fixes if they do.
+  if(m.open.n >= 4){
+    const o = perHole(m.open), s2 = perHole(m.second);
+    const bleed = (m.badOpen.n >= 8 && m.okOpen.n >= 8) ? perHole(m.badOpen) - perHole(m.okOpen) : null;
+    if(o - base >= 0.3) t.push({ ev:'round', s:'warn', src:`The first tee · ${m.open.n} starts`,
+      h:`Your opening hole costs ${sgn(o)} a hole`,
+      b:`${sgn(o)} across ${m.open.n} opening holes against ${sgn(base)} for every hole you've logged — the most concentrated leak in your data, and it happens before you've hit anything else. ${s2 != null ? `Then the SECOND hole plays ${sgn(s2)}, which is ${Math.abs(s2 - base) < 0.15 ? 'your average almost exactly' : s2 < base ? 'better than your average' : 'still above your average'}. ` : ''}${bleed != null ? `And the rest of a round after a bad opening plays ${sgn(perHole(m.badOpen))} against ${sgn(perHole(m.okOpen))} after a clean one${bleed <= 0.1 ? ' — no worse, so it does not bleed' : ''}. ` : ''}${bleed != null && bleed <= 0.1
+        ? 'So it costs you the opening hole and nothing after it. That makes this a WARM-UP and first-swing problem rather than a mental-toughness one: you do not need to recover better, you need to arrive with a swing. Prime the feel before the tee instead of hunting for it on the 4th.'
+        : 'Worth watching whether it bleeds into the rest of the round as more cards come in — that is the difference between a warm-up fix and a reset fix.'}` });
   }
 
   if(m.all.n >= 27){
@@ -1177,8 +1202,38 @@ function debriefCard(d, base){
   const parts = (d.when || []).filter(k => WHEN_THIRD[k] != null)
     .map(k => { const s = th[WHEN_THIRD[k]]; return `${LAB[WHEN_THIRD[k]]} ${sgn(s.reduce((a, b) => a + b, 0) / s.length)}`; });
   const tot = v.reduce((a, b) => a + b, 0);
+  const r = S.rounds.find(x => x.date === d.round.date && x.course === d.round.course
+    && (d.round.nine == null || (x.nine || null) === d.round.nine));
+  const match = matchLine(r);
   return `<br><span class="sm faint">That card: ${tot > 0 ? '+' : ''}${tot} over ${v.length} holes${
-    parts.length ? ` · ${parts.join(' · ')} a hole` : ''}${base != null ? ` · you average ${sgn(base)}` : ''}</span>`;
+    match ? ` · <b>${match}</b>` : ''}${parts.length ? ` · ${parts.join(' · ')} a hole` : ''}${
+    base != null ? ` · you average ${sgn(base)}` : ''}</span>`;
+}
+
+// ----- Match play -----
+// The only place the "I don't close" question can actually be answered. A stroke-play card
+// cannot see a match: you can shoot your best score of the week and still lose, and you can
+// hand back a two-hole lead without a single number on the card moving. So the result rides
+// on the round itself (`result` W/L/T and `margin` in holes, signed from Jack's side) and
+// the Mental tab reads it here.
+function matchLine(r){
+  if(!r || !r.result) return '';
+  const m = Math.abs(r.margin || 0);
+  return r.result === 'T' ? 'halved'
+    : `${r.result === 'W' ? 'won' : 'lost'} ${m ? `${m} ${r.result === 'W' ? 'up' : 'down'}` : ''}`.trim();
+}
+function matchStats(){
+  const ms = S.rounds.filter(r => r.result && Array.isArray(r.holes) && r.holes.length >= 6)
+    .map(r => ({ r, vs: roundVsPar(r), margin: r.margin || 0 }))
+    // `matchNo` wins where it's known: an event can play the back nine first, so date
+    // order is not match order and numbering them 1..n by date renames Jack's own matches.
+    .sort((a, b) => (a.r.matchNo || 99) - (b.r.matchNo || 99)
+      || (a.r.date || '').localeCompare(b.r.date || ''));
+  const w = ms.filter(m => m.r.result === 'W').length, l = ms.filter(m => m.r.result === 'L').length;
+  // "Live at the finish" is the set the closing question is actually about: halved, or
+  // decided by a single hole. A 4&3 loss was never a closing problem.
+  const live = ms.filter(m => m.r.result === 'T' || Math.abs(m.margin) <= 1);
+  return { ms, w, l, t: ms.length - w - l, live, holes: ms.reduce((a, m) => a + m.margin, 0) };
 }
 
 function mentalCounts(){
@@ -1226,7 +1281,10 @@ function mental(){
   </div>
   <div class="card">
     <table><tr><th>Situation</th><th>Holes</th><th>Per hole</th><th>vs. you</th></tr>
-      ${[['Every hole logged', m.all], ['After a bogey or worse', m.afterBog], ['After a double or worse', m.afterDbl],
+      ${[['The opening hole', m.open], ['The second hole', m.second],
+         [`After a bad opening${m.badOpen.rounds ? ` · ${m.badOpen.rounds} rounds` : ''}`, m.badOpen],
+         [`After a clean opening${m.okOpen.rounds ? ` · ${m.okOpen.rounds} rounds` : ''}`, m.okOpen],
+         ['Every hole logged', m.all], ['After a bogey or worse', m.afterBog], ['After a double or worse', m.afterDbl],
          ['The closing three', m.close], ['Everything before them', m.before],
          [`Closing when it was going well${m.inPos.rounds ? ` · ${m.inPos.rounds} rounds` : ''}`, m.inPos]]
         .filter(([, o]) => o.n).map(([lab, o]) => {
@@ -1245,6 +1303,26 @@ function mental(){
       <div class="src">${esc(t.src)}${evTag(t.ev)}</div><h4>${t.h}</h4>${expandable(t.b)}</div>`).join('')}
     <p class="sm faint">Measurement first, your own read last. A "good" card here is not a compliment — it means the cards can't find the thing you described, which is worth knowing before you spend practice on it.</p>
   </div>` : ''}
+
+  ${(() => {
+    const M = matchStats();
+    if(M.ms.length < 3) return '';
+    const base = perHole(m.all);
+    return `
+  <h2>Match play · ${M.w}–${M.l}${M.t ? `–${M.t}` : ''}</h2>
+  <div class="card">
+    <table><tr><th>Match</th><th>Score</th><th>vs par</th><th>Result</th></tr>
+      ${M.ms.map((x, i) => `<tr>
+        <td class="sm"><b>${x.r.matchNo || i + 1}</b> <span class="faint">${fmtDate(x.r.date)}${x.r.nine ? ` ${x.r.nine === 'B' ? 'back' : 'front'}` : ''}</span></td>
+        <td>${x.r.score ?? '—'}</td><td class="sm">${x.vs != null ? `${x.vs > 0 ? '+' : ''}${x.vs}` : '—'}</td>
+        <td class="sm"><b style="color:${x.r.result === 'W' ? 'var(--green)' : x.r.result === 'T' ? 'var(--ink)' : 'var(--burg)'}">${esc(matchLine(x.r))}</b></td></tr>`).join('')}
+    </table>
+    <p class="sm" style="margin-top:8px">${M.live.length
+      ? `<b>${M.live.length} of ${M.ms.length} ${M.live.length === 1 ? 'was' : 'were'} live at the finish</b> — halved or decided by a single hole. Those are the only ones the closing question is about; a match lost by more than that was decided by scoring, not by nerve. ${M.live.length >= 2 ? 'Look at what your debriefs say about those specific rounds — if one mechanism keeps turning up in them, that is your closing problem, whatever it turns out to be.' : ''}`
+      : 'None of these were decided by a single hole, so none of them can carry a closing story — they were decided by scoring.'}</p>
+    <p class="sm faint" style="margin-top:8px">A match result is the only thing that can answer "I get up and don't close" — a scorecard can't see it. You can shoot your best score of the week and lose, and hand back a lead without a number on the card moving. Tell Claude the result of a match and it lands here.</p>
+  </div>`;
+  })()}
 
   <h2>Triggers · decided in advance</h2>
   <div class="card">
