@@ -168,6 +168,12 @@ function seed(){
     lessonsRead: [],
     drillDays: [],        // ISO dates a drill was marked done
     briefings: [],        // {id, course, date, focus, sections:[{t,b}]} — pushed by Claude pre-round
+    // Lesson layer. `lessons.js` is the FROZEN BASELINE, exactly like seed() is for
+    // everything else; these three carry the live edits so a lesson change has the same
+    // append-only trail a plan change does. See lessons() below.
+    lessonEdits: {},      // { lessonId: {…patched fields} } — from `lesson-update`
+    lessonAdds: [],       // whole lessons pushed by feed — from `lesson-add`
+    lessonHidden: [],     // ids retired — from `lesson-remove`
   };
 }
 
@@ -184,6 +190,9 @@ function migrate(s){
   if(!s.carries){ const fresh = seed(); s.carries = fresh.carries; s.carriesCalibrated = false; }
   if(!s.briefings) s.briefings = [];
   if(!s.mental) s.mental = [];
+  if(!s.lessonEdits) s.lessonEdits = {};
+  if(!s.lessonAdds) s.lessonAdds = [];
+  if(!s.lessonHidden) s.lessonHidden = [];
   if(s.live === undefined) s.live = null;   // a round being logged hole-by-hole
   if(!s.evolution || s.sessions.every(x => !x.detail)){
     const fresh = seed();
@@ -305,9 +314,21 @@ function struggles(){
   S.faults.forEach(f => tags.set(f.tag, f.why));
   return tags;
 }
+// The live lesson list: the frozen `lessons.js` baseline with every feed edit applied on
+// top. Nothing reads LESSONS directly — a lesson change has to leave the same append-only
+// trail a plan change does, or a stale lesson can sit on the phone unnoticed (which is
+// exactly how a returned putter stayed named in the Equipment shelf for three weeks).
+function lessons(){
+  const base = typeof LESSONS !== 'undefined' ? LESSONS : [];
+  // Concat BEFORE patching: a feed-added lesson has to be patchable too, and it is the
+  // common case from here on, since every new lesson arrives through the feed.
+  return base.concat(S.lessonAdds || [])
+    .map(l => S.lessonEdits[l.id] ? { ...l, ...S.lessonEdits[l.id] } : l)
+    .filter(l => !(S.lessonHidden || []).includes(l.id));
+}
 function pickedLessons(){
   const tags = struggles();
-  return LESSONS
+  return lessons()
     .map(l => {
       const hit = l.tags.find(t => tags.has(t));
       return hit ? { l, why: tags.get(hit) } : null;
@@ -319,7 +340,7 @@ function pickedLessons(){
 function shelfCounts(){
   const tags = struggles();
   const by = {};
-  LESSONS.forEach(l => {
+  lessons().forEach(l => {
     by[l.shelf] = by[l.shelf] || { n:0, forYou:0 };
     by[l.shelf].n++;
     if (l.tags.some(t => tags.has(t)) && !S.lessonsRead.includes(l.id)) by[l.shelf].forYou++;
@@ -1518,7 +1539,7 @@ function coach(){
 
 function shelf(name){
   const tags = struggles();
-  const items = LESSONS.filter(l => l.shelf === name);
+  const items = lessons().filter(l => l.shelf === name);
   return `
   <button class="backlink" data-action="go" data-view="coach">← Coach</button>
   <h2>${esc(name)}</h2>
@@ -1532,7 +1553,7 @@ function shelf(name){
 }
 
 function lesson(id){
-  const l = LESSONS.find(x=>x.id===id);
+  const l = lessons().find(x=>x.id===id);
   if(!l) return coach();
   if(!S.lessonsRead.includes(id)){ S.lessonsRead.push(id); save(); }
   return `
@@ -3458,6 +3479,23 @@ function applyFeed(feed){
       S.briefings.push({ id:e.id, ...e.briefing });
     }
     else if(e.type === 'briefing-remove') S.briefings = S.briefings.filter(b => b.id !== e.target);
+    // Coach lessons patch the same way plans do. `lessons.js` stays the frozen baseline;
+    // these three are the live layer, so every lesson change carries a dated trail instead
+    // of silently overwriting the file. Patches accumulate, so two updates to one lesson
+    // both survive. An update naming a lesson that doesn't exist is left unapplied on
+    // purpose — a typo'd target does nothing rather than inventing a lesson.
+    else if(e.type === 'lesson-update' && e.target && e.lesson){
+      const known = (typeof LESSONS !== 'undefined' ? LESSONS : []).some(l => l.id === e.target)
+        || (S.lessonAdds || []).some(l => l.id === e.target);
+      if(known) S.lessonEdits[e.target] = { ...(S.lessonEdits[e.target] || {}), ...e.lesson };
+    }
+    else if(e.type === 'lesson-add' && e.lesson && e.lesson.id){
+      S.lessonAdds = (S.lessonAdds || []).filter(l => l.id !== e.lesson.id).concat([e.lesson]);
+      S.lessonHidden = (S.lessonHidden || []).filter(id => id !== e.lesson.id);
+    }
+    else if(e.type === 'lesson-remove' && e.target){
+      if(!S.lessonHidden.includes(e.target)) S.lessonHidden.push(e.target);
+    }
     // A debrief Jack RECOUNTED rather than typed. Same schema as the in-app form, and the
     // entry id becomes the debrief id so the × still deletes it and an update can find it.
     else if(e.type === 'debrief' && e.debrief){

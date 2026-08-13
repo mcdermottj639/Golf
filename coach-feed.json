@@ -13134,6 +13134,21 @@
           }
         ]
       }
+    },
+    {
+      "id": "lesson-claw-20260813",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "h9",
+        "shelf": "At-Home Putting",
+        "title": "Test the claw, don't just adopt it",
+        "min": 3,
+        "tags": [
+          "short-putts"
+        ],
+        "body": "The claw is one of two things you are trying inside six feet, and carpet is where it gets cheap. What it does: the trail hand comes off the handle and pinches the grip from the side, which moves pressure into the lead hand and makes flipping the wrists physically awkward. That is a mechanical version of quiet hands, which is why it suits a zero-torque head — the face squares itself once the hands stop interfering. What it costs: a little distance feel for line control, which is a good trade inside six feet and the wrong one on a lag. The discipline that matters more than the grip: change ONE thing at a time. Grip and stroke shape are separate dials, so a session where you switch to the claw AND shorten the stroke tells you nothing about either. That is the same error that moved four putters in twelve days.",
+        "drill": "On carpet at 5 ft, three blocks of 10 in one sitting, changing one dial at a time: conventional with your normal stroke (the baseline), then claw with your normal stroke, then conventional with the pop stroke. Write all three numbers down. Whichever wins gets taken to the 20-ball five-footer on a real green — carpet picks the candidate, the green decides it."
+      }
     }
   ]
 }
