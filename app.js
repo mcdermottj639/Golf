@@ -510,7 +510,7 @@ function home(){
     return `<div class="card">
       <h2>Round prep</h2>
       ${next ? planRow(next)
-      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Golf Mind, Miracle 201) live in the <b>Swing</b> lab.</p>`}
+      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Swing Positions, Golf Mind) live in the <b>Swing</b> lab, and the at-home training lives in <b>Coach</b>.</p>`}
       ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="preps">
         <span class="sm"><b>All round prep</b> · ${rest} more plan${rest === 1 ? '' : 's'} on file</span><span class="arr">→</span></div>` : ''}
       ${S.live ? '' : `<div class="linkrow" data-action="live-new" style="border-bottom:none;padding-bottom:0">
@@ -947,7 +947,7 @@ function swingPositions(){
   <div class="card">
     <h2>Shaft at the top <span class="sm faint">(down-the-line)</span></h2>
     <div class="posfig" style="padding:8px 6px">${topShaft()}</div>
-    <p class="sm" style="margin-top:8px">Your tendency is <b class="warn">across the line</b> — at the top the shaft points right of the target. The fix is Fix 1: feel the <b>trail elbow lead down</b> and the shaft drops back <b style="color:var(--gtext)">on line</b>. The one-handed Miracle 201 drop trains this directly.</p>
+    <p class="sm" style="margin-top:8px">Your tendency is <b class="warn">across the line</b> — at the top the shaft points right of the target. The fix is Fix 1: feel the <b>trail elbow lead down</b> and the shaft drops back <b style="color:var(--gtext)">on line</b>. The one-handed Miracle 201 drop trains this directly — it's in <b>Coach</b>, on the At-Home Swing shelf.</p>
   </div>
   <div class="card">
     <h2>Club path · your slice <span class="sm faint">(top-down)</span></h2>

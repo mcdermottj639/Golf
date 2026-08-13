@@ -12882,6 +12882,11 @@
           }
         ]
       }
+    },
+    {
+      "id": "rm-miracle201-to-coach-20260813",
+      "type": "briefing-remove",
+      "target": "plan-miracle201-20260727-2-k"
     }
   ]
 }

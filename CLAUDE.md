@@ -113,7 +113,9 @@ does nothing — double-check against `applyFeed()`.
   result, and the only peer-reviewed study here (Dalton, Guillon & Naroo, *Optom Vis Sci*
   2015;92(10):968–75, n=31) found primary- and putting-gaze dominance are neither equal
   nor predictive of each other, with putting-gaze the weaker — so putting-gaze dominance
-  is **unmeasured**. Full read in the *Eye Dominance — What It Changes* plan.
+  is **unmeasured**. Full read in the *Putting — The Workshop Log* plan (Aug 13 section);
+  the owed two-drop test rides along with the overhead five in *Grip & Posture*'s sibling,
+  the *Putting Routine* FACE section.
 - Signature miss: **left on short putts** — the through-line of the whole putter saga.
   **Aug 10, 2026: likely reclassified as an AIM error, not a delivery error.** Jack found
   that setting the face *barely open* at address is the sweet spot. A zero-torque head
@@ -454,6 +456,63 @@ Keep `h2`s few: the jump bar at the top of every view is built from them.
 
 - **Round-prep briefing**: append a `briefing` entry (dated = one round; undated =
   standing plan, singleton per course/title).
+
+### Where a new thing goes (standing instruction, Aug 13 2026)
+
+Jack's rule, in his words: as new stuff comes up we are **either expanding the plans we
+have, or creating a new one if it's a new issue**. Nothing lands loose. Route it:
+
+| What arrived | Where it goes |
+|---|---|
+| Changes what he DOES in a situation that already has a plan | **Expand that plan.** New section, or edit the section that owns it |
+| A genuinely new situation or skill | **New plan**, named for the situation |
+| A question worked through — research, a claim checked, a decision reached | **A workshop-log section**, whatever else it also does |
+| A **training** — drills, reps, at-home work | **A lesson in Coach**, not a plan. See below |
+| Contradicts something in another plan | **Fix both.** Never leave two live sources for one instruction |
+
+**Trainings live in Coach, not in a lab** (standing instruction, Aug 13 2026). Plans say what
+to do on the course; the Coach library trains it. A lesson in `lessons.js` already has a
+`drill` field, tag-matching to logged struggles, and the streak button — which is exactly
+what a training needs, and what a plan gives it none of. Add one to `lessons.js` as
+`{id, shelf, title, min, tags[], body, drill}`; the file declares a top-level `const LESSONS`
+(not `window.LESSONS`) and shelves are created just by naming one. Two hard rules: **`id`
+must be unique across the whole file** (`S.lessonsRead` keys off it, so a collision marks the
+wrong lesson read — the swing shelf uses `sw*` because `m*` was already Mental Game), and
+**`tags` must come from the struggle vocabulary** at the top of `lessons.js` or the lesson
+never surfaces for anyone. `body`/`drill` are escaped on render, so plain text only. Bump
+`CACHE` in `sw.js` after editing — `lessons.js` is a cached shell asset, not feed data.
+
+Standing plans are sliced by **situation, not by topic** — that's what Jack asked for and
+what the putting lab now models: `Grip & Posture — The Setup` (before the putter moves) ·
+`Putting Routine — Locked` (the order you do it in) · `Short Putts — The Pop Stroke`
+(inside ~6 ft) · `Lag Putts — The Distance Grind` (past ~6 ft) · `Putting — The Workshop
+Log`. Swing has `Swing — The Workshop Log` alongside its doing-plans. A new plan should be
+answerable to "which situation is this for?"
+
+Two rules that fall out of it, both learned the hard way on Aug 13:
+
+- **The doing-plans stay short; the log absorbs the reasoning.** A workshop section carries
+  the same skeleton every time — the question, what checked out, what did not, what changed
+  in the other plans, what is still unmeasured, and the sources. The unmeasured line is not
+  optional. Plans that tell him what to do get the conclusion and the guards, not the
+  derivation.
+- **A log is a record, so don't rewrite what it concluded.** When a later decision overtakes
+  a workshop, append a `SINCE UPDATED` line to that section rather than editing its finding.
+  Editing the conclusion to match what happened afterwards is how a log stops being worth
+  keeping.
+
+Merging plans is a `briefing` for the survivor plus a `briefing-remove` for each one folded
+in — and **read a plan before folding it**, so its content is carried rather than summarised
+from memory. Retitling a plan is the same two entries, because the singleton key is `course`:
+a new title creates a second plan unless the old id is explicitly removed. Before retiring a
+plan, move any live action it owns into a plan that survives.
+
+**Two plan titles are hardwired in `app.js` — do not rename them.** `positions` finds its
+detail plan with `/Swing Positions/i` against `course`, and `isRoutine()` / `planIdBy()`
+match `/routine/i`, which is what floats a routine plan to the top of its lab and links the
+Coach tips to it. Also grep for a plan's name before retiring it: the Round Prep empty-state
+copy names the swing plans literally, and it had to be updated when Miracle 201 moved to
+Coach.
 
 ### Forward plans only (standing instruction, Aug 10 2026)
 
