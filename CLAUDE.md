@@ -12,7 +12,8 @@ Hosted on GitHub Pages; installs to the phone home screen via the service worker
 ```
 index.html            App shell + nav + service-worker registration
 app.js                The whole app: seed data, state, all views, render logic
-                      (incl. the live-round logger — see "Live rounds" below)
+                      (incl. the live-round logger — see "Live rounds" below —
+                       and the Mental tab, see "The Mental tab")
 styles.css            "Scorecard Heritage" theme (cream paper, Masters green, burgundy)
 lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
@@ -83,7 +84,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `stats`          | Add/replace a cumulative stats snapshot (GHIN summaries); `replaces` swaps one out |
 | `test`           | Append a 10-ball putter test result |
 | `shortlist`      | Replace the putter shortlist (keeps prior `demoed` flags) |
-| `briefing` / `briefing-remove` | Round-prep briefings & standing plans (see *Writing briefings* below) |
+| `briefing` / `briefing-remove` | Round-prep briefings & standing plans (see *Writing briefings* below). `discipline` routes a standing plan to its lab: `putting`, `mental`, `full-swing`/absent |
 | `deadline`       | Set the return-window deadline (clears "estimated") |
 
 Unknown types are left unapplied on purpose (forward-compat), so a typo'd `type` silently
@@ -324,8 +325,9 @@ An extension of *film is king* to the numbers: a hole Jack recorded himself is *
 a pasted GHIN average is **summarized**, a feel is **feel**. This works two ways:
 
 1. **Ranking.** Every tip carries an `ev` provenance — `round` (hole-by-hole cards he
-   logged) → `measured` (5-ft tests, filmed faults) → `snapshot` (pasted GHIN summaries),
-   ranked by `EV_RANK` and badged in the UI by `evTag()`. Coach sorts severity first, then
+   logged) → `measured` (5-ft tests, filmed faults) → `snapshot` (pasted GHIN summaries)
+   → `self` (his own post-round debrief, the Mental tab's only witness for what a card
+   can't see), ranked by `EV_RANK` and badged in the UI by `evTag()`. Coach sorts severity first, then
    evidence, so the warnings still lead but his own rounds speak before a season average
    somebody else computed. **Any new tip must carry an `ev`** or it sorts as a snapshot.
 2. **Suppression.** Once the hole-logged sample is real (36+ recorded greens or putting
@@ -334,6 +336,48 @@ a pasted GHIN average is **summarized**, a feel is **feel**. This works two ways
 
 Don't reintroduce a snapshot claim the hole data now answers better; do keep saying which
 one a number came from.
+
+### The Mental tab (off-course, added Aug 13 2026)
+
+Jack asked for it in these words: he struggles to stay locked in for a full round, slow
+play and random partners set him off, he gets to a lead or a good position and doesn't
+close, and he lets himself get angry or distracted. **He asked for an OFF-COURSE tool** —
+so nothing on this page is meant to be tapped mid-round, and the live logger was
+deliberately left untouched. The deciding happens here; the course is execution only.
+
+Four moving parts, all in `app.js`:
+
+- **`mentalStats()`** reads `withHoles()` and computes, over cards of 6+ holes: the
+  **reset test** (the hole *after* a bogey-or-worse, and after a double-or-worse, each
+  against his own average hole), the **closing three** vs. everything before them, the
+  same closing three restricted to rounds that were *going well* when he got there, the
+  round in **thirds**, and the blow-up share. Nothing here needs new logging — it is the
+  hole arrays he already has, asked a different question.
+- **`mentalTips()`** turns those into `{ev, s, src, h, b}` tips on the usual contract:
+  sample gates, the triggering number in the copy, and — the important part — **a finding
+  that comes out GOOD still fires**. As of Aug 13 the cards do *not* show an anger tax or
+  a closing fade (+0.62 after a dropped shot vs +0.83 overall; +0.67 closing vs +0.89
+  before), while doubles are 50% of everything lost. Telling him that is the point of the
+  page; do not quietly drop a "we can't find what you described" card. Tips carrying
+  `coach:false` stay on this tab instead of also going to Coach, for findings Coach
+  already states from the scoring side.
+- **`MENTAL_TRIGGERS`** — a fixed eight-trigger vocabulary in his own words, each with an
+  **if-then** response. Fixed so it can be *counted*; the whole value is turning "stupid
+  stuff got me" into a tally across rounds. Editing a trigger's `k` orphans past debriefs.
+- **`S.mental`** — post-round debriefs, `{id, date, round:{course,date}|null, focus:1–5,
+  triggers:[], when:[], note, next}`. Self-report, so it ranks `self` — below every number
+  on the page and still the only witness for match play, mood and pace-of-play, none of
+  which appear on a scorecard. The newest `next` renders as the **"Next round · one job"**
+  card at the top: one job, never a list.
+
+**Mental plans are briefings with `"discipline": "mental"`.** That keys them to this tab
+(`swing()` excludes them explicitly — the swing lab is the default home for any plan that
+doesn't name a discipline, so a new discipline must be added to its exclusion list and to
+`briefing()`'s back-link map). The standing plan is *Locked In — The Mental Round*.
+
+Two honesty guards worth keeping: the sample is thin (63 holes at two courses), and
+**every card is stroke play**, so "got to a lead and didn't close" is untested rather than
+disproved — say so rather than letting the closing number answer a match-play question.
 
 ### Re-rendering must not move the page
 

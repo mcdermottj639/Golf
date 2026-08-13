@@ -9,6 +9,31 @@ const TROUBLES = [
   ['wedge-distance','Wedge distance'], ['mental','Mental'],
 ];
 const MISS_CYCLE = ['', 'make', 'L', 'R', 'S', 'Lg']; // 5-ft tap states
+// The mental tab's vocabulary. A fixed set, in Jack's own words, so that "I got upset by
+// stupid stuff" becomes something countable across rounds instead of a feeling that reads
+// the same every time. Each one carries its IF-THEN — the response is decided at home,
+// off the course, which is the whole point of deciding it in advance: on the 14th tee
+// there is no deciding, only doing whatever was already decided.
+const MENTAL_TRIGGERS = [
+  { k:'slow', lab:'Slow play', blurb:'Waiting on every shot; the group ahead never moves.',
+    then:'Do not stand over the ball early. Wait AWAY from it — pick the club and the target while you wait, and start the routine only when it is actually your turn. Your routine has a fixed length; let the waiting happen outside it, never inside it.' },
+  { k:'partner', lab:'Random partners', blurb:'Chatter, gimmes, someone standing in your eyeline.',
+    then:'The only response available is where you stand. Move so they are out of your eyeline for the ten seconds the shot takes. You get one comment in your head, then it is a course condition — you do not argue with wind either.' },
+  { k:'closing', lab:'Did not close', blurb:'Up in the match, or a good score going, and it slipped.',
+    then:'Same routine, same target selection as the 2nd hole — closing is not a different skill, it is the refusal to change anything. The one legitimate change: one more club, aimed at the middle. That is protecting a lead correctly; steering is not.' },
+  { k:'anger', lab:'Anger at a shot', blurb:'It was gone, and you carried it to the next one.',
+    then:'Ten yards of walking, then the club goes back in the bag and the hole is filed. The rule is not "do not be angry" — it is that anger gets a container with an end you can see.' },
+  { k:'drift', lab:'Checked out', blurb:'Went through the motions — no target, no routine.',
+    then:'Attention comes back through a target, not through effort. Next shot, name the smallest thing you can see — a branch, a mower line, a bunker lip — out loud. If you cannot name one, you are not in the round yet.' },
+  { k:'score', lab:'Score math', blurb:'Adding the round up while it was still going.',
+    then:'Convert it to the hole in front of you: what number makes THIS hole fine? Play that one. The arithmetic still works in the car.' },
+  { k:'rush', lab:'Rushed', blurb:'Played quicker than your own routine.',
+    then:'Count the beats — read, one rehearsal, step in, go. Rushing shows up as the rehearsal disappearing first, every time, so that is the one to check.' },
+  { k:'body', lab:'Tired · hungry · hot', blurb:'A physical state wearing a mental costume.',
+    then:'Eat before you diagnose your head. Water at every tee from the 10th and food at the turn whether you want it or not — a lot of 15th-hole collapses are blood sugar, not character.' },
+];
+const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closing stretch'], ['after','After a blow-up']];
+const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 const GROOVE_LIFE = 80;  // rounds until a wedge face is considered spent
 const GRIP_LIFE = 40;    // rounds until regrip
 
@@ -120,6 +145,7 @@ function seed(){
       { id:'x4', name:'Sand Valley', st:'WI', rating:null, pr:null, bucket:true, notes:'Next up.' },
     ],
     rounds: [],           // {date, course, score, putts, troubles:[], note}
+    mental: [],           // post-round debriefs — {id, date, round, focus, triggers:[], when:[], note, next}
     matrix: { 50:{h:null,t:null,f:null}, 56:{h:null,t:null,f:null}, 60:{h:null,t:null,f:null} },
     carries: [
       { club:'Driver', loft:'9°', carry:235 },
@@ -155,6 +181,7 @@ function migrate(s){
   ];
   if(!s.carries){ const fresh = seed(); s.carries = fresh.carries; s.carriesCalibrated = false; }
   if(!s.briefings) s.briefings = [];
+  if(!s.mental) s.mental = [];
   if(s.live === undefined) s.live = null;   // a round being logged hole-by-hole
   if(!s.evolution || s.sessions.every(x => !x.detail)){
     const fresh = seed();
@@ -351,6 +378,7 @@ const TITLES = {
   swing:['Swing Lab','Driver to wedge — film, plans, and speed work.'],
   positions:['Swing Positions','Where the body goes, address to finish.'],
   putting:['Putting Lab','The left-miss project — tracked until it’s dead.'],
+  mental:['Mental Game','Staying locked in for eighteen — decided off the course.'],
   coach:['Coach','Lessons that follow your game — not generic tips.'],
   courses:['Courses','Everywhere you’ve played, rated and remembered.'],
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
@@ -370,7 +398,7 @@ function render(view, arg, keepScroll){
   $('#pageTag').textContent = tag;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === view));
-  const R = { home, bag, swing, positions:swingPositions, putting, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
+  const R = { home, bag, swing, positions:swingPositions, putting, mental, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
   $('#view').innerHTML = R(arg);
   buildJumpBar();
   if(!keepScroll) window.scrollTo(0,0);
@@ -706,7 +734,9 @@ function routineBlock(plans){
 // ----- Swing Lab -----
 function swing(){
   const sessions = S.sessions.map((s,i) => ({ s, i })).filter(o => sessionDiscipline(o.s) === 'swing').reverse();
-  const plans = S.briefings.filter(b => !b.date && (b.discipline || 'swing') !== 'putting');
+  // Anything not explicitly claimed by another lab lands here — the swing lab is the
+  // default home for a standing plan, so new disciplines have to be named to stay out.
+  const plans = S.briefings.filter(b => !b.date && !['putting','mental'].includes(b.discipline || 'swing'));
   const other = plans.filter(b => !isRoutine(b));
   return `
   ${routineBlock(plans)}
@@ -995,6 +1025,239 @@ function putting(){
   </div>`;
 }
 
+// ----- Mental game -----
+// An OFF-COURSE tab. Nothing here is meant to be tapped mid-round — the point of the
+// mental game is that the responses are decided at home and merely executed on the
+// course, so this page is where the deciding happens and where the round gets reviewed
+// afterwards. It leads with the thing Jack's own cards can already answer.
+//
+// "I get upset and it costs me" and "I don't close" are both claims about WHERE in a
+// round the strokes go, and every hole-by-hole card carries that. So the measurement
+// speaks first and the debrief — his own read, written after the fact — is the weaker
+// witness, the same film-over-feel rule the rest of the app runs on.
+const perHole = o => o && o.n ? o.over / o.n : null;
+const sgn = v => (v > 0 ? '+' : '') + v.toFixed(2);
+
+function mentalStats(){
+  // Six holes is the floor: a card shorter than that has no "closing stretch" to speak of
+  // and can't say anything about the shape of a round.
+  const cards = withHoles()
+    .map(r => r.holes.filter(h => h && h.par != null && h.s != null).map(h => h.s - h.par))
+    .filter(a => a.length >= 6);
+  const m = { rounds:cards.length, all:{n:0,over:0}, blow:{n:0,shots:0},
+    afterBog:{n:0,over:0,save:0}, afterDbl:{n:0,over:0},
+    thirds:[{n:0,over:0},{n:0,over:0},{n:0,over:0}],
+    close:{n:0,over:0}, before:{n:0,over:0}, inPos:{n:0,over:0,rounds:0} };
+  const acc = (o, v) => { o.n++; o.over += v; };
+  cards.forEach(d => d.forEach((v, i) => {
+    acc(m.all, v);
+    if(v >= 2){ m.blow.n++; m.blow.shots += v; }
+    acc(m.thirds[Math.min(2, Math.floor(i * 3 / d.length))], v);
+    if(i >= d.length - 3) acc(m.close, v); else acc(m.before, v);
+    if(i){
+      // The reset test: what the hole AFTER a dropped shot costs, against his own average.
+      if(d[i-1] >= 1){ acc(m.afterBog, v); if(v <= 0) m.afterBog.save++; }
+      if(d[i-1] >= 2) acc(m.afterDbl, v);
+    }
+  }));
+  // Closing when there was something to close. A fade only counts as a fade if the round
+  // was going at least as well as usual when he got to the last three.
+  const base = perHole(m.all);
+  if(base != null) cards.forEach(d => {
+    const head = d.slice(0, d.length - 3);
+    if(!head.length || head.reduce((a, b) => a + b, 0) / head.length > base) return;
+    m.inPos.rounds++;
+    d.slice(-3).forEach(v => acc(m.inPos, v));
+  });
+  return m;
+}
+
+// Same contract as every other tip generator: nothing fires without a sample behind it,
+// each card carries the number that triggered it, and a finding that comes out GOOD says
+// so rather than being quietly dropped — "the cards don't show what you think" is one of
+// the more useful things this page can tell him.
+function mentalTips(m){
+  const t = [];
+  const base = perHole(m.all);
+  if(base == null) return t;
+  const thin = `Six-ish rounds is a first read, not a verdict — it grows every time you log a card hole by hole.`;
+
+  if(m.afterBog.n >= 12){
+    const a = perHole(m.afterBog), gap = a - base;
+    const save = Math.round(m.afterBog.save / m.afterBog.n * 100);
+    t.push(gap >= 0.2
+      ? { ev:'round', s:'warn', src:`The reset · ${m.afterBog.n} holes`, h:'The hole after a dropped shot costs you extra',
+          b:`It plays ${sgn(a)} a hole against ${sgn(base)} across every hole you've logged — ${sgn(gap)} of tax for carrying the last one${m.afterDbl.n >= 6 ? `, and ${sgn(perHole(m.afterDbl))} after a double or worse` : ''}. That is the measured version of what you described, and it has a fix with a landmark in it: ten yards of walking, then the hole is filed. ${thin}` }
+      : { ev:'round', s:'good', src:`The reset · ${m.afterBog.n} holes`, h:'Your cards do not show a tilt tax',
+          b:`The hole after a dropped shot plays ${sgn(a)} against ${sgn(base)} overall, and you make par or better on ${save}% of them${m.afterDbl.n >= 6 ? ` — ${sgn(perHole(m.afterDbl))} even after a double or worse` : ''}. So the anger is real as an experience and it is NOT currently showing up as strokes on the next tee. Two honest readings: the damage may be landing inside the bad hole rather than after it (see below), or the sample is still small. ${thin} Either way, do not spend practice on a reset problem the scorecard cannot find.` });
+  }
+
+  // Coach already carries the doubles finding from the scoring side; what's new here is
+  // only the framing, so this one stays on the Mental tab rather than going up twice.
+  if(m.blow.n && m.all.over > 0 && m.blow.shots / m.all.over >= 0.25)
+    t.push({ ev:'round', s:'warn', coach:false, src:`Where it actually lands · ${m.blow.n} holes`, h:'The damage is inside the bad hole, not after it',
+      b:`${m.blow.n} holes of double bogey or worse across ${m.all.n} played, costing ${m.blow.shots} strokes — ${Math.round(m.blow.shots / m.all.over * 100)}% of everything you've lost to par. A blow-up hole is where a bad decision gets made while you're already hot: the hero recovery, the second aggressive club, the flop you'd bet against. The mental work with the biggest number attached to it is not calming down afterwards, it is the one club you pick while still angry, DURING the hole.` });
+
+  if(m.close.n >= 9 && m.before.n >= 18){
+    const c = perHole(m.close), b = perHole(m.before), gap = c - b;
+    t.push(gap >= 0.2
+      ? { ev:'round', s:'warn', src:`Closing · ${m.close.n} holes`, h:'You fade over the last three',
+          b:`The closing three play ${sgn(c)} a hole against ${sgn(b)} for everything before them${m.inPos.rounds >= 3 ? `, and ${sgn(perHole(m.inPos))} across the ${m.inPos.rounds} rounds that were going well when you got there` : ''}. That is the shape you described, measured. The counter is deliberately boring: same routine, same target selection, one more club, aimed at the middle. ${thin}` }
+      : { ev:'round', s:'good', src:`Closing · ${m.close.n} holes`, h:'The closing stretch is not where your strokes go',
+          b:`The last three holes play ${sgn(c)} a hole against ${sgn(b)} for everything before them${m.inPos.rounds >= 3 ? `, and ${sgn(perHole(m.inPos))} across the ${m.inPos.rounds} rounds that were going well when you reached them` : ''}. So "not closing" is so far a MATCH feeling rather than a scoring one — which is worth knowing, because it means the fix is about how the last three feel, not about a swing that leaves you. ${thin} Match play doesn't live in these cards at all: log the ones that matter and this line can start answering the question you're actually asking.` });
+  }
+
+  if(m.all.n >= 27){
+    const v = m.thirds.map(perHole);
+    const worst = v.indexOf(Math.max(...v)), best = v.indexOf(Math.min(...v));
+    const LAB = ['the opening third', 'the middle third', 'the closing third'];
+    if(v[worst] - v[best] >= 0.25)
+      t.push({ ev:'round', s: worst === 2 ? 'warn' : 'mid', coach: worst === 2, src:`Shape of a round · ${m.all.n} holes`,
+        h:`Your strokes cluster in ${LAB[worst]}`,
+        b:`Per hole: ${sgn(v[0])} opening · ${sgn(v[1])} middle · ${sgn(v[2])} closing. ${worst === 2
+          ? 'The worst third is the last one, so attention is the likeliest suspect — this is the shape a fade actually has.'
+          : worst === 0 ? 'The worst third is the FIRST one, which is a warm-up problem rather than a focus problem — you are settling into the round instead of starting in it.'
+          : 'The worst third is the middle, which is usually where a round stops being new and nobody is watching the clock yet. It is the least glamorous place to lose shots and the easiest to fix with a target you say out loud.'}` });
+  }
+
+  // The debriefs get their own voice, ranked below every measurement on the page.
+  const d = S.mental || [];
+  if(d.length >= 3){
+    const c = new Map();
+    d.forEach(x => (x.triggers || []).forEach(k => c.set(k, (c.get(k) || 0) + 1)));
+    const top = [...c.entries()].sort((a, b) => b[1] - a[1])[0];
+    const tr = top && MENTAL_TRIGGERS.find(x => x.k === top[0]);
+    if(tr && top[1] >= 2) t.push({ ev:'self', s:'mid', src:`Your debriefs · ${d.length} rounds`,
+      h:`"${esc(tr.lab)}" is your most-logged trigger`,
+      b:`Logged after ${top[1]} of ${d.length} rounds. Your plan for it: ${tr.then} A trigger this repeatable is worth rehearsing off the course rather than meeting fresh every time.` });
+  }
+  return t.sort((a, b) => EV_RANK[a.ev || 'snapshot'] - EV_RANK[b.ev || 'snapshot']);
+}
+
+function mentalCounts(){
+  const c = {};
+  (S.mental || []).forEach(d => (d.triggers || []).forEach(k => c[k] = (c[k] || 0) + 1));
+  return c;
+}
+
+function mental(){
+  const m = mentalStats();
+  const tips = mentalTips(m);
+  // Newest first BY DATE, not by insertion — a debrief written on Tuesday about Sunday's
+  // round must not sit above Monday's. Insertion order only breaks ties.
+  const logs = (S.mental || []).map((d, i) => ({ d, i }))
+    .sort((a, b) => (b.d.date || '').localeCompare(a.d.date || '') || b.i - a.i)
+    .map(o => o.d);
+  const counts = mentalCounts();
+  const focus = logs.filter(d => d.focus).map(d => d.focus);
+  const avgFocus = focus.length ? focus.reduce((a, b) => a + b, 0) / focus.length : null;
+  const next = logs.find(d => d.next);
+  const plans = S.briefings.filter(b => !b.date && b.discipline === 'mental');
+  const other = plans.filter(b => !isRoutine(b));
+  const rounds = S.rounds.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10);
+  const v = m.thirds.map(perHole);
+  const worst = v.every(x => x != null) ? v.indexOf(Math.max(...v)) : -1;
+  const THIRD = ['Opening third', 'Middle third', 'Closing third'];
+  return `
+  ${next ? `<div class="card">
+    <h2>Next round · one job</h2>
+    <p class="sm"><b>${esc(next.next)}</b></p>
+    <p class="sm faint" style="margin-top:6px">You wrote that after ${next.round ? esc(next.round.course) : 'your last round'}${next.date ? ` on ${fmtDate(next.date)}` : ''}. One job is the limit — a list of five is the same as none.</p>
+  </div>` : ''}
+
+  <div class="card">
+    <p class="sm"><b>This page is for the kitchen table, not the golf course.</b> Everything a mental game does on the course is execution; the deciding happens here, before and after. What you get: what your own cards say about the two things you described — the anger tax and the fade — an if-then plan for every trigger that keeps getting you, and a debrief to fill in the evening after you play.</p>
+  </div>
+
+  ${routineBlock(plans)}
+  ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
+
+  <h2>What your cards say</h2>
+  ${m.all.n ? `<div class="rowgrid g3">
+    ${m.thirds.map((th, i) => `<div class="stat ${i === worst && v[worst] - Math.min(...v) >= 0.25 ? 'alert' : ''}">
+      <div class="v">${th.n ? sgn(perHole(th)) : '—'}</div><div class="l">${THIRD[i]}</div></div>`).join('')}
+  </div>
+  <div class="card">
+    <table><tr><th>Situation</th><th>Holes</th><th>Per hole</th><th>vs. you</th></tr>
+      ${[['Every hole logged', m.all], ['After a bogey or worse', m.afterBog], ['After a double or worse', m.afterDbl],
+         ['The closing three', m.close], ['Everything before them', m.before],
+         [`Closing when it was going well${m.inPos.rounds ? ` · ${m.inPos.rounds} rounds` : ''}`, m.inPos]]
+        .filter(([, o]) => o.n).map(([lab, o]) => {
+          const p = perHole(o), d = p - perHole(m.all);
+          return `<tr><td class="sm"><b>${lab}</b></td><td>${o.n}</td>
+            <td><b style="color:${p >= 1 ? 'var(--burg)' : p <= 0.5 ? 'var(--green)' : 'var(--ink)'}">${sgn(p)}</b></td>
+            <td class="sm">${Math.abs(d) < 0.05 ? '<span class="faint">—</span>'
+              : `<b style="color:${d > 0 ? 'var(--burg)' : 'var(--green)'}">${sgn(d)}</b>`}</td></tr>`;
+        }).join('')}
+    </table>
+    <p class="sm faint" style="margin-top:8px">Counted from ${m.rounds} of your own hole-by-hole cards. "vs. you" compares each situation against your own average hole — so it answers whether the situation costs you anything, not whether you're a good golfer in it.</p>
+  </div>` : `<div class="card"><p class="sm">Nothing to measure yet. This section reads your hole-by-hole cards — the reset test (what the hole after a dropped shot costs), the closing three, and the shape of a round in thirds. Log a live round and it fills itself in.</p></div>`}
+
+  ${tips.length ? `<div class="card">
+    ${tips.map(t => `<div class="tipcard ${t.s === 'good' ? 'green' : ''}">
+      <div class="src">${esc(t.src)}${evTag(t.ev)}</div><h4>${t.h}</h4>${expandable(t.b)}</div>`).join('')}
+    <p class="sm faint">Measurement first, your own read last. A "good" card here is not a compliment — it means the cards can't find the thing you described, which is worth knowing before you spend practice on it.</p>
+  </div>` : ''}
+
+  <h2>Triggers · decided in advance</h2>
+  <div class="card">
+    <p class="sm">An if-then plan beats willpower because it removes the deciding. Read these cold, at home, until the response is boring — that is the whole mechanism.${Object.keys(counts).length ? '' : ' The counts fill in as you log debriefs.'}</p>
+    ${MENTAL_TRIGGERS.map(x => `<div class="tipcard">
+      <div class="src">If · ${esc(x.lab)}${counts[x.k] ? ` · logged ${counts[x.k]}×` : ''}</div>
+      <h4>${esc(x.blurb)}</h4>
+      <p class="sm"><b>Then:</b> ${esc(x.then)}</p></div>`).join('')}
+  </div>
+
+  <h2>Round debrief</h2>
+  <div class="card">
+    <p class="sm">The evening after you play, not on the drive home. Two minutes: how locked in you were, what fired, and the one job for next time.</p>
+    <div class="formrow">
+      <div><label>Date</label><input type="date" id="mtDate" value="${today()}"></div>
+      <div><label>Round</label><select id="mtRound">
+        <option value="">Not logged / practice</option>
+        ${rounds.map((r, i) => `<option value="${i}">${fmtDate(r.date)} · ${esc(r.course || 'round')}${r.score != null ? ` (${r.score})` : ''}</option>`).join('')}
+      </select></div>
+    </div>
+    <label>How locked in were you?</label>
+    <div class="chips" id="mtFocus">${[1,2,3,4,5].map(n =>
+      `<span class="chip" data-action="mental-focus" data-focus="${n}">${n} · ${FOCUS_LAB[n]}</span>`).join('')}</div>
+    <label>What fired?</label>
+    <div class="chips" id="mtTriggers" data-multi>${MENTAL_TRIGGERS.map(x =>
+      `<span class="chip" data-trig="${x.k}">${esc(x.lab)}</span>`).join('')}</div>
+    <label>When?</label>
+    <div class="chips" id="mtWhen" data-multi>${MENTAL_WHEN.map(([k, lab]) =>
+      `<span class="chip" data-when="${k}">${lab}</span>`).join('')}</div>
+    <label>What actually happened</label><input id="mtNote" placeholder="e.g. two groups backed up on 7, stood over it waiting, blocked it right">
+    <label>One job next round</label><input id="mtNext" placeholder="e.g. wait off the tee box — routine starts when it's my turn">
+    <div style="margin-top:10px"><button class="btn" data-action="save-debrief">Save debrief</button></div>
+  </div>
+
+  ${logs.length ? `<h2>Debrief log · ${logs.length}</h2>
+  <div class="card">
+    ${avgFocus != null ? `<p class="sm">Focus averages <b>${avgFocus.toFixed(1)} / 5</b> across ${focus.length} rounds${focus.length >= 3 ? ` · newest three ${focus.slice(0,3).join(' · ')}` : ''}. Your own read, so it is the softest number on this page — but it is the only one that knows how the round felt.</p>` : ''}
+    ${logs.map((d, i) => `<div class="linkrow" style="align-items:flex-start${i === logs.length - 1 ? ';border-bottom:none' : ''}">
+      <span><b>${fmtDate(d.date)}${d.round ? ` · ${esc(d.round.course)}` : ''}</b>${d.focus ? ` <span class="sm faint">${d.focus}/5 ${FOCUS_LAB[d.focus]}</span>` : ''}
+      ${(d.triggers || []).length ? `<br><span class="sm">${d.triggers.map(k => esc((MENTAL_TRIGGERS.find(x => x.k === k) || {}).lab || k)).join(' · ')}${(d.when || []).length ? ` <span class="faint">— ${d.when.map(k => esc((MENTAL_WHEN.find(w => w[0] === k) || [])[1] || k)).join(', ')}</span>` : ''}</span>` : ''}
+      ${d.note ? `<br><span class="sm faint">${esc(d.note)}</span>` : ''}
+      ${d.next ? `<br><span class="sm"><b>Next:</b> ${esc(d.next)}</span>` : ''}</span>
+      <button class="minibtn" data-action="del-debrief" data-id="${esc(d.id)}">×</button></div>`).join('')}
+  </div>` : ''}
+
+  <h2>Off-course reps</h2>
+  <div class="card">
+    <p class="sm">The mental game is a skill, and a skill that is only ever attempted under pressure never improves. These are the reps that transfer:</p>
+    <div class="tipcard green"><div class="src">Builds the routine</div><h4>Twenty routines, no ball</h4>
+      <p class="sm">At home, full pre-shot routine twenty times with the same beat count — read, one rehearsal, step in, go. The routine has to be automatic BEFORE it's needed; a routine you have to think about is the first thing that disappears when you're hot or rushed.</p></div>
+    <div class="tipcard green"><div class="src">Builds the tolerance</div><h4>Practise with the interference</h4>
+      <p class="sm">Deliberately putt and chip with the thing that grates: music on, a timer counting, someone talking. Distraction only breaks a round when it's novel. Rehearsed, it's just a condition — and the slow-play wait is a condition you can rehearse by standing there doing nothing for a full minute before the stroke.</p></div>
+    <div class="tipcard green"><div class="src">Builds the closing</div><h4>Three to leave</h4>
+      <p class="sm">Finish every putting session with three straight 5-footers, full routine, restart on a miss. It's the only cheap way to buy strokes that count. Your 20-ball scoreboard in the Putting Lab is the same idea with a number attached.</p></div>
+    <div class="linkrow" data-action="open-shelf" data-shelf="Mental Game"><span><b>Mental Game lessons</b><br><span class="sm">One target one thought · the 10-yard reset · practice like it counts</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="open-lesson" data-id="c4"><span><b>Bogey is not an emergency</b><br><span class="sm">The lesson behind the blow-up finding above</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="putting" style="border-bottom:none"><span><b>Putting Lab · the 20-ball test</b><br><span class="sm">Pressure with a score on it</span></span><span class="arr">→</span></div>
+  </div>`;
+}
+
 // ----- Coach -----
 // Find a standing plan by title so a finding can point at the page that fixes it.
 function planIdBy(re, disc){
@@ -1022,6 +1285,11 @@ function coachSignals(){
       b:`Last logged test${mc.L || mc.R ? ` · all-time misses ${mc.L} left / ${mc.R} right / ${mc.S} short / ${mc.Lg} long` : ''}. ${s.makes >= 17 ? 'At or past the goal of 17 — hold it there.' : 'Goal is 17. ' + (mc.L > mc.R ? 'The left miss is still the pattern.' : 'Miss pattern is balanced — this is pace and read, not face.')}`,
       link: id ? { a:'open-briefing', id, lab:'Open the putting routine' } : { a:'go', view:'putting', lab:'Putting lab' } });
   }
+  // The mental findings are computed from the same cards, so they belong in the same
+  // ranked list — but only the ones that say something is wrong. A "the cards can't find
+  // it" card is the point of the Mental tab and pointless as a Coach to-do.
+  mentalTips(mentalStats()).filter(t => t.s !== 'good' && t.coach !== false).forEach(t => out.push({
+    sev:t.s, src:t.src, h:t.h, b:t.b, ev:t.ev, link:{ a:'go', view:'mental', lab:'Mental Game' } }));
   S.faults.forEach(f => out.push({ sev:'mid', src:'Open fault', ev:'measured',
     h:f.tag.replace(/-/g,' ').replace(/^./, c => c.toUpperCase()), b:f.why,
     link:{ a:'go', view:'putting', lab:'Putting lab' } }));
@@ -1190,8 +1458,9 @@ function briefing(id){
   // An undated plan is usually a lab routine, but a COURSE plan is undated too — course
   // knowledge doesn't expire — and sending that one back to the Swing Lab is nonsense.
   const isCourse = !!played || S.rounds.some(r => courseMatches(r.course, b.course));
-  const backView = b.date || isCourse ? 'preps' : (b.discipline === 'putting' ? 'putting' : 'swing');
-  const backLabel = b.date || isCourse ? 'Round Prep' : (b.discipline === 'putting' ? 'Putting Lab' : 'Swing Lab');
+  const LAB = { putting:['putting','Putting Lab'], mental:['mental','Mental Game'] };
+  const lab = LAB[b.discipline] || ['swing','Swing Lab'];
+  const [backView, backLabel] = b.date || isCourse ? ['preps','Round Prep'] : lab;
   return `
   <button class="backlink" data-action="go" data-view="${backView}">← ${backLabel}</button>
   <div class="card">
@@ -1382,6 +1651,9 @@ function statsCoverPutter(){
 function latestStats(){ return S.stats && S.stats.length ? S.stats[S.stats.length-1] : null; }
 function baselineStats(){ return S.stats && S.stats.length > 1 ? S.stats[0] : null; }
 function parOrBetter(g){ const s = g && g.scoring; return s ? (s.birdie||0) + (s.par||0) : null; }
+// These are sums of pasted percentages, so they arrive with float dust on them
+// (40.699999999999996). Never print one raw.
+const pc1 = v => v == null ? '—' : `${(+v).toFixed(1)}%`;
 function blowUps(g){ const s = g && g.scoring; return s ? (s.double||0) + (s.triple||0) : null; }
 // Up-and-down rate: some sources give a percentage, GHIN gives a per-round count
 // that only means something against how many greens were missed.
@@ -1414,7 +1686,7 @@ function statTips(live){
     const dGir = (b.gir != null && g.gir != null) ? g.gir - b.gir : null;
     if(dPutts != null && dPutts >= 1.5 && dGir != null && dGir <= -3)
       t.push({ ev:'snapshot', s:'warn', src:`Then vs now · ${b.rounds || b.roundsScoring} rds → ${nSc} rds`, h:'The leak is tee-to-green',
-        b:`Putts per round are DOWN ${dPutts.toFixed(1)} (${b.putts.toFixed(1)} → ${g.putts.toFixed(1)}), but greens in regulation fell ${Math.abs(dGir).toFixed(1)} points (${b.gir}% → ${g.gir}%)${b.driving && d ? ` and fairways ${b.driving.fairway}% → ${d.fairway}%` : ''}, and scoring barely moved: par-or-better ${parOrBetter(b)}% → ${parOrBetter(g)}%, doubles ${blowUps(b)}% → ${blowUps(g)}%. Whatever you saved on the greens you handed back before you got there. The strokes are tee-to-green.` });
+        b:`Putts per round are DOWN ${dPutts.toFixed(1)} (${b.putts.toFixed(1)} → ${g.putts.toFixed(1)}), but greens in regulation fell ${Math.abs(dGir).toFixed(1)} points (${b.gir}% → ${g.gir}%)${b.driving && d ? ` and fairways ${b.driving.fairway}% → ${d.fairway}%` : ''}, and scoring barely moved: par-or-better ${pc1(parOrBetter(b))} → ${pc1(parOrBetter(g))}, doubles ${pc1(blowUps(b))} → ${pc1(blowUps(g))}. Whatever you saved on the greens you handed back before you got there. The strokes are tee-to-green.` });
     const dOne = (b.putting && p && b.putting.one != null && p.one != null) ? p.one - b.putting.one : null;
     if(dPutts != null && dPutts >= 1.5 && dOne != null && Math.abs(dOne) <= 2)
       t.push({ ev:'snapshot', s:'mid', src:'Read this one carefully', h:'The putting gain is partly an artefact',
@@ -1587,8 +1859,11 @@ function scoreStats(){
 // he was there, he recorded it, and it is his own current game. A pasted GHIN summary is
 // somebody else's arithmetic over a season that may predate the bag he's playing — still
 // worth having, but it goes last. Same rule as "film is king", applied to the numbers.
-const EV_RANK = { round:0, measured:1, snapshot:2 };
-const EV_LAB = { round:'from your rounds', measured:'measured', snapshot:'GHIN summary' };
+// `self` is the weakest rank on purpose: a debrief is Jack telling us how the round felt,
+// which is the mental tab's only available witness for anything a scorecard can't see —
+// and still the first thing to give way when a card disagrees with it.
+const EV_RANK = { round:0, measured:1, snapshot:2, self:3 };
+const EV_LAB = { round:'from your rounds', measured:'measured', snapshot:'GHIN summary', self:'your own read' };
 const evTag = ev => ev ? ` <span class="ev ${ev}">${EV_LAB[ev]}</span>` : '';
 
 // Tips fire off thresholds in the data, so they only appear once there's
@@ -2780,6 +3055,32 @@ const ACTIONS = {
     if(!S.drillDays.includes(d)) S.drillDays.push(d);
     save(); rerender(); toast('Streak alive 🔥');
   },
+  // ----- Mental game -----
+  'mental-focus': el => {
+    const on = el.classList.contains('grn');
+    document.querySelectorAll('#mtFocus .chip').forEach(c => c.classList.remove('grn'));
+    if(!on) el.classList.add('grn');   // tapping the picked one clears it
+  },
+  'save-debrief': () => {
+    const pick = sel => [...document.querySelectorAll(sel)].filter(c => c.classList.contains('on'));
+    const triggers = pick('#mtTriggers .chip').map(c => c.dataset.trig);
+    const when = pick('#mtWhen .chip').map(c => c.dataset.when);
+    const f = document.querySelector('#mtFocus .chip.grn');
+    const note = $('#mtNote').value.trim(), nx = $('#mtNext').value.trim();
+    if(!f && !triggers.length && !note && !nx) return toast('Nothing to save yet');
+    const ri = $('#mtRound').value;
+    const rounds = S.rounds.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10);
+    const r = ri === '' ? null : rounds[+ri];
+    S.mental.push({ id:uid(), date: $('#mtDate').value || today(),
+      round: r ? { course:r.course, date:r.date } : null,
+      focus: f ? +f.dataset.focus : null, triggers, when, note, next:nx });
+    save(); rerender(); toast('Debrief saved');
+  },
+  'del-debrief': el => {
+    S.mental = S.mental.filter(d => d.id !== el.dataset.id);
+    save(); rerender(); toast('Deleted');
+  },
+
   'add-session': () => {
     const setup = $('#sesSetup').value.trim(), finding = $('#sesFind').value.trim();
     if(!setup && !finding) return toast('Fill in the session first');
@@ -2902,8 +3203,9 @@ document.addEventListener('click', e => {
     tap.textContent = next==='make' ? '✓' : next || (+tap.dataset.tap + 1);
     return;
   }
-  // trouble chips + bucket chip toggle themselves
-  const chip = e.target.closest('#troubleChips .chip, #coBucket');
+  // trouble chips, the bucket chip and any [data-multi] chip row toggle themselves —
+  // they're read back off the DOM when the form around them is saved.
+  const chip = e.target.closest('#troubleChips .chip, #coBucket, [data-multi] .chip');
   if(chip){ chip.classList.toggle(chip.id==='coBucket' ? 'grn' : 'on'); return; }
   const el = e.target.closest('[data-action]');
   if(el && ACTIONS[el.dataset.action]) ACTIONS[el.dataset.action](el);

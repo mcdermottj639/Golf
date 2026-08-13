@@ -75,7 +75,8 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
   vertical-align:1px;border:1px solid var(--line)}
 .ev.round{background:#dfe8dc;color:var(--green);border-color:#a8c0ad}
 .ev.measured{background:#efe6c8;color:#7a6414;border-color:#cdbd7e}
-.ev.snapshot{background:transparent;color:var(--faint)}
+.ev.snapshot, .ev.self{background:transparent;color:var(--faint)}
+.ev.self{font-style:italic;letter-spacing:.04em}
 body.night .ev.round{background:#1c2b22;color:#8fd0a8;border-color:#33503f}
 body.night .ev.measured{background:#33301c;color:#dfc76a;border-color:#5a5533}
 
@@ -186,10 +187,10 @@ td b{font-size:14px}
 .poslegend i.arc{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--burg);border-left-color:transparent;border-bottom-color:transparent;transform:rotate(45deg)}
 
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:30;
-  display:grid;grid-template-columns:repeat(7,1fr);padding:8px 6px calc(10px + env(safe-area-inset-bottom));
+  display:grid;grid-template-columns:repeat(8,1fr);padding:8px 4px calc(10px + env(safe-area-inset-bottom));
   text-align:center;background:var(--green);color:#a8bfa8;font-family:var(--sans)}
-nav button{background:none;border:none;color:#a8bfa8;font-size:9.5px;font-weight:700;padding:2px 0}
-nav button .ic{font-size:19px;display:block;margin-bottom:1px}
+nav button{background:none;border:none;color:#a8bfa8;font-size:8.8px;font-weight:700;padding:2px 0;letter-spacing:-.01em}
+nav button .ic{font-size:17px;display:block;margin-bottom:1px}
 nav button.on{color:#f2e9d0}
 
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--green);
