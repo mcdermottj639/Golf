@@ -87,6 +87,9 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `briefing` / `briefing-remove` | Round-prep briefings & standing plans (see *Writing briefings* below). `discipline` routes a standing plan to its lab: `putting`, `mental`, `full-swing`/absent |
 | `debrief` / `debrief-update` | Add/patch a mental-game debrief Jack **recounted** rather than typed (see *The Mental tab*). Entry `id` becomes the debrief id |
 | *(round fields)* | A round may carry `result` (`W`/`L`/`T`), `margin` (holes, signed from Jack's side) and `matchNo` — set them with `round-update`. See *Match play* |
+| `lesson-update` | Patch a Coach lesson by `target` (its id); `Object.assign` of `lesson`. Patches accumulate, so two updates to one lesson both survive. A `target` matching no lesson is ignored |
+| `lesson-add`    | Add a whole Coach lesson (`lesson` object carrying its own `id`). Naming a new `shelf` creates one |
+| `lesson-remove` | Retire a lesson by `target` — a later `lesson-add` with the same id un-retires it |
 | `deadline`       | Set the return-window deadline (clears "estimated") |
 
 Unknown types are left unapplied on purpose (forward-compat), so a typo'd `type` silently
@@ -479,8 +482,17 @@ what a training needs, and what a plan gives it none of. Add one to `lessons.js`
 must be unique across the whole file** (`S.lessonsRead` keys off it, so a collision marks the
 wrong lesson read — the swing shelf uses `sw*` because `m*` was already Mental Game), and
 **`tags` must come from the struggle vocabulary** at the top of `lessons.js` or the lesson
-never surfaces for anyone. `body`/`drill` are escaped on render, so plain text only. Bump
-`CACHE` in `sw.js` after editing — `lessons.js` is a cached shell asset, not feed data.
+never surfaces for anyone. `body`/`drill` are escaped on render, so plain text only.
+
+**`lessons.js` is a FROZEN BASELINE — same rule as `seed()`** (standing instruction, Aug 13
+2026). Do NOT edit a lesson in place: append a `lesson-update` / `lesson-add` /
+`lesson-remove` entry instead. `lessons()` in `app.js` merges the baseline with those edits
+and **nothing reads `LESSONS` directly**, so a lesson change gets the same dated,
+append-only trail a plan change does. This exists because editing the file overwrites the
+text on Jack's phone with no history — which is how two lessons stayed stale for three weeks,
+one of them still naming a putter returned Jul 20. Only touch `lessons.js` itself to seed a
+genuinely new baseline shelf, and bump `CACHE` in `sw.js` when you do, since it is a cached
+shell asset rather than feed data.
 
 Standing plans are sliced by **situation, not by topic** — that's what Jack asked for and
 what the putting lab now models: `Grip & Posture — The Setup` (before the putter moves) ·

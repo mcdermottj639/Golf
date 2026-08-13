@@ -1,4 +1,12 @@
 // Caddie HQ lesson library.
+//
+// THIS FILE IS THE FROZEN BASELINE — treat it exactly like seed() in app.js.
+// Live changes go through coach-feed.json (`lesson-update` / `lesson-add` /
+// `lesson-remove`), NOT by editing a lesson here. Editing in place overwrites the text on
+// Jack's phone with no trail and no history, which is how two lessons stayed stale for
+// three weeks (one still named a putter returned Jul 20). app.js merges this baseline
+// with the feed edits in lessons(); nothing reads LESSONS directly.
+//
 // Tags connect lessons to logged struggles; the Coach ranks by tag match.
 // Struggle tags: short-putts, three-putts, tempo, early-lift, bunkers, off-tee,
 // approach, chipping, mental, wedge-distance, equipment
