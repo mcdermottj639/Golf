@@ -503,7 +503,13 @@ Two rules that fall out of it, both learned the hard way on Aug 13:
 
 Merging plans is a `briefing` for the survivor plus a `briefing-remove` for each one folded
 in — and **read a plan before folding it**, so its content is carried rather than summarised
-from memory. Retitling a plan is the same two entries, because the singleton key is `course`:
+from memory. The same trap catches SECTION rewrites, which feel safe and are not: folding two
+sections into one by writing a fresh body drops whatever wasn't in your head at the time.
+Caught on Aug 13 — merging two claw sections silently lost the distance-feel-for-line-control
+trade, the "quiet hands and claw are the same instruction" framing, and the claw-vs-conventional
+A/B. **After any merge, grep the survivor for distinctive phrases from the original** (case-
+insensitively — a phrase re-typed in CAPS reads as missing) and restore what dropped. Prefer
+concatenating bodies over rewriting them when the content is still live instruction. Retitling a plan is the same two entries, because the singleton key is `course`:
 a new title creates a second plan unless the old id is explicitly removed. Before retiring a
 plan, move any live action it owns into a plan that survives.
 
