@@ -187,10 +187,12 @@ td b{font-size:14px}
 .poslegend i.arc{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--burg);border-left-color:transparent;border-bottom-color:transparent;transform:rotate(45deg)}
 
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:30;
-  display:grid;grid-template-columns:repeat(8,1fr);padding:8px 4px calc(10px + env(safe-area-inset-bottom));
+  /* Auto-fit the columns to however many buttons there are — hardcoding a count left the
+     tabs squeezed into part of the bar the moment the nav went from eight to six. */
+  display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:7px 2px calc(9px + env(safe-area-inset-bottom));
   text-align:center;background:var(--green);color:#a8bfa8;font-family:var(--sans)}
-nav button{background:none;border:none;color:#a8bfa8;font-size:8.8px;font-weight:700;padding:2px 0;letter-spacing:-.01em}
-nav button .ic{font-size:17px;display:block;margin-bottom:1px}
+nav button{background:none;border:none;color:#a8bfa8;font-size:11px;font-weight:700;padding:4px 0;letter-spacing:-.01em}
+nav button .ic{font-size:23px;display:block;margin-bottom:2px;line-height:1.05}
 nav button.on{color:#f2e9d0}
 
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--green);
