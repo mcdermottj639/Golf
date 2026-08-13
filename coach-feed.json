@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-08-12",
+  "updated": "2026-08-13",
   "entries": [
     {
       "id": "s4-session",
@@ -10933,6 +10933,67 @@
           }
         ]
       }
+    },
+    {
+      "id": "plan-eye-dominance-20260813",
+      "type": "briefing",
+      "briefing": {
+        "course": "Eye Dominance — What It Changes",
+        "discipline": "putting",
+        "focus": "You're right-eye dominant and right-handed — same-side dominant. Worth knowing, not worth acting on yet, in that order. The bias that setup is supposed to produce is LEFT, which is your signature miss exactly, so dominance is a candidate EXPLANATION for why 'barely open' had to become your square. But the one peer-reviewed study on this says the dominance you measured standing up does not predict the one that operates when you're bent over a putt. So: re-measure it in posture, add one drop to a test you already owe, and change nothing about the stroke until the overhead five reports.",
+        "rules": [
+          "SAME-SIDE dominant — right hand, right eye. The predicted aim bias is LEFT",
+          "That is your miss — so this is an EXPLANATION for barely-open, not a new fix",
+          "DON'T STACK IT. The barely-open feel already cancels it. Two corrections miss RIGHT",
+          "Your standing Miles-test answer may not be your PUTTING answer — re-measure bent over",
+          "GET LOW, STAND CLOSE already shrinks this — eyes over the ball leaves less parallax to have",
+          "Nothing changes until the overhead five reports"
+        ],
+        "sections": [
+          {
+            "t": "Why it fits — and how far that goes",
+            "k": "Same-side dominance predicts a left aim bias, which is your exact miss — but it can only ever be a partial explanation.",
+            "b": "The teaching claim is that a right-handed, right-eye-dominant player lets the head turn so the dominant eye sits slightly INSIDE the ball-to-target line, the target then appears further left than it really is, and the putter gets aimed left to match. Same-side dominance, left bias. That is your miss and it has been your miss the whole way through.\n\nIt matters more on this putter than it would on any other. A zero-torque head doesn't twist, so address IS impact — a face measured 1.5–1.7° left at impact on Jul 30 was pointing there before the stroke started. That already reclassified the fault from delivery to AIM on Aug 10. Dominance is the first candidate that says where an aim error would come from.\n\nAnd here is the honest strength of it: the left miss predates the LINK.2.1, predates the DF3i, predates the Phantom. A cause present through four putters fits a fact about your EYES far better than it fits any fact about a head. That is the real argument for taking it seriously — not the folklore, the persistence.\n\nWhat it cannot do is prove itself. There are at least three live explanations on your card for a left aim bias and they all point the same direction, so a start line alone will never separate them."
+          },
+          {
+            "t": "The study that says slow down",
+            "k": "The dominance you measured standing up is not the one that operates over a putt — measure the version that counts.",
+            "b": "Dalton, Guillon & Naroo, Optometry and Vision Science, October 2015, 92(10):968–75. Thirty-one golfers — 14 amateurs, 7 club pros, 10 top professionals — with ocular dominance measured in BOTH primary gaze (standing, pointing at a target) and putting gaze (addressing the ball).\n\nFour findings, and each one cuts against building anything on a standing test. Primary-gaze and putting-gaze dominance are NOT equal, and neither predicts the other. The magnitude of putting-gaze dominance is significantly WEAKER than primary-gaze. Dominance is NOT correlated with handedness in either position. And eye-hand dominance is not associated with better putting.\n\nSo 'I'm right-eye dominant' is almost certainly a primary-gaze fact — the Miles test, hands framed, standing up. The study's first finding says that number does not tell you what your eyes do in a putting stance, and its second says whatever dominance you do have down there is likely milder than the standing test made it look.\n\nThat is not a reason to ignore this. It is a reason to measure the version that matters before you act on the version you have."
+          },
+          {
+            "t": "The one thing to actually do — the two-drop test",
+            "k": "Drop from the nose AND from under the right eye; the gap between the two marks is whether dominance is live for you at all.",
+            "b": "You already owe an eyeline drop. Run it twice instead of once and it answers a much better question.\n\nFull putting posture over a ball, as you'd really stand to it. Hold a second ball at the BRIDGE OF THE NOSE, let it go, mark where it lands relative to the ball. Re-set exactly, hold the second ball directly under the RIGHT EYE, let it go, mark that. Photograph both marks with the ball in frame.\n\nRead it like this. Both marks in the same place — your head is square enough that dominance has no lever to pull, and you can cross this off permanently. An inch or more apart — dominance is live, and the gap IS the size of the effect, in the only units that matter.\n\nWhy from the eye and not just the nose: the standard check drops from the bridge of the nose, but for a strongly one-eyed player what governs aim is the 'vision centre', and the billiards literature — which has chased this harder than golf has — is clear that it can sit under the dominant eye, under the nose, or anywhere between, and it is individual. There is no formula. There is only your own two marks.\n\nWhile you are down there, re-run the MILES TEST IN POSTURE: bent over the ball, hands framed around a small target across the room, close one eye then the other. That is the putting-gaze number the study says counts, and nobody has ever taken it."
+          },
+          {
+            "t": "What it does NOT change",
+            "k": "Not the stroke, not the setup, not the putter — the barely-open feel already absorbs whatever this is.",
+            "b": "Aug 10's mat putts came back 0.8° right, 1.0° left, 0.6° right, against Jul 30's 1.5–1.7° LEFT. Whatever was aiming you left is currently being cancelled. If dominance turns out to be the cause, the compensation you already found IS the fix — and knowing the mechanism only makes it trustworthy instead of superstitious, which is worth something, because an unexplained compensation is the one you talk yourself out of on the last green.\n\nWhat you must not do is add a second correction. The standing rule is one at a time: the barely-open feel OR an aim-picture retrain, never both, or the correction lands twice and the miss flips right. Eye dominance would be a third layer of the same correction. It is knowledge, not an instruction.\n\nAlso not on the table: a different head, a different offset, a sight line chosen to suit an eye. The putter search closed Aug 12.\n\nOne thing your setup already does for you: GET LOW and STAND CLOSE puts your eyes more nearly over the ball, and the closer the eyes are to the line the less parallax either eye has to work with. The posture rule you kept for comfort was quietly the mitigation."
+          },
+          {
+            "t": "Where it goes if the pull comes back",
+            "k": "Hypothesis two, behind the LINK adaptation pattern — with the head shape third and weakest.",
+            "b": "If the overhead five shows the left miss returning, work the queue in order.\n\nONE — adaptation to the LINK.2.1 with a conventional grip. Plugged In Golf's reviewer, coming off other L.A.B. models, reported a run of highly repeatable PULLS in his first session that resolved once he adapted. Same model, same signature, and you switched heads on Aug 10.\n\nTWO — eye dominance and vision centre, and by then you will have the two-drop marks to test it against instead of a folklore claim.\n\nTHREE — the head shape as an aim influencer. The reported rule of thumb is that round shapes and mallets bias aim RIGHT while straight lines and blades bias aim LEFT, and you moved from a high-MOI mallet to a narrow blade on Aug 10. Ranked last on purpose: your left miss predates the LINK, so head shape can be an amplifier at most and never the origin.\n\nAnd hold this over all three — pace is the live fault, not line. The 30-ft ladder outranks every item on this page."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "One peer-reviewed source, several teaching claims, and a clear line between them.",
+            "b": "FROM JACK (Aug 13, 2026): that he is right-eye dominant. Self-reported, and this project had never recorded it before today. Which test produced it, and whether it was taken standing, is unknown — that gap is exactly what the two-drop test closes.\n\nPEER-REVIEWED: Dalton K, Guillon M, Naroo SA. 'Ocular Dominance and Handedness in Golf Putting.' Optometry and Vision Science 2015;92(10):968–75. n=31. The four findings quoted above are the study's own conclusions.\n\nTEACHING CLAIM, NOT EVIDENCE: that same-side (right hand / right eye) players aim left, via the dominant eye drifting inside the line and shifting where the target appears. Widely taught — The Left Rough, Golf State of Mind, and attributed in places to David Orr's aim work. Consistent across sources on DIRECTION; no controlled study behind it that this project has found, and the Dalton study's findings argue the mechanism is weaker in a putting stance than in a standing one.\n\nTEACHING CLAIM, NOT EVIDENCE: mallets/round shapes bias aim right, blades/straight lines bias aim left (GolfWRX, 'The Ultimate Putting Program' — aim). Reported as a rule of thumb, not a measurement of you.\n\nFROM THE BILLIARDS SIDE: the 'vision centre' framing — that the correct sighting position ranges from under the dominant eye to under the nose and is individual with no general formula. Cue-sports coaching, carried across because the aiming problem is the same shape.\n\nCARD FACTS: 1.5–1.7° left start line and face left at impact, measured Jul 30 on the LINK.2.1, overhead. Toe line 0.6°/2.9°/3.6° CLOSED across three reps — the feet were never the cause. Aug 10 mat putts 0.8° right, 1.0° left, 0.6° right — no directional bias since the barely-open change. Left miss on short putts present across the Phantom 7.5, the DF3i and the LINK.2.1.\n\nSTILL UNKNOWN: putting-gaze dominance, vision-centre offset, and whether any of the three left-bias candidates is doing the work. The overhead five and the two-drop test are what move those."
+          }
+        ]
+      }
+    },
+    {
+      "id": "eye-dominance-action-20260813",
+      "type": "action",
+      "pri": false,
+      "text": "PUTTING — THE TWO-DROP EYELINE TEST (2 minutes, at home). You're right-handed and right-eye dominant — same-side dominant, whose predicted aim bias is LEFT, which is the oldest fault on this card. Nothing in this project had recorded your eye dominance until Aug 13. Run it in full putting posture over a ball. (1) Hold a second ball at the BRIDGE OF THE NOSE, drop it, mark where it lands relative to the ball. (2) Re-set exactly, hold it directly under the RIGHT EYE, drop, mark that. Photograph both marks with the ball in frame. SAME SPOT = your head is square, dominance has no lever, cross it off for good. AN INCH OR MORE APART = dominance is live and that gap is the size of the effect. While you're down there, re-run the MILES TEST IN POSTURE — bent over the ball, hands framed on a small target across the room, close one eye then the other — because the only peer-reviewed study on this (Dalton, Guillon & Naroo, Optom Vis Sci 2015) found that standing dominance does not predict putting dominance, and that putting-gaze dominance is the weaker of the two. DELIBERATELY NOT A PRIORITY, and don't let it become one: it changes nothing about the stroke either way, the barely-open feel is already cancelling whatever aims you left, and pace is the live fault. Run it in the two minutes before a ladder session, never instead of one."
+    },
+    {
+      "id": "openface-eyedominance-20260813",
+      "type": "action-update",
+      "target": "openface-action-20260810",
+      "text": "PUTTING — CONFIRM THE PULL STAYS GONE, then stop working on this. Scope cut Aug 10 after the three mat putts came back with no directional bias (0.8° right, 1.0° left, 0.6° right against Jul 30's 1.5–1.7° LEFT). The barely-open setup did what it was supposed to do. ONE CHECK LEFT: five putts at a real target — a coin or a tee on a practice green, nothing drawn on the ground — filmed from directly behind the ball on the line. You are looking for ONE thing: do the misses still fall on both sides? If yes, this closes and start line stops being tracked. Do NOT chase magnitude — a 0.8° miss still holes out to nearly eight feet, and the old 0.5° target was too strict for a phone measurement carrying ±0.5° of its own error. KEEP THE FEEL AS IT IS: don't retrain the aim picture with a mirror on top of it, and don't add an eye-dominance correction either — any second layer applies the fix twice and the miss reappears on the right. IF THE PULL DOES COME BACK, work the hypotheses in this order. ONE, ADAPTATION: Plugged In Golf's reviewer — coming to the LINK.2.1 off other L.A.B. models — reported a run of highly repeatable PULLS in his first session with it, which resolved once he adapted to the conventional grip. Same model, same directional signature, and you switched to this head on Aug 10. TWO, EYE DOMINANCE (new Aug 13): you're right-handed and right-eye dominant, and same-side dominance is taught to aim LEFT — which is the only candidate that predates every putter you've owned. The two-drop eyeline test gives you numbers to judge it with; the full read is in the 'Eye Dominance — What It Changes' plan. THREE, THE HEAD: blades and straight lines are reported to bias aim left where mallets bias right, and you moved from a mallet to a narrow blade — ranked last because your left miss is older than this putter. None of the three is a reason to go shopping. Re-check the feel monthly so it doesn't drift, but it is no longer a priority item — pace is."
     }
   ]
 }

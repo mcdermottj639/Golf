@@ -101,6 +101,16 @@ does nothing — double-check against `applyFeed()`.
 - Jack McDermott · ~8.5 handicap · 5'10"
 - Putting stroke: **SBST** (straight-back-straight-through) — confirmed on overhead film.
   This is why arc/toe-flow putters get flagged as a mismatch.
+- **Right-eye dominant** (self-reported, Aug 13 2026) — and right-handed, so *same-side*
+  dominant, the group taught to aim **left**. That is the signature miss, and it is the
+  only candidate cause that predates every putter he has owned, so it is worth carrying.
+  Treat it as an **explanation, never a second correction**: the barely-open feel already
+  cancels whatever aims him left, and stacking an eye-dominance fix on top misses right.
+  Two honesty guards: the reported dominance is almost certainly a *standing* (primary-gaze)
+  result, and the only peer-reviewed study here (Dalton, Guillon & Naroo, *Optom Vis Sci*
+  2015;92(10):968–75, n=31) found primary- and putting-gaze dominance are neither equal
+  nor predictive of each other, with putting-gaze the weaker — so putting-gaze dominance
+  is **unmeasured**. Full read in the *Eye Dominance — What It Changes* plan.
 - Signature miss: **left on short putts** — the through-line of the whole putter saga.
   **Aug 10, 2026: likely reclassified as an AIM error, not a delivery error.** Jack found
   that setting the face *barely open* at address is the sweet spot. A zero-torque head
