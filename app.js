@@ -989,7 +989,8 @@ function putting(){
 
   <div class="card">
     <h2>The diagnosis</h2>
-    <p class="sm"><b>Two levers behind the left miss:</b> (1) equipment — max-toe-flow putter + toe-up lie on a confirmed <b>straight SBST stroke</b>; (2) mechanics — face closes through impact, timing-dependent. Fix: zero-torque head at 34" + lie set flat + the two drills below.</p>
+    <p class="sm"><b>The left miss is largely solved.</b> Equipment closed — zero-torque head, kept for good Aug 12. And the one-way pull didn't reproduce on Aug 10: mean bias ≈0.1°, small enough to hole out past eight feet. Line turned out to be the part that was fine.</p>
+    <p class="sm" style="margin-top:6px"><b class="warn">What's open: PACE and STRIKE.</b> Neither has ever been measured — no calibrated ladder session, and no strike test on any of four putters. Both are below.</p>
   </div>
 
   ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
