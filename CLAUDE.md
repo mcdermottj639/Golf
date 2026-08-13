@@ -72,7 +72,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `session-update` | Patch a session by `target` (its feed id) or `setupMatch` prefix |
 | `session-remove` | Drop a session by `target` (its feed id) — used to fold duplicates together |
 | `evolution`      | Replace the metric-evolution grid |
-| `faults`         | Replace the current faults list. **Start a `why` with `CLOSED` or `DOWNGRADED`** to settle one — `faultState()` reads that first word, which is what drops it off the Putting tab's diagnosis card and out of Coach's open-fault to-dos. Anything else reads as open |
+| `faults`         | Replace the faults list. **`discipline`** (`putting` default / `swing` / `short-game`) scopes the replace to that lab only, so pushing swing faults can't wipe the putting ones; omit it and it replaces everything. **Start a `why` with `CLOSED` or `DOWNGRADED`** to settle one — `faultState()` reads that first word, which is what drops it off the Putting tab's diagnosis card and out of Coach's open-fault to-dos. Anything else reads as open |
 | `action`         | Add an open action item |
 | `action-done`    | Mark action `target` done |
 | `action-update`  | Rewrite action `target` text |
@@ -84,7 +84,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `stats`          | Add/replace a cumulative stats snapshot (GHIN summaries); `replaces` swaps one out |
 | `test`           | Append a 10-ball putter test result |
 | `shortlist`      | Replace the putter shortlist (keeps prior `demoed` flags) |
-| `briefing` / `briefing-remove` | Round-prep briefings & standing plans (see *Writing briefings* below). `discipline` routes a standing plan to its lab: `putting`, `mental`, `full-swing`/absent |
+| `briefing` / `briefing-remove` | Round-prep briefings & standing plans (see *Writing briefings* below). `discipline` routes a standing plan to its lab: `putting`, `mental`, `short-game`, `full-swing`/absent |
 | `debrief` / `debrief-update` | Add/patch a mental-game debrief Jack **recounted** rather than typed (see *The Mental tab*). Entry `id` becomes the debrief id |
 | *(round fields)* | A round may carry `result` (`W`/`L`/`T`), `margin` (holes, signed from Jack's side) and `matchNo` — set them with `round-update`. See *Match play* |
 | `lesson-update` | Patch a Coach lesson by `target` (its id); `Object.assign` of `lesson`. Patches accumulate, so two updates to one lesson both survive. A `target` matching no lesson is ignored |
@@ -459,6 +459,23 @@ Keep `h2`s few: the jump bar at the top of every view is built from them.
 
 - **Round-prep briefing**: append a `briefing` entry (dated = one round; undated =
   standing plan, singleton per course/title).
+
+### The labs live behind one nav button (Aug 13 2026)
+
+The bar was at eight tabs and a short-game lab would have made nine, so **Swing · Short Game ·
+Putting · Mental now sit behind a single `Game` tab** (`game()` — the hub). Nav is six: Home ·
+Bag · Game · Scores · Coach · Courses. `NAV_OF` in `render()` maps every lab view back to the
+`game` button so it stays lit, and `S.settings.lastLab` pins the last-opened lab to the top of
+the hub. Adding a fifth lab now costs nothing in the nav.
+
+**Every lab shares one diagnosis renderer.** `diagnosisCard(discipline)` draws open faults with
+their detail and collapses settled ones to a line; `faultState()` reads the first word of a
+fault's `why`. So a new lab gets a real diagnosis for free, and closing a fault in the feed
+removes it from both the lab and Coach's to-do list with no second place to edit.
+
+A new discipline needs four things: an entry in `LABS`, a view in the `render()` map and
+`TITLES`, exclusion from `swing()`'s catch-all plan filter, and a row in `briefing()`'s `LAB`
+back-link map (plus `SESSION_LAB` if it will have film).
 
 ### Where a new thing goes (standing instruction, Aug 13 2026)
 
