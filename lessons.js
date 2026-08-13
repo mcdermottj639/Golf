@@ -130,7 +130,7 @@ const LESSONS = [
   // ---------- COURSE MANAGEMENT ----------
   { id:'c1', shelf:'Course Management', title:'Tee shots: play to the fat side', min:4,
     tags:['off-tee'],
-    body:'The driver question isn\'t "can I hit the fairway" — it\'s "where is the miss that ruins the hole." Before every tee shot, find the side where a miss is dead (water, OB, trees, bunkers you can\'t advance from) and aim so your normal shot pattern fits on the other side. An 8-handicap\'s dispersion is roughly 60 yards wide with driver; give that oval room. Sometimes that means 3-wood or hybrid — par is a fine score from the fairway.',
+    body:'The driver question isn\'t "can I hit the fairway" — it\'s "where is the miss that ruins the hole." Before every tee shot, find the side where a miss is dead (water, OB, trees, bunkers you can\'t advance from) and aim so your normal shot pattern fits on the other side. An 8-handicap\'s dispersion is roughly 60 yards wide with driver; give that oval room. Sometimes that means the 5-wood or the 2-iron utility — those are your fairway finders now that the mini driver is out of the bag — and par is a fine score from the fairway. One honest gap while you use this: the 5-wood\'s carry is unmeasured, so on a hole where the number matters, the 2-iron is the one you actually have a figure for.',
     drill:'Next round: on every tee, say the dead side out loud before choosing a club and target. Log how many penalty strokes you take off the tee vs. your average.' },
   { id:'c2', shelf:'Course Management', title:'Approach shots: the pin is a lie', min:4,
     tags:['approach'],
@@ -138,11 +138,11 @@ const LESSONS = [
     drill:'One round experiment: aim dead center of every green regardless of pin. Count greens hit and compare to your average.' },
   { id:'c3', shelf:'Course Management', title:'Lay up to a full number', min:3,
     tags:['approach','wedge-distance'],
-    body:'When you can\'t reach a par 5 or must pitch out, don\'t just advance it — lay up to one of your calibrated wedge numbers (that\'s what the matrix is for). A full 95-yard 56° beats an awkward 60-yard half-something for most players. Know your favorite number and hit lay-ups to it on purpose.',
+    body:'This is the single best-evidenced job in your whole game, so it is worth more than a rule of thumb. Two independent data sets say the same thing: three seasons of GHIN have your par-5 average getting worse every year without exception (5.46 → 5.72 → 5.88), and the Wianno member-guest produced ZERO birdies from eight par-5 plays. Different data, one conclusion. The mechanism is the lay-up. When you can\'t reach a par 5 or you must pitch out, don\'t just advance the ball — lay up to one of your CALIBRATED wedge numbers rather than to wherever a comfortable swing happens to finish. A full 95-yard 56° beats an awkward 60-yard half-something, because a full swing has one speed and a half swing has infinite. Know your favourite number and hit lay-ups to it on purpose.',
     drill:'Pick your money number (most players: full gap wedge). Next three rounds, every lay-up finishes at that number. Track proximity from it.' },
   { id:'c4', shelf:'Course Management', title:'Bogey is not an emergency', min:3,
     tags:['mental','off-tee'],
-    body:'The difference between an 84 and a 79 usually isn\'t more birdies — it\'s fewer doubles. Doubles come from hero recoveries: the 3-wood from the trees, the flop over water from a tight lie. When you\'re in trouble, take the highest-percentage route back to the fairway and accept the bogey putt. Count doubles per round in your log — driving that number toward zero is the fastest handicap drop available.',
+    body:'The difference between an 84 and a 79 isn\'t more birdies — it\'s fewer doubles, and your own cards put a number on it: across the hole-by-hole rounds on record, doubles and worse are about HALF of every stroke you have lost. Thirteen holes cost twenty-six shots. Doubles come from hero recoveries: the 3-wood from the trees, the flop over water off a tight lie. The rule that kills them is decided before you are angry — from any recovery position, pick the club and line you would bet a hundred dollars you can execute nine times in ten. From trouble that is nearly always the punch-out. When you are hot the club goes DOWN, never up. Count doubles per round in your log; driving that number toward zero is the fastest handicap drop available to you.',
     drill:'Trouble rule for one month: from any recovery spot, choose the club and line you would bet $100 you can execute 9 times out of 10. Nothing fancier.' },
   // ---------- MENTAL GAME ----------
   { id:'m1', shelf:'Mental Game', title:'One target, one thought', min:3,
@@ -155,7 +155,7 @@ const LESSONS = [
     drill:'Practice it on good holes too: 10 yards of review, then present-tense only. The ritual has to be automatic before it\'s needed.' },
   { id:'m3', shelf:'Mental Game', title:'Practice like it counts', min:3,
     tags:['mental','short-putts'],
-    body:'Twenty casual 5-footers teach you less than five with consequences. Pressure is a skill you can rehearse: put a score on everything, make yourself finish drills with a made putt, restart streaks when you miss. The 10-ball test in your Putting Lab exists precisely for this — a number you can\'t talk your way out of.',
+    body:'Twenty casual 5-footers teach you less than five with consequences. Pressure is a skill you can rehearse: put a score on everything, make yourself finish drills with a made putt, restart streaks when you miss. The 20-ball five-footer in your Putting Lab exists precisely for this — a number you can\'t talk your way out of, and the thing that decides every short-putt question instead of a feeling.',
     drill:'Finish every practice session with "3 to leave": three straight 5-footers with your full routine. Miss one, start over. You\'re not allowed to leave until it\'s done.' },
   // ---------- BUNKER PLAY ----------
   { id:'b1', shelf:'Bunker Play', title:'Hit the sand, not the ball', min:4,
@@ -171,9 +171,9 @@ const LESSONS = [
     body:'A fried-egg or plugged lie reverses the normal rules: square or slightly closed face, ball back of center, and a steep chop into the sand right behind the ball. The ball comes out low with no spin and runs — plan for that roll-out and just get it on the green. Trying to splash a plugged ball with an open face is how bunkers eat a whole scorecard.',
     drill:'Step on three balls in the practice bunker and play them out. Learning the shot when it doesn\'t count removes the panic when it does.' },
   // ---------- EQUIPMENT KNOWLEDGE ----------
-  { id:'e1', shelf:'Equipment Knowledge', title:'Why your putter fights your stroke', min:4,
+  { id:'e1', shelf:'Equipment Knowledge', title:'Why a toe-hang putter fought your stroke', min:4,
     tags:['short-putts','equipment'],
-    body:'Toe-hang putters (like your Phantom 7.5 and Newport 2) are balanced to swing on an arc — the face naturally opens and closes. Your overhead-confirmed stroke is straight-back-straight-through, which never re-squares that rotating face; the toe keeps closing and the ball starts left. Face-balanced and zero-torque putters hold the face square on their own, which is why the exchange matters more than any drill for the equipment half of your left miss.',
+    body:'The idea this whole project opened with, and it is now SETTLED — worth keeping so it does not get re-litigated. Toe-hang putters are balanced to swing on an arc: the face naturally opens and closes through the stroke. Your overhead-confirmed stroke is straight-back-straight-through, which never re-squares a rotating face, so the toe keeps closing and the ball starts left. That is why the app flags a MISMATCH on any toe-flow head against your stroke, and the Newport 2 in the bullpen is the last one you own. What is settled: you play a zero-torque L.A.B. head that holds the face square on its own, kept for good on Aug 12. What was NEVER equipment: the left miss survived three different putters, and on Aug 10 it was reclassified as an AIM error rather than a delivery one. So this explains a fault you already fixed with gear — it is not an argument that any remaining putting problem is buyable.',
     drill:'At the demo: 10 balls from 5 ft with the 7.5, then 10 with a zero-torque model, full routine both. The miss-direction pattern — not feel — makes the decision.' },
   { id:'e2', shelf:'Equipment Knowledge', title:'Grooves die quietly', min:3,
     tags:['equipment','wedge-distance','chipping'],
