@@ -541,7 +541,6 @@ function render(view, arg, keepScroll){
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === navView));
-  if(LABS.some(l => l.view === view) && S.settings.lastLab !== view){ S.settings.lastLab = view; save(); }
   const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
   $('#view').innerHTML = R(arg);
   buildJumpBar();
@@ -918,22 +917,34 @@ const CHEAT_ART = {
     </div></div>`;
   },
   putting(){
-    // Drawn through a RIGHT-hander's eyes looking down at address: the hole out to the
-    // LEFT, ball under you at the right, putter head behind (right of) the ball.
+    // Overhead, drawn for a RIGHT-hander: you stand at the bottom of the frame facing
+    // the ball, so the target is off to your LEFT — hole left, ball in front of you,
+    // putter head behind it on the right, shaft running back down to your hands.
+    // The stance is drawn on purpose: without feet a horizontal line diagram reads
+    // the same for a lefty, which is exactly the confusion this replaces.
+    // OPEN for a righty here = the face turned CLOCKWISE off the line (SVG rotate is
+    // clockwise), so the arc arrow at the toe has to swing right. Flip either one and
+    // the picture starts teaching the miss instead of the fix.
     const INK='var(--ink)', GRN='var(--gtext)', FNT='var(--faint)';
-    return `<div class="sheetart"><svg viewBox="0 0 320 104" role="img" aria-label="Face barely open is your square; pace before break">
-      <line x1="50" y1="56" x2="240" y2="56" style="stroke:${FNT};stroke-width:1.5;stroke-dasharray:5 5;opacity:.7"/>
-      <circle cx="34" cy="56" r="9" style="fill:none;stroke:${INK};stroke-width:2.5"/>
-      <circle cx="34" cy="56" r="2.5" style="fill:${FNT}"/>
-      <rect x="263" y="41" width="5" height="30" rx="2" style="fill:none;stroke:${FNT};stroke-width:1.5;stroke-dasharray:3 3"/>
-      <rect x="263" y="41" width="5" height="30" rx="2" style="fill:${GRN}" transform="rotate(9 265.5 56)"/>
-      <circle cx="250" cy="56" r="6.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>
-      <path d="M 273 34 A 22 22 0 0 0 259 30" style="fill:none;stroke:${GRN};stroke-width:2"/>
-      <polygon points="255,30 264,26.5 262.5,34.5" style="fill:${GRN}"/>
-      <text x="308" y="18" text-anchor="end" style="fill:${GRN};font:800 11px var(--sans)">Face BARELY OPEN — that IS your square</text>
-      <path d="M 202 80 q -30 -14 -58 0 q -26 12 -50 2" style="fill:none;stroke:${INK};stroke-width:2;opacity:.55"/>
-      <polygon points="86,84 96,78 95,87" style="fill:${INK};opacity:.55"/>
-      <text x="14" y="99" style="fill:${INK};font:800 11px var(--sans)">Read PACE first — break second</text>
+    return `<div class="sheetart"><svg viewBox="0 0 320 128" role="img" aria-label="Overhead for a right-hander: hole left, face barely open, read pace before break">
+      <line x1="48" y1="50" x2="238" y2="50" style="stroke:${FNT};stroke-width:1.5;stroke-dasharray:5 5;opacity:.7"/>
+      <circle cx="32" cy="50" r="9" style="fill:none;stroke:${INK};stroke-width:2.5"/>
+      <circle cx="32" cy="50" r="2.5" style="fill:${FNT}"/>
+      <rect x="264" y="35" width="5" height="30" rx="2" style="fill:none;stroke:${FNT};stroke-width:1.5;stroke-dasharray:3 3"/>
+      <g transform="rotate(9 266.5 50)">
+        <rect x="264" y="35" width="5" height="30" rx="2" style="fill:${GRN}"/>
+        <line x1="269" y1="56" x2="288" y2="92" style="stroke:${GRN};stroke-width:3;stroke-linecap:round"/>
+      </g>
+      <circle cx="250" cy="50" r="6.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>
+      <path d="M 258 27 A 22 22 0 0 1 274 30" style="fill:none;stroke:${GRN};stroke-width:2"/>
+      <polygon points="279,32 269,26 269,35" style="fill:${GRN}"/>
+      <text x="312" y="16" text-anchor="end" style="fill:${GRN};font:800 11px var(--sans)">Face BARELY OPEN — that IS your square</text>
+      <ellipse cx="232" cy="104" rx="13" ry="6" transform="rotate(-20 232 104)" style="fill:${INK};opacity:.75"/>
+      <ellipse cx="272" cy="107" rx="13" ry="6" style="fill:${INK};opacity:.75"/>
+      <text x="316" y="126" text-anchor="end" style="fill:${FNT};font:italic 9px var(--sans)">your stance · ball inside the lead heel</text>
+      <path d="M 196 76 q -28 -13 -54 0 q -24 11 -46 2" style="fill:none;stroke:${INK};stroke-width:2;opacity:.55"/>
+      <polygon points="88,76 98,71 97,80" style="fill:${INK};opacity:.55"/>
+      <text x="10" y="97" style="fill:${INK};font:800 11px var(--sans)">Read PACE first — break second</text>
     </svg></div>`;
   },
   'short-game'(){
@@ -2060,15 +2071,18 @@ function labRow(l){
     <br><span class="sm faint">${open ? `${open} open fault${open>1?'s':''}` : 'no open faults'} · ${plans} plan${plans===1?'':'s'}</span></span>
     <span class="arr">→</span></div>`;
 }
+// FIXED ORDER, always (Jack's instruction, Aug 14 2026): Swing · Short Game · Putting ·
+// Mental · Round Prep, top down. It used to float the last-opened lab to the top, which
+// meant the row you wanted was in a different place every visit — muscle memory beats
+// recency on a page whose whole job is to get you somewhere else in one tap.
 function game(){
-  const last = LABS.find(l => l.view === S.settings.lastLab);
-  const rest = LABS.filter(l => l !== last);
   return `
-  ${last ? `<h2>Pick up where you were</h2><div class="card flat">${labRow(last)}</div>` : ''}
-  <h2>${last ? 'The other labs' : 'The labs'}</h2>
-  <div class="card flat">${rest.map(labRow).join('')}</div>
-  <div class="card flat"><div class="linkrow" data-action="go" data-view="preps" style="border-bottom:none">
-    <span><b>🗒 Round Prep</b><br><span class="sm">Every course plan, kept for the next time.</span></span><span class="arr">→</span></div></div>`;
+  <h2>The labs</h2>
+  <div class="card flat">
+    ${LABS.map(labRow).join('')}
+    <div class="linkrow" data-action="go" data-view="preps" style="border-bottom:none">
+      <span><b>🗒 Round Prep</b><br><span class="sm">Every course plan, kept for the next time.</span></span><span class="arr">→</span></div>
+  </div>`;
 }
 
 // ----- Courses -----

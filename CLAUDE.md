@@ -466,8 +466,14 @@ Keep `h2`s few: the jump bar at the top of every view is built from them.
 The bar was at eight tabs and a short-game lab would have made nine, so **Swing · Short Game ·
 Putting · Mental now sit behind a single `Game` tab** (`game()` — the hub). Nav is six: Home ·
 Bag · Game · Scores · Coach · Courses. `NAV_OF` in `render()` maps every lab view back to the
-`game` button so it stays lit, and `S.settings.lastLab` pins the last-opened lab to the top of
-the hub. Adding a fifth lab now costs nothing in the nav.
+`game` button so it stays lit. Adding a fifth lab now costs nothing in the nav.
+
+**The hub order is FIXED and must stay that way** (standing instruction, Aug 14 2026): Swing ·
+Short Game · Putting · Mental · Round Prep, top down — i.e. `LABS` order, with Round Prep last.
+It used to float the last-opened lab into a "Pick up where you were" block at the top
+(`S.settings.lastLab`, now removed); Jack asked for the fixed order instead, because a row that
+moves defeats the muscle memory that makes a hub worth having. Don't reintroduce recency
+sorting here, and add a new lab to the END of `LABS` rather than reordering it.
 
 **Every lab shares one diagnosis renderer.** `diagnosisCard(discipline)` draws open faults with
 their detail and collapses settled ones to a line; `faultState()` reads the first word of a
