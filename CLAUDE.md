@@ -70,7 +70,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `history-edit`   | Rewrite a history row containing `match` |
 | `session`        | Add a filmed putting session (`date`, `setup`, `finding`, `detail`) |
 | `session-update` | Patch a session by `target` (its feed id) or `setupMatch` prefix |
-| `session-remove` | Drop a session by `target` (its feed id) — used to fold duplicates together |
+| `session-remove` | Drop a session by `target` (its feed id), **or** by a `setupMatch` prefix optionally narrowed by `date` — the second form is the only way to remove a `seed()` session, which has no feed id. Used to fold duplicates and to clear out retired-gear film |
 | `evolution`      | Replace the metric-evolution grid |
 | `faults`         | Replace the faults list. **`discipline`** (`putting` default / `swing` / `short-game`) scopes the replace to that lab only, so pushing swing faults can't wipe the putting ones; omit it and it replaces everything. **Start a `why` with `CLOSED` or `DOWNGRADED`** to settle one — `faultState()` reads that first word, which is what drops it off the Putting tab's diagnosis card and out of Coach's open-fault to-dos. Anything else reads as open |
 | `action`         | Add an open action item |
@@ -624,6 +624,25 @@ measurement over self-report — and say which one you're using.
   they arrive in. Don't create a second session because a new clip turns up hours later —
   `session-update` the day's entry and widen its `setup` to list every angle. If separate
   entries already exist for one day, fold them with `session-remove`.
+
+- **Deleting film: preserve the numbers first** (standing instruction, Aug 14 2026). Jack
+  cleared every putting session shot on a putter he no longer plays — the Phantom 7.5,
+  Newport 2 and DF3i, eight sessions Jul 17–21, which also emptied Jul 18 entirely and
+  settled the one-per-day backlog above. The rule that came out of it: **before removing a
+  session, write what it MEASURED into the discipline's workshop log**, because the
+  conclusions live in the faults, the evolution grid and the plans while the evidence lived
+  only on the row being deleted — and a claim whose source was thrown away becomes folklore.
+  The Aug 14 section of the *Putting — The Workshop Log* is the worked example; it carries
+  the SBST confirmation (the basis of the whole zero-torque case, measured on the two ARC
+  putters) and the 8/10 from four feet (Jul 20, DF3i — still the only scored putting
+  benchmark in the project).
+  Two kinds of session survive a gear clear-out on purpose: one with **no film** (the Aug 1
+  Beekman entry is the "pace felt dialled" counter-example this project keeps visible), and
+  a **mixed A/B** (Aug 10 is DF3i-vs-LINK, i.e. the comparison that decided the putter).
+  **Known consequence, unresolved:** the Putting Lab's stroke-evolution grid columns
+  (`S1`–`S4`, `BL`) ARE those deleted sessions, so that table is now entirely pre-LINK and
+  stops before the current putter. Rebuilding it on the Jul 30 / Aug 10 LINK sessions is
+  Jack's call and has not been made.
 
 - **Jack mentions a course he's playing** (standing instruction, Jul 29 2026): don't wait
   to be asked — append a `course-add` for it alongside whatever else the message calls

@@ -3720,7 +3720,18 @@ function applyFeed(feed){
                 S.sessions.find(x => e.setupMatch && (x.setup||'').startsWith(e.setupMatch));
       if(s){ if(e.setup) s.setup = e.setup; if(e.finding) s.finding = e.finding; if(e.detail) s.detail = e.detail; }
     }
-    else if(e.type === 'session-remove') S.sessions = S.sessions.filter(x => x._fid !== e.target);
+    // Remove by feed id, or — for seed()'s own baseline sessions, which have no `_fid` —
+    // by a `setupMatch` prefix optionally narrowed by `date`. session-update already
+    // matches both ways; without the same on remove, the seeded rows could never be
+    // deleted at all, which is what the Aug 14 pre-LINK clear-out ran into.
+    else if(e.type === 'session-remove'){
+      S.sessions = S.sessions.filter(x => {
+        if(e.target && x._fid === e.target) return false;
+        if(e.setupMatch && (x.setup || '').startsWith(e.setupMatch)
+           && (!e.date || x.date === e.date)) return false;
+        return true;
+      });
+    }
     else if(e.type === 'evolution' && e.evolution) S.evolution = e.evolution;
     else if(e.type === 'club-add' && e.club) S.clubs.push({ id:e.id, rounds:0, ...e.club });
     else if(e.type === 'club-update'){
