@@ -999,6 +999,8 @@ function cheatSheet(disc){
     <h2>${lab ? `${lab.ic} ${esc(lab.name)}` : ''} · before you play</h2>
     <button class="minibtn" data-action="cheat-close">✕ Close</button>
   </div>
+  <div class="sheettabs">${LABS.map(l => `<span class="${l.disc === disc ? 'on' : ''}"
+    data-action="cheat-open" data-disc="${l.disc}">${l.ic} ${esc(l.short || l.name)}</span>`).join('')}</div>
   ${oneJob ? `<div class="tipcard" style="margin-top:11px"><h4>One job</h4><p class="sm"><b>${esc(oneJob.next)}</b></p></div>` : ''}
   ${CHEAT_ART[disc] ? CHEAT_ART[disc]() : ''}
   ${lead
@@ -1008,13 +1010,21 @@ function cheatSheet(disc){
   ${lead ? `<div class="linkrow" style="border-bottom:none;margin-top:8px" data-action="open-briefing" data-id="${lead.id}">
     <span class="sm"><b>${esc(lead.course)}</b> — the full plan</span><span class="arr">→</span></div>` : ''}`;
 }
+// Opening a sheet and switching between them are the same call: if the overlay is
+// already up, only its contents are swapped. That keeps the pre-round read as ONE
+// pass through the whole game — swing, short game, putting, mental — instead of four
+// separate trips out to the hub and back.
 function openCheat(disc){
-  closeCheat();
-  const v = document.createElement('div');
-  v.className = 'sheetveil'; v.id = 'sheetveil';
+  let v = document.getElementById('sheetveil');
+  if(!v){
+    v = document.createElement('div');
+    v.className = 'sheetveil'; v.id = 'sheetveil';
+    v.addEventListener('click', e => { if(e.target === v) closeCheat(); });
+    document.body.appendChild(v);
+  }
   v.innerHTML = `<div class="sheet card">${cheatSheet(disc)}</div>`;
-  v.addEventListener('click', e => { if(e.target === v) closeCheat(); });
-  document.body.appendChild(v);
+  const s = v.querySelector('.sheet');
+  if(s) s.scrollTop = 0;   // a switched sheet starts at its own top, not the last one's
 }
 function closeCheat(){
   const v = document.getElementById('sheetveil');
@@ -2057,11 +2067,12 @@ function shortgame(){
 // have made nine; these four are the same KIND of thing — a discipline with faults, film
 // and plans — so they belong behind one door. Training is deliberately NOT on that list:
 // drills live on the bench in Coach, one home for all of them.
+// `short` is the cheat sheet's tab label — four have to sit in one row on a phone.
 const LABS = [
-  { view:'swing',     disc:'swing',       ic:'🏌', name:'Full Swing',  sub:'Driver to wedge — film, plans, speed work.' },
-  { view:'shortgame', disc:'short-game',  ic:'⛳', name:'Short Game',  sub:'Around the green — chipping, pitching, bunkers.' },
-  { view:'putting',   disc:'putting',     ic:'◎', name:'Putting',     sub:'Stroke, pace and the short ones.' },
-  { view:'mental',    disc:'mental',      ic:'🧠', name:'Mental',      sub:'Staying locked in — decided off the course.' },
+  { view:'swing',     disc:'swing',       ic:'🏌', name:'Full Swing',  short:'Swing', sub:'Driver to wedge — film, plans, speed work.' },
+  { view:'shortgame', disc:'short-game',  ic:'⛳', name:'Short Game',  short:'Short', sub:'Around the green — chipping, pitching, bunkers.' },
+  { view:'putting',   disc:'putting',     ic:'◎', name:'Putting',     short:'Putting', sub:'Stroke, pace and the short ones.' },
+  { view:'mental',    disc:'mental',      ic:'🧠', name:'Mental',      short:'Mental', sub:'Staying locked in — decided off the course.' },
 ];
 function labRow(l){
   const open = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;

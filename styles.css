@@ -246,6 +246,15 @@ details.more summary{font-size:10.5px;letter-spacing:.07em;text-transform:upperc
 .sheethead{display:flex;justify-content:space-between;align-items:center;gap:10px;
   padding-bottom:9px;border-bottom:2px solid var(--green)}
 .sheethead h2{margin:0}
+/* Lab switcher: every sheet reachable from every sheet, so the pre-round read is one
+   pass through the game rather than four trips back out to the hub. */
+.sheettabs{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.sheettabs span{flex:1 1 auto;text-align:center;white-space:nowrap;cursor:pointer;
+  font-family:var(--sans);font-size:10.5px;font-weight:800;padding:7px 5px;
+  border-radius:16px;background:var(--card2);color:var(--gtext);border:1px solid var(--line)}
+.sheettabs span.on{background:var(--green);color:var(--green-ink);border-color:var(--green)}
+body.night .sheettabs span{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+body.night .sheettabs span.on{background:var(--green);color:var(--green-ink);border-color:var(--green)}
 /* The art block: a picture instead of a paragraph. */
 .sheetart{margin:12px 0 0;padding:9px 7px 6px;border:1px solid var(--line2);
   border-radius:8px;background:var(--card2)}
