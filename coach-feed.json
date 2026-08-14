@@ -13817,6 +13817,118 @@
           }
         ]
       }
+    },
+    {
+      "id": "plan-swing-thoughts-20260814",
+      "type": "briefing",
+      "briefing": {
+        "course": "Swing Thoughts — Club by Club",
+        "focus": "Your own swing thoughts and setup keys, club by club, in your words — the go-to reference before a round or a range session. Grip settled: conventional. Everything about putting lives in the Putting lab, so there is one source for it rather than two.\n\nRenamed from ‘Golf Mind’ on Aug 14 2026: the page has always been driver / 5-wood / irons / wedges, and the old title read as the mental game, which now has a lab of its own.",
+        "sections": [
+          {
+            "t": "Driver — the big stick",
+            "b": "Aim the CENTER of the fairway — the start line tends to pull left, so center-aim leaves room. The straight ball comes from a LONGER, fuller swing — commit to that one. A tighter, shorter swing turns it into a cut, and when that goes wrong the miss is a PUSH-SLICE. So: full swing for straight; if you shorten it, expect the cut and know the push-slice is the bad one.",
+            "k": "Aim centre — your start line pulls left, and the straight ball needs a LONGER swing, not a tighter one."
+          },
+          {
+            "t": "The fairway finder — 5-wood",
+            "b": "The mini driver came OUT of the bag on Aug 12 and the Cobra Darkspeed X 5-wood (16.5°, bumped down from stock) took its slot as the fairway finder. Same job as before: a club you can put in play when the driver is the wrong risk.\n\nOne honest gap — its CARRY is unmeasured. It has been out of the bag a year, and there is no number for it on the ladder. Leave that blank until you hit some; a guessed number on a calibrated ladder reads exactly like a measured one, and that is how you end up short of a green with the right club in your hands.\n\nAnd an open question worth knowing you have: at 16.5° it sits about half a degree off the 2-iron utility, so whether both belong in the bag is genuinely unsettled.\n\n(The mini driver was kept, not sold — teed LOW with the weights back for the piercing ball, if it ever comes back.)",
+            "k": "The Cobra Darkspeed X 16.5° took this slot on Aug 12; its carry is unmeasured, so don't guess a number."
+          },
+          {
+            "t": "Irons",
+            "b": "Ball position right of center, toward the trail (right) thigh. The new KING TECs fly HIGHER and longer than the old set — trust the extra height. When you need to flight it down or take something off, CHOKE DOWN and hit the control shot rather than just swinging soft.",
+            "k": "Ball back toward the trail thigh; the KING TECs fly higher than the old set, so trust the height."
+          },
+          {
+            "t": "Wedges",
+            "b": "(Open — fill in as you dial the Vokeys: your go-to feels for full vs. partial, and any open-face/flop keys. Ladder to stay honest: 60°→80 · 56°→95 · 50°→108 · PW→122.)",
+            "k": "Open — fill in your Vokey feels as you dial them. Ladder: 60°→80 · 56°→95 · 50°→108 · PW→122."
+          },
+          {
+            "t": "Putting — it lives in the Putting lab",
+            "b": "This section used to carry a putting key, and it went stale the moment the putter changed — it still said 'hands EVEN with the ball, press stays tiny', which was the DF3i's Press Pistol 2° geometry. The DF3i went back on Aug 10, and on the LINK's Pistol 0 that same cue is lean YOU are adding to a face with 2° to give.\n\nThat is the argument for not keeping it here at all. Two plans describing one stroke is exactly how a retired cue survives a putter change, and this one did for three days.\n\nSo: putting lives in the PUTTING LAB. The Routine plan is the whole stroke, the Setup plan is the low point and the weight, and the Distance Grind is the pace work. Nothing about putting gets written here again.",
+            "k": "Deliberately empty: two places describing one stroke is how a retired cue survives."
+          }
+        ],
+        "rules": [
+          "Driver: aim centre, swing LONGER not tighter",
+          "5-wood: the fairway finder now — the mini driver came out Aug 12",
+          "Irons: trust the extra height, choke down to flight it"
+        ],
+        "discipline": "full-swing"
+      }
+    },
+    {
+      "id": "rm-golf-mind-retitle-20260814",
+      "type": "briefing-remove",
+      "target": "golf-mind-20260813"
+    },
+    {
+      "id": "done-a5-20260814",
+      "type": "action-done",
+      "target": "a5"
+    },
+    {
+      "id": "done-a6-20260814",
+      "type": "action-done",
+      "target": "a6"
+    },
+    {
+      "id": "done-s4-faceon-20260814",
+      "type": "action-done",
+      "target": "s4-action-faceon"
+    },
+    {
+      "id": "done-act-session5-20260814",
+      "type": "action-done",
+      "target": "act-session5"
+    },
+    {
+      "id": "done-swing-film-20260814",
+      "type": "action-done",
+      "target": "swing-film-action"
+    },
+    {
+      "id": "done-aim-check-20260814",
+      "type": "action-done",
+      "target": "aim-check-action-20260730"
+    },
+    {
+      "id": "upd-eye-dominance-20260814",
+      "type": "action-update",
+      "target": "eye-dominance-action-20260813",
+      "text": "PUTTING — THE TWO-DROP EYELINE TEST (2 minutes, at home). You're right-handed and right-eye dominant — same-side dominant, whose predicted aim bias is LEFT, which is the oldest fault on this card. Nothing in this project had recorded your eye dominance until Aug 13. Run it in full putting posture over a ball. (1) Hold a second ball at the BRIDGE OF THE NOSE, drop it, mark where it lands relative to the ball. (2) Re-set exactly, hold it directly under the RIGHT EYE, drop, mark that. Photograph both marks with the ball in frame. SAME SPOT = your head is square, dominance has no lever, cross it off for good. AN INCH OR MORE APART = dominance is live and that gap is the size of the effect. While you're down there, re-run the MILES TEST IN POSTURE — bent over the ball, hands framed on a small target across the room, close one eye then the other — because the only peer-reviewed study on this (Dalton, Guillon & Naroo, Optom Vis Sci 2015) found that standing dominance does not predict putting dominance, and that putting-gaze dominance is the weaker of the two. DELIBERATELY NOT A PRIORITY, and don't let it become one: it changes nothing about the stroke either way, the barely-open feel is already cancelling whatever aims you left, and pace is the live fault. Run it in the two minutes before a ladder session, never instead of one. (Absorbs the old ‘nose-drop eyeline test at 34\"’ item from the putter-shopping era — same test, and the 34\" belonged to a putter you were choosing rather than the one you play.)"
+    },
+    {
+      "id": "upd-faceon-20260814",
+      "type": "action-update",
+      "target": "faceon-action-20260730",
+      "text": "PUTTING — ONE FACE-ON CLIP. It is now the only thing standing between you and a diagnosis: it separates 'face aimed left' from 'face closing through impact', closes the held-press question (lean at address vs at impact) and closes early-lift. Camera at ball height, square to the target line, 2–3 strokes. NOTE (Aug 14): this is now the ONLY face-on ask. Two older ones were closed into it — the Session 4 clip request, whose early-lift question film answered on Jul 30, and the Session 5 leftover. Both predate the LINK; this one is on the putter you actually play."
+    },
+    {
+      "id": "upd-cold-driver-20260814",
+      "type": "action-update",
+      "target": "action-cold-driver-film-20260813",
+      "text": "DRIVER — FILM A COLD SWING. Two opening tee shots at Wianno went hard LEFT, badly enough to re-tee once, and your usual bad miss is a slice/push-slice — so the worst misses are going the opposite way to the normal one. Your own Golf Mind note already says the driver start line tends to PULL LEFT and that the straight ball needs the LONGER swing. That is a hypothesis, not a diagnosis: a ball that finishes hard left off a driver can be a pull, a snap hook, or a toe strike, and those have three different fixes. A true hosel strike starts RIGHT for a right-hander, so 'shank' is probably describing how it felt rather than where it came off the face. THE CATCH: the swing that is failing is the FIRST one, cold. Film the first two swings of a range session before you have hit anything — down-the-line at hand height and face-on — and send them. The 30th ball will not show the fault. (This replaces the older generic ‘film 3 swings’ item, closed Aug 14: same two angles, same slo-mo, but it names WHICH swings matter — the cold ones.)"
+    },
+    {
+      "id": "upd-laser-audit-20260814b",
+      "type": "action-update",
+      "target": "action-laser-audit-20260814",
+      "text": "LASER — RUN THE AIM AUDIT BEFORE YOU PRACTISE WITH IT. The PUTTLAZR can settle the oldest open question in this project: whether ‘barely open’ actually aims square. Calibrate it to the FACE (not the shaft), then 10 balls at six feet on carpet with a half-inch scale taped at the target and the phone behind you on the line — aiming by feel, never looking at the beam. At six feet, 1.26 inches is one degree, so the 1.5–1.7° left from Jul 30 would show as about two inches left. Send the clip and it gets read to the half-inch. Until that is done, do NOT use the laser to retrain your aim picture: that is Lane B, it stacks with the barely-open feel, and it flips the miss right. It also closes out the old ‘aim check on a straight 6-footer’ and the Jul 30 aim-check item: both were waiting on a measurement, and this is the measurement."
+    },
+    {
+      "id": "lesson-e1-drill-20260814",
+      "type": "lesson-update",
+      "target": "e1",
+      "lesson": {
+        "where": "green",
+        "kit": [
+          "putter"
+        ],
+        "drill": "You own both sides of this experiment, so it costs nothing to check once and never re-open: 10 balls from five feet with the Newport 2, then 10 with the LINK.2.1, full routine on every ball. Read MISS DIRECTION, not feel — the arc-suited head should start more of them left. Log both numbers, then put the Newport back in the bullpen. (Rewritten Aug 14: this drill used to send you to a demo with the Phantom 7.5, which went back on Jul 20 — the putter search is over and the only toe-hang head left is the one in your own bag.)"
+      }
     }
   ]
 }

@@ -620,6 +620,11 @@ function preps(){
   ${block('Played', p.past, 'Kept for the next time you go back.')}`;
 }
 
+// One row of the to-do list, used open and done alike — the done ones stay tappable so a
+// wrongly-ticked action can be brought back.
+const actionLi = a => `<li class="${a.done ? 'done' : ''}" data-action="toggle-action" data-id="${a.id}">
+  <span class="box"></span><span class="txt">${esc(a.text)}${a.pri && !a.done ? '<span class="pri">HIGH</span>' : ''}</span></li>`;
+
 // ----- Home -----
 function home(){
   const dl = daysLeft(S.settings.returnDeadline);
@@ -648,7 +653,7 @@ function home(){
     return `<div class="card">
       <h2>Round prep</h2>
       ${next ? planRow(next)
-      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Swing Positions, Golf Mind) live in the <b>Swing</b> lab, and the at-home training lives in <b>Coach</b>.</p>`}
+      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Swing Positions, Swing Thoughts) live in the <b>Swing</b> lab, and the at-home training lives in <b>Coach</b>.</p>`}
       ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="preps">
         <span class="sm"><b>All round prep</b> · ${rest} more plan${rest === 1 ? '' : 's'} on file</span><span class="arr">→</span></div>` : ''}
       ${S.live ? '' : `<div class="linkrow" data-action="live-new" style="border-bottom:none;padding-bottom:0">
@@ -695,9 +700,12 @@ function home(){
   <div class="card">
     <h2>Open actions</h2>
     <ul class="check">
-      ${S.actions.map(a => `<li class="${a.done?'done':''}" data-action="toggle-action" data-id="${a.id}">
-        <span class="box"></span><span class="txt">${esc(a.text)}${a.pri && !a.done ? '<span class="pri">HIGH</span>':''}</span></li>`).join('')}
+      ${S.actions.filter(a => !a.done).map(actionLi).join('')}
     </ul>
+    ${S.actions.some(a => a.done) ? `<details class="more">
+      <summary>${S.actions.filter(a => a.done).length} done</summary>
+      <ul class="check">${S.actions.filter(a => a.done).map(actionLi).join('')}</ul>
+    </details>` : ''}
     <div class="formrow" style="margin-top:10px">
       <input id="newAction" placeholder="Add an action item…">
       <button class="btn ghost" data-action="add-action">Add</button>
@@ -881,7 +889,13 @@ function swing(){
   const sessions = S.sessions.map((s,i) => ({ s, i })).filter(o => sessionDiscipline(o.s) === 'swing').reverse();
   // Anything not explicitly claimed by another lab lands here — the swing lab is the
   // default home for a standing plan, so new disciplines have to be named to stay out.
-  const plans = S.briefings.filter(b => !b.date && !['putting','mental','short-game'].includes(b.discipline || 'swing'));
+  // COURSE plans are the exception that is not a discipline: a standing plan named for a
+  // course belongs to Round Prep, and it has no `discipline` by design, so the catch-all
+  // was swallowing it — Sterling Farms was rendering as a swing plan.
+  const known = S.courses.map(c => c.name);
+  const plans = S.briefings.filter(b => !b.date
+    && !['putting','mental','short-game'].includes(b.discipline || 'swing')
+    && !known.some(n => courseMatches(b.course, n)));
   const other = plans.filter(b => !isRoutine(b));
   return `
   ${routineBlock(plans)}
@@ -1147,7 +1161,8 @@ function putting(){
     <p class="sm"><b>1 · Overhead</b> — the gold standard for path (this is what settled SBST).<br>
     <b>2 · Down-the-line</b> — behind the ball at hip height: start line, face at address.<br>
     <b>3 · Face-on</b> — waist height: posture, eyeline, tempo.<br>
-    Film 3–5 strokes per angle so rep-to-rep patterns show.</p>
+    Film 3–5 strokes per angle so rep-to-rep patterns show.<br>
+    <b>Shooting with the laser?</b> It needs a scale in frame or the clip can't be measured — the protocol is in Coach, <i>Filming the beam so it can actually be measured</i>.</p>
   </div>
 
   <h2>5-footer scoreboard</h2>
@@ -1599,9 +1614,9 @@ function coach(){
   ${open.length ? `<h2>Next actions</h2>
   <div class="card">
     <ul class="check">
-      ${open.slice(0,6).map(a => `<li data-action="toggle-action" data-id="${a.id}">
-        <span class="box"></span><span class="txt">${esc(a.text)}${a.pri ? '<span class="pri">HIGH</span>' : ''}</span></li>`).join('')}
+      ${open.slice(0,6).map(actionLi).join('')}
     </ul>
+    ${open.length > 6 ? `<p class="sm faint">Showing 6 of ${open.length}. The full list is on <b>Home</b> — a cap you can't see reads as "that's everything".</p>` : ''}
   </div>` : ''}
 
   ${plans.length ? `<h2>Your plans</h2>

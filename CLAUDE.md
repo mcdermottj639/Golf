@@ -139,6 +139,7 @@ does nothing — double-check against `applyFeed()`.
 | Wedges | **Vokey 50.08F · 56.10S · 60.08M** | 50 = F/8° sweeper · 56 = S/10° workhorse · 60 = M/8° creative |
 | Putter | **L.A.B. Golf LINK.2.1** | the only zero-torque head left. Narrow blade, gamed Jul 30 – Aug 1 and again from **Aug 10, 2026**. **KEPT for good Aug 12, 2026** — Jack closed the return window by decision, so `returnWindow:false` and `pendingReturn()` is empty: the Home return-window card is gone and Decisions reads DECIDED. The putter search is over; every remaining explanation for the left miss is aim or stroke, not gear. Carries a **Pistol 0** grip: zero built-in lean, shaft vertical, hands ~1.35" behind the ball — that's the live cue. Its column holds the only two reds on the evolution grid (face at impact, 1.5–1.7° left start line, both measured Jul 30) |
 | Benched | ~~TaylorMade r7 Quad Mini Driver · 13.5°~~ | **out Aug 12 2026**, kept not sold. Its tee-shot record stays in the Off-the-tee table as history |
+| Bullpen | Titleist TSR2 7-wood | used demo · HZRDUS Red CB regular · picked up Aug 12 2026, **owned not gamed**. Sits behind the 4-iron on loft if it's stock, so it is not in the 14 and not on the carry ladder |
 | Backup putter | Scotty Newport 2 | arc-suited toe-hang blade — renders a **MISMATCH** flag against the SBST stroke. If the LINK goes back this is all that's left, i.e. the mismatch the whole saga opened with |
 | Returned | ~~L.A.B. Golf DF3i · 34"~~ | **returned Aug 10, 2026 — distance control.** Gamed Jul 18–30 and Aug 1–10. Its Press Pistol 2° went with it, so the "hands even with the ball" cue is **retired** — don't carry it to the LINK. Lost with it: the only measured scoreboard in the project (8/10 from four feet, Jul 20) and the high-MOI control head |
 | Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** |
@@ -572,7 +573,24 @@ detail plan with `/Swing Positions/i` against `course`, and `isRoutine()` / `pla
 match `/routine/i`, which is what floats a routine plan to the top of its lab and links the
 Coach tips to it. Also grep for a plan's name before retiring it: the Round Prep empty-state
 copy names the swing plans literally, and it had to be updated when Miracle 201 moved to
-Coach.
+Coach — and again on Aug 14 when *Golf Mind* was renamed.
+
+**A plan with no `discipline` lands in the SWING lab, so always set one** (Aug 14 2026).
+The catch-all is a convenience that quietly became a dumping ground: an audit found the
+*Sterling Farms* course plan and *Golf Mind* both rendering as swing plans. Two fixes, and
+both matter going forward:
+
+- `swing()` now also excludes any plan whose `course` matches a **known course** — a course
+  plan has no discipline *by design* and belongs to Round Prep, so it must never need one.
+- *Golf Mind* was never a mental plan despite the name — it is Jack's club-by-club swing
+  thoughts (driver / 5-wood / irons / wedges). Renamed **Swing Thoughts — Club by Club**
+  and tagged `full-swing`. **Check a plan's TITLE against its CONTENT**: once the Mental lab
+  existed, "Golf Mind" read as a mental plan and pointed at the wrong lab.
+
+**A drill that names retired gear is the same bug as a stale lesson body.** `e1`'s drill was
+still sending Jack to a demo with a putter returned Jul 20 — invisible while drills were
+buried inside lessons, obvious the moment the drill bench listed them all. When gear changes,
+grep the lesson library's `drill` fields too, not just the bodies.
 
 ### Forward plans only (standing instruction, Aug 10 2026)
 
