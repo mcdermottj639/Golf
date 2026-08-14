@@ -697,20 +697,6 @@ function home(){
     <p class="sm">Spin drops noticeably below ~50% (${GROOVE_LIFE}-round life). Grips: round ${S.settings.gripRounds} of ~${GRIP_LIFE} before regrip. Both counters advance automatically when you log rounds.</p>
   </div>` : ''}
 
-  <div class="card">
-    <h2>Open actions</h2>
-    <ul class="check">
-      ${S.actions.filter(a => !a.done).map(actionLi).join('')}
-    </ul>
-    ${S.actions.some(a => a.done) ? `<details class="more">
-      <summary>${S.actions.filter(a => a.done).length} done</summary>
-      <ul class="check">${S.actions.filter(a => a.done).map(actionLi).join('')}</ul>
-    </details>` : ''}
-    <div class="formrow" style="margin-top:10px">
-      <input id="newAction" placeholder="Add an action item…">
-      <button class="btn ghost" data-action="add-action">Add</button>
-    </div>
-  </div>
 
   ${!pending ? '' : `
   <div class="card">
@@ -1618,39 +1604,23 @@ function coach(){
     <p class="sm faint">Ranked by how good the evidence is: rounds you logged hole by hole lead, then what you've measured, then the GHIN summaries — those are somebody else's arithmetic over a season, so they speak last. Within that, the warnings come first.</p>
   </div>` : ''}
 
-  ${open.length ? `<h2>Next actions</h2>
+  <h2>Next actions${open.length ? ` · ${open.length}` : ''}</h2>
   <div class="card">
-    <ul class="check">
-      ${open.slice(0,6).map(actionLi).join('')}
-    </ul>
-    ${open.length > 6 ? `<p class="sm faint">Showing 6 of ${open.length}. The full list is on <b>Home</b> — a cap you can't see reads as "that's everything".</p>` : ''}
-  </div>` : ''}
-
-
-  <h2>Log a round · 60 seconds</h2>
-  <div class="card">
-    <div class="formrow g3">
-      <div><label>Score</label><input id="rdScore" inputmode="numeric" placeholder="84"></div>
-      <div><label>Putts</label><input id="rdPutts" inputmode="numeric" placeholder="34"></div>
-      <div><label>Date</label><input id="rdDate" type="date" value="${today()}"></div>
+    ${open.length ? `<ul class="check">${open.map(actionLi).join('')}</ul>`
+      : '<p class="sm">Nothing open. Log a round or send Claude some film and the next things to do land here.</p>'}
+    ${S.actions.some(a => a.done) ? `<details class="more">
+      <summary>${S.actions.filter(a => a.done).length} done</summary>
+      <ul class="check">${S.actions.filter(a => a.done).map(actionLi).join('')}</ul>
+    </details>` : ''}
+    <div class="formrow" style="margin-top:10px">
+      <input id="newAction" placeholder="Add an action item…">
+      <button class="btn ghost" data-action="add-action">Add</button>
     </div>
-    <label>Course</label>
-    <input id="rdCourse" list="courseList" placeholder="Start typing…">
-    <datalist id="courseList">${S.courses.map(c=>`<option value="${esc(c.name)}">`).join('')}</datalist>
-    <label>What gave you trouble? (tap all that apply)</label>
-    <div class="chips" id="troubleChips">
-      ${TROUBLES.map(([k,lab])=>`<span class="chip" data-trouble="${k}">${lab}</span>`).join('')}
-    </div>
-    <label>Anything else</label>
-    <textarea id="rdNote" rows="2" placeholder='"Wind got me on the back nine…"'></textarea>
-    <div style="margin-top:10px"><button class="btn" data-action="save-round">Save round → Coach updates</button></div>
-    <p class="sm faint" style="margin-top:8px">Hole-by-hole detail is what powers the ranking above — send Claude a GHIN round summary and it lands with every hole.</p>
-    <div class="linkrow" data-action="live-new" style="border-bottom:none">
-      <span class="sm"><b>${S.live ? 'Resume your live round' : 'Or play it live, hole by hole'}</b> — every detail, no typing</span><span class="arr">→</span></div>
   </div>
 
-  ${S.rounds.length ? `<div class="card flat"><div class="linkrow" data-action="go" data-view="scores">
-    <span><b>Score history &amp; analytics</b><br><span class="sm">${S.rounds.length} rounds · scoring mix, par splits, worst holes</span></span><span class="arr">→</span></div></div>` : ''}
+
+  <div class="card flat"><div class="linkrow" data-action="go" data-view="scores">
+    <span><b>Score history &amp; analytics</b><br><span class="sm">${S.rounds.length ? `${S.rounds.length} rounds · scoring mix, par splits, worst holes` : 'Log a round — the coaching above is built from them'} · logging lives there</span></span><span class="arr">→</span></div></div>
 
   <h2>Drills · what you can do right now</h2>
   <div class="card">
@@ -2452,13 +2422,42 @@ function clubTables(st){
   </div>` : ''}`;
 }
 
+// The quick-entry card. It lives at the BOTTOM of Scores — rounds are the input to this
+// page, so the form belongs with them rather than in Coach, which reads them. Shared with
+// the empty state, because a page that has no rounds is exactly where the form matters most.
+function logRoundCard(){
+  return `
+  <h2>Log a round · 60 seconds</h2>
+  <div class="card">
+    <div class="formrow g3">
+      <div><label>Score</label><input id="rdScore" inputmode="numeric" placeholder="84"></div>
+      <div><label>Putts</label><input id="rdPutts" inputmode="numeric" placeholder="34"></div>
+      <div><label>Date</label><input id="rdDate" type="date" value="${today()}"></div>
+    </div>
+    <label>Course</label>
+    <input id="rdCourse" list="courseList" placeholder="Start typing…">
+    <datalist id="courseList">${S.courses.map(c=>`<option value="${esc(c.name)}">`).join('')}</datalist>
+    <label>What gave you trouble? (tap all that apply)</label>
+    <div class="chips" id="troubleChips">
+      ${TROUBLES.map(([k,lab])=>`<span class="chip" data-trouble="${k}">${lab}</span>`).join('')}
+    </div>
+    <label>Anything else</label>
+    <textarea id="rdNote" rows="2" placeholder='"Wind got me on the back nine…"'></textarea>
+    <div style="margin-top:10px"><button class="btn" data-action="save-round">Save round → Coach updates</button></div>
+    <p class="sm faint" style="margin-top:8px">Hole-by-hole detail is what powers everything on this page — send Claude a GHIN round summary and it lands with every hole.</p>
+    <div class="linkrow" data-action="live-new" style="border-bottom:none">
+      <span class="sm"><b>${S.live ? 'Resume your live round' : 'Or play it live, hole by hole'}</b> — every detail, no typing</span><span class="arr">→</span></div>
+  </div>`;
+}
+
 function scores(){
   const all = S.rounds.slice().sort((a,b) => (a.date || '').localeCompare(b.date || ''));
   if(!all.length) return `
   <div class="card">
     <h2>No rounds yet</h2>
-    <p class="sm">Log a round on the <b>Home</b> page, or send Claude your GHIN round summaries and they'll land here with the hole-by-hole detail — which is what unlocks the analytics below: scoring mix, par-3/4/5 splits, your worst holes, and tips built from your own numbers.</p>
-  </div>`;
+    <p class="sm">Log one below, or send Claude your GHIN round summaries and they'll land here with the hole-by-hole detail — which is what unlocks the analytics: scoring mix, par-3/4/5 splits, your worst holes, and tips built from your own numbers.</p>
+  </div>
+  ${logRoundCard()}`;
   const st = scoreStats();
   const tips = scoreTips(st);
   const idx = estIndex();
@@ -2549,7 +2548,9 @@ function scores(){
     </table>
     <p class="sm faint" style="margin-top:8px">Tap any round for the hole-by-hole card and its own breakdown.${
       all.some(r => r.note) ? ` Latest note: "${esc(all.filter(r=>r.note).slice(-1)[0].note)}"` : ''}</p>
-  </div>`;
+  </div>
+
+  ${logRoundCard()}`;
 }
 
 // ----- Single round deep dive -----
