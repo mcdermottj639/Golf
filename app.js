@@ -38,7 +38,7 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v36';
+const BUILD = 'v37';
 const GROOVE_LIFE = 80;  // rounds until a wedge face is considered spent
 const GRIP_LIFE = 40;    // rounds until regrip
 
@@ -1022,20 +1022,90 @@ function cheatPrep(id){
       ${list.map(x => `<div class="linkrow" data-action="cheat-open" data-disc="prep" data-id="${x.id}">
         <span class="sm"><b>${esc(x.course)}</b>${x.date ? ` · ${fmtDate(x.date)}` : ''}</span><span class="arr">→</span></div>`).join('')}`
     : `<p class="sm" style="margin-top:11px">No course plans yet. Tell Claude where you're playing and one lands here — tee strategy, the hazards, and a note on every hole the research supports.</p>`}`;
-  // Hazards are the single highest-value thing on a course plan, because unlike a pin
-  // they don't move — so the sheet leads with them rather than with the prose.
-  const hz = (b.holes || []).filter(h => h && h.n && h.avoid).map(h => ({ n:h.n, t:h.avoid }));
-  const SHOW = 7;
+  const sh = courseShape(b);
   return `${cheatHead('prep', '🗒 ' + (b.course.length > 22 ? b.course.slice(0, 21) + '…' : b.course))}
   <p class="sm" style="margin-top:11px">${b.date ? `<b class="warn">${fmtDate(b.date)}</b> · ` : ''}${esc(b.focus || 'Plan ready')}</p>
-  ${(b.rules || []).length ? `<div class="cues">${b.rules.map(r => `<span>${esc(cheatCue(r))}</span>`).join('')}</div>` : ''}
-  ${hz.length ? `<p class="sm sheetwatch"><b>⚠ Trouble, hole by hole</b></p>
-    <div class="hzlist">${hz.slice(0, SHOW).map(h => `<div><b>${h.n}</b><span>${emph(h.t)}</span></div>`).join('')}</div>
-    ${hz.length > SHOW ? `<p class="sm faint" style="margin-top:5px">+ ${hz.length - SHOW} more on the full plan.</p>` : ''}` : ''}
+  ${sh.rules.length ? `<div class="cues">${sh.rules.map(r => `<span>${esc(cheatCue(r))}</span>`).join('')}</div>` : ''}
+  ${sh.plays.length ? `<p class="sm sheetwatch"><b>How it plays</b></p>
+    <ul class="hi-why" style="margin-top:5px">${sh.plays.map(t => `<li>${emph(t)}</li>`).join('')}</ul>` : ''}
+  ${sh.record.length ? `<p class="sm sheetwatch"><b>Your record here</b></p>
+    <ul class="hi-why" style="margin-top:5px">${sh.record.map(t => `<li>${emph(t)}</li>`).join('')}</ul>` : ''}
   <div class="linkrow" style="border-bottom:none;margin-top:8px" data-action="open-briefing" data-id="${b.id}">
-    <span class="sm"><b>The full plan</b>${(b.holes || []).length ? ` · ${(b.holes || []).length} hole notes` : ''}</span><span class="arr">→</span></div>
+    <span class="sm"><b>The full plan</b>${sh.noted ? ` · ${sh.noted} hole notes` : ''}</span><span class="arr">→</span></div>
+  <p class="sm faint" style="margin-top:2px">Hole by hole reaches you on the tee — each note shows on its own hole while you log the round.</p>
   ${list.length > 1 ? `<div class="linkrow" style="border-bottom:none" data-action="cheat-open" data-disc="prep" data-id="pick">
     <span class="sm faint">Playing somewhere else?</span><span class="arr">→</span></div>` : ''}`;
+}
+// What the course IS, rather than what each hole is — the hole notes already reach him
+// on the tee through the live logger, so repeating them here spends the one screen he
+// reads before a round on something he's about to be told anyway. Everything below is
+// computed: the plan's own tee calls and hazard warnings counted up into a character,
+// and his own cards at the course asked what it actually costs him.
+function courseShape(b){
+  const holes = (b.holes || []).filter(h => h && h.n);
+  const plays = [], record = [];
+  const has = (h, re) => re.test(`${h.avoid || ''} ${h.play || ''} ${h.note || ''} ${(h.why || []).join(' ')}`);
+  // TEE POLICY. A course that wants irons off the tee is the single most useful thing
+  // to know walking to the 1st, and the plan already decided it hole by hole.
+  const tee = holes.filter(h => h.play);
+  const drv = tee.filter(h => /\bdriver\b/i.test(h.play) && !/not driver|isn't driver|no driver/i.test(h.play));
+  if(tee.length >= 6) plays.push(drv.length <= tee.length / 3
+    ? `*Driver on ${drv.length} of ${tee.length}* tee calls — this is a *positioning* course, not a long one`
+    : `*Driver on ${drv.length} of ${tee.length}* tee calls — it lets you have it`);
+  // HAZARD CENSUS by kind. Which hazards exist and how many, not where each one is.
+  // Naming the holes keeps it a fact about the course ("the water is on 13") rather than
+  // a tee instruction ("13: wood, right-center") — the instruction arrives on the tee.
+  const kinds = [[/\bwater\b|\bpond\b|\bcreek\b/i, 'Water'], [/\bbunker/i, 'Bunkers'],
+                 [/\btree/i, 'Trees'], [/\bO\.?B\b|out of bounds/i, 'OB']];
+  const cen = kinds.map(([re, lab]) => [lab, holes.filter(h => has(h, re)).map(h => h.n)]).filter(x => x[1].length);
+  const ord = n => n + (['th','st','nd','rd'][n % 10] && n % 100 - n % 10 !== 10 ? ['th','st','nd','rd'][n % 10] || 'th' : 'th');
+  if(cen.length) plays.push(cen.map(([lab, ns]) =>
+    `*${lab}* on ${ns.length === 1 ? `the ${ord(ns[0])}` : ns.join(', ')}`).join(' · '));
+  // THE RECURRING MISS. When one direction is the warning on hole after hole, that's a
+  // property of the course, and it's worth knowing whether it's also his own miss.
+  const dirs = [[/\bshort\b/i, 'SHORT'], [/\bright\b/i, 'RIGHT'], [/\bleft\b/i, 'LEFT'], [/\blong\b/i, 'LONG']]
+    .map(([re, lab]) => [lab, holes.filter(h => h.avoid && re.test(h.avoid)).length])
+    .sort((x, y) => y[1] - x[1])[0];
+  if(dirs && dirs[1] >= 3) plays.push(`*${dirs[0]}* is the warning on ${dirs[1]} holes — the miss this course punishes`);
+  // HIS OWN CARDS. Par mix comes off a card rather than the plan, since a briefing's
+  // holes carry yardages but never pars.
+  const rds = S.rounds.filter(r => courseMatches(r.course, b.course) && (r.holes || []).length);
+  const full = rds.find(r => r.holes.length >= 18) || rds[0];
+  if(full){
+    const hs = full.holes.filter(h => h && h.par != null);
+    const p3 = hs.filter(h => h.par === 3).length, p5 = hs.filter(h => h.par === 5).length;
+    if(hs.length >= 9) plays.push(`Par ${hs.reduce((s, h) => s + h.par, 0)} — *${p3} par 3s*, *${p5} par 5s*`);
+  }
+  const scored = rds.filter(r => r.score != null);
+  if(scored.length){
+    const best = scored.reduce((a, r) => r.score < a.score ? r : a);
+    record.push(`${scored.length} round${scored.length > 1 ? 's' : ''} here · best *${best.score}*${best.par ? ` (${best.score - best.par > 0 ? '+' : ''}${best.score - best.par})` : ''}`);
+  }
+  // Where the strokes actually went last time — greens, and the tee shots that took the
+  // approach away before it was hit. Both are course-level, neither is a hole note.
+  const card = (rds.slice().sort((a, b2) => (b2.date || '').localeCompare(a.date || ''))[0] || {}).holes || [];
+  const gir = card.filter(h => h.gir === true).length, miss = card.filter(h => h.gir === false).length;
+  const dead = card.filter(h => h.noshot).length;
+  if(gir + miss >= 9) record.push(`Last time: *${gir} greens*${dead ? ` · *${dead} tee shots* left no play at the green` : ''}`);
+  // The stretch that costs him. Four consecutive holes, so it names a part of the course
+  // ("the turn", "the closing stretch") rather than a hole he'll be told about anyway.
+  if(card.length >= 12){
+    const d = card.filter(h => h.par != null && h.s != null);
+    let worst = null;
+    for(let i = 0; i + 4 <= d.length; i++){
+      const w = d.slice(i, i + 4), over = w.reduce((s, h) => s + (h.s - h.par), 0);
+      if(!worst || over > worst.over) worst = { over, a:w[0].n, b:w[3].n };
+    }
+    if(worst && worst.over >= 4) record.push(`*${worst.a}–${worst.b}* is where it went: *+${worst.over}* across four holes`);
+  }
+  // A rule scoped to one hole ("13: WATER — wood off the tee") is a tee instruction, and
+  // the tee is where he'll get it. Only the rules that describe the whole course survive
+  // onto this sheet; the rest are on the full plan and on the hole itself.
+  const holeScoped = r => /^\s*\d{1,2}\s*(?:[–-]\s*\d{1,2}\s*)?[:.]/.test(r)
+    || /^\s*(?:the\s+)?(?:\d{1,2}(?:st|nd|rd|th)|1st|2nd|3rd)\b/i.test(r);
+  const rules = (b.rules || []).filter(r => !holeScoped(r));
+  return { plays, record, rules,
+    noted: holes.filter(h => h.play || h.note || (h.why || []).length).length };
 }
 function cheatSheet(disc, arg){
   if(disc === 'prep') return cheatPrep(arg === 'pick' ? null : arg);
