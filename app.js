@@ -38,7 +38,7 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v37';
+const BUILD = 'v38';
 const GROOVE_LIFE = 80;  // rounds until a wedge face is considered spent
 const GRIP_LIFE = 40;    // rounds until regrip
 

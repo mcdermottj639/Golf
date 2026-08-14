@@ -13,8 +13,14 @@ html{-webkit-text-size-adjust:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.5;
   max-width:520px;margin:0 auto;padding:0 16px calc(84px + env(safe-area-inset-bottom))}
 button{font-family:inherit;cursor:pointer}
-input,select,textarea{font-family:var(--sans);font-size:14px;color:var(--ink);
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:9px 10px;width:100%}
+/* 16px is a HARD FLOOR on every form control, not a style choice: iOS Safari auto-zooms
+   the page when you focus a field smaller than 16px, and it never zooms back out. The
+   Course box on "Start a live round" is the first thing tapped on a tee box, so a 14px
+   input meant every live round began by pinching back out. Don't drop this below 16px,
+   and don't "fix" a future recurrence with maximum-scale — that kills pinch-zoom
+   everywhere. Inline font-size overrides on narrow numeric inputs are the same trap. */
+input,select,textarea{font-family:var(--sans);font-size:16px;color:var(--ink);
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;width:100%}
 input:focus,select:focus,textarea:focus{outline:2px solid #2e5c42;outline-offset:-1px}
 label{display:block;font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;
   letter-spacing:.1em;color:var(--faint);margin:10px 0 4px}

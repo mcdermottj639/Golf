@@ -439,6 +439,17 @@ made scoring a hole mean scrolling back down six times. Use `rerender()` for in-
 changes and `render()` only when the user has actually gone somewhere (including moving to
 the next hole, which is a navigation).
 
+### Form controls never go below 16px (Aug 14 2026)
+
+iOS Safari **auto-zooms the whole page** when you focus an `input`/`select`/`textarea` whose
+computed `font-size` is under 16px, and it never zooms back out. The base rule in
+`styles.css` was 14px, so starting a live round — where the first tap is the Course box —
+zoomed the phone in and left it that way for all eighteen holes. The base is now **16px**;
+don't lower it, and don't set a smaller inline `font-size` on the narrow numeric inputs
+(carry ladder, gap matrix) either. The other "fix" for this — `maximum-scale=1` on the
+viewport — is worse: it disables pinch-zoom everywhere in the app. Checked at 320px, the
+narrowest phone: the tightest row (Tees · Rating · Slope) still fits at 16px.
+
 ### Writing briefings (they render in layers — write for that)
 
 `briefing()` renders a plan as four layers, so depth is opt-in rather than a wall of text:
