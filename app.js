@@ -36,6 +36,9 @@ const MENTAL_TRIGGERS = [
 ];
 const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closing stretch'], ['after','After a blow-up']];
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
+// Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
+// one so "is the new version actually on the phone?" is answerable without guessing.
+const BUILD = 'v36';
 const GROOVE_LIFE = 80;  // rounds until a wedge face is considered spent
 const GRIP_LIFE = 40;    // rounds until regrip
 
@@ -613,6 +616,7 @@ function preps(){
   const any = p.up.length + p.standing.length + p.past.length;
   return `
   <button class="backlink" data-action="go" data-view="home">← Home</button>
+  ${any ? cheatBtn('prep') : ''}
   ${!any ? `<div class="card"><p class="sm">No course plans yet. Tell Claude where you're playing and one lands here — tee strategy, the holes that cost you, lay-up numbers off your ladder, and a note on every hole the research can support.</p></div>` : ''}
   ${block('Coming up', p.up)}
   ${block('Standing course plans', p.standing,
@@ -656,8 +660,11 @@ function home(){
       : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Swing Positions, Swing Thoughts) live in the <b>Swing</b> lab, and the at-home training lives in <b>Coach</b>.</p>`}
       ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="preps">
         <span class="sm"><b>All round prep</b> · ${rest} more plan${rest === 1 ? '' : 's'} on file</span><span class="arr">→</span></div>` : ''}
-      ${S.live ? '' : `<div class="linkrow" data-action="live-new" style="border-bottom:none;padding-bottom:0">
+      ${S.live ? '' : `<div class="linkrow" data-action="live-new">
         <span><b>Play a live round</b><br><span class="sm">Tap each hole in as you go — clubs, fairways, greens, putts</span></span><span class="arr">→</span></div>`}
+      <div class="linkrow" style="border-bottom:none;padding-bottom:0"
+        data-action="cheat-open" data-disc="${next ? 'prep' : 'swing'}">
+        <span><b>⚡ Cheat sheet</b><br><span class="sm">The pre-round read — course, swing, short game, putting, mental</span></span><span class="arr">→</span></div>
     </div>`;
   })()}
 
@@ -985,7 +992,53 @@ const CHEAT_ART = {
     </svg></div>`;
   },
 };
-function cheatSheet(disc){
+// The tab row: the four labs plus the course you're about to play. Round Prep isn't a
+// lab (no faults, no film, and its content is per-COURSE rather than standing), so it
+// rides alongside LABS here rather than being forced into it.
+// A FUNCTION, not a const array: `LABS` is declared further down the file, so building
+// this at load time reads it inside its temporal dead zone and throws — which kills the
+// whole IIFE and white-screens the app. Evaluate it when a sheet is drawn instead.
+const cheatTabs = () => [...LABS.map(l => ({ k:l.disc, ic:l.ic, short:l.short || l.name })),
+  { k:'prep', ic:'🗒', short:'Course' }];
+function cheatHead(disc, title){
+  return `
+  <div class="sheethead">
+    <h2>${esc(title)}</h2>
+    <button class="minibtn" data-action="cheat-close">✕ Close</button>
+  </div>
+  <div class="sheettabs">${cheatTabs().map(t => `<span class="${t.k === disc ? 'on' : ''}"
+    data-action="cheat-open" data-disc="${t.k}">${t.ic} ${esc(t.short)}</span>`).join('')}</div>`;
+}
+// The course sheet. Unlike a lab, this one has to pick WHICH plan: the next dated
+// briefing is unambiguous, and a lone standing plan is too — otherwise it can't know
+// which course he's playing today, so it asks instead of guessing.
+function cheatPrep(id){
+  const p = coursePlans();
+  const list = [...p.up, ...p.standing];
+  const b = (id && S.briefings.find(x => x.id === id))
+    || p.up[0] || (list.length === 1 ? list[0] : null);
+  if(!b) return `${cheatHead('prep', '🗒 Round Prep')}
+    ${list.length ? `<p class="sm" style="margin:11px 0 2px">Which course are you playing?</p>
+      ${list.map(x => `<div class="linkrow" data-action="cheat-open" data-disc="prep" data-id="${x.id}">
+        <span class="sm"><b>${esc(x.course)}</b>${x.date ? ` · ${fmtDate(x.date)}` : ''}</span><span class="arr">→</span></div>`).join('')}`
+    : `<p class="sm" style="margin-top:11px">No course plans yet. Tell Claude where you're playing and one lands here — tee strategy, the hazards, and a note on every hole the research supports.</p>`}`;
+  // Hazards are the single highest-value thing on a course plan, because unlike a pin
+  // they don't move — so the sheet leads with them rather than with the prose.
+  const hz = (b.holes || []).filter(h => h && h.n && h.avoid).map(h => ({ n:h.n, t:h.avoid }));
+  const SHOW = 7;
+  return `${cheatHead('prep', '🗒 ' + (b.course.length > 22 ? b.course.slice(0, 21) + '…' : b.course))}
+  <p class="sm" style="margin-top:11px">${b.date ? `<b class="warn">${fmtDate(b.date)}</b> · ` : ''}${esc(b.focus || 'Plan ready')}</p>
+  ${(b.rules || []).length ? `<div class="cues">${b.rules.map(r => `<span>${esc(cheatCue(r))}</span>`).join('')}</div>` : ''}
+  ${hz.length ? `<p class="sm sheetwatch"><b>⚠ Trouble, hole by hole</b></p>
+    <div class="hzlist">${hz.slice(0, SHOW).map(h => `<div><b>${h.n}</b><span>${emph(h.t)}</span></div>`).join('')}</div>
+    ${hz.length > SHOW ? `<p class="sm faint" style="margin-top:5px">+ ${hz.length - SHOW} more on the full plan.</p>` : ''}` : ''}
+  <div class="linkrow" style="border-bottom:none;margin-top:8px" data-action="open-briefing" data-id="${b.id}">
+    <span class="sm"><b>The full plan</b>${(b.holes || []).length ? ` · ${(b.holes || []).length} hole notes` : ''}</span><span class="arr">→</span></div>
+  ${list.length > 1 ? `<div class="linkrow" style="border-bottom:none" data-action="cheat-open" data-disc="prep" data-id="pick">
+    <span class="sm faint">Playing somewhere else?</span><span class="arr">→</span></div>` : ''}`;
+}
+function cheatSheet(disc, arg){
+  if(disc === 'prep') return cheatPrep(arg === 'pick' ? null : arg);
   const lab = LABS.find(l => l.disc === disc);
   const plans = plansFor(disc);
   const lead = plans.find(isRoutine) || plans[0];
@@ -995,12 +1048,7 @@ function cheatSheet(disc){
     .sort((a, b) => (b.d.date || '').localeCompare(a.d.date || '') || b.i - a.i)
     .map(o => o.d).find(d => d.next) : null;
   return `
-  <div class="sheethead">
-    <h2>${lab ? `${lab.ic} ${esc(lab.name)}` : ''} · before you play</h2>
-    <button class="minibtn" data-action="cheat-close">✕ Close</button>
-  </div>
-  <div class="sheettabs">${LABS.map(l => `<span class="${l.disc === disc ? 'on' : ''}"
-    data-action="cheat-open" data-disc="${l.disc}">${l.ic} ${esc(l.short || l.name)}</span>`).join('')}</div>
+  ${cheatHead(disc, `${lab ? `${lab.ic} ${lab.name}` : ''} · before you play`)}
   ${oneJob ? `<div class="tipcard" style="margin-top:11px"><h4>One job</h4><p class="sm"><b>${esc(oneJob.next)}</b></p></div>` : ''}
   ${CHEAT_ART[disc] ? CHEAT_ART[disc]() : ''}
   ${lead
@@ -1014,7 +1062,7 @@ function cheatSheet(disc){
 // already up, only its contents are swapped. That keeps the pre-round read as ONE
 // pass through the whole game — swing, short game, putting, mental — instead of four
 // separate trips out to the hub and back.
-function openCheat(disc){
+function openCheat(disc, arg){
   let v = document.getElementById('sheetveil');
   if(!v){
     v = document.createElement('div');
@@ -1022,7 +1070,7 @@ function openCheat(disc){
     v.addEventListener('click', e => { if(e.target === v) closeCheat(); });
     document.body.appendChild(v);
   }
-  v.innerHTML = `<div class="sheet card">${cheatSheet(disc)}</div>`;
+  v.innerHTML = `<div class="sheet card">${cheatSheet(disc, arg)}</div>`;
   const s = v.querySelector('.sheet');
   if(s) s.scrollTop = 0;   // a switched sheet starts at its own top, not the last one's
 }
@@ -3480,6 +3528,13 @@ function dataView(){
     </div>
   </div>
   <div class="card">
+    <h2>This version</h2>
+    <p class="sm">Running build <b>${BUILD}</b>. The app checks for a new one every time you
+    open it and refreshes itself when it finds one — if this number is behind what Claude
+    just shipped, that's worth saying, because it means the update didn't land.</p>
+    <button class="btn ghost tiny" data-action="check-update" style="margin-top:8px">Check for an update</button>
+  </div>
+  <div class="card">
     <h2>Danger zone</h2>
     <p class="sm">Reset wipes all logged data and restores the original seed.</p>
     <button class="btn burg" data-action="reset" style="margin-top:8px">Reset app</button>
@@ -3789,8 +3844,17 @@ const ACTIONS = {
     toast(S.settings.theme === 'night' ? 'Night mode ☾' : 'Heritage mode ☀');
   },
   'get-weather': () => fetchWeather(true),
-  'cheat-open': el => openCheat(el.dataset.disc),
+  'cheat-open': el => openCheat(el.dataset.disc, el.dataset.id),
   'cheat-close': () => closeCheat(),
+  // A manual version of what visibilitychange does, for when you want to force it.
+  // A found update reloads the page on its own (see index.html), so the "up to date"
+  // toast only ever shows when there genuinely wasn't one.
+  'check-update': () => {
+    if(!navigator.serviceWorker){ toast('No updater on this browser'); return; }
+    navigator.serviceWorker.getRegistration()
+      .then(r => r ? r.update().then(() => toast(`Up to date · ${BUILD}`)) : toast('Not installed yet'))
+      .catch(() => toast('Update check failed — offline?'));
+  },
 };
 
 function applyTheme(){
@@ -4034,6 +4098,12 @@ if(S.weather) fetchWeather();  // silent refresh only if previously enabled
 // iOS resumes a suspended PWA without reloading the page — re-check the
 // coach feed whenever the app comes back to the foreground.
 document.addEventListener('visibilitychange', () => {
-  if(document.visibilityState === 'visible') fetchFeed();
+  if(document.visibilityState !== 'visible') return;
+  fetchFeed();
+  // Coming back to a suspended app is the one moment it's certain to be running old
+  // code, so check for a new BUILD too — the feed only carries data, and a fix to the
+  // app itself has no other route onto the phone. index.html reloads once if one lands.
+  if(navigator.serviceWorker) navigator.serviceWorker.getRegistration()
+    .then(r => r && r.update()).catch(() => {});
 });
 })();

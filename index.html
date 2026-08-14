@@ -34,8 +34,28 @@
 <script src="./courses-db.js"></script>
 <script src="./app.js"></script>
 <script>
+// Keeping the installed app up to date.
+// Registering once on load is NOT enough: an installed PWA can sit suspended for days
+// and resume without ever re-fetching app.js, so a shipped fix silently never reaches
+// the phone — which is exactly what happened on Aug 14. Two things fix it. We ask the
+// browser to re-check sw.js on every load (and app.js's visibilitychange handler asks
+// again each time the app comes back to the foreground), and because sw.js calls
+// skipWaiting() + clients.claim(), a new build takes control the moment it installs and
+// fires 'controllerchange' — at which point we reload once to pick up the new code.
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+  // A first-ever visit also fires controllerchange (from clients.claim), and reloading
+  // there would be a pointless flash — so only an app that was ALREADY controlled counts.
+  var hadController = !!navigator.serviceWorker.controller, reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function(){
+    if (reloading || !hadController) return;
+    reloading = true;
+    location.reload();
+  });
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(reg){ reg.update(); })
+      .catch(function(){});
+  });
 }
 </script>
 </body>
