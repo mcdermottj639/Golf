@@ -174,6 +174,12 @@ function seed(){
     lessonEdits: {},      // { lessonId: {…patched fields} } — from `lesson-update`
     lessonAdds: [],       // whole lessons pushed by feed — from `lesson-add`
     lessonHidden: [],     // ids retired — from `lesson-remove`
+    // The kit on hand, which is what the drill bench filters by. Owning something is a
+    // claim about the world, so this starts as ONLY what the record establishes — the bag,
+    // the phone every filmed fault came off, the Miracle 201, the PUTTLAZR laser bought
+    // Aug 13 2026, and a tee, which anybody carrying that bag has. Everything else waits
+    // for a tap rather than being assumed.
+    kit: ['putter','phone','laser','m201','coins'],
   };
 }
 
@@ -193,6 +199,7 @@ function migrate(s){
   if(!s.lessonEdits) s.lessonEdits = {};
   if(!s.lessonAdds) s.lessonAdds = [];
   if(!s.lessonHidden) s.lessonHidden = [];
+  if(!s.kit) s.kit = seed().kit;
   if(s.live === undefined) s.live = null;   // a round being logged hole-by-hole
   if(!s.evolution || s.sessions.every(x => !x.detail)){
     const fresh = seed();
@@ -339,7 +346,11 @@ function struggles(){
     tags.set(t, `logged at ${r.course || 'your round'} on ${fmtDate(r.date)}`)));
   const mc = missCounts();
   if (mc.L > mc.R) tags.set('short-putts', `${mc.L} left misses in your 5-ft logs`);
-  S.faults.forEach(f => tags.set(f.tag, f.why));
+  // OPEN faults only. A fault whose `why` opens with CLOSED already drops off the lab's
+  // diagnosis card and out of Coach's to-do list, so letting it go on matching lessons was
+  // the one place a settled fault could still ask for work — and it showed: the drill bench
+  // opened flagging a tempo drill FOR YOU underneath the words "CLOSED Jul 30 ✓".
+  S.faults.filter(f => faultState(f) === 'open').forEach(f => tags.set(f.tag, f.why));
   return tags;
 }
 // The live lesson list: the frozen `lessons.js` baseline with every feed edit applied on
@@ -374,6 +385,76 @@ function shelfCounts(){
     if (l.tags.some(t => tags.has(t)) && !S.lessonsRead.includes(l.id)) by[l.shelf].forYou++;
   });
   return by;
+}
+
+// ----- The drill bench -----
+// "What can I do right now" is a different question from "what should I learn", and the
+// library only answers the second one. Every lesson already carries a `drill`, so the bench
+// is the same content asked the other way round — sorted by the KIT in the house and the
+// PLACE he's standing, because those are what actually decide whether a drill happens.
+//
+// Two rules this is built on. A drill needing kit he hasn't marked is never hidden: it
+// drops to the bottom with the missing item named, since a silently shortened list reads as
+// "that's everything" — the same failure the round-prep rules warn about. And kit is his to
+// declare, never inferred: reading a lesson about a yardstick is not evidence he owns one.
+const KIT = [
+  { k:'putter', lab:'Putter + carpet',  n:'Six feet of floor is a putting lab' },
+  { k:'phone',  lab:'Phone + a prop',   n:'Every fault in this app came off it' },
+  { k:'laser',  lab:'PUTTLAZR laser',   n:'Shaft-clamp aim laser · bought Aug 13 2026' },
+  { k:'m201',   lab:'Miracle 201',      n:'The swing trainer that clicks' },
+  { k:'coins',  lab:'Coins or tees',    n:'Gates and targets, on any surface' },
+  { k:'ruler',  lab:'Metal yardstick',  n:'The $3 start-line machine' },
+  { k:'metro',  lab:'Metronome app',    n:'Free — the tempo checks need it' },
+  { k:'powder', lab:'Foot powder or impact tape', n:'The tape test needs it' },
+  { k:'mirror', lab:'Putting mirror',   n:'Eye line and shoulders' },
+  { k:'sticks', lab:'Alignment sticks', n:'' },
+];
+const KIT_LAB = Object.fromEntries(KIT.map(g => [g.k, g.lab]));
+const PLACES = { home:'At home', green:'Practice green', range:'Range',
+                 bunker:'Practice bunker', course:'On the course' };
+
+// Where each baseline drill happens and what it needs. This lives in app.js rather than in
+// lessons.js because it is presentation metadata, not lesson content — and lessons.js is a
+// frozen baseline. A lesson arriving through the feed can carry its own `where` / `kit`
+// instead, which is the route every new lesson takes from here on. An id in neither place
+// is fine: it reads as "anywhere, nothing needed" and shows under every filter, so a new
+// lesson can never fall off this page for want of a table entry.
+const DRILL_KIT = {
+  p1:{ where:'green' }, p2:{ where:'home', kit:['putter','metro'] },
+  p3:{ where:'home', kit:['putter','coins'] }, p4:{ where:'green', kit:['putter'] },
+  p5:{ where:'green', kit:['putter'] },
+  h1:{ where:'home', kit:['putter','coins'] }, h2:{ where:'home', kit:['putter','ruler'] },
+  h3:{ where:'home', kit:['putter'] }, h4:{ where:'home', kit:['putter','phone'] },
+  h5:{ where:'home', kit:['putter','metro'] }, h6:{ where:'home', kit:['putter'] },
+  h7:{ where:'home', kit:['putter','coins'] }, h8:{ where:'home', kit:['putter','coins'] },
+  h9:{ where:'home', kit:['putter'] },
+  sw1:{ where:'home', kit:['m201'] }, sw2:{ where:'home', kit:['m201'] },
+  sw3:{ where:'home', kit:['m201'] }, sw4:{ where:'home', kit:['m201'] },
+  sw5:{ where:'home', kit:['m201'] }, sw6:{ where:'home', kit:['m201','phone'] },
+  sw7:{ where:'home', kit:['m201'] },
+  g1:{ where:'green' }, g2:{ where:'green' }, g3:{ where:'course' },
+  g4:{ where:'green' }, g5:{ where:'green' },
+  w1:{ where:'range' }, w2:{ where:'range' }, w3:{ where:'green' }, w4:{ where:'green' },
+  c1:{ where:'course' }, c2:{ where:'course' }, c3:{ where:'course' }, c4:{ where:'course' },
+  m1:{ where:'range' }, m2:{ where:'course' }, m3:{ where:'green' },
+  b1:{ where:'bunker' }, b2:{ where:'bunker' }, b3:{ where:'bunker' },
+  e1:{ where:'green' }, e2:{ where:'home' }, e3:{ where:'home' }, e4:{ where:'course' },
+};
+const haveKit = k => (S.kit || []).includes(k);
+function drillList(){
+  const tags = struggles();
+  // A struggle tag arrives from one of two places and they are not equal evidence: a
+  // standing FAULT was measured off film, while a round tag is a trouble chip he tapped
+  // after playing. Both are worth surfacing; the filmed one goes first.
+  const faultTags = new Set(S.faults.filter(f => faultState(f) === 'open').map(f => f.tag));
+  return lessons().filter(l => l.drill).map(l => {
+    const m = DRILL_KIT[l.id] || {};
+    const kit = l.kit || m.kit || [];
+    const hit = l.tags.find(t => tags.has(t));
+    return { l, kit, where: l.where || m.where || null,
+             missing: kit.filter(k => !haveKit(k)),
+             why: hit ? tags.get(hit) : null, filmed: hit ? faultTags.has(hit) : false };
+  });
 }
 // ----- The playable club list -----
 // This comes from the CARRY LADDER, not S.clubs: the bag holds the irons as a single
@@ -436,6 +517,7 @@ const TITLES = {
   putting:['Putting Lab','Stroke, pace, and the short ones.'],
   mental:['Mental Game','Staying locked in for eighteen — decided off the course.'],
   coach:['Coach','Lessons that follow your game — not generic tips.'],
+  drills:['Drills','What you can actually do — with the kit you own.'],
   courses:['Courses','Everywhere you’ve played, rated and remembered.'],
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
   scores:['Scores','Every round, what it cost you, and what to fix.'],
@@ -453,12 +535,13 @@ function render(view, arg, keepScroll){
   $('#pageTitle').textContent = title;
   $('#pageTag').textContent = tag;
   // The four labs live behind one nav button, so they all light it.
-  const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game' };
+  const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game',
+                   drills:'coach', shelf:'coach', lesson:'coach' };
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === navView));
   if(LABS.some(l => l.view === view) && S.settings.lastLab !== view){ S.settings.lastLab = view; save(); }
-  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
+  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
   $('#view').innerHTML = R(arg);
   buildJumpBar();
   if(!keepScroll) window.scrollTo(0,0);
@@ -781,7 +864,7 @@ function sessionDiscipline(s){
 
 // ----- Lab plan blocks -----
 // Pre-shot routines head every lab: they're what you read standing on the first tee,
-// so they sit above the diagnosis and the drills rather than buried under them.
+// so they sit above the diagnosis rather than buried under it.
 const isRoutine = b => /routine/i.test(b.course || '');
 function planLinks(list){
   return list.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
@@ -808,7 +891,7 @@ function swing(){
   <div class="card flat"><div class="linkrow" data-action="go" data-view="positions">
     <span><b>📐 Swing Positions · visual guide</b><br><span class="sm">Body checkpoints, address → finish, with a slide-vs-clear hip diagram</span></span><span class="arr">→</span></div></div>
 
-  ${other.length ? `<h2>Plans &amp; training</h2>
+  ${other.length ? `<h2>Plans</h2>
   <div class="card">
     ${planLinks(other)}
   </div>` : ''}
@@ -1019,7 +1102,11 @@ function swingPositions(){
 function putting(){
   const entries = S.fiveFt.slice(-6);
   const mc = missCounts();
-  const streak = weekStreak();
+  // The lab diagnoses; Coach trains. This page used to carry two hardcoded drills of its
+  // own, which is how one of them went on prescribing a tempo fix for a fault that closed
+  // on film in July. Drills have exactly one home now — the bench in Coach.
+  const putDrills = drillList().filter(d => !d.missing.length &&
+    /Putting/.test(d.l.shelf)).length;
   const plans = S.briefings.filter(b => !b.date && b.discipline === 'putting');
   const other = plans.filter(b => !isRoutine(b));
   return `
@@ -1029,15 +1116,8 @@ function putting(){
 
   ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
 
-  <h2>Drills · this week</h2>
-  <div class="card">
-    <div class="tipcard green"><div class="src">Fixes tempo</div><h4>"One-Two" tempo drill</h4>
-      <p class="sm">Steady count — backswing longer & slower. Metronome ~70–76 bpm. Target 2:1.</p></div>
-    <div class="tipcard green"><div class="src">Fixes lift + face</div><h4>Low-follow-through gate</h4>
-      <p class="sm">Tee 6" ahead on the line — chase past it low. Kills the lift, quiets the toe-over.</p></div>
-    <button class="btn" data-action="drill-done">Mark today's drill done</button>
-    <div class="streak">${streak.map(d=>`<div class="day ${d.hit?'hit':''}">${d.lab}</div>`).join('')}</div>
-  </div>
+  <div class="card flat"><div class="linkrow" data-action="go" data-view="drills">
+    <span><b>Training lives in Coach</b><br><span class="sm">${putDrills} putting drills you have the kit for — the drill bench keeps them all, with the streak</span></span><span class="arr">→</span></div></div>
 
   <h2>Stroke evolution · every session, one view</h2>
   <div class="card">
@@ -1427,13 +1507,8 @@ function mental(){
 
   <h2>Off-course reps</h2>
   <div class="card">
-    <p class="sm">The mental game is a skill, and a skill that is only ever attempted under pressure never improves. These are the reps that transfer:</p>
-    <div class="tipcard green"><div class="src">Builds the routine</div><h4>Twenty routines, no ball</h4>
-      <p class="sm">At home, full pre-shot routine twenty times with the same beat count — read, one rehearsal, step in, go. The routine has to be automatic BEFORE it's needed; a routine you have to think about is the first thing that disappears when you're hot or rushed.</p></div>
-    <div class="tipcard green"><div class="src">Builds the tolerance</div><h4>Practise with the interference</h4>
-      <p class="sm">Deliberately putt and chip with the thing that grates: music on, a timer counting, someone talking. Distraction only breaks a round when it's novel. Rehearsed, it's just a condition — and the slow-play wait is a condition you can rehearse by standing there doing nothing for a full minute before the stroke.</p></div>
-    <div class="tipcard green"><div class="src">Builds the closing</div><h4>Three to leave</h4>
-      <p class="sm">Finish every putting session with three straight 5-footers, full routine, restart on a miss. It's the only cheap way to buy strokes that count. Your 20-ball scoreboard in the Putting Lab is the same idea with a number attached.</p></div>
+    <p class="sm">The mental game is a skill, and a skill only ever attempted under pressure never improves. The reps that transfer are drills like any other, so they live on the bench in Coach with the rest — routines with no ball, practising with the interference, and three to leave.</p>
+    <div class="linkrow" data-action="go" data-view="drills"><span><b>The drill bench</b><br><span class="sm">Every drill you have the kit for, filtered by where you are</span></span><span class="arr">→</span></div>
     <div class="linkrow" data-action="open-shelf" data-shelf="Mental Game"><span><b>Mental Game lessons</b><br><span class="sm">One target one thought · the 10-yard reset · practice like it counts</span></span><span class="arr">→</span></div>
     <div class="linkrow" data-action="open-lesson" data-id="c4"><span><b>Bogey is not an emergency</b><br><span class="sm">The lesson behind the blow-up finding above</span></span><span class="arr">→</span></div>
     <div class="linkrow" data-action="go" data-view="putting" style="border-bottom:none"><span><b>Putting Lab · the 20-ball test</b><br><span class="sm">Pressure with a score on it</span></span><span class="arr">→</span></div>
@@ -1492,6 +1567,9 @@ function coach(){
   const picks = pickedLessons();
   const counts = shelfCounts();
   const streak = weekStreak();
+  const dl = drillList().filter(d => !d.missing.length);
+  const dr = { ready: dl.length, home: dl.filter(d => d.where === 'home').length,
+               forYou: dl.filter(d => d.why && !S.lessonsRead.includes(d.l.id)).length };
   const open = S.actions.filter(a => !a.done);
   const blow = st.mix.double * 2 + st.mix.triple * 3;
   const read = [];
@@ -1557,6 +1635,13 @@ function coach(){
   ${S.rounds.length ? `<div class="card flat"><div class="linkrow" data-action="go" data-view="scores">
     <span><b>Score history &amp; analytics</b><br><span class="sm">${S.rounds.length} rounds · scoring mix, par splits, worst holes</span></span><span class="arr">→</span></div></div>` : ''}
 
+  <h2>Drills · what you can do right now</h2>
+  <div class="card">
+    <div class="linkrow" data-action="go" data-view="drills">
+      <span><b>Open the drill bench</b><br><span class="sm">${dr.ready} drills you have the kit for${dr.home ? ` · ${dr.home} at home` : ''}${dr.forYou ? ` · <b>${dr.forYou} matched to your game</b>` : ''}</span></span><span class="arr">→</span></div>
+    <p class="sm faint">Every lesson's drill in one list, filtered by the kit in the house and where you're standing.</p>
+  </div>
+
   <h2>Keep the streak</h2>
   <div class="card">
     ${picks.length ? picks.map(tipHTML).join('') : '<p class="sm">Lessons matched to your struggles appear here as you log rounds.</p>'}
@@ -1603,6 +1688,76 @@ function lesson(id){
     ${l.drill ? `<div class="lesson-drill"><b>Drill:</b> ${esc(l.drill)}</div>` : ''}
     <div style="margin-top:12px"><button class="btn" data-action="drill-done">Did the work · keep streak</button></div>
   </div>`;
+}
+
+// ----- The drill bench -----
+// Sorted the way a decision actually gets made: is it for me, can I do it here, do I own
+// the thing. Blocked drills stay on the page under their own heading — see drillList().
+function drills(){
+  const all = drillList();
+  const place = S.settings.drillPlace || 'all';
+  const here = d => place === 'all' || !d.where || d.where === place;
+  const shown = all.filter(here);
+  const ready = shown.filter(d => !d.missing.length);
+  // Matching on tags alone flags roughly half the library, which is a list, not a
+  // priority. So the top group is capped at six and ordered filmed-fault first — and the
+  // ones that don't make the cut keep their FOR YOU badge in the group below rather than
+  // disappearing, so the page never claims the shortlist is everything.
+  const matched = ready.filter(d => d.why && !S.lessonsRead.includes(d.l.id))
+    .sort((a,b) => (b.filmed ? 1 : 0) - (a.filmed ? 1 : 0));
+  const forYou = matched.slice(0,6);
+  const rest = ready.filter(d => !forYou.includes(d));
+  const spill = matched.length - forYou.length;
+  const blocked = shown.filter(d => d.missing.length);
+  const chip = (k, lab, n) => `<span class="chip ${place === k ? 'on' : ''}" data-action="pick-place" data-place="${k}">${esc(lab)}${n ? ` · ${n}` : ''}</span>`;
+  const card = d => {
+    // Naming the place is only worth a line when the list spans more than one of them.
+    const tag = [d.l.shelf].concat(place === 'all' ? [d.where ? PLACES[d.where] : 'Anywhere'] : []).join(' · ');
+    return `<details class="sect">
+      <summary><b>${esc(tag)}${d.why && !S.lessonsRead.includes(d.l.id) ? ' <span class="warn">FOR YOU</span>' : ''}</b>
+        <span class="gist">${esc(d.l.title)}</span></summary>
+      ${d.missing.length ? `<p class="sm warn"><b>Needs ${esc(d.missing.map(k => KIT_LAB[k] || k).join(' + '))}</b> — mark it above once you have it.</p>` : ''}
+      ${d.why ? `<p class="sm faint">Matched to your game: ${esc(splitLead(d.why)[0])}</p>` : ''}
+      ${prose(d.l.drill, 'lesson-body')}
+      ${d.kit.length ? `<div class="chips">${d.kit.map(k => `<span class="chip static ${haveKit(k) ? 'grn' : 'ns'}">${esc(KIT_LAB[k] || k)}</span>`).join('')}</div>` : ''}
+      <div class="linkrow" data-action="open-lesson" data-id="${esc(d.l.id)}">
+        <span class="sm"><b>Why this drill exists</b> — read the lesson</span><span class="arr">→</span></div>
+      <div style="margin-top:10px"><button class="minibtn" data-action="drill-done">Did it ✓ keep the streak</button></div>
+    </details>`;
+  };
+  const group = (title, list, note) => !list.length ? '' : `
+    <div class="secthead"><h2>${title} · ${list.length}</h2>
+      <button class="minibtn" data-action="toggle-sections">Expand all</button></div>
+    ${note ? `<p class="sm faint" style="margin:-4px 0 6px">${note}</p>` : ''}
+    <div class="card">${list.map(card).join('')}</div>`;
+  return `
+  <button class="backlink" data-action="go" data-view="coach">← Coach</button>
+
+  <h2>What you've got</h2>
+  <div class="card">
+    <p class="sm">Tap what you own. Nothing is assumed — the ones already lit are the ones your record proves, plus a tee, which anyone carrying that bag has.</p>
+    <div class="chips">
+      ${KIT.map(g => `<span class="chip ${haveKit(g.k) ? 'grn' : ''}" data-action="toggle-kit" data-kit="${g.k}">${esc(g.lab)}</span>`).join('')}
+    </div>
+    <p class="sm faint">A drill needing something you haven't marked doesn't vanish — it drops to the bottom of this page with the missing item named.</p>
+  </div>
+
+  <h2>Where are you?</h2>
+  <div class="card">
+    <div class="chips">
+      ${chip('all', 'Everything', all.length)}
+      ${Object.entries(PLACES).map(([k, lab]) =>
+        chip(k, lab, all.filter(d => d.where === k).length)).join('')}
+    </div>
+  </div>
+
+  ${group('For you right now', forYou,
+    `Matched to a fault or a struggle that is currently open, film-measured ones first, and you have the kit for every one.${spill ? ` ${spill} more carry the badge below.` : ''}`)}
+  ${group('Ready to go', rest)}
+  ${group('Needs kit you haven\'t marked', blocked,
+    'Not hidden, just parked — every one of these is a tap on the kit list away.')}
+  ${!shown.length ? '<div class="card"><p class="sm">Nothing filed under that place yet.</p></div>' : ''}
+  <p class="sm faint" style="margin:10px 0">Every drill here belongs to a lesson in the library — this page is the same shelf sorted by what you can actually do today.</p>`;
 }
 
 // ----- Session deep-dive -----
@@ -1756,14 +1911,16 @@ function shortgame(){
   <h2>Train it</h2>
   <div class="card flat">
     <div class="linkrow" data-action="open-shelf" data-shelf="Wedges &amp; Short Game"><span><b>Wedges &amp; Short Game</b><br><span class="sm">Clock system, bounce, chip vs pitch, landing spots</span></span><span class="arr">→</span></div>
-    <div class="linkrow" data-action="open-shelf" data-shelf="Bunker Play" style="border-bottom:none"><span><b>Bunker Play</b><br><span class="sm">Splash, distance by follow-through, plugged lies</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="open-shelf" data-shelf="Bunker Play"><span><b>Bunker Play</b><br><span class="sm">Splash, distance by follow-through, plugged lies</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="drills" style="border-bottom:none"><span><b>The drill bench</b><br><span class="sm">Every drill you have the kit for, filtered by where you are</span></span><span class="arr">→</span></div>
   </div>`;
 }
 
 // ----- The labs hub -----
 // Four labs behind one nav button. The bar was at eight tabs and a short-game lab would
-// have made nine; these four are the same KIND of thing — a discipline with faults, film,
-// plans and drills — so they belong behind one door.
+// have made nine; these four are the same KIND of thing — a discipline with faults, film
+// and plans — so they belong behind one door. Training is deliberately NOT on that list:
+// drills live on the bench in Coach, one home for all of them.
 const LABS = [
   { view:'swing',     disc:'swing',       ic:'🏌', name:'Full Swing',  sub:'Driver to wedge — film, plans, speed work.' },
   { view:'shortgame', disc:'short-game',  ic:'⛳', name:'Short Game',  sub:'Around the green — chipping, pitching, bunkers.' },
@@ -3390,6 +3547,14 @@ const ACTIONS = {
   'open-session': el => render('session', el.dataset.i),
   'open-briefing': el => render('briefing', el.dataset.id),
   'open-shelf': el => render('shelf', el.dataset.shelf),
+  // Kit and place are filters on a list, so they redraw in place — jumping to the top of
+  // the page every time you tap a chip is exactly what rerender() exists to prevent.
+  'toggle-kit': el => {
+    const k = el.dataset.kit;
+    S.kit = haveKit(k) ? S.kit.filter(x => x !== k) : S.kit.concat(k);
+    save(); rerender();
+  },
+  'pick-place': el => { S.settings.drillPlace = el.dataset.place; save(); rerender(); },
   'open-lesson': el => render('lesson', el.dataset.id),
   'edit-course': el => {
     editingCourse = S.courses.find(c=>c.id===el.dataset.id) || null;

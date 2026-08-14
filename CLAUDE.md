@@ -501,6 +501,31 @@ wrong lesson read — the swing shelf uses `sw*` because `m*` was already Mental
 **`tags` must come from the struggle vocabulary** at the top of `lessons.js` or the lesson
 never surfaces for anyone. `body`/`drill` are escaped on render, so plain text only.
 
+**Drills have exactly ONE home: the bench in Coach** (standing instruction, Aug 14 2026).
+Jack's rule — drills are not to appear anywhere else in the app. `drills()` (Coach → *the
+drill bench*) lists **every lesson's `drill`**, sorted by the kit he owns and the place he's
+standing, so a drill exists in the library and on the bench and nowhere else. The labs
+diagnose, plans say what to do on the course, Coach trains — and a lab that grows its own
+drill section is how one went on prescribing a tempo fix for a fault that closed on film in
+July. What that means for writing:
+
+- **A new lesson should carry `where` and `kit`** in its `lesson-add` object. `where` is one
+  of `home` · `green` · `range` · `bunker` · `course`; `kit` is keys from **`KIT`** in
+  `app.js` (`putter` `phone` `laser` `m201` `coins` `ruler` `metro` `powder` `mirror`
+  `sticks`). Baseline lessons are mapped in **`DRILL_KIT`** instead, which is presentation
+  metadata and so lives in `app.js` rather than in frozen `lessons.js`. A lesson in neither
+  reads as "anywhere, nothing needed" and shows under every filter, so it can never fall off
+  the page for want of a table row.
+- **`S.kit` is a claim about the world, so nothing infers it.** It seeds to only what the
+  record proves and he taps the rest. A drill needing unmarked kit is **never hidden** — it
+  drops to a *Needs kit you haven't marked* group with the missing item named, because a
+  silently shortened list reads as "that's everything".
+- **`struggles()` returns OPEN faults only** (fixed Aug 14). A `CLOSED` fault already drops
+  off the diagnosis card and Coach's to-dos; it used to go on matching lessons anyway, which
+  is how the bench opened flagging a tempo drill FOR YOU under the words "CLOSED Jul 30 ✓".
+- The *For you right now* group is **capped at six**, filmed faults first, and the ones that
+  don't make the cut keep their badge in the group below rather than vanishing.
+
 **`lessons.js` is a FROZEN BASELINE — same rule as `seed()`** (standing instruction, Aug 13
 2026). Do NOT edit a lesson in place: append a `lesson-update` / `lesson-add` /
 `lesson-remove` entry instead. `lessons()` in `app.js` merges the baseline with those edits
