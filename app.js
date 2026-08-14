@@ -918,20 +918,22 @@ const CHEAT_ART = {
     </div></div>`;
   },
   putting(){
+    // Drawn through a RIGHT-hander's eyes looking down at address: the hole out to the
+    // LEFT, ball under you at the right, putter head behind (right of) the ball.
     const INK='var(--ink)', GRN='var(--gtext)', FNT='var(--faint)';
     return `<div class="sheetart"><svg viewBox="0 0 320 104" role="img" aria-label="Face barely open is your square; pace before break">
-      <line x1="80" y1="56" x2="270" y2="56" style="stroke:${FNT};stroke-width:1.5;stroke-dasharray:5 5;opacity:.7"/>
-      <circle cx="286" cy="56" r="9" style="fill:none;stroke:${INK};stroke-width:2.5"/>
-      <circle cx="286" cy="56" r="2.5" style="fill:${FNT}"/>
-      <rect x="52" y="41" width="5" height="30" rx="2" style="fill:none;stroke:${FNT};stroke-width:1.5;stroke-dasharray:3 3"/>
-      <rect x="52" y="41" width="5" height="30" rx="2" style="fill:${GRN}" transform="rotate(-9 54.5 56)"/>
-      <circle cx="70" cy="56" r="6.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>
-      <path d="M 47 34 A 22 22 0 0 1 61 30" style="fill:none;stroke:${GRN};stroke-width:2"/>
-      <polygon points="65,30 56,26.5 57.5,34.5" style="fill:${GRN}"/>
-      <text x="12" y="18" style="fill:${GRN};font:800 11px var(--sans)">Face BARELY OPEN — that IS your square</text>
-      <path d="M 118 80 q 30 -14 58 0 q 26 12 50 2" style="fill:none;stroke:${INK};stroke-width:2;opacity:.55"/>
-      <polygon points="234,84 224,78 225,87" style="fill:${INK};opacity:.55"/>
-      <text x="118" y="99" style="fill:${INK};font:800 11px var(--sans)">Read PACE first — break second</text>
+      <line x1="50" y1="56" x2="240" y2="56" style="stroke:${FNT};stroke-width:1.5;stroke-dasharray:5 5;opacity:.7"/>
+      <circle cx="34" cy="56" r="9" style="fill:none;stroke:${INK};stroke-width:2.5"/>
+      <circle cx="34" cy="56" r="2.5" style="fill:${FNT}"/>
+      <rect x="263" y="41" width="5" height="30" rx="2" style="fill:none;stroke:${FNT};stroke-width:1.5;stroke-dasharray:3 3"/>
+      <rect x="263" y="41" width="5" height="30" rx="2" style="fill:${GRN}" transform="rotate(9 265.5 56)"/>
+      <circle cx="250" cy="56" r="6.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>
+      <path d="M 273 34 A 22 22 0 0 0 259 30" style="fill:none;stroke:${GRN};stroke-width:2"/>
+      <polygon points="255,30 264,26.5 262.5,34.5" style="fill:${GRN}"/>
+      <text x="308" y="18" text-anchor="end" style="fill:${GRN};font:800 11px var(--sans)">Face BARELY OPEN — that IS your square</text>
+      <path d="M 202 80 q -30 -14 -58 0 q -26 12 -50 2" style="fill:none;stroke:${INK};stroke-width:2;opacity:.55"/>
+      <polygon points="86,84 96,78 95,87" style="fill:${INK};opacity:.55"/>
+      <text x="14" y="99" style="fill:${INK};font:800 11px var(--sans)">Read PACE first — break second</text>
     </svg></div>`;
   },
   'short-game'(){
