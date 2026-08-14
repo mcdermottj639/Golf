@@ -231,6 +231,26 @@ details.more summary{font-size:10.5px;letter-spacing:.07em;text-transform:upperc
 .steprules.top{margin-top:0;padding-top:0;border-top:none}
 
 
+/* ---- Pre-round cheat sheet: one screen, read in the parking lot ---- */
+.cheatbtn{display:flex;justify-content:space-between;align-items:baseline;gap:10px;width:100%;
+  margin:12px 0 0;padding:12px 14px;border-radius:var(--r);border:1px solid var(--green);
+  background:var(--green);color:var(--green-ink);font-family:var(--sans);font-size:13.5px;
+  font-weight:800;letter-spacing:.01em;text-align:left;box-shadow:var(--shadow)}
+.cheatbtn span{font-weight:400;font-size:10.5px;font-style:italic;opacity:.85;white-space:nowrap}
+.cheatbtn:active{transform:translateY(1px)}
+.sheetveil{position:fixed;inset:0;z-index:60;background:rgba(24,19,8,.55);
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
+.sheet{width:100%;max-width:492px;max-height:86vh;overflow-y:auto;margin:0;
+  -webkit-overflow-scrolling:touch;border-radius:12px;padding:15px 15px 12px}
+.sheethead{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding-bottom:9px;border-bottom:2px solid var(--green)}
+.sheethead h2{margin:0}
+body.night .sheetveil{background:rgba(0,0,0,.62)}
+/* Solid card in night mode — glass-over-veil reads muddy at this size. Doubled-up
+   selector so it outranks the later night-mode glass rules on .card. */
+body.night .sheet.card{background:#15191d;border-radius:16px;backdrop-filter:none;-webkit-backdrop-filter:none}
+
 /* ---- Night mode: the command-center skin ---- */
 body.night{
   --paper:#0d1013; --card:#15191d; --card2:#1a1f24; --line:#2b3238; --line2:#242b31;

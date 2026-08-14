@@ -530,6 +530,7 @@ const TITLES = {
 };
 
 function render(view, arg, keepScroll){
+  closeCheat();  // the cheat sheet overlay lives on <body>, so navigation must clear it
   current = { view, arg };
   const [title, tag] = TITLES[view] || TITLES.home;
   $('#pageTitle').textContent = title;
@@ -860,6 +861,17 @@ function sessionDiscipline(s){
 // Pre-shot routines head every lab: they're what you read standing on the first tee,
 // so they sit above the diagnosis rather than buried under it.
 const isRoutine = b => /routine/i.test(b.course || '');
+// Which standing plans belong to a lab — ONE source, shared by the lab views, the hub
+// rows and the cheat sheet. The swing lab is the catch-all for any plan with no
+// discipline, EXCEPT course plans, which have none by design and belong to Round Prep
+// (that's the Aug 14 audit fix — Sterling Farms was rendering as a swing plan).
+function plansFor(disc){
+  if(disc !== 'swing') return S.briefings.filter(b => !b.date && b.discipline === disc);
+  const known = S.courses.map(c => c.name);
+  return S.briefings.filter(b => !b.date
+    && !['putting','mental','short-game'].includes(b.discipline || 'swing')
+    && !known.some(n => courseMatches(b.course, n)));
+}
 function planLinks(list){
   return list.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
       <span><b>${esc(b.course)}</b><br><span class="sm clip2">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('');
@@ -870,20 +882,67 @@ function routineBlock(plans){
   <div class="card">${planLinks(r)}</div>` : '';
 }
 
+// ----- Pre-round cheat sheet -----
+// One screen, read in the parking lot. Nothing on it is authored twice: the chips are
+// the lead plan's own rules[], the focus line is that plan's focus, and the watch list
+// is the open faults off the diagnosis card — so the sheet updates itself whenever a
+// feed entry updates the plan or settles a fault, with no second copy to keep current.
+function cheatBtn(disc){
+  return `<button class="cheatbtn" data-action="cheat-open" data-disc="${disc}">⚡ Cheat sheet<span>the pre-round read · one screen</span></button>`;
+}
+// An open fault's `why` often opens with its status word ("Open — 7 of 12…"); the
+// sheet already says these are open, so drop the token and let the number lead.
+function faultLine(f){
+  const t = String(f.why || '').replace(/^\s*OPEN\b[\s,—–:-]*(and\s+)?/i, '');
+  const lead = splitLead(t)[0];
+  return lead.replace(/^./, c => c.toUpperCase());
+}
+function cheatSheet(disc){
+  const lab = LABS.find(l => l.disc === disc);
+  const plans = plansFor(disc);
+  const lead = plans.find(isRoutine) || plans[0];
+  const open = faultsFor(disc).filter(f => faultState(f) === 'open');
+  // Same pick as the Mental tab's "one job" card: newest debrief that set one.
+  const oneJob = disc === 'mental' ? (S.mental || []).map((d, i) => ({ d, i }))
+    .sort((a, b) => (b.d.date || '').localeCompare(a.d.date || '') || b.i - a.i)
+    .map(o => o.d).find(d => d.next) : null;
+  return `
+  <div class="sheethead">
+    <h2>${lab ? `${lab.ic} ${esc(lab.name)}` : ''} · before you play</h2>
+    <button class="minibtn" data-action="cheat-close">✕ Close</button>
+  </div>
+  ${oneJob ? `<div class="tipcard"><h4>One job</h4><p class="sm"><b>${esc(oneJob.next)}</b></p></div>` : ''}
+  ${lead ? `
+    ${lead.focus ? `<p class="sm" style="margin-top:9px"><b class="warn">The short version:</b> ${esc(lead.focus)}</p>` : ''}
+    ${(lead.rules || []).length ? `<div class="steprules top" style="margin-top:11px">${lead.rules.map(r => `<span>${esc(r)}</span>`).join('')}</div>` : ''}`
+  : `<p class="sm" style="margin-top:9px">No standing plan in this lab yet — ask Claude for one and this sheet builds itself from it.</p>`}
+  ${open.length ? `<h2 style="margin-top:16px">Watch for</h2>
+    ${open.map(f => `<p class="sm" style="margin-top:5px"><b class="warn">${esc(faultLabel(f.tag))}</b> — ${esc(faultLine(f))}</p>`).join('')}` : ''}
+  ${lead ? `<div class="linkrow" style="border-bottom:none;margin-top:10px" data-action="open-briefing" data-id="${lead.id}">
+    <span class="sm"><b>${esc(lead.course)}</b> — the full plan</span><span class="arr">→</span></div>` : ''}`;
+}
+function openCheat(disc){
+  closeCheat();
+  const v = document.createElement('div');
+  v.className = 'sheetveil'; v.id = 'sheetveil';
+  v.innerHTML = `<div class="sheet card">${cheatSheet(disc)}</div>`;
+  v.addEventListener('click', e => { if(e.target === v) closeCheat(); });
+  document.body.appendChild(v);
+}
+function closeCheat(){
+  const v = document.getElementById('sheetveil');
+  if(v) v.remove();
+}
+
 // ----- Swing Lab -----
 function swing(){
   const sessions = S.sessions.map((s,i) => ({ s, i })).filter(o => sessionDiscipline(o.s) === 'swing').reverse();
-  // Anything not explicitly claimed by another lab lands here — the swing lab is the
-  // default home for a standing plan, so new disciplines have to be named to stay out.
-  // COURSE plans are the exception that is not a discipline: a standing plan named for a
-  // course belongs to Round Prep, and it has no `discipline` by design, so the catch-all
-  // was swallowing it — Sterling Farms was rendering as a swing plan.
-  const known = S.courses.map(c => c.name);
-  const plans = S.briefings.filter(b => !b.date
-    && !['putting','mental','short-game'].includes(b.discipline || 'swing')
-    && !known.some(n => courseMatches(b.course, n)));
+  // Anything not explicitly claimed by another lab lands here — plansFor('swing') is the
+  // catch-all, minus course plans; see its comment.
+  const plans = plansFor('swing');
   const other = plans.filter(b => !isRoutine(b));
   return `
+  ${cheatBtn('swing')}
   ${routineBlock(plans)}
 
   ${diagnosisCard('swing', 'No swing faults on the card yet — send film and they land here.')}
@@ -1107,9 +1166,10 @@ function putting(){
   // on film in July. Drills have exactly one home now — the bench in Coach.
   const putDrills = drillList().filter(d => !d.missing.length &&
     /Putting/.test(d.l.shelf)).length;
-  const plans = S.briefings.filter(b => !b.date && b.discipline === 'putting');
+  const plans = plansFor('putting');
   const other = plans.filter(b => !isRoutine(b));
   return `
+  ${cheatBtn('putting')}
   ${routineBlock(plans)}
 
   ${diagnosisCard('putting')}
@@ -1393,13 +1453,14 @@ function mental(){
   const focus = logs.filter(d => d.focus).map(d => d.focus);
   const avgFocus = focus.length ? focus.reduce((a, b) => a + b, 0) / focus.length : null;
   const next = logs.find(d => d.next);
-  const plans = S.briefings.filter(b => !b.date && b.discipline === 'mental');
+  const plans = plansFor('mental');
   const other = plans.filter(b => !isRoutine(b));
   const rounds = S.rounds.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10);
   const v = m.thirds.map(perHole);
   const worst = v.every(x => x != null) ? v.indexOf(Math.max(...v)) : -1;
   const THIRD = ['Opening third', 'Middle third', 'Closing third'];
   return `
+  ${cheatBtn('mental')}
   ${next ? `<div class="card">
     <h2>Next round · one job</h2>
     <p class="sm"><b>${esc(next.next)}</b></p>
@@ -1861,13 +1922,14 @@ function shortGameStats(){
 }
 function shortgame(){
   const pc = (n, d) => d ? Math.round(n / d * 100) : 0;
-  const plans = S.briefings.filter(b => !b.date && b.discipline === 'short-game');
+  const plans = plansFor('short-game');
   const other = plans.filter(b => !isRoutine(b));
   const a = shortGameStats();
   const sessions = S.sessions.map((x,i) => ({ s:x, i })).filter(o => sessionDiscipline(o.s) === 'short-game').reverse();
   const missRow = Object.entries(a.miss).sort((x,y) => y[1]-x[1])
     .map(([k,v]) => `${v} ${MISS_LAB[k] || k}`).join(' · ');
   return `
+  ${cheatBtn('short-game')}
   ${routineBlock(plans)}
 
   ${a.holes ? `<div class="rowgrid g3">
@@ -1916,9 +1978,7 @@ const LABS = [
 ];
 function labRow(l){
   const open = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;
-  const plans = S.briefings.filter(b => !b.date && (l.disc === 'swing'
-    ? !['putting','mental','short-game'].includes(b.discipline || 'swing')
-    : b.discipline === l.disc)).length;
+  const plans = plansFor(l.disc).length;
   return `<div class="linkrow" data-action="go" data-view="${l.view}">
     <span><b>${l.ic} ${esc(l.name)}</b><br><span class="sm">${esc(l.sub)}</span>
     <br><span class="sm faint">${open ? `${open} open fault${open>1?'s':''}` : 'no open faults'} · ${plans} plan${plans===1?'':'s'}</span></span>
@@ -3628,6 +3688,8 @@ const ACTIONS = {
     toast(S.settings.theme === 'night' ? 'Night mode ☾' : 'Heritage mode ☀');
   },
   'get-weather': () => fetchWeather(true),
+  'cheat-open': el => openCheat(el.dataset.disc),
+  'cheat-close': () => closeCheat(),
 };
 
 function applyTheme(){
