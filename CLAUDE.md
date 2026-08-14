@@ -639,10 +639,18 @@ measurement over self-report — and say which one you're using.
   Two kinds of session survive a gear clear-out on purpose: one with **no film** (the Aug 1
   Beekman entry is the "pace felt dialled" counter-example this project keeps visible), and
   a **mixed A/B** (Aug 10 is DF3i-vs-LINK, i.e. the comparison that decided the putter).
-  **Known consequence, unresolved:** the Putting Lab's stroke-evolution grid columns
-  (`S1`–`S4`, `BL`) ARE those deleted sessions, so that table is now entirely pre-LINK and
-  stops before the current putter. Rebuilding it on the Jul 30 / Aug 10 LINK sessions is
-  Jack's call and has not been made.
+  **Consequence, since resolved:** the grid's old columns (`S1`–`S4`, `BL`) WERE those
+  deleted sessions, so it briefly tracked nothing current. **Rebuilt Aug 14 on the LINK
+  alone** — three columns, `Jul 30` · `Aug 10 pm` · `Aug 10 mat` — and the rebuild is the
+  model for the next one. Three things it does that the old grid didn't:
+  a column per **BATCH** rather than per day, since Aug 10's outdoor set could score pace
+  but not direction and its mat set the reverse; a `—` that means *this batch couldn't
+  answer this row*, stated in the legend so a dash never reads as a bad result; and **two
+  new rows for the things nothing has ever measured** — `Strike location` (all `?`, the
+  leading candidate for the Aug 10 scatter) and `Pace / distance` (the open fault, which the
+  old grid didn't track at all). A row of question marks is the most useful row on the page:
+  it is the only one that says what to go and film next. The grid heading and legend are
+  hardcoded in `putting()`, so a future rebuild has to update those too.
 
 - **Jack mentions a course he's playing** (standing instruction, Jul 29 2026): don't wait
   to be asked — append a `course-add` for it alongside whatever else the message calls

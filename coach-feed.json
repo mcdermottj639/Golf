@@ -14368,6 +14368,89 @@
       "id": "rm-sess-s8-dtl-20260814",
       "type": "session-remove",
       "target": "s8-dtl-gate"
+    },
+    {
+      "id": "evolution-link-rebuild-20260814",
+      "type": "evolution",
+      "evolution": {
+        "sessions": [
+          "Jul 30",
+          "Aug 10 pm",
+          "Aug 10 mat"
+        ],
+        "metrics": [
+          {
+            "name": "Path",
+            "marks": [
+              "✓",
+              "—",
+              "—"
+            ],
+            "s": "good",
+            "verdict": "SETTLED — straight back, straight through. Measured on the LINK on Jul 30 from three overhead clips: a quarter to a half inch inside at the top, back on line by impact. Neither Aug 10 batch could see it (the afternoon clips were all oblique, the mat set had no overhead), and it does not need re-testing — this is the finding the whole zero-torque case rests on, and nothing since has argued with it."
+          },
+          {
+            "name": "Tempo / load",
+            "marks": [
+              "✓",
+              "—",
+              "—"
+            ],
+            "s": "good",
+            "verdict": "SETTLED at 2.0:1 against a 2:1 target — 7 of 8 down-the-line clips landed 1.9–2.1 on Jul 30. Not measured since, and it is now a thing to hold still rather than fix. If you ever catch yourself hitting AT a long putt, that is this drifting, and it will show up as pace before it shows up as anything else."
+          },
+          {
+            "name": "Early lift",
+            "marks": [
+              "✓",
+              "—",
+              "—"
+            ],
+            "s": "good",
+            "verdict": "CLOSED Jul 30 — at 120 fps the sole held within 0.05–0.08 inches of its address height for the full 83 ms into impact, flat across ten consecutive frames, and never dropped below address height. This was fault number one in every early session. It is the classic fault that comes back quietly under pressure, so it stays on the grid as maintenance, not as a repair."
+          },
+          {
+            "name": "Start line / aim",
+            "marks": [
+              "✗",
+              "—",
+              "~"
+            ],
+            "s": "warn",
+            "verdict": "THE BIAS IS GONE. THE SCATTER IS NOT. Jul 30: 1.5° and 1.7° LEFT on two of three measured putts with one straight — three putts pulling the same way, which is what an AIM error looks like, because aim does not vary between reps. Aug 10 on the mat: 0.8° right, 1.0° left, 0.6° right — mean bias about 0.1° right, which is zero, and the one-way pull did not reproduce once. But the median miss is 0.8° against this project's own 0.5° gate, so it does NOT come off the card. Three caveats stand: n=3, at roughly ±0.5° each; the absence of the bias is the robust part, not the size of what is left; and it was a mat with a printed line, which does the aiming for you."
+          },
+          {
+            "name": "Face at impact",
+            "marks": [
+              "✗",
+              "—",
+              "?"
+            ],
+            "s": "warn",
+            "verdict": "NEVER DIRECTLY MEASURED — every reading here is inferred. Jul 30 was a red by deduction: neutral path, square stance, and the ball still starting left, so the face was pointing left at impact. On Aug 10 it was not measurable at all — the head spans about 70 pixels in those clips and 1.5° is under two of them. On a zero-torque head this is the same question as AIM, since the face you set is the face you deliver, which is exactly what the laser audit exists to put a number on."
+          },
+          {
+            "name": "Strike location",
+            "marks": [
+              "?",
+              "?",
+              "?"
+            ],
+            "s": "warn",
+            "verdict": "NEVER MEASURED, on any of the four putters owned this month, and since Aug 10 it is the leading candidate for what is left. Heel and toe contact rotate the face in opposite directions, which produces scatter with NO bias — which is the exact shape the mat set came back in. That is an inference, not a finding. The foot-powder tape test settles it in twelve minutes and has been owed since Jul 30."
+          },
+          {
+            "name": "Pace / distance",
+            "marks": [
+              "—",
+              "~",
+              "—"
+            ],
+            "s": "warn",
+            "verdict": "THE OPEN FAULT, and still the least-measured thing on this page — it has decided the fate of two putters and has never had a number. The one piece of real evidence is Aug 10 afternoon: about 20 putts scored off above-ground cups, NINE finishing dead, the worst about 4 feet, and nothing long all day. That is encouraging and it is not a baseline. The 30-foot ladder — shorts, spread and green speed, twice a week — is what turns this row into a number."
+          }
+        ]
+      }
     }
   ]
 }
