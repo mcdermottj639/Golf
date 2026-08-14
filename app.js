@@ -1594,7 +1594,12 @@ function coach(){
   if(st.over > 0 && blow) read.push(`doubles and worse are <b>${Math.round(blow/st.over*100)}%</b> of everything you've lost`);
   const lf = latestFiveFt();
   if(lf) read.push(`<b>${fiveFtScore(lf).makes}/${fiveFtScore(lf).total}</b> from 5 feet last test`);
-  const plans = S.briefings.filter(b => !b.date).sort((a,b) => (isRoutine(b) ? 1 : 0) - (isRoutine(a) ? 1 : 0));
+  // No plan list here on purpose. Coach owns LESSONS, DRILLS and the to-do list; a plan
+  // belongs to its lab, and a course plan to Round Prep. Listing every standing plan here
+  // as well put each one in two places and flattened the discipline split that the labs
+  // exist to make — a course prep and a putting routine sat in one undifferentiated column.
+  // The tips below still deep-link to a specific plan, which is the useful version: a
+  // pointer earned by context rather than a second copy of the shelf.
   const linkFor = l => !l ? '' :
     `<div class="linkrow" data-action="${l.a}"${l.id ? ` data-id="${esc(l.id)}"` : ''}${l.view ? ` data-view="${l.view}"` : ''}>
        <span class="sm"><b>${esc(l.lab)}</b></span><span class="arr">→</span></div>`;
@@ -1621,11 +1626,6 @@ function coach(){
     ${open.length > 6 ? `<p class="sm faint">Showing 6 of ${open.length}. The full list is on <b>Home</b> — a cap you can't see reads as "that's everything".</p>` : ''}
   </div>` : ''}
 
-  ${plans.length ? `<h2>Your plans</h2>
-  <div class="card">
-    ${plans.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-      <span><b>${esc(b.course)}</b><br><span class="sm clip2">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">→</span></div>`).join('')}
-  </div>` : ''}
 
   <h2>Log a round · 60 seconds</h2>
   <div class="card">
