@@ -890,13 +890,88 @@ function routineBlock(plans){
 function cheatBtn(disc){
   return `<button class="cheatbtn" data-action="cheat-open" data-disc="${disc}">⚡ Cheat sheet<span>the pre-round read · one screen</span></button>`;
 }
-// An open fault's `why` often opens with its status word ("Open — 7 of 12…"); the
-// sheet already says these are open, so drop the token and let the number lead.
-function faultLine(f){
-  const t = String(f.why || '').replace(/^\s*OPEN\b[\s,—–:-]*(and\s+)?/i, '');
-  const lead = splitLead(t)[0];
-  return lead.replace(/^./, c => c.toUpperCase());
+// A rule chip compressed to the phrase you act on. The plans author their rules with
+// the payload up front ("Set the face BARELY OPEN — that's your square"), so the lead
+// clause IS the cue; the reasoning stays one tap away in the full plan.
+function cheatCue(r){
+  let t = String(r || '').trim();
+  if(t.length <= 44) return t;
+  const dash = t.split(/\s+[—–]\s+/)[0];
+  if(dash.length <= 52) return dash;
+  t = splitLead(dash)[0];
+  if(t.length <= 52) return t;
+  t = t.split(/,\s/)[0];
+  return t.length <= 56 ? t : t.slice(0, 52).replace(/\s+\S*$/, '') + '…';
 }
+// Per-lab art — a picture instead of a paragraph. Like the Swing Positions guide this
+// is hardcoded presentation, and it draws the standing plans' HEADLINE instructions:
+// if a plan's headline changes (the face call, the landing-spot rule, the guard-the-
+// start read), the drawing here has to change with it. Theme-aware via CSS vars.
+const CHEAT_ART = {
+  swing(){
+    // The two positions the whole plan hangs on: address, and the top — where the
+    // laid-off re-route starts and the ONE thought (trail elbow) does its work.
+    const d = posData();
+    return `<div class="sheetart"><div class="duo">
+      <div>${posSvg(d[0])}<div class="cap">Address · 50/50, hinge from the hips</div></div>
+      <div>${posSvg(d[2])}<div class="cap">Top · trail elbow DOWN &amp; IN FRONT</div></div>
+    </div></div>`;
+  },
+  putting(){
+    const INK='var(--ink)', GRN='var(--gtext)', FNT='var(--faint)';
+    return `<div class="sheetart"><svg viewBox="0 0 320 104" role="img" aria-label="Face barely open is your square; pace before break">
+      <line x1="80" y1="56" x2="270" y2="56" style="stroke:${FNT};stroke-width:1.5;stroke-dasharray:5 5;opacity:.7"/>
+      <circle cx="286" cy="56" r="9" style="fill:none;stroke:${INK};stroke-width:2.5"/>
+      <circle cx="286" cy="56" r="2.5" style="fill:${FNT}"/>
+      <rect x="52" y="41" width="5" height="30" rx="2" style="fill:none;stroke:${FNT};stroke-width:1.5;stroke-dasharray:3 3"/>
+      <rect x="52" y="41" width="5" height="30" rx="2" style="fill:${GRN}" transform="rotate(-9 54.5 56)"/>
+      <circle cx="70" cy="56" r="6.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>
+      <path d="M 47 34 A 22 22 0 0 1 61 30" style="fill:none;stroke:${GRN};stroke-width:2"/>
+      <polygon points="65,30 56,26.5 57.5,34.5" style="fill:${GRN}"/>
+      <text x="12" y="18" style="fill:${GRN};font:800 11px var(--sans)">Face BARELY OPEN — that IS your square</text>
+      <path d="M 118 80 q 30 -14 58 0 q 26 12 50 2" style="fill:none;stroke:${INK};stroke-width:2;opacity:.55"/>
+      <polygon points="234,84 224,78 225,87" style="fill:${INK};opacity:.55"/>
+      <text x="118" y="99" style="fill:${INK};font:800 11px var(--sans)">Read PACE first — break second</text>
+    </svg></div>`;
+  },
+  'short-game'(){
+    const INK='var(--ink)', GRN='var(--gtext)', FNT='var(--faint)', BURG='var(--btext)';
+    return `<div class="sheetart"><svg viewBox="0 0 320 112" role="img" aria-label="Pick a landing spot and take the lowest shot that works">
+      <line x1="8" y1="96" x2="312" y2="96" style="stroke:${FNT};stroke-width:1.5"/>
+      <rect x="150" y="93.5" width="162" height="5" rx="2.5" style="fill:${GRN};opacity:.45"/>
+      <ellipse cx="122" cy="96" rx="20" ry="4.5" style="fill:${FNT};opacity:.5"/>
+      <line x1="282" y1="93" x2="282" y2="40" style="stroke:${INK};stroke-width:2"/>
+      <polygon points="282,40 300,46 282,52" style="fill:${BURG}"/>
+      <circle cx="30" cy="90" r="5.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>
+      <path d="M 30 88 Q 100 34 178 92" style="fill:none;stroke:${INK};stroke-width:2.5"/>
+      <line x1="184" y1="92" x2="266" y2="92" style="stroke:${INK};stroke-width:2;stroke-dasharray:3 5"/>
+      <path d="M 30 88 Q 140 -18 254 90" style="fill:none;stroke:${FNT};stroke-width:1.5;stroke-dasharray:4 4"/>
+      <circle cx="178" cy="93" r="6" style="fill:none;stroke:${GRN};stroke-width:2.5"/>
+      <text x="118" y="24" style="fill:${GRN};font:800 11px var(--sans)">Land it HERE, let it roll</text>
+      <line x1="172" y1="30" x2="178" y2="84" style="stroke:${GRN};stroke-width:1.5;stroke-dasharray:2 3"/>
+      <text x="8" y="48" style="fill:${INK};font:800 10.5px var(--sans)">LOW beats high</text>
+      <text x="312" y="110" text-anchor="end" style="fill:${FNT};font:italic 9.5px var(--sans)">pitch: only over trouble</text>
+      <text x="104" y="110" style="fill:${FNT};font:italic 9.5px var(--sans)">bunker</text>
+    </svg></div>`;
+  },
+  mental(){
+    const INK='var(--ink)', GRN='var(--gtext)', FNT='var(--faint)', BURG='var(--btext)';
+    const dots = Array.from({length:18}, (_,i) => {
+      const x = 21 + i * 16.4;
+      const guard = i < 3, last = i === 17;
+      return `<circle cx="${x}" cy="34" r="5.5" style="fill:${last?GRN:'none'};stroke:${guard?BURG:FNT};stroke-width:${guard?2.5:1.5}"/>`;
+    }).join('');
+    return `<div class="sheetart"><svg viewBox="0 0 320 100" role="img" aria-label="Guard holes 1 to 3; attention on for the shot, off on the walk">
+      ${dots}
+      <path d="M 15 20 h 44" style="stroke:${BURG};stroke-width:2"/>
+      <text x="64" y="23" style="fill:${BURG};font:800 10.5px var(--sans)">guard the START — that's where it lands</text>
+      <text x="314" y="53" text-anchor="end" style="fill:${GRN};font:800 10.5px var(--sans)">change NOTHING</text>
+      <path d="M 16 84 h 30 v-16 h 11 v16 h 44 v-16 h 11 v16 h 44 v-16 h 11 v16 h 46" style="fill:none;stroke:${GRN};stroke-width:2"/>
+      <text x="64" y="62" style="fill:${GRN};font:800 10px var(--sans)">ON 30s</text>
+      <text x="126" y="97" style="fill:${INK};font:800 10px var(--sans)">OFF on the walk</text>
+    </svg></div>`;
+  },
+};
 function cheatSheet(disc){
   const lab = LABS.find(l => l.disc === disc);
   const plans = plansFor(disc);
@@ -911,14 +986,13 @@ function cheatSheet(disc){
     <h2>${lab ? `${lab.ic} ${esc(lab.name)}` : ''} · before you play</h2>
     <button class="minibtn" data-action="cheat-close">✕ Close</button>
   </div>
-  ${oneJob ? `<div class="tipcard"><h4>One job</h4><p class="sm"><b>${esc(oneJob.next)}</b></p></div>` : ''}
-  ${lead ? `
-    ${lead.focus ? `<p class="sm" style="margin-top:9px"><b class="warn">The short version:</b> ${esc(lead.focus)}</p>` : ''}
-    ${(lead.rules || []).length ? `<div class="steprules top" style="margin-top:11px">${lead.rules.map(r => `<span>${esc(r)}</span>`).join('')}</div>` : ''}`
-  : `<p class="sm" style="margin-top:9px">No standing plan in this lab yet — ask Claude for one and this sheet builds itself from it.</p>`}
-  ${open.length ? `<h2 style="margin-top:16px">Watch for</h2>
-    ${open.map(f => `<p class="sm" style="margin-top:5px"><b class="warn">${esc(faultLabel(f.tag))}</b> — ${esc(faultLine(f))}</p>`).join('')}` : ''}
-  ${lead ? `<div class="linkrow" style="border-bottom:none;margin-top:10px" data-action="open-briefing" data-id="${lead.id}">
+  ${oneJob ? `<div class="tipcard" style="margin-top:11px"><h4>One job</h4><p class="sm"><b>${esc(oneJob.next)}</b></p></div>` : ''}
+  ${CHEAT_ART[disc] ? CHEAT_ART[disc]() : ''}
+  ${lead
+    ? ((lead.rules || []).length ? `<div class="cues">${lead.rules.map(r => `<span>${esc(cheatCue(r))}</span>`).join('')}</div>` : '')
+    : `<p class="sm" style="margin-top:9px">No standing plan in this lab yet — ask Claude for one and this sheet builds itself from it.</p>`}
+  ${open.length ? `<p class="sm sheetwatch"><b>Watch for:</b> ${open.map(f => `<b class="warn">${esc(faultLabel(f.tag))}</b>`).join(' · ')}</p>` : ''}
+  ${lead ? `<div class="linkrow" style="border-bottom:none;margin-top:8px" data-action="open-briefing" data-id="${lead.id}">
     <span class="sm"><b>${esc(lead.course)}</b> — the full plan</span><span class="arr">→</span></div>` : ''}`;
 }
 function openCheat(disc){
