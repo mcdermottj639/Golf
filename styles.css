@@ -79,10 +79,12 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 .ev{display:inline-block;font-size:8.5px;font-weight:800;letter-spacing:.07em;
   text-transform:uppercase;padding:1px 6px;border-radius:9px;margin-left:6px;
   vertical-align:1px;border:1px solid var(--line)}
+.ev.live{background:var(--green);color:var(--green-ink);border-color:var(--green)}
 .ev.round{background:#dfe8dc;color:var(--green);border-color:#a8c0ad}
 .ev.measured{background:#efe6c8;color:#7a6414;border-color:#cdbd7e}
 .ev.snapshot, .ev.self{background:transparent;color:var(--faint)}
 .ev.self{font-style:italic;letter-spacing:.04em}
+body.night .ev.live{background:#2f6b46;color:#eaf6ee;border-color:#3f8159}
 body.night .ev.round{background:#1c2b22;color:#8fd0a8;border-color:#33503f}
 body.night .ev.measured{background:#33301c;color:#dfc76a;border-color:#5a5533}
 
@@ -481,11 +483,29 @@ h2{scroll-margin-top:14px}
 .chip.on.auto{background:#f0dbde;color:var(--burg);border:1.5px solid var(--burg)}
 body.night .chip.on.auto{background:rgba(163,51,68,.3);color:#eab4bd;border-color:var(--burg)}
 /* Not a direction — a qualifier on the miss, so it reads as its own kind of tap. */
-.chip.ns{background:transparent;border:1px dashed var(--burg);color:var(--btext);padding:8px 14px}
-.chip.ns.on{background:var(--burg);color:var(--burg-ink);border-style:solid}
+.chip.ns, .chip.ob{background:transparent;border:1px dashed var(--burg);color:var(--btext);padding:8px 14px}
+.chip.ns.on, .chip.ob.on{background:var(--burg);color:var(--burg-ink);border-style:solid}
+.chip.ob{font-weight:700;letter-spacing:.04em}
 .res.ns{font-size:9.5px;letter-spacing:-.01em}
-body.night .chip.ns{background:transparent;border-color:var(--burg);color:var(--btext)}
-body.night .chip.ns.on{background:var(--burg);color:var(--burg-ink)}
+body.night .chip.ns, body.night .chip.ob{background:transparent;border-color:var(--burg);color:var(--btext)}
+body.night .chip.ns.on, body.night .chip.ob.on{background:var(--burg);color:var(--burg-ink)}
+/* A note is the one thing on this screen that wants a keyboard, so it stays folded away
+   behind a chip until he asks for it — the logger is thumbs-only by default. */
+.chip.note{background:transparent;border:1px dashed var(--line);color:var(--soft);padding:8px 14px}
+.lvnote{margin-top:6px;min-height:62px;line-height:1.45}
+/* A hole carrying a note, on the jump strip: a dot, not a badge — the strip is a scoring
+   view first and the note is a footnote to it. */
+.hstrip{position:relative}
+.hstrip.noted::after{content:'';position:absolute;left:50%;bottom:3px;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:var(--burg)}
+.hstrip.cur.noted::after{background:var(--green-ink)}
+/* Same mark on the scorecard, next to the hole number. */
+.nmark{font-size:10px;color:var(--burg);margin-left:3px;vertical-align:1px}
+/* Hole notes, read back: the hole number is the label, the note is the content. */
+.holenotes{display:grid;grid-template-columns:auto 1fr;gap:7px 11px;margin:2px 0 0}
+.holenotes dt{font-family:var(--sans);font-size:11px;font-weight:800;color:var(--btext);
+  padding-top:2px;white-space:nowrap}
+.holenotes dd{font-size:13.5px;line-height:1.45;color:var(--ink)}
 .chip.sc{display:inline-flex;flex-direction:column;align-items:center;gap:1px;padding:7px 13px;line-height:1.1}
 .chip.sc b{font-size:16px}
 .chip.sc i{font-size:8.5px;font-style:normal;letter-spacing:.05em;text-transform:uppercase;opacity:.75}

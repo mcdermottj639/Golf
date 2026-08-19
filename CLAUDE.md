@@ -80,7 +80,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `carry-update`   | Patch ONE ladder row by `target` name: `club` to add/patch (`after` names the row to insert behind), `remove:true` to drop it. **Not** gated on calibration — see below |
 | `course-add` / `course-remove` | Add/remove a course |
 | `round`          | Add a played round (see *Logging a round* below). Skipped if a round with the same `date` + `course` + `nine` is already there, whatever put it there |
-| `round-update`   | Patch a round matched by `date` + `course` (+ `nine`): `Object.assign` of the top level, per-hole merge by hole `n`. **The way to backfill `rating`/`slope` onto a live-logged card**, or fix a hole after the fact |
+| `round-update`   | Patch a round matched by `date` + `course` (+ `nine`): `Object.assign` of the top level, per-hole merge by hole `n`. **The way to backfill `rating`/`slope` onto a live-logged card**, or fix a hole after the fact. **On a `live:true` card it only FILLS GAPS** — fields the card already carries are left alone, because he recorded them standing on the hole. To overwrite one deliberately, put `"force": true` on the entry. Per-hole merges are unaffected either way |
 | `stats`          | Add/replace a cumulative stats snapshot (GHIN summaries); `replaces` swaps one out |
 | `test`           | Append a 10-ball putter test result |
 | `shortlist`      | Replace the putter shortlist (keeps prior `demoed` flags) |
@@ -167,12 +167,13 @@ differential — omit rather than guess). The value is in `holes[]`, one object 
 | `si` | stroke index. Unlocks the hardest-six / easiest-six split |
 | `putts` | putts on that hole. Unlocks 1/2/3-putt counts and putts-on-GIR-vs-off |
 | `gir` | `true`/`false` — green in regulation |
-| `gmiss` | where a missed green finished: `S` `L` `R` `Lg` `X` (short/left/right/long/other) |
+| `gmiss` | where a missed green finished: `S` `L` `R` `Lg` `OB` `X` (short/left/right/long/out of bounds/other) |
 | `fw` | `true`/`false` — fairway hit. **Omit entirely on par 3s** so they don't count against the fairway rate |
-| `fmiss` | where a missed tee shot finished, same codes |
+| `fmiss` | where a missed tee shot finished, same codes — `OB` included |
 | `tee` | **club key** hit off the tee — drives the *Off the tee · by club* table |
 | `app` | **club key** hit into the green on a par 4/5. Omit on par 3s: there the tee shot *is* the approach |
 | `noshot` | `true` when the tee shot left **no realistic play at the green** — see *Two ways to miss a green* below. Par 4/5 only |
+| `note` | free text Jack wrote **on that hole**, in the live logger. The only field on a card that records *why* — everything else records *what*. Renders on the round card under "What you wrote on the course", and marks the hole with ✎ |
 
 Tapping a round in **Scores** opens `roundView()` — the hole-by-hole card, scoring mix,
 par splits, miss directions, round-scoped coaching, and a comparison against the latest
@@ -200,8 +201,10 @@ unrecognised key still renders — it just prints itself.
 
 Home → **Play a live round** opens the hole-by-hole logger: one screen per hole, chips only,
 saving to `S.live` on every tap (iOS kills suspended PWAs, so nothing may live in memory).
-Finishing writes an ordinary round — same schema as above, plus `live:true` — and drops him
-straight into its `roundView`. Par and stroke index prefill from the newest card at that
+Finishing writes an ordinary round — same schema as above, plus `live:true`, which is what
+puts the card at the top of the evidence stack (see *Live rounds take precedence* below) —
+and drops him straight into its `roundView`. Two rows on the hole screen beyond the scoring
+chips: **OB** on Fairway and Green, and a per-hole **Note** — both documented below. Par and stroke index prefill from the newest card at that
 course, so a repeat course needs no typing at all.
 
 **Round prep reaches the course, one hole at a time.** A briefing whose `course` matches
@@ -327,13 +330,60 @@ leaves a clean look. Never infer it from `fw:false`. Rounds logged before this e
 carry no flag, so their misses all read as playable — backfill with `round-update` if he
 tells you which holes.
 
+### Out of bounds is a price, not a direction (Aug 19 2026)
+
+`OB` is a `fmiss` / `gmiss` code, tapped on the **Fairway** and **Green** rows of the live
+logger — a shot at the green goes out of bounds as readily as a tee shot does. It sits in
+the miss maps with the directions because it is where the ball *finished*, which is what
+those maps record, and it renders in the miss splits and on the round card like any other.
+
+What it is **not** is a dispersion reading. Out of bounds is stroke and distance — one
+penalty plus replaying the shot, **two strokes every time**, before there is a ball in
+play — and "40% of your misses go OB" answers a penalty question, not an aim one. So every
+place that asks *which way does the miss go* sorts through **`topDir()`**, which filters to
+the real directions in **`DIRS`**. Add a new finish code and it must be added to `MISS_LAB`,
+and to `DIRS` **only if it is genuinely a direction**.
+
+Where OB then speaks for itself:
+
+- Its own finding on Scores (`key:'ob'`) and on the round card, both stating the strokes
+  rather than the count — the number that matters is `n × 2`.
+- **An OB column in the off-the-tee club table**, beside Dead. A club that finds two thirds
+  of fairways and goes out of bounds with the rest is not the club its percentage makes it
+  look like, and that is the driver-vs-fairway-finder question stated in strokes.
+- One OB pre-ticks *Off the tee* (or *Approach*) on the finish screen. Two strokes gone is
+  not a marginal round.
+
+GIR% and fairway% are unchanged — a miss is a miss, and the flag prices it rather than
+erasing it. Same rule as `noshot`.
+
+### A note on any hole (Aug 19 2026)
+
+Jack asked to be able to write a note on **any hole**, the way he already could at the end
+of a round. The live logger's Note row does it: one chip (`＋ Add a note`) that opens a
+textarea, saved to `h.note` on **every keystroke** — same reason every chip tap saves, iOS
+kills suspended PWAs — plus `syncHoleNote()` on every way off the hole. `noteOpen` is UI
+state on `S.live` and never reaches the card.
+
+Two things this preserves. **The logger stays thumbs-only by default**: the keyboard is
+opt-in, one tap away, never in the way of the chips. And **the textarea is 16px** like every
+other form control — see the iOS auto-zoom rule below; do not shrink it.
+
+A noted hole is marked with a dot on the jump strip and a ✎ on the scorecard, and the notes
+themselves render as their own block — on the finish screen before he saves (so he can go
+back and edit any of them) and on the round card afterwards. **This is the only part of a
+card that remembers *why*; everything else records *what*** — so it is worth reading before
+the analytics when a round is being discussed. Feed entries can carry a hole `note` too, via
+`round` or `round-update`'s per-hole merge.
+
 ### Hole data outranks a stats snapshot
 
 An extension of *film is king* to the numbers: a hole Jack recorded himself is **measured**,
 a pasted GHIN average is **summarized**, a feel is **feel**. This works two ways:
 
-1. **Ranking.** Every tip carries an `ev` provenance — `round` (hole-by-hole cards he
-   logged) → `measured` (5-ft tests, filmed faults) → `snapshot` (pasted GHIN summaries)
+1. **Ranking.** Every tip carries an `ev` provenance — `live` (cards he logged in the live
+   logger, on the hole) → `round` (any other hole-by-hole card) → `measured` (5-ft tests,
+   filmed faults) → `snapshot` (pasted GHIN summaries)
    → `self` (his own post-round debrief, the Mental tab's only witness for what a card
    can't see), ranked by `EV_RANK` and badged in the UI by `evTag()`. Coach sorts severity first, then
    evidence, so the warnings still lead but his own rounds speak before a season average
@@ -344,6 +394,44 @@ a pasted GHIN average is **summarized**, a feel is **feel**. This works two ways
 
 Don't reintroduce a snapshot claim the hole data now answers better; do keep saying which
 one a number came from.
+
+### Live rounds take precedence over everything (standing instruction, Aug 19 2026)
+
+Jack's words: *"I've started adding the live rounds to the app — make sure those take
+precedence for everything. That's the best info we have right now to go off of."* A card
+logged in the live logger was recorded **on the hole, between shots, with the bag he is
+playing today**. Nothing sits between the shot and the record. Every other card — typed up
+afterwards, fed in from a GHIN summary — is the same shape of data one remove further
+away. So `live:true` is not a decoration; it is the top of the evidence stack, and four
+things enforce it:
+
+- **`EV_RANK` puts `live` above `round`**, so live findings lead every ranked list (Scores,
+  Coach, Mental) and wear the strongest badge.
+- **`scoreTips()` computes from the live cards ALONE wherever they can carry a finding.**
+  `holeTips(st, EV)` makes every hole-derived finding out of whatever set of cards it is
+  handed, and each one carries a stable **`key`**. `scoreTips()` runs it twice — once over
+  the live cards, once over all of them — and the live version of a finding **replaces**
+  the all-cards version rather than sitting beside it. Where the live sample can't clear a
+  finding's own gate yet, the full sample still speaks and the badge says `from your rounds`,
+  so preferring the better evidence can never *lose* a finding: the worst case is the answer
+  he already had. **A new hole-derived finding must be added inside `holeTips()` with a
+  `key`**, or it will render twice once he has a live sample.
+- **The GHIN claims stand down at a live-only bar.** `statTips()`'s approach-miss and
+  three-putt findings retire at 36 recorded holes as before, *or* at **14 live-logged ones**
+  — most of one round he tapped in himself. Only suppress a snapshot claim the live version
+  genuinely answers: the blow-up claim fires at 15% while its live twin needs a 25% share of
+  strokes lost, so standing that one down would delete a finding rather than replace it.
+- **A feed entry never overwrites a live card.** See `round-update` above: on `live:true` it
+  fills gaps only, unless the entry says `"force": true`.
+
+Two more places live wins, both in `app.js`: `newestLiveFirst` sorts the logger's par /
+stroke-index / tee-club prefill so a live card beats a fed one of the same date, and the
+Scores round list badges every live card so it is obvious at a glance which data is which.
+
+The honesty guard that makes all of this safe: **`evOf()` claims `live` only when the live
+cards really do carry the sample** — a round's worth, and at least half of what was counted.
+A badge saying "you logged this live" over a number mostly made of fed-in rounds is exactly
+the laundering the evidence ranks exist to prevent.
 
 ### The Mental tab (off-course, added Aug 13 2026)
 
