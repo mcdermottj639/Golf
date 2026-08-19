@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-08-14",
+  "updated": "2026-08-19",
   "entries": [
     {
       "id": "s4-session",
@@ -15360,6 +15360,106 @@
           }
         ]
       }
+    },
+    {
+      "id": "add-lakeside-20260819",
+      "type": "course-add",
+      "course": {
+        "name": "Lakeside Country Club",
+        "st": "NY"
+      }
+    },
+    {
+      "id": "briefing-lakeside-20260820",
+      "type": "briefing",
+      "briefing": {
+        "course": "Lakeside Country Club",
+        "date": "2026-08-20",
+        "focus": "First look at a hill course: rolling ground above Keuka Lake, five elevated greens, blind approaches, long uphill par 4s and a creek on five holes. Every one of those pushes the ball SHORT, which is already your standing miss. Club up, cover the middle, and take bogey on the climbs without an argument.",
+        "rules": [
+          "Club up — greens here play long",
+          "Cover the middle, never the flag",
+          "Blind shot? Pick the target first",
+          "Creek on 5 holes — ask which",
+          "Ball above your feet goes LEFT",
+          "1 is a hard opener: par is a bonus",
+          "Four 30-ft lags before you tee off"
+        ],
+        "holes": [
+          {
+            "n": 1,
+            "play": "*Position, not driver on autopilot* — reviewers call this one of the hardest opening holes here",
+            "avoid": "*A big number on a cold swing.* Bogey on the 1st costs one shot; the tee shot you try to rescue costs three",
+            "why": [
+              "The one hole anybody wrote about: *one of the hardest starting holes*, with the views back *down the hill* toward Keuka Lake from up by the green",
+              "So it climbs — that is *INFERRED* from the view direction, not stated anywhere. If it does climb, the approach is a *club more* than the number",
+              "Your own record says a round gets away *early*, not late: the Wianno match with the disruptive partner went *+6 over holes 1–3*",
+              "No sourced yardage, par or stroke index for this hole or any other — see the last section for why"
+            ]
+          }
+        ],
+        "sections": [
+          {
+            "t": "Every green plays long here",
+            "k": "Five elevated greens, blind approaches and uphill par 4s all leave the ball short — and short is already your miss.",
+            "b": "The course description is unusually specific about this: five ELEVATED greens, many holes needing a BLIND approach, and long uphill par 4s with steep approaches to the greens. That is three separate reasons for the ball to finish short of the putting surface.\n\nAnd short is your standing miss on approach — it is the loudest finding in your own hole data, and it is why the carry ladder keeps coming up. So the correction is not subtle here: take the yardage to the MIDDLE of the green, then add a club for the climb. On an elevated green the flag is often all you can see, which makes the front edge look like the middle; it isn't.\n\nWhy that trade is cheap: past the middle of an elevated green you are usually putting. Short of it, you are chipping up a steep bank from below the surface, which is the hardest shot on this kind of course and the one that turns a bogey into a double.\n\nThe blind ones need a separate discipline: do not swing at a target you have not chosen. Walk to the crest or the marker post, pick a tree, a pole or a skyline notch, aim at THAT, and go. A blind approach played at a vague 'up there' is how you end up short and left of everything."
+          },
+          {
+            "t": "Very few level lies",
+            "k": "The slope aims the ball — read the lie before you read the yardage.",
+            "b": "Built on rolling terrain overlooking the lake, so 'expect very few level lies' is the course's own summary of itself. That is a sourced fact about the ground. What follows below is standard ball-flight, not Lakeside research — it is true everywhere, it just matters more here.\n\nBall ABOVE your feet: the club sits toe-down, the face points left, and the ball starts and curves LEFT. Stand a touch taller, grip down, aim right of the target. This is the lie you will get most often on a hillside course and it is the one to have in your head.\n\nBall BELOW your feet: the opposite — the ball leaks RIGHT. More knee flex, stay down through it, aim left, and take one more club because you will catch it thinner than you want.\n\nUPHILL lie: the slope adds loft. Higher, shorter, and it can be a full club or more. Club up, ball slightly forward, swing with the slope rather than into it.\n\nDOWNHILL lie: the slope takes loft off. Lower, longer, and it is the hardest of the four. Take more loft than the number says, play the ball back, and let the club chase down the hill.\n\nThe compounding case is the one that will actually cost you a shot tomorrow: an uphill lie into an elevated green is two clubs, not one. On a hill course the errors stack in the same direction, and that direction is short."
+          },
+          {
+            "t": "The tee shot: trees, a creek, and no local knowledge",
+            "k": "The drive that leaves no play is the shot that has cost you most — and this is a blind, wooded course you have never seen.",
+            "b": "What is sourced: heavily wooded landscaping, with many of the tees sitting inside tunnels of trees, and a creek that comes into play on FIVE holes. Which five is not published anywhere reachable. That is a ten-second question on the first tee and it is worth asking the pro shop or whoever you are playing with — where the water crosses is the single most valuable fact about a course you have never played, because unlike a pin it never moves.\n\nThe course also changes character halfway through. The original nine dates from 1950 and is the tight, wooded half; the holes added in 1995 were built on wide-open terrain and are described as a deliberate contrast. So do not carry a driver decision made on the open holes back onto the tree tunnels.\n\nYour own evidence for the club choice: at Sterling Farms three tee shots left you with NO realistic play at the green — three holes, +4 between them, and the approach club never got a say. That is exactly what a blind, tree-lined tee shot on an unknown course produces. When you cannot see where the fairway goes, the 5-wood or the 2-iron is the honest club, and neither of them costs you a wedge into a 6,600-yard par 72.\n\nTwo things to log while you are out there. Tap the TEE CLUB on every hole — the by-club table is the only thing that will ever settle the driver-versus-5-wood question, and the 5-wood's carry is still unmeasured. And use the DEAD chip on any hole where the drive took the green away, so those holes get charged to the tee shot rather than to your irons."
+          },
+          {
+            "t": "Greens you have never putted",
+            "k": "Medium speed and unknown to you, so the round turns on lag — which is the fault you are already working on.",
+            "b": "Sourced: the greens are well bunkered and described as medium speed; one review calls them medium-fast with a very true roll, which is the good version of unknown. Bent grass, per one listing.\n\nDistance control is your open putting fault and it has never been measured. A course you have never putted is where it will show, so give it the ten minutes before you tee off rather than finding out on the 3rd green: four lags from 30 feet and one from 40, scoring nothing but whether the ball finishes inside a six-foot circle, then five from three feet with the full routine. That is your standing grind, done on the greens you are about to play.\n\nOn the LINK the aim picture is unchanged and does not get a second correction: face BARELY OPEN at address, shaft vertical, hands about 1.35 inches behind the ball. Do not add an aim-picture adjustment on top of the barely-open feel — that applies the fix twice and misses right.\n\nOne green-reading note that follows from the terrain rather than from research: on ground that rolls this much, the big break is usually the one you cannot see from beside the ball. Read the putt from below the hole, where the slope shows itself, and if you are guessing, miss on the HIGH side — a low miss was never going in."
+          },
+          {
+            "t": "The first three holes",
+            "k": "Your record says a round gets away EARLY, not at the finish — and the 1st here is a hard opener.",
+            "b": "This is the one place where your mental data and the course description point at the same holes. Reviewers call the 1st one of the hardest starting holes on the course. Your own cards say the Wianno match where a partner got into your head cost +6 over holes 1–3, against +3 on each of the other four nines out there — partner disruption lands at the START, not at the finish. Honest caveat, the same one that is in the Locked In plan: that was also the coldest start of the event, so warm-up and partner are confounded on that card and neither is established.\n\nWhat the same data says you do NOT have: a closing fade. Your last three holes run +0.67 against +0.89 for everything before them. So the job tomorrow is the beginning, not the end.\n\nPractical version: get there early enough to do the lag ladder above, treat the first three holes as the ones to protect, and take par-or-bogey on the 1st without a second thought. Slow play and random partners are two of your named triggers — if either shows up, the if-then responses are in the Mental tab, and the debrief afterwards is where they get counted."
+          },
+          {
+            "t": "Nobody publishes this course hole by hole — so log it",
+            "k": "One live round with tee clubs and stroke indexes turns the next Lakeside plan into a real hole-by-hole briefing.",
+            "b": "This plan has ONE hole note instead of eighteen, and that is deliberate. The club's own site and every scorecard database that carries Lakeside were unreachable from here, so nothing per-hole could be pinned: no yardages, no pars, no stroke indexes, no idea which five holes the creek crosses or which five greens are the elevated ones. Writing tee-shot lines for holes nobody could see would read exactly like researched ones, and that is the failure worth avoiding.\n\nSo the round itself is the research. Log it live: par and stroke index off the card, putts, greens hit and where the misses finished, fairways, the tee club on every hole, the approach club on the par 4s and 5s, and the DEAD chip where the drive left nothing. That card prefills every future round here — par and stroke index come straight off the newest card at the same course, so the second Lakeside round needs almost no typing.\n\nAnd photograph the scorecard. Tees played, rating, slope, the yardage column and the stroke indexes. Rating and slope get backfilled onto the card so the round produces a handicap differential, and the yardage column is what a proper hole-by-hole plan is built from."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "Course-level facts came from search summaries of blocked sites; nothing per-hole could be sourced, and the numbers below disagree with each other.",
+            "b": "RESEARCHED (searched Aug 19 2026). Every course site and scorecard database — lccpy.com, BlueGolf, GolfLink, GolfPass, Golfify, GolfTraxx, foretee — was blocked outright from this session, so these come from search-result summaries OF those pages rather than the pages themselves. Treat them as good but second-hand.\n\n- 18 holes, par 72, roughly 6,631–6,663 yards from the tips. The two figures come from different listings and disagree by 32 yards.\n- Rating and slope CONFLICT across sources: 71.6 / 131 from the Blue (the club's own listing); 72.3 / 131 Blue and 70.5 / 129 White (GolfLink summary); 71.4 / 129 unattributed to a tee elsewhere. UNCONFIRMED — read the card, and send me the tees you played so the round gets the right pair.\n- Terrain: built on rolling terrain overlooking Keuka Lake, 'expect very few level lies'.\n- Heavily wooded; many tees sit inside tunnels of trees.\n- A creek comes into play on FIVE holes. Which five: not published anywhere reachable.\n- FIVE elevated greens; many holes need a blind approach.\n- Greens well bunkered, medium speed; one review says medium-fast with a very true roll. Where the bunkers sit, hole by hole: unknown.\n- Long uphill par 4s with steep approaches to the greens (review summary).\n- Hole 1: 'one of the hardest starting holes', with views back down the hill toward Keuka Lake. That it plays UPHILL is my inference from the view direction, not a sourced statement.\n- Lake views from behind the 5th and 10th greens (review summary). That is scenery, not a playing instruction, so neither hole is written up — there is nothing about how to play them.\n- History: club established 1923; the golf course opened in 1950 as nine holes and went to 18 in 1995, the new holes built on open ground in deliberate contrast to the wooded originals.\n- Semi-private. 145 Rt 54 E Lake Road, Penn Yan NY 14527. Opens 8am (from the listing on the map card you sent).\n\nFROM YOUR OWN CARDS. Approach misses finish short more than any other direction. Three tee shots at Sterling Farms left no realistic play at the green, +4 between them. Wianno holes 1–3 played +6 on the disrupted card against +3 on each of the other four nines. Closing three holes +0.67 a hole against +0.89 before them. Putting distance control is open and unmeasured; tempo is closed at 2.0:1.\n\nNOT SOURCED, THEREFORE NOT WRITTEN: per-hole yardages, pars and stroke indexes; which holes the creek crosses; which greens are the elevated ones; where the bunkers sit; any dogleg direction. If you can grab the course's own hole-by-hole tour or a scorecard photo, all of that becomes writable."
+          }
+        ]
+      }
+    },
+    {
+      "id": "lesson-uneven-lies-20260819",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "c5",
+        "shelf": "Course Management",
+        "title": "Play the hill before you play the yardage",
+        "min": 4,
+        "tags": [
+          "approach",
+          "off-tee"
+        ],
+        "where": "course",
+        "kit": [],
+        "body": "On a course built across a hillside you will hit more sloping lies than flat ones, and the slope decides both the number and the start line before you have made a decision about either. Four lies, four rules.\n\nBALL ABOVE FEET: the club sits toe-down, the face aims left, the ball starts and curves LEFT. Stand taller, grip down, aim right.\n\nBALL BELOW FEET: the ball leaks RIGHT. More knee flex, stay down through it, aim left, one more club — you will catch it thin.\n\nUPHILL LIE: the slope adds loft. Higher and shorter, often a full club. Club up, ball a touch forward, swing along the slope.\n\nDOWNHILL LIE: the slope removes loft. Lower and longer, and the hardest of the four to strike. More loft than the number, ball back, chase the club down the hill.\n\nThe reason this is a course-management lesson rather than a swing one: the errors STACK. An uphill lie into an elevated green is two clubs, not one, and both mistakes push the ball the same way you already miss — short. The saving is not in a better swing off the slope, it is in reading the lie and the green together before you pull a club.",
+        "drill": "Nine holes of naming it out loud. Before every full shot off a slope, say the lie and the correction — 'above my feet, it goes left, aim right' — then pick the club, then swing. Note on the card where each miss actually finished. Score the CALLS, not the shots: you are looking for the lies where your prediction and the ball disagreed, because those are the two you have to work on."
+      }
+    },
+    {
+      "id": "action-lakeside-card-20260819",
+      "type": "action",
+      "pri": true,
+      "text": "Photograph the Lakeside scorecard — tees played, rating, slope, yardages and stroke indexes. Nothing about this course is published, so it is the only route to a real hole-by-hole plan (and to backfilling rating/slope onto the round)"
     }
   ]
 }
