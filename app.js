@@ -100,13 +100,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v49';
+const BUILD = 'v50';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v50', d:'2026-08-20', items:[
+    'What\u2019s new sends film to the right lab. Every film session in the log linked to the Putting Lab whatever it was of \u2014 so the driver breakdown that just landed would have opened your putting page. Swing film now goes to the Swing Lab, short-game film to Short Game, putting film to Putting. Rows already sitting in your log keep the link they were filed with; everything from here lands right.' ] },
   { b:'v49', d:'2026-08-20', items:[
     'Lakeside\u2019s real scorecard is on file \u2014 you photographed it, so par, stroke index, rating and slope now come off the club\u2019s own card instead of a simulator library.',
     'Your stroke indexes there were WRONG and are now fixed, both on the card on file and on your Aug 20 round. That card prints three different handicap rows \u2014 one for Blue/White, one for Green, one for the forward tees \u2014 and the old source had copied the forward one. Off the whites the 3rd is stroke index 1, the 16th is 2, and the 7th at 275 yards is 15, not 9. Your scores were not touched.',
@@ -4986,6 +4988,21 @@ function sameRound(list, r){
 // one described vaguely, so the fallback names the entry type rather than dropping it.
 const LAB_VIEW = { swing:'swing', 'short-game':'shortgame', putting:'putting', mental:'mental',
   'full-swing':'swing' };
+// A film session's changelog row has to point at the lab the session actually landed in.
+// sessionDiscipline() reads the setup text, which `session` entries always carry and most
+// `session-remove` entries do; a `session-update` patching only the finding carries none,
+// so fall back to the session it targets — recordUpdate() runs AFTER the entry is applied,
+// so that row is already in S.sessions. A remove by bare feed id has neither, because the
+// row is gone by then, so reuse the lab its own "Film ·" line was filed under.
+function sessionLabView(e){
+  const known = S.sessions.find(x => x._fid === (e.target || e.id));
+  const setup = e.setup || e.setupMatch || (known && known.setup) || '';
+  if(!setup && e.target){
+    const prior = (S.updates || []).find(u => u.id === e.target && u.act && u.act.v);
+    if(prior) return prior.act.v;
+  }
+  return LAB_VIEW[sessionDiscipline({ setup })] || 'putting';
+}
 // Text here is RAW — whatsNew() escapes when it renders, so nothing in the feed can
 // inject markup and nothing gets double-escaped on the way through localStorage.
 function updateLine(e){
@@ -5004,9 +5021,9 @@ function updateLine(e){
       s: e.remove ? 'dropped from the ladder — and from the tee chips in the live logger'
         : clip((e.club && e.club.carry != null) ? `${e.club.carry} yds` : 'carry unmeasured', 72), act:go('bag') };
     case 'carries':       return { h:'Carry ladder rebuilt', s:'', act:go('bag') };
-    case 'session':       return { h:`Film · ${clip(e.setup, 72)}`, s:clip(e.finding, 104), act:go('putting') };
-    case 'session-update':return { h:'Film session updated', s:clip(e.finding || e.setup, 104), act:go('putting') };
-    case 'session-remove':return { h:'Film session removed', s:clip(e.setupMatch, 96), act:go('putting') };
+    case 'session':       return { h:`Film · ${clip(e.setup, 72)}`, s:clip(e.finding, 104), act:go(sessionLabView(e)) };
+    case 'session-update':return { h:'Film session updated', s:clip(e.finding || e.setup, 104), act:go(sessionLabView(e)) };
+    case 'session-remove':return { h:'Film session removed', s:clip(e.setupMatch, 96), act:go(sessionLabView(e)) };
     case 'evolution':     return { h:'Stroke evolution grid rebuilt', s:'', act:go('putting') };
     case 'faults':        return { h:`Diagnosis updated · ${e.discipline || 'putting'}`,
       s:`${(e.faults || []).length} fault${(e.faults || []).length === 1 ? '' : 's'} on the board`,
