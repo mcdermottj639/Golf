@@ -38,13 +38,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v40';
+const BUILD = 'v41';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v41', d:'2026-08-20', items:[
+    'The notes you write on a hole now come back to you. Play that hole again and the note is on the hole card in the live logger, under your record for it.',
+    'Scores has a What you wrote on the course section — every hole note you have written, newest first, tappable through to its round.',
+    'A finding about a hole that keeps costing you now quotes what you wrote on it, and a round\u2019s blow-up list shows the note off each hole.' ] },
   { b:'v40', d:'2026-08-20', items:[
     'Home now ends with What\u2019s new — every change, newest first, with the day it was made. Tap any row to open what it changed.',
     'The gear wear counters moved to the Bag, where the clubs they describe are.' ] },
@@ -2655,8 +2659,13 @@ function scoreStats(rounds){
     if(i === 0){ opening.n++; opening.over += d; }
     const n = h.n ?? i + 1;
     const k = `${r.course}|${n}`;
-    const e = spots.get(k) || { course:r.course, hole:n, par:h.par, n:0, over:0 };
-    e.n++; e.over += d; spots.set(k, e);
+    const e = spots.get(k) || { course:r.course, hole:n, par:h.par, n:0, over:0, notes:[] };
+    e.n++; e.over += d;
+    // Carried, not counted. The worst-hole finding is arithmetic; what he wrote standing
+    // on the hole is the only record of why it keeps happening, and it rides along so the
+    // finding can quote it rather than leave him to remember.
+    if(h.note) e.notes.push({ text:h.note, date:r.date, over:d });
+    spots.set(k, e);
     // Shot detail. Recorded per hole since the live logger existed; absent on the older
     // score-only cards, which is why every consumer below gates on its own sample size.
     if(h.putts != null){
@@ -2801,7 +2810,8 @@ function holeTips(st, EV){
     b:`${p5.n} par-5 holes played, zero under par. Par 5s are where a mid-handicap makes his money. Decide the lay-up off your wedge ladder so the third shot is a NUMBER you own rather than whatever's left — 60°→80 · 56°→95 · 50°→108 · PW→122.` });
   const w = st.worst[0];
   if(w && (w.over / w.n) >= 1.5) t.push({ key:'worst-hole', ev:EV, s:'warn', src:'One hole', h:`${esc(w.course)} hole ${w.hole} is eating you`,
-    b:`+${w.over} across ${w.n} plays on a par ${w.par} — ${(w.over/w.n).toFixed(1)} a go. One hole played a handful of times shouldn't cost this much. Next time you see it, play it as a bogey hole on purpose and take the trouble out of the equation.` });
+    b:`+${w.over} across ${w.n} plays on a par ${w.par} — ${(w.over/w.n).toFixed(1)} a go. One hole played a handful of times shouldn't cost this much. Next time you see it, play it as a bogey hole on purpose and take the trouble out of the equation.${
+      (w.notes || []).length ? ` You wrote on it: ${w.notes.slice(-2).map(x => `&ldquo;${esc(x.text)}&rdquo; <span class="faint">${fmtDate(x.date)}</span>`).join(' · ')} — that is the part the number can't tell you.` : ''}` });
   const parRate = (st.mix.par + st.mix.birdie + st.mix.eagle) / st.holes;
   if(parRate >= 0.4) t.push({ key:'pars', ev:EV, s:'good', src:'Protect this', h:'You make a lot of pars',
     b:`${Math.round(parRate*100)}% of holes played at par or better. The base game is there — the scoring gap is the tail, not the average.` });
@@ -3018,6 +3028,29 @@ function scores(){
       all.some(r => r.note) ? ` Latest note: "${esc(all.filter(r=>r.note).slice(-1)[0].note)}"` : ''}</p>
   </div>
 
+  ${(() => {
+    // EVERY note he has written, newest first. Until now a note was only visible inside
+    // the round card it was written on, which made the one field that records WHY the
+    // hardest thing on the page to find. They are quoted, never parsed: free text reaches
+    // the app's logic by being handed back where it applies — this list, the finding it
+    // belongs to, and the tee box he wrote it on — not by being scanned for keywords,
+    // which would be inference wearing a measurement's badge.
+    const notes = [];
+    S.rounds.forEach((r, i) => (Array.isArray(r.holes) ? r.holes : []).forEach(h => {
+      if(h && h.note) notes.push({ r, i, n:h.n, text:h.note });
+    }));
+    if(!notes.length) return '';
+    notes.sort((a, b) => (b.r.date || '').localeCompare(a.r.date || '') || b.i - a.i);
+    const show = notes.slice(0, 12);
+    return `<h2>What you wrote on the course</h2>
+    <div class="card">
+      <dl class="holenotes">${show.map(x => `<dt data-action="open-round" data-i="${x.i}" style="cursor:pointer">${esc(x.n)}</dt>
+        <dd data-action="open-round" data-i="${x.i}" style="cursor:pointer">${esc(x.text)}
+          <span class="sm faint">— ${esc(x.r.course || 'your round')}${x.r.nine ? ` ${x.r.nine === 'F' ? 'front' : 'back'}` : ''} · ${fmtDate(x.r.date)}</span></dd>`).join('')}</dl>
+      <p class="sm faint" style="margin-top:8px">${notes.length > show.length ? `The newest ${show.length} of ${notes.length}. ` : ''}Written on the hole itself, while you could still see the shot — the only part of a card that remembers <b>why</b>. Tap one to open its round. Play that hole again and the note comes back to you on the tee.</p>
+    </div>` ;
+  })()}
+
   ${logRoundCard()}`;
 }
 
@@ -3216,7 +3249,7 @@ function roundTips(r, a){
   if(a.blowups.length){
     const cost = a.blowups.reduce((x,h) => x + (h.s - h.par - 1), 0);
     t.push({ s:'warn', src:'Biggest single lever', h:`${a.blowups.length} hole${a.blowups.length === 1 ? '' : 's'} of double or worse · ${cost} stroke${cost === 1 ? '' : 's'} over bogey`,
-      b:`${a.blowups.map(h => `hole ${h.n} (par ${h.par}, ${h.s})`).join(' · ')}. Turning each of these into a bogey is ${cost} shots without hitting one better shot. On a hole that starts badly, take the punch-out.` });
+      b:`${a.blowups.map(h => `hole ${h.n} (par ${h.par}, ${h.s})${h.note ? ` — &ldquo;${esc(h.note)}&rdquo;` : ''}`).join(' · ')}. Turning each of these into a bogey is ${cost} shots without hitting one better shot. On a hole that starts badly, take the punch-out.` });
   }
 
   // Stroke index tiers. A card where the easy holes cost as much as the hard ones is
@@ -3478,13 +3511,20 @@ function holeRecord(course, n){
   S.rounds.forEach(r => {
     if((r.course || '').trim().toLowerCase() !== key || !Array.isArray(r.holes)) return;
     const h = r.holes.find(x => x && x.n === n && x.s != null && x.par != null);
-    if(h) plays.push({ d:h.s - h.par, s:h.s, tee:h.tee });
+    if(h) plays.push({ d:h.s - h.par, s:h.s, tee:h.tee, note:h.note, date:r.date });
   });
   if(!plays.length) return null;
   const over = plays.reduce((a, p) => a + p.d, 0);
   const clubs = [...new Set(plays.map(p => p.tee).filter(Boolean))];
+  // WHAT HE WROTE, HANDED BACK ON THE HOLE HE WROTE IT ABOUT. A note is free text, so it
+  // can never be counted the way a chip can — and it is the only field on a card that
+  // records WHY the hole played the way it did. So it is never parsed into a finding;
+  // it is returned where it answers something, which is standing on that tee again.
+  // Newest first, and only two: this renders on a phone between shots.
+  const notes = plays.filter(p => p.note)
+    .sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 2);
   return { n:plays.length, over, avg:over / plays.length,
-    best:plays.reduce((a, p) => Math.min(a, p.s), Infinity), clubs };
+    best:plays.reduce((a, p) => Math.min(a, p.s), Infinity), clubs, notes };
 }
 
 // ----- Cutting the tee tap -----
@@ -3717,12 +3757,15 @@ function livePlay(L){
             k === 'Avoid' ? 'hot' : i === 0 && hn.play ? 'lead' : ''}">${emph(v)}</dd>`).join('')}
           ${rec ? `${rows.length ? '<div class="hi-sep"></div>' : ''}
             <dt class="was">Last</dt><dd class="was">${line}${
-            eating ? ' — <b class="hot">play it as a bogey hole</b>' : ''}</dd>` : ''}
+            eating ? ' — <b class="hot">play it as a bogey hole</b>' : ''}</dd>
+            ${rec.notes.map(p => `<dt class="was">Wrote</dt>
+              <dd class="was">&ldquo;${esc(p.note)}&rdquo; <span class="faint">${fmtDate(p.date)}</span></dd>`).join('')}` : ''}
         </dl>`;
       })()}
       ${why.length || !hn ? `<ul class="hi-why">
         ${why.map(w => `<li>${emph(w)}</li>`).join('')}
         ${!hn && rec ? `<li>${line}</li>` : ''}
+        ${!hn ? (rec ? rec.notes : []).map(p => `<li>You wrote here ${fmtDate(p.date)}: &ldquo;${esc(p.note)}&rdquo;</li>`).join('') : ''}
         ${!hn && eating ? `<li class="hot"><b>This one has been eating you</b> — play it as a bogey hole on purpose</li>` : ''}
       </ul>` : ''}
     </div>`;
