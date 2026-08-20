@@ -12,8 +12,9 @@ Hosted on GitHub Pages; installs to the phone home screen via the service worker
 ```
 index.html            App shell + nav + service-worker registration
 app.js                The whole app: seed data, state, all views, render logic
-                      (incl. the live-round logger — see "Live rounds" below —
-                       and the Mental tab, see "The Mental tab")
+                      (incl. the live-round logger — see "Live rounds" below,
+                       the Mental tab, see "The Mental tab", and RELEASES, the
+                       app's own changelog — see "Home ends with What's new")
 styles.css            "Scorecard Heritage" theme (cream paper, Masters green, burgundy)
 lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
@@ -764,6 +765,43 @@ measurement over self-report — and say which one you're using.
   empty — those are his to fill in. `course-add` is a no-op if the name already exists,
   so a duplicate is harmless. Name it the same as the matching briefing's `course` where
   possible — `briefing()` links a briefing's "Your history" line by exact name match.
+
+### Home ends with What's new — and it has to be fed (Aug 20 2026)
+
+Jack's instruction: *"Make home page the same down to from your coach today. After that make
+it showing anything new that is updated for reference. If multiple list them all."* So Home
+is unchanged through the coach tip, and everything below it is now a **changelog**: every
+change, newest first, grouped by the day it was made, all of them listed rather than the
+latest one. (The old *Gear intelligence* card moved to Bag → **Wear**, where the clubs it
+describes are; the return-window card and the Decisions / Data links still follow it.)
+
+Two streams merge in `whatsNew()`:
+
+- **The coach feed.** `applyFeed()` calls `recordUpdate()` on every entry it applies, and
+  `updateLine()` turns the entry into one line of plain English plus where it landed.
+  **A new feed `type` needs a case in `updateLine()`** or it renders as a bare
+  `Update · <type>` — the fallback exists so a change can never be invisible, not as a
+  substitute for describing it. Text stored there is RAW; `whatsNew()` escapes on render.
+- **`RELEASES` in `app.js`** — the app's own notes. The feed carries data; a change to the
+  app itself has no other route onto the phone and nowhere else to announce itself.
+  **Add a `RELEASES` block every time you bump `BUILD`**, newest first, written for Jack
+  rather than for a developer. An update he can't see landed is indistinguishable from one
+  that didn't.
+
+Three behaviours worth not breaking:
+
+- **Dates come from the feed id** (`plan-short-putts-20260814-v8` → Aug 14), because that is
+  the day the change was made. `entryDate()` prefers it over the entry's own `date`, which
+  means different things per type — and on a briefing is the date of a round that may not
+  have happened yet.
+- **Same headline, same day = one row**, with an `N updates` count. The feed versions a plan
+  by re-sending it, which is right for the data and pure noise in a changelog.
+- **`updatesInit` / `seenUpdates`.** On an install that has already applied the whole feed
+  the log would open empty, so `backfillUpdates()` replays the feed's tail once and marks it
+  — plus every release before the current `BUILD` — already seen. That way the "N new"
+  banner on the first open after an upgrade counts only what is genuinely new. Boot renders
+  Home before the feed is fetched, so the first render is deliberately read-only; the one
+  after it commits.
 
 After any feed change: `python3 -c "import json; json.load(open('coach-feed.json'))"`,
 `node --check app.js`, bump `"updated"`, commit, push.

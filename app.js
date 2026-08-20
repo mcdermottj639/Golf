@@ -38,7 +38,29 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v39';
+const BUILD = 'v40';
+// The app's own changelog. coach-feed.json carries DATA updates and announces itself
+// through them; a change to the app ITSELF has no other route onto the phone and nowhere
+// else to say what it did, so it is written here and merged into Home's What's new block
+// alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
+// update he can't see landed is indistinguishable from one that didn't.
+const RELEASES = [
+  { b:'v40', d:'2026-08-20', items:[
+    'Home now ends with What\u2019s new — every change, newest first, with the day it was made. Tap any row to open what it changed.',
+    'The gear wear counters moved to the Bag, where the clubs they describe are.' ] },
+  { b:'v39', d:'2026-08-19', items:[
+    'Rounds you log live now outrank everything else. Where your live cards can answer a question on their own they answer it alone, and the finding says "you logged this live".',
+    'OB on the live logger — one chip on Fairway and on Green. It gets priced rather than counted: stroke and distance is two strokes every time, and there is now an OB column in the off-the-tee club table.',
+    'A note on any hole, not just at the end of the round. One tap opens the box; it saves as you type.' ] },
+  { b:'v38', d:'2026-08-14', items:[
+    'Starting a live round no longer zooms the phone in and leaves it there.' ] },
+  { b:'v37', d:'2026-08-14', items:[
+    'The course cheat sheet describes the course rather than repeating the hole notes.' ] },
+  { b:'v36', d:'2026-08-14', items:[
+    'Pre-round cheat sheet, reachable from Home.',
+    'The app checks for a new build every time you open it and refreshes itself.' ] },
+];
+
 const GROOVE_LIFE = 80;  // rounds until a wedge face is considered spent
 const GRIP_LIFE = 40;    // rounds until regrip
 
@@ -204,6 +226,10 @@ function migrate(s){
   if(!s.lessonHidden) s.lessonHidden = [];
   if(!s.kit) s.kit = seed().kit;
   if(s.live === undefined) s.live = null;   // a round being logged hole-by-hole
+  if(!s.updates) s.updates = [];            // the What's new log — see recordUpdate()
+  if(s.updatesInit === undefined) s.updatesInit = false;
+  if(s.settings.seenBuild === undefined) s.settings.seenBuild = null;
+  if(!s.settings.seenUpdates) s.settings.seenUpdates = [];
   if(!s.evolution || s.sessions.every(x => !x.detail)){
     const fresh = seed();
     if(!s.evolution) s.evolution = fresh.evolution;
@@ -527,6 +553,8 @@ const TITLES = {
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
+  shelf:['Coach','One shelf of the library.'],
+  lesson:['Coach','One lesson, and the drill that trains it.'],
   round:['Round Detail','One card, hole by hole, and what it cost you.'],
   live:['Live Round','Tap it in as you play — it scores itself.'],
   preps:['Round Prep','Every course plan, kept for the next time.'],
@@ -629,6 +657,79 @@ function preps(){
 const actionLi = a => `<li class="${a.done ? 'done' : ''}" data-action="toggle-action" data-id="${a.id}">
   <span class="box"></span><span class="txt">${esc(a.text)}${a.pri && !a.done ? '<span class="pri">HIGH</span>' : ''}</span></li>`;
 
+// ----- What's new -----
+// Everything that has changed, newest first, in one place — Jack asked for it on Home
+// under the coach tip, and asked for ALL of it rather than the latest one. Two streams
+// merge here: the coach feed (data — plans, bag changes, rounds, lessons) and RELEASES
+// (the app itself, which the feed cannot carry). Grouped by the day the change was made,
+// so it reads as a log rather than a list.
+//
+// A row is tappable wherever the change has somewhere to be looked at, which is the point
+// of the block: it is a table of contents for what is different, not a substitute for it.
+function whatsNew(){
+  const rows = [];
+  (S.updates || []).forEach(u => rows.push({ d:u.d, k:u.id, h:u.h, s:u.s, act:u.act }));
+  // One row per RELEASE, not per note: three sentences of release copy set as three
+  // headlines shouts over the data changes around it, and a build is one event anyway.
+  RELEASES.forEach(r => rows.push({ d:r.d, k:`build:${r.b}`, h:'The app updated',
+    b:r.b, items:r.items, s:'', act:null }));
+  if(!rows.length) return '';
+  // Stable sort on the date alone, so within one day the feed's own order survives and
+  // the app notes sit under the data changes they shipped alongside.
+  rows.sort((a, b) => (b.d || '').localeCompare(a.d || ''));
+  const seen = new Set(S.settings.seenUpdates || []);
+  // Boot renders Home before the feed has been fetched, so on the very first open after an
+  // upgrade this runs with nothing in the log yet. Marking seen there would consume this
+  // build's release notes in the same paint that introduced them, a second before the feed
+  // lands and redraws. So the first render is read-only and the one after it does the work.
+  const commit = S.updatesInit;
+  const days = [];
+  rows.forEach(r => {
+    const last = days[days.length - 1];
+    if(last && last.d === r.d) last.rows.push(r); else days.push({ d:r.d, rows:[r] });
+  });
+  // Three pushes to one plan on one day is one change to that plan, not three — the feed
+  // is append-only and versions a plan by re-sending it, which is right for the data and
+  // pure noise in a changelog. Collapse them onto the newest, keep the count, and carry
+  // every merged id so the row is fresh if ANY of them is and all of them are marked seen.
+  days.forEach(day => {
+    const byHead = new Map();
+    day.rows.forEach(r => {
+      const hit = byHead.get(r.h);
+      if(hit){ hit.n++; hit.keys.push(r.k); }
+      else byHead.set(r.h, Object.assign(r, { n:1, keys:[r.k] }));
+    });
+    day.rows = [...byHead.values()];
+  });
+  const fresh = days.reduce((a, day) =>
+    a + day.rows.filter(r => !r.keys.every(k => seen.has(k))).length, 0);
+  const attrs = a => !a ? '' :
+    ` data-action="${a.a}"${a.v ? ` data-view="${a.v}"` : ''}${a.id ? ` data-id="${esc(a.id)}"` : ''}`;
+  // Remember only what is still on the list, so the seen-set can't grow forever.
+  const keys = days.flatMap(day => day.rows.flatMap(r => r.keys));
+  if(commit && (fresh || keys.length !== (S.settings.seenUpdates || []).length)){
+    S.settings.seenUpdates = keys;
+    save();
+  }
+  return `
+  <h2>What's new</h2>
+  <div class="card">
+    ${fresh ? `<p class="sm"><b class="warn">${fresh} new</b> since you last opened this page.</p>` : ''}
+    ${days.map(day => `<div class="upday">
+      <div class="update-d">${fmtDate(day.d)}</div>
+      <div>${day.rows.map(r => `<div class="uprow${r.keys.every(k => seen.has(k)) ? '' : ' fresh'}${
+        r.act ? ' opens' : ''}"${attrs(r.act)}>
+        <div class="uph">${esc(r.h)}${r.b ? `<span class="upb">${esc(r.b)}</span>` : ''}${
+          r.n > 1 ? `<span class="upn">${r.n} updates</span>` : ''}</div>
+        ${r.s ? `<div class="ups">${esc(r.s)}</div>` : ''}
+        ${r.items ? `<ul class="upli">${r.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+        ${r.act ? '<span class="arr">→</span>' : ''}
+      </div>`).join('')}</div>
+    </div>`).join('')}
+    <p class="sm faint" style="margin-top:10px">Every change Claude has pushed, newest first — plans, bag changes, rounds, lessons and coaching, plus what changed in the app itself. Tap any row to open what it changed. Dated by the day the change was made. Older entries drop off the bottom once there are ${UPDATE_CAP}; nothing is lost — the change itself lives in the bag, the plan or the card it landed on.</p>
+  </div>`;
+}
+
 // ----- Home -----
 function home(){
   const dl = daysLeft(S.settings.returnDeadline);
@@ -637,8 +738,6 @@ function home(){
   const last = latestFiveFt();
   const sc = last ? fiveFtScore(last) : null;
   const picks = pickedLessons().slice(0,1);
-  const wedges = S.clubs.filter(c => c.cat==='wedge' && c.status==='gaming');
-  const worstWedge = wedges.sort((a,b)=>groovePct(a)-groovePct(b))[0];
   return `
   ${liveBanner()}
   <div class="rowgrid">
@@ -697,13 +796,7 @@ function home(){
     <button class="btn ghost tiny" data-action="go" data-view="coach">All lessons →</button>
   </div>` : ''}
 
-  ${worstWedge ? `<div class="card">
-    <h2>Gear intelligence</h2>
-    <h3>${esc(worstWedge.name)} grooves at ${groovePct(worstWedge)}% life</h3>
-    <div class="meter grn"><span style="width:${groovePct(worstWedge)}%"></span></div>
-    <p class="sm">Spin drops noticeably below ~50% (${GROOVE_LIFE}-round life). Grips: round ${S.settings.gripRounds} of ~${GRIP_LIFE} before regrip. Both counters advance automatically when you log rounds.</p>
-  </div>` : ''}
-
+  ${whatsNew()}
 
   ${!pending ? '' : `
   <div class="card">
@@ -774,6 +867,21 @@ function bag(){
     <label>Notes</label><input id="clNo" placeholder="Why it's in the bag">
     <div style="margin-top:10px"><button class="btn" data-action="add-club">Save club</button></div>
   </div>
+
+  ${(() => {
+    // The wear counters used to live on Home. Home is the what's-changed page now, and
+    // these belong with the clubs they describe anyway: the groove meter is already on
+    // every wedge card above, and the grip count had nowhere else at all.
+    const w = S.clubs.filter(c => c.cat === 'wedge' && c.status === 'gaming')
+      .sort((a, b) => groovePct(a) - groovePct(b))[0];
+    return `<h2>Wear</h2>
+    <div class="card">
+      <p class="sm"><b>Grips</b> — round ${S.settings.gripRounds} of ~${GRIP_LIFE} before a regrip.${
+        w ? ` <b>Grooves</b> — the ${esc(w.name)} is the most worn face in the bag at ${groovePct(w)}% of its ${GROOVE_LIFE}-round life; spin drops noticeably below ~50%.` : ''}</p>
+      ${w ? `<div class="meter grn"><span style="width:${groovePct(w)}%"></span></div>` : ''}
+      <p class="sm faint" style="margin-top:8px">Both counters advance automatically every time you log a round, however you logged it.</p>
+    </div>`;
+  })()}
 
   <h2>Full-bag distance ladder</h2>
   <div class="card">
@@ -4176,8 +4284,114 @@ function sameRound(list, r){
     && (x.course || '').trim().toLowerCase() === key
     && (x.nine || null) === (r.nine || null)) || null;
 }
+// ---------- What's new: the log of everything that has changed ----------
+// Every feed entry is a change somebody made to his app, and until now the only sign one
+// had landed was a toast that disappeared. This turns each of them into one line of plain
+// English plus the place it landed, so Home can say what is different since he last looked.
+//
+// Anything this doesn't recognise still gets a line: a change he cannot see is worse than
+// one described vaguely, so the fallback names the entry type rather than dropping it.
+const LAB_VIEW = { swing:'swing', 'short-game':'shortgame', putting:'putting', mental:'mental',
+  'full-swing':'swing' };
+// Text here is RAW — whatsNew() escapes when it renders, so nothing in the feed can
+// inject markup and nothing gets double-escaped on the way through localStorage.
+function updateLine(e){
+  const go = v => ({ a:'go', v });
+  const nm = o => (o && o.name) || '';
+  const clip = (t, n) => { t = (t || '').replace(/\s+/g, ' ').trim();
+    return t.length > n ? t.slice(0, n - 1).trimEnd() + '…' : t; };
+  const club = e.club || {}, br = e.briefing || {}, ls = e.lesson || {}, rd = e.round || {};
+  switch(e.type){
+    case 'club-add':      return { h:`New club · ${nm(club) || 'in the bag'}`, s:clip(club.spec || club.note, 96), act:go('bag') };
+    case 'club-update':   return { h:`Bag update · ${e.target || 'a club'}`,
+      s: club.status ? `now ${club.status}` : clip(club.note || club.spec, 96), act:go('bag') };
+    case 'history':       return { h:'Bag history', s:clip(e.text, 96), act:go('bag') };
+    case 'history-edit':  return { h:'Bag history corrected', s:clip(e.text, 96), act:go('bag') };
+    case 'carry-update':  return { h:`Carry ladder · ${e.target || ''}`,
+      s: e.remove ? 'dropped from the ladder — and from the tee chips in the live logger'
+        : clip((e.club && e.club.carry != null) ? `${e.club.carry} yds` : 'carry unmeasured', 72), act:go('bag') };
+    case 'carries':       return { h:'Carry ladder rebuilt', s:'', act:go('bag') };
+    case 'session':       return { h:`Film · ${clip(e.setup, 72)}`, s:clip(e.finding, 104), act:go('putting') };
+    case 'session-update':return { h:'Film session updated', s:clip(e.finding || e.setup, 104), act:go('putting') };
+    case 'session-remove':return { h:'Film session removed', s:clip(e.setupMatch, 96), act:go('putting') };
+    case 'evolution':     return { h:'Stroke evolution grid rebuilt', s:'', act:go('putting') };
+    case 'faults':        return { h:`Diagnosis updated · ${e.discipline || 'putting'}`,
+      s:`${(e.faults || []).length} fault${(e.faults || []).length === 1 ? '' : 's'} on the board`,
+      act:go(LAB_VIEW[e.discipline || 'putting'] || 'putting') };
+    case 'action':        return { h:'New to-do', s:clip(e.text, 104), act:go('coach') };
+    case 'action-done':   return { h:'To-do closed', s:'', act:go('coach') };
+    case 'action-update': return { h:'To-do reworded', s:clip(e.text, 104), act:go('coach') };
+    case 'course-add':    return { h:`Course added · ${nm(e.course)}`, s:'Rate it after you play it', act:go('courses') };
+    case 'course-remove': return { h:`Course removed · ${e.target || ''}`, s:'', act:go('courses') };
+    case 'round':         return { h:`Round · ${rd.course || ''}`,
+      s:[rd.date ? fmtDate(rd.date) : '', rd.score != null ? `${rd.score}` : ''].filter(Boolean).join(' · '), act:go('scores') };
+    case 'round-update':  return { h:`Round updated · ${rd.course || ''}`,
+      s:[rd.date ? fmtDate(rd.date) : '', rd.rating != null ? 'rating and slope backfilled' : ''].filter(Boolean).join(' · '), act:go('scores') };
+    case 'stats':         return { h:'Stats snapshot', s:'A new GHIN summary to measure against', act:go('scores') };
+    case 'test':          return { h:'Putter test logged', s:clip(e.test && e.test.note, 96), act:go('putting') };
+    case 'shortlist':     return { h:'Putter shortlist updated', s:'', act:go('putting') };
+    case 'briefing':      return { h:`${br.date ? 'Round prep' : 'Plan'} · ${br.course || ''}`,
+      s:clip(br.focus, 104), act:{ a:'open-briefing', id:e.id } };
+    case 'briefing-remove': return { h:'Plan retired', s:'', act:go('preps') };
+    case 'debrief':       return { h:'Debrief recorded', s:clip(e.debrief && e.debrief.note, 104), act:go('mental') };
+    case 'debrief-update':return { h:'Debrief updated', s:'', act:go('mental') };
+    case 'lesson-add':    return { h:`New lesson · ${ls.title || ''}`, s:clip(ls.body, 104),
+      act: ls.id ? { a:'open-lesson', id:ls.id } : go('coach') };
+    case 'lesson-update': return { h:`Lesson updated${ls.title ? ` · ${ls.title}` : ''}`, s:clip(ls.body || ls.drill, 104),
+      act: e.target ? { a:'open-lesson', id:e.target } : go('coach') };
+    case 'lesson-remove': return { h:'Lesson retired', s:'', act:go('coach') };
+    case 'deadline':      return { h: e.date ? 'Return deadline set' : 'Return deadline cleared', s:'', act:go('decisions') };
+    default:              return { h:`Update · ${e.type || 'change'}`, s:'', act:null };
+  }
+}
+
+// When a change happened. Feed ids carry the date they were appended by convention
+// (`plan-short-putts-20260814-v8`), and that is exactly the date a changelog wants — the
+// day the change was made. It beats the entry's own `date`, which means different things
+// per type: the day a round was played, the day film was shot, or on a briefing the day of
+// a round that may not have happened yet. Undated id, no date field: it landed today.
+function entryDate(e){
+  const m = /(20\d{2})(\d{2})(\d{2})/.exec(e.id || '');
+  if(m) return `${m[1]}-${m[2]}-${m[3]}`;
+  return e.date || (e.round && e.round.date) || (e.briefing && e.briefing.date) || today();
+}
+
+// One row of the log. Newest first, capped — this is a "what changed" list, not an
+// archive; the plans, the bag and the cards are where the change itself lives.
+const UPDATE_CAP = 40;
+function recordUpdate(e){
+  const l = updateLine(e);
+  if(!l) return;
+  S.updates.unshift({ id:e.id, t:e.type, d:entryDate(e), h:l.h, s:l.s || '', act:l.act || null });
+  if(S.updates.length > UPDATE_CAP) S.updates.length = UPDATE_CAP;
+}
+
+// First run on a phone that has already applied the whole feed: without this the block
+// would open empty on the one install that has the most history behind it. The feed is
+// append-only, so its TAIL is the most recent work — replay that much of it as already
+// seen, with no applied-on date, because this device genuinely doesn't know when it
+// landed and inventing one would be worse than saying nothing.
+function backfillUpdates(feed){
+  const entries = (feed.entries || []).filter(e => e.id && S.feedApplied.includes(e.id));
+  // Replayed oldest→newest and unshifted, so the newest ends up on top with no reversing.
+  // Half the cap, so the first render is a readable recap rather than a wall, and there is
+  // room for what arrives next before anything gets pushed off the bottom.
+  entries.slice(-Math.floor(UPDATE_CAP / 2)).forEach(recordUpdate);
+  // These are not news — they are what he has already been running for weeks. Same for
+  // the release notes of builds before this one. So the backfill marks all of it seen,
+  // and the "N new" banner on the first render after an upgrade counts only what genuinely
+  // is new: this build's notes, plus whatever the feed pushes from here on.
+  S.settings.seenUpdates = S.updates.map(u => u.id)
+    .concat(RELEASES.filter(r => r.b !== BUILD).map(r => `build:${r.b}`));
+  S.updatesInit = true;
+}
+
 function applyFeed(feed){
   let changed = false;
+  // Building the log for the first time is itself a change worth persisting and redrawing:
+  // on a phone that has already applied the whole feed nothing else here will be, and
+  // without this the What's new block would stay empty until the next push arrived.
+  if(!S.updatesInit){ backfillUpdates(feed); changed = true; }
   (feed.entries || []).forEach(e => {
     if(!e.id || S.feedApplied.includes(e.id)) return;
     if(e.type === 'session') S.sessions.push({ date:e.date, setup:e.setup, finding:e.finding, detail:e.detail, _fid:e.id });
@@ -4322,6 +4536,7 @@ function applyFeed(feed){
     else if(e.type === 'deadline'){ S.settings.returnDeadline = e.date; S.settings.deadlineEstimated = false; }
     else return; // unknown type: leave unapplied so a newer app version can pick it up
     S.feedApplied.push(e.id);
+    recordUpdate(e);
     changed = true;
   });
   if(changed){ save(); rerender(); toast('Coach update from Claude ⛳'); }
