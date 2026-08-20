@@ -46,19 +46,32 @@
 // it is — the same rule the rest of this app runs on.
 const COURSE_CARDS = [
   // --- READ ---------------------------------------------------------------------------
-  // The course he played Aug 20 2026, and the one that produced this whole fix. Found in
-  // the Foresight Sports FSX Play course library (a simulator card library mirrored on
-  // GitHub), whose table was fetched and parsed rather than summarised. Every check
-  // passes: par 36/36 = 72 as stated; stroke index is a clean 1..18 with odds out and
-  // evens in; and ALL FIVE tee columns sum exactly to their stated totals (6549 / 6230 /
-  // 6002 / 5369 / 5118). Its White 70.5/129 and Green 68.4/123 ratings match the figures
-  // indexed from GolfLink independently, so FSX copied a real USGA rating table.
-  // Unresolved and deliberately not encoded here: the Blue rating (FSX 72.3/131 vs 71.6
-  // elsewhere), and aggregators quoting 6631/6663 yards for a longer tee FSX omits.
+  // The course he played Aug 20 2026, and the one that produced this whole fix. The source
+  // is now the club's OWN scorecard, photographed by Jack and read Aug 20 2026, off the
+  // WHITE tees he plays. Par 36/36 = 72. The transcription is checked by summing all six
+  // tee rows against their own printed totals — 6513 · 6189 · 5687 · 5211 · 4944 · 4013,
+  // all exact — and its ratings (Blue 72.3/131, White 70.5/129, Green 68.4/123, Gold
+  // 65.8/113, Red 64.3/111) match the figures indexed from GolfLink independently, which
+  // is what pins the photo to this course. It also settles the Blue rating this file
+  // previously left open: 72.3/131, not the 71.6 the club's own listing carries.
+  //
+  // WHAT CHANGED, AND THE LESSON IN IT. This entry previously carried the stroke index from
+  // the Foresight Sports FSX Play simulator library. Its pars were right; its stroke index
+  // was not the row he plays. The real card prints THREE handicap rows — Blue/White, Green,
+  // and Gold/Red/Fwd White — and FSX's is a near-copy of the FORWARD one, two digits out.
+  // Nothing about the numbers gave that away: it is a clean permutation of 1..18 with the
+  // odds out and the evens in, so it passed every check `courseCardOK()` makes. The visible
+  // symptom was the 7th — 275 yards, the shortest par 4 here — carrying stroke index 9
+  // instead of 15. So: `ver:'read'` says somebody read A card, and it cannot say they read
+  // the tee you play. Where a course prints per-tee indexes, NAME THE TEE in `src`.
+  //
+  // Holes 13 and 16 print dual pars, 5/4 and 4/5. From White (and Blue, Green and Gold) the
+  // 13th is a par 5 at 486 and the 16th a par 4 at 441; the forward tees swap them. The
+  // pars below are the White ones.
   { n:'Lakeside Country Club', st:'NY', tot:72, ver:'read',
     par:[5,4,4,4,3,5,4,4,3, 4,4,5,5,3,4,4,3,4],
-    si: [1,13,5,11,17,3,9,7,15, 2,6,10,12,14,4,8,16,18],
-    src:'Foresight Sports FSX Play course library (LordScorpion60/lordscorpion60.github.io), read Aug 20 2026',
+    si: [3,5,1,7,17,9,15,13,11, 6,8,16,12,14,4,2,18,10],
+    src:'The club\'s own scorecard, photographed by Jack and read Aug 20 2026 — WHITE tees, 6,189 yds, 70.5/129. The card prints a separate stroke index for Blue/White, for Green, and for Gold/Red/Fwd White; this is the Blue/White row',
     as:'2026-08-20' },
 
   // --- RECONCILED ---------------------------------------------------------------------

@@ -100,13 +100,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v48';
+const BUILD = 'v49';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v49', d:'2026-08-20', items:[
+    'Lakeside\u2019s real scorecard is on file \u2014 you photographed it, so par, stroke index, rating and slope now come off the club\u2019s own card instead of a simulator library.',
+    'Your stroke indexes there were WRONG and are now fixed, both on the card on file and on your Aug 20 round. That card prints three different handicap rows \u2014 one for Blue/White, one for Green, one for the forward tees \u2014 and the old source had copied the forward one. Off the whites the 3rd is stroke index 1, the 16th is 2, and the 7th at 275 yards is 15, not 9. Your scores were not touched.',
+    'The Aug 20 round now carries White, 70.5 and 129, so it produces a handicap differential at last.',
+    'The Lakeside plan is rebuilt as a standing plan with all eighteen holes on it \u2014 yardage, par and stroke index on every one, and the club the number asks for. It is 6,189 yards from the whites: eight of the ten par 4s are under 400, no par 3 is over 180, and only the 441-yard 16th really needs a driver.' ] },
   { b:'v48', d:'2026-08-20', items:[
     'The live hole gives you the screen back. Everything above Off the tee was eating a third of the phone before a single chip appeared \u2014 the scoring rows now start about 220px higher.',
     'The 1\u201318 strip folds away. It starts collapsed and lives behind a 1\u201318 control in the par row, so it costs no room until you want to jump; opening it and tapping a hole closes it again.',

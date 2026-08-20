@@ -15923,6 +15923,563 @@
       "type": "action-update",
       "target": "action-lakeside-card-20260819",
       "text": "Photograph the Lakeside scorecard — specifically the TEES you played, and that tee's rating and slope. The par and stroke index are now on file (Blue 6549 72.3/131 · White 6230 70.5/129 · Green 6002 68.4/123 · Gold 5369 65.8/113 · Red 5118 64.3/111), so the tee is the only thing still missing before the Aug 20 round can carry a handicap differential"
+    },
+    {
+      "id": "layout-lakeside-20260820-card",
+      "type": "layout",
+      "layout": {
+        "course": "Lakeside Country Club",
+        "tot": 72,
+        "par": [
+          5,
+          4,
+          4,
+          4,
+          3,
+          5,
+          4,
+          4,
+          3,
+          4,
+          4,
+          5,
+          5,
+          3,
+          4,
+          4,
+          3,
+          4
+        ],
+        "si": [
+          3,
+          5,
+          1,
+          7,
+          17,
+          9,
+          15,
+          13,
+          11,
+          6,
+          8,
+          16,
+          12,
+          14,
+          4,
+          2,
+          18,
+          10
+        ],
+        "ver": "read",
+        "as": "2026-08-20",
+        "src": "Lakeside Country Club's own scorecard, photographed by Jack and read Aug 20 2026 — WHITE tees (M 70.5/129, 6,189 yds; OUT 3034, IN 3155). Par 36/36/72. The card prints three separate handicap rows (Blue/White, Green, Gold/Red/Fwd White), so the tee has to be named: this is the Blue/White row. Holes 13 and 16 print dual pars — 5/4 and 4/5 — and from the whites 13 is a par 5 (486) and 16 a par 4 (441). Transcription checked by summing all six tee rows against their printed OUT/IN/TOT: 6513 · 6189 · 5687 · 5211 · 4944 · 4013, all exact. Replaces the Foresight Sports FSX Play library card, whose pars were right and whose stroke index was the forward-tee row."
+      }
+    },
+    {
+      "id": "round-update-lakeside-20260820-card",
+      "type": "round-update",
+      "round": {
+        "date": "2026-08-20",
+        "course": "Lakeside Country Club",
+        "tees": "White",
+        "rating": 70.5,
+        "slope": 129,
+        "holes": [
+          {
+            "n": 1,
+            "par": 5,
+            "si": 3
+          },
+          {
+            "n": 2,
+            "par": 4,
+            "si": 5
+          },
+          {
+            "n": 3,
+            "par": 4,
+            "si": 1
+          },
+          {
+            "n": 4,
+            "par": 4,
+            "si": 7
+          },
+          {
+            "n": 5,
+            "par": 3,
+            "si": 17
+          },
+          {
+            "n": 6,
+            "par": 5,
+            "si": 9
+          },
+          {
+            "n": 7,
+            "par": 4,
+            "si": 15
+          },
+          {
+            "n": 8,
+            "par": 4,
+            "si": 13
+          },
+          {
+            "n": 9,
+            "par": 3,
+            "si": 11
+          },
+          {
+            "n": 10,
+            "par": 4,
+            "si": 6
+          },
+          {
+            "n": 11,
+            "par": 4,
+            "si": 8
+          },
+          {
+            "n": 12,
+            "par": 5,
+            "si": 16
+          },
+          {
+            "n": 13,
+            "par": 5,
+            "si": 12
+          },
+          {
+            "n": 14,
+            "par": 3,
+            "si": 14
+          },
+          {
+            "n": 15,
+            "par": 4,
+            "si": 4
+          },
+          {
+            "n": 16,
+            "par": 4,
+            "si": 2
+          },
+          {
+            "n": 17,
+            "par": 3,
+            "si": 18
+          },
+          {
+            "n": 18,
+            "par": 4,
+            "si": 10
+          }
+        ],
+        "note": "The white-tee stroke index off Lakeside's own scorecard, photographed by Jack and read Aug 20 2026. The card prints THREE handicap rows — Blue/White, Green, and Gold/Red/Fwd White — and they disagree; he plays white, so the Blue/White row is the one that counts. The card the app had before this came from the Foresight Sports FSX Play simulator library and had copied the FORWARD row instead, two digits out, which is why the 7th (275 yards) was carrying stroke index 9. Pars are unchanged and were already right. Scores untouched. White tees are 70.5/129, so this round now produces a handicap differential."
+      }
+    },
+    {
+      "id": "round-update-lakeside-20260820-card-f",
+      "type": "round-update",
+      "round": {
+        "date": "2026-08-20",
+        "course": "Lakeside Country Club",
+        "nine": "F",
+        "tees": "White",
+        "holes": [
+          {
+            "n": 1,
+            "par": 5,
+            "si": 3
+          },
+          {
+            "n": 2,
+            "par": 4,
+            "si": 5
+          },
+          {
+            "n": 3,
+            "par": 4,
+            "si": 1
+          },
+          {
+            "n": 4,
+            "par": 4,
+            "si": 7
+          },
+          {
+            "n": 5,
+            "par": 3,
+            "si": 17
+          },
+          {
+            "n": 6,
+            "par": 5,
+            "si": 9
+          },
+          {
+            "n": 7,
+            "par": 4,
+            "si": 15
+          },
+          {
+            "n": 8,
+            "par": 4,
+            "si": 13
+          },
+          {
+            "n": 9,
+            "par": 3,
+            "si": 11
+          }
+        ],
+        "note": "The white-tee stroke index off Lakeside's own scorecard, photographed by Jack and read Aug 20 2026. The card prints THREE handicap rows — Blue/White, Green, and Gold/Red/Fwd White — and they disagree; he plays white, so the Blue/White row is the one that counts. The card the app had before this came from the Foresight Sports FSX Play simulator library and had copied the FORWARD row instead, two digits out, which is why the 7th (275 yards) was carrying stroke index 9. Pars are unchanged and were already right. Scores untouched. Rating and slope are deliberately NOT on this nine-hole version: the card publishes an eighteen-hole rating only (White 70.5/129), and half a rating guessed onto a nine would poison the differential rather than produce one."
+      }
+    },
+    {
+      "id": "round-update-lakeside-20260820-card-b",
+      "type": "round-update",
+      "round": {
+        "date": "2026-08-20",
+        "course": "Lakeside Country Club",
+        "nine": "B",
+        "tees": "White",
+        "holes": [
+          {
+            "n": 10,
+            "par": 4,
+            "si": 6
+          },
+          {
+            "n": 11,
+            "par": 4,
+            "si": 8
+          },
+          {
+            "n": 12,
+            "par": 5,
+            "si": 16
+          },
+          {
+            "n": 13,
+            "par": 5,
+            "si": 12
+          },
+          {
+            "n": 14,
+            "par": 3,
+            "si": 14
+          },
+          {
+            "n": 15,
+            "par": 4,
+            "si": 4
+          },
+          {
+            "n": 16,
+            "par": 4,
+            "si": 2
+          },
+          {
+            "n": 17,
+            "par": 3,
+            "si": 18
+          },
+          {
+            "n": 18,
+            "par": 4,
+            "si": 10
+          }
+        ],
+        "note": "The white-tee stroke index off Lakeside's own scorecard, photographed by Jack and read Aug 20 2026. The card prints THREE handicap rows — Blue/White, Green, and Gold/Red/Fwd White — and they disagree; he plays white, so the Blue/White row is the one that counts. The card the app had before this came from the Foresight Sports FSX Play simulator library and had copied the FORWARD row instead, two digits out, which is why the 7th (275 yards) was carrying stroke index 9. Pars are unchanged and were already right. Scores untouched. Rating and slope are deliberately NOT on this nine-hole version: the card publishes an eighteen-hole rating only (White 70.5/129), and half a rating guessed onto a nine would poison the differential rather than produce one."
+      }
+    },
+    {
+      "id": "action-done-lakeside-card-20260820",
+      "type": "action-done",
+      "target": "action-lakeside-card-20260819"
+    },
+    {
+      "id": "briefing-lakeside-standing-20260820",
+      "type": "briefing",
+      "briefing": {
+        "course": "Lakeside Country Club",
+        "focus": "Your own card is the plan now: 6,189 yards from the whites, 70.5/129, and it is SHORT — eight of the ten par 4s are under 400 and no par 3 is over 180. That makes it a position course, which is the argument for the fairway finder on nearly every tee; only the 441-yard 16th genuinely needs a driver. What the card still cannot tell you is where the creek and the bunkers are.",
+        "rules": [
+          "Club up — greens here play long",
+          "Cover the middle, never the flag",
+          "8 of 10 par 4s under 400 — position",
+          "Only the 16th really needs a driver",
+          "3 · 16 · 1 are stroke index 1-2-3 — take bogey",
+          "7th and 12th are the giveaways — take them",
+          "Blind shot? Pick the target first",
+          "Creek on 5 holes — ask which",
+          "Four 30-ft lags before you tee off"
+        ],
+        "holes": [
+          {
+            "n": 1,
+            "yds": 490,
+            "play": "*Three shots, no hero* — 490, and it is stroke index 3",
+            "avoid": "*A big number on a cold swing.* Bogey on the 1st costs one shot; the tee shot you try to rescue costs three",
+            "why": [
+              "*490 yards, par 5, stroke index 3* off the whites — the third-hardest hole on the card, and it is the opener",
+              "Reviewers call it *one of the hardest starting holes* here and the card agrees. That it plays *uphill* is still an inference from the view back down to the lake, not a sourced fact",
+              "Driver plus 2-iron is 440 of the 490 on the estimated ladder, so it looks *reachable* — which is the trap on a cold first swing at stroke index 3. Three sensible shots is par or bogey; the rescue is the double",
+              "Your own record says a round gets away *early*, not late: +6 over holes 1–3 on the disrupted Wianno card"
+            ]
+          },
+          {
+            "n": 2,
+            "yds": 387,
+            "play": "*Driver or 2-iron* — either leaves a full club in",
+            "club": [
+              "driver",
+              "2-iron"
+            ],
+            "why": [
+              "387, par 4, *stroke index 5* — the fifth-hardest hole out here",
+              "On the estimated ladder driver leaves *152* (7-iron) and the 2-iron leaves *182* (5-iron). Neither is a wedge, so pick the club by where you can *see* the fairway, not by the number"
+            ]
+          },
+          {
+            "n": 3,
+            "yds": 399,
+            "play": "*Stroke index 1.* Fairway, middle of the green, take bogey without an argument",
+            "why": [
+              "399, par 4, and the *hardest hole on the card* from the whites",
+              "Driver leaves 164 (6-iron); the 2-iron leaves 194 (4-iron). Either way the approach is a *middle of the green* shot at best",
+              "399 yards does not explain a stroke index of 1 on its own, so something out there does. Nothing is published about what — look, and tell me afterwards"
+            ]
+          },
+          {
+            "n": 4,
+            "yds": 345,
+            "play": "*2-iron* — 345 does not need a driver",
+            "leaves": "*140 in* — an 8-iron",
+            "club": [
+              "2-iron"
+            ],
+            "why": [
+              "345, par 4, stroke index 7",
+              "The 2-iron's 205 leaves 140. Driver leaves 110, which is a *50°* — a smaller club, for a wider tee shot, into a green nobody has mapped"
+            ]
+          },
+          {
+            "n": 5,
+            "yds": 144,
+            "play": "*8-iron* to the middle — 144",
+            "why": [
+              "144, par 3, *stroke index 17* — the second-easiest hole on the card",
+              "The 8-iron carries 146 on the estimated ladder. If the green sits *above* you, it is a 7-iron: the standing miss here is short, and on an elevated green the front edge looks like the middle"
+            ]
+          },
+          {
+            "n": 6,
+            "yds": 439,
+            "play": "*Driver, then decide* — 439 is the shortest par 5 out here",
+            "club": [
+              "driver"
+            ],
+            "why": [
+              "439, par 5, stroke index 9",
+              "Driver leaves *204*, which is a 2-iron. On paper it is reachable",
+              "In fact it is a 2-iron at a green you cannot see the bunkering of, on a course where five greens are elevated and nobody knows which. *Lay up to a full wedge* unless the drive is perfect — the par is the point, not the eagle putt"
+            ]
+          },
+          {
+            "n": 7,
+            "yds": 275,
+            "play": "*2-iron, or even a 4-iron* — never driver",
+            "leaves": "*70 yards* — a 60°",
+            "club": [
+              "2-iron",
+              "4-iron"
+            ],
+            "why": [
+              "275, par 4, stroke index 15 — the *shortest par 4 on the card* by 52 yards, and one of the five holes the card is handing you",
+              "The 2-iron leaves 70 and a 4-iron leaves 85. Driver leaves 40, which is the *hardest* of those three numbers to get close from",
+              "This is the clearest no-driver hole on the course"
+            ]
+          },
+          {
+            "n": 8,
+            "yds": 378,
+            "play": "*Driver or 2-iron* — 378",
+            "club": [
+              "driver",
+              "2-iron"
+            ],
+            "why": [
+              "378, par 4, stroke index 13",
+              "Driver leaves 143 (8-iron); the 2-iron leaves 173 (6-iron). A stroke index of 13 says this one should not be costing you anything"
+            ]
+          },
+          {
+            "n": 9,
+            "yds": 177,
+            "play": "*5-iron* to the middle — 177",
+            "why": [
+              "177, par 3, stroke index 11 — the *longest par 3 on the card* and the only one over 160",
+              "5-iron carries 180, 6-iron 170. Take the 5-iron and the middle of the green",
+              "Lake views behind this green, per a review — scenery, not a playing instruction, so nothing here is built on it"
+            ]
+          },
+          {
+            "n": 10,
+            "yds": 327,
+            "play": "*2-iron* — 327 with stroke index 6 on it",
+            "leaves": "*122 in* — a full PW",
+            "club": [
+              "2-iron"
+            ],
+            "why": [
+              "327, par 4, *stroke index 6*. Short and rated hard is the combination that says the trouble is *not length*",
+              "The 2-iron leaves 122, a full pitching wedge. Driver leaves 92 — a 56°, and a shorter club into an unmapped green is not worth the wider tee shot on a hole the card already calls difficult",
+              "Lake views behind this green too, per a review. Scenery, not instruction"
+            ]
+          },
+          {
+            "n": 11,
+            "yds": 346,
+            "play": "*2-iron* — leaves 141, an 8-iron",
+            "club": [
+              "2-iron"
+            ],
+            "why": [
+              "346, par 4, stroke index 8",
+              "The same hole as the 4th by the numbers: fairway finder leaves a mid-iron, driver leaves a 50°"
+            ]
+          },
+          {
+            "n": 12,
+            "yds": 482,
+            "play": "*The one the card is giving you* — 482, stroke index 16",
+            "why": [
+              "482, par 5, *stroke index 16* — the second-easiest hole on the card, and a par 5",
+              "Driver leaves 247, which is past your longest iron, so it is a *three-shot hole played properly*: drive, 5-iron, wedge. That sequence is a realistic birdie look and a nearly automatic par",
+              "A giveaway hole that gives nothing back costs more than any birdie you chase on the hard ones"
+            ]
+          },
+          {
+            "n": 13,
+            "yds": 486,
+            "play": "*Three shots* — 486, and from the whites it is a *par 5*",
+            "why": [
+              "486, par 5, stroke index 12",
+              "The card prints *5/4* on this hole: it is a five from Blue, White, Green and Gold, and a four from the forward tees. You are playing it as a *five*",
+              "Driver leaves 251, past your longest iron. Drive, mid-iron, wedge"
+            ]
+          },
+          {
+            "n": 14,
+            "yds": 158,
+            "play": "*7-iron* to the middle — 158",
+            "why": [
+              "158, par 3, stroke index 14",
+              "The 7-iron carries 158 exactly on the estimated ladder. Club up if it plays uphill — that is the standing rule here and this is a hole where an exact number invites you to ignore it"
+            ]
+          },
+          {
+            "n": 15,
+            "yds": 393,
+            "play": "*Driver or 2-iron*, then the middle — stroke index 4",
+            "club": [
+              "driver",
+              "2-iron"
+            ],
+            "why": [
+              "393, par 4, *stroke index 4* — the fourth-hardest hole on the card",
+              "Driver leaves 158 (7-iron); the 2-iron leaves 188 (4-iron)",
+              "One of the five holes to *protect*. Par or bogey and walk to the 16th"
+            ]
+          },
+          {
+            "n": 16,
+            "yds": 441,
+            "play": "*Driver.* This is the one hole out here that genuinely needs it",
+            "club": [
+              "driver"
+            ],
+            "why": [
+              "441, par 4, *stroke index 2* — the longest par 4 on the card and the second-hardest hole",
+              "Even after a driver you have *206* left, which is a 2-iron into a par-4 green. By the numbers this is a *bogey hole*, and playing it as one is how you protect the 17th and 18th",
+              "The card prints *4/5* here — a four from the whites, a five from the forward tees. Do not let the scorecard talk you into treating it as a five"
+            ]
+          },
+          {
+            "n": 17,
+            "yds": 137,
+            "play": "*9-iron* to the middle — 137",
+            "why": [
+              "137, par 3, *stroke index 18* — the easiest hole on the card",
+              "9-iron carries 134, PW carries 122. The 9-iron to the middle is the shot, and where the flag is does not matter"
+            ]
+          },
+          {
+            "n": 18,
+            "yds": 385,
+            "play": "*Driver or 2-iron* — 385 to finish",
+            "club": [
+              "driver",
+              "2-iron"
+            ],
+            "why": [
+              "385, par 4, stroke index 10",
+              "Driver leaves 150 (7-iron); the 2-iron leaves 180 (5-iron)",
+              "Your closing three run *+0.67 a hole* against +0.89 for everything before them — you finish fine. Middle of the green, two putts, done"
+            ]
+          }
+        ],
+        "sections": [
+          {
+            "t": "What the card actually says",
+            "k": "6,189 yards from the whites, eight of ten par 4s under 400 and no par 3 over 180 — this is a position course.",
+            "b": "WHITE TEES: 6,189 yards, par 72, 70.5 / 129. Out 3,034 · In 3,155. Everything below is built on that card rather than on a database, because you photographed it.\n\nIt is a SHORT course. There are ten par 4s and eight of them are under 400 yards — 275 (7th), 327 (10th), 345 (4th), 346 (11th), 378 (8th), 385 (18th), 387 (2nd), 393 (15th). Only the 3rd at 399 and the 16th at 441 are longer, and only the 16th is out of reach for a fairway finder.\n\nFour par 3s, and not one is long: 137 (17th), 144 (5th), 158 (14th), 177 (9th). On your estimated ladder that is a 9-iron, an 8-iron, a 7-iron and a 5-iron — four clubs you can control.\n\nFour par 5s, all under 500: 439 (6th), 482 (12th), 486 (13th), 490 (1st). The 12th and 13th are back to back.\n\nWHERE THE CARD SAYS THE SHOTS ARE. The five hardest holes by stroke index are the 3rd (1), the 16th (2), the 1st (3), the 15th (4) and the 2nd (5) — four par 4s and the opening par 5. The five easiest are the 17th (18), the 5th (17), the 12th (16), the 7th (15) and the 14th (14) — two par 3s, a par 5 and the shortest par 4 on the course.\n\nThat split is the whole plan in one line. The hard five are holes you protect and take bogey on; the easy five are where the round is actually made. A 482-yard par 5 rated stroke index 16, and a 275-yard par 4 rated 15, are the two the card is openly handing you."
+          },
+          {
+            "t": "Every green plays long here",
+            "k": "Five elevated greens, blind approaches and uphill par 4s all leave the ball short — and short is already your miss.",
+            "b": "The course description is unusually specific about this: five ELEVATED greens, many holes needing a BLIND approach, and long uphill par 4s with steep approaches to the greens. That is three separate reasons for the ball to finish short of the putting surface.\n\nAnd short is your standing miss on approach — it is the loudest finding in your own hole data, and it is why the carry ladder keeps coming up. So the correction is not subtle here: take the yardage to the MIDDLE of the green, then add a club for the climb. On an elevated green the flag is often all you can see, which makes the front edge look like the middle; it isn't.\n\nWhy that trade is cheap: past the middle of an elevated green you are usually putting. Short of it, you are chipping up a steep bank from below the surface, which is the hardest shot on this kind of course and the one that turns a bogey into a double.\n\nThe blind ones need a separate discipline: do not swing at a target you have not chosen. Walk to the crest or the marker post, pick a tree, a pole or a skyline notch, aim at THAT, and go. A blind approach played at a vague 'up there' is how you end up short and left of everything."
+          },
+          {
+            "t": "Very few level lies",
+            "k": "The slope aims the ball — read the lie before you read the yardage.",
+            "b": "Built on rolling terrain overlooking the lake, so 'expect very few level lies' is the course's own summary of itself. That is a sourced fact about the ground. What follows below is standard ball-flight, not Lakeside research — it is true everywhere, it just matters more here.\n\nBall ABOVE your feet: the club sits toe-down, the face points left, and the ball starts and curves LEFT. Stand a touch taller, grip down, aim right of the target. This is the lie you will get most often on a hillside course and it is the one to have in your head.\n\nBall BELOW your feet: the opposite — the ball leaks RIGHT. More knee flex, stay down through it, aim left, and take one more club because you will catch it thinner than you want.\n\nUPHILL lie: the slope adds loft. Higher, shorter, and it can be a full club or more. Club up, ball slightly forward, swing with the slope rather than into it.\n\nDOWNHILL lie: the slope takes loft off. Lower, longer, and it is the hardest of the four. Take more loft than the number says, play the ball back, and let the club chase down the hill.\n\nThe compounding case is the one that will actually cost you a shot tomorrow: an uphill lie into an elevated green is two clubs, not one. On a hill course the errors stack in the same direction, and that direction is short."
+          },
+          {
+            "t": "The tee shot: trees, a creek, and no local knowledge",
+            "k": "The drive that leaves no play is the shot that has cost you most — and this is a blind, wooded course you have never seen.",
+            "b": "What is sourced: heavily wooded landscaping, with many of the tees sitting inside tunnels of trees, and a creek that comes into play on FIVE holes. Which five is not published anywhere reachable. That is a ten-second question on the first tee and it is worth asking the pro shop or whoever you are playing with — where the water crosses is the single most valuable fact about a course you have never played, because unlike a pin it never moves.\n\nThe course also changes character halfway through. The original nine dates from 1950 and is the tight, wooded half; the holes added in 1995 were built on wide-open terrain and are described as a deliberate contrast. So do not carry a driver decision made on the open holes back onto the tree tunnels.\n\nYour own evidence for the club choice: at Sterling Farms three tee shots left you with NO realistic play at the green — three holes, +4 between them, and the approach club never got a say. That is exactly what a blind, tree-lined tee shot on an unknown course produces. When you cannot see where the fairway goes, the 5-wood or the 2-iron is the honest club, and on this card neither of them costs you much: from the whites the 2-iron leaves 141 or less into four of the ten par 4s and a long-to-mid iron into five more, and only the 441-yard 16th genuinely needs the driver.\n\nTwo things to log while you are out there. Tap the TEE CLUB on every hole — the by-club table is the only thing that will ever settle the driver-versus-5-wood question, and the 5-wood's carry is still unmeasured. And use the DEAD chip on any hole where the drive took the green away, so those holes get charged to the tee shot rather than to your irons."
+          },
+          {
+            "t": "The greens",
+            "k": "Medium speed, and the round turns on lag — which is the fault you are already working on.",
+            "b": "Sourced: the greens are well bunkered and described as medium speed; one review calls them medium-fast with a very true roll, which is the good version of unknown. Bent grass, per one listing.\n\nDistance control is your open putting fault and it has never been measured. You have putted them once now, on Aug 20, so the next round here is not a blind one — but the fault is still open, so give it the ten minutes before you tee off rather than finding out on the 3rd green: four lags from 30 feet and one from 40, scoring nothing but whether the ball finishes inside a six-foot circle, then five from three feet with the full routine. That is your standing grind, done on the greens you are about to play.\n\nOn the LINK the aim picture is unchanged and does not get a second correction: face BARELY OPEN at address, shaft vertical, hands about 1.35 inches behind the ball. Do not add an aim-picture adjustment on top of the barely-open feel — that applies the fix twice and misses right.\n\nOne green-reading note that follows from the terrain rather than from research: on ground that rolls this much, the big break is usually the one you cannot see from beside the ball. Read the putt from below the hole, where the slope shows itself, and if you are guessing, miss on the HIGH side — a low miss was never going in."
+          },
+          {
+            "t": "The first three holes",
+            "k": "Your record says a round gets away EARLY, not at the finish — and the 1st here is a hard opener.",
+            "b": "This is the one place where your mental data and the course description point at the same holes. Reviewers call the 1st one of the hardest starting holes on the course, and the card backs them: it is a 490-yard par 5 at stroke index 3. Your own cards say the Wianno match where a partner got into your head cost +6 over holes 1–3, against +3 on each of the other four nines out there — partner disruption lands at the START, not at the finish. Honest caveat, the same one that is in the Locked In plan: that was also the coldest start of the event, so warm-up and partner are confounded on that card and neither is established.\n\nWhat the same data says you do NOT have: a closing fade. Your last three holes run +0.67 against +0.89 for everything before them. So the job here is the beginning, not the end.\n\nPractical version: get there early enough to do the lag ladder above, treat the first three holes as the ones to protect, and take par-or-bogey on the 1st without a second thought. Slow play and random partners are two of your named triggers — if either shows up, the if-then responses are in the Mental tab, and the debrief afterwards is where they get counted."
+          },
+          {
+            "t": "What the card still cannot tell you",
+            "k": "Yardage, par and stroke index are settled; the creek, the elevated greens and the bunkering are not — and you have played it once now.",
+            "b": "The card settles yardage, par, stroke index, rating and slope. It says nothing about the ground, and four course-level facts from the research are still unpinned to holes:\n\n— A creek comes into play on FIVE holes. Which five: still not published anywhere reachable.\n— FIVE greens are elevated. Which five: unknown.\n— The greens are well bunkered. Where the bunkers sit, hole by hole: unknown.\n— Doglegs: no direction is sourced for any hole here.\n\nWhat has changed is that you have now played it. Anything you remember — which holes the creek crosses, which greens sit up, which fairways bend — becomes a hole note, and unlike a pin position none of it ever moves. That is the highest-value thing you could send me about this course.\n\nUntil then, no hole note in this plan names a hazard or a safe side, because nothing establishes one. Every one of them is built on the yardage, par and stroke index off your card plus your carry ladder — and that ladder is ESTIMATED, not calibrated, with the 5-wood still unmeasured. Treat every 'leaves 140' as arithmetic, not a promise."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "The card is now the source for every number here; what it settled, what it corrected, and what is still second-hand.",
+            "b": "THE CARD (read Aug 20 2026). Jack photographed Lakeside's own scorecard, and it is the source for every number in this plan. White tees: 6,189 yards, par 72, M 70.5 / 129 (W 76.5 / 137), out 3,034 and in 3,155. The transcription was checked by summing all six tee rows against their own printed totals — Blue 6,513 · White 6,189 · Green 5,687 · Gold 5,211 · Red 4,944 · Forward White 4,013 — and all six come out exact.\n\nWHAT THE CARD SETTLED. Three things this plan previously flagged as unconfirmed. (1) Rating and slope conflicted across sources — 71.6/131, 72.3/131, 70.5/129 and 71.4/129 were all in circulation. The card says Blue 72.3/131 and White 70.5/129, which matches the GolfLink figures exactly and makes the club's own 71.6/131 listing wrong or stale. You played WHITE, so 70.5/129 is now on your Aug 20 round and it produces a handicap differential. (2) 'Roughly 6,631–6,663 yards from the tips' was wrong on both figures — the longest tee on this card is Blue at 6,513. (3) Per-hole yardages, pars and stroke indexes were the reason this plan had one hole note instead of eighteen. They are all here now.\n\nA CORRECTION WORTH KNOWING ABOUT. The app's Lakeside card had been taken from the Foresight Sports FSX Play simulator library. Its pars were right. Its stroke index was not: the real card prints THREE handicap rows — Blue/White, Green, and Gold/Red/Forward White — and the FSX row is a near-copy of the FORWARD one, two digits out. That is a genuine transcription of the wrong row, and nothing in the numbers gives it away: it is a clean 1–18 with the odds out and the evens in, so it passed every check the app makes. The visible symptom was the 7th — 275 yards, the shortest par 4 on the course — carrying stroke index 9 instead of 15. Your Aug 20 round has been corrected and your scores were not touched.\n\nRESEARCHED, AND STILL UNPINNED (searched Aug 19 2026; every course site and scorecard database was blocked from that session, so these come from search-result summaries rather than the pages themselves — good, but second-hand). Rolling ground overlooking Keuka Lake, 'expect very few level lies'. Heavily wooded, with many tees inside tunnels of trees. A creek in play on FIVE holes, unknown which. FIVE elevated greens, unknown which. Greens well bunkered and medium speed; one review says medium-fast with a very true roll; bent grass per one listing. Long uphill par 4s with steep approaches. Hole 1 'one of the hardest starting holes', with views back down the hill toward the lake — the card now CONFIRMS the difficulty at stroke index 3, but not the climb, which is still an inference from the view direction. Lake views from behind the 5th and 10th greens: scenery, not a playing instruction, so no note is built on it. Club established 1923; nine holes in 1950, eighteen in 1995, the new holes on open ground in deliberate contrast to the wooded originals. Semi-private, 145 Rt 54 E Lake Road, Penn Yan NY 14527.\n\nFROM YOUR OWN CARDS. Approach misses finish short more than any other direction. Three tee shots at Sterling Farms left no realistic play at the green, +4 between them. Wianno holes 1–3 played +6 on the disrupted card against +3 on each of the other four nines. Closing three holes +0.67 a hole against +0.89 before them. Putting distance control is open and unmeasured; tempo is closed at 2.0:1. The ladder every 'leaves' number comes off: driver 235, 2-iron 205, 4-iron 190, 5-iron 180, 6-iron 170, 7-iron 158, 8-iron 146, 9-iron 134, PW 122, 50° 108, 56° 95, 60° 80 — estimated, not calibrated, and the 5-wood unmeasured.\n\nTWO EDITS MADE WHEN THIS BECAME A STANDING PLAN. The Aug 20 dated version has been folded into this one and retired: a dated plan outranks a standing one in the live logger permanently, so leaving it in place would have meant none of these eighteen hole notes ever reached a tee box. And one line in 'The tee shot' was corrected — it described a '6,600-yard par 72', which the card puts at 6,189 from the whites.\n\nNOT SOURCED, THEREFORE NOT WRITTEN: which holes the creek crosses, which greens are elevated, where the bunkers sit, and any dogleg direction."
+          }
+        ]
+      }
+    },
+    {
+      "id": "briefing-remove-lakeside-dated-20260820",
+      "type": "briefing-remove",
+      "target": "briefing-lakeside-20260820"
     }
   ]
 }
