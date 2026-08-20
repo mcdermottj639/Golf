@@ -9,9 +9,9 @@ const TROUBLES = [
   ['wedge-distance','Wedge distance'], ['mental','Mental'],
 ];
 const MISS_CYCLE = ['', 'make', 'L', 'R', 'S', 'Lg']; // 5-ft tap states
-// How far the FIRST putt on a hole was. One tap on the green, and it is the field that
-// turns a putt count into a putting statistic: a 2-putt from 40 feet is a good hole and a
-// 2-putt from 5 is a dropped shot, and until now the card could not tell them apart.
+// How long a putt was. One tap on the green, and it is what turns a putt count into a
+// putting statistic: a 2-putt from 40 feet is a good hole and a 2-putt from 5 is a dropped
+// shot, and a putt count alone cannot tell them apart.
 //
 // The boundaries are not generic — every one of them is a line this project already draws,
 // which is what makes the buckets worth counting:
@@ -46,6 +46,27 @@ const PD = Object.fromEntries(PUTT_DIST.map(d => [d.k, d]));
 //     a straight win for the open distance-control fault.
 const conceded = h => !!h.gimme && h.putts === 1;      // a make he never hit
 const lagGiven = h => !!h.gimme && h.putts >= 2;       // a lag that finished inside the circle
+// A hole records up to two putts by distance, which is what makes a real make rate
+// possible rather than a count of holes:
+//   `pm` — the putt that WENT IN. On a one-putt hole it is the only putt there was.
+//   `pd` — where the FIRST one started, asked only once the total says there were two or
+//          more, because on a one-putt hole the first putt and the made putt are the same
+//          putt and asking twice would be asking him to tap the same fact into two rows.
+//   `gimme` — the last one was given instead of holed, so there is no made distance.
+// Both readers tolerate cards written before `pm` existed, where the single distance was
+// stored as `pd` whatever the putt count — nothing has to be migrated to keep counting.
+const puttFirstK = h => ((h.putts >= 2 ? h.pd : (h.pm || h.pd)) || null);
+const puttMadeK  = h => (h.gimme ? null : ((h.putts === 1 ? (h.pm || h.pd) : h.pm) || null));
+// Every putt on the hole whose distance is actually known, and whether it went in. A
+// three-putt's middle putts are unknown and stay out rather than being guessed at.
+function puttAttempts(h){
+  const out = [];
+  if(h.putts == null || h.putts === 0) return out;
+  if(h.putts >= 2 && h.pd) out.push({ k:h.pd, made:false });
+  const m = puttMadeK(h);
+  if(m) out.push({ k:m, made:true });
+  return out;
+}
 const pdName = k => (PD[k] || { name:k }).name;
 // Inside six feet is one question (do you hole them), past it is another (do you leave
 // yourself a tap-in). The plans are sliced the same way, so the analytics are too.
@@ -79,21 +100,24 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v45';
+const BUILD = 'v46';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
-  { b:'v45', d:'2026-08-20', items:[
+  { b:'v46', d:'2026-08-20', items:[
     'Quick view on the live logger. A Full card / Quick view switch sits under the hole’s prep; flip it and the hole becomes one-line rows — tee shot through score on one screen, no scrolling.',
     'One row is open at a time with full-size chips. Answer it and the next unanswered row opens by itself; tap any row to fix it, and a row you don’t track just stays blank, same as the full card.',
     'The switch remembers which view you used last, the full card stays one tap away, and every tap still saves instantly.' ] },
+  { b:'v45', d:'2026-08-20', items:[
+    'The putting rows are rebuilt. Putts is the total; Putt made is how long the one you holed was, with Given as one of its options; and First putt only appears once the total says there were two or more, to record where you started.',
+    'That gives a REAL make rate for the first time — from a two-putt hole the app now knows one putt you missed and one you holed, both with distances, so the table counts putts struck rather than holes played.',
+    'The hole\u2019s prep now starts collapsed, showing just the one line to act on. Tap its header for the reasoning underneath.' ] },
   { b:'v44', d:'2026-08-20', items:[
-    'The hole\u2019s prep folds away. Tap its header on the live logger and the plan collapses to the one line to act on, bringing the scoring chips up the screen. It opens again on the next hole.',
-    'A gimme chip on the putts row for when you lag it up and it gets given.',
-    'Given putts are handled honestly. One given from close is a make you never hit, so it comes OUT of your make rate rather than padding it. One given after a lag is the opposite — proof the lag finished inside the circle, which is the only proximity number a scorecard can produce, and it now reads alongside your three-putts.' ] },
+    'A gimme chip for when you lag it up and it gets given.',
+    'Given putts are handled honestly. One given from close is a make you never hit, so it stays out of your make rate rather than padding it. One given after a lag is the opposite — proof the lag finished inside the circle, which is the only proximity number a scorecard can produce.' ] },
   { b:'v43', d:'2026-08-20', items:[
     'The round prep now gets marked. Open a round played at a course with a plan and the card ends with How the plan held up — what the plan called on each hole, what you hit, where both shots finished, what it scored.',
     'Where a plan names a club or a direction to avoid, the card counts it: how often you took the call, and whether the miss it warned about is the one that happened. The Sterling Farms plan carries those on 11 of its holes now.',
@@ -2729,7 +2753,7 @@ function scoreStats(rounds){
       putts.holes++; putts.total += h.putts;
       if(L) live.putts++;
       if(h.putts <= 1) putts.one++; else if(h.putts >= 3) putts.three++;
-      if(h.pd && PD[h.pd]){ bagPutt(putts.dist, h); putts.distN++; if(L) live.pd = (live.pd || 0) + 1; }
+      if(puttFirstK(h) || puttMadeK(h)){ bagPutt(putts.dist, h); putts.distN++; if(L) live.pd = (live.pd || 0) + 1; }
     }
     if(h.gir != null){
       green.n++;
@@ -2850,12 +2874,12 @@ function holeTips(st, EV){
   if(st.putts.distN >= 18){
     const P = st.putts.dist;
     const shortB = P.get('s');            // 4–6 ft: the scoring zone, and his signature miss
-    if(shortB && shortB.hit >= 8){
-      const made = Math.round(shortB.made / shortB.hit * 100);
+    if(shortB && shortB.att >= 8){
+      const made = Math.round(shortB.made / shortB.att * 100);
       const test = latestFiveFt(), ts = test ? fiveFtScore(test) : null;
       t.push({ key:'putt-short', ev:EV, s: made >= 60 ? 'good' : 'warn',
-        src:`Putting · ${shortB.hit} putts from 4–6 ft`,
-        h:`${made}% from the scoring zone — ${shortB.made} of ${shortB.hit}`,
+        src:`Putting · ${shortB.att} putts from 4–6 ft`,
+        h:`${made}% from the scoring zone — ${shortB.made} of ${shortB.att}`,
         b:`${made >= 60 ? 'That holds up' : 'This is the range the whole putter search has been about'}, and it is the first time it has been measured ON A GREEN rather than on a mat.${
           ts ? ` Your last 5-ft test was ${ts.makes}/${ts.total} (${Math.round(ts.makes / ts.total * 100)}%) — ${
             Math.abs(made - Math.round(ts.makes / ts.total * 100)) <= 10
@@ -2868,22 +2892,22 @@ function holeTips(st, EV){
     const lag = puttRoll(P, ['xl', 'xxl']);   // 21 ft and out — where pace decides the hole
     // A lag that got conceded finished inside gimme range. Nothing else on a scorecard
     // says how CLOSE a long putt finished, which is the whole distance-control question.
-    const near = lag.lagIn ? ` And ${lag.lagIn} of them finished inside gimme range — ${Math.round(lag.lagIn / lag.n * 100)}% lagged to a putt nobody made you hit, which is the only proximity number this card can produce and the one worth watching alongside the three-putts.` : '';
-    if(lag.n >= 8){
-      const rate = lag.three / lag.n;
+    const near = lag.lagIn ? ` And ${lag.lagIn} of them finished inside gimme range — ${Math.round(lag.lagIn / lag.first * 100)}% lagged to a putt nobody made you hit, which is the only proximity number this card can produce and the one worth watching alongside the three-putts.` : '';
+    if(lag.first >= 8){
+      const rate = lag.three / lag.first;
       t.push({ key:'putt-lag', ev:EV, s: rate >= 0.15 ? 'warn' : 'good',
-        src:`Putting · ${lag.n} first putts from 21 ft +`,
+        src:`Putting · ${lag.first} first putts from 21 ft +`,
         h: rate >= 0.15 ? `${lag.three} three-putts from long range — ${Math.round(rate * 100)}% of them`
           : `${Math.round((1 - rate) * 100)}% of your long putts finish in two`,
         b:`${rate >= 0.15
           ? `Distance control is the open fault and this is it with a number on it at last: from past twenty feet you are failing to two-putt one hole in ${(1 / rate).toFixed(1)}. A three-putt from here is pace, not line — the first putt is finishing outside gimme range and the second one is a real putt. The 30-ft ladder is the drill that moves this: log shorts, spread and green speed, and watch this row rather than your total putts.`
-          : `From past twenty feet you are two-putting all but ${lag.three} of ${lag.n}, which is what good pace looks like on a scorecard. Distance control has been the open fault on feel alone; this is the first evidence either way, and it is pointing the other way.`}${near} Keep tapping the distance in — this row is the measurement the ladder drill has been waiting for.` });
+          : `From past twenty feet you are two-putting all but ${lag.three} of ${lag.first}, which is what good pace looks like on a scorecard. Distance control has been the open fault on feel alone; this is the first evidence either way, and it is pointing the other way.`}${near} Keep tapping the distance in — this row is the measurement the ladder drill has been waiting for.` });
     }
     const tap = P.get('t');
-    if(tap && tap.hit >= 6 && tap.made < tap.hit)
+    if(tap && tap.att >= 6 && tap.made < tap.att)
       t.push({ key:'putt-tap', ev:EV, s:'warn', src:`Putting · inside 3 ft`,
-        h:`${tap.hit - tap.made} missed from inside three feet`,
-        b:`${tap.made} of ${tap.hit} actually struck${tap.gim ? `, with ${tap.gim} more given` : ''}. At this range a miss is not variance, it is the stroke or the routine — and each one is a whole stroke off the card for a putt you were expected to hole. Worth checking whether these came after a long lag, which would make them a pace problem wearing a short-putt mask.` });
+        h:`${tap.att - tap.made} missed from inside three feet`,
+        b:`${tap.made} of ${tap.att} actually struck${tap.gim ? `, with ${tap.gim} more given` : ''}. At this range a miss is not variance, it is the stroke or the routine — and each one is a whole stroke off the card for a putt you were expected to hole. Worth checking whether these came after a long lag, which would make them a pace problem wearing a short-putt mask.` });
   }
 
   const blowN = st.mix.double + st.mix.triple;
@@ -2996,32 +3020,34 @@ function clubTables(st){
   </div>` : ''}`;
 }
 
-// Putting by the distance the first putt was from. This is the table the new row on the
-// live logger exists to fill, and it is the first thing in the project that can separate a
-// pace problem from a stroke problem: makes fall off with distance for everyone, but
-// THREE-putts are the pace column, and where they start is the whole question.
+// Putting by distance. Two questions share the rows because they share an axis, and they
+// are counted over different things on purpose: PUTTS/MADE are individual putts struck
+// from that range — a real conversion rate, available because a two-putt hole records one
+// putt he missed and one he holed — while 1ST PUTTS/3-PUTTS are holes that STARTED there,
+// which is the pace question and is only meaningful about a first putt. Makes falling off
+// with distance is true of everyone; where the three-putts start is the whole question.
 function puttDistTable(P, note){
   const rows = puttRows(P.dist);
   if(!rows.length) return '';
   const pct = (n, d) => d ? `${Math.round(n / d * 100)}%` : '—';
   return `
-  <h2>Putting · by first-putt distance</h2>
+  <h2>Putting · by distance</h2>
   <div class="card">
-    <table><tr><th>From</th><th>Holes</th><th>Made</th><th>3-putts</th><th>Putts</th></tr>
+    <table><tr><th>From</th><th>Putts</th><th>Made</th><th>1st putts</th><th>3-putts</th></tr>
       ${rows.map(e => `<tr>
         <td class="sm"><b>${esc(PD[e.k].lab)}</b><span class="sm faint"> ft</span>${
           e.gim ? `<br><span class="sm faint">${e.gim} given</span>` : ''}</td>
-        <td>${e.n}</td>
-        <td>${e.hit ? `<b>${pct(e.made, e.hit)}</b><span class="sm faint"> ${e.made}/${e.hit}</span>`
+        <td>${e.att || '<span class="faint">—</span>'}</td>
+        <td>${e.att ? `<b>${pct(e.made, e.att)}</b><span class="sm faint"> ${e.made}/${e.att}</span>`
           : '<span class="faint">—</span>'}</td>
-        <td>${e.three ? `<b style="color:var(--burg)">${e.three}</b><span class="sm faint"> ${pct(e.three, e.n)}</span>` : '<span class="faint">—</span>'}</td>
-        <td class="sm">${(e.total / e.n).toFixed(2)}</td></tr>`).join('')}
+        <td class="sm">${e.first || '<span class="faint">—</span>'}</td>
+        <td>${e.three ? `<b style="color:var(--burg)">${e.three}</b><span class="sm faint"> ${pct(e.three, e.first)}</span>` : '<span class="faint">—</span>'}</td></tr>`).join('')}
     </table>
     ${(() => {
       const sh = puttRoll(P.dist, PD_SHORT), lag = puttRoll(P.dist, PD_LAG);
       const bits = [];
-      if(sh.hit) bits.push(`Inside six feet you have holed <b>${sh.made} of ${sh.hit}</b> (${pct(sh.made, sh.hit)})`);
-      if(lag.n) bits.push(`from past thirteen you have three-putted <b>${lag.three} of ${lag.n}</b> (${pct(lag.three, lag.n)})`);
+      if(sh.att) bits.push(`Inside six feet you have holed <b>${sh.made} of ${sh.att}</b> (${pct(sh.made, sh.att)})`);
+      if(lag.first) bits.push(`from past thirteen you have three-putted <b>${lag.three} of ${lag.first}</b> (${pct(lag.three, lag.first)})`);
       return bits.length ? `<p class="sm" style="margin-top:8px">${bits.join(' · ')}. Those are the two questions the putting plans are sliced by — holing the short ones, and leaving the long ones close.</p>` : '';
     })()}
     ${(() => {
@@ -3029,10 +3055,10 @@ function puttDistTable(P, note){
       const lag = puttRoll(P.dist, PD_LAG);
       if(!all.gim && !all.lagIn) return '';
       return `<p class="sm" style="margin-top:8px">${all.lagIn ? `<b>${all.lagIn} lag${all.lagIn === 1 ? '' : 's'} finished inside gimme range</b>${
-        lag.n ? ` — ${pct(all.lagIn, lag.n)} of your putts from past thirteen feet` : ''}. That is the closest thing this card has to a proximity measurement, and it is a straight read on distance control. ` : ''}${
+        lag.first ? ` — ${pct(all.lagIn, lag.first)} of your putts from past thirteen feet` : ''}. That is the closest thing this card has to a proximity measurement, and it is a straight read on distance control. ` : ''}${
         all.gim ? `<b>${all.gim} first putt${all.gim === 1 ? ' was' : 's were'} given.</b> Those are out of the Made column entirely rather than counted as holed — a putt nobody made you hit is not a putt you made, and the one number this project cannot afford to flatter is the short one.` : ''}</p>`;
     })()}
-    <p class="sm faint" style="margin-top:8px">${note || 'How far the FIRST putt was, tapped on the green as you played. A two-putt from forty feet is a good hole and a two-putt from five is a dropped shot — this is the only table that can tell them apart.'}</p>
+    <p class="sm faint" style="margin-top:8px">${note || '<b>Putts</b> and <b>Made</b> count individual putts struck from that range — a real conversion rate, because the one you holed and the one you missed are both on the card. <b>1st putts</b> and <b>3-putts</b> count HOLES that started from there, which is the pace question and only makes sense about a first putt.'}</p>
   </div>`;
 }
 
@@ -3272,28 +3298,35 @@ const topDir = m => Object.entries(m).filter(([k]) => DIRS.includes(k)).sort((x,
 // One first putt's worth of record. `one` is a hole where that putt went in, `three` a
 // hole it took three or more from there — which is the pace fault stated as a number for
 // the first time, because it now carries the distance it happened FROM.
+// One distance's record. Two different questions live in one row and they are counted
+// separately on purpose:
+//   `att` / `made`  — PUTTS struck from this range and how many went in. A real make rate,
+//                     because both a miss and a make from the same range are recorded.
+//   `first` / `three` — HOLES whose first putt started here, and how many took three. That
+//                     is the pace column, and it only makes sense against the first putt.
+const puttCell = () => ({ att:0, made:0, first:0, one:0, three:0, gim:0, lagIn:0 });
 function bagPutt(map, h){
-  let e = map.get(h.pd);
-  if(!e){ e = { k:h.pd, n:0, one:0, two:0, three:0, total:0, gim:0, lagIn:0 }; map.set(h.pd, e); }
-  e.n++; e.total += h.putts;
-  if(h.putts <= 1) e.one++; else if(h.putts === 2) e.two++; else e.three++;
-  // A first putt that was given is not a make — it is an unplayed putt, and it leaves the
-  // make rate rather than padding it. `hit` is what he actually struck from this range.
-  if(conceded(h)) e.gim++;
-  if(lagGiven(h)) e.lagIn++;
-  e.hit = e.n - e.gim;
-  e.made = e.one - e.gim;
-  return e;
+  const get = k => { let e = map.get(k); if(!e){ e = puttCell(); e.k = k; map.set(k, e); } return e; };
+  puttAttempts(h).forEach(a => { const e = get(a.k); e.att++; if(a.made) e.made++; });
+  const f = puttFirstK(h);
+  if(f){
+    const e = get(f);
+    e.first++;
+    if(h.putts <= 1) e.one++; else if(h.putts >= 3) e.three++;
+    // Given from here: on a one-putt hole a make he never hit, on a longer one a lag that
+    // finished inside the circle. Opposite meanings, so they are never added together.
+    if(conceded(h)) e.gim++;
+    if(lagGiven(h)) e.lagIn++;
+  }
 }
 // In table order rather than in the order they turned up, because these are a ladder.
 const puttRows = map => PUTT_DIST.map(d => map.get(d.k)).filter(Boolean);
 // Roll a set of buckets into one line: makes, holes, three-putts.
 const puttRoll = (map, keys) => keys.reduce((a, k) => {
   const e = map.get(k);
-  if(e){ a.n += e.n; a.one += e.one; a.three += e.three;
-         a.gim += e.gim; a.lagIn += e.lagIn; a.hit += e.hit; a.made += e.made; }
+  if(e) Object.keys(a).forEach(f => { a[f] += e[f]; });
   return a;
-}, { n:0, one:0, three:0, gim:0, lagIn:0, hit:0, made:0 });
+}, puttCell());
 
 // One shot's worth of club record, shared by the per-round card and the season roll-up so
 // the two can never disagree about what a club did. `over` is strokes against par on the
@@ -3347,7 +3380,7 @@ function roundAnalysis(r){
       else { a.putts.three++; a.putts.threes.push(h); }
       if(h.gir === true){ a.putts.girN++; a.putts.girTot += h.putts; }
       else if(h.gir === false){ a.putts.offN++; a.putts.offTot += h.putts; }
-      if(h.pd && PD[h.pd]){ bagPutt(a.putts.dist, h); a.putts.distN++; }
+      if(puttFirstK(h) || puttMadeK(h)){ bagPutt(a.putts.dist, h); a.putts.distN++; }
     }
     if(h.gir != null){
       a.gir.n++;
@@ -3561,8 +3594,13 @@ function roundView(i){
     rows.push(`<tr><td><b>${h.n ?? idx + 1}</b>${h.si ? `<span class="si"> ${h.si}</span>` : ''}${
       h.note ? '<span class="nmark" title="You left a note on this hole">✎</span>' : ''}</td>
       <td class="sm">${h.par}</td><td>${mark(h)}</td>
-      <td class="sm">${h.putts ?? '·'}${h.gimme ? '<span class="giv" title="last one given">g</span>' : ''}${
-        h.pd && PD[h.pd] ? `<span class="cl">${esc(PD[h.pd].lab)}′</span>` : ''}</td>
+      ${(() => {
+        const m = puttMadeK(h), f = puttFirstK(h);
+        // Made from, and where it started when that is a different putt.
+        const tag = [m && PD[m] ? `${PD[m].lab}′` : (h.gimme ? 'given' : ''),
+          f && f !== m && PD[f] ? `from ${PD[f].lab}′` : ''].filter(Boolean).join(' · ');
+        return `<td class="sm">${h.putts ?? '·'}${tag ? `<span class="cl">${esc(tag)}</span>` : ''}</td>`;
+      })()}
       <td>${res(h.gir, h.gmiss, h.par === 3 ? null : h.app, h.noshot)}</td>
       <td>${res(h.fw, h.fmiss, h.tee)}</td></tr>`);
     if(a.nines.length === 2 && idx === 8) rows.push(subRow(a.nines[0]));
@@ -3605,8 +3643,7 @@ function roundView(i){
       ${rows.join('')}
     </table>
     <p class="sm faint">Small grey number is the stroke index. Circle = under par, square = over.
-    ${a.putts.distN ? 'Under the putt count is how far the first putt was.' : ''}
-    ${a.holes.some(h => h.gimme) ? 'A <b>g</b> beside the count means the last one was given.' : ''}
+    ${a.putts.distN ? 'Under the putt count is how long the putt you holed was, and where the first one started when that was a different putt.' : ''}
     ${a.gir.n ? 'Green and Tee show where the shot finished, where it was recorded; a dot means it was not. <b>OB</b> is out of bounds — two strokes each.' : ''}
     ${a.tee.size ? 'The club under each result is what you hit.' : ''}
     ${a.holes.some(h => h.note) ? '✎ marks a hole you wrote a note on — they are below.' : ''}</p>
@@ -3693,7 +3730,7 @@ function roundView(i){
     <p class="sm faint">Computed from this card alone — every line carries the number that triggered it.</p>
   </div>` : ''}
 
-  ${puttDistTable(a.putts, 'How far the first putt was on each hole, tapped in as you played.')}
+  ${puttDistTable(a.putts, 'How long the putt you holed was and where the first one started, tapped in on each hole as you played.')}
 
   ${roundVsBaseline(a)}`;
 }
@@ -3863,8 +3900,11 @@ function liveRound(L){
     const o = { n:h.n, par:h.par, s:h.s };
     if(h.si != null) o.si = h.si;
     if(h.putts != null) o.putts = h.putts;
-    if(h.pd && h.putts !== 0) o.pd = h.pd;
-    if(h.gimme && h.putts !== 0) o.gimme = true;
+    if(h.putts){
+      if(h.pm && !h.gimme) o.pm = h.pm;
+      if(h.pd && h.putts >= 2) o.pd = h.pd;
+      if(h.gimme) o.gimme = true;
+    }
     if(h.tee) o.tee = h.tee;
     if(h.gir != null){ o.gir = h.gir; if(h.gir === false && h.gmiss) o.gmiss = h.gmiss; }
     // A par 3 carries no fairway and no separate approach — the tee shot IS the approach.
@@ -3958,19 +3998,22 @@ function liveStart(){
 
 // ---- Quick view: the whole hole as one-line rows, the open row full-size ----
 // The row order IS the logging order — tee shot through score, note last. A par 3 has no
-// fairway and no separate approach, and 0 putts hides First putt, same as the full card.
+// fairway and no separate approach, and the putting detail rows follow the total the same
+// way the full card gates them: Putt made needs a putt, First putt needs two or more.
 function qRows(h){
   return ['tee', h.par === 3 ? null : 'fw', h.par === 3 ? null : 'app', 'green', 'putts',
-    h.putts === 0 ? null : 'pd', 's', 'note'].filter(Boolean);
+    h.putts ? 'pm' : null, h.putts >= 2 ? 'pd' : null, 's', 'note'].filter(Boolean);
 }
 // A carried-over tee suggestion is NOT an answer — the row opens so he confirms it with
-// the same tap the full card asks for, just on a bigger chip.
+// the same tap the full card asks for, just on a bigger chip. Given IS an answer to the
+// made-putt row: it either went in from somewhere, or nobody made him hit it.
 function qAnswered(h, r){
   if(r === 'tee') return !!h.tee && !h.teeAuto;
   if(r === 'fw') return h.fw != null;
   if(r === 'app') return !!h.app;
   if(r === 'green') return h.gir != null;
   if(r === 'putts') return h.putts != null;
+  if(r === 'pm') return !!h.pm || !!h.gimme;
   if(r === 'pd') return !!h.pd;
   if(r === 's') return h.s != null;
   if(r === 'note') return !!h.note;
@@ -4043,10 +4086,11 @@ function livePlay(L){
         data-action="live-set" data-k="noshot" data-v="1">No shot at it</span></div>`}`,
     putts: `<div class="chips">${[0,1,2,3,4,5].map(p =>
       chip('putts', p, p === 5 ? '5+' : p, h.putts === p)).join('')}</div>`,
+    pm: `<div class="chips">${PUTT_DIST.map(d =>
+      chip('pm', d.k, d.lab, h.pm === d.k && !h.gimme)).join('')}
+      ${chip('gimme', '1', 'Given', !!h.gimme, 'ns')}</div>`,
     pd: `<div class="chips">${PUTT_DIST.map(d =>
-      chip('pd', d.k, d.lab, h.pd === d.k)).join('')}</div>
-      <div class="chips"><span class="chip big ns${h.gimme ? ' on' : ''}"
-        data-action="live-set" data-k="gimme" data-v="1">Last one given</span></div>`,
+      chip('pd', d.k, d.lab, h.pd === d.k)).join('')}</div>`,
     s: `<div class="chips">${scores}${outlier}
       <span class="chip big" data-action="live-bump" data-d="1">+1</span>
       <span class="chip big" data-action="live-bump" data-d="-1">−1</span></div>`,
@@ -4070,18 +4114,19 @@ function livePlay(L){
     if(r === 'green') return h.gir == null ? null
       : { txt: (h.gir ? 'Hit' : (h.gmiss ? dirLab(h.gmiss) : 'Miss')) + (h.noshot ? ' · no shot' : '') };
     if(r === 'putts') return h.putts == null ? null : { txt: String(h.putts) };
-    if(r === 'pd') return h.pd ? { txt: PD[h.pd].lab + ' ft' + (h.gimme ? ' · given' : '') }
-      : (h.gimme ? { txt: 'given' } : null);
+    if(r === 'pm') return h.gimme ? { txt: 'given' }
+      : (h.pm ? { txt: PD[h.pm].lab + ' ft' } : null);
+    if(r === 'pd') return h.pd ? { txt: PD[h.pd].lab + ' ft' } : null;
     if(r === 's') return h.s == null ? null : { txt: h.s + ' · ' + scName(h.s - h.par) };
     if(r === 'note') return h.note ? { txt: '✎' } : null;
     return null;
   };
   const QLAB = { tee:'Off the tee', fw:'Fairway', app:'Into the green', green:'Green',
-    putts:'Putts', pd:'First putt', s:'Score', note:'Note' };
+    putts:'Putts', pm:'Putt made', pd:'First putt', s:'Score', note:'Note' };
   const QHINT = { tee: h.teeAuto ? 'carried over — tap to keep or change' : '',
     fw:'OB is two strokes — tap it and the app counts them', app:'optional',
-    green: par3 ? '' : 'the drive left you nothing',
-    pd:'feet — a 2-putt from 40 is not a 2-putt from 5',
+    green: par3 ? '' : 'the drive left you nothing', putts:'the total',
+    pm:'feet — how long the one you holed was', pd:'feet — where you started from',
     note:'saved to this hole, on the card forever' };
   const open = qOpenRow(h);
   const quickCard = `<div class="card lvcard qcard">
@@ -4103,8 +4148,9 @@ function livePlay(L){
     ${par3 ? '' : row('Fairway', bodies.fw, 'OB is two strokes — tap it and the app counts them')}
     ${par3 ? '' : row('Into the green', bodies.app, 'optional')}
     ${row('Green', bodies.green, par3 ? '' : 'the drive left you nothing')}
-    ${row('Putts', bodies.putts)}
-    ${h.putts === 0 ? '' : row('First putt', bodies.pd, 'feet — a 2-putt from 40 is not a 2-putt from 5')}
+    ${row('Putts', bodies.putts, 'the total')}
+    ${!h.putts ? '' : row('Putt made', bodies.pm, 'feet — how long the one you holed was')}
+    ${h.putts >= 2 ? row('First putt', bodies.pd, 'feet — where you started from') : ''}
     ${row('Score', bodies.s)}
     ${row('Note', bodies.note, 'saved to this hole, on the card forever')}
   </div>`;
@@ -4135,13 +4181,12 @@ function livePlay(L){
     const head = ['Hole ' + h.n]
       .concat(hn && hn.yds ? [hn.yds + ' yds'] : [])
       .concat(hn ? ['from your prep'] : ['your record']);
-    // Collapsible, because the plan is a TEE-BOX read and the chips are a
-    // between-shots one. It opens on arrival at every hole — a hole note he never sees is
-    // worth nothing, and that is the whole reason the notes are here — and folds away with
-    // one tap once he has read it, bringing the scoring rows up the screen. Shut, it still
-    // shows the ONE line to act on, so collapsing never hides the decision itself.
-    // `intelShut` is UI state on S.live and never reaches the saved card.
-    const shut = !!h.intelShut;
+    // STARTS COLLAPSED (Jack's call, Aug 20) and opens with one tap. That only works
+    // because shut is not empty: the header keeps the ONE line to act on, so the default
+    // state still delivers the decision and it is the reasoning behind it that costs a tap.
+    // Per hole, and deliberately not sticky — the next hole has its own plan.
+    // `intelOpen` is UI state on S.live and never reaches the saved card.
+    const shut = !h.intelOpen;
     const gist = hn && hn.play ? emph(hn.play) : (hn && hn.note ? emph(hn.note) : line);
     return `<div class="card flat holeintel${shut ? ' shut' : ''}">
       <div class="lvlab hi-head" data-action="live-intel">${head.join(' · ')}
@@ -4371,18 +4416,28 @@ const ACTIONS = {
     }
     else if(k === 'putts'){
       if(lit) delete h.putts;
-      // Chipped in, or holed from off the green: there was no first putt to measure and
-      // nothing anybody could have conceded.
-      else { h.putts = +v; if(h.putts === 0){ delete h.pd; delete h.gimme; } }
+      // Chipped in, or holed from off the green: no putt to measure and nothing anybody
+      // could have conceded. And on a ONE-putt hole the first putt and the made putt are
+      // the same putt, so the separate starting point stops applying.
+      else {
+        h.putts = +v;
+        if(h.putts === 0){ delete h.pm; delete h.pd; delete h.gimme; }
+        else if(h.putts === 1) delete h.pd;
+      }
     }
+    else if(k === 'pm'){ if(lit) delete h.pm; else { h.pm = v; delete h.gimme; } }
     else if(k === 'pd'){ if(lit) delete h.pd; else h.pd = v; }
-    else if(k === 'gimme'){ if(lit) delete h.gimme; else h.gimme = true; }
+    // Given and a made distance are the same slot: it either went in from somewhere, or
+    // nobody made him hit it.
+    else if(k === 'gimme'){ if(lit) delete h.gimme; else { h.gimme = true; delete h.pm; } }
     else if(k === 's'){ h.s = lit ? null : +v; }
     // Quick view: answering the open row opens the next unanswered one, forward only.
-    // Qualifiers (no shot, gimme) don't advance — they refine the answer already given —
-    // and clearing a chip leaves the row open, because an empty row is not answered.
+    // The no-shot qualifier doesn't advance — it refines the answer already given — but
+    // Given does: it fills the made-putt slot the same way a distance would. Clearing a
+    // chip leaves the row open, because an empty row is not answered.
     if(S.settings.liveQuick && k !== 'par'){
-      const ROW = { tee:'tee', fw:'fw', app:'app', green:'green', putts:'putts', pd:'pd', s:'s' };
+      const ROW = { tee:'tee', fw:'fw', app:'app', green:'green', putts:'putts',
+        pm:'pm', gimme:'pm', pd:'pd', s:'s' };
       const r = ROW[k];
       if(r && r === qOpenRow(h) && qAnswered(h, r)) qAdvance(h, r);
     }
@@ -4407,13 +4462,12 @@ const ACTIONS = {
     if(h.qOpen === 'note') h.noteOpen = true;
     save(); rerender();
   },
-  // Fold the hole's prep away once it has been read, so the scoring rows come up the
-  // screen. Per hole and deliberately not sticky: the next hole has its own plan, and a
-  // preference carried forward would mean he never sees it.
+  // Open the hole's prep. It arrives folded so the scoring rows are up the screen, and the
+  // one line to act on is showing either way — this tap is for the reasoning under it.
   'live-intel': () => {
     const L = S.live, h = L && L.holes[L.cur];
     if(!h) return;
-    if(h.intelShut) delete h.intelShut; else h.intelShut = true;
+    if(h.intelOpen) delete h.intelOpen; else h.intelOpen = true;
     save(); rerender();
   },
   // The keyboard is opt-in. Everything else on this screen is a chip, and it stays that

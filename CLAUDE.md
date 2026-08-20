@@ -167,8 +167,9 @@ differential — omit rather than guess). The value is in `holes[]`, one object 
 | `n` · `par` · `s` | hole number, par, score — the minimum; everything else is optional |
 | `si` | stroke index. Unlocks the hardest-six / easiest-six split |
 | `putts` | putts on that hole. Unlocks 1/2/3-putt counts and putts-on-GIR-vs-off |
-| `pd` | how far the **first** putt was, as a `PUTT_DIST` key — see *Putting by distance* below. Omit where `putts` is 0 |
-| `gimme` | `true` when the **last** putt on the hole was conceded rather than holed. Still counted in `putts` and in the score; see *Given putts* below for what it changes |
+| `pm` | how long the putt he **holed** was, as a `PUTT_DIST` key. Absent on a conceded hole and where `putts` is 0 |
+| `pd` | where the **first** putt started, same keys. Only recorded when `putts` >= 2 — on a one-putt hole the first putt IS the made putt |
+| `gimme` | `true` when the last putt was conceded rather than holed. Still counted in `putts` and in the score; see *Given putts* below |
 | `gir` | `true`/`false` — green in regulation |
 | `gmiss` | where a missed green finished: `S` `L` `R` `Lg` `OB` `X` (short/left/right/long/out of bounds/other) |
 | `fw` | `true`/`false` — fairway hit. **Omit entirely on par 3s** so they don't count against the fairway rate |
@@ -371,14 +372,25 @@ Where OB then speaks for itself:
 GIR% and fairway% are unchanged — a miss is a miss, and the flag prices it rather than
 erasing it. Same rule as `noshot`.
 
-### Putting by distance — the first-putt field (Aug 20 2026)
+### Putting by distance (Aug 20 2026)
 
-Jack asked for "a length of putt made" on the live logger. What the card records is the
-distance of the **first putt on the hole** (`h.pd`), because that is the superset: on a
-one-putt hole it *is* the length he holed, and on every other hole it is the number that
-actually decides whether the hole went well. A putt count on its own cannot tell a
-two-putt from forty feet (a good hole) from a two-putt from five (a dropped shot), and
-until this field existed nothing in the project could.
+Three rows on the live logger, in Jack's own shape — the first version recorded only the
+first putt and he rejected it, correctly:
+
+1. **Putts** — the total, as before.
+2. **Putt made** — how long the one he holed was, with **Given** as the seventh chip in
+   the same row, because a hole ends either with a putt going in from somewhere or with
+   nobody making him hit it.
+3. **First putt** — where he started. **Only rendered once the total says two or more**:
+   on a one-putt hole the first putt and the made putt are the same putt, and asking twice
+   is asking him to tap one fact into two rows.
+
+The pay-off is that a two-putt hole now records **one putt he missed and one he holed,
+both with distances** — so the app has a real *make rate per putt struck* rather than a
+count of holes. `puttAttempts()` is the reader: it yields the first putt as a miss and the
+made putt as a make, and leaves a three-putt's middle putts out because nothing knows how
+long they were. `puttFirstK()` / `puttMadeK()` derive the two distances and both tolerate
+cards written before `pm` existed, so nothing needed migrating.
 
 **The buckets are `PUTT_DIST` in `app.js`, and every boundary is a line this project
 already draws** — that is what makes them worth counting rather than generic:
@@ -395,15 +407,20 @@ already draws** — that is what makes them worth counting rather than generic:
 Changing a `k` orphans every hole already logged with it, the same trap as
 `MENTAL_TRIGGERS` — add a bucket rather than resplitting the existing ones.
 
-What it feeds: `puttDistTable()` on Scores and on every round card (makes and three-putts
-from each range), and three findings inside `holeTips()` — `putt-short` (the 4–6 ft
-conversion, compared against the latest 5-ft mat test, which is the first mat-vs-green
-comparison the project can make), `putt-lag` (three-putt rate from 21 ft +, i.e. **the
-open distance-control fault with a number on it at last**) and `putt-tap` (misses from
-inside three feet). Being in `holeTips` with keys, they inherit live-round precedence.
+`puttDistTable()` on Scores and on every round card carries **two questions on one axis,
+counted over different things and labelled as such**: `att`/`made` are individual putts
+struck from that range (the conversion rate), while `first`/`three` are HOLES that started
+there (the pace question, which is only meaningful about a first putt). Don't merge those
+columns — a make rate over holes is the thing this rebuild exists to stop computing.
 
-The row hides itself when `putts` is 0 — chipped in, so there was no first putt — and
-tapping 0 putts clears any distance already set.
+Three findings inside `holeTips()` — `putt-short` (the 4–6 ft conversion, compared against
+the latest 5-ft mat test, which is the first mat-vs-green comparison the project can make),
+`putt-lag` (three-putt rate from 21 ft +, i.e. **the open distance-control fault with a
+number on it at last**) and `putt-tap` (misses from inside three feet). Being in `holeTips`
+with keys, they inherit live-round precedence.
+
+Tapping 0 putts (chipped in) clears all three fields; dropping the total back to 1 clears
+`pd` alone.
 
 ### Given putts (Aug 20 2026)
 
@@ -411,21 +428,18 @@ tapping 0 putts clears any distance already set.
 everyone does — but it was never struck, and that cuts two opposite ways, which is the
 whole reason the flag exists rather than being folded into the putt count:
 
-- **Given from the first putt** (`putts === 1`) — a make he never hit. Counting it as a
-  make inflates the one number this project cannot afford to flatter, so it comes out of
-  **both** the numerator and the denominator of the make rate: `hit = n - gim`,
-  `made = one - gim`. You cannot measure a putt that was not attempted. Film is king,
-  applied to a scorecard.
+- **Given from the first putt** (`putts === 1`) — a make he never hit. It is simply not a
+  putt attempt, so `puttAttempts()` yields nothing for it and it never reaches the make
+  rate in either the numerator or the denominator. You cannot measure a putt that was not
+  attempted. Film is king, applied to a scorecard.
 - **Given after a lag** (`putts >= 2`) — the opposite. The first putt finished inside
   gimme range, which is the closest thing a scorecard can produce to a **proximity**
   measurement, and it is a straight read on the open distance-control fault. Counted as
   `lagIn` and reported next to the three-putt rate.
 
-`conceded()` and `lagGiven()` in `app.js` are the two predicates; `bagPutt()` derives
-`hit`/`made`/`gim`/`lagIn` from them, and `puttDistTable()` plus the `putt-short`,
-`putt-tap` and `putt-lag` findings all read the derived fields rather than `one`/`n`.
-The chip sits on the First-putt row and clears itself when he taps 0 putts (chipped in —
-there was nothing to concede). The scorecard marks a conceded hole with a **g**.
+`conceded()` and `lagGiven()` in `app.js` are the two predicates, and `bagPutt()` counts
+`gim` / `lagIn` from them alongside the attempt tallies. **Given and a made distance are
+one slot** — tapping either clears the other, because the hole ended one way or the other.
 
 ### The hole's prep collapses (Aug 20 2026)
 
@@ -434,12 +448,11 @@ between-shots one. Once he has played the hole, the plan is just pushing the chi
 the screen — so tapping its header folds it away (`live-intel` → `h.intelShut`, UI state
 on `S.live` that never reaches the saved card).
 
-Two rules that keep it honest. **It opens on arrival at every hole and the state is
-deliberately NOT sticky** — a preference carried forward would mean he stops seeing hole
-notes, and surfacing them on the hole he is standing on is the entire reason they exist.
-And **shut is not empty**: the header keeps the one line to act on (`play`, else the prose
-note, else his record for the hole), so collapsing hides the reasoning and never the
-decision.
+**It starts collapsed** (Jack's call, Aug 20) and opens with a tap, per hole and not
+sticky. That is only safe because **shut is not empty**: the header keeps the one line to
+act on (`play`, else the prose note, else his record for the hole), so the default state
+still delivers the decision and it is the reasoning under it that costs a tap. Never make
+the collapsed state a bare header — the whole design rests on the gist being there.
 
 ### A note on any hole (Aug 19 2026)
 
