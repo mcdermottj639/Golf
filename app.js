@@ -38,13 +38,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v41';
+const BUILD = 'v42';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v42', d:'2026-08-20', items:[
+    'The round prep now gets marked. Open a round played at a course with a plan and the card ends with How the plan held up — what the plan called on each hole, what you hit, where it finished, what it scored.',
+    'Where a plan names a club or a direction to avoid, the card counts it: how often you took the call, and whether the miss it warned about is the one that happened. The Sterling Farms plan carries those on 11 of its holes now.',
+    'A plan is only marked against a round it was written BEFORE. Where it was built from that card, the block says so instead of pretending to have predicted it.' ] },
   { b:'v41', d:'2026-08-20', items:[
     'The notes you write on a hole now come back to you. Play that hole again and the note is on the hole card in the live logger, under your record for it.',
     'Scores has a What you wrote on the course section — every hole note you have written, newest first, tappable through to its round.',
@@ -3054,6 +3058,61 @@ function scores(){
   ${logRoundCard()}`;
 }
 
+// ----- The prep loop, closed (Aug 20 2026) -----
+// A course plan's per-hole notes only ever travelled ONE WAY: onto the tee, through the
+// live logger. Nothing ever came back afterwards to ask whether the call was taken or
+// whether it worked — which made the per-hole research the single biggest write-only file
+// in the app. The record fed the plan (`holeRecord()` prints his history on the hole card);
+// the plan never fed the record.
+//
+// This joins a played card to the plan covering that course, hole by hole: what the plan
+// called, what he actually hit, where the ball finished, what it scored.
+//
+// It counts only STRUCTURED fields — `club` (carry-ladder keys the call names) and
+// `avoidDir` (a DIRS code) — and never the prose. The prose is quoted BESIDE the result,
+// which needs no interpretation, but "the plan said avoid right" is a claim and a claim
+// gets a field. The existing plans prove why: `avoid` reads "*Right*. That is where you
+// had no play" on one hole and "The long second" on another, and only one of those two
+// words is a direction. Same rule as a hole note — carried, not parsed.
+// A plan's authoring date lives in its feed id, same as everywhere else in the app.
+const planWritten = b => { const m = /(20\d{2})(\d{2})(\d{2})/.exec((b && b.id) || '');
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : null; };
+function planHeld(r){
+  const plan = liveBriefing(r);
+  if(!plan || !Array.isArray(plan.holes) || !plan.holes.length) return null;
+  const rows = [];
+  (Array.isArray(r.holes) ? r.holes : []).forEach(h => {
+    const hn = h && h.s != null && h.par != null ? briefHole(plan, h.n) : null;
+    if(!hn) return;
+    const warned = DIRS.includes(hn.avoidDir) ? hn.avoidDir : null;
+    rows.push({ h, hn, lab: hn.playAs || 'Tee', call: hn.play || hn.note || '',
+      // Was the call taken? Answerable only where the plan names the clubs it meant.
+      onPlan: Array.isArray(hn.club) && hn.club.length && h.tee ? hn.club.includes(h.tee) : null,
+      // Did the warned miss actually happen? Only where the plan names a direction.
+      // `avoidOn` scopes the warning to the shot it was about — a tree down the right of
+      // the fairway and a bunker short of the green are different warnings, and counting
+      // either finish against either warning would inflate the hit rate. Omitted = either.
+      warned, hit: !warned ? null
+        : hn.avoidOn === 'tee' ? h.fmiss === warned
+        : hn.avoidOn === 'green' ? h.gmiss === warned
+        : (h.fmiss === warned || h.gmiss === warned),
+      d: h.s - h.par });
+  });
+  if(!rows.length) return null;
+  const took = rows.filter(x => x.onPlan !== null), warn = rows.filter(x => x.warned);
+  const onN = took.filter(x => x.onPlan).length;
+  const sum = { n:rows.length, took:took.length, onN,
+    onOver: took.filter(x => x.onPlan).reduce((a, x) => a + x.d, 0),
+    offOver: took.filter(x => !x.onPlan).reduce((a, x) => a + x.d, 0),
+    warn:warn.length, warnHit: warn.filter(x => x.hit).length,
+    over: rows.reduce((a, x) => a + x.d, 0) };
+  // A plan only TESTS a round it predates. The Sterling Farms plan was written the same
+  // day off this very card — it describes the round, it did not predict it, and calling
+  // that "the plan held up" would be marking my own homework. The block says which it is.
+  const w = planWritten(plan);
+  return { plan, rows, sum, retro: !w || !r.date || w >= r.date, written:w };
+}
+
 // ----- Single round deep dive -----
 // Rounds arrive with wildly different detail. The early cards are par-and-score only;
 // the Aug 12 card is the first carrying a putt count, a green result and a tee result
@@ -3389,6 +3448,44 @@ function roundView(i){
     <dl class="holenotes">${notes.map(h => `<dt>${h.n}</dt><dd>${esc(h.note)}</dd>`).join('')}</dl>
     <p class="sm faint" style="margin-top:8px">Logged on the hole itself, while you could still see the shot. This is the only part of the card that remembers WHY — everything else records what.</p>
   </div>` : '')(a.holes.filter(h => h.note))}
+
+  ${(P => !P ? '' : `<h2>How the plan held up</h2>
+  <div class="card">
+    <p class="sm">${P.retro
+      ? `The <b>${esc(P.plan.course || 'course')}</b> plan was written ${P.written ? `on ${fmtDate(P.written)}, ` : ''}from this round among others — so this is what it was built ON, not a test of it. It becomes a test the next time you play here.`
+      : `The <b>${esc(P.plan.course || 'course')}</b> plan${P.written ? ` (written ${fmtDate(P.written)})` : ''} covered <b>${P.sum.n}</b> of these holes${P.sum.n ? `, and they played ${P.sum.over > 0 ? '+' : ''}${P.sum.over}` : ''}.`}</p>
+    ${P.sum.took || P.sum.warn ? `<ul class="hi-why" style="margin-top:6px">
+      ${P.sum.took ? `<li><b>You took the call on ${P.sum.onN} of ${P.sum.took}</b> holes where the plan named a club${
+        P.sum.onN && P.sum.took - P.sum.onN ? ` — those played ${P.sum.onOver > 0 ? '+' : ''}${(P.sum.onOver / P.sum.onN).toFixed(2)} a hole against ${P.sum.offOver > 0 ? '+' : ''}${(P.sum.offOver / (P.sum.took - P.sum.onN)).toFixed(2)} on the ones you didn't` : ''}.</li>` : ''}
+      ${P.sum.warn ? `<li><b>The warned miss happened on ${P.sum.warnHit} of ${P.sum.warn}</b> holes where the plan named a direction to avoid.</li>` : ''}
+    </ul>` : ''}
+    <table class="scard" style="margin-top:8px">
+      <tr><th>Hole</th><th>The plan said</th><th>You hit</th><th>Finished</th><th>Score</th></tr>
+      ${P.rows.map(x => `<tr>
+        <td><b>${x.h.n}</b></td>
+        <td class="sm pv-said">${emph(x.call)}${x.hn.avoid ? `<br><span class="faint">Avoid: ${emph(x.hn.avoid)}</span>` : ''}</td>
+        <td class="sm">${x.h.tee ? `${esc(clubTag(x.h.tee))}${x.onPlan === true ? ' <b class="pv-ok">✓</b>' : x.onPlan === false ? ' <b class="pv-no">✗</b>' : ''}` : '<span class="faint">—</span>'}</td>
+        ${(() => {
+          // BOTH finishes, because a warning is about one shot or the other: a tree down
+          // the right of the fairway is answered by the tee line, a bunker short of the
+          // green by the approach line. Marking only the green lost the tee warnings —
+          // including the three holes the drive left him no play on, which are exactly the
+          // ones the plan was loudest about.
+          const flag = on => x.hit && (x.hn.avoidOn === on
+            || (!x.hn.avoidOn && (on === 'tee' ? x.h.fmiss : x.h.gmiss) === x.warned))
+            ? ' <b class="pv-no">← warned</b>' : '';
+          const t = x.h.fw === true ? 'fairway' : x.h.fw === false ? (MISS_LAB[x.h.fmiss] || 'missed') : null;
+          const g = x.h.noshot ? '<b class="pv-no">no play at it</b>'
+            : x.h.gir === true ? 'hit' : x.h.gir === false ? (MISS_LAB[x.h.gmiss] || 'missed') : null;
+          const lines = [t ? `<span class="faint">tee</span> ${esc(t)}${flag('tee')}` : '',
+                         g ? `<span class="faint">green</span> ${g}${flag('green')}` : '']
+            .filter(Boolean);
+          return `<td class="sm">${lines.length ? lines.join('<br>') : '<span class="faint">—</span>'}</td>`;
+        })()}
+        <td class="sm"><b>${x.h.s}</b> <span class="faint">${x.d > 0 ? '+' + x.d : x.d === 0 ? 'par' : x.d}</span></td></tr>`).join('')}
+    </table>
+    <p class="sm faint" style="margin-top:8px">The plan's words are quoted, never scored — only the holes where it named a <b>club</b> or a <b>direction</b> are counted, because those are the parts it stated plainly enough to be wrong about. Everything else here is your card.</p>
+  </div>`)(planHeld(r))}
 
   <h2>Scoring mix</h2>
   <div class="card">
