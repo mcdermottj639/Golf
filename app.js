@@ -100,13 +100,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v50';
+const BUILD = 'v51';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v51', d:'2026-08-20', items:[
+    'The course box on Start a live round opens its own list. Tap it and every course you have a plan written for is right there \u2014 the upcoming ones first with their date, then the standing plans, each one saying how many hole notes it carries.',
+    'Underneath them sits everywhere else you have on file, marked where a scorecard is already on record, so a course with no plan still fills in its own spelling rather than being thumbed in from scratch.',
+    'It filters as you type and a tap fills the box \u2014 no keyboard needed to start a round at a course you have played or prepped.' ] },
   { b:'v50', d:'2026-08-20', items:[
     'What\u2019s new sends film to the right lab. Every film session in the log linked to the Putting Lab whatever it was of \u2014 so the driver breakdown that just landed would have opened your putting page. Swing film now goes to the Swing Lab, short-game film to Short Game, putting film to Putting. Rows already sitting in your log keep the link they were filed with; everything from here lands right.' ] },
   { b:'v49', d:'2026-08-20', items:[
@@ -4079,6 +4083,84 @@ function liveCard(L){
   <p class="sm faint" style="margin-top:10px">You can still change a hole's par while you play it — the card is on the hole screen too. This screen is here so a wrong one gets caught on the first tee instead of on the last.</p>`;
 }
 
+// ----- The course box offers what he has already prepped -----
+// A course with a plan written for it is far and away the likeliest thing he is about to
+// tap on the first tee, and the native datalist only opens once you type — which means
+// remembering the spelling, one-handed, in the sun. So the box opens its own list.
+//
+// The name on a plan is not always the name that goes on the card ("Beekman Golf Course —
+// Scramble" is a plan for Beekman), and course name is the join key for layouts, the
+// worst-holes table and a briefing's history link. So a pick resolves to the spelling
+// already on record wherever there is one, and to the plain name otherwise.
+function planPlayName(b){
+  const raw = (b.course || '').trim();
+  const known = [...S.courses.map(c => c.name), ...S.rounds.map(r => r.course)]
+    .find(n => n && courseMatches(raw, n));
+  return known || raw.replace(/\s+[—–]\s+.*$/, '');
+}
+// Two groups, in the order a tee box asks for them: what has a plan, then every other
+// course on his list. The second group is what stops the list dead-ending — a course with
+// no plan must still offer its own spelling rather than falling off the page — and it is
+// deliberately NOT called "played before": half of it is courses he has only rated.
+function livePicks(){
+  const p = coursePlans();
+  const seen = new Set();
+  const prepped = [];
+  const take = (list, tag) => list.forEach(b => {
+    const name = planPlayName(b);
+    if(!name || seen.has(name.toLowerCase())) return;
+    seen.add(name.toLowerCase());
+    const holes = (b.holes || []).filter(h => h && (h.play || h.note || (h.why || []).length)).length;
+    prepped.push({ name, tag:[tag(b), holes ? `${holes} hole notes` : ''].filter(Boolean).join(' · ') });
+  });
+  take(p.up, b => fmtDate(b.date));
+  take(p.standing, () => 'standing plan');
+  take(p.past, b => `played ${fmtDate(b.date)}`);
+  const cards = new Set(coursesWithLayout().map(n => n.toLowerCase()));
+  const rest = [...S.courses.map(c => c.name), ...S.rounds.map(r => r.course)]
+    .filter(Boolean)
+    .filter(n => { const k = n.toLowerCase(); if(seen.has(k)) return false; seen.add(k); return true; })
+    .sort((a, b) => a.localeCompare(b))
+    .map(n => ({ name:n, tag: cards.has(n.toLowerCase()) ? 'card on file' : '' }));
+  return { prepped, rest };
+}
+function livePicker(){
+  const g = livePicks();
+  if(!g.prepped.length && !g.rest.length) return '';
+  const row = c => `<div class="pkrow" data-action="live-pick" data-course="${esc(c.name)}" data-q="${
+    esc(c.name.toLowerCase())}"><span class="pkn">${esc(c.name)}</span>${
+    c.tag ? `<span class="pkt">${esc(c.tag)}</span>` : ''}</div>`;
+  const grp = (title, list) => !list.length ? '' :
+    `<div class="pkgrp" data-grp>${title}</div>${list.map(row).join('')}`;
+  return `<div class="picker" id="lvPick" hidden>
+    ${grp('Prepped — a plan is written', g.prepped)}
+    ${grp('Your courses — no plan yet', g.rest)}
+    <div class="pkgrp pknone" hidden>Nothing on file by that name — keep typing and it starts a new course.</div>
+  </div>`;
+}
+// Filter as he types, and never leave a group heading standing over nothing.
+function pickFilter(q){
+  const p = document.getElementById('lvPick'); if(!p) return;
+  const s = (q || '').trim().toLowerCase();
+  let any = 0;
+  p.querySelectorAll('.pkrow').forEach(r => {
+    const hit = !s || (r.dataset.q || '').includes(s);
+    r.hidden = !hit; if(hit) any++;
+  });
+  p.querySelectorAll('.pkgrp[data-grp]').forEach(g => {
+    let n = 0;
+    for(let el = g.nextElementSibling; el && el.classList.contains('pkrow'); el = el.nextElementSibling)
+      if(!el.hidden) n++;
+    g.hidden = !n;
+  });
+  const none = p.querySelector('.pknone'); if(none) none.hidden = !!any;
+}
+function showPicks(on){
+  const p = document.getElementById('lvPick'); if(!p) return;
+  if(on) pickFilter(document.getElementById('lvCourse')?.value || '');
+  p.hidden = !on;
+}
+
 function liveStart(){
   const d = today();
   const soon = S.briefings.filter(b => b.date && b.date >= d)
@@ -4090,10 +4172,11 @@ function liveStart(){
     <h2>Start a live round</h2>
     <p class="sm">One screen per hole — tee club, fairway, green, putts, score. It saves after every tap, so you can lock the phone between shots and pick it up on the next tee. Nothing here needs the keyboard once you've started.</p>
     <label>Course</label>
-    <input id="lvCourse" list="courseList" placeholder="Start typing…">
-    <datalist id="courseList">${S.courses.map(c => `<option value="${esc(c.name)}">`).join('')}</datalist>
+    <input id="lvCourse" placeholder="Tap for your courses — or type…" autocomplete="off">
+    ${livePicker()}
     ${soon.length ? `<div class="chips">${soon.map(b =>
-      `<span class="chip" data-action="live-pick" data-course="${esc(b.course)}">${esc(b.course)} · ${fmtDate(b.date)}</span>`).join('')}</div>` : ''}
+      `<span class="chip" data-action="live-pick" data-course="${esc(planPlayName(b))}">${
+        esc(planPlayName(b))} · ${fmtDate(b.date)}</span>`).join('')}</div>` : ''}
     <div class="formrow">
       <div><label>Date</label><input id="lvDate" type="date" value="${d}"></div>
       <div><label>Holes</label><select id="lvNine">
@@ -4467,7 +4550,7 @@ const ACTIONS = {
 
   // ----- Live round -----
   'live-new': () => render('live'),
-  'live-pick': el => { const i = $('#lvCourse'); if(i) i.value = el.dataset.course; },
+  'live-pick': el => { const i = $('#lvCourse'); if(i) i.value = el.dataset.course; showPicks(false); },
   'live-start': () => {
     const typed = $('#lvCourse').value.trim();
     if(!typed) return toast('Name the course first');
@@ -4907,6 +4990,9 @@ function fetchWeather(manual){
 }
 
 document.addEventListener('click', e => {
+  // The course picker on "Start a live round" closes on a tap anywhere outside it. A tap
+  // in the box itself re-opens it, so closing it by mistake costs one tap, not a re-entry.
+  if(!e.target.closest('#lvPick')) showPicks(e.target.id === 'lvCourse');
   // in-page section jump
   const jump = e.target.closest('[data-jump]');
   if(jump){
@@ -4942,6 +5028,13 @@ document.addEventListener('input', e => {
   if(v) h.note = v; else delete h.note;
   save();
 });
+
+// The course picker: opens on focus, filters on every keystroke. A row is picked on
+// mousedown-prevented default so the input never blurs — losing focus closes the iOS
+// keyboard, which reflows the page out from under the finger mid-tap.
+document.addEventListener('focusin', e => { if(e.target.id === 'lvCourse') showPicks(true); });
+document.addEventListener('input', e => { if(e.target.id === 'lvCourse') pickFilter(e.target.value); });
+document.addEventListener('mousedown', e => { if(e.target.closest('.pkrow')) e.preventDefault(); });
 
 // Course directory autofill: picking/typing a known course fills its state.
 document.addEventListener('input', e => {

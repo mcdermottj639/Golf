@@ -211,6 +211,16 @@ and drops him straight into its `roundView`. Two rows on the hole screen beyond 
 chips: **OB** on Fairway and Green, and a per-hole **Note** — both documented below. Par and stroke index prefill from the newest card at that
 course, so a repeat course needs no typing at all.
 
+**The course box offers what he has already prepped (Aug 20 2026).** Tapping it opens
+`livePicker()` — the prepped courses first (upcoming plans by date, then standing plans,
+then played ones, each with its hole-note count), then every other course on his list,
+marked where a scorecard is on file. It filters as he types and a tap fills the box, so a
+round at a prepped course needs no keyboard. Two things to keep: a pick resolves through
+`planPlayName()` to the spelling already on record — course name is the join key for
+layouts, the worst-holes table and a briefing's history link, and a plan's own name may
+carry an event suffix — and the second group exists so the list never dead-ends on a
+course nobody has written a plan for.
+
 **Round prep reaches the course, one hole at a time.** A briefing whose `course` matches
 the round (suffix-tolerant, so "Beekman Golf Course — Scramble" matches a round logged as
 "Beekman Golf Course") reaches the logger through its **per-hole notes only** — the

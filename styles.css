@@ -208,6 +208,25 @@ td b{font-size:14px}
   font-size:12.5px;margin-top:8px}
 .lesson-drill b{color:var(--burg)}
 
+/* The course picker on "Start a live round" — the prepped courses as a tappable list.
+   In flow rather than floating: an absolutely-positioned dropdown over an iOS keyboard
+   ends up half off-screen, and pushing the two rows below it down for a moment costs
+   nothing on a screen nobody is reading while they pick. */
+.picker{border:1px solid var(--line);border-radius:var(--r);margin-top:6px;
+  background:var(--card);max-height:232px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.picker[hidden],.pkrow[hidden],.pkgrp[hidden]{display:none}
+.pkgrp{font-family:var(--sans);font-size:9.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--faint);background:var(--card2);padding:6px 11px;
+  border-bottom:1px solid var(--line2);position:sticky;top:0}
+.pkgrp.pknone{text-transform:none;letter-spacing:0;font-weight:400;font-style:italic;
+  font-size:11.5px;position:static}
+.pkrow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  padding:11px;border-bottom:1px dotted #c9bd9d;cursor:pointer}
+.pkrow:last-child{border-bottom:none}
+.pkrow:active{background:var(--card2)}
+.pkn{font-size:14px;color:var(--ink);font-weight:600}
+.pkt{font-family:var(--sans);font-size:10px;color:var(--faint);white-space:nowrap;flex-shrink:0}
+
 .formrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .formrow.g3{grid-template-columns:1fr 1fr 1fr}
 .note-preview{border:1px dashed #c9bd9d;border-radius:var(--r);background:var(--card);padding:10px 12px;
@@ -351,6 +370,9 @@ body.night .f-new{background:#33301c;color:#dfc76a;border-color:#5a5533}
 body.night .f-ok{background:#1c2b22;color:#8fd0a8;border-color:#33503f}
 body.night .spark .b{background:#39423e}
 body.night th{border-bottom-color:#33503f}
+body.night .picker{background:#1a1f24}
+body.night .pkgrp{background:#22292e}
+body.night .pkrow:active{background:#22292e}
 body.night nav{background:#0a0f0c}
 body.night input,body.night select,body.night textarea{background:#1a1f24;color:var(--ink);border-color:var(--line)}
 
