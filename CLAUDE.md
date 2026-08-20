@@ -412,6 +412,31 @@ card that remembers *why*; everything else records *what*** — so it is worth r
 the analytics when a round is being discussed. Feed entries can carry a hole `note` too, via
 `round` or `round-update`'s per-hole merge.
 
+**Notes are CARRIED, never PARSED (standing rule, Aug 20 2026).** A note is free text, so
+nothing in the app scans it for keywords — no note ever produces a finding, changes a number,
+pre-ticks a trouble, or matches a lesson, and none ever should. That road is inference wearing
+a measurement's badge, which is precisely what `EV_RANK` and *film is king* exist to stop.
+The countable version of "why" already exists and is deliberately a **fixed vocabulary**:
+`TROUBLES` on the finish screen and `MENTAL_TRIGGERS` on a debrief. Prose stays prose.
+
+What a note gets instead is **delivery** — it is handed back wherever it answers something
+the numbers can't, joined on the hole it was written about:
+
+- **`holeRecord()` carries `notes[]`**, so the live logger prints *Wrote* under *Last* on the
+  hole card. Standing on the 7th tee he gets his own words from the last time he stood there.
+  This is the highest-value one: it needs no memory and no scrolling.
+- **`scoreStats()`'s `spots` carry `notes[]`**, so the worst-hole finding quotes what he wrote
+  on those plays rather than leaving the number to speak alone. A round's blow-up list does
+  the same per hole.
+- **Scores ends with *What you wrote on the course*** — every hole note across every card,
+  newest first, tappable through to its round. Before this a note was only visible inside the
+  one card it was written on, which made the field that records *why* the hardest thing on the
+  page to find.
+
+So a new place for notes is a **join**, not a scan: find the holes a finding is already built
+on and quote them. Anything injecting note text into a tip `b`/`h` must `esc()` it — those
+fields render as raw HTML.
+
 ### Hole data outranks a stats snapshot
 
 An extension of *film is king* to the numbers: a hole Jack recorded himself is **measured**,
