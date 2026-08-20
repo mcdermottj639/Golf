@@ -100,13 +100,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v47';
+const BUILD = 'v48';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v48', d:'2026-08-20', items:[
+    'The live hole gives you the screen back. Everything above Off the tee was eating a third of the phone before a single chip appeared \u2014 the scoring rows now start about 220px higher.',
+    'The 1\u201318 strip folds away. It starts collapsed and lives behind a 1\u201318 control in the par row, so it costs no room until you want to jump; opening it and tapping a hole closes it again.',
+    'On a live hole the app\u2019s own banner shrinks to just the night-mode button \u2014 the hole title, course and par row say where you are, and they now sit at the top of the screen.' ] },
   { b:'v47', d:'2026-08-20', items:[
     'The card gets checked before you tee off. Starting a live round now opens the whole scorecard — every par, the total, and out and in — so a wrong one gets caught on the first tee instead of on the last. Tap any hole to cycle its par.',
     'No more silent par 4s. A course with no card on file used to prefill eighteen par 4s that looked exactly like a real scorecard. Guessed pars now render DASHED, on that screen and on the hole, so a placeholder can never pass for a card.',
@@ -661,6 +665,11 @@ function render(view, arg, keepScroll){
   const [title, tag] = TITLES[view] || TITLES.home;
   $('#pageTitle').textContent = title;
   $('#pageTag').textContent = tag;
+  // Standing over a shot, the app's own masthead is pure overhead — the hole screen
+  // already says where he is. On that one view it shrinks to the theme toggle, which
+  // hands roughly a fifth of the phone back to the rows he is actually tapping.
+  document.body.classList.toggle('lvfocus',
+    view === 'live' && !!S.live && S.live.stage === 'play');
   // The four labs live behind one nav button, so they all light it.
   const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game',
                    drills:'coach', shelf:'coach', lesson:'coach' };
@@ -4321,10 +4330,13 @@ function livePlay(L){
       // A par nobody has confirmed renders HALF-LIT, the same language as a carried-over
       // tee club — so a placeholder can never sit there looking like a scorecard.
       chip('par', p, p, h.par === p, h.parAuto && h.par === p ? 'auto' : '')).join('')}
-      <span class="cardlink" data-action="live-card-open">Card</span></div>
+      <span class="lvctl">
+        <span class="cardlink" data-action="live-holes">${L.holesOpen ? '▾' : '▸'} 1–18</span>
+        <span class="cardlink" data-action="live-card-open">Card</span>
+      </span></div>
   </div>
-  <div class="hstriprow">${L.holes.map((x, i) =>
-    `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}${x.note ? ' noted' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>
+  ${L.holesOpen ? `<div class="hstriprow">${L.holes.map((x, i) =>
+    `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}${x.note ? ' noted' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>` : ''}
 
 
   <div class="formrow">
@@ -4513,6 +4525,15 @@ const ACTIONS = {
     toast('Round started — good luck');
   },
   // Back to the card from the first tee, for the hole he notices on the walk up.
+  // The jump strip is for going somewhere, not for reading, so it folds away and stays
+  // folded: every arrival at a hole closes it again. Two rows of eighteen buttons is the
+  // tallest block on the screen and he is looking at it between shots, not navigating.
+  'live-holes': () => {
+    const L = S.live; if(!L) return;
+    syncHoleNote();
+    if(L.holesOpen) delete L.holesOpen; else L.holesOpen = true;
+    save(); rerender();
+  },
   'live-card-open': () => {
     const L = S.live; if(!L) return;
     syncHoleNote();
@@ -4633,7 +4654,8 @@ const ACTIONS = {
     save(); rerender();
   },
   // Changing hole IS a navigation — that one should land at the top of the new hole.
-  'live-goto': el => { if(S.live){ syncHoleNote(); S.live.cur = +el.dataset.i; suggestTee(S.live); save(); render('live'); } },
+  'live-goto': el => { if(S.live){ syncHoleNote(); S.live.cur = +el.dataset.i;
+    delete S.live.holesOpen; suggestTee(S.live); save(); render('live'); } },
   'live-nav': el => {
     const L = S.live; if(!L) return;
     syncHoleNote();
@@ -4645,7 +4667,7 @@ const ACTIONS = {
       L.troubles = liveTroubles(roundAnalysis(liveRound(L)));
       save(); return render('live');
     }
-    L.cur = to; suggestTee(L); save(); render('live');
+    L.cur = to; delete L.holesOpen; suggestTee(L); save(); render('live');
   },
   'live-save': () => {
     const L = S.live; if(!L) return;

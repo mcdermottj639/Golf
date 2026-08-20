@@ -511,6 +511,31 @@ body.night .hi-gist{color:#9ed4b2}
 .hi-grid dd.was b{color:var(--ink)}
 .hi-grid dd.was b.hot{color:var(--btext)}
 .hi-why + .hi-grid, .hi-grid + .hi-why{margin-top:9px}
+/* ---- Live hole: give the screen back to the rows (Aug 20 2026) ----
+   Everything above OFF THE TEE was costing about a third of the phone before a single
+   chip appeared. Two changes, and neither touches the view switch or the hole buttons:
+   the app masthead collapses to the theme toggle on this one screen, and the 1-18 jump
+   strip folds away behind a control in the par row so it costs no height until asked
+   for. The hole title, the course and the par row all stay — that is the identity of
+   the screen and it reads in one line. */
+body.lvfocus .hero{padding:10px 0 0;min-height:0}
+body.lvfocus .hero .badge,
+body.lvfocus .hero h1,
+body.lvfocus .hero .tag{display:none}
+body.lvfocus .hero::after{content:'';display:block;clear:both}
+body.lvfocus .themebtn{width:32px;height:32px;font-size:15px;margin-top:0}
+/* With the masthead gone the sticky header is the top of the screen, so it carries the
+   breathing room itself rather than inheriting it. */
+body.lvfocus .lvhead{padding:6px 0 7px}
+body.lvfocus .lvh1{font-size:19px}
+body.lvfocus .lvh2{margin-top:1px}
+/* 2px over on a 320px phone put the two controls on a second line; a 1px gap trim
+   lands the whole row — par picker and both controls — back on one. */
+body.lvfocus .parpick{margin-top:6px;gap:4px}
+body.lvfocus .cardlink{padding:4px 8px}
+/* The strip, when he opens it, sits directly under the par row. */
+body.lvfocus .hstriprow{margin:7px 0 0}
+
 /* ---- The card check (Aug 20 2026): eighteen pars and a total, before the first tee.
    The total is the error detector — a course that should be 71 reading 72 is one glance,
    and nothing downstream can catch a wrong par once the round is logged against it. ---- */
@@ -536,9 +561,15 @@ body.night .hi-gist{color:#9ed4b2}
 body.night .pcell{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
 body.night .pcell.guess{background:transparent;border-color:var(--burg)}
 /* Back to the card from the hole screen, for the one he notices on the walk up. */
-.cardlink{margin-left:auto;font-family:var(--sans);font-size:10px;font-weight:800;
+.parpick{flex-wrap:wrap}
+.cardlink{font-family:var(--sans);font-size:10px;font-weight:800;
   letter-spacing:.08em;text-transform:uppercase;color:var(--gtext);background:var(--card2);
-  border:1px solid var(--line);border-radius:20px;padding:4px 10px;cursor:pointer}
+  border:1px solid var(--line);border-radius:20px;padding:4px 10px;cursor:pointer;
+  white-space:nowrap;user-select:none}
+/* The pair sits right, as one unit. The auto margin belongs on the GROUP, never on a
+   flex item inside a wrapping row: there it swallows the free space and pushes whatever
+   follows onto the next line, which is what put Card on its own row at 320px. */
+.lvctl{margin-left:auto;display:flex;gap:4px;align-items:center}
 body.night .cardlink{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
 
 /* ---- Quick view (Aug 20 2026): the Full card / Quick view switch under the hole's
