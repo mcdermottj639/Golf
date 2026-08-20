@@ -16480,6 +16480,178 @@
       "id": "briefing-remove-lakeside-dated-20260820",
       "type": "briefing-remove",
       "target": "briefing-lakeside-20260820"
+    },
+    {
+      "id": "s14-driver-lakeside-20260820",
+      "type": "session",
+      "date": "2026-08-20",
+      "setup": "FULL SWING · Driver · 7 phone stills (address → finish) · ON COURSE, elevated tee · rear-quarter angle (behind and off the rear shoulder — NOT square DTL)",
+      "finding": "First driver film taken on the course rather than in a bay, and the first of any swing on file that catches the FINISH — which changes the read. The finish is complete: trail toe up, weight fully on the lead side, chest and hips turned through, held in balance. That argues against the strong 'hips stall' story on the card, because a stalled, all-arms swing does not finish there. What these frames DO show is a posture problem — a rounded upper back and chin on the chest at address, a trail leg that straightens at the top, and a body visibly taller through delivery than at address. So the fault is refined rather than restated: the rotation happens, the tilt is what gets lost. The angle cannot read shaft plane, path, face or attack angle, so the across-the-line top and the slice both stay exactly where Jul 27 left them.",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Finish",
+            "v": "Complete · held",
+            "s": "good",
+            "n": "trail toe up, weight fully left, chest and hips through, balanced"
+          },
+          {
+            "k": "Transition",
+            "v": "Lower body first",
+            "s": "good",
+            "n": "clubhead still well behind at hands-hip-high — no cast"
+          },
+          {
+            "k": "Shoulder turn",
+            "v": "Full coil",
+            "s": "good",
+            "n": "back to target, head stayed behind the ball"
+          },
+          {
+            "k": "Ball position",
+            "v": "Forward · off lead heel",
+            "s": "good",
+            "n": "right for driver; stance width fine"
+          },
+          {
+            "k": "Address posture",
+            "v": "Rounded upper back",
+            "s": "warn",
+            "n": "chin down on the chest; spine curved rather than hinged from the hips"
+          },
+          {
+            "k": "Trail leg at top",
+            "v": "Straightens",
+            "s": "warn",
+            "n": "pelvis gives up its forward tilt before transition starts"
+          },
+          {
+            "k": "Posture thru delivery",
+            "v": "Stands up",
+            "s": "warn",
+            "n": "taller than at address — but a rear-quarter angle exaggerates this"
+          },
+          {
+            "k": "Top of swing",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "angle can't read the shaft against the target line — Jul 26 reading still stands"
+          },
+          {
+            "k": "Path · face · AoA",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "no launch data. Unmeasured since Jul 27"
+          }
+        ],
+        "story": "Seven stills spanning address, early takeaway, top, transition, past impact and a held finish. The bones are the same ones Jul 26 found and they are good: a genuinely full coil with the head behind the ball, and a transition that starts from the ground — at hands-hip-high the clubhead is still well behind him, which is the opposite of a cast.\n\nThe new frame is the finish, and it is the best one in the set. Fully up on the trail toe, weight completely on the lead side, chest and hips turned past the target, hands high with the club wrapped behind the lead shoulder, and he holds it. Post-impact backs it up: head still down and behind the ball well past the strike.\n\nThat finish is what forces the refinement. The open fault said the hips stall and slide instead of clearing. A swing that truly stalls does not finish like this — it hangs back on the trail foot or the lead arm collapses. So the rotation is not what is missing. What IS missing is the posture it rotates around: the upper back is rounded and the chin is down at address, the trail leg straightens at the top so the pelvis loses its forward tilt before the downswing begins, and by the delivery frame the body is plainly taller than it was at address. Three frames, one story — he turns around a rising spine rather than the one he set. The useful consequence is that the cheapest entry point is now the earliest one: address posture and a little trail-knee flex, both checkable in a mirror before a ball is hit.",
+        "compare": "Third full-swing entry on record, after the Jul 19 sim baseline and the Jul 26 driver/wedge stills. Confirms Jul 26's three positives a second time and on the course rather than in a bay — coil, head behind the ball, ground-up transition, balanced finish. Revises Jul 26's 'hips slide level through impact' from a rotation fault to a posture fault. Does NOT re-grade Jul 26's across-the-line top, which needs an angle this film does not have.",
+        "limits": "Rear-quarter camera — behind and off the rear shoulder, elevated — so shaft plane at the top, club path, face-to-path and attack angle are all unreadable, and nothing here can confirm or refute the over-the-top slice. No true impact frame: the sequence jumps from hands-hip-high to well past the strike. The apparent standing-up in the delivery frame is partly perspective, since a rear-quarter lens exaggerates it as the body rotates toward the camera — the ADDRESS frames are the solid evidence, because a static position does not depend on rotation. DATE AND COURSE ARE AN INFERENCE, not Jack's report: he described the film only as recent, and it is dated to the Aug 20 Lakeside Country Club round on the strength of the terrain and the day it arrived. Correct it and this row gets removed and re-added."
+      }
+    },
+    {
+      "id": "faults-swing-20260820",
+      "type": "faults",
+      "discipline": "swing",
+      "faults": [
+        {
+          "tag": "across-the-line-top",
+          "why": "Open — filmed Jul 26, both clubs. At the top the shaft points RIGHT of target, which is ACROSS THE LINE. TERMINOLOGY CORRECTED Aug 20: this fault was tagged 'laid-off-top' and its text called the same position 'across the line / laid off'. Those are opposite positions — laid off is the shaft pointing LEFT of target — and the Jul 26 metrics say right, so across the line is the observation and always was. The fix is one thought: the trail elbow points DOWN and stays IN FRONT of the hip seam. WORKING (Jul 27): one-handed Miracle 201 swings land the drop into the slot, and that is the confirmed fix-feel rather than a theory. NOT RE-GRADED Aug 20: the on-course driver film was shot from behind and off the rear shoulder, and a rear-quarter angle cannot read the shaft against the target line — so this is still a Jul 26 reading, not a current one. NOT MEASURED: no sim numbers. Video shows a position; it cannot give club path or face-to-path, and until those exist the root cause is reasoned rather than established."
+        },
+        {
+          "tag": "posture-through-impact",
+          "why": "Open — and REFINED Aug 20 by the first film that caught a finish. This was tagged 'hips-stall' and read as the hips sliding toward the target instead of clearing back and up. The Aug 20 on-course driver stills argue against the strong version of that: the finish is complete — trail toe up, weight fully on the lead side, chest and hips turned through, held in balance — and a genuinely stalled, all-arms swing does not finish there. It hangs back or the lead arm collapses. So the rotation is not the missing piece. WHAT IS: the posture set at address is not the posture he turns around, and it goes in three places — the upper back is rounded and the chin is down at ADDRESS; the trail leg straightens at the TOP, so the pelvis gives up its forward tilt before transition starts; and the body is visibly taller through DELIVERY than at address. The instruction is unchanged in spirit — turn around a post, do not slide — but the entry point moves earlier: a long spine at address and a little trail-knee flex to the top, and the pelvis has somewhere to stay. HONESTY GUARD: a rear-quarter camera exaggerates apparent standing-up as the body rotates toward the lens, so the delivery frame is a candidate rather than a measurement; the address frames are the solid ones, because a static position does not depend on rotation. GOOD and to be protected, now confirmed twice and on the course rather than in a bay: the coil, the head behind the ball, the ground-up transition, and the balanced held finish."
+        },
+        {
+          "tag": "over-the-top-slice",
+          "why": "Open — the lifelong miss, and the reason the two above matter. Same root: arms come over the top when the body cannot deliver from the inside, producing an out-to-in path and the slice. Drill that isolates it: a headcover just outside the ball forces an in-to-out path. NOT ADVANCED Aug 20 — seven stills of a live tee shot neither confirm nor refute it. A finish that swings around and left is what a normal rotational finish looks like too, and no still from a rear-quarter angle can give a path. NOT MEASURED, and this is the honest limit — no launch monitor session exists, so path and face-to-path are inferred from video and from the shape of the miss. The next sim session settles it; until then this is the best-supported explanation rather than a measurement, and it has been waiting three and a half weeks."
+        }
+      ]
+    },
+    {
+      "id": "plan-swing-posture-20260820",
+      "type": "briefing",
+      "discipline": "full-swing",
+      "briefing": {
+        "course": "Swing Focus — Posture & the Top",
+        "focus": "Good ground-up sequencing and a complete, balanced finish (keep both) and a posture that does not survive the swing (fix). Your read — 'great at the top, lose it through contact' — was written up here as stalling hips; the Aug 20 on-course driver film says the rotation DOES finish, and what you lose is the tilt you set at address. Same instruction, earlier entry point. Standing swing plan until the next filmed check.",
+        "sections": [
+          {
+            "t": "✓ What's working — one-handed Miracle 201 drop",
+            "b": "CONFIRMED (Jul 27): swinging the MIRACLE 201 ONE-HANDED (trail/right hand only) tonight really helped you FEEL the club drop into the slot in transition. Make it your go-to reset — the heavy, whippy head with just the trail hand forces the elbow to lead DOWN (in front of the trail-hip seam) and shallows the shaft, so the hips can clear instead of the club laying off. Use it as a warm-up primer and any time the top gets across the line: a few slow one-handed 201 reps feeling the drop, then blend it into your two-hand swing. A club held trail-arm-only works as a stand-in when the trainer isn't handy.",
+            "k": "One-handed Miracle 201 swings are the confirmed fix-feel for the transition drop."
+          },
+          {
+            "t": "The one connection: the top, the posture AND the over-the-top slice are one story",
+            "b": "When the club gets across the line / laid off at the top (shaft pointing right of target, trail elbow drifting behind you), the downswing has to re-route the club to save the shot. Two re-routes usually happen together: the hips SLIDE toward the target and the chest hangs back (the 'lose it through contact' feel), AND the trail shoulder throws the club OUT over the plane so it cuts across the ball — that's the over-the-top slice. One cause, three symptoms. So we don't chase three fixes: clean up the top, drop the club into the slot (shallow), and let the hips CLEAR — and all three symptoms go with it.\n\nUPDATED Aug 20: two corrections to the WORDS, not to the mechanism. (1) The top position filmed on Jul 26 is ACROSS THE LINE — shaft pointing RIGHT of target. 'Laid off' is the opposite position, shaft pointing LEFT of target, and the two were being used interchangeably here. They are not the same thing. (2) The middle symptom is better described as LOSING POSTURE than as stalling hips: the Aug 20 finish is complete and balanced, so the hips do get there. The one-cause reading survives both corrections.",
+            "k": "The top, the lost posture and the lifelong slice are one fault, not three."
+          },
+          {
+            "t": "What the film showed (both clubs, Jul 26)",
+            "b": "GOOD, protect it: full coil, head behind the ball (driver), lower-body-led transition on both, and a balanced held finish. WEDGE bonus: spine angle stayed, you covered the ball — a proper descending strike. TO FIX: (1) slightly across-the-line top on BOTH clubs — one feel fixes both; (2) driver hips look to slide level through impact instead of clearing up-and-around. No launch numbers were in frame, so path/attack-angle/spin are still unmeasured — that's the next data to grab.",
+            "k": "Film says: coil, head behind the ball and lower-body-led transition are all good — protect them."
+          },
+          {
+            "t": "What the on-course film showed (driver, Aug 20)",
+            "k": "The finish is complete — so what you lose through contact is posture, not rotation.",
+            "b": "Seven phone stills of a live tee shot, address to finish — the first driver film taken ON THE COURSE rather than in a bay, and the first of any driver swing that catches the FINISH.\n\nGOOD, and now confirmed twice: a full coil with the head behind the ball; a ground-up transition (at hands-hip-high the clubhead is still well behind you — no cast); and a finish that is genuinely complete — trail toe up, weight fully on the lead side, chest and hips turned through, held in balance.\n\nThat finish is why this plan changed. A swing whose hips truly stall does not finish there — it hangs back on the trail foot or collapses the lead arm. Yours does not. So rotation is not the missing piece.\n\nWHAT IS: posture. The upper back is rounded and the chin is down on the chest at ADDRESS. The trail leg straightens at the TOP. And through DELIVERY the body is visibly taller than it was at address. One story across three frames — you turn around a rising spine instead of the one you set.\n\nWHAT THE FRAMES CANNOT SAY: the camera sat behind you and off the rear shoulder, so shaft plane at the top, club path, face-to-path and attack angle are all unreadable, and there is no true impact frame. The across-the-line top and the slice are both exactly where Jul 27 left them. Next film: phone on the ground ON the target line behind the ball, at hand height, plus one face-on."
+          },
+          {
+            "t": "Fix 0 · Keep the posture you set",
+            "k": "Set a long spine and hold a little trail-knee flex to the top; the pelvis then has somewhere to stay.",
+            "b": "This one happens before the club moves, which is why it is Fix 0 rather than Fix 4 — and it is the cheapest thing on this page, because it is static and you can check it in a mirror.\n\nAT ADDRESS: hinge from the HIPS, not from the middle of your back. Chest tall, shoulder blades down, room for a fist between your chin and your chest, arms hanging under the shoulders. The rounded-back, chin-down setup in the Aug 20 stills costs you twice: it caps the shoulder turn, so the arms lift to make up the difference, and a chest already folded at address is the setup most likely to stand up in transition.\n\nTO THE TOP: keep a little flex in the TRAIL knee. If the trail leg straightens going back — which it does in the Aug 20 film — the pelvis has already given up its forward tilt before the downswing starts, and coming down there is nowhere to go but up. Holding it at the top is cheaper than fighting it at the bottom.\n\nTHE CHECK: phone on the ground, square down the line, at hand height. Freeze address and freeze delivery and put the two side by side. Your belt line should sit at roughly the same height in both. That is the whole test."
+          },
+          {
+            "t": "Fix 1 · Clean up the top (trail elbow in front)",
+            "b": "FEEL: at the top, the trail (right) elbow points more DOWN at the ground and stays in FRONT of your trail-hip seam, keeping the club a hair more in front of your chest. Right now the elbow drifts behind you, which lays the shaft off. DRILL — the one-handed Miracle 201 (or club trail-arm-only): make slow half-swings feeling the trail elbow lead down into the slot; pause at the top and check the shaft points AT the target line, not right of it. Mirror or a phone on a tripod DTL at the top confirms it. 10 slow reps before you hit balls. (This is the drill that's working for you — see 'What's working' above.)",
+            "k": "Fix 1: trail elbow points down and stays in FRONT of the hip seam at the top."
+          },
+          {
+            "t": "Fix 2 · Clear the hips, don't slide them",
+            "b": "FEEL: from the top, the lead (left) hip clears BACK and UP — belt buckle turning left and rotating open — while your chest stays over the ball a beat longer. Not a slide toward the target; a turn around a post. This is where your speed and your 'through contact' consistency live. DRILLS: (a) Trail-foot-back / step-through: hit half wedges stepping the trail foot back through impact — forces rotation over slide. (b) Lead-hip-to-the-wall: set up with your lead hip a few inches off a wall/bag; on the downswing the hip should clear so it just brushes back and up, not bump forward into it. (c) Chair/impact-bag: feel the trail glute fire and the hips deepen (not thrust toward the ball) so you don't early-extend. 2–3 sets of 10 each, twice a week.\n\nUPDATED Aug 20: the on-course driver film says the clearing itself IS happening — the finish is complete and balanced, which a stalled swing cannot produce. So read this section as being about HEIGHT more than about turn: the lead hip clears back and UP around a spine angle you have KEPT, and the drills that earn their time here are the two that stop you standing up — lead-hip-to-the-wall and the chair/impact-bag feel. Start at Fix 0 though; by the time this section gets its chance the tilt has usually already gone.",
+            "k": "Fix 2: the lead hip clears BACK and UP while the chest stays over the ball a beat longer."
+          },
+          {
+            "t": "Fix 3 · Your over-the-top slice — same root, plus the path & face piece",
+            "b": "The lifelong slice comes from the SAME move: OVER THE TOP means in transition the upper body (trail shoulder) takes over and throws the club OUT and over the plane, so it swings across the ball OUT-TO-IN; with an open face that start-left, curve-right is your slice (a square face on that same path is a pull). Everything in this plan already fixes the CAUSE — the one-handed drop shallows the club, the trail elbow leading down puts it on line, and the hips CLEARING makes room so the arms deliver from the INSIDE instead of over the top. The extra piece is PATH then FACE. (1) PATH feel: from the top, feel the club fall behind you and swing OUT toward right-center field (in-to-out). DRILL — put a headcover/water bottle a few inches OUTSIDE the ball on the target line; swing so you miss it (coming over the top clips it). (2) FACE: a slice also needs an open face — once your path comes from the inside, if the ball still fades or you start pulling, the face is open to the path; with your conventional grip, let the trail forearm rotate/release through and check the grip isn't too weak. Fix PATH FIRST — chasing the face while still coming over the top just makes a bigger slice or a smother-hook.",
+            "k": "Fix 3: the slice is the same root — a headcover outside the ball forces the in-to-out path."
+          },
+          {
+            "t": "Driver vs wedge — keep them different on purpose",
+            "b": "DRIVER: ball forward, hips clearing up-and-around so you hit slightly UP — that's carry and less spin. WEDGE: keep exactly what the film showed — stay down, cover the ball, hit DOWN; don't let 'clear the hips' turn into standing up out of a wedge. Same sequencing engine, opposite low-point. If a swing thought bleeds the wrong way, park it — the wedge is already good.",
+            "k": "Keep driver and wedge deliberately different: up on the driver, down and covering on the wedge."
+          },
+          {
+            "t": "How to test it at the sim (get the numbers this time)",
+            "b": "The visual read can only go so far without data. Next session, capture and log these: DRIVER — attack angle (want positive / hitting up), CLUB PATH (over-the-top shows as a negative/left number — you want it near zero to slightly positive/right), FACE-TO-PATH (that's what curves it), spin, and ball speed. WEDGES — carry, spin, launch, and gap-check 60/56/50 against the ladder (80/95/108). Film one DTL clip at hand height + one face-on per club. Bring those back and we can prove whether the path is actually coming from the inside now.",
+            "k": "Stop guessing from video — get attack angle, club path and face-to-path at the next sim session."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "Where each instruction here came from, and what is still unmeasured.",
+            "b": "JUL 26 — five phone stills each of driver and wedge, simulator bay. Source of the full coil, the head behind the ball, the ground-up transition and the balanced finish (all GOOD), and of the across-the-line top on BOTH clubs.\n\nJUL 27 — one-handed Miracle 201 swings confirmed as the fix-feel for the transition drop. Your own report of what you did, so it stands on its own.\n\nAUG 20 — seven phone stills of a live tee shot with the driver, address to finish, rear-quarter angle. First film to catch a finish. Source of the posture reading and of the correction to the hips-stall framing. The plan was retitled here: it was 'Swing Focus — Hips & the Laid-Off Top', and both halves of that name had gone wrong — 'laid off' was the wrong term for an across-the-line top, and the hips are not the part that fails.\n\nSTILL UNMEASURED, and it has been since Jul 27: club path, face-to-path, attack angle and spin. No launch-monitor session exists, so everything this plan says about the slice is the best-supported explanation rather than a measurement. The Aug 20 film could not advance it — a rear-quarter camera cannot read a path — and there is still no true impact frame on any driver swing on file."
+          }
+        ],
+        "rules": [
+          "Long spine at address — chin off the chest",
+          "Keep a little trail-knee flex to the top",
+          "Trail elbow DOWN and in FRONT — the one thought",
+          "Turn around the post — the finish is already right",
+          "Next film: SQUARE down the line, at hand height",
+          "Next sim session: get path and face-to-path numbers"
+        ],
+        "discipline": "full-swing"
+      }
+    },
+    {
+      "id": "plan-swing-hips-retire-20260820",
+      "type": "briefing-remove",
+      "target": "plan-swing-hips-20260727-3-k"
+    },
+    {
+      "id": "action-swing-posture-20260820",
+      "type": "action",
+      "text": "SWING — POSTURE, and the film that can actually grade it. The Aug 20 driver stills show a rounded upper back and chin on the chest at address, a trail leg that straightens at the top, and a body taller through delivery than at address — so the 'lose it through contact' feel is posture, not stalling hips: the finish is complete. Two things. (1) MIRROR CHECK at address: hinge from the hips, chest tall, a fist between chin and chest, and hold a little trail-knee flex to the top. (2) NEXT RANGE SESSION, film SQUARE down the line — phone on the ground ON the target line behind the ball, at hand height — plus one face-on. The Aug 20 angle was rear-quarter, which is why the across-the-line top still has not been re-graded since Jul 26."
     }
   ]
 }
