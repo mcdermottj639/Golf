@@ -168,6 +168,7 @@ differential — omit rather than guess). The value is in `holes[]`, one object 
 | `si` | stroke index. Unlocks the hardest-six / easiest-six split |
 | `putts` | putts on that hole. Unlocks 1/2/3-putt counts and putts-on-GIR-vs-off |
 | `pd` | how far the **first** putt was, as a `PUTT_DIST` key — see *Putting by distance* below. Omit where `putts` is 0 |
+| `gimme` | `true` when the **last** putt on the hole was conceded rather than holed. Still counted in `putts` and in the score; see *Given putts* below for what it changes |
 | `gir` | `true`/`false` — green in regulation |
 | `gmiss` | where a missed green finished: `S` `L` `R` `Lg` `OB` `X` (short/left/right/long/out of bounds/other) |
 | `fw` | `true`/`false` — fairway hit. **Omit entirely on par 3s** so they don't count against the fairway rate |
@@ -392,6 +393,42 @@ inside three feet). Being in `holeTips` with keys, they inherit live-round prece
 
 The row hides itself when `putts` is 0 — chipped in, so there was no first putt — and
 tapping 0 putts clears any distance already set.
+
+### Given putts (Aug 20 2026)
+
+`h.gimme` means the LAST putt on the hole was conceded. It still counts — he scores it,
+everyone does — but it was never struck, and that cuts two opposite ways, which is the
+whole reason the flag exists rather than being folded into the putt count:
+
+- **Given from the first putt** (`putts === 1`) — a make he never hit. Counting it as a
+  make inflates the one number this project cannot afford to flatter, so it comes out of
+  **both** the numerator and the denominator of the make rate: `hit = n - gim`,
+  `made = one - gim`. You cannot measure a putt that was not attempted. Film is king,
+  applied to a scorecard.
+- **Given after a lag** (`putts >= 2`) — the opposite. The first putt finished inside
+  gimme range, which is the closest thing a scorecard can produce to a **proximity**
+  measurement, and it is a straight read on the open distance-control fault. Counted as
+  `lagIn` and reported next to the three-putt rate.
+
+`conceded()` and `lagGiven()` in `app.js` are the two predicates; `bagPutt()` derives
+`hit`/`made`/`gim`/`lagIn` from them, and `puttDistTable()` plus the `putt-short`,
+`putt-tap` and `putt-lag` findings all read the derived fields rather than `one`/`n`.
+The chip sits on the First-putt row and clears itself when he taps 0 putts (chipped in —
+there was nothing to concede). The scorecard marks a conceded hole with a **g**.
+
+### The hole's prep collapses (Aug 20 2026)
+
+The prep card at the top of a live hole is a **tee-box read**; the scoring chips are a
+between-shots one. Once he has played the hole, the plan is just pushing the chips down
+the screen — so tapping its header folds it away (`live-intel` → `h.intelShut`, UI state
+on `S.live` that never reaches the saved card).
+
+Two rules that keep it honest. **It opens on arrival at every hole and the state is
+deliberately NOT sticky** — a preference carried forward would mean he stops seeing hole
+notes, and surfacing them on the hole he is standing on is the entire reason they exist.
+And **shut is not empty**: the header keeps the one line to act on (`play`, else the prose
+note, else his record for the hole), so collapsing hides the reasoning and never the
+decision.
 
 ### A note on any hole (Aug 19 2026)
 

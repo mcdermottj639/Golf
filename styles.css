@@ -476,6 +476,17 @@ h2{scroll-margin-top:14px}
 /* What this hole has cost you before, and what the prep says about it — read with a club
    already in your hand, so it sits above the card and ahead of the taps. */
 .holeintel{margin:8px 0 0;padding:11px 13px;border-left:3px solid var(--green)}
+/* Tap the header to fold the prep away — the plan is a tee-box read, the chips are a
+   between-shots one, and on a hole he has already played the plan is just in the way. */
+.hi-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.hi-tog{margin-left:auto;font-size:11px;color:var(--faint);font-weight:400}
+/* Shut, the card still carries the one line to act on — collapsing hides the reasoning,
+   never the decision. */
+.holeintel.shut{padding-top:9px;padding-bottom:9px}
+.hi-gist{font-size:13px;line-height:1.4;color:var(--gtext);margin-top:3px;cursor:pointer;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.hi-gist b{font-weight:700}
+body.night .hi-gist{color:#9ed4b2}
 /* The reasons, under the labelled decision rows. */
 .hi-why{list-style:none;margin:0}
 .hi-why li{position:relative;padding-left:15px;font-size:12.5px;line-height:1.5;
@@ -540,6 +551,9 @@ body.night .chip.ns.on, body.night .chip.ob.on{background:var(--burg);color:var(
 .hstrip.cur.noted::after{background:var(--green-ink)}
 /* Same mark on the scorecard, next to the hole number. */
 .nmark{font-size:10px;color:var(--burg);margin-left:3px;vertical-align:1px}
+/* A conceded last putt, beside the count on the scorecard. */
+.giv{font-family:var(--sans);font-size:9px;font-weight:800;color:var(--btext);
+  margin-left:2px;vertical-align:1px}
 /* Hole notes, read back: the hole number is the label, the note is the content. */
 .holenotes{display:grid;grid-template-columns:auto 1fr;gap:7px 11px;margin:2px 0 0}
 .holenotes dt{font-family:var(--sans);font-size:11px;font-weight:800;color:var(--btext);
