@@ -244,6 +244,17 @@ everything the slots don't.
 `*asterisks*` bold a phrase (applied after escaping, so the markup is author-only). A
 prose `note` still renders for older plans, but don't write new ones that way.
 
+**Three more fields make the hole MARKABLE afterwards — write them on every hole you can
+(Aug 20 2026).** They are what lets the round card grade the plan (see *The prep loop* below),
+and they exist because the prose can't be trusted to say it: `avoid` reads "*Right*." on one
+hole and "The long second" on another, and only one of those two words is a direction.
+
+| Field | Meaning |
+|---|---|
+| `club` | Carry-ladder **keys** the `play` call names, as an array — `["5-wood","2-iron"]`. Omit where the call is positional ("Fairway first — favour left-center") rather than a club |
+| `avoidDir` | The finish `avoid` warns about, as a **`DIRS` code** (`S` `L` `R` `Lg`). Omit where the warning isn't a direction — "the three-putt", "getting greedy", "the water" all correctly get nothing |
+| `avoidOn` | `tee` or `green` — which shot the warning is about. Omit for a hazard in play on both (bunkers right of the fairway *and* the green). A tree down the right and a bunker short are different warnings, and counting either finish against either one would inflate the hit rate |
+
 **The Sterling Farms standard (standing instruction, Aug 12 2026) — every round prep
 works this way now.** Jack approved the Sterling Farms plan as the model. When he names a
 course he's playing:
@@ -473,6 +484,35 @@ the numbers can't, joined on the hole it was written about:
 So a new place for notes is a **join**, not a scan: find the holes a finding is already built
 on and quote them. Anything injecting note text into a tip `b`/`h` must `esc()` it — those
 fields render as raw HTML.
+
+### The prep loop, closed (Aug 20 2026)
+
+The per-hole plan notes had the same problem one rung up, and worse: they were the biggest
+**write-only** file in the app. They travelled one way — onto the tee, via `briefHole()` —
+and nothing ever came back to ask whether the call was taken or whether it worked. The
+record fed the plan (`holeRecord()` prints his history on the hole card); the plan never fed
+the record. `courseShape()` was the only thing that read a plan's prose at all, and only to
+describe the course on the cheat sheet.
+
+**`planHeld(r)`** joins a played card to the plan covering that course and renders *How the
+plan held up* at the bottom of the round card: per hole, what the plan called, what he hit,
+where both shots finished, what it scored. Three rules hold it honest:
+
+- **It counts the fields, never the prose.** Only `club` and `avoidDir`/`avoidOn` (above)
+  feed the two rates — took-the-call, and did-the-warned-miss-happen. The plan's words are
+  quoted beside the result, which needs no interpretation. Same rule as a hole note:
+  **carried, not parsed.**
+- **A plan only marks a round it PREDATES**, by its feed-id date vs. the round's. The
+  Sterling Farms standing plan was written Aug 12 largely from the Aug 12 card, so that
+  card renders as *what it was built on*, not as a test of it. Grading a plan against the
+  round it was derived from is marking your own homework, and the block says which it is.
+- **No Coach tip fires off it.** One round is not a sample, and "the plan held" is exactly
+  the sort of claim that would harden into folklore. It stays descriptive on the card until
+  there are repeat rounds at a planned course to compute over.
+
+Consequence for writing plans: a hole note with no `club` and no `avoidDir` is unmarkable
+forever. Fill them in wherever the call genuinely names one — and leave them off where it
+doesn't, because a padded field is a false record, not a fuller one.
 
 ### Hole data outranks a stats snapshot
 

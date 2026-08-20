@@ -567,3 +567,12 @@ body.night .hstrip{background:#22292e;border-color:var(--line);color:var(--faint
 body.night .hstrip.done{background:#1c2b22;color:#8fd0a8;border-color:#33503f}
 body.night .hstrip.cur{background:var(--green);color:var(--green-ink);border-color:var(--green)}
 body.night .lvhead{background:#0b0e11}
+
+/* Plan-vs-card marks on the round card's "How the plan held up" table. Green = the call
+   the plan named was the club he took; burgundy = it wasn't, or the miss the plan warned
+   about is the one that happened. */
+.pv-ok{color:var(--green)}
+.pv-no{color:var(--burg)}
+/* The plan's own words read as prose, so they are left-aligned inside the otherwise
+   centred scorecard grid, and given the room — this is the widest column on the table. */
+.scard td.pv-said{text-align:left;width:44%}
