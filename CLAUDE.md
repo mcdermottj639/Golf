@@ -145,7 +145,7 @@ does nothing — double-check against `applyFeed()`.
 | Returned | ~~L.A.B. Golf DF3i · 34"~~ | **returned Aug 10, 2026 — distance control.** Gamed Jul 18–30 and Aug 1–10. Its Press Pistol 2° went with it, so the "hands even with the ball" cue is **retired** — don't carry it to the LINK. Lost with it: the only measured scoreboard in the project (8/10 from four feet, Jul 20) and the high-MOI control head |
 | Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** |
 
-**Live putting priority: distance control.** Pace has now decided the fate of two putters (DF3i benched Jul 30, reprieved Aug 1, returned Aug 10) and has never been measured once. The grind is the 30-ft ladder twice a week on the LINK, logging *shorts · spread · green speed*, plus the unrun tape test — an off-centre strike bleeds ball speed, so it's a distance fault before it's a line fault. Tempo is **not** the problem (2.0:1 on this head vs a 2:1 target).
+**Live putting priority: distance control.** Pace has now decided the fate of two putters (DF3i benched Jul 30, reprieved Aug 1, returned Aug 10) and had never been measured once until the live logger's first-putt distance field (Aug 20) — the three-putt rate from 21 ft + is the on-course version of it, so check that row before repeating "unmeasured". The grind is the 30-ft ladder twice a week on the LINK, logging *shorts · spread · green speed*, plus the unrun tape test — an off-centre strike bleeds ball speed, so it's a distance fault before it's a line fault. Tempo is **not** the problem (2.0:1 on this head vs a 2:1 target).
 
 Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 · 60° 80.
 
@@ -167,6 +167,7 @@ differential — omit rather than guess). The value is in `holes[]`, one object 
 | `n` · `par` · `s` | hole number, par, score — the minimum; everything else is optional |
 | `si` | stroke index. Unlocks the hardest-six / easiest-six split |
 | `putts` | putts on that hole. Unlocks 1/2/3-putt counts and putts-on-GIR-vs-off |
+| `pd` | how far the **first** putt was, as a `PUTT_DIST` key — see *Putting by distance* below. Omit where `putts` is 0 |
 | `gir` | `true`/`false` — green in regulation |
 | `gmiss` | where a missed green finished: `S` `L` `R` `Lg` `OB` `X` (short/left/right/long/out of bounds/other) |
 | `fw` | `true`/`false` — fairway hit. **Omit entirely on par 3s** so they don't count against the fairway rate |
@@ -368,6 +369,40 @@ Where OB then speaks for itself:
 
 GIR% and fairway% are unchanged — a miss is a miss, and the flag prices it rather than
 erasing it. Same rule as `noshot`.
+
+### Putting by distance — the first-putt field (Aug 20 2026)
+
+Jack asked for "a length of putt made" on the live logger. What the card records is the
+distance of the **first putt on the hole** (`h.pd`), because that is the superset: on a
+one-putt hole it *is* the length he holed, and on every other hole it is the number that
+actually decides whether the hole went well. A putt count on its own cannot tell a
+two-putt from forty feet (a good hole) from a two-putt from five (a dropped shot), and
+until this field existed nothing in the project could.
+
+**The buckets are `PUTT_DIST` in `app.js`, and every boundary is a line this project
+already draws** — that is what makes them worth counting rather than generic:
+
+| Key | Range | Why that line |
+|---|---|---|
+| `t`   | ≤3 ft    | tap-in range. Splitting it out stops gimmes inflating the make rate, and a miss inside it is a real event |
+| `s`   | 4–6 ft   | the scoring zone and **his** zone: the 5-ft test sits in the middle of it, the left miss is the whole putter saga, and `Short Putts — The Pop Stroke` covers exactly this range |
+| `m`   | 7–12 ft  | the make-some window — birdie chances and par saves |
+| `l`   | 13–20 ft | two-putt territory; a make is a bonus. First real pace test |
+| `xl`  | 21–30 ft | lag proper — three-putt risk climbs steeply through here |
+| `xxl` | 30+ ft   | the ladder distance, so the on-course number is directly comparable to the 30-ft grind |
+
+Changing a `k` orphans every hole already logged with it, the same trap as
+`MENTAL_TRIGGERS` — add a bucket rather than resplitting the existing ones.
+
+What it feeds: `puttDistTable()` on Scores and on every round card (makes and three-putts
+from each range), and three findings inside `holeTips()` — `putt-short` (the 4–6 ft
+conversion, compared against the latest 5-ft mat test, which is the first mat-vs-green
+comparison the project can make), `putt-lag` (three-putt rate from 21 ft +, i.e. **the
+open distance-control fault with a number on it at last**) and `putt-tap` (misses from
+inside three feet). Being in `holeTips` with keys, they inherit live-round precedence.
+
+The row hides itself when `putts` is 0 — chipped in, so there was no first putt — and
+tapping 0 putts clears any distance already set.
 
 ### A note on any hole (Aug 19 2026)
 
