@@ -79,13 +79,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v44';
+const BUILD = 'v45';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v45', d:'2026-08-20', items:[
+    'Quick view on the live logger. A Full card / Quick view switch sits under the hole’s prep; flip it and the hole becomes one-line rows — tee shot through score on one screen, no scrolling.',
+    'One row is open at a time with full-size chips. Answer it and the next unanswered row opens by itself; tap any row to fix it, and a row you don’t track just stays blank, same as the full card.',
+    'The switch remembers which view you used last, the full card stays one tap away, and every tap still saves instantly.' ] },
   { b:'v44', d:'2026-08-20', items:[
     'The hole\u2019s prep folds away. Tap its header on the live logger and the plan collapses to the one line to act on, bringing the scoring chips up the screen. It opens again on the next hole.',
     'A gimme chip on the putts row for when you lag it up and it gets given.',
@@ -3952,6 +3956,40 @@ function liveStart(){
   </div>`;
 }
 
+// ---- Quick view: the whole hole as one-line rows, the open row full-size ----
+// The row order IS the logging order — tee shot through score, note last. A par 3 has no
+// fairway and no separate approach, and 0 putts hides First putt, same as the full card.
+function qRows(h){
+  return ['tee', h.par === 3 ? null : 'fw', h.par === 3 ? null : 'app', 'green', 'putts',
+    h.putts === 0 ? null : 'pd', 's', 'note'].filter(Boolean);
+}
+// A carried-over tee suggestion is NOT an answer — the row opens so he confirms it with
+// the same tap the full card asks for, just on a bigger chip.
+function qAnswered(h, r){
+  if(r === 'tee') return !!h.tee && !h.teeAuto;
+  if(r === 'fw') return h.fw != null;
+  if(r === 'app') return !!h.app;
+  if(r === 'green') return h.gir != null;
+  if(r === 'putts') return h.putts != null;
+  if(r === 'pd') return !!h.pd;
+  if(r === 's') return h.s != null;
+  if(r === 'note') return !!h.note;
+  return false;
+}
+// Which row is open. Arriving at a hole derives it — first unanswered, skipping the note
+// (a keyboard must never open itself) — and after that his taps own it. `qOpen` is UI
+// state on S.live and never reaches the saved card.
+function qOpenRow(h){
+  if(h.qOpen !== undefined) return h.qOpen;
+  return qRows(h).find(r => r !== 'note' && !qAnswered(h, r)) || '';
+}
+// Answering a row opens the NEXT unanswered one, forward only — auto-advance that jumped
+// back up to a row he chose to skip would spend the taps this view exists to save.
+function qAdvance(h, from){
+  const rows = qRows(h);
+  h.qOpen = rows.slice(rows.indexOf(from) + 1).find(r => r !== 'note' && !qAnswered(h, r)) || '';
+}
+
 function livePlay(L){
   const h = L.holes[L.cur];
   const t = liveThru(L);
@@ -3980,6 +4018,97 @@ function livePlay(L){
     ? `<span class="chip big sc on" data-action="live-set" data-k="s" data-v="${h.s}"><b>${h.s}</b><i>${h.s - h.par > 0 ? '+' + (h.s - h.par) : h.s - h.par}</i></span>` : '';
 
   const last = L.cur === L.holes.length - 1;
+
+  // One body per row, shared verbatim by both layouts — same chips, same data-actions,
+  // so the full card and quick view can never drift apart on what a tap records.
+  const bodies = {
+    tee: clubRow('tee', teeClubs),
+    fw: `<div class="chips">
+      ${chip('fw', 'hit', 'Hit', h.fw === true)}
+      ${chip('fw', 'L', 'Left', h.fw === false && h.fmiss === 'L')}
+      ${chip('fw', 'R', 'Right', h.fw === false && h.fmiss === 'R')}
+      ${chip('fw', 'X', 'Other', h.fw === false && !h.fmiss)}
+      ${chip('fw', 'OB', 'OB', h.fw === false && h.fmiss === 'OB', 'ob')}</div>`,
+    app: clubRow('app', clubs),
+    green: `<div class="chips">
+      ${chip('green', 'hit', 'Hit', h.gir === true)}
+      ${chip('green', 'S', 'Short', h.gir === false && h.gmiss === 'S')}
+      ${chip('green', 'L', 'Left', h.gir === false && h.gmiss === 'L')}
+      ${chip('green', 'R', 'Right', h.gir === false && h.gmiss === 'R')}
+      ${chip('green', 'Lg', 'Long', h.gir === false && h.gmiss === 'Lg')}
+      ${chip('green', 'OB', 'OB', h.gir === false && h.gmiss === 'OB', 'ob')}</div>${
+      // Separate toggle, not a sixth direction: a short one you had no play at is both
+      // short AND conceded, and only the second fact tells you which club to blame.
+      par3 ? '' : `<div class="chips"><span class="chip big ns${h.noshot ? ' on' : ''}"
+        data-action="live-set" data-k="noshot" data-v="1">No shot at it</span></div>`}`,
+    putts: `<div class="chips">${[0,1,2,3,4,5].map(p =>
+      chip('putts', p, p === 5 ? '5+' : p, h.putts === p)).join('')}</div>`,
+    pd: `<div class="chips">${PUTT_DIST.map(d =>
+      chip('pd', d.k, d.lab, h.pd === d.k)).join('')}</div>
+      <div class="chips"><span class="chip big ns${h.gimme ? ' on' : ''}"
+        data-action="live-set" data-k="gimme" data-v="1">Last one given</span></div>`,
+    s: `<div class="chips">${scores}${outlier}
+      <span class="chip big" data-action="live-bump" data-d="1">+1</span>
+      <span class="chip big" data-action="live-bump" data-d="-1">−1</span></div>`,
+    note: (h.note || h.noteOpen)
+      ? `<textarea id="lvHoleNote" class="lvnote" rows="2"
+          placeholder="What actually happened here">${esc(h.note || '')}</textarea>`
+      : `<div class="chips"><span class="chip big note" data-action="live-note">＋ Add a note</span></div>`,
+  };
+
+  const quick = !!S.settings.liveQuick;
+  const scName = d => ({ '-2':'Eagle', '-1':'Birdie', 0:'Par', 1:'Bogey', 2:'Double', 3:'Triple' })[d]
+    || (d > 0 ? '+' + d : String(d));
+  const dirLab = m => m === 'OB' ? 'OB'
+    : (MISS_LAB[m] ? MISS_LAB[m][0].toUpperCase() + MISS_LAB[m].slice(1) : m);
+  // The value column: what the row already says, so a shut row still reads. Null = blank.
+  const qVal = r => {
+    if(r === 'tee') return h.tee ? { txt: esc(clubTag(h.tee)), carry: !!h.teeAuto } : null;
+    if(r === 'fw') return h.fw == null ? null
+      : { txt: h.fw ? 'Hit' : (h.fmiss ? dirLab(h.fmiss) : 'Other') };
+    if(r === 'app') return h.app ? { txt: esc(clubTag(h.app)) } : null;
+    if(r === 'green') return h.gir == null ? null
+      : { txt: (h.gir ? 'Hit' : (h.gmiss ? dirLab(h.gmiss) : 'Miss')) + (h.noshot ? ' · no shot' : '') };
+    if(r === 'putts') return h.putts == null ? null : { txt: String(h.putts) };
+    if(r === 'pd') return h.pd ? { txt: PD[h.pd].lab + ' ft' + (h.gimme ? ' · given' : '') }
+      : (h.gimme ? { txt: 'given' } : null);
+    if(r === 's') return h.s == null ? null : { txt: h.s + ' · ' + scName(h.s - h.par) };
+    if(r === 'note') return h.note ? { txt: '✎' } : null;
+    return null;
+  };
+  const QLAB = { tee:'Off the tee', fw:'Fairway', app:'Into the green', green:'Green',
+    putts:'Putts', pd:'First putt', s:'Score', note:'Note' };
+  const QHINT = { tee: h.teeAuto ? 'carried over — tap to keep or change' : '',
+    fw:'OB is two strokes — tap it and the app counts them', app:'optional',
+    green: par3 ? '' : 'the drive left you nothing',
+    pd:'feet — a 2-putt from 40 is not a 2-putt from 5',
+    note:'saved to this hole, on the card forever' };
+  const open = qOpenRow(h);
+  const quickCard = `<div class="card lvcard qcard">
+    ${qRows(h).map(r => {
+      const v = qVal(r), on = open === r;
+      return `<div class="qrow${on ? ' open' : ''}">
+        <div class="qhead" data-action="live-qrow" data-r="${r}">
+          <span class="qlab">${QLAB[r]}</span>
+          <span class="qval${v ? (v.carry ? ' carry' : '') : ' none'}">${v ? v.txt : '—'}</span>
+        </div>
+        ${on ? `<div class="qbody">${QHINT[r] ? `<div class="qhint">${QHINT[r]}</div>` : ''}${bodies[r]}</div>` : ''}
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  const fullCard = `<div class="card lvcard">
+    ${row('Off the tee', bodies.tee,
+      h.teeAuto ? 'carried over — tap to keep or change' : '')}
+    ${par3 ? '' : row('Fairway', bodies.fw, 'OB is two strokes — tap it and the app counts them')}
+    ${par3 ? '' : row('Into the green', bodies.app, 'optional')}
+    ${row('Green', bodies.green, par3 ? '' : 'the drive left you nothing')}
+    ${row('Putts', bodies.putts)}
+    ${h.putts === 0 ? '' : row('First putt', bodies.pd, 'feet — a 2-putt from 40 is not a 2-putt from 5')}
+    ${row('Score', bodies.s)}
+    ${row('Note', bodies.note, 'saved to this hole, on the card forever')}
+  </div>`;
+
   return `
   <div class="lvhead">
     <div class="lvh1">Hole ${h.n}<span> · par ${h.par}${h.si ? ` · SI ${h.si}` : ''}</span></div>
@@ -4047,45 +4176,12 @@ function livePlay(L){
     </div>`;
   })()}
 
-  <div class="card lvcard">
-    ${row('Off the tee', clubRow('tee', teeClubs),
-      h.teeAuto ? 'carried over — tap to keep or change' : '')}
-    ${par3 ? '' : row('Fairway', `<div class="chips">
-      ${chip('fw', 'hit', 'Hit', h.fw === true)}
-      ${chip('fw', 'L', 'Left', h.fw === false && h.fmiss === 'L')}
-      ${chip('fw', 'R', 'Right', h.fw === false && h.fmiss === 'R')}
-      ${chip('fw', 'X', 'Other', h.fw === false && !h.fmiss)}
-      ${chip('fw', 'OB', 'OB', h.fw === false && h.fmiss === 'OB', 'ob')}</div>`,
-      'OB is two strokes — tap it and the app counts them')}
-    ${par3 ? '' : row('Into the green', clubRow('app', clubs), 'optional')}
-    ${row('Green', `<div class="chips">
-      ${chip('green', 'hit', 'Hit', h.gir === true)}
-      ${chip('green', 'S', 'Short', h.gir === false && h.gmiss === 'S')}
-      ${chip('green', 'L', 'Left', h.gir === false && h.gmiss === 'L')}
-      ${chip('green', 'R', 'Right', h.gir === false && h.gmiss === 'R')}
-      ${chip('green', 'Lg', 'Long', h.gir === false && h.gmiss === 'Lg')}
-      ${chip('green', 'OB', 'OB', h.gir === false && h.gmiss === 'OB', 'ob')}</div>${
-      // Separate toggle, not a sixth direction: a short one you had no play at is both
-      // short AND conceded, and only the second fact tells you which club to blame.
-      par3 ? '' : `<div class="chips"><span class="chip big ns${h.noshot ? ' on' : ''}"
-        data-action="live-set" data-k="noshot" data-v="1">No shot at it</span></div>`}`,
-      par3 ? '' : 'the drive left you nothing')}
-    ${row('Putts', `<div class="chips">${[0,1,2,3,4,5].map(p =>
-      chip('putts', p, p === 5 ? '5+' : p, h.putts === p)).join('')}</div>`)}
-    ${h.putts === 0 ? '' : row('First putt', `<div class="chips">${PUTT_DIST.map(d =>
-      chip('pd', d.k, d.lab, h.pd === d.k)).join('')}</div>
-      <div class="chips"><span class="chip big ns${h.gimme ? ' on' : ''}"
-        data-action="live-set" data-k="gimme" data-v="1">Last one given</span></div>`,
-      'feet — a 2-putt from 40 is not a 2-putt from 5')}
-    ${row('Score', `<div class="chips">${scores}${outlier}
-      <span class="chip big" data-action="live-bump" data-d="1">+1</span>
-      <span class="chip big" data-action="live-bump" data-d="-1">−1</span></div>`)}
-    ${row('Note', (h.note || h.noteOpen)
-      ? `<textarea id="lvHoleNote" class="lvnote" rows="2"
-          placeholder="What actually happened here">${esc(h.note || '')}</textarea>`
-      : `<div class="chips"><span class="chip big note" data-action="live-note">＋ Add a note</span></div>`,
-      'saved to this hole, on the card forever')}
+  <div class="lvseg">
+    <span class="${quick ? '' : 'on'}" data-action="live-view" data-v="">Full card</span>
+    <span class="${quick ? 'on' : ''}" data-action="live-view" data-v="1">⚡ Quick view</span>
   </div>
+
+  ${quick ? quickCard : fullCard}
 
   <div class="formrow">
     <button class="btn ghost"${L.cur === 0 ? ' disabled' : ''} data-action="live-nav" data-d="-1">← ${L.cur === 0 ? 'Start' : 'Hole ' + L.holes[L.cur - 1].n}</button>
@@ -4243,6 +4339,8 @@ const ACTIONS = {
       if(h.par === 3){ delete h.fw; delete h.fmiss; delete h.app; delete h.noshot; }
       // A suggestion made for a par 4 isn't valid for a par 3, so re-derive it.
       if(h.teeAuto){ delete h.tee; delete h.teeAuto; suggestTee(L); }
+      // The par decides which quick-view rows exist, so the open one is re-derived too.
+      delete h.qOpen;
     }
     else if(k === 'tee'){
       // Tapping the suggested club CONFIRMS it rather than clearing it — clearing a chip
@@ -4280,6 +4378,33 @@ const ACTIONS = {
     else if(k === 'pd'){ if(lit) delete h.pd; else h.pd = v; }
     else if(k === 'gimme'){ if(lit) delete h.gimme; else h.gimme = true; }
     else if(k === 's'){ h.s = lit ? null : +v; }
+    // Quick view: answering the open row opens the next unanswered one, forward only.
+    // Qualifiers (no shot, gimme) don't advance — they refine the answer already given —
+    // and clearing a chip leaves the row open, because an empty row is not answered.
+    if(S.settings.liveQuick && k !== 'par'){
+      const ROW = { tee:'tee', fw:'fw', app:'app', green:'green', putts:'putts', pd:'pd', s:'s' };
+      const r = ROW[k];
+      if(r && r === qOpenRow(h) && qAnswered(h, r)) qAdvance(h, r);
+    }
+    save(); rerender();
+  },
+  // The Full card / Quick view switch under the hole's prep. Sticky on purpose — unlike
+  // the prep collapse it hides nothing, it's the same taps on a different layout.
+  'live-view': el => {
+    syncHoleNote();
+    if(el.dataset.v) S.settings.liveQuick = true; else delete S.settings.liveQuick;
+    save(); rerender();
+  },
+  // Tap a quick-view row to open it (or close it again) — fixing an earlier answer is
+  // one tap on its row, and skipping a row is simply never opening it.
+  'live-qrow': el => {
+    const L = S.live, h = L && L.holes[L.cur];
+    if(!h) return;
+    syncHoleNote();
+    h.qOpen = qOpenRow(h) === el.dataset.r ? '' : el.dataset.r;
+    // Opening the Note row already says "I want to write" — show the box, not a chip
+    // asking again. The keyboard still waits for a tap on the box itself.
+    if(h.qOpen === 'note') h.noteOpen = true;
     save(); rerender();
   },
   // Fold the hole's prep away once it has been read, so the scoring rows come up the
