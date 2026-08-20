@@ -100,13 +100,19 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v46';
+const BUILD = 'v47';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v47', d:'2026-08-20', items:[
+    'The card gets checked before you tee off. Starting a live round now opens the whole scorecard — every par, the total, and out and in — so a wrong one gets caught on the first tee instead of on the last. Tap any hole to cycle its par.',
+    'No more silent par 4s. A course with no card on file used to prefill eighteen par 4s that looked exactly like a real scorecard. Guessed pars now render DASHED, on that screen and on the hole, so a placeholder can never pass for a card.',
+    'Six scorecards are on file — Lakeside, Pound Ridge, Van Cortlandt, Hogs Head, Richter Park and Ferry Point. Lakeside was read off a real card table; the other five were pieced together from published data and are labelled that way, so glance at them against the card in your hand.',
+    'Your Aug 20 round at Lakeside has been corrected — the real pars and stroke indexes are on it now, and your scores were not touched. It was logged before the card was on file, which is what put a par 4 on every hole.',
+    'On the hole screen, the next-hole button moved up above the scoring card and the prep note moved down below it.' ] },
   { b:'v46', d:'2026-08-20', items:[
     'Quick view on the live logger. A Full card / Quick view switch sits under the hole’s prep; flip it and the hole becomes one-line rows — tee shot through score on one screen, no scrolling.',
     'One row is open at a time with full-size chips. Answer it and the next unanswered row opens by itself; tap any row to fix it, and a row you don’t track just stays blank, same as the full card.',
@@ -278,6 +284,9 @@ function seed(){
     lessonsRead: [],
     drillDays: [],        // ISO dates a drill was marked done
     briefings: [],        // {id, course, date, focus, sections:[{t,b}]} — pushed by Claude pre-round
+    // Published scorecards pushed by feed — {course, par:[], si:[], nine, src}. Ranks
+    // below Jack's own cards and above the course-cards.js baseline. See holeLayout().
+    layouts: [],
     // Lesson layer. `lessons.js` is the FROZEN BASELINE, exactly like seed() is for
     // everything else; these three carry the live edits so a lesson change has the same
     // append-only trail a plan change does. See lessons() below.
@@ -305,6 +314,7 @@ function migrate(s){
   ];
   if(!s.carries){ const fresh = seed(); s.carries = fresh.carries; s.carriesCalibrated = false; }
   if(!s.briefings) s.briefings = [];
+  if(!s.layouts) s.layouts = [];             // scorecards pushed by feed — see holeLayout()
   if(!s.mental) s.mental = [];
   if(!s.lessonEdits) s.lessonEdits = {};
   if(!s.lessonAdds) s.lessonAdds = [];
@@ -3774,12 +3784,42 @@ function priorLayout(course, nine){
     rating: exact ? (exact.rating ?? null) : null,
     slope: exact ? (exact.slope ?? null) : null };
 }
+// ---- Published scorecards ----
+// The layout question has three possible answers and they are NOT equally good, so the
+// app keeps them apart and says which one it used. Jack's own card at that course is the
+// strongest — he stood on the hole and wrote the par down. A published scorecard is next:
+// sourced, but somebody else's transcription, and courses get renovated. A guess is last
+// and is the one that caused this: eighteen par 4s that LOOKED like a prefilled card.
+// Same evidence ranking the rest of the app runs on, applied to course knowledge.
+function publishedCard(course, nine){
+  const key = (course || '').trim().toLowerCase();
+  if(!key) return null;
+  const hit = c => (c.course || c.n || '').trim().toLowerCase() === key
+    && (!c.nine || !nine || c.nine === nine);
+  // Feed first: a `layout` entry is how a card gets corrected without a build, so it has
+  // to outrank the file it is correcting.
+  const fed = (S.layouts || []).filter(hit).pop();
+  const base = typeof COURSE_CARDS_OK !== 'undefined' ? COURSE_CARDS_OK.find(hit) : null;
+  const c = fed || base;
+  if(!c || !Array.isArray(c.par)) return null;
+  // A 9-long card fills the nine it names; an 18-long one is read straight.
+  const first = c.par.length === 9 ? (c.nine === 'B' ? 10 : 1) : 1;
+  const by = new Map();
+  c.par.forEach((p, i) => by.set(first + i, { par:p, si: c.si ? c.si[i] : null }));
+  // `ver` separates a card somebody READ from one assembled out of published data that
+  // reconciles. Both beat a guess; only one is a transcription, and the card-check screen
+  // says which — see the header of course-cards.js.
+  return { by, src: c.src || 'a published scorecard', fed: !!fed, ver: c.ver || 'reconciled' };
+}
+
 function coursesWithLayout(){
   const seen = new Map();
   S.rounds.forEach(r => {
     if(!r.course || !Array.isArray(r.holes) || !r.holes.some(h => h && h.par)) return;
     seen.set(r.course, Math.max(seen.get(r.course) || 0, r.holes.length));
   });
+  (S.layouts || []).forEach(c => c.course && seen.set(c.course, 18));
+  if(typeof COURSE_CARDS_OK !== 'undefined') COURSE_CARDS_OK.forEach(c => seen.set(c.n, 18));
   return [...seen.keys()];
 }
 
@@ -3963,7 +4003,64 @@ function liveBanner(){
 function live(){
   const L = S.live;
   if(!L) return liveStart();
+  if(L.stage === 'card') return liveCard(L);
   return L.stage === 'finish' ? liveFinish(L) : livePlay(L);
+}
+
+// The card check — one screen, before the first tee. It exists because the wrong par is
+// not a cosmetic error: it moves every hole's score-vs-par, the birdie/par/bogey chips,
+// the scoring mix and the par splits, and nothing downstream can detect it afterwards.
+// The total is the detector — a course that should be 71 reading 72 is one glance.
+function liveCard(L){
+  const tot = L.holes.reduce((a, h) => a + h.par, 0);
+  const half = n => L.holes.filter(h => h.n <= 9 === (n === 'out')).reduce((a, h) => a + h.par, 0);
+  const guesses = L.holes.filter(h => h.parAuto).length;
+  const SRC = {
+    mine: { lab:'From your own card', cls:'f-ok',
+      b:`Par and stroke index carried over from the round you logged here on ${esc(L.cardFrom)}. You wrote these down standing on the holes, so they are the best record there is — but check the total anyway.` },
+    card: { lab:'From the published scorecard', cls:'f-new',
+      b:`Par and stroke index read off ${esc(L.cardFrom)}. Sourced, but it is somebody else's transcription and courses get renovated — the total below is the quickest way to catch it.` },
+    // Assembled rather than read. It survives the checks a wrong card fails, and that is
+    // still not the same as having seen the card, so it says so and asks for a glance.
+    soft: { lab:'Pieced together — worth a glance', cls:'f-new',
+      b:`No scorecard could be opened for here, so this was assembled from ${esc(L.cardFrom)}. It passes the checks a wrong card would fail — the pars add up to the published total and the stroke indexes run clean — but nobody has read it off the real card. Check it against the one in your hand and fix anything that is off.` },
+    guess: { lab:'Not on file — these are guesses', cls:'f-warn',
+      b:'No card of yours here and no published scorecard on file, so every hole below is a placeholder par 4. Tap the ones that are wrong. This screen exists because a round logged against eighteen guessed par 4s puts the wrong number on every hole and nothing afterwards can tell.' },
+    // A round already under way when this screen shipped has no recorded source.
+  }[L.cardSrc] || { lab:'The card as it stands', cls:'f-new',
+      b:'This round was already under way, so where its pars came from was never recorded. Check them against the card in your hand — anything you change here applies to the holes you have not played yet as well.' };
+  const cell = (h, i) => `<span class="pcell${h.parAuto ? ' guess' : ''}"
+    data-action="live-card-par" data-i="${i}"><i>${h.n}</i><b>${h.par}</b></span>`;
+  const rows = [];
+  for(let i = 0; i < L.holes.length; i += 9)
+    rows.push(`<div class="pgrid">${L.holes.slice(i, i + 9)
+      .map((h, j) => cell(h, i + j)).join('')}</div>`);
+
+  return `
+  <button class="backlink" data-action="live-discard">← Not this course</button>
+  <div class="card">
+    <h2 style="margin-top:0">Check the card</h2>
+    <h3>${esc(L.course)}</h3>
+    <p class="sm faint">${fmtDate(L.date)}${L.nine ? ` · ${L.nine === 'F' ? 'front' : 'back'} nine` : ' · full 18'}</p>
+    <span class="flag ${SRC.cls || 'f-new'}" style="position:static;display:inline-block;margin-top:8px">${SRC.lab || ''}</span>
+    <p class="sm" style="margin-top:8px">${SRC.b || ''}</p>
+  </div>
+
+  <div class="card">
+    <div class="ptot">
+      <div><b>${tot}</b><span>Par</span></div>
+      ${L.nine ? '' : `<div><b>${half('out')}</b><span>Out</span></div>
+      <div><b>${half('in')}</b><span>In</span></div>`}
+      ${guesses ? `<div class="warnbox"><b>${guesses}</b><span>guessed</span></div>` : ''}
+    </div>
+    ${rows.join('')}
+    <p class="sm faint" style="margin-top:10px">Tap any hole to change its par — it cycles 3 · 4 · 5. ${
+      guesses ? 'The <b>dashed</b> ones are placeholders nobody has confirmed.' : 'Nothing here is a guess.'}</p>
+  </div>
+
+  <button class="btn" style="width:100%;padding:14px" data-action="live-card-play">${
+    guesses ? 'Pars are right — play →' : 'Play →'}</button>
+  <p class="sm faint" style="margin-top:10px">You can still change a hole's par while you play it — the card is on the hole screen too. This screen is here so a wrong one gets caught on the first tee instead of on the last.</p>`;
 }
 
 function liveStart(){
@@ -4155,16 +4252,11 @@ function livePlay(L){
     ${row('Note', bodies.note, 'saved to this hole, on the card forever')}
   </div>`;
 
-  return `
-  <div class="lvhead">
-    <div class="lvh1">Hole ${h.n}<span> · par ${h.par}${h.si ? ` · SI ${h.si}` : ''}</span></div>
-    <div class="lvh2">${t.n ? `<b>${t.over > 0 ? '+' : ''}${t.over}</b> thru ${t.n}` : esc(L.course)}</div>
-    <div class="parpick"><em>Par</em>${[3,4,5].map(p => chip('par', p, p, h.par === p)).join('')}</div>
-  </div>
-  <div class="hstriprow">${L.holes.map((x, i) =>
-    `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}${x.note ? ' noted' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>
-
-  ${(() => {
+  // The hole's prep is built here and rendered BELOW the scoring card (Jack's call,
+  // Aug 20): on the hole he wants the next-hole button and the chips at the top of
+  // the screen and the plan underneath them. It still opens on arrival at every hole
+  // and still leads with the one line to act on — only its position changed.
+  const prep = (() => {
     const hn = briefHole(liveBriefing(L), h.n);
     const rec = holeRecord(L.course, h.n);
     if(!hn && !rec) return '';
@@ -4219,7 +4311,26 @@ function livePlay(L){
         ${!hn && eating ? `<li class="hot"><b>This one has been eating you</b> — play it as a bogey hole on purpose</li>` : ''}
       </ul>` : ''}`}
     </div>`;
-  })()}
+  })();
+
+  return `
+  <div class="lvhead">
+    <div class="lvh1">Hole ${h.n}<span> · par ${h.par}${h.si ? ` · SI ${h.si}` : ''}</span></div>
+    <div class="lvh2">${t.n ? `<b>${t.over > 0 ? '+' : ''}${t.over}</b> thru ${t.n}` : esc(L.course)}</div>
+    <div class="parpick"><em>Par</em>${[3,4,5].map(p =>
+      // A par nobody has confirmed renders HALF-LIT, the same language as a carried-over
+      // tee club — so a placeholder can never sit there looking like a scorecard.
+      chip('par', p, p, h.par === p, h.parAuto && h.par === p ? 'auto' : '')).join('')}
+      <span class="cardlink" data-action="live-card-open">Card</span></div>
+  </div>
+  <div class="hstriprow">${L.holes.map((x, i) =>
+    `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}${x.note ? ' noted' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>
+
+
+  <div class="formrow">
+    <button class="btn ghost"${L.cur === 0 ? ' disabled' : ''} data-action="live-nav" data-d="-1">← ${L.cur === 0 ? 'Start' : 'Hole ' + L.holes[L.cur - 1].n}</button>
+    <button class="btn" data-action="live-nav" data-d="1">${last ? 'Finish round →' : 'Hole ' + L.holes[L.cur + 1].n + ' →'}</button>
+  </div>
 
   <div class="lvseg">
     <span class="${quick ? '' : 'on'}" data-action="live-view" data-v="">Full card</span>
@@ -4228,10 +4339,7 @@ function livePlay(L){
 
   ${quick ? quickCard : fullCard}
 
-  <div class="formrow">
-    <button class="btn ghost"${L.cur === 0 ? ' disabled' : ''} data-action="live-nav" data-d="-1">← ${L.cur === 0 ? 'Start' : 'Hole ' + L.holes[L.cur - 1].n}</button>
-    <button class="btn" data-action="live-nav" data-d="1">${last ? 'Finish round →' : 'Hole ' + L.holes[L.cur + 1].n + ' →'}</button>
-  </div>
+  ${prep}
   <p class="sm faint" style="margin-top:10px">Everything except the score is optional — skip a row and it simply isn't recorded, rather than being guessed. Tap a lit chip again to clear it. A <b>half-lit</b> tee club is one carried over from the last time you played this hole, or from earlier in this round: leave it if it's right, tap another club if it isn't.</p>
   <div class="formrow" style="margin-top:6px">
     <button class="btn ghost tiny" data-action="go" data-view="home">Pause · back to Home</button>
@@ -4353,12 +4461,21 @@ const ACTIONS = {
     const date = $('#lvDate').value || today();
     const nine = $('#lvNine').value || null;
     const prior = priorLayout(course, nine);
+    const pub = publishedCard(course, nine);
     const first = nine === 'B' ? 10 : 1;
     const holes = [];
     for(let i = 0; i < (nine ? 9 : 18); i++){
       const n = first + i;
-      const p = prior && prior.by.get(n);
-      holes.push({ n, par: p ? p.par : 4, si: p ? p.si : null, s:null });
+      const mine = prior && prior.by.get(n);
+      const card = pub && pub.by.get(n);
+      // His own card, then the published one, then a guess that ADMITS it is a guess.
+      const src = mine ? 'mine' : card ? 'card' : 'guess';
+      const h = { n, par: mine ? mine.par : card ? card.par : 4,
+        si: (mine && mine.si) ?? (card && card.si) ?? null, s:null, parFrom:src };
+      // The flag is the whole fix: a guessed par renders half-lit everywhere, exactly
+      // like a carried-over tee club, so it can never pass for a prefilled scorecard.
+      if(src === 'guess') h.parAuto = true;
+      holes.push(h);
     }
     // He's playing it, so it belongs in Courses whether or not he's rated it yet.
     if(!S.courses.some(c => (c.name || '').toLowerCase() === course.toLowerCase())){
@@ -4366,12 +4483,40 @@ const ACTIONS = {
         ? COURSE_DB.find(c => c.n.toLowerCase() === course.toLowerCase()) : null;
       S.courses.push({ id:uid(), name:course, st: db ? db.st : '', rating:null, pr:null, bucket:false, notes:'' });
     }
-    S.live = { date, course, nine, cur:0, holes, stage:'play', prevLayout: !!prior,
+    // Straight to the card check rather than to hole 1. One glance at eighteen pars and a
+    // total costs a couple of seconds on the first tee; discovering on the 14th that the
+    // card has been wrong all day costs the round's data, which is what happened Aug 20.
+    S.live = { date, course, nine, cur:0, holes, stage:'card', prevLayout: !!prior,
+      cardSrc: prior ? 'mine' : pub ? (pub.ver === 'read' ? 'card' : 'soft') : 'guess',
+      cardFrom: prior ? fmtDate(prior.from) : pub ? pub.src : '',
       tees: prior ? prior.tees : '', rating: prior ? prior.rating : null,
       slope: prior ? prior.slope : null, troubles:[], note:'' };
-    suggestTee(S.live);
     save(); render('live');
-    toast(prior ? `Card prefilled from ${fmtDate(prior.from)}` : 'Round started — good luck');
+  },
+  // Tap a hole on the card check to cycle its par. Same 3/4/5 the hole screen offers, and
+  // touching one confirms it: a par he has looked at is no longer a guess.
+  'live-card-par': el => {
+    const L = S.live; if(!L) return;
+    const h = L.holes[+el.dataset.i]; if(!h) return;
+    h.par = h.par >= 5 ? 3 : h.par + 1;
+    delete h.parAuto; h.parFrom = 'mine';
+    save(); rerender();
+  },
+  'live-card-play': () => {
+    const L = S.live; if(!L) return;
+    // Confirming the card is a claim about the course, so it clears every guess flag at
+    // once — he has now seen the pars, which is exactly what the screen is for.
+    L.holes.forEach(h => { delete h.parAuto; if(h.parFrom === 'guess') h.parFrom = 'mine'; });
+    L.stage = 'play'; L.cardOK = true;
+    suggestTee(L);
+    save(); render('live');
+    toast('Round started — good luck');
+  },
+  // Back to the card from the first tee, for the hole he notices on the walk up.
+  'live-card-open': () => {
+    const L = S.live; if(!L) return;
+    syncHoleNote();
+    L.stage = 'card'; save(); render('live');
   },
   'live-set': el => {
     const L = S.live, h = L && L.holes[L.cur];
@@ -4380,6 +4525,8 @@ const ACTIONS = {
     const lit = el.classList.contains('on');   // re-tapping a lit chip clears it
     if(k === 'par'){
       h.par = +v;
+      // Touching a par settles it: it is his number now, not a placeholder.
+      delete h.parAuto; h.parFrom = 'mine';
       // A par 3 has no fairway, no separate approach, and always a shot at the green.
       if(h.par === 3){ delete h.fw; delete h.fmiss; delete h.app; delete h.noshot; }
       // A suggestion made for a par 4 isn't valid for a par 3, so re-derive it.
@@ -4842,6 +4989,9 @@ function updateLine(e){
     case 'action-update': return { h:'To-do reworded', s:clip(e.text, 104), act:go('coach') };
     case 'course-add':    return { h:`Course added · ${nm(e.course)}`, s:'Rate it after you play it', act:go('courses') };
     case 'course-remove': return { h:`Course removed · ${e.target || ''}`, s:'', act:go('courses') };
+    case 'layout':        return { h:`Scorecard on file · ${(e.layout && e.layout.course) || ''}`,
+      s:`Par${e.layout && e.layout.si ? ' and stroke index' : ''} prefills now when you log a live round there`,
+      act:go('courses') };
     case 'round':         return { h:`Round · ${rd.course || ''}`,
       s:[rd.date ? fmtDate(rd.date) : '', rd.score != null ? `${rd.score}` : ''].filter(Boolean).join(' · '), act:go('scores') };
     case 'round-update':  return { h:`Round updated · ${rd.course || ''}`,
@@ -4963,6 +5113,18 @@ function applyFeed(feed){
     else if(e.type === 'course-add' && e.course && !S.courses.some(c => c.name === e.course.name))
       S.courses.push({ id:e.id, rating:null, pr:null, bucket:false, notes:'', ...e.course });
     else if(e.type === 'course-remove') S.courses = S.courses.filter(c => c.name !== e.target);
+    // A published scorecard, pushed as data. This is how a card gets added or corrected
+    // without shipping a build, so it outranks the course-cards.js baseline — and it is
+    // checked on the way in exactly like the baseline is, because a card that doesn't
+    // reconcile is a typo and a typo here renders as fact.
+    else if(e.type === 'layout' && e.layout && e.layout.course){
+      const c = e.layout;
+      if(typeof courseCardOK === 'undefined' || courseCardOK(c)){
+        S.layouts = (S.layouts || []).filter(x =>
+          !(x.course === c.course && (x.nine || null) === (c.nine || null)));
+        S.layouts.push({ id:e.id, ...c });
+      }
+    }
     else if(e.type === 'stats' && e.stats){
       if(e.replaces) S.stats = S.stats.filter(x => x.id !== e.replaces);
       if(!S.stats.some(x => x.id === e.id)) S.stats.push({ id:e.id, ...e.stats });
@@ -4994,8 +5156,16 @@ function applyFeed(feed){
         if(Array.isArray(holes) && Array.isArray(r.holes)){
           holes.forEach(h => {
             const hit = r.holes.find(x => x.n === h.n);
-            if(hit) Object.assign(hit, h); else r.holes.push(h);
+            // A hole he never scored was never played — `liveRound()` drops those on the
+            // way in. So an entry naming a hole the card doesn't have only ADDS it if it
+            // brings a score with it; otherwise it is a correction to a hole that isn't
+            // there and is ignored. Without this, a card-wide par fix sent to a round he
+            // walked in from after fourteen holes would append the four he never played
+            // and quietly restate the round as a full eighteen.
+            if(hit) Object.assign(hit, h);
+            else if(h.s != null) r.holes.push(h);
           });
+          r.holes.sort((a, b) => a.n - b.n);
           // Correcting a hole has to move the card's total with it, or the header and the
           // hole-by-hole table start telling different stories. An explicit total wins.
           if(rest.score == null && r.holes.every(h => h.s != null))

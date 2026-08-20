@@ -511,6 +511,36 @@ body.night .hi-gist{color:#9ed4b2}
 .hi-grid dd.was b{color:var(--ink)}
 .hi-grid dd.was b.hot{color:var(--btext)}
 .hi-why + .hi-grid, .hi-grid + .hi-why{margin-top:9px}
+/* ---- The card check (Aug 20 2026): eighteen pars and a total, before the first tee.
+   The total is the error detector — a course that should be 71 reading 72 is one glance,
+   and nothing downstream can catch a wrong par once the round is logged against it. ---- */
+.ptot{display:flex;gap:8px;margin:0 0 12px}
+.ptot>div{flex:1;background:var(--card2);border:1px solid var(--line);border-top:3px solid var(--green);
+  border-radius:var(--r);padding:9px 4px;text-align:center}
+.ptot b{display:block;font-size:20px;font-weight:700;color:var(--gtext);line-height:1.15}
+.ptot span{display:block;font-family:var(--sans);font-size:8.5px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:3px}
+.ptot .warnbox{border-top-color:var(--burg)}
+.ptot .warnbox b{color:var(--burg)}
+/* Nine across, so a row of the grid IS a nine — same shape as the hole jump strip. */
+.pgrid{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin-bottom:6px}
+.pcell{display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 0 7px;
+  border-radius:9px;border:1px solid var(--line);background:var(--card2);
+  cursor:pointer;user-select:none;font-family:var(--sans)}
+.pcell i{font-size:8.5px;font-style:normal;font-weight:700;color:var(--faint);line-height:1}
+.pcell b{font-size:16px;font-weight:700;color:var(--gtext);line-height:1.1}
+/* A par nobody has confirmed: dashed, the same "this is not a record" language the
+   no-shot and OB chips use. It must never look like a scorecard. */
+.pcell.guess{background:transparent;border:1px dashed var(--burg)}
+.pcell.guess b{color:var(--btext)}
+body.night .pcell{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+body.night .pcell.guess{background:transparent;border-color:var(--burg)}
+/* Back to the card from the hole screen, for the one he notices on the walk up. */
+.cardlink{margin-left:auto;font-family:var(--sans);font-size:10px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--gtext);background:var(--card2);
+  border:1px solid var(--line);border-radius:20px;padding:4px 10px;cursor:pointer}
+body.night .cardlink{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+
 /* ---- Quick view (Aug 20 2026): the Full card / Quick view switch under the hole's
    prep, and the hole as one-line rows. The open row gets FULL-SIZE chips — that's the
    blend Jack picked: option B's one-screen scorecard rows, option A's big targets. ---- */

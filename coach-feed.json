@@ -15702,6 +15702,227 @@
           }
         ]
       }
+    },
+    {
+      "id": "round-update-lakeside-20260820-pars",
+      "type": "round-update",
+      "round": {
+        "date": "2026-08-20",
+        "course": "Lakeside Country Club",
+        "holes": [
+          {
+            "n": 1,
+            "par": 5,
+            "si": 1
+          },
+          {
+            "n": 2,
+            "par": 4,
+            "si": 13
+          },
+          {
+            "n": 3,
+            "par": 4,
+            "si": 5
+          },
+          {
+            "n": 4,
+            "par": 4,
+            "si": 11
+          },
+          {
+            "n": 5,
+            "par": 3,
+            "si": 17
+          },
+          {
+            "n": 6,
+            "par": 5,
+            "si": 3
+          },
+          {
+            "n": 7,
+            "par": 4,
+            "si": 9
+          },
+          {
+            "n": 8,
+            "par": 4,
+            "si": 7
+          },
+          {
+            "n": 9,
+            "par": 3,
+            "si": 15
+          },
+          {
+            "n": 10,
+            "par": 4,
+            "si": 2
+          },
+          {
+            "n": 11,
+            "par": 4,
+            "si": 6
+          },
+          {
+            "n": 12,
+            "par": 5,
+            "si": 10
+          },
+          {
+            "n": 13,
+            "par": 5,
+            "si": 12
+          },
+          {
+            "n": 14,
+            "par": 3,
+            "si": 14
+          },
+          {
+            "n": 15,
+            "par": 4,
+            "si": 4
+          },
+          {
+            "n": 16,
+            "par": 4,
+            "si": 8
+          },
+          {
+            "n": 17,
+            "par": 3,
+            "si": 16
+          },
+          {
+            "n": 18,
+            "par": 4,
+            "si": 18
+          }
+        ],
+        "note": "Lakeside's card was not on file when this round was logged, so every hole prefilled as par 4. These are the real pars and stroke indexes, from the Foresight Sports FSX Play library card (read Aug 20 2026): par 72, 36 out and 36 in, stroke index a clean 1-18 with the odds out and the evens in, and all five tee columns summing exactly to their stated totals. Scores are untouched."
+      }
+    },
+    {
+      "id": "round-update-lakeside-20260820-pars-f",
+      "type": "round-update",
+      "round": {
+        "date": "2026-08-20",
+        "course": "Lakeside Country Club",
+        "nine": "F",
+        "holes": [
+          {
+            "n": 1,
+            "par": 5,
+            "si": 1
+          },
+          {
+            "n": 2,
+            "par": 4,
+            "si": 13
+          },
+          {
+            "n": 3,
+            "par": 4,
+            "si": 5
+          },
+          {
+            "n": 4,
+            "par": 4,
+            "si": 11
+          },
+          {
+            "n": 5,
+            "par": 3,
+            "si": 17
+          },
+          {
+            "n": 6,
+            "par": 5,
+            "si": 3
+          },
+          {
+            "n": 7,
+            "par": 4,
+            "si": 9
+          },
+          {
+            "n": 8,
+            "par": 4,
+            "si": 7
+          },
+          {
+            "n": 9,
+            "par": 3,
+            "si": 15
+          }
+        ],
+        "note": "Lakeside's card was not on file when this round was logged, so every hole prefilled as par 4. These are the real pars and stroke indexes, from the Foresight Sports FSX Play library card (read Aug 20 2026): par 72, 36 out and 36 in, stroke index a clean 1-18 with the odds out and the evens in, and all five tee columns summing exactly to their stated totals. Scores are untouched."
+      }
+    },
+    {
+      "id": "round-update-lakeside-20260820-pars-b",
+      "type": "round-update",
+      "round": {
+        "date": "2026-08-20",
+        "course": "Lakeside Country Club",
+        "nine": "B",
+        "holes": [
+          {
+            "n": 10,
+            "par": 4,
+            "si": 2
+          },
+          {
+            "n": 11,
+            "par": 4,
+            "si": 6
+          },
+          {
+            "n": 12,
+            "par": 5,
+            "si": 10
+          },
+          {
+            "n": 13,
+            "par": 5,
+            "si": 12
+          },
+          {
+            "n": 14,
+            "par": 3,
+            "si": 14
+          },
+          {
+            "n": 15,
+            "par": 4,
+            "si": 4
+          },
+          {
+            "n": 16,
+            "par": 4,
+            "si": 8
+          },
+          {
+            "n": 17,
+            "par": 3,
+            "si": 16
+          },
+          {
+            "n": 18,
+            "par": 4,
+            "si": 18
+          }
+        ],
+        "note": "Lakeside's card was not on file when this round was logged, so every hole prefilled as par 4. These are the real pars and stroke indexes, from the Foresight Sports FSX Play library card (read Aug 20 2026): par 72, 36 out and 36 in, stroke index a clean 1-18 with the odds out and the evens in, and all five tee columns summing exactly to their stated totals. Scores are untouched."
+      }
+    },
+    {
+      "id": "action-lakeside-card-20260820-update",
+      "type": "action-update",
+      "target": "action-lakeside-card-20260819",
+      "text": "Photograph the Lakeside scorecard — specifically the TEES you played, and that tee's rating and slope. The par and stroke index are now on file (Blue 6549 72.3/131 · White 6230 70.5/129 · Green 6002 68.4/123 · Gold 5369 65.8/113 · Red 5118 64.3/111), so the tee is the only thing still missing before the Aug 20 round can carry a handicap differential"
     }
   ]
 }
