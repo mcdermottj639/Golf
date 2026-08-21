@@ -100,13 +100,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v55';
+const BUILD = 'v56';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v56', d:'2026-08-21', items:[
+    'Courses now flags TWO ROWS FOR ONE COURSE. Adding your round history brought in names that did not always match the ones you had already typed, and the list quietly grew a second row for the same place.',
+    'Sand Valley Golf Resort \u2014 Mammoth Dunes is gone; your own Mammoth Dunes row stays, with your rating and your PR on it, and it now has a location so it sorts by distance like the rest.',
+    'Anything else it finds sits in a Two rows, one course? card above the rankings. It never merges or deletes on its own \u2014 tap the row you want to lose and Delete it. Two courses at one club (Whistling Straits \u2014 Straits and \u2014 Irish) are never flagged against each other.' ] },
   { b:'v55', d:'2026-08-21', items:[
     'The course rankings sort three ways now \u2014 Rating, PR or Nearest. Rating is still what opens, and the one you pick sticks.',
     'Nearest works off the same location the weather card asks for, and the arithmetic happens on this phone. Pick it with no fix on file and it asks for one there and then; say no and the list simply stays in its rating order.',
@@ -2586,6 +2590,33 @@ function game(){
 // nothing at. And the sort is only ever a re-ordering — nothing drops off the page for
 // want of a value. Array.prototype.sort is stable, so ties keep the order they were added
 // in rather than shuffling between renders.
+// ----- Two rows, one course -----
+// Importing a batch of courses from anywhere else is how a list ends up with two rows for
+// one course: his spelling and the import's differ, and `course-add` only dedupes on an
+// EXACT name match. Caught the day the round history landed — he already had "Mammoth
+// Dunes" and the import added "Sand Valley Golf Resort — Mammoth Dunes" beside it.
+//
+// This only ever NAMES the pairs worth a look. It never merges and never deletes: which
+// spelling survives is his call, and the rating, PR and notes on those rows are his data,
+// not something to be picked between by a heuristic.
+const COURSE_STOP = new Set(['golf','club','course','courses','country','the','at','of','and','cc','gc','resort']);
+const courseWords = n => (n || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+  .split(' ').filter(w => w && !COURSE_STOP.has(w));
+function courseDupes(list){
+  const sub = (a, b) => a.length > 0 && a.every(w => b.includes(w));
+  const out = [];
+  for(let i = 0; i < list.length; i++) for(let j = i + 1; j < list.length; j++){
+    const a = list[i], b = list[j];
+    // Two courses at one facility are written "Facility — Course" and are genuinely two
+    // rows. Whistling Straits' Straits and Irish are not a duplicate of each other, and
+    // flagging them as one would train him to ignore this card.
+    if(/ — /.test(a.name || '') && / — /.test(b.name || '')) continue;
+    const wa = courseWords(a.name), wb = courseWords(b.name);
+    if(sub(wa, wb) || sub(wb, wa)) out.push([a, b]);
+  }
+  return out;
+}
+
 const COURSE_SORTS = [['rating','Rating'], ['pr','PR'], ['dist','Nearest']];
 function courseSortKey(){
   const k = S.settings.courseSort;
@@ -2634,6 +2665,7 @@ function courses(){
   const key = courseSortKey();
   const live = key === 'dist' && !S.here ? 'rating' : key;
   const sorted = sortCourses(played, live);
+  // One row renderer, shared by the rankings and the duplicate check.
   const row = c => {
     const mi = courseMilesLab(c.name);
     return `<div class="crs" data-action="edit-course" data-id="${c.id}">
@@ -2647,6 +2679,16 @@ function courses(){
     <div class="stat"><div class="v">${states.size}</div><div class="l">States/Countries</div></div>
     <div class="stat"><div class="v">${avg}</div><div class="l">Avg rating</div></div>
   </div>
+
+  ${(() => {
+    const d = courseDupes(S.courses);
+    if(!d.length) return '';
+    return `<h2>Two rows, one course?</h2>
+    <div class="card">
+      ${d.map(pair => `<div class="dupe">${pair.map(row).join('')}</div>`).join('')}
+      <p class="sm faint" style="margin-top:8px">These look like the same course under two names — usually one you added yourself and one that came in with an import. Tap the row you want to lose and <b>Delete</b> it; the other keeps its rating, PR and notes. If they really are two courses, ignore this. Two courses at one club are written <i>Facility — Course</i> and are never flagged against each other.</p>
+    </div>`;
+  })()}
 
   <h2>The rankings</h2>
   <div class="card">

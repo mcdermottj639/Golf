@@ -26230,6 +26230,23 @@
         "place": "Waterville, Co. Kerry",
         "src": "TOWN CENTRE: placed on Waterville Golf Links' coordinate (51.83911, -10.19537). Hog's Head sits a few miles across Ballinskelligs Bay from the village — good to about 4 miles. Read Aug 21 2026."
       }
+    },
+    {
+      "id": "rm-sandvalley-mammoth-20260821",
+      "type": "course-remove",
+      "target": "Sand Valley Golf Resort — Mammoth Dunes"
+    },
+    {
+      "id": "loc-mammothdunes-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Mammoth Dunes",
+        "lat": 44.319,
+        "lon": -89.9,
+        "prec": "town",
+        "place": "Nekoosa, WI",
+        "src": "TOWN CENTRE: Nekoosa WI is 44.319080, -89.899940 (latlong.net). The resort is several miles out of town, so good to about 8 miles. Put on the row Jack already had, after the import's duplicate of it was removed. Read Aug 21 2026."
+      }
     }
   ]
 }

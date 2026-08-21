@@ -719,3 +719,7 @@ body.night .lvhead{background:#0b0e11}
 /* The plan's own words read as prose, so they are left-aligned inside the otherwise
    centred scorecard grid, and given the room — this is the widest column on the table. */
 .scard td.pv-said{text-align:left;width:44%}
+
+/* Two rows, one course? — a flagged pair reads as one block, not two loose rows. */
+.dupe{border-left:2px solid var(--burg);padding-left:10px;margin:10px 0}
+.dupe .crs:last-child{border-bottom:none}

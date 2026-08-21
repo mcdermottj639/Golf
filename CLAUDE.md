@@ -79,7 +79,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `action-update`  | Rewrite action `target` text |
 | `carries`        | Replace the distance ladder (ignored once the user calibrates) |
 | `carry-update`   | Patch ONE ladder row by `target` name: `club` to add/patch (`after` names the row to insert behind), `remove:true` to drop it. **Not** gated on calibration — see below |
-| `course-add` / `course-remove` | Add/remove a course |
+| `course-add` / `course-remove` | Add/remove a course. **`course-add` dedupes on an EXACT name match only**, so pushing a course Jack already typed under a different spelling gives him two rows for one course — see *Two rows, one course* below |
 | `round`          | Add a played round (see *Logging a round* below). Skipped if a round with the same `date` + `course` + `nine` is already there, whatever put it there |
 | `round-update`   | Patch a round matched by `date` + `course` (+ `nine`): `Object.assign` of the top level, per-hole merge by hole `n`. **The way to backfill `rating`/`slope` onto a live-logged card**, or fix a hole after the fact. **On a `live:true` card it only FILLS GAPS** — fields the card already carries are left alone, because he recorded them standing on the hole. To overwrite one deliberately, put `"force": true` on the entry. Per-hole merges are unaffected either way |
 | `stats`          | Add/replace a cumulative stats snapshot (GHIN summaries); `replaces` swaps one out |
@@ -752,6 +752,21 @@ The rules that make it safe to add a fourth:
   order and the note says so, with a button that asks for a fix; picking *Nearest* with no fix
   calls `fetchHere(true)` there and then, so the chip is the request. Deny it and nothing
   moves.
+
+### Two rows, one course (Aug 21 2026)
+
+`course-add` only dedupes on an **exact** name match, so a batch import is how the list grows
+a second row for a course he had already typed himself — caught the day his round history
+landed, where he had *Mammoth Dunes* and the import added *Sand Valley Golf Resort — Mammoth
+Dunes* beside it. So when you push courses in bulk:
+
+- **His spelling wins where he already has the row.** There is no `course-update`, so a
+  `course-add` for a course he already has under another name cannot patch it — it can only
+  duplicate it. Remove the import's row and put the `geo` on HIS name instead.
+- **`courseDupes()`** flags the pairs on the Courses page and does nothing else. It never
+  merges and never deletes: the rating, PR and notes on those rows are his, and picking
+  between two of his rows is not a heuristic's job. Two courses at one facility are written
+  `Facility — Course` and are never flagged against each other.
 
 ### Writing briefings (they render in layers — write for that)
 
