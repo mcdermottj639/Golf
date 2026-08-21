@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-08-20",
+  "updated": "2026-08-21",
   "entries": [
     {
       "id": "s4-session",
@@ -16652,6 +16652,223 @@
       "id": "action-swing-posture-20260820",
       "type": "action",
       "text": "SWING — POSTURE, and the film that can actually grade it. The Aug 20 driver stills show a rounded upper back and chin on the chest at address, a trail leg that straightens at the top, and a body taller through delivery than at address — so the 'lose it through contact' feel is posture, not stalling hips: the finish is complete. Two things. (1) MIRROR CHECK at address: hinge from the hips, chest tall, a fist between chin and chest, and hold a little trail-knee flex to the top. (2) NEXT RANGE SESSION, film SQUARE down the line — phone on the ground ON the target line behind the ball, at hand height — plus one face-on. The Aug 20 angle was rear-quarter, which is why the across-the-line top still has not been re-graded since Jul 26."
+    },
+    {
+      "id": "lesson-range-cold-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "r1",
+        "shelf": "At the Range",
+        "title": "The first two balls are the only cold ones you get",
+        "min": 4,
+        "where": "range",
+        "kit": [
+          "phone"
+        ],
+        "tags": [
+          "off-tee",
+          "mental"
+        ],
+        "body": "Every swing fault in this app was filmed off a ball somewhere in the middle of a session — warm, loose, third club of the day. That is not the swing that starts your round. Two opening tee shots at Wianno went hard LEFT, badly enough to re-tee once, and your normal bad miss is a slice or push-slice, so the worst swings you make are going the OPPOSITE way to the diagnosed ones. Nothing in the library grades that swing, because by ball thirty it has gone. A range session is the only place you can film it on purpose: you arrive cold once per session, and if you spend that arrival on a wedge you have spent the only cold driver swing of the day. So the first two balls of a range session are not warm-up. They are data, and they are the only data of their kind you can collect.",
+        "drill": "First two balls of the session, before anything else and before any stretching that changes what you are: driver, full routine, real target. Film both — phone on the ground ON the target line behind the ball at hand height, then one face-on. Do not re-hit them, do not judge them, and do not fix anything. Note the start line and the curve of each in one line, then warm up normally. Send the clips. Do it on three separate range sessions before you draw any conclusion: two hard-left openers is a pattern worth filming, not a diagnosis, and a pull, a snap hook and a toe strike all finish left with three different fixes."
+      }
+    },
+    {
+      "id": "lesson-range-carries-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "r2",
+        "shelf": "At the Range",
+        "title": "Put a number on every club before the ladder claims one",
+        "min": 5,
+        "where": "range",
+        "kit": [],
+        "tags": [
+          "approach",
+          "wedge-distance",
+          "equipment",
+          "missing-short"
+        ],
+        "body": "Your loudest scoring pattern is that you miss greens SHORT — Sterling Farms missed twelve greens and seven of them were short, against two left, one right and one long, and the GHIN archive says the same thing across a season. There are exactly two causes and this drill separates them: either you are picking the wrong club, or your ladder numbers are wrong. Right now one club in the bag has no number at all. The Cobra Darkspeed X 5-wood at 16.5 degrees went back in the bag on Aug 12 and has never been measured, and it sits about half a degree off the 2-iron utility — so the ladder cannot say whether both clubs belong in there. The 7-wood in the bullpen is in the same position. And a carry number is a CARRY off a good strike; a 60 percent strike from rough finishes eight to ten yards shorter, which is most of the short miss right there. Measure the number, then club off the number, then stop guessing.",
+        "drill": "Bring a rangefinder and pick a target with something behind it you can shoot. Five balls per club, alternating clubs rather than raking a bucket with one — ignore the best and the worst, average the middle three, and write that number down as the CARRY. Do the whole ladder over two sessions: driver, 5-wood, 2-iron, 4 through 9 iron on the first; PW, 50, 56, 60 and a second pass at the 5-wood on the second. Enter them in the carry ladder in the app. Two things to record beside each number: how many of the five you actually struck, and how big the gap is to the club either side. Any gap under six yards is two clubs doing one job, and any gap over eighteen is a hole in the bag — those two answers are the whole 5-wood-versus-2-iron question."
+      }
+    },
+    {
+      "id": "lesson-range-gate-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "r3",
+        "shelf": "At the Range",
+        "title": "The gate outside the ball — path before face",
+        "min": 4,
+        "where": "range",
+        "kit": [],
+        "tags": [
+          "off-tee",
+          "over-the-top-slice"
+        ],
+        "body": "Over the top is the open fault with the longest record: it is the lifelong miss, it was filmed on Jul 26 on both clubs, and it is the reason the other two swing faults matter. The arms come over the top when the body cannot deliver from the inside, and the ball starts left of target and curves right. The fix is not a feel, it is an obstacle. If there is something just outside the ball on the target line, an over-the-top move hits it and an inside delivery misses it — the feedback arrives before you have finished the swing, which is the only kind of feedback that changes a pattern. Two rules keep this honest. PATH FIRST, FACE SECOND: while you are learning to come from the inside the ball will start right and stay right, and that is a pass, not a failure — you release the face once the path is repeatable, not at the same time. And do it at HALF SPEED to begin with, because a full-speed swing at an object you are trying to miss is how the object gets hit.",
+        "drill": "A headcover or a water bottle on the ground just outside the ball, on the target line, level with the ball. Aim at right-center field. 3 sets of 8 with a 7-iron: swing to miss the object, from the inside, ball starting at the right half of the target. Score each set out of 8 for clean misses of the object — under 6 and you slow down, you do not swing harder. Once a set of 8 comes back clean at full speed, hit five with the driver, then STOP: this drill is worth more in 25 balls twice a week than in a hundred once a month. Warm into it with the one-handed Miracle 201 reps so the slot feel is already there before a ball is involved."
+      }
+    },
+    {
+      "id": "lesson-range-film-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "r4",
+        "shelf": "At the Range",
+        "title": "Film it SQUARE, or it cannot be graded",
+        "min": 4,
+        "where": "range",
+        "kit": [
+          "phone"
+        ],
+        "tags": [
+          "off-tee",
+          "across-the-line-top"
+        ],
+        "body": "Film is king in this project, but only a square camera is film — everything else is an opinion with a timestamp. The across-the-line top was measured on Jul 26 on both clubs and it has NOT been re-graded since, not because nobody filmed the swing but because the Aug 20 driver angle was rear-quarter. A shaft that points right of target at the top and a camera that sits right of the target line produce the same picture, so an off-line angle cannot tell you which one you are looking at. The setup is worth more than the swing you put in front of it: phone on the ground, ON the target line, directly behind the ball, lens at hand height. Face-on means level with the ball, square to the target line, hips height. Get those two right once and every session afterwards is comparable to every other one, which is the entire point of filming at all.",
+        "drill": "Set the phone on the ground on the target line behind the ball at hand height, with an alignment stick or a club laid on the line so you can see in the frame whether the camera is honest. Ten swings, 7-iron, 60 fps or better. Then move to face-on, level with the ball, and shoot five more. Watch one thing only: at the top, does the shaft point AT the target line, right of it (across the line) or left of it. Say the answer out loud, then send the clips. Re-shoot from the same two positions every fortnight — the value is in the comparison, and a rear-quarter clip is worth nothing to it."
+      }
+    },
+    {
+      "id": "lesson-range-posture-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "r5",
+        "shelf": "At the Range",
+        "title": "Stay in your posture — with balls in the way",
+        "min": 4,
+        "where": "range",
+        "kit": [
+          "phone"
+        ],
+        "tags": [
+          "off-tee",
+          "approach",
+          "posture-through-impact"
+        ],
+        "body": "The Aug 20 driver stills changed what this fault IS. It used to be read as the hips stalling; the film says the finish is complete, so it is not a stall — it is posture. Rounded upper back and chin on the chest at address, the trail leg straightening at the top, and a body standing TALLER through delivery than it was at address. That last one is the one that costs shots: if you rise between address and impact the club has to find a ball that is now further away than it was when you set the low point, and thin, heel and a face that never squares all come out of the same rise. The at-home mirror check gets the address position right. What it cannot do is prove the position survives a ball, and the position surviving a ball is the entire fault.",
+        "drill": "Set up at address and check three things: hinge from the hips, chest tall, a fist of room between chin and chest, and a little trail-knee flex you intend to hold to the top. Then 3 sets of 8 with a 7-iron at 80 percent, holding the finish upright for a count of three on every ball — a swing you cannot hold is a swing that came out of posture. Film the last set square down the line at hand height and look at ONE thing: the height of your head at address versus at impact. Grade the set out of 8 for balls where it did not rise. Under 5 means drop to 60 percent speed rather than trying harder; posture does not respond to effort."
+      }
+    },
+    {
+      "id": "lesson-range-aim-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "r6",
+        "shelf": "At the Range",
+        "title": "Aim is a measurement, not a feel",
+        "min": 4,
+        "where": "range",
+        "kit": [
+          "sticks"
+        ],
+        "tags": [
+          "off-tee",
+          "approach"
+        ],
+        "body": "This project has already learned this lesson once, on the green. The whole putter saga turned out to be an AIM question rather than a delivery one, and it took a laser to find out — because how the face LOOKS is a habit, and a habit feels correct by definition. Nothing has ever checked the same thing on your full swing. That matters more than it sounds: if your feet and shoulders are aimed right of target, a perfectly delivered swing produces a push, and every fix you then apply is a fix for a swing that was fine. Over the top is exactly the compensation a body makes to get a ball back at a target it is not aimed at, so an unmeasured aim can quietly manufacture the fault you are working on. Sticks on the ground cost nothing and answer it in one look. The rule from the putting side applies here too: MEASURE with them, do not let them retrain you. If you find you are aimed right, that is a fact about your setup, not a new swing thought to carry to the first tee.",
+        "drill": "One stick on the ground along your toe line, a second pointing at the target just outside the ball. Set up to the target the way you normally would, WITHOUT looking down, then step back and look at where the toe stick actually points. That first look is the measurement — write down which way you were off and by roughly how much. Then hit 15 balls with the sticks down, then TAKE THEM AWAY and hit 10 more, checking your aim on every third one by stepping behind the ball. Ten balls without the sticks is the real test: aim only counts when nothing on the ground is holding it."
+      }
+    },
+    {
+      "id": "lesson-range-teeclub-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "r7",
+        "shelf": "At the Range",
+        "title": "Driver, 5-wood or 2-iron — settle it with a fairway-width target",
+        "min": 4,
+        "where": "range",
+        "kit": [],
+        "tags": [
+          "off-tee",
+          "equipment"
+        ],
+        "body": "The bag currently carries three answers to the same question. The mini driver came out on Aug 12 and the 5-wood took its fairway-finder slot without ever being measured, and the 2-iron utility sits about half a degree away from it. Meanwhile the app now counts something better than a fairway percentage: the DEAD column on the off-the-tee table, which is how often a club left you no realistic play at the green. Most rough is playable and none of those are, and that is the real driver-versus-fairway-finder question. What the round data cannot do is give you a fair sample quickly — you hit maybe four drivers a round off holes that all differ. A range bay can put all three clubs on the same target on the same day, which is the only way the comparison is clean.",
+        "drill": "Pick two objects on the range roughly 30 yards apart at your tee-shot distance — that is a generous fairway, and generous is right, because the question is not accuracy, it is trouble. 10 balls with each of driver, 5-wood and 2-iron, rotating one ball at a time rather than a block per club, full routine on every one. Score three columns per club: IN the gap, outside it, and DEAD — a ball so far off it would have been behind trees or out of bounds. Carry the numbers over two sessions before reading them, then compare the dead rate against what the off-the-tee table in Scores says about the same clubs on the course. If the 5-wood and the 2-iron score the same on every column, that is your answer about whether both belong in the bag."
+      }
+    },
+    {
+      "id": "lesson-range-playnine-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "r8",
+        "shelf": "At the Range",
+        "title": "Play nine holes on the range",
+        "min": 4,
+        "where": "range",
+        "kit": [],
+        "tags": [
+          "off-tee",
+          "approach",
+          "mental"
+        ],
+        "body": "A bucket of balls is the least golf-like activity in golf: same club, same target, same lie, no consequence, and a rehearsal between every ball. The course gives you one swing, then a four-minute walk, then a different club at a different target. Everything you practise in a block gets easier as the block goes on, which is precisely why block work flatters you and then does not transfer. The fix is not to stop hitting balls, it is to spend the LAST part of every session doing what the course actually asks. This also gives you somewhere to rehearse the thing the Mental tab keeps pointing at: your reset. A bad ball in a block costs nothing, so a block cannot train what you do after one. Nine imaginary holes can — a duffed tee shot means you are now playing a recovery, exactly like a Tuesday.",
+        "drill": "Last 20 balls of every range session, no exceptions. Play nine holes of a course you know — say each hole out loud before you hit: the hole, the club, the target, the miss you will not take. Tee shot, then the approach from wherever you honestly judge that ball finished, with the club that distance would actually ask for. One ball per shot, full routine, no re-hits and no rehearsal of the swing you just made. Score it against par and write the number in your phone. Two rules that make it work: never hit two balls at the same target, and when one goes badly, walk the ten yards behind the mat and start the next hole properly. Compare the score to the last three sessions — that number moves with your golf, and a block of 7-irons never does."
+      }
+    },
+    {
+      "id": "lesson-green-strike-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "p6",
+        "shelf": "Putting",
+        "title": "Find out where on the face you are actually hitting it",
+        "min": 4,
+        "where": "green",
+        "kit": [
+          "putter",
+          "powder"
+        ],
+        "tags": [
+          "three-putts",
+          "strike-location"
+        ],
+        "body": "This is the one row on the evolution grid that is nothing but question marks, and a row of question marks is the most useful row on that page: it says what to go and film next. Strike location has NEVER been measured, on any of the four putter heads you have owned. It matters because it is a DISTANCE fault before it is a line fault — an off-centre strike bleeds ball speed, so the same-looking stroke rolls two different distances, and distance control is the open priority that has now decided the fate of two putters. It is also the leading candidate for the Aug 10 scatter. The at-home tape test answers the question indoors on a flat carpet; this is the version that answers it on a real green at the distance where a bad strike actually costs you a hole, because a heel strike from four feet still goes in and a heel strike from thirty feet is a three-putt.",
+        "drill": "Foot powder or impact tape on the LINK's face — a light even coat, and re-coat every five balls, because a smeared face reads as a wide pattern that is not there. 10 balls from 30 feet at a hole, then 10 from 20. Photograph the face after each set of five before you wipe it. What you are reading is not whether a strike was centred; it is whether the pattern is TIGHT and whether it is CENTRED, and those are two different answers with two different fixes. Write both in the Putting Lab alongside how far each ball finished from the hole. Do the whole thing again a fortnight later before you conclude anything — one session is a session, not a measurement."
+      }
+    },
+    {
+      "id": "lesson-green-random-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "p7",
+        "shelf": "Putting",
+        "title": "Never the same putt twice",
+        "min": 4,
+        "where": "green",
+        "kit": [
+          "putter"
+        ],
+        "tags": [
+          "three-putts",
+          "pace-calibration"
+        ],
+        "body": "Every lag drill you own is a ladder: fixed distances, several balls from each, working up and back down. Ladders are the right way to CALIBRATE, and the 30-foot grind stays the main event. But a ladder cannot test what the course tests, because on the course you never get a second ball from the same spot — the putt that produces a three-putt is always a first putt from a distance you have not just rehearsed. That is exactly what the app now records: where the first putt started, and how often a hole that started past 21 feet turned into three. This drill is the practice-green version of that number, and it is the honest one. The pass mark is not makes. From 25 feet a make is luck; finishing inside three feet is a skill, and three feet is the distance where the next putt stops being a question.",
+        "drill": "One ball. Walk to a spot on the green, no measuring and no aiming practice, and hit ONE putt with your full routine. Then walk to wherever it finished, pick a new hole, and putt from there — so every putt is a first putt from a distance you did not choose in advance. 20 putts. Score one point for every ball finishing inside three feet and subtract one for anything that finishes past six, and estimate the distance of each putt as you walk to it so you are training the read as well as the stroke. Anything above +10 out of 20 is a good day. Log the score and the green speed each time: this number is directly comparable to the three-putt rate from 21 feet and up on your round cards, which is the on-course version of the same question."
+      }
+    },
+    {
+      "id": "lesson-green-slope-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "p8",
+        "shelf": "Putting",
+        "title": "Uphill and downhill are two different putts from one distance",
+        "min": 3,
+        "where": "green",
+        "kit": [
+          "putter"
+        ],
+        "tags": [
+          "three-putts",
+          "pace-calibration"
+        ],
+        "body": "Distance control gets practised as if a green were flat, and no green is. The same 25 feet can need two very different strokes, and the miss is not symmetrical: leave an uphill putt short and you have a straightforward eight-footer, but run a downhill putt six feet past and you have the exact putt this whole project is about — a short one, breaking, that you have to hole. That is how a pace error turns into the fault you already have. Most players learn the uphill number and apply it to everything, which is why downhill lags finish long far more often than uphill ones finish short. What you want out of this is not a feel but a RATIO you can carry: how much less stroke a downhill putt of the same length needs on this green today, and how much more an uphill one takes.",
+        "drill": "Find a slope you can putt straight up and straight down — same line, same length, about 25 feet. 5 balls up, 5 balls down, alternating rather than in blocks. Measure how far past or short each one finishes in paces and write down the two averages. Then repeat at 12 feet. What you are after is one sentence you can say on the course: on a green this speed, downhill takes about X less and uphill about Y more. Re-run it in the first three minutes of any round on a green you do not know, at one distance only — the ratio changes with green speed, and a number from a fast green applied to a slow one is worse than no number."
+      }
     }
   ]
 }
