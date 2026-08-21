@@ -100,13 +100,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v51';
+const BUILD = 'v52';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v52', d:'2026-08-21', items:[
+    'Drills are drawn now. Every new range and practice-green drill comes with a diagram \u2014 where the headcover goes, where the phone goes, which way the club travels, what the divot has to do \u2014 so the setup is a picture instead of a paragraph.',
+    'And they read as instructions: one line of setup, numbered steps, then a PASS MARK saying what a good session actually looks like. The reasoning is still there, one tap away under Why this drill exists.',
+    'A wedge drill joins the range shelf: a club on the ground, the ball just ahead of it, and the divot has to start at or after the line. Every number on your carry ladder assumes a good strike, and seven of the twelve greens you missed at Sterling finished short.' ] },
   { b:'v51', d:'2026-08-20', items:[
     'The course box on Start a live round opens its own list. Tap it and every course you have a plan written for is right there \u2014 the upcoming ones first with their date, then the standing plans, each one saying how many hole notes it carries.',
     'Underneath them sits everywhere else you have on file, marked where a scorecard is already on record, so a course with no plan still fills in its own spelling rather than being thumbed in from scratch.',
@@ -595,6 +599,87 @@ function drillList(){
              why: hit ? tags.get(hit) : null, filmed: hit ? faultTags.has(hit) : false };
   });
 }
+// ----- Drill diagrams -----
+// A drill is instructions, and instructions about where to stand, what goes on the ground
+// and which way the club travels are read off a picture in a second and out of a paragraph
+// in thirty. `viz` is a tiny scene — a list of primitives on a 100-wide grid, top-down or
+// side-on — authored per drill IN THE FEED, so a diagram arrives by the same append-only
+// route a lesson body does and needs no app release. Colours are theme variables, so night
+// mode needs no second drawing, and arrowheads are computed as polygons rather than SVG
+// markers because marker ids would collide across the dozen diagrams on the bench.
+const VIZ_C = { i:'var(--ink)', g:'var(--gtext)', b:'var(--btext)', f:'var(--faint)', s:'var(--soft)' };
+const vizC = k => VIZ_C[k] || VIZ_C.i;
+function vizHead(x1, y1, x2, y2, c, L, W){
+  L = L || 2.9; W = W || 1.7;
+  const dx = x2 - x1, dy = y2 - y1, m = Math.hypot(dx, dy) || 1;
+  const ux = dx/m, uy = dy/m, bx = x2 - ux*L, by = y2 - uy*L, px = -uy*W, py = ux*W;
+  return `<polygon points="${x2},${y2} ${bx+px},${by+py} ${bx-px},${by-py}" fill="${c}"/>`;
+}
+function drillViz(v){
+  if(!v || !Array.isArray(v.parts) || !v.parts.length) return '';
+  const H = +v.h || 62;
+  const out = v.parts.map(p => {
+    const c = vizC(p.c), w = p.w || 0.7, dash = p.d ? ' stroke-dasharray="2.2 1.8"' : '';
+    switch(p.k){
+      case 'band':
+        return `<rect x="0" y="${p.y}" width="100" height="${p.h}" fill="${c}" opacity=".12"/>`
+             + `<line x1="0" y1="${p.y}" x2="100" y2="${p.y}" stroke="${c}" stroke-width=".6"/>`;
+      case 'box':
+        return `<rect x="${p.x}" y="${p.y}" width="${p.bw}" height="${p.bh}" rx="${p.r || 1}"`
+             + ` fill="${p.f ? vizC(p.f) : 'none'}" fill-opacity="${p.f ? (p.o || .12) : 0}"`
+             + ` stroke="${c}" stroke-width="${w}"${dash}/>`;
+      case 'line':
+        return `<line x1="${p.x1}" y1="${p.y1}" x2="${p.x2}" y2="${p.y2}" stroke="${c}"`
+             + ` stroke-width="${w}"${dash} stroke-linecap="round"/>`;
+      case 'club':
+        return `<line x1="${p.x1}" y1="${p.y1}" x2="${p.x2}" y2="${p.y2}" stroke="${c}"`
+             + ` stroke-width="${p.w || 1.5}" stroke-linecap="round"/>`;
+      case 'arrow':
+        return `<line x1="${p.x1}" y1="${p.y1}" x2="${p.x2}" y2="${p.y2}" stroke="${c}"`
+             + ` stroke-width="${w}"${dash} stroke-linecap="round"/>` + vizHead(p.x1, p.y1, p.x2, p.y2, c);
+      case 'curve':
+        return `<path d="M${p.x1} ${p.y1} Q${p.cx} ${p.cy} ${p.x2} ${p.y2}" fill="none" stroke="${c}"`
+             + ` stroke-width="${w}"${dash} stroke-linecap="round"/>` + vizHead(p.cx, p.cy, p.x2, p.y2, c);
+      case 'ball':
+        return `<circle cx="${p.x}" cy="${p.y}" r="${p.r || 1.9}" fill="var(--card)"`
+             + ` stroke="${vizC('i')}" stroke-width=".6"/>`;
+      case 'dot':   return `<circle cx="${p.x}" cy="${p.y}" r="${p.r || 1.2}" fill="${c}"/>`;
+      case 'hole':  return `<circle cx="${p.x}" cy="${p.y}" r="${p.r || 2.1}" fill="${c}"/>`;
+      case 'ring':
+        return `<circle cx="${p.x}" cy="${p.y}" r="${p.r || 6}" fill="none" stroke="${c}"`
+             + ` stroke-width=".6" stroke-dasharray="1.8 1.6"/>`;
+      case 'obj':   // a headcover, a bottle, a range marker — something in the way
+        return `<rect x="${p.x - 2.6}" y="${p.y - 1.6}" width="5.2" height="3.2" rx="1.5"`
+             + ` fill="${c}" fill-opacity=".22" stroke="${c}" stroke-width=".6"/>`;
+      case 'cam':
+        return `<rect x="${p.x - 3.2}" y="${p.y - 2.2}" width="6.4" height="4.4" rx="1"`
+             + ` fill="${c}" fill-opacity=".16" stroke="${c}" stroke-width=".7"/>`
+             + `<circle cx="${p.x}" cy="${p.y}" r="1.2" fill="none" stroke="${c}" stroke-width=".7"/>`;
+      case 'flag':
+        return `<line x1="${p.x}" y1="${p.y}" x2="${p.x}" y2="${p.y - 8}" stroke="${c}" stroke-width=".7"/>`
+             + `<polygon points="${p.x},${p.y-8} ${p.x+5},${p.y-6.3} ${p.x},${p.y-4.6}" fill="${c}"/>`;
+      case 'text':
+        return `<text x="${p.x}" y="${p.y}" font-size="${p.sz || 3.1}" font-weight="${p.bold ? 800 : 600}"`
+             + ` text-anchor="${p.a || 'middle'}" fill="${c}"`
+             + ` letter-spacing="${p.ls || .05}">${esc(p.t)}</text>`;
+      default: return '';
+    }
+  }).join('');
+  return `<figure class="dviz"><svg viewBox="0 0 100 ${H}" role="img" aria-label="${esc(v.cap || 'Drill setup')}">`
+       + `${out}</svg>${v.cap ? `<figcaption>${esc(v.cap)}</figcaption>` : ''}</figure>`;
+}
+// A drill renders the same way on the bench and inside its lesson. `steps` is the
+// instruction; `drill` is the one-line setup above it. A lesson with no `steps` is a
+// baseline one whose whole drill is the paragraph, so it still renders as prose — the two
+// shapes coexist rather than one needing a migration.
+function drillBody(l){
+  const steps = (Array.isArray(l.steps) ? l.steps : []).filter(Boolean);
+  return `${steps.length ? `<p class="dlead">${esc(l.drill)}</p>` : prose(l.drill, 'lesson-body')}
+    ${drillViz(l.viz)}
+    ${steps.length ? `<ol class="dsteps">${steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
+    ${l.score ? `<p class="dscore"><b>Pass mark</b> ${esc(l.score)}</p>` : ''}`;
+}
+
 // ----- The playable club list -----
 // This comes from the CARRY LADDER, not S.clubs: the bag holds the irons as a single
 // "KING TEC 4–PW" entry, so it can't name the club that actually hit a shot. The ladder
@@ -2177,7 +2262,7 @@ function lesson(id){
     <h2>${esc(l.shelf)} · ${l.min} min</h2>
     <h3 style="font-size:19px">${esc(l.title)}</h3>
     <p class="lesson-body">${esc(l.body)}</p>
-    ${l.drill ? `<div class="lesson-drill"><b>Drill:</b> ${esc(l.drill)}</div>` : ''}
+    ${l.drill ? `<div class="lesson-drill"><b>Drill</b>${drillBody(l)}</div>` : ''}
     <div style="margin-top:12px"><button class="btn" data-action="drill-done">Did the work · keep streak</button></div>
   </div>`;
 }
@@ -2210,7 +2295,7 @@ function drills(){
         <span class="gist">${esc(d.l.title)}</span></summary>
       ${d.missing.length ? `<p class="sm warn"><b>Needs ${esc(d.missing.map(k => KIT_LAB[k] || k).join(' + '))}</b> — mark it above once you have it.</p>` : ''}
       ${d.why ? `<p class="sm faint">Matched to your game: ${esc(splitLead(d.why)[0])}</p>` : ''}
-      ${prose(d.l.drill, 'lesson-body')}
+      ${drillBody(d.l)}
       ${d.kit.length ? `<div class="chips">${d.kit.map(k => `<span class="chip static ${haveKit(k) ? 'grn' : 'ns'}">${esc(KIT_LAB[k] || k)}</span>`).join('')}</div>` : ''}
       <div class="linkrow" data-action="open-lesson" data-id="${esc(d.l.id)}">
         <span class="sm"><b>Why this drill exists</b> — read the lesson</span><span class="arr">→</span></div>

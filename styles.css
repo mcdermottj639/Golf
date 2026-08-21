@@ -207,6 +207,30 @@ td b{font-size:14px}
 .lesson-drill{background:var(--card2);border:1px dashed var(--line);border-radius:var(--r);padding:10px 12px;
   font-size:12.5px;margin-top:8px}
 .lesson-drill b{color:var(--burg)}
+.lesson-drill > b:first-child{display:block;font-family:var(--sans);font-size:10px;font-weight:800;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--btext);margin-bottom:2px}
+
+/* ----- Drill diagrams, steps and pass marks -----
+   A drill is instructions. It used to render as one paragraph, which is the wrong shape for
+   something read standing on a range mat with a club in one hand: the setup, the reps and
+   the pass mark were all in the same block of prose. `viz` draws the setup, `steps` numbers
+   the doing, `score` says what a pass looks like. The SVG paints itself from the theme
+   variables, so night mode is free. */
+.dviz{margin:10px 0 4px;border:1px solid var(--line2);border-radius:var(--r);
+  background:var(--card2);padding:9px 9px 5px}
+.dviz svg{display:block;width:100%;height:auto;font-family:var(--sans);overflow:visible}
+.dviz figcaption{font-family:var(--sans);font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);margin-top:6px;text-align:center}
+.dlead{font-size:13.5px;line-height:1.6;color:var(--ink);margin:8px 0 0;font-weight:700}
+.dsteps{margin:9px 0 2px;padding-left:19px}
+.dsteps li{font-size:13.5px;line-height:1.6;color:var(--ink);margin-bottom:6px;padding-left:2px}
+.dsteps li::marker{font-family:var(--sans);font-size:11px;font-weight:800;color:var(--btext)}
+.dscore{font-family:var(--sans);font-size:12px;line-height:1.5;color:var(--soft);
+  margin:10px 0 2px;border-left:3px solid var(--green);padding:3px 0 3px 9px}
+.dscore b{display:block;font-size:9.5px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gtext)}
+body.night .dviz{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+body.night .dscore{border-left-color:var(--gtext)}
 
 /* The course picker on "Start a live round" — the prepped courses as a tappable list.
    In flow rather than floating: an absolutely-positioned dropdown over an iOS keyboard

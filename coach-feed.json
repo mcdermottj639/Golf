@@ -17617,6 +17617,1548 @@
         "body": "The clock system gives you nine numbers and the carry ladder writes them down: PW 122, 50 at 108, 56 at 95, 60 at 80. Every one of those is a CARRY off a good strike, and that is the quiet assumption underneath the biggest scoring pattern you have. Sterling Farms missed twelve greens and seven of them finished SHORT, and a fat wedge is short by a distance nobody can predict — half a groove low costs more yards than a whole club does. So there are two completely different reasons a 95-yard shot finishes at 88, and the wedge matrix cannot tell them apart: either the number is wrong, or the strike was. This drill answers the second one, which is worth doing FIRST, because re-baselining a ladder off a session of thin and fat contact just writes bad numbers down more carefully. The bounce is on your side here — the 50 is an 8-degree F grind, the 56 a 10-degree S, the 60 an 8-degree M — and bounce only works if the club is still travelling down when it reaches the ball.",
         "drill": "Lay a club or an alignment stick on the ground perpendicular to your target line and put the ball just ahead of it, or spray a line in the turf if the range lets you. 10 balls each with the 56 and the PW at a three-quarter swing: the divot has to START at or AFTER the line. Score each set out of 10 for ball-first contact — not for where it finished, and not for how it felt. Under 7 and you have found the short miss, and no amount of clubbing up fixes it. Then hit five more of whichever club scored worse, this time calling out loud before each one whether the last strike was ball-first, fat or thin, and check yourself against the divot: knowing which one you just hit is the skill that lets you trust a yardage on the course."
       }
+    },
+    {
+      "id": "lesson-r1-viz-20260821",
+      "type": "lesson-update",
+      "target": "r1",
+      "lesson": {
+        "drill": "Two balls, driver, filmed from two angles — before you have hit anything else.",
+        "steps": [
+          "Set the phone on the ground ON the target line behind the ball, lens at hand height.",
+          "Ball one: full routine, real target. Do not re-hit it.",
+          "Move the phone square to the line, level with the ball. Ball two, same routine.",
+          "Write one line on each — start line and curve. Then warm up normally and leave it alone.",
+          "Send both clips. Repeat on three separate sessions before concluding anything."
+        ],
+        "score": "Two clips, both from the FIRST two swings of the day. A warm swing is not the swing that is failing.",
+        "viz": {
+          "h": 46,
+          "cap": "Top down · the two angles",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 4.5,
+              "t": "2 · FACE-ON — square to the line",
+              "sz": 2.9,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "cam",
+              "x": 50,
+              "y": 11,
+              "c": "g"
+            },
+            {
+              "k": "line",
+              "x1": 12,
+              "y1": 26,
+              "x2": 84,
+              "y2": 26,
+              "d": 1,
+              "c": "f"
+            },
+            {
+              "k": "arrow",
+              "x1": 84,
+              "y1": 26,
+              "x2": 95,
+              "y2": 26,
+              "c": "f"
+            },
+            {
+              "k": "text",
+              "x": 89,
+              "y": 22.5,
+              "t": "TARGET",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 26
+            },
+            {
+              "k": "cam",
+              "x": 20,
+              "y": 26,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 20,
+              "y": 33.5,
+              "t": "1 · DOWN THE LINE",
+              "sz": 2.9,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 20,
+              "y": 37.8,
+              "t": "on the line · hand height",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 44,
+              "t": "First two balls of the session. Driver. Do not fix anything.",
+              "sz": 2.8,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-r2-viz-20260821",
+      "type": "lesson-update",
+      "target": "r2",
+      "lesson": {
+        "drill": "Five balls a club, alternating clubs, rangefinder on a target you can shoot.",
+        "steps": [
+          "Five balls with one club, then switch — never rake a bucket with one club.",
+          "Throw out the best and the worst. Average the middle three. That is the CARRY.",
+          "Session one: driver, 5-wood, 2-iron, 4 through 9 iron. Session two: PW, 50, 56, 60, and the 5-wood again.",
+          "Beside each number write how many of the five you actually struck.",
+          "Enter them in the carry ladder, then read the GAPS between neighbours."
+        ],
+        "score": "Any gap under 6 yards is two clubs doing one job. Over 18 is a hole in the bag. Those two answers settle the 5-wood.",
+        "viz": {
+          "h": 62,
+          "cap": "Your ladder today · every number an estimate, one rung empty",
+          "parts": [
+            {
+              "k": "text",
+              "x": 4,
+              "y": 14,
+              "t": "DRIVER",
+              "sz": 3.0,
+              "c": "i",
+              "a": "start"
+            },
+            {
+              "k": "line",
+              "x1": 30,
+              "y1": 13,
+              "x2": 84.2,
+              "y2": 13,
+              "c": "i",
+              "w": 1.9
+            },
+            {
+              "k": "text",
+              "x": 97,
+              "y": 14,
+              "t": "235",
+              "sz": 3.0,
+              "c": "i",
+              "a": "end"
+            },
+            {
+              "k": "box",
+              "x": 30,
+              "y": 18.5,
+              "bw": 54.2,
+              "bh": 7.6,
+              "d": 1,
+              "c": "b",
+              "r": 1
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 25,
+              "t": "5-WOOD",
+              "sz": 3.0,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 57,
+              "y": 24.7,
+              "t": "NEVER MEASURED",
+              "sz": 2.7,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 97,
+              "y": 25,
+              "t": "?",
+              "sz": 3.4,
+              "c": "b",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 34,
+              "t": "2-IRON",
+              "sz": 3.0,
+              "c": "i",
+              "a": "start"
+            },
+            {
+              "k": "line",
+              "x1": 30,
+              "y1": 33,
+              "x2": 73.6,
+              "y2": 33,
+              "c": "i",
+              "w": 1.9
+            },
+            {
+              "k": "text",
+              "x": 97,
+              "y": 34,
+              "t": "205",
+              "sz": 3.0,
+              "c": "i",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 30,
+              "y": 39.5,
+              "t": "the 5-wood sits 0.5° from this club",
+              "sz": 2.5,
+              "c": "f",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 49,
+              "t": "PW",
+              "sz": 3.0,
+              "c": "i",
+              "a": "start"
+            },
+            {
+              "k": "line",
+              "x1": 30,
+              "y1": 48,
+              "x2": 44.4,
+              "y2": 48,
+              "c": "i",
+              "w": 1.9
+            },
+            {
+              "k": "text",
+              "x": 97,
+              "y": 49,
+              "t": "122",
+              "sz": 3.0,
+              "c": "i",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 58,
+              "t": "56°",
+              "sz": 3.0,
+              "c": "i",
+              "a": "start"
+            },
+            {
+              "k": "line",
+              "x1": 30,
+              "y1": 57,
+              "x2": 34.8,
+              "y2": 57,
+              "c": "i",
+              "w": 1.9
+            },
+            {
+              "k": "text",
+              "x": 97,
+              "y": 58,
+              "t": "95",
+              "sz": 3.0,
+              "c": "i",
+              "a": "end"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-r3-viz-20260821",
+      "type": "lesson-update",
+      "target": "r3",
+      "lesson": {
+        "drill": "Headcover on the ground just outside the ball, level with it. 3 sets of 8, 7-iron.",
+        "steps": [
+          "Headcover or a bottle just outside the ball, on the target line.",
+          "Aim at right-center field, not at the target.",
+          "Half speed to start. Swing to miss the headcover, from the inside.",
+          "The ball will start RIGHT and stay right. That is a pass — path first, face second.",
+          "Only once a set of 8 comes back clean at full speed, hit five drivers. Then stop."
+        ],
+        "score": "Each set out of 8 for clean misses. Under 6, slow down — do not swing harder at an object you are trying to avoid.",
+        "viz": {
+          "h": 56,
+          "cap": "Top down · the gate outside the ball",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 10,
+              "y1": 30,
+              "x2": 84,
+              "y2": 30,
+              "d": 1,
+              "c": "f"
+            },
+            {
+              "k": "arrow",
+              "x1": 84,
+              "y1": 30,
+              "x2": 95,
+              "y2": 30,
+              "c": "f"
+            },
+            {
+              "k": "text",
+              "x": 89,
+              "y": 26.5,
+              "t": "TARGET",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "obj",
+              "x": 36,
+              "y": 24,
+              "c": "b"
+            },
+            {
+              "k": "line",
+              "x1": 18,
+              "y1": 22.5,
+              "x2": 32.5,
+              "y2": 23.6,
+              "d": 1,
+              "c": "b",
+              "w": 0.5
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 23.5,
+              "t": "HEADCOVER",
+              "sz": 2.6,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "ball",
+              "x": 40,
+              "y": 30
+            },
+            {
+              "k": "arrow",
+              "x1": 14,
+              "y1": 5,
+              "x2": 52,
+              "y2": 37,
+              "c": "b"
+            },
+            {
+              "k": "arrow",
+              "x1": 16,
+              "y1": 44,
+              "x2": 60,
+              "y2": 20,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 52,
+              "t": "✗ over the top — hits it",
+              "sz": 2.8,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 96,
+              "y": 52,
+              "t": "✓ from the inside — misses it",
+              "sz": 2.8,
+              "c": "g",
+              "a": "end"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-r4-viz-20260821",
+      "type": "lesson-update",
+      "target": "r4",
+      "lesson": {
+        "drill": "Phone on the ground, on the target line, behind the ball, at hand height.",
+        "steps": [
+          "Lay a club on the target line so you can see in the frame whether the camera is honest.",
+          "Ten swings with a 7-iron, 60 fps or better, from directly behind the ball.",
+          "Move square to the line, level with the ball, and shoot five face-on.",
+          "Watch ONE thing at the top: does the shaft point at the line, right of it, or left of it.",
+          "Say the answer out loud, then send the clips."
+        ],
+        "score": "Same two camera spots every fortnight. A rear-quarter angle grades nothing — it is why the top has not been re-read since Jul 26.",
+        "viz": {
+          "h": 52,
+          "cap": "Top down · where the phone goes",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 10,
+              "y1": 30,
+              "x2": 86,
+              "y2": 30,
+              "d": 1,
+              "c": "f"
+            },
+            {
+              "k": "arrow",
+              "x1": 86,
+              "y1": 30,
+              "x2": 96,
+              "y2": 30,
+              "c": "f"
+            },
+            {
+              "k": "text",
+              "x": 90,
+              "y": 26.5,
+              "t": "TARGET",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 58,
+              "y": 30
+            },
+            {
+              "k": "cam",
+              "x": 18,
+              "y": 30,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 18,
+              "y": 37.5,
+              "t": "✓ DOWN THE LINE",
+              "sz": 2.8,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 18,
+              "y": 41.8,
+              "t": "on the line · hand height",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "cam",
+              "x": 58,
+              "y": 11,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 64,
+              "y": 12.2,
+              "t": "✓ FACE-ON",
+              "sz": 2.8,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "cam",
+              "x": 32,
+              "y": 15,
+              "c": "b"
+            },
+            {
+              "k": "text",
+              "x": 32,
+              "y": 8.5,
+              "t": "✗ REAR-QUARTER",
+              "sz": 2.7,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 49,
+              "t": "The angle is worth more than the swing you put in front of it.",
+              "sz": 2.8,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-r5-viz-20260821",
+      "type": "lesson-update",
+      "target": "r5",
+      "lesson": {
+        "drill": "Address check, then 3 sets of 8 at 80 percent, holding the finish for three.",
+        "steps": [
+          "At address: hinge from the hips, chest tall, a fist between chin and chest.",
+          "Hold a little trail-knee flex all the way to the top.",
+          "3 sets of 8 with a 7-iron at 80 percent. Hold every finish upright for a count of three.",
+          "Film the last set square down the line at hand height.",
+          "Compare head height at address against head height at impact. That is the whole fault."
+        ],
+        "score": "Grade the set out of 8 for balls where the head did not rise. Under 5, drop to 60 percent — posture does not respond to effort.",
+        "viz": {
+          "h": 52,
+          "cap": "Side on · the head must not rise between address and impact",
+          "parts": [
+            {
+              "k": "band",
+              "y": 46,
+              "h": 6,
+              "c": "g"
+            },
+            {
+              "k": "line",
+              "x1": 18,
+              "y1": 11,
+              "x2": 88,
+              "y2": 11,
+              "d": 1,
+              "c": "b"
+            },
+            {
+              "k": "line",
+              "x1": 18,
+              "y1": 17,
+              "x2": 88,
+              "y2": 17,
+              "d": 1,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 18,
+              "y": 8.6,
+              "t": "IMPACT ✗ — stood up",
+              "sz": 2.7,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 18,
+              "y": 21.5,
+              "t": "ADDRESS",
+              "sz": 2.7,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "arrow",
+              "x1": 80,
+              "y1": 16.4,
+              "x2": 80,
+              "y2": 11.8,
+              "c": "b"
+            },
+            {
+              "k": "dot",
+              "x": 47,
+              "y": 17,
+              "r": 2.7,
+              "c": "i"
+            },
+            {
+              "k": "line",
+              "x1": 38,
+              "y1": 31,
+              "x2": 46,
+              "y2": 20,
+              "c": "i",
+              "w": 1.2
+            },
+            {
+              "k": "line",
+              "x1": 38,
+              "y1": 31,
+              "x2": 41,
+              "y2": 39,
+              "c": "i",
+              "w": 1.1
+            },
+            {
+              "k": "line",
+              "x1": 41,
+              "y1": 39,
+              "x2": 38,
+              "y2": 46,
+              "c": "i",
+              "w": 1.1
+            },
+            {
+              "k": "line",
+              "x1": 45,
+              "y1": 22,
+              "x2": 56,
+              "y2": 33,
+              "c": "i",
+              "w": 1.0
+            },
+            {
+              "k": "club",
+              "x1": 56,
+              "y1": 33,
+              "x2": 66,
+              "y2": 45.5,
+              "c": "i",
+              "w": 1.3
+            },
+            {
+              "k": "ball",
+              "x": 66,
+              "y": 44,
+              "r": 1.7
+            },
+            {
+              "k": "text",
+              "x": 76,
+              "y": 15,
+              "t": "the rise",
+              "sz": 2.5,
+              "c": "b",
+              "a": "end"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-r6-viz-20260821",
+      "type": "lesson-update",
+      "target": "r6",
+      "lesson": {
+        "drill": "Two sticks: one on the target line outside the ball, one along your toes.",
+        "steps": [
+          "Lay stick 1 just outside the ball, pointing at the target.",
+          "Set up to the target the way you normally would, WITHOUT looking down.",
+          "Lay stick 2 along your toe line, step back, and look at where it actually points.",
+          "That first look is the measurement. Write down which way you were off.",
+          "Hit 15 with the sticks down, then take them away and hit 10 more, checking every third."
+        ],
+        "score": "The ten without the sticks are the real test. Aim only counts when nothing on the ground is holding it.",
+        "viz": {
+          "h": 56,
+          "cap": "Top down · set up as normal, THEN look",
+          "parts": [
+            {
+              "k": "text",
+              "x": 24,
+              "y": 21.5,
+              "t": "STICK 1 · the target line",
+              "sz": 2.8,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "club",
+              "x1": 24,
+              "y1": 26,
+              "x2": 84,
+              "y2": 26,
+              "c": "g",
+              "w": 1.5
+            },
+            {
+              "k": "flag",
+              "x": 93,
+              "y": 29,
+              "c": "g"
+            },
+            {
+              "k": "ball",
+              "x": 46,
+              "y": 30.5
+            },
+            {
+              "k": "line",
+              "x1": 24,
+              "y1": 43,
+              "x2": 84,
+              "y2": 43,
+              "d": 1,
+              "c": "f"
+            },
+            {
+              "k": "text",
+              "x": 86,
+              "y": 44,
+              "t": "parallel",
+              "sz": 2.5,
+              "c": "f",
+              "a": "start"
+            },
+            {
+              "k": "club",
+              "x1": 24,
+              "y1": 43,
+              "x2": 84,
+              "y2": 36,
+              "c": "i",
+              "w": 1.5
+            },
+            {
+              "k": "text",
+              "x": 24,
+              "y": 50.5,
+              "t": "STICK 2 · your toe line — aimed RIGHT?",
+              "sz": 2.8,
+              "c": "i",
+              "a": "start"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-r7-viz-20260821",
+      "type": "lesson-update",
+      "target": "r7",
+      "lesson": {
+        "drill": "Two range markers about 30 yards apart. 10 balls each with driver, 5-wood, 2-iron.",
+        "steps": [
+          "Pick two objects roughly 30 yards apart at your tee-shot distance. That is a generous fairway.",
+          "Rotate ONE ball at a time between the three clubs, never a block per club.",
+          "Full routine on every ball.",
+          "Score three columns per club: IN the gap, OUT of it, and DEAD — behind trees or out of bounds.",
+          "Carry the numbers over two sessions, then compare them to the Dead column in Scores."
+        ],
+        "score": "If the 5-wood and the 2-iron score the same on all three columns, that is your answer about whether both belong in the bag.",
+        "viz": {
+          "h": 60,
+          "cap": "Looking down the range · a generous fairway",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 30,
+              "y1": 14,
+              "x2": 42,
+              "y2": 46,
+              "d": 1,
+              "c": "g"
+            },
+            {
+              "k": "line",
+              "x1": 70,
+              "y1": 14,
+              "x2": 58,
+              "y2": 46,
+              "d": 1,
+              "c": "g"
+            },
+            {
+              "k": "obj",
+              "x": 30,
+              "y": 13,
+              "c": "i"
+            },
+            {
+              "k": "obj",
+              "x": 70,
+              "y": 13,
+              "c": "i"
+            },
+            {
+              "k": "line",
+              "x1": 33.5,
+              "y1": 13,
+              "x2": 66.5,
+              "y2": 13,
+              "d": 1,
+              "c": "f"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 8,
+              "t": "≈ 30 yds",
+              "sz": 2.8,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "dot",
+              "x": 48,
+              "y": 24,
+              "c": "g"
+            },
+            {
+              "k": "dot",
+              "x": 54,
+              "y": 32,
+              "c": "g"
+            },
+            {
+              "k": "dot",
+              "x": 47,
+              "y": 39,
+              "c": "g"
+            },
+            {
+              "k": "dot",
+              "x": 78,
+              "y": 27,
+              "c": "f"
+            },
+            {
+              "k": "dot",
+              "x": 14,
+              "y": 21,
+              "c": "b",
+              "r": 1.5
+            },
+            {
+              "k": "text",
+              "x": 14,
+              "y": 16,
+              "t": "DEAD",
+              "sz": 2.5,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 49
+            },
+            {
+              "k": "dot",
+              "x": 10,
+              "y": 56,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 13,
+              "y": 57,
+              "t": "in",
+              "sz": 2.6,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "dot",
+              "x": 30,
+              "y": 56,
+              "c": "f"
+            },
+            {
+              "k": "text",
+              "x": 33,
+              "y": 57,
+              "t": "out",
+              "sz": 2.6,
+              "c": "f",
+              "a": "start"
+            },
+            {
+              "k": "dot",
+              "x": 54,
+              "y": 56,
+              "c": "b",
+              "r": 1.5
+            },
+            {
+              "k": "text",
+              "x": 58,
+              "y": 57,
+              "t": "dead — no play at the green",
+              "sz": 2.6,
+              "c": "b",
+              "a": "start"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-r8-viz-20260821",
+      "type": "lesson-update",
+      "target": "r8",
+      "lesson": {
+        "drill": "The last 20 balls of every range session are nine holes, one ball per shot.",
+        "steps": [
+          "Say the hole out loud first: the club, the target, and the miss you will not take.",
+          "Tee shot, then the approach from wherever you honestly judge that ball finished.",
+          "One ball per shot. No re-hits, no rehearsal of the swing you just made.",
+          "Never two balls at the same target.",
+          "After a bad one, walk the ten yards behind the mat before starting the next hole."
+        ],
+        "score": "Score it against par and keep the number. It moves with your golf — a block of 7-irons never does.",
+        "viz": {
+          "h": 46,
+          "cap": "Every range session · the last fifth is golf",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 7,
+              "t": "ONE RANGE SESSION",
+              "sz": 2.9,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 6,
+              "y": 12,
+              "bw": 64,
+              "bh": 12,
+              "c": "i",
+              "f": "i",
+              "o": 0.08
+            },
+            {
+              "k": "text",
+              "x": 38,
+              "y": 19.8,
+              "t": "BLOCK WORK",
+              "sz": 3.0,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 72,
+              "y": 12,
+              "bw": 22,
+              "bh": 12,
+              "c": "g",
+              "f": "g",
+              "o": 0.18
+            },
+            {
+              "k": "text",
+              "x": 83,
+              "y": 19.8,
+              "t": "LAST 20",
+              "sz": 2.9,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 38,
+              "y": 29,
+              "t": "same club, same target",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 83,
+              "y": 29,
+              "t": "= 9 holes",
+              "sz": 2.7,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "dot",
+              "x": 10,
+              "y": 36,
+              "c": "g",
+              "r": 1.5
+            },
+            {
+              "k": "dot",
+              "x": 20,
+              "y": 36,
+              "c": "g",
+              "r": 1.5
+            },
+            {
+              "k": "dot",
+              "x": 30,
+              "y": 36,
+              "c": "g",
+              "r": 1.5
+            },
+            {
+              "k": "dot",
+              "x": 40,
+              "y": 36,
+              "c": "g",
+              "r": 1.5
+            },
+            {
+              "k": "dot",
+              "x": 50,
+              "y": 36,
+              "c": "g",
+              "r": 1.5
+            },
+            {
+              "k": "dot",
+              "x": 60,
+              "y": 36,
+              "c": "g",
+              "r": 1.5
+            },
+            {
+              "k": "dot",
+              "x": 70,
+              "y": 36,
+              "c": "g",
+              "r": 1.5
+            },
+            {
+              "k": "dot",
+              "x": 80,
+              "y": 36,
+              "c": "g",
+              "r": 1.5
+            },
+            {
+              "k": "dot",
+              "x": 90,
+              "y": 36,
+              "c": "g",
+              "r": 1.5
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 43,
+              "t": "1 ball per shot · a new target every time",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-r9-viz-20260821",
+      "type": "lesson-update",
+      "target": "r9",
+      "lesson": {
+        "drill": "A club laid across the target line, ball just ahead of it. 10 each with the 56 and the PW.",
+        "steps": [
+          "Lay a club or a stick on the ground square across the line, ball just ahead of it.",
+          "Three-quarter swings. The divot has to START at or after the line.",
+          "10 with the 56, then 10 with the PW.",
+          "Score for ball-first contact — not for where it finished and not for how it felt.",
+          "Then five more with whichever scored worse, calling fat, thin or ball-first BEFORE you look at the divot."
+        ],
+        "score": "Under 7 out of 10 and you have found the short miss. Clubbing up does not fix a fat wedge.",
+        "viz": {
+          "h": 52,
+          "cap": "Side on · the divot starts AT or AFTER the line",
+          "parts": [
+            {
+              "k": "band",
+              "y": 34,
+              "h": 14,
+              "c": "g"
+            },
+            {
+              "k": "box",
+              "x": 34,
+              "y": 34,
+              "bw": 13,
+              "bh": 3.4,
+              "r": 0.7,
+              "c": "b",
+              "f": "b",
+              "o": 0.32
+            },
+            {
+              "k": "box",
+              "x": 53,
+              "y": 34,
+              "bw": 16,
+              "bh": 3.4,
+              "r": 0.7,
+              "c": "g",
+              "f": "g",
+              "o": 0.32
+            },
+            {
+              "k": "line",
+              "x1": 48,
+              "y1": 28,
+              "x2": 48,
+              "y2": 40,
+              "c": "i",
+              "w": 1.2
+            },
+            {
+              "k": "text",
+              "x": 48,
+              "y": 25,
+              "t": "LINE",
+              "sz": 2.7,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 53.5,
+              "y": 32
+            },
+            {
+              "k": "arrow",
+              "x1": 28,
+              "y1": 10,
+              "x2": 45.5,
+              "y2": 29,
+              "c": "i"
+            },
+            {
+              "k": "text",
+              "x": 24,
+              "y": 8,
+              "t": "club still descending",
+              "sz": 2.6,
+              "c": "i",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 40,
+              "y": 45,
+              "t": "✗ fat",
+              "sz": 2.9,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 61,
+              "y": 45,
+              "t": "✓ ball first",
+              "sz": 2.9,
+              "c": "g",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-p6-viz-20260821",
+      "type": "lesson-update",
+      "target": "p6",
+      "lesson": {
+        "drill": "Foot powder on the LINK's face. 10 balls from 30 ft, 10 from 20.",
+        "steps": [
+          "Light, even coat of powder or impact tape on the face.",
+          "Re-coat every five balls — a smeared face reads as a wide pattern that is not there.",
+          "10 balls from 30 ft at a hole, then 10 from 20. Photograph the face before each wipe.",
+          "Log how far each ball finished from the hole beside the strike pattern.",
+          "Run the whole thing again a fortnight later before concluding anything."
+        ],
+        "score": "Two separate answers: is the pattern TIGHT, and is it CENTRED. They have different fixes.",
+        "viz": {
+          "h": 46,
+          "cap": "The two answers a powdered face gives you",
+          "parts": [
+            {
+              "k": "box",
+              "x": 8,
+              "y": 12,
+              "bw": 34,
+              "bh": 14,
+              "r": 2,
+              "c": "i"
+            },
+            {
+              "k": "line",
+              "x1": 25,
+              "y1": 12,
+              "x2": 25,
+              "y2": 26,
+              "d": 1,
+              "c": "f"
+            },
+            {
+              "k": "dot",
+              "x": 18,
+              "y": 17,
+              "c": "b",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 19.5,
+              "y": 20,
+              "c": "b",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 16.5,
+              "y": 19.2,
+              "c": "b",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 20,
+              "y": 17.8,
+              "c": "b",
+              "r": 1.1
+            },
+            {
+              "k": "text",
+              "x": 25,
+              "y": 33,
+              "t": "TIGHT but OFF-CENTRE",
+              "sz": 2.8,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 25,
+              "y": 38,
+              "t": "setup or ball position",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 58,
+              "y": 12,
+              "bw": 34,
+              "bh": 14,
+              "r": 2,
+              "c": "i"
+            },
+            {
+              "k": "line",
+              "x1": 75,
+              "y1": 12,
+              "x2": 75,
+              "y2": 26,
+              "d": 1,
+              "c": "f"
+            },
+            {
+              "k": "dot",
+              "x": 63,
+              "y": 16.5,
+              "c": "b",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 72,
+              "y": 21,
+              "c": "b",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 81,
+              "y": 17,
+              "c": "b",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 67,
+              "y": 22.5,
+              "c": "b",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 86,
+              "y": 20,
+              "c": "b",
+              "r": 1.1
+            },
+            {
+              "k": "text",
+              "x": 75,
+              "y": 33,
+              "t": "WIDE",
+              "sz": 2.8,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 75,
+              "y": 38,
+              "t": "this is your pace fault",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 44.5,
+              "t": "An off-centre strike bleeds ball speed — distance before line.",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-p7-viz-20260821",
+      "type": "lesson-update",
+      "target": "p7",
+      "lesson": {
+        "drill": "One ball. Putt, walk to where it finished, pick a new hole, putt again. 20 putts.",
+        "steps": [
+          "One ball only. Walk to a spot — no measuring, no practice putt from there.",
+          "Estimate the distance as you walk to it. You are training the read too.",
+          "Full routine, one putt.",
+          "Walk to wherever it finished, pick a DIFFERENT hole, and putt from there.",
+          "20 putts. Log the score and the green speed."
+        ],
+        "score": "+1 for every ball finishing inside 3 ft, −1 for anything past 6 ft. Above +10 out of 20 is a good day.",
+        "viz": {
+          "h": 58,
+          "cap": "Every putt is a FIRST putt from a distance you did not choose",
+          "parts": [
+            {
+              "k": "box",
+              "x": 5,
+              "y": 5,
+              "bw": 90,
+              "bh": 42,
+              "r": 7,
+              "c": "g",
+              "f": "g",
+              "o": 0.07
+            },
+            {
+              "k": "hole",
+              "x": 74,
+              "y": 14,
+              "c": "i"
+            },
+            {
+              "k": "ring",
+              "x": 74,
+              "y": 14,
+              "r": 7,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 83,
+              "y": 15.5,
+              "t": "3 ft",
+              "sz": 2.5,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "ball",
+              "x": 16,
+              "y": 38
+            },
+            {
+              "k": "arrow",
+              "x1": 19,
+              "y1": 37,
+              "x2": 60,
+              "y2": 22,
+              "c": "i",
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 36,
+              "y": 35,
+              "t": "putt 1",
+              "sz": 2.8,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "dot",
+              "x": 60,
+              "y": 22,
+              "r": 1.7,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 63,
+              "y": 27.5,
+              "t": "finished here",
+              "sz": 2.5,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "hole",
+              "x": 24,
+              "y": 12,
+              "c": "i"
+            },
+            {
+              "k": "arrow",
+              "x1": 57,
+              "y1": 23,
+              "x2": 29,
+              "y2": 14,
+              "c": "i",
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 44,
+              "y": 10,
+              "t": "putt 2 — from that exact spot",
+              "sz": 2.6,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 54,
+              "t": "20 putts · +1 inside 3 ft · −1 past 6 ft",
+              "sz": 2.9,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-p8-viz-20260821",
+      "type": "lesson-update",
+      "target": "p8",
+      "lesson": {
+        "drill": "One slope, one line: 5 balls straight down, 5 straight up, alternating. 25 ft.",
+        "steps": [
+          "Find a slope you can putt straight up and straight down on the same line, about 25 ft.",
+          "Alternate — 1 down, 1 up, 1 down — never in blocks.",
+          "Measure how far past or short each one finishes, in paces.",
+          "Write the two averages down. Then repeat the whole thing at 12 ft.",
+          "Re-run it at one distance in the first three minutes of any round on a green you do not know."
+        ],
+        "score": "One sentence to carry: on a green this speed, downhill takes about X less and uphill about Y more.",
+        "viz": {
+          "h": 52,
+          "cap": "Same line, same length · the ratio changes with green speed",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 8,
+              "y1": 44,
+              "x2": 92,
+              "y2": 18.8,
+              "c": "g",
+              "w": 1.4
+            },
+            {
+              "k": "flag",
+              "x": 50,
+              "y": 32,
+              "c": "i"
+            },
+            {
+              "k": "ball",
+              "x": 76,
+              "y": 22
+            },
+            {
+              "k": "arrow",
+              "x1": 73,
+              "y1": 24.5,
+              "x2": 57,
+              "y2": 30,
+              "c": "b"
+            },
+            {
+              "k": "text",
+              "x": 78,
+              "y": 15,
+              "t": "DOWNHILL ×5",
+              "sz": 2.8,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 24,
+              "y": 38
+            },
+            {
+              "k": "arrow",
+              "x1": 27,
+              "y1": 37,
+              "x2": 44,
+              "y2": 33.5,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 22,
+              "y": 46,
+              "t": "UPHILL ×5",
+              "sz": 2.8,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 50,
+              "t": "Run one 6 ft past and it is the putt this whole project is about.",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
     }
   ]
 }
