@@ -91,6 +91,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `lesson-update` | Patch a Coach lesson by `target` (its id); `Object.assign` of `lesson`. Patches accumulate, so two updates to one lesson both survive. A `target` matching no lesson is ignored |
 | `lesson-add`    | Add a whole Coach lesson (`lesson` object carrying its own `id`). Naming a new `shelf` creates one |
 | `lesson-remove` | Retire a lesson by `target` — a later `lesson-add` with the same id un-retires it |
+| `geo`            | Put a course's location on file (`geo:{course, lat, lon, prec, place, src}`). Round Prep sorts the standing plans **nearest first** off it — see *Nearest first* below. Replaces any earlier fix for that course |
 | `deadline`       | Set the return-window deadline (clears "estimated") |
 
 Unknown types are left unapplied on purpose (forward-compat), so a typo'd `type` silently
@@ -698,6 +699,32 @@ don't lower it, and don't set a smaller inline `font-size` on the narrow numeric
 (carry ladder, gap matrix) either. The other "fix" for this — `maximum-scale=1` on the
 viewport — is worse: it disables pinch-zoom everywhere in the app. Checked at 320px, the
 narrowest phone: the tightest row (Tees · Rating · Slope) still fits at 16px.
+
+### Nearest first (Aug 21 2026)
+
+Jack asked for the standing course plans to be ordered nearest to furthest, off the
+location the app already asks for. Three pieces:
+
+- **`S.here`** — his last position fix, `{lat, lon, ts}`, rounded to three decimals.
+  `fetchWeather()` has always asked the phone for a position and thrown it away; it now
+  calls `setHere()` on the way past, and `fetchHere()` asks for one on its own (the
+  *Sort by distance* button) without pulling the weather down. **The sort is arithmetic on
+  the phone** — nothing about where he is is sent anywhere for it, and that is worth
+  keeping true.
+- **`geo` feed entries** — a coordinate is a researched fact about the world, so it
+  arrives the way a scorecard does and carries `place`, `src` and **`prec`**. `prec` is
+  `exact` when it is the club's own coordinate and `town` when it is the town centre
+  standing in for one; anything other than `exact` renders with a **`≈`**, because a
+  placement is not a measurement.
+- **`byDistance()` / `courseMiles()`** — great-circle miles, nulls last and stable, so a
+  course with no coordinate on file **keeps its place at the bottom rather than
+  disappearing**. `coursePlans().standing` is sorted, which means the live logger's course
+  picker inherits the same order for free.
+
+Two things the UI must keep saying: that the list is sorted and from when (`standingNote()`
+prints the date of the fix), and that these are **straight-line miles, not drive time** —
+an hour up the Merritt and an hour to the Cape are not the same hour. With no fix at all
+the list renders in its original order with a button, never silently re-sorted.
 
 ### Writing briefings (they render in layers — write for that)
 

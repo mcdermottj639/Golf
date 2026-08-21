@@ -19159,6 +19159,54 @@
           ]
         }
       }
+    },
+    {
+      "id": "geo-sterlingfarms-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Sterling Farms Golf Course",
+        "lat": 41.102,
+        "lon": -73.531,
+        "prec": "exact",
+        "place": "1349 Newfield Ave, Stamford, CT 06905",
+        "src": "Geocoded club address (41.1020067, -73.5305171), read Aug 21 2026 from the course's own listing"
+      }
+    },
+    {
+      "id": "geo-wianno-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Wianno Club",
+        "lat": 41.616,
+        "lon": -70.371,
+        "prec": "exact",
+        "place": "107 Sea View Ave, Osterville, MA 02655",
+        "src": "Wikipedia's coordinates for the club, 41°36'58\"N 70°22'17\"W (41.61611, -70.37139), read Aug 21 2026"
+      }
+    },
+    {
+      "id": "geo-poundridge-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Pound Ridge Golf Club",
+        "lat": 41.205,
+        "lon": -73.572,
+        "prec": "town",
+        "place": "18 High Ridge Rd, Pound Ridge, NY 10576",
+        "src": "TOWN CENTRE, not the club gate: Pound Ridge NY is 41.2052, -73.5715 (latitude.to). The club's street address is confirmed (Yelp listing, phone 914-764-5771 matching the club's own), but no published coordinate for it could be found and every mapping host is blocked from this session. Good to about 3 miles"
+      }
+    },
+    {
+      "id": "geo-lakeside-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Lakeside Country Club",
+        "lat": 42.661,
+        "lon": -77.055,
+        "prec": "town",
+        "place": "145 Rt 54 East Lake Rd, Penn Yan, NY 14527",
+        "src": "TOWN CENTRE, not the club gate: Penn Yan NY is 42.6607, -77.0551 (National Weather Service point). The club sits about 1.5 miles south-east of the village on Rt 54, and the address is the one on the map card Jack sent. Good to about 2 miles"
+      }
     }
   ]
 }

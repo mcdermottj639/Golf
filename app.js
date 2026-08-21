@@ -100,13 +100,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v52';
+const BUILD = 'v53';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v53', d:'2026-08-21', items:[
+    'Your standing course plans now sort NEAREST FIRST. Round Prep puts the closest one at the top and prints the miles beside each name, so the plan for the course you are actually driving to is the one you land on.',
+    'It uses the location your phone already gives the weather card \u2014 that fix is now kept instead of thrown away, and the sorting happens on the phone. Nothing about where you are is sent anywhere to do it.',
+    'If the app has never had a fix, Round Prep shows a Sort by distance button instead and the list stays exactly as it was until you tap it.',
+    'The distances are straight-line miles to the course, not drive time. Sterling Farms and Wianno are pinned to the club itself; Pound Ridge and Lakeside are pinned to the town, which is why they show a \u2248 \u2014 good to a couple of miles, which is plenty to order a list. A plan with no location on file keeps its place at the bottom rather than disappearing.' ] },
   { b:'v52', d:'2026-08-21', items:[
     'Drills are drawn now. Every new range and practice-green drill comes with a diagram \u2014 where the headcover goes, where the phone goes, which way the club travels, what the divot has to do \u2014 so the setup is a picture instead of a paragraph.',
     'And they read as instructions: one line of setup, numbered steps, then a PASS MARK saying what a good session actually looks like. The reasoning is still there, one tap away under Why this drill exists.',
@@ -334,6 +339,8 @@ function migrate(s){
   if(!s.carries){ const fresh = seed(); s.carries = fresh.carries; s.carriesCalibrated = false; }
   if(!s.briefings) s.briefings = [];
   if(!s.layouts) s.layouts = [];             // scorecards pushed by feed — see holeLayout()
+  if(!s.geo) s.geo = [];                     // course locations pushed by feed — see courseGeo()
+  if(s.here === undefined) s.here = null;    // his last location fix — see fetchHere()
   if(!s.mental) s.mental = [];
   if(!s.lessonEdits) s.lessonEdits = {};
   if(!s.lessonAdds) s.lessonAdds = [];
@@ -822,18 +829,49 @@ function coursePlans(){
   return {
     up: S.briefings.filter(b => b.date && b.date >= t)
       .sort((a, b) => (a.date || '').localeCompare(b.date || '')),
-    standing: S.briefings.filter(b => !b.date && b.course && known.some(n => courseMatches(b.course, n))),
+    // Standing plans are sorted NEAREST FIRST once his phone has given up a location and
+    // the courses have one on file. It is the right order for the question this list gets
+    // asked — which of these am I playing? — and it is only ever a re-ordering: a plan
+    // with no coordinate keeps its place at the bottom rather than dropping off.
+    standing: byDistance(
+      S.briefings.filter(b => !b.date && b.course && known.some(n => courseMatches(b.course, n)))),
     past: S.briefings.filter(b => b.date && b.date < t)
       .sort((a, b) => (b.date || '').localeCompare(a.date || '')),
   };
+}
+// Nulls last, and stable within each group — Array.prototype.sort is stable, so plans
+// with no location on file stay in the order the feed put them in.
+function byDistance(list){
+  if(!S.here) return list;
+  return [...list].sort((a, b) => {
+    const x = courseMiles(a.course), y = courseMiles(b.course);
+    if(x == null && y == null) return 0;
+    if(x == null) return 1;
+    if(y == null) return -1;
+    return x - y;
+  });
 }
 function planRow(b){
   const t = today();
   const tag = !b.date ? 'standing plan' : b.date < t ? `played · ${fmtDate(b.date)}` : fmtDate(b.date);
   const holes = (b.holes || []).filter(h => h && (h.play || h.note || (h.why || []).length)).length;
+  const mi = courseMilesLab(b.course);
   return `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-    <span><b>${esc(b.course)}</b><span class="sm faint"> · ${tag}${holes ? ` · ${holes} hole notes` : ''}</span><br>
+    <span><b>${esc(b.course)}</b>${mi ? `<span class="mi">${mi}</span>` : ''}<span class="sm faint"> · ${tag}${holes ? ` · ${holes} hole notes` : ''}</span><br>
     <span class="sm clip2">${esc(b.focus || 'Briefing ready')}</span></span><span class="arr">→</span></div>`;
+}
+// The line under the standing plans. It has to say which order they are in, because a list
+// that silently re-sorted itself is worse than one that never did — and where the sort
+// could not run, it has to say why rather than looking unsorted.
+function standingNote(list){
+  const base = "These don't expire — course knowledge keeps. Each one's hole notes surface on that hole while you're logging a live round there.";
+  const placed = list.filter(b => courseGeo(b.course)).length;
+  if(!S.here) return `${base}<br><br>${list.length > 1 && placed
+    ? `<button class="btn ghost tiny" data-action="locate">Sort by distance</button> — nearest first. Your location is used on this phone to do the arithmetic and is not sent anywhere.`
+    : ''}`;
+  const missing = list.length - placed;
+  return `${base}<br><br>Sorted <b>nearest first</b>, from your last location fix (${fmtDate(new Date(S.here.ts).toISOString().slice(0,10))}) — straight-line miles to the course, not drive time.${
+    missing ? ` ${missing} plan${missing > 1 ? 's have' : ' has'} no location on file yet, so ${missing > 1 ? 'they sit' : 'it sits'} at the bottom.` : ''}`;
 }
 function preps(){
   const p = coursePlans();
@@ -847,8 +885,7 @@ function preps(){
   ${any ? cheatBtn('prep') : ''}
   ${!any ? `<div class="card"><p class="sm">No course plans yet. Tell Claude where you're playing and one lands here — tee strategy, the holes that cost you, lay-up numbers off your ladder, and a note on every hole the research can support.</p></div>` : ''}
   ${block('Coming up', p.up)}
-  ${block('Standing course plans', p.standing,
-    "These don't expire — course knowledge keeps. Each one's hole notes surface on that hole while you're logging a live round there.")}
+  ${block('Standing course plans', p.standing, standingNote(p.standing))}
   ${block('Played', p.past, 'Kept for the next time you go back.')}`;
 }
 
@@ -3938,6 +3975,40 @@ function courseMatches(a, b){
   const base = s => (s || '').trim().toLowerCase().replace(/\s+[—–]\s+.*$/, '');
   return (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase() || base(a) === base(b);
 }
+// ----- How far away a course is -----
+// Course locations arrive by feed (`geo` entries), same as scorecards do, and for the same
+// reason: a coordinate is a researched fact about the world, so it carries where it came
+// from and how precise it is rather than being guessed at in the app.
+function courseGeo(name){
+  return (S.geo || []).find(g => g.course && courseMatches(g.course, name)) || null;
+}
+// Great-circle miles. This is the distance a crow flies, NOT a drive time — an hour up the
+// Merritt and an hour out to the Cape are not the same hour, and nothing here pretends
+// otherwise. It is enough to order a list, which is all it is asked to do.
+function milesBetween(a, b){
+  const R = 3958.8, rad = d => d * Math.PI / 180;
+  const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+  const h = Math.sin(dLat/2)**2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon/2)**2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+// null means "cannot say" — no fix, or no location on file for that course. Every caller
+// has to handle it, because a course with no coordinate must never sort as if it were at
+// the centre of the earth.
+function courseMiles(name){
+  const g = courseGeo(name);
+  if(!g || !S.here) return null;
+  return milesBetween(S.here, g);
+}
+const milesLab = m => m == null ? '' : m < 10 ? `${m.toFixed(1)} mi` : `${Math.round(m)} mi`;
+// A coordinate that is really the town's, not the club's, is worth a mile or two of error
+// and the label says so — a "≈" is the difference between a measurement and a placement.
+function courseMilesLab(name){
+  const m = courseMiles(name);
+  if(m == null) return '';
+  const g = courseGeo(name);
+  return (g && g.prec && g.prec !== 'exact' ? '≈ ' : '') + milesLab(m);
+}
+
 function liveBriefing(L){
   const all = S.briefings.filter(b => b.course && courseMatches(b.course, L.course));
   if(!all.length) return null;
@@ -5039,6 +5110,7 @@ const ACTIONS = {
     toast(S.settings.theme === 'night' ? 'Night mode ☾' : 'Heritage mode ☀');
   },
   'get-weather': () => fetchWeather(true),
+  'locate': () => fetchHere(true),
   'cheat-open': el => openCheat(el.dataset.disc, el.dataset.id),
   'cheat-close': () => closeCheat(),
   // A manual version of what visibilitychange does, for when you want to force it.
@@ -5058,11 +5130,36 @@ function applyTheme(){
   if(b) b.textContent = S.settings.theme === 'night' ? '☀' : '☾';
 }
 
+// ----- Where he is -----
+// The weather fetch has always asked the phone for a position and then thrown it away.
+// Keeping it costs nothing and answers a second question — which of his course plans is
+// the nearest — so the fix is now stored in its own place rather than inside S.weather:
+// it outlives a weather refresh, and it is the thing a distance sort actually depends on.
+//
+// It stays on the phone. Sorting by distance is arithmetic, not a lookup — nothing about
+// where he is leaves the device for it. (The weather call itself does send coordinates to
+// open-meteo, exactly as it always has.) Rounded to three decimals, ~100 m, which is far
+// finer than a mile-scale sort needs.
+function setHere(pos){
+  const { latitude, longitude } = pos.coords;
+  S.here = { lat:+latitude.toFixed(3), lon:+longitude.toFixed(3), ts:Date.now() };
+  save();
+  return S.here;
+}
+// Asking for a position on its own, for the sort, without pulling the weather down too.
+function fetchHere(manual){
+  if(!navigator.geolocation){ if(manual) toast('No location on this device'); return; }
+  navigator.geolocation.getCurrentPosition(pos => { setHere(pos); rerender(); },
+    () => { if(manual) toast('Location permission needed to sort by distance'); },
+    { timeout:8000, maximumAge:600000 });
+}
+
 function fetchWeather(manual){
   if(!manual && S.weather && Date.now() - S.weather.ts < 30*60*1000) return;
   if(!navigator.geolocation){ if(manual) toast('No location on this device'); return; }
   navigator.geolocation.getCurrentPosition(pos => {
     const { latitude, longitude } = pos.coords;
+    setHere(pos);   // free — the phone has just told us, and the sort wants it
     fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(3)}&longitude=${longitude.toFixed(3)}&current=temperature_2m,wind_speed_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph`)
       .then(r => r.json())
       .then(j => {
@@ -5211,6 +5308,8 @@ function updateLine(e){
     case 'action-update': return { h:'To-do reworded', s:clip(e.text, 104), act:go('coach') };
     case 'course-add':    return { h:`Course added · ${nm(e.course)}`, s:'Rate it after you play it', act:go('courses') };
     case 'course-remove': return { h:`Course removed · ${e.target || ''}`, s:'', act:go('courses') };
+    case 'geo':           return { h:`Location on file · ${(e.geo && e.geo.course) || ''}`,
+      s:'Round Prep can sort your standing plans nearest first', act:go('preps') };
     case 'layout':        return { h:`Scorecard on file · ${(e.layout && e.layout.course) || ''}`,
       s:`Par${e.layout && e.layout.si ? ' and stroke index' : ''} prefills now when you log a live round there`,
       act:go('courses') };
@@ -5346,6 +5445,15 @@ function applyFeed(feed){
           !(x.course === c.course && (x.nine || null) === (c.nine || null)));
         S.layouts.push({ id:e.id, ...c });
       }
+    }
+    // Where a course IS. Same shape of thing as a scorecard — a researched fact about the
+    // world that the app cannot work out for itself — so it arrives the same way, carries
+    // its source and its precision, and replaces any earlier fix for that course.
+    else if(e.type === 'geo' && e.geo && e.geo.course
+            && typeof e.geo.lat === 'number' && typeof e.geo.lon === 'number'
+            && Math.abs(e.geo.lat) <= 90 && Math.abs(e.geo.lon) <= 180){
+      S.geo = (S.geo || []).filter(g => !courseMatches(g.course, e.geo.course));
+      S.geo.push({ id:e.id, ...e.geo });
     }
     else if(e.type === 'stats' && e.stats){
       if(e.replaces) S.stats = S.stats.filter(x => x.id !== e.replaces);
