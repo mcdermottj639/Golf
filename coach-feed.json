@@ -25505,6 +25505,203 @@
           ]
         }
       }
+    },
+    {
+      "id": "add-neshaminyvalley-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Neshaminy Valley Golf Club",
+        "st": "PA",
+        "pr": 77
+      }
+    },
+    {
+      "id": "add-springfieldgolfcenter-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Springfield Golf Center",
+        "st": "PA",
+        "pr": 77
+      }
+    },
+    {
+      "id": "add-westover-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Westover Country Club",
+        "st": "PA",
+        "pr": 78
+      }
+    },
+    {
+      "id": "add-greenknoll-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Green Knoll Golf Course",
+        "st": "NJ",
+        "pr": 80
+      }
+    },
+    {
+      "id": "add-weequahic-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Weequahic Park Golf Course",
+        "st": "NJ",
+        "pr": 80
+      }
+    },
+    {
+      "id": "add-mountainview-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Mountain View Golf Course",
+        "st": "NJ",
+        "pr": 80
+      }
+    },
+    {
+      "id": "add-islandsend-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Islands End Golf and Country Club",
+        "st": "NY",
+        "pr": 80
+      }
+    },
+    {
+      "id": "add-quailvillage-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Quail Village Golf Course",
+        "st": "FL",
+        "pr": 80
+      }
+    },
+    {
+      "id": "add-bonitabaywest-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Bonita Bay West — Bay Island",
+        "st": "FL",
+        "pr": 81
+      }
+    },
+    {
+      "id": "add-quailbrook-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Quail Brook Golf Course",
+        "st": "NJ",
+        "pr": 81
+      }
+    },
+    {
+      "id": "add-northamptonvalley-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Northampton Valley Country Club",
+        "st": "PA",
+        "pr": 81
+      }
+    },
+    {
+      "id": "add-concordia-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Concordia Golf Club",
+        "st": "NJ"
+      }
+    },
+    {
+      "id": "add-newyorkcc-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "New York Country Club",
+        "st": "NY",
+        "pr": 83
+      }
+    },
+    {
+      "id": "add-lawsonia-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "The Golf Courses of Lawsonia — Links",
+        "st": "WI",
+        "pr": 83
+      }
+    },
+    {
+      "id": "add-arrowheadheritage-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Arrowhead Golf Course at Heritage Greens",
+        "st": "FL",
+        "pr": 83
+      }
+    },
+    {
+      "id": "add-bassriver-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Bass River Golf Course",
+        "st": "MA",
+        "pr": 83
+      }
+    },
+    {
+      "id": "add-middletowncc-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Middletown Country Club",
+        "st": "PA",
+        "pr": 83
+      }
+    },
+    {
+      "id": "add-broadrun-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Broad Run Golf Club",
+        "st": "PA",
+        "pr": 84
+      }
+    },
+    {
+      "id": "add-whistlingstraits-irish-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Whistling Straits — Irish",
+        "st": "WI",
+        "pr": 85
+      }
+    },
+    {
+      "id": "add-blackwolfrun-river-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Blackwolf Run — River",
+        "st": "WI",
+        "pr": 89
+      }
+    },
+    {
+      "id": "add-whistlingstraits-straits-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Whistling Straits — Straits",
+        "st": "WI",
+        "pr": 91
+      }
+    },
+    {
+      "id": "add-sandvalley-mammoth-20260821",
+      "type": "course-add",
+      "course": {
+        "name": "Sand Valley Golf Resort — Mammoth Dunes",
+        "st": "WI",
+        "pr": 91
+      }
     }
   ]
 }
