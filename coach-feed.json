@@ -16869,6 +16869,735 @@
         "body": "Distance control gets practised as if a green were flat, and no green is. The same 25 feet can need two very different strokes, and the miss is not symmetrical: leave an uphill putt short and you have a straightforward eight-footer, but run a downhill putt six feet past and you have the exact putt this whole project is about — a short one, breaking, that you have to hole. That is how a pace error turns into the fault you already have. Most players learn the uphill number and apply it to everything, which is why downhill lags finish long far more often than uphill ones finish short. What you want out of this is not a feel but a RATIO you can carry: how much less stroke a downhill putt of the same length needs on this green today, and how much more an uphill one takes.",
         "drill": "Find a slope you can putt straight up and straight down — same line, same length, about 25 feet. 5 balls up, 5 balls down, alternating rather than in blocks. Measure how far past or short each one finishes in paces and write down the two averages. Then repeat at 12 feet. What you are after is one sentence you can say on the course: on a green this speed, downhill takes about X less and uphill about Y more. Re-run it in the first three minutes of any round on a green you do not know, at one distance only — the ratio changes with green speed, and a number from a fast green applied to a slow one is worse than no number."
       }
+    },
+    {
+      "id": "layout-wianno-20260821-card",
+      "type": "layout",
+      "layout": {
+        "course": "Wianno Club",
+        "tot": 70,
+        "par": [
+          4,
+          4,
+          3,
+          5,
+          3,
+          4,
+          4,
+          5,
+          3,
+          4,
+          3,
+          5,
+          4,
+          3,
+          4,
+          4,
+          4,
+          4
+        ],
+        "si": [
+          15,
+          1,
+          17,
+          11,
+          7,
+          5,
+          9,
+          3,
+          13,
+          2,
+          18,
+          10,
+          16,
+          12,
+          6,
+          8,
+          14,
+          4
+        ],
+        "ver": "reconciled",
+        "as": "2026-08-21",
+        "src": "18Birdies' Wianno Club card, BLUE tees (OUT 3,031 / IN 3,055 / 6,086, par 35-35-70). Every one of the eighteen pars matches the pars on Jack's own five nines from the Jul 9-11 2026 member-guest, and the stroke indexes are a clean permutation of 1-18 with the odds on the front and the evens on the back. Yardage totals disagree across sources - GolfLink and Golf Digest both say 5,900 from the longest tees and Top 100 puts the front nine at 2,871 from the back tees - so the PARS and STROKE INDEXES here are corroborated and the yardages are Blue-card figures from one source"
+      }
+    },
+    {
+      "id": "briefing-wianno-standing-20260821",
+      "type": "briefing",
+      "briefing": {
+        "course": "Wianno Club",
+        "focus": "6,086 yards, par 70, Donald Ross 1916, on the wind off Nantucket Sound with small square greens. You have played it five nines in one week, so this plan is mostly YOUR OWN record rather than research — and your record says the round is decided on two short holes. The 1st (319) and the 3rd (150) cost you +10 of your +37 across the member-guest, off six holes played. Both are the sort of hole a driver cannot help with.",
+        "rules": [
+          "1st and 3rd cost you +10 of +37 — they are the round",
+          "319 yards on the 1st — 2-iron, not driver",
+          "You have never parred the opening hole",
+          "8th, 14th, 16th are yours — don't change them",
+          "Wind off the Sound decides all five par 3s",
+          "9th carries the corner of Parker Pond",
+          "Centreline bunkers on 12 and 13 — pick a side",
+          "Small square greens — middle, never the flag",
+          "Warm up. Cold, the 1st costs you +1.67",
+          "Par 5s: 4 · 8 · 12 — lay to a full wedge"
+        ],
+        "holes": [
+          {
+            "n": 1,
+            "yds": 319,
+            "par": 4,
+            "play": "*2-iron* — 319 yards is not a driver",
+            "club": [
+              "2-iron"
+            ],
+            "leaves": "*114 in* — a 50° or a soft PW on the estimated ladder",
+            "avoid": "*Left*. Both opening drives that got away from you here went hard left",
+            "avoidDir": "L",
+            "avoidOn": "tee",
+            "why": [
+              "319 yards, par 4, *stroke index 15* — the fourth-easiest hole on the card",
+              "*Your most expensive hole at Wianno*: 6, 6, 5 in three plays, +1.67 a hole. You have never parred it",
+              "It and the 3rd account for *+10 of your +37* across the whole member-guest, off six holes played",
+              "A 2-iron leaves a wedge and takes the left miss out of play. The driver is what made those sixes"
+            ]
+          },
+          {
+            "n": 2,
+            "yds": 452,
+            "par": 4,
+            "play": "*Driver* — 452 is the longest par 4 out here",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*217 in* — a 2-iron, so play for the front edge",
+            "why": [
+              "452, par 4, *stroke index 1* — the hardest hole on the card",
+              "The 2nd and the 8th *share a fairway*, separated by four crescent-shaped bunkers. Know which side is yours before you swing",
+              "Your record is 6, 3, 5 — the 3 is the best hole you have played here, so this one is not the problem",
+              "*Bogey is a good score.* Two putts from the front edge beats a 2-iron at a flag"
+            ]
+          },
+          {
+            "n": 3,
+            "yds": 150,
+            "par": 3,
+            "play": "*8-iron to the middle* — and one more club if it is into the breeze",
+            "club": [
+              "8-iron"
+            ],
+            "avoid": "*Short.* Every one of the three was a 5 or a 4, never a 3",
+            "avoidDir": "S",
+            "avoidOn": "green",
+            "why": [
+              "150, par 3, *stroke index 17* — the second-easiest hole on the card",
+              "*Your other most expensive hole*: 5, 5, 4, +1.67 a hole, and the hole you have played worst relative to its rating",
+              "Nothing is published about what defends this green — Wianno is private and no hole tour exists. You have stood on it three times: log a note next round and the app will carry it",
+              "8-iron carries 146 on the estimated ladder. Into a Cape crosswind that is a 7"
+            ]
+          },
+          {
+            "n": 4,
+            "yds": 465,
+            "par": 5,
+            "play": "*Driver, then a 9-iron lay-up* — leaves a full 56°",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*96 in* — a full 56° rather than a half wedge",
+            "why": [
+              "465, par 5, *stroke index 11* — one of the two reachable-for-some par 5s here",
+              "Your record is 6, 6, 5. *No par in three plays* on a hole rated the 11th-hardest",
+              "Reachable is the trap: driver plus 230 is not a shot on your ladder, and the lay-up to a full wedge is"
+            ]
+          },
+          {
+            "n": 5,
+            "yds": 210,
+            "par": 3,
+            "play": "*4-iron* — the front edge is a fine result",
+            "club": [
+              "4-iron"
+            ],
+            "why": [
+              "210, par 3, *stroke index 7* — the longest par 3 on the card and the hardest of the five",
+              "Your record is 4, 3, 4 — +0.67, which is *better than your average hole*. This one already works",
+              "4-iron carries 190. Nobody is on this green in regulation from 210 into wind — a 4 is a fine score"
+            ]
+          },
+          {
+            "n": 6,
+            "yds": 380,
+            "par": 4,
+            "play": "*Driver* — 145 in from the fairway",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*145* — an 8-iron",
+            "why": [
+              "380, par 4, *stroke index 5*",
+              "Your record is 4, 4, 5 — *+0.33 a hole*, your best par 4 here. Keep doing what you are doing"
+            ]
+          },
+          {
+            "n": 7,
+            "yds": 340,
+            "par": 4,
+            "play": "*2-iron* — a short dogleg left, and the green is small and square",
+            "club": [
+              "2-iron"
+            ],
+            "leaves": "*135 in* — a 9-iron to the middle",
+            "why": [
+              "340, par 4, *stroke index 9*. Sourced: a *short doglegging par 4 to a squared-edge green* — one of many square greens here",
+              "Your record is 6, 5, 4 — +1.00 a hole",
+              "A square, compact green is a *middle of the green* target in a crosswind. There is no good short-side here"
+            ]
+          },
+          {
+            "n": 8,
+            "yds": 555,
+            "par": 5,
+            "play": "*Three shots.* This is already your best hole — do not change it",
+            "why": [
+              "555, par 5, *stroke index 3* — the longest hole on the card and the third-hardest",
+              "*Your record is 5, 5, 5.* Three plays, three pars, on the hardest par 5 out here. It is the only hole at Wianno you have never dropped a shot on",
+              "Shares its fairway with the 2nd, split by the four crescent bunkers"
+            ]
+          },
+          {
+            "n": 9,
+            "yds": 160,
+            "par": 3,
+            "play": "*7-iron* — carry the corner of the pond, middle of the green",
+            "club": [
+              "7-iron"
+            ],
+            "avoid": "*Short* — the tee shot carries the northeast corner of *Parker Pond*",
+            "avoidDir": "S",
+            "avoidOn": "green",
+            "why": [
+              "160, par 3, *stroke index 13*. Sourced: the tee shot *must carry the northeast corner of Parker Pond*, and it is an exposed tee — club selection is dominated by the wind",
+              "Your record is 4, 3, 4",
+              "Top 100 lists this hole at *134 yards from the back tees* against 160 on the Blue card, so check the marker on the day"
+            ]
+          },
+          {
+            "n": 10,
+            "yds": 436,
+            "par": 4,
+            "play": "*Driver* — and a long one in",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*201* — a 2-iron, so the front edge is the target",
+            "why": [
+              "436, par 4, *stroke index 2* — the second-hardest hole on the card and the hardest on the back",
+              "Your record is 4 and 6 — one par, one double",
+              "*Bogey is a good score.* A 2-iron at a flag from 200 is how the 6 happens"
+            ]
+          },
+          {
+            "n": 11,
+            "yds": 118,
+            "par": 3,
+            "play": "*PW* — the shortest hole on the card",
+            "club": [
+              "pw"
+            ],
+            "why": [
+              "118, par 3, *stroke index 18* — the easiest hole at Wianno",
+              "Your record is 5 and 3. *The 5 is the kind of hole that loses a match* — a double on the easiest hole out here",
+              "PW carries 122 on the estimated ladder. Middle of the green, two putts, walk"
+            ]
+          },
+          {
+            "n": 12,
+            "yds": 470,
+            "par": 5,
+            "play": "*Pick a side off the tee* — there is a centreline bunker",
+            "leaves": "*89 in* after an 8-iron second — a full 56°",
+            "avoid": "*The middle.* The bunker is in the centre of the fairway, not the edge",
+            "why": [
+              "470, par 5, *stroke index 10*, and the second reachable-for-some par 5",
+              "Sourced: *centreline bunkers on the 12th and 13th* complicate otherwise modest yardages — the ask is to pick a side and open up the approach angle",
+              "Your record is 6 and 6. *You have never made par here*, and it is a par 5 rated 10th-hardest",
+              "Zero par-5 birdies is a finding you already carry from two separate sources. This hole and the 4th are where that gets fixed"
+            ]
+          },
+          {
+            "n": 13,
+            "yds": 290,
+            "par": 4,
+            "play": "*4-iron* — short of the centreline bunker",
+            "club": [
+              "4-iron"
+            ],
+            "leaves": "*100 in* — a full 50°",
+            "avoid": "*The middle*, again — the second of the two centreline bunkers",
+            "why": [
+              "290, par 4, *stroke index 16*",
+              "Sourced: the 12th and 13th both carry *centreline bunkering* — the yardage is modest and the bunker is the whole hole",
+              "Your record is 5 and 5. A 290-yard par 4 you have bogeyed twice is a *4-iron and a wedge*, not a driver"
+            ]
+          },
+          {
+            "n": 14,
+            "yds": 192,
+            "par": 3,
+            "play": "*4-iron to the middle*",
+            "club": [
+              "4-iron"
+            ],
+            "why": [
+              "192, par 3, *stroke index 12*",
+              "*Your record is 3 and 3* — two plays, two pars. Along with the 8th and the 16th, this is a hole you already own"
+            ]
+          },
+          {
+            "n": 15,
+            "yds": 405,
+            "par": 4,
+            "play": "*Driver* — 170 in",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*170* — a 6-iron",
+            "why": [
+              "405, par 4, *stroke index 6*",
+              "Your record is 6 and 5 — *+1.50 a hole, your worst on the back nine*",
+              "Nothing is published about this hole. Write a note on it next round"
+            ]
+          },
+          {
+            "n": 16,
+            "yds": 402,
+            "par": 4,
+            "play": "*Driver* — 167 in",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*167* — a 6-iron",
+            "why": [
+              "402, par 4, *stroke index 8*",
+              "*Your record is 4 and 4* — two pars on the eighth-hardest hole on the card. Whatever you are doing here, keep it"
+            ]
+          },
+          {
+            "n": 17,
+            "yds": 320,
+            "par": 4,
+            "play": "*2-iron* — 115 in",
+            "club": [
+              "2-iron"
+            ],
+            "leaves": "*115* — a 50°",
+            "avoid": "*The hero drive.* Two of your five matches here were still live standing on 17",
+            "why": [
+              "320, par 4, *stroke index 14*",
+              "Your record is 5 and 4",
+              "This is the hole where the *Jul 10 back-nine crumble* started: bogey-double on 17 and 18. That is one card in six and it is on this tee"
+            ]
+          },
+          {
+            "n": 18,
+            "yds": 422,
+            "par": 4,
+            "play": "*Driver* — 187 in, and take the middle",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*187* — a 4-iron",
+            "avoid": "*Short-siding yourself* from 187. The front half of the green is the whole target",
+            "why": [
+              "422, par 4, *stroke index 4* — the fourth-hardest hole on the card, and the closing hole",
+              "Your record is 6 and 5 — *+1.50 a hole*, tied for your worst on the back",
+              "Both of your two matches that were still live at the finish were lost on *short putts*, with a putter that has since gone back. The LINK is in the bag now — the Short Putts plan is the one to have read before you get here"
+            ]
+          }
+        ],
+        "sections": [
+          {
+            "t": "Your two most expensive holes",
+            "k": "The 1st and the 3rd cost you a quarter of everything you lost at Wianno, and neither is a hard hole.",
+            "b": "Across the five nines of the Jul 9-11 member-guest you played the 1st three times for 6, 6, 5 and the 3rd three times for 5, 5, 4. That is +10 between them, out of +37 for the whole event, off six of the forty-five holes you played.\n\nWhat makes it worth a plan rather than a shrug is what those holes ARE. The 1st is 319 yards and stroke index 15 - the fourth-easiest hole on the card. The 3rd is a 150-yard par 3 at stroke index 17 - the second-easiest. You are not being beaten by the hard holes here. The 2nd (stroke index 1) you have played in 6, 3, 5, and the 8th (stroke index 3) in three straight pars.\n\nSo the two fixes are small and specific. On the 1st, take the driver out of it: 2-iron leaves 114 yards, which is a full 50-degree, and it takes the left miss out of play - both opening drives that got away from you here went hard left, which is the fault the driver film is already chasing. On the 3rd, take one more club than the yardage says and aim at the middle: three plays, no par, and every miss was a dropped shot rather than a disaster.\n\nOne honest caveat on the 1st: your record there is also the coldest swing of every round, and the Mental tab has been reporting the opening third as your worst. Warm-up and hole difficulty are confounded on that tee. The 2-iron helps either way."
+          },
+          {
+            "t": "What the card says",
+            "k": "Par 70 with five par 3s and three par 5s - the par 3s are a third of your scoring here.",
+            "b": "Blue tees: OUT 3,031, IN 3,055, 6,086 total, par 35-35-70. Rating and slope off your own GHIN cards from July: 35.4/125 front, 35.1/125 back.\n\nThe shape of it: TEN par 4s, FIVE par 3s and THREE par 5s. Five par 3s is unusual and it matters - a third of your scoring chances here are tee shots to a green, in wind, off a Cape links-ish turf. They are 150, 210, 160, 118 and 192 yards, so they ask for an 8-iron, a 4-iron, a 7-iron, a pitching wedge and a 4-iron on your estimated ladder. Nothing longer than a 4-iron, and two of them are wedges or short irons.\n\nYour record on the five: 3rd +1.67, 5th +0.67, 9th +0.67, 11th +1.00, 14th 0.00. So the two SHORTEST of them (the 150-yard 3rd and the 118-yard 11th) are the two you play worst, and the 210-yard 5th - the hardest par 3 on the card - you play better than your average hole. That is a straight aiming-and-commitment read, not a distance one.\n\nThe stroke indexes run odds on the front and evens on the back, which is the standard convention and a good sign the card is a real one. Hardest four: 2, 10, 8, 18. Easiest four: 11, 3, 13, 1 - and you have lost eight shots on three of those four."
+          },
+          {
+            "t": "Wind, square greens and firm turf",
+            "k": "Middle of the green, always - a compact square green in a crosswind has no safe short side.",
+            "b": "Sourced, from the course write-ups: a compact, wind-exposed Cape layout with short walking connections, modest elevation change and frequent cross-winds off Nantucket Sound. Fast and firm conditions, a handful of heavily-sloped greens, and a set of square-edged green pads - the 7th is named as one of many square greens on the course. Hole variety leans to shorter par 4s that reward placement and two reachable-for-some par 5s.\n\nWhat that means for how you play it. A compact green pad with square edges and firm turf is a target that does not hold a shot coming in on a bad line - which is the case for the middle of the green on every approach, and against ever aiming at an edge. Add a crosswind and the short side stops being a place you can get up and down from.\n\nIt also means the ball runs. On a firm Cape course the number is not the carry number, and a 3 that lands pin-high finishes long. Where you have a choice between two clubs on a downwind approach, the smaller one lands short and runs on; the bigger one is over the back and dead.\n\nWhat is NOT sourced and should not be guessed: the individual green slopes, the bunker positions on fifteen of the eighteen holes, and where the wind normally comes from. Wianno is private, there is no published hole-by-hole tour, and no plan can invent them."
+          },
+          {
+            "t": "The holes you already own",
+            "k": "The 8th, the 14th and the 16th - five plays between them, five pars, and two are rated top-eight hardest.",
+            "b": "The 8th: 555 yards, par 5, stroke index 3 - the longest hole on the card and the third-hardest. You have played it three times for 5, 5, 5. That is the only hole at Wianno you have never dropped a shot on, and it is the hardest par 5 out there.\n\nThe 14th: 192-yard par 3, stroke index 12. Two plays, two 3s.\n\nThe 16th: 402-yard par 4, stroke index 8 - the eighth-hardest hole on the card. Two plays, two 4s.\n\nThis is in the plan for one reason: nothing in the app tells you to keep doing something, and it should. Whatever club and whatever line you have been using on those three, that is the pattern to repeat, not to review. The prep list is the 1st, the 3rd, the 12th and the 15th - and none of the three above."
+          },
+          {
+            "t": "Match play, and what your five matches actually said",
+            "k": "Two of the five were still live at the finish, and both were lost on short putts with a putter that has since gone back.",
+            "b": "You played five 9-hole matches here with your brother, Jul 9-11 2026, Blue tees. Of those five, only two were live at the finish - a halve and a one-hole margin. A match lost 2 down was decided by scoring, not by nerve, and the Mental tab is deliberate about not turning those into a closing story.\n\nThe two that WERE live are both matches you lost short putts in, with the arc-suited Phantom 7.5 in the bag - a putter that mismatched your straight-back-straight-through stroke and went back on Jul 20. That reframe is the most useful thing the Mental tab has produced: on your own record, your closing problem is a short-putt problem. The LINK is in the bag now and the Short Putts plan is the thing to have read on the way up.\n\nThe other card-checked example: the first match (Jul 9 front, 46) is the worst card of the event by five shots, and holes 1-3 went +2, +2, +2 - six over in three holes, against +3 over the first three on each of the other four nines. That is the match where an opponent got into your head. The honest caveat, unchanged: it was also the coldest start of the week, so warm-up and partner are confounded on that one card and neither is established.\n\nNothing here needs doing on the course. It is here because the Mental tab is off-course by design and this is the course it is about."
+          },
+          {
+            "t": "What is not published, and what to log",
+            "k": "Twelve of the eighteen holes have no researched note at all - Wianno is private and the hole tours do not exist.",
+            "b": "Sourced hole facts, all of them, in full: the 2nd and 8th share a fairway separated by four crescent-shaped bunkers; the 7th is a short left dogleg to a squared-edge green; the 9th carries the northeast corner of Parker Pond; the 12th and 13th have centreline bunkers. That is five holes. Everything else on the hole notes above is your own scorecard.\n\nThat is not a gap that more searching fixes. Wianno is a private club with no public hole-by-hole tour, no course-tour video and no published yardage book. Rather than describe holes nobody has written about, those holes carry your record and nothing else - which is the rule this app runs on.\n\nSo the way this plan gets better is you. Log the round in the live logger and write a hole note on the 1st, the 3rd, the 12th and the 15th - where the trouble actually is, which side the pin tends to be cut, what the wind was doing. Notes are carried, never parsed: nothing in the app reads them for keywords, but the next time you stand on that tee, the logger prints what you wrote last time under your record for the hole. Four notes turns the twelve blank holes into a real plan over two visits.\n\nAlso worth logging in one tap each: putts per hole and how long the putt you holed was. Two of your five matches here turned on short putts and there is no putt data on any of those five cards, so 'missed short putts when it mattered' can be remembered but not checked."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "Pars and stroke indexes are corroborated by two independent sources; the yardages come from one card and the totals disagree across publishers.",
+            "b": "RESEARCHED - the card. 18Birdies' Wianno Club scorecard, Blue tees: OUT 3,031, IN 3,055, 6,086, par 35-35-70, with a yardage, par and handicap for all eighteen holes. All eighteen pars match the pars on your own five GHIN cards from Jul 9-11 2026 exactly, front and back, which is an independent corroboration of both the pars and the hole numbering. The stroke indexes are a clean permutation of 1-18 with odds on the front and evens on the back. This card is now on file as a `layout` entry, so par and stroke index prefill when you start a live round there - which also unlocks the hardest-six / easiest-six split on the round card.\n\nRESEARCHED - conflicting totals, stated rather than resolved. GolfLink and Golf Digest both give 5,900 yards from the longest tees and a 70.4/125 rating; Top 100 Golf Courses puts the front nine at 2,871 from the back tees, against 3,031 on the Blue card. Three published totals, three different numbers. What is NOT in doubt: par 70, the par of every individual hole, and your own GHIN ratings of 35.4/125 and 35.1/125. Treat the individual yardages as approximate and check the markers on the day.\n\nRESEARCHED - hole facts. Top 100 Golf Courses: the 2nd and 8th are separated on the same fairway by four crescent-shaped bunkers; the 7th is a left-doglegged short par 4 with one of many square-shaped greens; the 9th tee shot must carry the northeast corner of Parker Pond (they list it at 134 yards from the back tees). Greens Visited: compact, wind-exposed Cape layout around Parker Pond and Neck Pond, cross-winds off the Sound, fast and firm, heavily-sloped greens, shorter par 4s that reward placement, two reachable-for-some par 5s, and centreline bunkers on the 12th and 13th. Golf Digest / GolfLink: Donald Ross, opened 1916, the original nine redesigned and a second nine added in 1919.\n\nNOT FOUND, and not invented: hole-by-hole descriptions for thirteen of the eighteen holes, bunker positions, green slopes, prevailing wind direction, and any yardage book. Wianno is private and publishes none of it. Six searches, no source.\n\nFROM YOUR CARDS. Five 9-hole matches, Jul 9-11 2026, Blue tees, 45 holes, 212 strokes, +37, transcribed from the GHIN cards. Every per-hole average quoted above is computed off those five cards: the front nine holes have three plays each, the back nine two. No putt data, no fairway or green data on any of them - the hole-by-hole is scores only, so nothing here says anything about how you were missing.\n\nINFERRED, and flagged as such: that the 1st playing +1.67 is partly a cold-start effect rather than the hole (your opening third runs +1.05 a hole across all cards, and one Wianno card carries a confounded partner-disruption story). That a 2-iron off the 1st is the right club - it follows from the yardage and your ladder, not from having seen the hole. That firm-and-fast turf means the ball runs out on approaches; sourced as a condition, applied as an inference.\n\nESTIMATED, throughout: every 'leaves' number comes off the carry ladder, which is not calibrated. Driver 235, 2-iron 205, 4-iron 190, 6-iron 170, 7-iron 158, 8-iron 146, 9-iron 134, PW 122, 50-degree 108, 56-degree 95. The 5-wood carry is unmeasured, so it is named as an option nowhere a number was needed."
+          }
+        ]
+      }
+    },
+    {
+      "id": "briefing-poundridge-standing-20260821",
+      "type": "briefing",
+      "briefing": {
+        "course": "Pound Ridge Golf Club",
+        "focus": "Pete Dye's only New York design, ranked 7th-toughest public course in the country by Golf Advisor's readers, and you have never played it. 6,261 from the Granite tees is the card for your game. Water is in play on six holes, pot bunkers and 14,000 feet of rock wall are in play everywhere, and the greens are small and often crowned — so the whole plan is position off the tee and the middle of every green. There is no record here to lean on: this is research only, and it says take bogey on 2, 18, 8 and 17 without an argument.",
+        "rules": [
+          "Water: 1 · 2 · 3 · 4 · 15 · 18 — know which shot",
+          "Top-10 toughest in the country — bogey is fine",
+          "Stroke index 1-2-3-4 are 2 · 18 · 8 · 17",
+          "Position beats distance — bunkers have mounds",
+          "Centre of the green, always. Crowned greens shed",
+          "Miss RIGHT on 18 — everything left is dead",
+          "Par 5s 7 · 9 · 13 · 16 — lay to a FULL wedge",
+          "13: drive over Pete's Rock, then lay up",
+          "Granite tees (6,261) — not the Oak (6,773)",
+          "First time here: log a note on every blind tee"
+        ],
+        "holes": [
+          {
+            "n": 1,
+            "yds": 380,
+            "par": 4,
+            "play": "*Driver* — the one genuinely open tee shot out here",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*145 in* — an 8-iron on the estimated ladder",
+            "avoid": "*Long.* A bunker horseshoes the green and there is *water behind it*",
+            "avoidDir": "Lg",
+            "avoidOn": "green",
+            "why": [
+              "380, par 4, *stroke index 7*",
+              "Sourced: the drive is *nice and open* — reviewers single it out as the friendly tee shot of the round — but the green complex is treacherous, ringed by a horseshoe bunker with water behind",
+              "So the approach is the shot on this hole, not the drive. *Middle of the green*, and the front half of the middle at that"
+            ]
+          },
+          {
+            "n": 2,
+            "yds": 413,
+            "par": 4,
+            "play": "*Driver, and accept the narrowing* — you need the yardage here",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*178 in* — a 5-iron, over water if you go at the flag",
+            "avoid": "*Short.* The approach carries *water* unless you take the bail-out left",
+            "avoidDir": "S",
+            "avoidOn": "green",
+            "why": [
+              "413, par 4, *stroke index 1* — the hardest hole on the course, and it plays as long as two of the par 5s",
+              "Sourced: the *further you hit it, the narrower the fairway gets*, with bunkers left for the long drive. Downslope off the tee, then the hole climbs back up to the green",
+              "Sourced: the approach *must carry water* to get at the pin — and there is *ample bail-out left of the green*",
+              "*Take the bail-out.* Stroke index 1, a 5-iron in your hands and water short is a bogey hole played sensibly and a triple played bravely"
+            ]
+          },
+          {
+            "n": 3,
+            "yds": 369,
+            "par": 4,
+            "play": "*Driver or 2-iron* — whichever you can carry the water with",
+            "club": [
+              "driver",
+              "2-iron"
+            ],
+            "leaves": "*134 with driver · 164 with the 2-iron*",
+            "avoid": "*Right.* An *enormous mound of bunkering* runs down that side",
+            "avoidDir": "R",
+            "avoidOn": "tee",
+            "why": [
+              "369, par 4, *stroke index 5*",
+              "Sourced: the drive has to *carry water* and avoid a huge bunker mound right",
+              "Water on the tee shot means the carry number decides the club — not the leave. If the 2-iron clears it, hit the 2-iron"
+            ]
+          },
+          {
+            "n": 4,
+            "yds": 139,
+            "par": 3,
+            "play": "*9-iron to the middle* — 8-iron if there is any wind",
+            "club": [
+              "9-iron"
+            ],
+            "avoid": "*Right.* Bunkers right and then *water further right*",
+            "avoidDir": "R",
+            "avoidOn": "green",
+            "why": [
+              "139, par 3, *stroke index 15*",
+              "Sourced: bunkers short, left and right, with water beyond the right ones. One reviewer's summary is worth quoting — *should be an easy hole, but a bad shot can easily lead to a real high number*",
+              "9-iron carries 134 on the estimated ladder, so the middle of the green is the club — not the flag"
+            ]
+          },
+          {
+            "n": 5,
+            "yds": 290,
+            "par": 4,
+            "play": "*2-iron or 4-iron* — pick the one that leaves a FULL wedge",
+            "club": [
+              "2-iron",
+              "4-iron"
+            ],
+            "leaves": "*85 after the 2-iron · 100 after the 4-iron*",
+            "avoid": "*The pot bunkers.* They are dotted over the *entire* hole, so there is no side to favour",
+            "why": [
+              "290, par 4, *stroke index 17* — the second-easiest hole on the card",
+              "Sourced: *pot bunkers dot the entire hole*",
+              "A drivable-looking par 4 with pot bunkers everywhere is a *layup-and-wedge* hole. The 4-iron leaves a full 50°, which is the shot you want"
+            ]
+          },
+          {
+            "n": 6,
+            "yds": 162,
+            "par": 3,
+            "play": "*8-iron* — it is downhill, so take one less than the number",
+            "club": [
+              "8-iron"
+            ],
+            "avoid": "*Anything off-centre.* A crowned green sheds it away from the hole",
+            "why": [
+              "162, par 3, *stroke index 13*",
+              "Sourced: *downhill par 3 to a crowned green*",
+              "7-iron carries 158 on the flat. Downhill takes a club off, and a crowned green makes the middle the only sane target"
+            ]
+          },
+          {
+            "n": 7,
+            "yds": 480,
+            "par": 5,
+            "play": "*Driver, then lay to a full wedge* — the birdie chance of the front",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*245 after the drive* — a 7-iron lay-up leaves 87, a full 56°",
+            "why": [
+              "480, par 5, *stroke index 11*. Sourced: *a fairly easy par 5* — which on this course is a thing worth knowing",
+              "*Zero par-5 birdies* is a finding you already carry from two separate sources, GHIN and Wianno. The par 5s here are 7, 9, 13 and 16, and this is the friendliest of the four",
+              "The lay-up number is the whole hole: 87 yards is a full 56°, and a full wedge is a birdie look"
+            ]
+          },
+          {
+            "n": 8,
+            "yds": 374,
+            "par": 4,
+            "play": "*Fairway first.* Stroke index 3 — par is a good score",
+            "leaves": "*139 in* — a 9-iron or a soft 8",
+            "why": [
+              "374, par 4, *stroke index 3* — the third-hardest hole out here",
+              "*No source describes this hole.* The card says it is hard and the reviews do not say why, so play it as an unknown: fairway, middle of the green, take your 4 or your 5 and go",
+              "Positioning matters more than distance everywhere on this course — the bunkers are built with mounds around them, and missing a bunker into the thick grass is worse than being in it"
+            ]
+          },
+          {
+            "n": 9,
+            "yds": 521,
+            "par": 5,
+            "play": "*Three shots.* The second is where this hole bites",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*286 after the drive* — a 5-iron then leaves 106, a full 50°",
+            "avoid": "*Forcing the second* into a narrow gap for a green you cannot hold anyway",
+            "why": [
+              "521, par 5, *stroke index 9*. Sourced: *a tough par 5 — the fairway is pretty narrow on the second shot, and it leads to another crowned green*",
+              "A narrow second shot and a crowned green is the definition of a three-shot hole",
+              "Longest hole on the course. Bogey here is not a problem — a 7 from the trees is"
+            ]
+          },
+          {
+            "n": 10,
+            "yds": 340,
+            "par": 4,
+            "play": "*2-iron* — it takes both sides out of play",
+            "club": [
+              "2-iron"
+            ],
+            "leaves": "*135 in* — a 9-iron",
+            "avoid": "*Left.* The woods run down that side of the dogleg",
+            "avoidDir": "L",
+            "avoidOn": "tee",
+            "why": [
+              "340, par 4, *stroke index 12*. Sourced: a *slight dogleg left* where you can challenge it by flirting with the woods left",
+              "Sourced, and this is the important half: *bailing out right finds a multi-layered mound with bunkers that is as dangerous as the woods*",
+              "Both sides punish, and the hole is 340 yards. The 2-iron is the answer to a hole that has an answer"
+            ]
+          },
+          {
+            "n": 11,
+            "yds": 190,
+            "par": 3,
+            "play": "*4-iron to the middle* — check the tee marker, it plays 181 to 206",
+            "club": [
+              "4-iron"
+            ],
+            "avoid": "*Right.* A *steep falloff* right, with a long narrow bunker under it",
+            "avoidDir": "R",
+            "avoidOn": "green",
+            "why": [
+              "Par 3, *stroke index 8*, and the yardage moves a lot with the tee — sourced as *181 to 206 yards*",
+              "Sourced: rock walls two to seven feet high surround the tee on three sides, and *with a back-right pin the shot is frightening*",
+              "4-iron carries 190. Take the middle and two putts — this is a hole to walk off with a 3 or a 4, never a 5"
+            ]
+          },
+          {
+            "n": 12,
+            "yds": 337,
+            "par": 4,
+            "play": "*2-iron or 4-iron* — the drive has to clear a fairway bunker",
+            "club": [
+              "2-iron",
+              "4-iron"
+            ],
+            "leaves": "*132 after the 2-iron · 147 after the 4-iron*",
+            "why": [
+              "337, par 4, *stroke index 10*. Sourced: *a scenic hole requiring an accurate drive to clear a fairway bunker*",
+              "Which bunker, and at what carry, is not published. Look from the tee before you pick the club — a 2-iron that does not clear it is worse than a 4-iron short of it"
+            ]
+          },
+          {
+            "n": 13,
+            "yds": 448,
+            "par": 5,
+            "play": "*Driver over Pete's Rock*, then a PW lay-up — do NOT go at this green in two",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*213 after the drive* — PW leaves 91, a full 56° into a tiny green",
+            "avoid": "*Left.* A *deep ravine with a bunker in the floor of it* guards the green that side",
+            "avoidDir": "L",
+            "avoidOn": "green",
+            "why": [
+              "448, par 5, *stroke index 16* — the third-easiest hole on the card, and the most famous one out here",
+              "Sourced: the drive is *over 'Pete's Rock'*, a boulder that blocks the view of the fairway from the tee, to a *saddle-shaped landing area with danger both sides*",
+              "Sourced: the green is *tiny and perched*, with a cavernous bunker guarding the front, that ravine left and woods right. Reviewers call the narrowness the hardest part of the hole",
+              "A tiny perched green from 213 is not a shot. A full 56° from 91 is, and it is your best birdie look of the back nine"
+            ]
+          },
+          {
+            "n": 14,
+            "yds": 379,
+            "par": 4,
+            "play": "*Driver* — take on the carry, the green is the kindest here",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*144 in* — an 8-iron",
+            "why": [
+              "379, par 4, *stroke index 6*",
+              "Sourced: the tee shot is picturesque and *requires a fairly long carry*, but the *green complex is among the most simple on the entire course*",
+              "A simple green after a demanding drive is the one hole out here where being aggressive off the tee pays. The carry distance is not published — look before you swing"
+            ]
+          },
+          {
+            "n": 15,
+            "par": 3,
+            "play": "*Enough club to carry the pond* — the front edge is water",
+            "avoid": "*Short.* The tee shot is over a *reed-lined pond* to a sliver of green",
+            "avoidDir": "S",
+            "avoidOn": "green",
+            "why": [
+              "Par 3, *stroke index 18* — the easiest hole on the card, and one of the best on it",
+              "Sourced: played over a *reed-lined pond to a sliver of green* — long and shallow, wetland in front, rock around the perimeter and a big hill along two sides. From the shorter tees it is a *direct, slightly uphill iron; the elevation is the only real challenge*",
+              "*The yardage is not published* in any source that could be reached — read the marker on the tee",
+              "A long, shallow green means the depth you have to judge is tiny and the front of it is water. Take the club that gets you *past* the middle"
+            ]
+          },
+          {
+            "n": 16,
+            "yds": 494,
+            "par": 5,
+            "play": "*Driver, then lay to a full wedge* — the green is elevated, so club up on the third",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*259 after the drive* — a 7-iron lay-up leaves 101, a full 50°",
+            "avoid": "*Left.* A *steep bank runs down into sand* the whole way along that side",
+            "avoidDir": "L",
+            "avoidOn": "tee",
+            "why": [
+              "494, par 5, *stroke index 14*. Sourced: a steep bank left falling into sand, *pot bunkers dotting the fairway*, and an elevated green",
+              "Pot bunkers in the lay-up zone is an argument for a longer lay-up club, not a shorter one — pick the number, then pick the club that flies the bunkers",
+              "An elevated green plays a club longer, and short is already your standing miss"
+            ]
+          },
+          {
+            "n": 17,
+            "yds": 396,
+            "par": 4,
+            "play": "*Fairway first* — stroke index 4, and bunkers everywhere",
+            "leaves": "*161 in* — a 6-iron",
+            "why": [
+              "396, par 4, *stroke index 4* — sourced as *one of the tougher holes, with lots of bunkers*",
+              "Which bunkers and where is not published. On a Pete Dye course the safe read is that they are where a good drive wants to finish",
+              "Par here is a win. The round is not lost on 17 unless you make it be"
+            ]
+          },
+          {
+            "n": 18,
+            "yds": 415,
+            "par": 4,
+            "play": "*Driver, favour the RIGHT half* — everything on this hole is left",
+            "club": [
+              "driver"
+            ],
+            "leaves": "*180 in* — a 5-iron, uphill, so 4-iron",
+            "avoid": "*Left*, on both shots. Bunkers up the whole left side off the tee, then a *lake* left of the green",
+            "avoidDir": "L",
+            "why": [
+              "415, par 4, *stroke index 2* — the second-hardest hole on the course and the closing hole",
+              "Sourced: *uphill, with bunkers on the left running the whole fairway — they only stop when a lake comes into play on the left*. One review's words: *danger after danger on the left. If you're going to miss, miss right*",
+              "Uphill means a club more on the approach, and short-and-right is a chip. Short-and-left is a drop"
+            ]
+          }
+        ],
+        "sections": [
+          {
+            "t": "The tee sheet decision: Granite, not Oak",
+            "k": "6,261 from the Granite tees is your card here — the Oak at 6,773 is a different golf course.",
+            "b": "Five sets: Black 7,165, Oak 6,773, Granite 6,261, Sand 5,683, Pine 5,151.\n\nGranite is the one. It is the same length as the courses you play well - Lakeside is 6,189, Richter Park 6,547 - and it is the set the hole-by-hole yardages in this plan appear to come from: they sum to roughly 6,270 with two holes estimated, which lines up with the published Granite figure of 6,261. That is an inference from arithmetic, not a sourced tee assignment, so check the card in the pro shop.\n\nWhy it matters more here than elsewhere. This course was ranked no. 7 in Golf Advisor's 2020 Top 50 Toughest Golf Courses in the U.S., off 350,000 reader ratings. From the Black tees it is 76.0/150. An extra 500 yards on a Pete Dye course with forced carries is not a stretch, it is a different game - and the holes where you would feel it (the 2nd, the 9th, the 18th) are already the hardest ones on the card."
+          },
+          {
+            "t": "The water, hole by hole",
+            "k": "Six holes have water, and on four of them it is the approach rather than the drive.",
+            "b": "Hunted specifically, because unlike a pin a pond does not move:\n\n1st - water BEHIND the green, behind the horseshoe bunker. Only in play if you air-mail the approach, which makes the long miss the expensive one.\n2nd - water on the APPROACH, short of the green, with a bail-out area left. Stroke index 1. Take the bail-out.\n3rd - water on the DRIVE. The tee shot has to carry it.\n4th - water RIGHT of the green, beyond the right-hand bunkers. Par 3, 139 yards.\n15th - a reed-lined POND fronting the green. Par 3, and the green is a shallow sliver, so the front edge is the water.\n18th - a LAKE left of the green, at the end of a left-hand bunker chain that runs the whole fairway.\n\nNot water but the same conversation: the 13th green has a deep ravine left with a bunker in the floor of it, and there are wetlands through the property that the 14,000 feet of rock wall runs around.\n\nWhat is NOT confirmed: whether any of the remaining twelve holes carry water. Absence of a mention in a review is not absence of a hazard, and no published hole-by-hole for this course could be opened directly from here - everything above is from reviews and course write-ups. Treat this list as 'water certainly here' rather than 'water nowhere else', and log what you find."
+          },
+          {
+            "t": "Pete Dye bunkering: position beats distance",
+            "k": "Missing a bunker into the mounded grass around it is worse than being in the bunker.",
+            "b": "Sourced: Pete and Perry Dye's signature volcanic bunkers and mounds work with the natural wetlands, trees and exposed rock; pot bunkers dot whole holes (the 5th and the 16th are both named); bunkers are built with mounds around them, so missing a bunker into thick grass makes the approach harder than being in the sand; and rock walls, two to seven feet high in places, are used as both natural and man-made barriers - the 11th tee is walled on three sides.\n\nThe practical version for your game, off your own numbers. Your standing miss off the tee is the drive that leaves no play at the green - the 'Dead' column on the tee-club table exists because of it - and this is the course where that miss costs the most. Four holes on this card have an answer that is not a driver: the 5th (290, pot bunkers everywhere), the 10th (340, woods left and mounded bunkers right), the 12th (337, a fairway bunker to clear) and the 13th (a lay-up after the drive). Take the answer.\n\nThe other half is the greens. Two are described as crowned (the 6th and the 9th), one as tiny and perched (13th), one as a shallow sliver (15th), one as long and narrow (11th's neighbourhood). A crowned or perched green does not hold an off-centre shot, which is the case for the middle on every single approach here - and it is the same instruction the Lakeside plan gives for a different reason."
+          },
+          {
+            "t": "The four par 5s are the round",
+            "k": "7, 9, 13 and 16 — the only four holes here where a full wedge into a green is a realistic ask.",
+            "b": "You carry a finding from two independent sources - your GHIN history and the Wianno member-guest - that you make no birdies on par 5s. This course gives you four of them, and three are gettable in three sensible shots:\n\n7th, 480, sourced as 'a fairly easy par 5'. Driver, 7-iron, 87 yards - a full 56°.\n9th, 521, narrow on the second and a crowned green. Driver, 5-iron, 106 yards - a full 50°. This one is a par hole.\n13th, 448, drive over Pete's Rock then a PW to 91 - a full 56° into a tiny green.\n16th, 494, driver then a 7-iron to 101 - a full 50°, to an elevated green, so club up.\n\nThe pattern is deliberate and it is the whole tactic: on every one of them the lay-up club is chosen to leave a FULL wedge, not the shortest possible shot. A 40-yard pitch is the hardest shot in golf and a 90-yard 56° is one of your best. All four numbers come off the estimated ladder, which is not calibrated - so treat them as the shape of the plan rather than as exact."
+          },
+          {
+            "t": "You have never played here",
+            "k": "No card, no hole record, no notes — everything in this plan is research, and the app will say so.",
+            "b": "Pound Ridge went into your Courses list on Jul 29 2026 and you have not logged a round there. That has three consequences worth stating.\n\nThe hole cards in the live logger will show this plan's note and NOTHING under 'Last' - there is no record to print. That is expected, not a bug.\n\nThe par and stroke index will still prefill, because a reconciled scorecard for Pound Ridge has been on file since Aug 20: par 72, and stroke indexes for all eighteen. Every one of those eighteen pars is independently confirmed by the hole-by-hole review this plan is built from - a par 3 on 4, 6, 11 and 15, a par 5 on 7, 9, 13 and 16, par 4s everywhere else - which is a real check on a card that was assembled rather than photographed.\n\nAnd the plan gets its second draft from you. Blind tee shots are the specific thing to write a note about here: the 13th over Pete's Rock is blind by design, the 12th needs a carry number nobody publishes, and the 14th needs one too. Write down what you actually took and where it finished, and the next visit starts with your own numbers instead of a reviewer's adjectives."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "Sixteen of the eighteen holes have a sourced description; the yardages come from one hole-by-hole review and the card from a separate reconciled scorecard.",
+            "b": "RESEARCHED - the card. Pound Ridge Golf Club, par 72, on file since Aug 20 2026 from mScorecard/Golfify cross-checked against the Black-tee total of 7,165 (76.0/150). Par: 4,4,4,3,4,3,5,4,5 / 4,3,4,5,4,3,5,4,4. Stroke index: 7,1,5,15,17,13,11,3,9 / 12,8,10,16,6,18,14,4,2. All eighteen pars are corroborated independently by the hole-by-hole review below, which is the first time a reconciled card in this app has been checked against a second source hole for hole.\n\nRESEARCHED - the hole-by-hole. The Ultimate Loop's review of Pound Ridge carries a yardage and a description for most holes: 1st 380, 2nd 413, 3rd 369, 4th 139, 5th 290, 6th 162, 7th 480, 8th 374, 9th 521, 10th 340, 11th 181-206, 12th 337, 13th 448, 14th 379, 16th 494, 17th 396, 18th 415. The 15th's yardage is not given there and could not be found elsewhere. These sum to about 6,270 with the 11th taken at 190 and the 15th excluded, which is why this plan calls them the Granite numbers - an inference.\n\nRESEARCHED - hazards and character. CBS New York's 'How To Navigate And Beat Pound Ridge': the five tee sets and their yardages, the 2nd playing as long as two of the par 5s and narrowing as you hit it further, the 15th as a short, slightly uphill iron whose elevation is the challenge. LINKS Magazine and the club's own description: 14,000 linear feet of rock wall around trees, wetlands and water hazards; Pete's Rock at the 13th; the 15th's long shallow green protected by wetlands in front and rock around it. Golf.com: the 13th at 485 from the back, the saddle landing area, the deep ravine and bunker left of the green, woods right. Top 100 Golf Courses: the 15th played over a reed-lined pond to a sliver of green. The Golf Wire: no. 7 in Golf Advisor's 2020 Top 50 Toughest U.S. Courses. Golf Wisconsin: rock formations left on site, the 13th over Pete's Rock.\n\nDROPPED, deliberately. One review attaches 'a narrow green protected between a long marshy carry and a granite rock face' to the SIXTEENTH, while two other sources put that description on the FIFTEENTH - and the card says the 16th is a par 5 and the 15th a par 3. The syndicated-tip numbering problem is exactly what the pin-it-before-you-write rule exists for, so that description is attached to the 15th where two sources agree, and nothing is attached to the 16th from it.\n\nNOT AVAILABLE, and worth knowing for next time: every scorecard host and the club's own site are blocked by this session's network policy - poundridgegolf.com, offcourse, golfify, bluegolf, 18Birdies, golf.com and Wikipedia all refuse to load. Everything above came from search summaries of those pages rather than the pages themselves, which is why yardages carry one source rather than two.\n\nNOT SOURCED, and therefore not written: any description of the 8th beyond its stroke index, the carry distances on the 12th and 14th, the yardage of the 15th, the fairway bunker positions on the 17th, and which side of any green the bunkers sit on except where named above.\n\nESTIMATED, throughout: every 'leaves' number comes off the carry ladder, which is not calibrated. Driver 235, 2-iron 205, 4-iron 190, 5-iron 180, 6-iron 170, 7-iron 158, 8-iron 146, 9-iron 134, PW 122, 50° 108, 56° 95. The 5-wood is unmeasured, so it is not used for a number anywhere in this plan."
+          }
+        ]
+      }
     }
   ]
 }
