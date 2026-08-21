@@ -100,13 +100,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v54';
+const BUILD = 'v55';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v55', d:'2026-08-21', items:[
+    'The course rankings sort three ways now \u2014 Rating, PR or Nearest. Rating is still what opens, and the one you pick sticks.',
+    'Nearest works off the same location the weather card asks for, and the arithmetic happens on this phone. Pick it with no fix on file and it asks for one there and then; say no and the list simply stays in its rating order.',
+    'Every course you have played now has a location on file \u2014 45 of them, added today. Nine are the club\u2019s own coordinate; the rest are the town centre standing in for it, which is what the \u2248 beside the mileage means. Straight-line miles, not drive time.',
+    'A course with no rating, no PR or no location sits at the BOTTOM of whichever sort you are in. It never counts as a zero and it never drops off the page.' ] },
   { b:'v54', d:'2026-08-21', items:[
     'The whole drill bench is drawn now \u2014 all 63 drills, not just the new ones. Every one opens with a diagram of the setup, then numbered steps, then a PASS MARK saying what a good session looks like.',
     'Some of those diagrams answer a question on their own. The wedge matrix shows that six of your nine clock numbers have never been measured. The green-reading one shows the same putt needing three different lines at three speeds. The groove test makes the heel of the club the control sample for the worn middle.',
@@ -2571,13 +2576,71 @@ function game(){
 }
 
 // ----- Courses -----
+// The rankings answer three different questions and they do not share an order: which
+// course did you like best, where have you played best, and which of these could you get
+// to today. So the list sorts by any of the three and says which one it is in — a list
+// that silently re-ordered itself is worse than one that never did.
+//
+// Two rules hold across all three. NULLS GO LAST, never to zero: a course you have not
+// rated is not a course you rated 0, and one with no PR on file is not one you shot
+// nothing at. And the sort is only ever a re-ordering — nothing drops off the page for
+// want of a value. Array.prototype.sort is stable, so ties keep the order they were added
+// in rather than shuffling between renders.
+const COURSE_SORTS = [['rating','Rating'], ['pr','PR'], ['dist','Nearest']];
+function courseSortKey(){
+  const k = S.settings.courseSort;
+  return COURSE_SORTS.some(x => x[0] === k) ? k : 'rating';
+}
+function sortCourses(list, key){
+  const val = c => key === 'pr' ? (c.pr != null ? +c.pr : null)
+    : key === 'dist' ? courseMiles(c.name)
+    : (c.rating != null ? +c.rating : null);
+  // Rating counts DOWN from the best; a PR and a distance both count up from the lowest.
+  const dir = key === 'rating' ? -1 : 1;
+  return [...list].sort((a, b) => {
+    const x = val(a), y = val(b);
+    if(x == null && y == null) return 0;
+    if(x == null) return 1;
+    if(y == null) return -1;
+    return (x - y) * dir;
+  });
+}
+// What the current order is, what it leaves at the bottom, and — on distance — where the
+// fix came from and that these are straight-line miles. Same honesty guards as Round Prep,
+// which sorts the standing plans off the same location.
+function courseSortNote(list, key){
+  const missing = (n, what) => !n ? '' :
+    ` ${n} ${n > 1 ? 'have' : 'has'} no ${what} on file, so ${n > 1 ? 'they sit' : 'it sits'} at the bottom rather than counting as a zero.`;
+  if(key === 'pr')
+    return `<b>Best score first.</b>${missing(list.filter(c => c.pr == null).length, 'PR')} A PR is the lowest score you have sent me for that course — send a better one and it moves.`;
+  if(key === 'dist'){
+    const placed = list.filter(c => courseGeo(c.name)).length;
+    if(!S.here) return `Sorted by rating for now — your phone hasn't given up a location yet.<br><br>${
+      placed ? `<button class="btn ghost tiny" data-action="locate">Use my location</button> — the arithmetic happens on this phone and nothing about where you are is sent anywhere.`
+             : 'No course here has a location on file yet, so there is nothing to measure from.'}`;
+    return `<b>Nearest first</b>, from your last location fix (${fmtDate(new Date(S.here.ts).toISOString().slice(0,10))}) — straight-line miles to the course, <b>not drive time</b>.${
+      missing(list.length - placed, 'location')}`;
+  }
+  return `<b>Your rating, best first.</b>${missing(list.filter(c => c.rating == null).length, 'rating')}`;
+}
 function courses(){
   const played = S.courses.filter(c=>!c.bucket);
   const bucket = S.courses.filter(c=>c.bucket);
   const states = new Set(played.map(c=>c.st).filter(Boolean));
   const rated = played.filter(c=>c.rating!=null);
   const avg = rated.length ? (rated.reduce((s,c)=>s+ +c.rating,0)/rated.length).toFixed(1) : '—';
-  const sorted = [...played].sort((a,b)=>(b.rating??-1)-(a.rating??-1));
+  // Distance falls back to the rating order until the phone has given up a fix — the list
+  // still renders in a sensible order, and the note under it says why it isn't distance.
+  const key = courseSortKey();
+  const live = key === 'dist' && !S.here ? 'rating' : key;
+  const sorted = sortCourses(played, live);
+  const row = c => {
+    const mi = courseMilesLab(c.name);
+    return `<div class="crs" data-action="edit-course" data-id="${c.id}">
+      <span class="nm">${esc(c.name)}<span class="st">${esc(c.st||'')}</span>${mi ? `<span class="mi">${mi}</span>` : ''}</span>
+      <span class="rt">${c.rating!=null? Number(c.rating).toFixed(2) : '—'}${c.pr!=null?' · PR '+esc(c.pr):''}</span>
+    </div>`;
+  };
   return `
   <div class="rowgrid g3">
     <div class="stat"><div class="v">${played.length}</div><div class="l">Played</div></div>
@@ -2587,17 +2650,17 @@ function courses(){
 
   <h2>The rankings</h2>
   <div class="card">
-    ${sorted.length ? sorted.map(c=>`<div class="crs" data-action="edit-course" data-id="${c.id}">
-      <span class="nm">${esc(c.name)}<span class="st">${esc(c.st||'')}</span></span>
-      <span class="rt">${c.rating!=null? Number(c.rating).toFixed(2) : '—'}${c.pr!=null?' · PR '+esc(c.pr):''}</span>
-    </div>`).join('') : '<p class="sm">No courses yet — add your first below.</p>'}
-    <p class="sm faint" style="margin-top:8px">Tap a course to edit its rating, PR or notes. Seeded from your course sheet — fix anything I guessed wrong.</p>
+    <div class="chips">${COURSE_SORTS.map(([k,l]) =>
+      `<span class="chip ${k===key?'on':''}" data-action="course-sort" data-k="${k}">${l}</span>`).join('')}</div>
+    ${sorted.length ? sorted.map(row).join('') : '<p class="sm">No courses yet — add your first below.</p>'}
+    <p class="sm faint" style="margin-top:8px">${courseSortNote(played, key)}<br><br>Tap a course to edit its rating, PR or notes. Seeded from your course sheet — fix anything I guessed wrong.</p>
   </div>
 
   <h2>Bucket list</h2>
   <div class="card flat">
     ${bucket.length ? bucket.map(c=>`<div class="crs" data-action="edit-course" data-id="${c.id}">
-      <span class="nm">${esc(c.name)}<span class="st">${esc(c.st||'')}</span></span><span class="rt">someday</span></div>`).join('') : '<p class="sm">Nothing queued.</p>'}
+      <span class="nm">${esc(c.name)}<span class="st">${esc(c.st||'')}</span>${
+        courseMilesLab(c.name) ? `<span class="mi">${courseMilesLab(c.name)}</span>` : ''}</span><span class="rt">someday</span></div>`).join('') : '<p class="sm">Nothing queued.</p>'}
   </div>
 
   <h2 id="courseFormAnchor">${editingCourse ? 'Edit course' : 'Add a course'}</h2>
@@ -5116,6 +5179,14 @@ const ACTIONS = {
   },
   'get-weather': () => fetchWeather(true),
   'locate': () => fetchHere(true),
+  // Picking Nearest with no fix on file asks for one there and then: the chip is the
+  // request. fetchHere() re-renders on its own if the phone answers, and toasts if it
+  // doesn't — either way the list stays in its rating order until there's a fix to use.
+  'course-sort': el => {
+    S.settings.courseSort = el.dataset.k; save();
+    if(el.dataset.k === 'dist' && !S.here) fetchHere(true);
+    rerender();
+  },
   'cheat-open': el => openCheat(el.dataset.disc, el.dataset.id),
   'cheat-close': () => closeCheat(),
   // A manual version of what visibilitychange does, for when you want to force it.
@@ -5313,8 +5384,12 @@ function updateLine(e){
     case 'action-update': return { h:'To-do reworded', s:clip(e.text, 104), act:go('coach') };
     case 'course-add':    return { h:`Course added · ${nm(e.course)}`, s:'Rate it after you play it', act:go('courses') };
     case 'course-remove': return { h:`Course removed · ${e.target || ''}`, s:'', act:go('courses') };
-    case 'geo':           return { h:`Location on file · ${(e.geo && e.geo.course) || ''}`,
-      s:'Round Prep can sort your standing plans nearest first', act:go('preps') };
+    // Deliberately a CONSTANT headline: a location is supporting data, and a push that puts
+    // one on file for forty-five courses is one change, not forty-five. What's new collapses
+    // rows sharing a headline on a day, so the batch reads as a single line with its count.
+    case 'geo':           return { h:'Course location on file',
+      s:[(e.geo && e.geo.course) || '', (e.geo && e.geo.place) || ''].filter(Boolean).join(' · ')
+        || 'Courses and Round Prep can sort nearest first', act:go('courses') };
     case 'layout':        return { h:`Scorecard on file · ${(e.layout && e.layout.course) || ''}`,
       s:`Par${e.layout && e.layout.si ? ' and stroke index' : ''} prefills now when you log a live round there`,
       act:go('courses') };
@@ -5353,7 +5428,12 @@ function entryDate(e){
 
 // One row of the log. Newest first, capped — this is a "what changed" list, not an
 // archive; the plans, the bag and the cards are where the change itself lives.
-const UPDATE_CAP = 40;
+// A day's work used to be a handful of entries. Putting a location on file for every
+// course he has played is 45 in one push, and at a cap of 40 that one batch would have
+// evicted the entire log behind it — the changelog would have recorded the supporting
+// data and lost the change it was supporting. The cap exists to stop the list growing
+// forever, not to ration a busy day, so it is set well above one.
+const UPDATE_CAP = 120;
 function recordUpdate(e){
   const l = updateLine(e);
   if(!l) return;

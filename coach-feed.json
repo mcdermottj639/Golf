@@ -25702,6 +25702,534 @@
         "st": "WI",
         "pr": 91
       }
+    },
+    {
+      "id": "loc-vancortlandt-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Van Cortlandt Park Golf Course",
+        "lat": 40.889,
+        "lon": -73.893,
+        "prec": "exact",
+        "place": "Bronx, NY",
+        "src": "Wikipedia's coordinate for Van Cortlandt Golf Course, 40°53′21″N 73°53′33″W. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-saxonwoods-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Saxon Woods Golf Course",
+        "lat": 40.981,
+        "lon": -73.758,
+        "prec": "exact",
+        "place": "Scarsdale, NY",
+        "src": "Geocoded club address, 315 Mamaroneck Rd (40.980579, -73.758216). Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-richterpark2-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Richter Park Golf Course",
+        "lat": 41.412,
+        "lon": -73.52,
+        "prec": "exact",
+        "place": "Danbury, CT",
+        "src": "Course listing coordinate for 100 Aunt Hack Rd (41.412, -73.520). Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-oakhillspark-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Oak Hills Park Golf Club",
+        "lat": 41.117,
+        "lon": -73.45,
+        "prec": "exact",
+        "place": "Norwalk, CT",
+        "src": "Geocoded club address, 165 Fillow St (41.1167588, -73.4499156). Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-hudsonhills-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Hudson Hills Golf Course",
+        "lat": 41.197,
+        "lon": -73.821,
+        "prec": "exact",
+        "place": "Ossining, NY",
+        "src": "Geocoded club address, 400 Croton Dam Rd (41.196859, -73.821155). Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-ferrypoint-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Trump Links at Ferry Point",
+        "lat": 40.815,
+        "lon": -73.832,
+        "prec": "exact",
+        "place": "Bronx, NY",
+        "src": "Course listing coordinate for 500 Hutchinson River Pkwy (40.815, -73.832). Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-basinharbor-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Basin Harbor Club",
+        "lat": 44.181,
+        "lon": -73.309,
+        "prec": "exact",
+        "place": "Vergennes, VT",
+        "src": "Course listing coordinate for Basin Harbor Rd (44.1810018, -73.3090398). Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-metedeconk-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Metedeconk National",
+        "lat": 40.166,
+        "lon": -74.337,
+        "prec": "exact",
+        "place": "Jackson, NJ",
+        "src": "Wikipedia's coordinate for the club, 40°09′58″N 74°20′13″W. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-foxhollow-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Fox Hollow Golf Club",
+        "lat": 40.618,
+        "lon": -74.709,
+        "prec": "exact",
+        "place": "Branchburg, NJ",
+        "src": "Topozone's coordinate for the club, 59 Fox Chase Run (40.6176022, -74.70905). Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-oldhead-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Old Head",
+        "lat": 51.605,
+        "lon": -8.534,
+        "prec": "exact",
+        "place": "Kinsale, Co. Cork",
+        "src": "The Old Head of Kinsale, 51°36.287′N 8°32.018′W — the headland the course is built on. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-waterville-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Waterville",
+        "lat": 51.839,
+        "lon": -10.195,
+        "prec": "exact",
+        "place": "Waterville, Co. Kerry",
+        "src": "Published GPS coordinate for Waterville Golf Links (51.83911, -10.19537). Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-whistlingstraits-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Whistling Straits",
+        "lat": 43.851,
+        "lon": -87.736,
+        "prec": "exact",
+        "place": "Haven, WI",
+        "src": "latlong.net's coordinate for Whistling Straits (43.851112, -87.735954). ONE fix for the facility: the Straits and Irish courses share a clubhouse and are not separately published, and a course finds its location on the name before the em dash. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-beekman-loc-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Beekman Golf Course",
+        "lat": 41.584,
+        "lon": -73.793,
+        "prec": "town",
+        "place": "Hopewell Junction, NY",
+        "src": "TOWN CENTRE, not the club gate: Hopewell Junction NY is 41.5838, -73.7932 (latitude.to). The club's address, 11 Country Club Rd, is confirmed but no published coordinate for it could be found. Good to about 2 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-vermontnat-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Vermont National Country Club",
+        "lat": 44.467,
+        "lon": -73.171,
+        "prec": "town",
+        "place": "South Burlington, VT",
+        "src": "TOWN CENTRE: South Burlington VT is 44.466995, -73.170959 (latlong.net). Club address 1227 Dorset St confirmed, no published coordinate. Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-trentoncc-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Trenton Country Club",
+        "lat": 40.258,
+        "lon": -74.818,
+        "prec": "town",
+        "place": "West Trenton, NJ",
+        "src": "TOWN CENTRE: West Trenton NJ is 40.2583, -74.8178 (latitude.to). Good to about 2 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-princetoncc-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Princeton Country Club",
+        "lat": 40.29,
+        "lon": -74.628,
+        "prec": "town",
+        "place": "West Windsor, NJ",
+        "src": "TOWN CENTRE: West Windsor NJ is 40.290253, -74.627672 (Wikipedia). Club address 1 Wheeler Way confirmed, no published coordinate. Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-springlake-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Spring Lake Golf Club",
+        "lat": 40.149,
+        "lon": -74.046,
+        "prec": "town",
+        "place": "Spring Lake Heights, NJ",
+        "src": "TOWN CENTRE: Spring Lake Heights NJ is 40.149483, -74.046169 (Wikipedia). Club address 901 Warren Ave confirmed. Good to about 1 mile. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-makefield-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Makefield Highlands Golf Club",
+        "lat": 40.241,
+        "lon": -74.836,
+        "prec": "town",
+        "place": "Yardley, PA",
+        "src": "TOWN CENTRE: Yardley PA is 40.24139, -74.83639 (Wikipedia). Club address 1418 Woodside Rd confirmed, no published coordinate. Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-granitelinks-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Granite Links Golf Club",
+        "lat": 42.253,
+        "lon": -71.002,
+        "prec": "town",
+        "place": "Quincy, MA",
+        "src": "TOWN CENTRE: Quincy MA is 42.250, -71.000 (Wikipedia). Club address 100 Quarry Hills Dr confirmed, no published coordinate. Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-neshaminyvalley-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Neshaminy Valley Golf Club",
+        "lat": 40.255,
+        "lon": -75.089,
+        "prec": "town",
+        "place": "Jamison, PA",
+        "src": "TOWN CENTRE: Jamison PA is 40.25472, -75.08944 (Wikipedia). Club address 440 Almshouse Rd confirmed. Good to about 2 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-middletowncc-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Middletown Country Club",
+        "lat": 40.178,
+        "lon": -74.919,
+        "prec": "town",
+        "place": "Langhorne, PA",
+        "src": "TOWN CENTRE: Langhorne PA is 40.17750, -74.91889 (Wikipedia). Good to about 2 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-westover-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Westover Country Club",
+        "lat": 40.121,
+        "lon": -75.34,
+        "prec": "town",
+        "place": "Norristown, PA",
+        "src": "TOWN CENTRE: Norristown PA is 40.121498, -75.339905 (latlong.net). Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-broadrun-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Broad Run Golf Club",
+        "lat": 39.959,
+        "lon": -75.605,
+        "prec": "town",
+        "place": "West Chester, PA",
+        "src": "TOWN CENTRE: West Chester PA is 39.95861, -75.60500 (Wikipedia). Matched to Broad Run Golfer's Club, 1520 Tattersall Way — the only Broad Run in the area. Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-springfieldgolfcenter-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Springfield Golf Center",
+        "lat": 39.927,
+        "lon": -75.335,
+        "prec": "town",
+        "place": "Springfield, Delaware County, PA",
+        "src": "TOWN CENTRE: Springfield Township, Delaware County PA is 39.92694, -75.33528 (Wikipedia). The club itself could not be pinned — the TOWN was inferred from the surrounding 2017 rounds, all Philadelphia-area, so that is the uncertain half here, not the placement within it. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-greenknoll-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Green Knoll Golf Course",
+        "lat": 40.592,
+        "lon": -74.604,
+        "prec": "town",
+        "place": "Bridgewater, NJ",
+        "src": "TOWN CENTRE: Bridgewater Township NJ is 40.592358, -74.60401 (Wikipedia). Club address 587 Garretson Rd confirmed. Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-mountainview-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Mountain View Golf Course",
+        "lat": 40.263,
+        "lon": -74.799,
+        "prec": "town",
+        "place": "Ewing, NJ",
+        "src": "TOWN CENTRE: Ewing Township NJ is 40.263344, -74.798704 (Wikipedia). Matched to the Mercer County course, inferred from the surrounding rounds rather than confirmed — so the TOWN is the uncertain part, not the placement within it. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-concordia-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Concordia Golf Club",
+        "lat": 40.319,
+        "lon": -74.429,
+        "prec": "town",
+        "place": "Monroe Township, NJ",
+        "src": "TOWN CENTRE: Monroe Township, Middlesex County NJ is 40.319474, -74.428802 (Wikipedia). Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-quailbrook-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Quail Brook Golf Course",
+        "lat": 40.509,
+        "lon": -74.5,
+        "prec": "town",
+        "place": "Somerset, NJ",
+        "src": "TOWN CENTRE: Somerset NJ is 40.508507, -74.500207 (Wikipedia). The course sits in Franklin Township, south-east of the village. Good to about 4 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-weequahic-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Weequahic Park Golf Course",
+        "lat": 40.736,
+        "lon": -74.172,
+        "prec": "town",
+        "place": "Newark, NJ",
+        "src": "TOWN CENTRE: Newark NJ is 40.735657, -74.172363 (latlong.net). The course is in Weequahic Park, about 3 miles south of downtown, so this one reads long. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-bassriver-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Bass River Golf Course",
+        "lat": 41.668,
+        "lon": -70.2,
+        "prec": "town",
+        "place": "South Yarmouth, MA",
+        "src": "TOWN CENTRE: South Yarmouth MA is 41.66778, -70.19972 (Wikipedia). Club address 62 High Bank Rd confirmed. Good to about 1 mile. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-northamptonvalley-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Northampton Valley Country Club",
+        "lat": 40.255,
+        "lon": -75.006,
+        "prec": "town",
+        "place": "Richboro, PA",
+        "src": "TOWN CENTRE: Richboro PA is 40.25500, -75.00611 (Wikipedia). Good to about 2 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-newyorkcc-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "New York Country Club",
+        "lat": 41.146,
+        "lon": -74.047,
+        "prec": "town",
+        "place": "New Hempstead, NY",
+        "src": "TOWN CENTRE: New Hempstead NY is 41.14583, -74.04667 (Wikipedia). Good to about 2 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-islandsend-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Islands End Golf and Country Club",
+        "lat": 41.103,
+        "lon": -72.364,
+        "prec": "town",
+        "place": "Greenport, NY",
+        "src": "TOWN CENTRE: Greenport NY is 41.10306, -72.36389 (Wikipedia). The club is on Route 25 east of the village. Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-quailvillage-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Quail Village Golf Course",
+        "lat": 26.178,
+        "lon": -81.807,
+        "prec": "town",
+        "place": "Naples, FL",
+        "src": "TOWN CENTRE: Naples FL is 26.177624, -81.806946 (latlong.net). The club is in North Naples, 11719 Quail Village Way, so this reads several miles short. Naples is a big town — read it as Naples, not as the gate. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-arrowheadheritage-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Arrowhead Golf Course at Heritage Greens",
+        "lat": 26.178,
+        "lon": -81.807,
+        "prec": "town",
+        "place": "Naples, FL",
+        "src": "TOWN CENTRE: Naples FL is 26.177624, -81.806946 (latlong.net). Same caveat as Quail Village — the course is in North Naples, so this reads several miles short. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-bonitabayclub-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Bonita Bay Club",
+        "lat": 26.339,
+        "lon": -81.775,
+        "prec": "town",
+        "place": "Bonita Springs, FL",
+        "src": "TOWN CENTRE: Bonita Springs FL is 26.338654, -81.775017 (latlong.net). Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-bonitabaywest-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Bonita Bay West — Bay Island",
+        "lat": 26.339,
+        "lon": -81.775,
+        "prec": "town",
+        "place": "Bonita Springs, FL",
+        "src": "TOWN CENTRE: Bonita Springs FL is 26.338654, -81.775017 (latlong.net). Bay Island is one of the west-side courses. Good to about 3 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-shadowwood-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Shadow Wood Country Club",
+        "lat": 26.339,
+        "lon": -81.775,
+        "prec": "town",
+        "place": "Bonita Springs, FL",
+        "src": "TOWN CENTRE: Bonita Springs FL is 26.338654, -81.775017 (latlong.net). Good to about 4 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-oldcorkscrew-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Old Corkscrew Golf Club",
+        "lat": 26.438,
+        "lon": -81.807,
+        "prec": "town",
+        "place": "Estero, FL",
+        "src": "TOWN CENTRE: Estero FL is 26.43814, -81.80675 (latlong.info). The course sits well inland of the town on Corkscrew Rd, so this reads short — good to about 8 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-lawsonia-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "The Golf Courses of Lawsonia — Links",
+        "lat": 43.844,
+        "lon": -88.96,
+        "prec": "town",
+        "place": "Green Lake, WI",
+        "src": "TOWN CENTRE: Green Lake WI is 43.84417, -88.96000 (Wikipedia). Good to about 2 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-sandvalley-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Sand Valley",
+        "lat": 44.319,
+        "lon": -89.9,
+        "prec": "town",
+        "place": "Nekoosa, WI",
+        "src": "TOWN CENTRE: Nekoosa WI is 44.319080, -89.899940 (latlong.net). The resort is several miles out of town. Good to about 8 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-sandvalley-mammoth-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Sand Valley Golf Resort — Mammoth Dunes",
+        "lat": 44.319,
+        "lon": -89.9,
+        "prec": "town",
+        "place": "Nekoosa, WI",
+        "src": "TOWN CENTRE: Nekoosa WI is 44.319080, -89.899940 (latlong.net). Same resort as Sand Valley, same caveat — good to about 8 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-blackwolfrun-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Blackwolf Run — River",
+        "lat": 43.738,
+        "lon": -87.781,
+        "prec": "town",
+        "place": "Kohler, WI",
+        "src": "TOWN CENTRE: Kohler WI is 43.73833, -87.78111 (Wikipedia). The course is on the Sheboygan River at the edge of the village. Good to about 2 miles. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "loc-hogshead-20260821",
+      "type": "geo",
+      "geo": {
+        "course": "Hogs Head",
+        "lat": 51.839,
+        "lon": -10.195,
+        "prec": "town",
+        "place": "Waterville, Co. Kerry",
+        "src": "TOWN CENTRE: placed on Waterville Golf Links' coordinate (51.83911, -10.19537). Hog's Head sits a few miles across Ballinskelligs Bay from the village — good to about 4 miles. Read Aug 21 2026."
+      }
     }
   ]
 }

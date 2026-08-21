@@ -91,7 +91,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `lesson-update` | Patch a Coach lesson by `target` (its id); `Object.assign` of `lesson`. Patches accumulate, so two updates to one lesson both survive. A `target` matching no lesson is ignored |
 | `lesson-add`    | Add a whole Coach lesson (`lesson` object carrying its own `id`). Naming a new `shelf` creates one |
 | `lesson-remove` | Retire a lesson by `target` — a later `lesson-add` with the same id un-retires it |
-| `geo`            | Put a course's location on file (`geo:{course, lat, lon, prec, place, src}`). Round Prep sorts the standing plans **nearest first** off it — see *Nearest first* below. Replaces any earlier fix for that course |
+| `geo`            | Put a course's location on file (`geo:{course, lat, lon, prec, place, src}`). Round Prep sorts the standing plans and Courses sorts the rankings **nearest first** off it — see *Nearest first* below. Replaces any earlier fix for that course, matching on the name **before the em dash**, so one fix serves every course at a facility |
 | `deadline`       | Set the return-window deadline (clears "estimated") |
 
 Unknown types are left unapplied on purpose (forward-compat), so a typo'd `type` silently
@@ -725,6 +725,33 @@ Two things the UI must keep saying: that the list is sorted and from when (`stan
 prints the date of the fix), and that these are **straight-line miles, not drive time** —
 an hour up the Merritt and an hour to the Cape are not the same hour. With no fix at all
 the list renders in its original order with a button, never silently re-sorted.
+
+**Every course on his list has a fix on file (Aug 21 2026)** — 49 of them, 12 on the club's
+own coordinate and the rest on the town centre standing in for it. Add a course and add its
+`geo` in the same push: a course with no location is not broken, but it can only ever sit at
+the bottom of a distance sort, and the sort is the reason the coordinates exist.
+
+### The rankings sort three ways (Aug 21 2026)
+
+Jack asked for Courses to sort by rating, PR and distance. `COURSE_SORTS` / `sortCourses()` /
+`courseSortNote()` do it, with the picked sort kept in `S.settings.courseSort`. Rating is the
+default and what an empty setting falls back to.
+
+The rules that make it safe to add a fourth:
+
+- **Nulls go last, never to zero.** A course he hasn't rated is not a course he rated 0, and
+  one with no PR on file is not one he shot nothing at. `sortCourses()` puts every null at
+  the bottom whichever key is picked, so a sort is only ever a re-ordering — nothing drops
+  off the page for want of a value.
+- **Direction is per key**: rating counts DOWN from the best, a PR and a distance both count
+  UP from the lowest.
+- **`courseSortNote()` says which order the list is in**, and how many are sitting at the
+  bottom for want of a value — the same rule `standingNote()` follows in Round Prep, and for
+  the same reason: a list that silently re-ordered itself is worse than one that never did.
+- **Distance degrades rather than failing.** With no `S.here` the list renders in its RATING
+  order and the note says so, with a button that asks for a fix; picking *Nearest* with no fix
+  calls `fetchHere(true)` there and then, so the chip is the request. Deny it and nothing
+  moves.
 
 ### Writing briefings (they render in layers — write for that)
 
