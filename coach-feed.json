@@ -19207,6 +19207,6304 @@
         "place": "145 Rt 54 East Lake Rd, Penn Yan, NY 14527",
         "src": "TOWN CENTRE, not the club gate: Penn Yan NY is 42.6607, -77.0551 (National Weather Service point). The club sits about 1.5 miles south-east of the village on Rt 54, and the address is the one on the map card Jack sent. Good to about 2 miles"
       }
+    },
+    {
+      "id": "lesson-p1-steps-20260821",
+      "type": "lesson-update",
+      "target": "p1",
+      "lesson": {
+        "drill": "Balls at 20, 30 and 40 ft. Two putts from each, up the ladder and back.",
+        "steps": [
+          "Drop balls at 20, 30 and 40 ft from one hole.",
+          "Two putts from 20, two from 30, two from 40 — then back down. That is 12 balls.",
+          "You are not trying to hole them. You are trying to finish inside six feet.",
+          "Score a point per ball that finishes inside six feet.",
+          "Log the score and the green speed each time."
+        ],
+        "score": "9 or better out of 12. This is the main event — pace has decided the fate of two putters.",
+        "viz": {
+          "h": 52,
+          "cap": "The ladder · three distances, up and back",
+          "parts": [
+            {
+              "k": "hole",
+              "x": 88,
+              "y": 26,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "ring",
+              "x": 88,
+              "y": 26,
+              "r": 8,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 97,
+              "y": 42,
+              "t": "inside 6 ft = 1 point",
+              "sz": 2.5,
+              "c": "g",
+              "a": "end"
+            },
+            {
+              "k": "ball",
+              "x": 62,
+              "y": 26,
+              "r": 1.9
+            },
+            {
+              "k": "text",
+              "x": 62,
+              "y": 19,
+              "t": "20 ft",
+              "sz": 2.7,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 40,
+              "y": 26,
+              "r": 1.9
+            },
+            {
+              "k": "text",
+              "x": 40,
+              "y": 19,
+              "t": "30 ft",
+              "sz": 2.7,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 16,
+              "y": 26,
+              "r": 1.9
+            },
+            {
+              "k": "text",
+              "x": 16,
+              "y": 19,
+              "t": "40 ft",
+              "sz": 2.7,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "arrow",
+              "x1": 19,
+              "y1": 26,
+              "x2": 77,
+              "y2": 26,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 48,
+              "t": "2 putts from each · up and back = 12 balls",
+              "sz": 2.8,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-p2-steps-20260821",
+      "type": "lesson-update",
+      "target": "p2",
+      "lesson": {
+        "drill": "A check, not a fix. Metronome at 70–76, 20 strokes at mixed lengths.",
+        "steps": [
+          "Metronome at 70–76 bpm. One click at the top of the stroke, one at impact.",
+          "20 strokes at mixed lengths — short, medium, long, in no order.",
+          "Every length must take the SAME beat. Only the size of the stroke changes.",
+          "Any length that needs a different beat is the one to watch on the ladder.",
+          "Once a fortnight is enough. Your tempo is already 2.0:1 — this protects it."
+        ],
+        "score": "Same two clicks at every length. A length that will not fit the beat is a distance-control fault, not a tempo one.",
+        "viz": {
+          "h": 58,
+          "cap": "One beat, three sizes",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 8,
+              "t": "metronome 70–76 · click at the top, click at impact",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "curve",
+              "x1": 15,
+              "y1": 30,
+              "cx": 20,
+              "cy": 39,
+              "x2": 25,
+              "y2": 30,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 20,
+              "y": 25,
+              "t": "short",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "curve",
+              "x1": 41,
+              "y1": 30,
+              "cx": 50,
+              "cy": 40,
+              "x2": 59,
+              "y2": 30,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 25,
+              "t": "medium",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "curve",
+              "x1": 67,
+              "y1": 30,
+              "cx": 80,
+              "cy": 41,
+              "x2": 93,
+              "y2": 30,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 80,
+              "y": 25,
+              "t": "long",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "line",
+              "x1": 12,
+              "y1": 46,
+              "x2": 28,
+              "y2": 46,
+              "c": "g",
+              "w": 1.7
+            },
+            {
+              "k": "line",
+              "x1": 42,
+              "y1": 46,
+              "x2": 58,
+              "y2": 46,
+              "c": "g",
+              "w": 1.7
+            },
+            {
+              "k": "line",
+              "x1": 72,
+              "y1": 46,
+              "x2": 88,
+              "y2": 46,
+              "c": "g",
+              "w": 1.7
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 55,
+              "t": "every length takes the SAME beat — only the size changes",
+              "sz": 2.7,
+              "c": "g",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-p3-steps-20260821",
+      "type": "lesson-update",
+      "target": "p3",
+      "lesson": {
+        "drill": "A tee six inches ahead of the ball on the line. The head must pass over it.",
+        "steps": [
+          "Put a tee in the ground six inches ahead of the ball, on your line.",
+          "Make your normal stroke.",
+          "After impact the head must pass OVER the tee — and stay below shin height doing it.",
+          "15 reps, every session.",
+          "It quiets the toe-over release at the same time."
+        ],
+        "score": "15 clean passes. This fault closed on film Jul 30 and has stayed closed — this is maintenance, not a repair.",
+        "viz": {
+          "h": 58,
+          "cap": "Side on · low and long past the tee",
+          "parts": [
+            {
+              "k": "band",
+              "y": 40,
+              "h": 12,
+              "c": "g"
+            },
+            {
+              "k": "line",
+              "x1": 10,
+              "y1": 22,
+              "x2": 90,
+              "y2": 22,
+              "c": "b",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 11,
+              "y": 19.5,
+              "t": "shin height — stay under it",
+              "sz": 2.6,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "ball",
+              "x": 34,
+              "y": 38,
+              "r": 1.9
+            },
+            {
+              "k": "line",
+              "x1": 48,
+              "y1": 40,
+              "x2": 48,
+              "y2": 35.5,
+              "c": "i",
+              "w": 1.1
+            },
+            {
+              "k": "text",
+              "x": 95,
+              "y": 39,
+              "t": "tee 6\" ahead of the ball",
+              "sz": 2.5,
+              "c": "i",
+              "a": "end"
+            },
+            {
+              "k": "arrow",
+              "x1": 28,
+              "y1": 34,
+              "x2": 66,
+              "y2": 32.5,
+              "c": "g",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 24,
+              "y": 30,
+              "t": "the head chases low",
+              "sz": 2.6,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 54,
+              "t": "15 reps, every session",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-p4-steps-20260821",
+      "type": "lesson-update",
+      "target": "p4",
+      "lesson": {
+        "drill": "20 balls from five feet with the FULL routine on every one.",
+        "steps": [
+          "Five feet, one hole, 20 balls.",
+          "Full routine on every ball — the beat count and the trigger included. No raking.",
+          "Log makes AND miss direction in the Putting Lab.",
+          "Count the LEFT misses separately. That number is the one that matters.",
+          "Compare it to your 4–6 ft conversion on the round cards — mat against grass."
+        ],
+        "score": "2 or fewer LEFT misses in 20. That is the scoreboard for the whole short-putt project.",
+        "viz": {
+          "h": 62,
+          "cap": "Five feet · the left miss is the number",
+          "parts": [
+            {
+              "k": "hole",
+              "x": 50,
+              "y": 14,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 44,
+              "r": 1.9
+            },
+            {
+              "k": "line",
+              "x1": 50,
+              "y1": 42,
+              "x2": 50,
+              "y2": 17,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 54,
+              "y": 31,
+              "t": "5 ft",
+              "sz": 2.6,
+              "c": "f",
+              "a": "start"
+            },
+            {
+              "k": "dot",
+              "x": 41,
+              "y": 16,
+              "c": "b",
+              "r": 1.2
+            },
+            {
+              "k": "dot",
+              "x": 44,
+              "y": 17.5,
+              "c": "b",
+              "r": 1.2
+            },
+            {
+              "k": "dot",
+              "x": 58,
+              "y": 16,
+              "c": "f",
+              "r": 1.2
+            },
+            {
+              "k": "text",
+              "x": 28,
+              "y": 13,
+              "t": "left",
+              "sz": 2.6,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 72,
+              "y": 13,
+              "t": "right",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "dot",
+              "x": 10.0,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 14.2,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 18.4,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 22.6,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 26.8,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 31.0,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 35.2,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 39.400000000000006,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 43.6,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 47.800000000000004,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 52.0,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 56.2,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 60.400000000000006,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 64.6,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 68.80000000000001,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 73.0,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 77.2,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 81.4,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 85.60000000000001,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "dot",
+              "x": 89.8,
+              "y": 52,
+              "c": "f",
+              "r": 0.9
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 59,
+              "t": "20 balls · full routine on every one",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-p5-steps-20260821",
+      "type": "lesson-update",
+      "target": "p5",
+      "lesson": {
+        "drill": "Around the clock at 5 ft on a sloped hole. Eight positions, one ball each.",
+        "steps": [
+          "Find the fall line through the hole first.",
+          "Place 8 balls in a circle at 5 ft — the clock positions.",
+          "Before each putt, say the clock position and the break you expect out loud.",
+          "Work round the clock. One ball per position.",
+          "Note which positions you miss LOW."
+        ],
+        "score": "The positions you miss low are your read-bias putts. That is the finding, not the make count.",
+        "viz": {
+          "h": 60,
+          "cap": "Eight positions · find the fall line first",
+          "parts": [
+            {
+              "k": "ring",
+              "x": 50,
+              "y": 28,
+              "r": 18,
+              "c": "f"
+            },
+            {
+              "k": "hole",
+              "x": 50,
+              "y": 28,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "arrow",
+              "x1": 72,
+              "y1": 12,
+              "x2": 28,
+              "y2": 44,
+              "c": "g",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 80,
+              "y": 12,
+              "t": "downhill",
+              "sz": 2.5,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "ball",
+              "x": 68,
+              "y": 28,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 62.7,
+              "y": 40.7,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 46,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 37.3,
+              "y": 40.7,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 32,
+              "y": 28,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 37.3,
+              "y": 15.3,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 10,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 62.7,
+              "y": 15.3,
+              "r": 1.9
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 53,
+              "t": "the ones you miss LOW are your read-bias putts",
+              "sz": 2.7,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 58,
+              "t": "say the position and the break out loud",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h1-steps-20260821",
+      "type": "lesson-update",
+      "target": "h1",
+      "lesson": {
+        "drill": "Two coin gates on carpet, a target six feet away, 20 putts.",
+        "steps": [
+          "Gate 1 at the ball: two coins just wider than the putter head.",
+          "Gate 2 one putter-length ahead: two coins barely wider than the ball.",
+          "Target six feet away — a coaster, a table leg, anything.",
+          "Set the face BARELY OPEN, exactly as you do on the course. That is the aim picture being tested.",
+          "20 putts. Count clean passes through both gates."
+        ],
+        "score": "Under 15 clean, slow down and watch the FACE, not the ball. Clip the far gate's left coin and you aimed left.",
+        "viz": {
+          "h": 54,
+          "cap": "Top down · the far gate is the aim test",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 20,
+              "y1": 30,
+              "x2": 86,
+              "y2": 30,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "dot",
+              "x": 20,
+              "y": 25.4,
+              "c": "i",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 20,
+              "y": 34.6,
+              "c": "i",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 48,
+              "y": 27.4,
+              "c": "i",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 48,
+              "y": 32.6,
+              "c": "i",
+              "r": 1.3
+            },
+            {
+              "k": "ball",
+              "x": 20,
+              "y": 30,
+              "r": 1.9
+            },
+            {
+              "k": "hole",
+              "x": 88,
+              "y": 30,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "text",
+              "x": 20,
+              "y": 20,
+              "t": "gate 1",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 20,
+              "y": 42,
+              "t": "at the ball",
+              "sz": 2.4,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 20,
+              "t": "gate 2 · one putter-length on",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 88,
+              "y": 20,
+              "t": "6 ft",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 52,
+              "y": 40,
+              "t": "clip the LEFT coin here = you aimed left",
+              "sz": 2.6,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 50,
+              "t": "20 putts · count clean passes through both",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h2-steps-20260821",
+      "type": "lesson-update",
+      "target": "h2",
+      "lesson": {
+        "drill": "Ten balls down a metal yardstick. Streak scoring.",
+        "steps": [
+          "Lay the yardstick on the carpet, ball on one end.",
+          "Roll ten balls down it. A ball that stays on for the full length is a hold.",
+          "Count CONSECUTIVE holds. One fall-off restarts the streak.",
+          "Before work or after dinner — it takes three minutes.",
+          "Write the longest streak down."
+        ],
+        "score": "Beat yesterday's streak. Nothing else on this drill is worth measuring.",
+        "viz": {
+          "h": 44,
+          "cap": "The $3 start-line machine",
+          "parts": [
+            {
+              "k": "box",
+              "x": 14,
+              "y": 20,
+              "bw": 72,
+              "bh": 7,
+              "c": "i",
+              "r": 1
+            },
+            {
+              "k": "ball",
+              "x": 19,
+              "y": 23.5,
+              "r": 1.9
+            },
+            {
+              "k": "arrow",
+              "x1": 24,
+              "y1": 23.5,
+              "x2": 80,
+              "y2": 23.5,
+              "c": "g",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 15,
+              "t": "a ball that holds the full length is a hold",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 36,
+              "t": "count consecutive holds · one fall-off and you restart",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h3-steps-20260821",
+      "type": "lesson-update",
+      "target": "h3",
+      "lesson": {
+        "drill": "Putter head a half-inch off the baseboard, and it stays there — back and through.",
+        "steps": [
+          "Set up with the putter head a half-inch from the baseboard.",
+          "15 slow-motion strokes keeping the HEEL that same half-inch away, back and through.",
+          "Then 10 at full speed.",
+          "Then 5 with a ball rolled at a target along the wall.",
+          "Three minutes, every day you don't see a green."
+        ],
+        "score": "Heel drifts INTO the wall going back = you are pulling inside. Drifts AWAY coming through = an arc is sneaking into a straight stroke.",
+        "viz": {
+          "h": 50,
+          "cap": "Top down · the wall does not flatter you",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 6,
+              "y1": 12,
+              "x2": 94,
+              "y2": 12,
+              "c": "i",
+              "w": 1.6
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 8,
+              "t": "BASEBOARD",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 97,
+              "y": 15.5,
+              "t": "half an inch, the whole way",
+              "sz": 2.5,
+              "c": "g",
+              "a": "end"
+            },
+            {
+              "k": "line",
+              "x1": 6,
+              "y1": 18,
+              "x2": 94,
+              "y2": 18,
+              "c": "g",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "box",
+              "x": 30,
+              "y": 18.5,
+              "bw": 14,
+              "bh": 5,
+              "c": "i",
+              "r": 0.8
+            },
+            {
+              "k": "text",
+              "x": 37,
+              "y": 30,
+              "t": "putter head",
+              "sz": 2.4,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "arrow",
+              "x1": 48,
+              "y1": 21,
+              "x2": 74,
+              "y2": 21,
+              "c": "g",
+              "w": 0.7
+            },
+            {
+              "k": "arrow",
+              "x1": 26,
+              "y1": 21,
+              "x2": 12,
+              "y2": 21,
+              "c": "g",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 42,
+              "t": "15 slow · 10 at speed · 5 with a ball",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h4-steps-20260821",
+      "type": "lesson-update",
+      "target": "h4",
+      "lesson": {
+        "drill": "Weekly: five putts face-on, five overhead. Watch them back at half speed.",
+        "steps": [
+          "Film 5 putts FACE-ON — phone at shin height, square to you.",
+          "Film 5 OVERHEAD — phone directly over the ball.",
+          "Watch them back once at half speed. Once, not five times.",
+          "Write one note per session — 'head stayed down 4/5'.",
+          "Since Aug 13 there is a third angle: from BEHIND on the line with the laser on and a marked scale at the target. That one measures your AIM, not your stroke."
+        ],
+        "score": "One note per session and the clips sent in. They land in the Putting Lab like any other filmed session.",
+        "viz": {
+          "h": 50,
+          "cap": "Three angles · the third one measures aim",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 14,
+              "y1": 26,
+              "x2": 80,
+              "y2": 26,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 26,
+              "r": 1.9
+            },
+            {
+              "k": "cam",
+              "x": 50,
+              "y": 10,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 5,
+              "t": "OVERHEAD",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "cam",
+              "x": 50,
+              "y": 42,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 47.5,
+              "t": "FACE-ON",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "cam",
+              "x": 16,
+              "y": 26,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 16,
+              "y": 20,
+              "t": "BEHIND",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 16,
+              "y": 33,
+              "t": "+ laser + a taped scale",
+              "sz": 2.4,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "hole",
+              "x": 86,
+              "y": 26,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "text",
+              "x": 86,
+              "y": 20,
+              "t": "target",
+              "sz": 2.4,
+              "c": "f",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h5-steps-20260821",
+      "type": "lesson-update",
+      "target": "h5",
+      "lesson": {
+        "drill": "Metronome at 72. No target, no hole. 20 strokes without a ball, 20 with.",
+        "steps": [
+          "Metronome at 72 bpm. No target and no hole — this is not about where it goes.",
+          "20 strokes with no ball at all.",
+          "Then 20 with a ball rolled nowhere in particular.",
+          "Eyes on tempo only.",
+          "If a stroke feels rushed, it was. Restart the count of 20."
+        ],
+        "score": "40 strokes on the beat. A restart is not a failure — it is the drill working.",
+        "viz": {
+          "h": 40,
+          "cap": "No ball, no target, no result to chase",
+          "parts": [
+            {
+              "k": "box",
+              "x": 6,
+              "y": 14,
+              "bw": 42,
+              "bh": 12,
+              "c": "i",
+              "r": 1.2,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 27,
+              "y": 21.6,
+              "t": "20 · no ball",
+              "sz": 2.9,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 54,
+              "y": 14,
+              "bw": 40,
+              "bh": 12,
+              "c": "g",
+              "r": 1.2,
+              "d": 1,
+              "f": "g",
+              "o": 0.12
+            },
+            {
+              "k": "text",
+              "x": 74,
+              "y": 21.6,
+              "t": "20 · with a ball",
+              "sz": 2.9,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 34,
+              "t": "a stroke that felt rushed was rushed — restart the 20",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h6-steps-20260821",
+      "type": "lesson-update",
+      "target": "h6",
+      "lesson": {
+        "drill": "Ten putts to a target 15 ft +, eyes closed at impact. Call each one before you look.",
+        "steps": [
+          "Target 15 ft or more away. Full routine.",
+          "Close your eyes at impact and keep them closed.",
+          "Call the finish out loud — short, on it, or past — BEFORE you look.",
+          "Score your CALLS, not your putts.",
+          "Move the target and do it again."
+        ],
+        "score": "8 out of 10 correct calls. If you cannot feel where it finished, you cannot control the distance.",
+        "viz": {
+          "h": 46,
+          "cap": "Call it before you look",
+          "parts": [
+            {
+              "k": "ball",
+              "x": 12,
+              "y": 26,
+              "r": 1.9
+            },
+            {
+              "k": "hole",
+              "x": 72,
+              "y": 26,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "ring",
+              "x": 72,
+              "y": 26,
+              "r": 8,
+              "c": "g"
+            },
+            {
+              "k": "arrow",
+              "x1": 16,
+              "y1": 26,
+              "x2": 64,
+              "y2": 26,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 30,
+              "y": 19,
+              "t": "eyes closed at impact",
+              "sz": 2.6,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 72,
+              "y": 42,
+              "t": "short?  on it?  past?",
+              "sz": 2.7,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 10,
+              "t": "score the CALLS, not the putts",
+              "sz": 2.8,
+              "c": "b",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h8-steps-20260821",
+      "type": "lesson-update",
+      "target": "h8",
+      "lesson": {
+        "drill": "A target five feet away and a second marker 17 INCHES past it.",
+        "steps": [
+          "Target at 5 ft on the carpet. Second marker 17 inches beyond it.",
+          "17 inches is the researched pace for a short putt — firm enough to hold its line through the trodden ring round a real hole.",
+          "20 balls. The win is finishing BETWEEN the two, not hitting the target.",
+          "Short back, short through, run from the shoulders with the wrists silent.",
+          "Watch for the putter head passing your hands — that is the wrist releasing, and it is the half of the pop stroke you are NOT copying."
+        ],
+        "score": "Balls dying short means the through-stroke is quitting, not that it was merely small. A short stroke that accelerated and one that quit look identical afterwards.",
+        "viz": {
+          "h": 48,
+          "cap": "Carpet · finish in the window, do not hit the target",
+          "parts": [
+            {
+              "k": "ball",
+              "x": 10,
+              "y": 26,
+              "r": 1.9
+            },
+            {
+              "k": "hole",
+              "x": 62,
+              "y": 26,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "line",
+              "x1": 84,
+              "y1": 20,
+              "x2": 84,
+              "y2": 32,
+              "c": "b",
+              "w": 1.2
+            },
+            {
+              "k": "box",
+              "x": 62,
+              "y": 20,
+              "bw": 22,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "d": 1,
+              "f": "g",
+              "o": 0.13
+            },
+            {
+              "k": "arrow",
+              "x1": 14,
+              "y1": 26,
+              "x2": 58,
+              "y2": 26,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 36,
+              "y": 20,
+              "t": "5 ft",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 73,
+              "y": 16,
+              "t": "17\"",
+              "sz": 2.6,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 73,
+              "y": 38,
+              "t": "finish in here",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 45,
+              "t": "20 balls · still accelerating when it stops",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h7-steps-20260821",
+      "type": "lesson-update",
+      "target": "h7",
+      "lesson": {
+        "drill": "20 consecutive hits on a coin-sized target from four feet.",
+        "steps": [
+          "Coin-sized target, four feet away.",
+          "Hit it 20 times in a row. A miss restarts the count.",
+          "Full routine on the last five — those are the ones with real pressure.",
+          "Track the longest streak in your notes.",
+          "Mark the streak day done when you finish."
+        ],
+        "score": "20 in a row, or the longest streak you got to. The last five are the whole point.",
+        "viz": {
+          "h": 46,
+          "cap": "Twenty in a row · a miss restarts it",
+          "parts": [
+            {
+              "k": "ball",
+              "x": 8,
+              "y": 18,
+              "r": 1.9
+            },
+            {
+              "k": "dot",
+              "x": 88,
+              "y": 18,
+              "c": "i",
+              "r": 2.0
+            },
+            {
+              "k": "text",
+              "x": 88,
+              "y": 11,
+              "t": "a coin, 4 ft",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "arrow",
+              "x1": 12,
+              "y1": 18,
+              "x2": 82,
+              "y2": 18,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "box",
+              "x": 6.0,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 10.5,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 15.0,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 19.5,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 24.0,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 28.5,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 33.0,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 37.5,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 42.0,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 46.5,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 51.0,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 55.5,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 60.0,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 64.5,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 69.0,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "g",
+              "r": 0.6,
+              "f": "g",
+              "o": 0.5
+            },
+            {
+              "k": "box",
+              "x": 73.5,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "b",
+              "r": 0.6,
+              "f": "b",
+              "o": 0.35
+            },
+            {
+              "k": "box",
+              "x": 78.0,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "b",
+              "r": 0.6,
+              "f": "b",
+              "o": 0.35
+            },
+            {
+              "k": "box",
+              "x": 82.5,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "b",
+              "r": 0.6,
+              "f": "b",
+              "o": 0.35
+            },
+            {
+              "k": "box",
+              "x": 87.0,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "b",
+              "r": 0.6,
+              "f": "b",
+              "o": 0.35
+            },
+            {
+              "k": "box",
+              "x": 91.5,
+              "y": 30,
+              "bw": 3.4,
+              "bh": 5,
+              "c": "b",
+              "r": 0.6,
+              "f": "b",
+              "o": 0.35
+            },
+            {
+              "k": "text",
+              "x": 46,
+              "y": 43,
+              "t": "the last five carry the pressure",
+              "sz": 2.6,
+              "c": "b",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h9-steps-20260821",
+      "type": "lesson-update",
+      "target": "h9",
+      "lesson": {
+        "drill": "Three blocks of ten at five feet on carpet, one dial changed at a time.",
+        "steps": [
+          "Block 1 — conventional grip, your normal stroke. This is the BASELINE.",
+          "Block 2 — claw grip, your normal stroke.",
+          "Block 3 — conventional grip, the pop stroke.",
+          "All three in one sitting, at 5 ft, same target. Write all three numbers down.",
+          "Whichever wins gets taken to the 20-ball five-footer on a real green."
+        ],
+        "score": "Carpet picks the candidate; the green decides it. Changing two dials at once tells you nothing.",
+        "viz": {
+          "h": 52,
+          "cap": "One dial at a time, or it proves nothing",
+          "parts": [
+            {
+              "k": "box",
+              "x": 6,
+              "y": 14,
+              "bw": 26,
+              "bh": 16,
+              "c": "i",
+              "r": 1.2,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 19,
+              "y": 21,
+              "t": "conventional",
+              "sz": 2.6,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 19,
+              "y": 26,
+              "t": "normal stroke",
+              "sz": 2.4,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 37,
+              "y": 14,
+              "bw": 26,
+              "bh": 16,
+              "c": "i",
+              "r": 1.2,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 21,
+              "t": "CLAW",
+              "sz": 2.6,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 26,
+              "t": "normal stroke",
+              "sz": 2.4,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 68,
+              "y": 14,
+              "bw": 26,
+              "bh": 16,
+              "c": "i",
+              "r": 1.2,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 81,
+              "y": 21,
+              "t": "conventional",
+              "sz": 2.6,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 81,
+              "y": 26,
+              "t": "POP stroke",
+              "sz": 2.4,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 19,
+              "y": 10,
+              "t": "baseline",
+              "sz": 2.5,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 40,
+              "t": "10 balls each · 5 ft · one sitting",
+              "sz": 2.8,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 47,
+              "t": "the winner goes to a real green before you adopt it",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h10-steps-20260821",
+      "type": "lesson-update",
+      "target": "h10",
+      "lesson": {
+        "drill": "Three minutes, before every laser session. A hardcover book is the square edge.",
+        "steps": [
+          "Lay a hardcover book flat on the carpet, one long edge running at your target.",
+          "Set up in your real posture. Put the putter FACE flush against the book's end edge.",
+          "Rotate the LASER HEAD until the beam runs down the line onto the target. That is the face, not the shaft.",
+          "Mark the clamp with a strip of tape so any movement is visible.",
+          "Re-check at the END of the session — 30 seconds."
+        ],
+        "score": "If the end check fails, throw the session's numbers out. Half-believing them is worse than not measuring.",
+        "viz": {
+          "h": 52,
+          "cap": "Top down · square the beam to the FACE",
+          "parts": [
+            {
+              "k": "box",
+              "x": 20,
+              "y": 14,
+              "bw": 44,
+              "bh": 16,
+              "c": "i",
+              "r": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 20,
+              "y1": 14,
+              "x2": 20,
+              "y2": 30,
+              "c": "i",
+              "w": 1.6
+            },
+            {
+              "k": "club",
+              "x1": 18,
+              "y1": 14,
+              "x2": 18,
+              "y2": 30,
+              "c": "g",
+              "w": 1.8
+            },
+            {
+              "k": "text",
+              "x": 10,
+              "y": 37,
+              "t": "putter face,",
+              "sz": 2.4,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 10,
+              "y": 41,
+              "t": "flush to the edge",
+              "sz": 2.4,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 46,
+              "y": 36,
+              "t": "HARDCOVER BOOK",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "line",
+              "x1": 20,
+              "y1": 22,
+              "x2": 92,
+              "y2": 22,
+              "c": "b",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "arrow",
+              "x1": 86,
+              "y1": 22,
+              "x2": 95,
+              "y2": 22,
+              "c": "b",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 80,
+              "y": 17,
+              "t": "beam",
+              "sz": 2.5,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 49,
+              "t": "tape the clamp · re-check at the end",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h11-steps-20260821",
+      "type": "lesson-update",
+      "target": "h11",
+      "lesson": {
+        "drill": "Ten balls at a coin six feet away, laser calibrated, a taped scale at the target.",
+        "steps": [
+          "Calibrate the laser to the face first. Always first.",
+          "Tape a strip of paper across the line AT the target, marked in half-inches out to four each way. The scale is what turns a clip into a measurement.",
+          "Phone behind the ball, low, on the line.",
+          "Full routine every ball. Aim by the barely-open feel. Hold still two seconds at address so the beam is readable, then putt.",
+          "Log every ball's offset in inches, L or R. Ten numbers and one average."
+        ],
+        "score": "An average, in inches, for 'barely open' — measured for the first time. Send the clip.",
+        "viz": {
+          "h": 50,
+          "cap": "The scale is what makes it a measurement",
+          "parts": [
+            {
+              "k": "ball",
+              "x": 12,
+              "y": 26,
+              "r": 1.9
+            },
+            {
+              "k": "line",
+              "x1": 14,
+              "y1": 26,
+              "x2": 74,
+              "y2": 26,
+              "c": "b",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "line",
+              "x1": 78,
+              "y1": 12,
+              "x2": 78,
+              "y2": 40,
+              "c": "i",
+              "w": 1.3
+            },
+            {
+              "k": "line",
+              "x1": 75,
+              "y1": 14.0,
+              "x2": 81,
+              "y2": 14.0,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 75,
+              "y1": 17.25,
+              "x2": 81,
+              "y2": 17.25,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 75,
+              "y1": 20.5,
+              "x2": 81,
+              "y2": 20.5,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 75,
+              "y1": 23.75,
+              "x2": 81,
+              "y2": 23.75,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 75,
+              "y1": 27.0,
+              "x2": 81,
+              "y2": 27.0,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 75,
+              "y1": 30.25,
+              "x2": 81,
+              "y2": 30.25,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 75,
+              "y1": 33.5,
+              "x2": 81,
+              "y2": 33.5,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 75,
+              "y1": 36.75,
+              "x2": 81,
+              "y2": 36.75,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 75,
+              "y1": 40.0,
+              "x2": 81,
+              "y2": 40.0,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "dot",
+              "x": 78,
+              "y": 20,
+              "c": "b",
+              "r": 1.5
+            },
+            {
+              "k": "text",
+              "x": 90,
+              "y": 15,
+              "t": "4\" L",
+              "sz": 2.4,
+              "c": "f",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 90,
+              "y": 39,
+              "t": "4\" R",
+              "sz": 2.4,
+              "c": "f",
+              "a": "start"
+            },
+            {
+              "k": "cam",
+              "x": 8,
+              "y": 26,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 40,
+              "y": 20,
+              "t": "hold two seconds at address",
+              "sz": 2.6,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 45,
+              "y": 46,
+              "t": "10 balls · log every offset in inches",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h12-steps-20260821",
+      "type": "lesson-update",
+      "target": "h12",
+      "lesson": {
+        "drill": "The monthly re-check. Five balls, and most months you do nothing about it.",
+        "steps": [
+          "Calibrate. Target at six feet. Phone behind, on the line.",
+          "Five putts with the full routine.",
+          "Eyes on the ball and the face — never on the floor. You are measuring, not aiming at a beam.",
+          "Read the average offset off the film afterwards.",
+          "Under an inch either way is nothing to act on. Put it away for another month."
+        ],
+        "score": "A bias in the SAME direction across all five is drift — log it in the app before you change anything in the routine.",
+        "viz": {
+          "h": 44,
+          "cap": "Under an inch is not a finding",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 10,
+              "y1": 22,
+              "x2": 90,
+              "y2": 22,
+              "c": "f",
+              "w": 0.8
+            },
+            {
+              "k": "line",
+              "x1": 50,
+              "y1": 15,
+              "x2": 50,
+              "y2": 29,
+              "c": "i",
+              "w": 1.3
+            },
+            {
+              "k": "box",
+              "x": 38,
+              "y": 16,
+              "bw": 24,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "d": 1,
+              "f": "g",
+              "o": 0.12
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 11,
+              "t": "do nothing",
+              "sz": 2.7,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 28,
+              "y": 34,
+              "t": "1\" L",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 72,
+              "y": 34,
+              "t": "1\" R",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "dot",
+              "x": 46,
+              "y": 22,
+              "c": "i",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 53,
+              "y": 22,
+              "c": "i",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 49,
+              "y": 22,
+              "c": "i",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 56,
+              "y": 22,
+              "c": "i",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 44,
+              "y": 22,
+              "c": "i",
+              "r": 1.3
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 41,
+              "t": "five in the same direction is drift — log it",
+              "sz": 2.7,
+              "c": "b",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-h13-steps-20260821",
+      "type": "lesson-update",
+      "target": "h13",
+      "lesson": {
+        "drill": "Every laser session: three clips, about four minutes.",
+        "steps": [
+          "BEHIND — 10 balls, scale taped at the target, phone low and on the line.",
+          "OVERHEAD — 5 balls, phone directly over the ball.",
+          "FACE-ON — 5 balls, shin height, square to you.",
+          "Call the ball number out loud on the behind clips so numbers can be matched to film later.",
+          "Send all three."
+        ],
+        "score": "Three clips is a filmed session and it lands in the Putting Lab like any other. Two clips is a note.",
+        "viz": {
+          "h": 50,
+          "cap": "Three angles, four minutes",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 16,
+              "y1": 26,
+              "x2": 78,
+              "y2": 26,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "ball",
+              "x": 52,
+              "y": 26,
+              "r": 1.9
+            },
+            {
+              "k": "cam",
+              "x": 14,
+              "y": 26,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 14,
+              "y": 20,
+              "t": "BEHIND",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 14,
+              "y": 33,
+              "t": "10 balls",
+              "sz": 2.4,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "cam",
+              "x": 52,
+              "y": 10,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 52,
+              "y": 5,
+              "t": "OVERHEAD · 5",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "cam",
+              "x": 52,
+              "y": 42,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 52,
+              "y": 47.5,
+              "t": "FACE-ON · 5",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "line",
+              "x1": 84,
+              "y1": 16,
+              "x2": 84,
+              "y2": 36,
+              "c": "i",
+              "w": 1.2
+            },
+            {
+              "k": "text",
+              "x": 90,
+              "y": 26,
+              "t": "scale",
+              "sz": 2.4,
+              "c": "f",
+              "a": "start"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-sw1-steps-20260821",
+      "type": "lesson-update",
+      "target": "sw1",
+      "lesson": {
+        "drill": "Clear the space, check the grip, warm up. Every session, before anything else.",
+        "steps": [
+          "About 8 ft clear all round and a high ceiling. Never near people, lights or a TV.",
+          "Normal conventional grip and your REAL posture — it only transfers if the setup matches.",
+          "20–30 slow smooth swings before anything hard. At 550 g it is heavier than your driver.",
+          "Add a few LEFT-handed swings each session to balance the body.",
+          "A cold max swing is how you tweak a back. There is no version of this that skips the warm-up."
+        ],
+        "score": "Space checked and 20–30 easy swings in before the first hard one. Every session, no exceptions.",
+        "viz": {
+          "h": 64,
+          "cap": "About 8 ft clear, all the way round",
+          "parts": [
+            {
+              "k": "ring",
+              "x": 50,
+              "y": 28,
+              "r": 24,
+              "c": "g"
+            },
+            {
+              "k": "dot",
+              "x": 50,
+              "y": 28,
+              "c": "i",
+              "r": 2.6
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 10,
+              "t": "✗ people",
+              "sz": 2.5,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 96,
+              "y": 10,
+              "t": "✗ lights",
+              "sz": 2.5,
+              "c": "b",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 50,
+              "t": "✗ low ceiling",
+              "sz": 2.5,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 96,
+              "y": 50,
+              "t": "✗ the TV",
+              "sz": 2.5,
+              "c": "b",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 58,
+              "t": "550 g — heavier than your driver",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 63,
+              "t": "20–30 slow swings before anything hard",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-sw2-steps-20260821",
+      "type": "lesson-update",
+      "target": "sw2",
+      "lesson": {
+        "drill": "6–8 slow one-handed trail-arm swings to open, then again before every two-handed set.",
+        "steps": [
+          "6–8 slow one-handed trail-arm swings to open the session.",
+          "Then repeat them inside Drill 1, before each two-handed set.",
+          "Slow. There is no speed in this one.",
+          "Any session where the top feels across the line, go back to one-handed until the drop returns."
+        ],
+        "score": "One-handed reps between every set, not just at the start. This is the reset that is already working.",
+        "viz": {
+          "h": 40,
+          "cap": "Between every set, not just at the start",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 8,
+              "t": "6–8 SLOW REPS TO OPEN, THEN BEFORE EVERY SET",
+              "sz": 2.5,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 6,
+              "y": 14,
+              "bw": 20,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "f": "g",
+              "o": 0.16
+            },
+            {
+              "k": "text",
+              "x": 16,
+              "y": 21.6,
+              "t": "1-hand",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 28,
+              "y": 14,
+              "bw": 20,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 38,
+              "y": 21.6,
+              "t": "2-hand",
+              "sz": 2.6,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 50,
+              "y": 14,
+              "bw": 20,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "f": "g",
+              "o": 0.16
+            },
+            {
+              "k": "text",
+              "x": 60,
+              "y": 21.6,
+              "t": "1-hand",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 72,
+              "y": 14,
+              "bw": 22,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 83,
+              "y": 21.6,
+              "t": "2-hand",
+              "sz": 2.6,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 35,
+              "t": "top feels across the line? back to one-handed until the drop returns",
+              "sz": 2.4,
+              "c": "b",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-sw3-steps-20260821",
+      "type": "lesson-update",
+      "target": "sw3",
+      "lesson": {
+        "drill": "Warm in one-handed, then 2 sets of 10 two-handed, both directions, dial low.",
+        "steps": [
+          "Warm in with the one-handed reps.",
+          "2 sets of 10 two-handed, both directions, dial LOW.",
+          "Every session without exception — this one outranks the rest.",
+          "If the click is firing early, the load was not patient enough.",
+          "Slow the TRANSITION, not the backswing. They are not the same thing."
+        ],
+        "score": "Two sets of ten, every session. An early click means go back and be more patient at the top, not slower going back.",
+        "viz": {
+          "h": 48,
+          "cap": "Which part to slow down",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 10,
+              "t": "2 sets of 10 · both directions · dial LOW",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 8,
+              "y": 18,
+              "bw": 26,
+              "bh": 10,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 21,
+              "y": 24.6,
+              "t": "backswing",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 36,
+              "y": 18,
+              "bw": 20,
+              "bh": 10,
+              "c": "b",
+              "r": 1,
+              "f": "b",
+              "o": 0.2
+            },
+            {
+              "k": "text",
+              "x": 46,
+              "y": 24.6,
+              "t": "transition",
+              "sz": 2.5,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 58,
+              "y": 18,
+              "bw": 34,
+              "bh": 10,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 75,
+              "y": 24.6,
+              "t": "downswing",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "arrow",
+              "x1": 46,
+              "y1": 38,
+              "x2": 46,
+              "y2": 30,
+              "c": "b",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 46,
+              "y": 44,
+              "t": "slow THIS one",
+              "sz": 2.7,
+              "c": "b",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-sw4-steps-20260821",
+      "type": "lesson-update",
+      "target": "sw4",
+      "lesson": {
+        "drill": "3 sets of 8, listening every rep. The click must live at or past the bottom.",
+        "steps": [
+          "3 sets of 8. Listen on every rep.",
+          "The click should crack at the BOTTOM of the arc, at or just past your lead leg.",
+          "A click up in the downswing is casting — the speed is spent above the ball.",
+          "Keep the wrists hinged and let the head release LATE.",
+          "Log whether the click is firing past the ball yet."
+        ],
+        "score": "The click at or past the bottom, consistently. You do not need a camera or an opinion for this one — you need to listen.",
+        "viz": {
+          "h": 56,
+          "cap": "You can hear this one",
+          "parts": [
+            {
+              "k": "curve",
+              "x1": 14,
+              "y1": 8,
+              "cx": 50,
+              "cy": 52,
+              "x2": 86,
+              "y2": 8,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 31,
+              "r": 1.9
+            },
+            {
+              "k": "dot",
+              "x": 32,
+              "y": 24.5,
+              "c": "b",
+              "r": 1.7
+            },
+            {
+              "k": "line",
+              "x1": 23,
+              "y1": 31,
+              "x2": 30.5,
+              "y2": 26,
+              "c": "b",
+              "w": 0.5,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 34,
+              "t": "✗ click here = casting",
+              "sz": 2.5,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "dot",
+              "x": 57,
+              "y": 29,
+              "c": "g",
+              "r": 1.7
+            },
+            {
+              "k": "text",
+              "x": 62,
+              "y": 38,
+              "t": "✓ at or just past the ball",
+              "sz": 2.5,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 50,
+              "t": "wrists hinged · let the head release LATE",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-sw5-steps-20260821",
+      "type": "lesson-update",
+      "target": "sw5",
+      "lesson": {
+        "drill": "2 sets of 8, straight after the wall and trail-foot-back drills.",
+        "steps": [
+          "Run the wall drill and the trail-foot-back drill from your swing plan first.",
+          "Then 2 sets of 8 here, while the feel is still fresh.",
+          "Feel the lead hip clear BACK and UP through impact — not sliding toward the target.",
+          "The order is the drill. On its own it trains half of it."
+        ],
+        "score": "Two sets of eight, run immediately after the other two. Doing it cold on another day is a different exercise.",
+        "viz": {
+          "h": 38,
+          "cap": "The order is the drill",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 8,
+              "t": "RUN IT WHILE THE FEEL IS FRESH",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 4,
+              "y": 16,
+              "bw": 26,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 17,
+              "y": 23.6,
+              "t": "wall drill",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "arrow",
+              "x1": 31,
+              "y1": 22,
+              "x2": 35,
+              "y2": 22,
+              "c": "f",
+              "w": 0.7
+            },
+            {
+              "k": "box",
+              "x": 36,
+              "y": 16,
+              "bw": 26,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 49,
+              "y": 23.6,
+              "t": "trail foot back",
+              "sz": 2.3,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "arrow",
+              "x1": 63,
+              "y1": 22,
+              "x2": 67,
+              "y2": 22,
+              "c": "f",
+              "w": 0.7
+            },
+            {
+              "k": "box",
+              "x": 68,
+              "y": 16,
+              "bw": 28,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "f": "g",
+              "o": 0.16
+            },
+            {
+              "k": "text",
+              "x": 82,
+              "y": 23.6,
+              "t": "2 × 8 here",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-sw6-steps-20260821",
+      "type": "lesson-update",
+      "target": "sw6",
+      "lesson": {
+        "drill": "10 slow reps to a PAUSE at the top. No speed at all.",
+        "steps": [
+          "Slow reps to a full PAUSE at the top. There is no speed in this drill.",
+          "At the pause, feel the trail elbow point DOWN and stay IN FRONT of your trail-hip seam.",
+          "Check in a mirror, or a phone on a tripod: the shaft must point AT the target line, not right of it.",
+          "10 reps. Pause and check on every one.",
+          "The whippy shaft is why this is worth doing on the 201 — a normal club hides an off-plane top well enough to need film."
+        ],
+        "score": "Shaft pointing at the line, not right of it, on 10 out of 10. Pointing right is across the line — the fault filmed Jul 26 on both clubs.",
+        "viz": {
+          "h": 62,
+          "cap": "Top down at the top · across the line points RIGHT of target",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 8,
+              "t": "trail elbow down and IN FRONT of the trail-hip seam",
+              "sz": 2.6,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "line",
+              "x1": 20,
+              "y1": 26,
+              "x2": 94,
+              "y2": 26,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 56,
+              "y": 22,
+              "t": "target line",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "dot",
+              "x": 20,
+              "y": 26,
+              "c": "i",
+              "r": 1.9
+            },
+            {
+              "k": "club",
+              "x1": 20,
+              "y1": 26,
+              "x2": 72,
+              "y2": 26,
+              "c": "g",
+              "w": 1.9
+            },
+            {
+              "k": "text",
+              "x": 76,
+              "y": 22,
+              "t": "✓ on line",
+              "sz": 2.6,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "club",
+              "x1": 20,
+              "y1": 26,
+              "x2": 74,
+              "y2": 44,
+              "c": "b",
+              "w": 1.9
+            },
+            {
+              "k": "text",
+              "x": 78,
+              "y": 46,
+              "t": "✗ across",
+              "sz": 2.6,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 56,
+              "t": "10 slow reps to a PAUSE · no speed at all",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        },
+        "title": "Kill the across-the-line top"
+      }
+    },
+    {
+      "id": "lesson-sw7-steps-20260821",
+      "type": "lesson-update",
+      "target": "sw7",
+      "lesson": {
+        "drill": "3 sets of 5 max-effort swings, full rest between sets.",
+        "steps": [
+          "3 sets of 5 max-effort swings. FULL rest between sets — this is speed work, not conditioning.",
+          "Add a few non-dominant-side swings.",
+          "Benchmark: the highest dial setting you can consistently trigger. Track it week over week.",
+          "Alternate a tempo day (low dial, Drills 1–4) with a speed day. Do not grind both.",
+          "Pre-round: 15–20 EASY swings only — a warm-up and a tempo primer, never a speed session."
+        ],
+        "score": "The highest dial you can consistently trigger, climbing week over week. That is the only number on this drill.",
+        "viz": {
+          "h": 46,
+          "cap": "Alternate the days · never grind both",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 9,
+              "t": "THE WEEK",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 4,
+              "y": 15,
+              "bw": 28,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 18,
+              "y": 22.6,
+              "t": "tempo day",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 36,
+              "y": 15,
+              "bw": 28,
+              "bh": 12,
+              "c": "b",
+              "r": 1,
+              "f": "b",
+              "o": 0.18
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 22.6,
+              "t": "speed day",
+              "sz": 2.5,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 68,
+              "y": 15,
+              "bw": 28,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 82,
+              "y": 22.6,
+              "t": "tempo day",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 35,
+              "t": "3 × 5 max effort · full rest between sets",
+              "sz": 2.7,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 42,
+              "t": "pre-round is 15–20 EASY swings, never this",
+              "sz": 2.6,
+              "c": "b",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-g1-steps-20260821",
+      "type": "lesson-update",
+      "target": "g1",
+      "lesson": {
+        "drill": "First 3 minutes of every round: two long putts, looking at the hole.",
+        "steps": [
+          "Two long putts on the practice green. Look at the HOLE, not the ball.",
+          "Call the finish spot out loud before the ball stops.",
+          "That is it. Two putts, three minutes.",
+          "It calibrates the day's speed better than ten mechanical reps do."
+        ],
+        "score": "Two called finishes before you tee off. Speed is the one thing that changes green to green and day to day.",
+        "viz": {
+          "h": 54,
+          "cap": "Three minutes, two putts, before every round",
+          "parts": [
+            {
+              "k": "ball",
+              "x": 10,
+              "y": 26,
+              "r": 1.9
+            },
+            {
+              "k": "hole",
+              "x": 84,
+              "y": 26,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "ring",
+              "x": 84,
+              "y": 26,
+              "r": 7,
+              "c": "g"
+            },
+            {
+              "k": "arrow",
+              "x1": 14,
+              "y1": 26,
+              "x2": 72,
+              "y2": 26,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "dot",
+              "x": 70,
+              "y": 26,
+              "c": "g",
+              "r": 1.6
+            },
+            {
+              "k": "text",
+              "x": 30,
+              "y": 18,
+              "t": "eyes on the HOLE, not the ball",
+              "sz": 2.7,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 64,
+              "y": 40,
+              "t": "call the finish out loud",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 49,
+              "t": "first 3 minutes, every round",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-g2-steps-20260821",
+      "type": "lesson-update",
+      "target": "g2",
+      "lesson": {
+        "drill": "The same flat 10-footer in both directions, with the same stroke.",
+        "steps": [
+          "Find a flat 10-footer on the practice green.",
+          "Putt it one way with your normal stroke. Note where it finishes.",
+          "Putt it back the other way with the SAME stroke. Note where that finishes.",
+          "The gap between the two is the day's grain strength.",
+          "Remember it on the course — it is the read under the read."
+        ],
+        "score": "One number: how much further the ball runs downgrain. Same stroke both ways, or it measures nothing.",
+        "viz": {
+          "h": 58,
+          "cap": "Same stroke, both directions",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 10,
+              "t": "same flat 10-footer, both ways, same stroke",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 10,
+              "y": 18,
+              "r": 1.9
+            },
+            {
+              "k": "hole",
+              "x": 58,
+              "y": 18,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "arrow",
+              "x1": 14,
+              "y1": 18,
+              "x2": 68,
+              "y2": 18,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "dot",
+              "x": 72,
+              "y": 18,
+              "c": "g",
+              "r": 1.7
+            },
+            {
+              "k": "text",
+              "x": 80,
+              "y": 24,
+              "t": "ran on",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 90,
+              "y": 38,
+              "r": 1.9
+            },
+            {
+              "k": "hole",
+              "x": 42,
+              "y": 38,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "arrow",
+              "x1": 86,
+              "y1": 38,
+              "x2": 34,
+              "y2": 38,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "dot",
+              "x": 30,
+              "y": 38,
+              "c": "b",
+              "r": 1.7
+            },
+            {
+              "k": "text",
+              "x": 22,
+              "y": 45,
+              "t": "came up short",
+              "sz": 2.6,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 54,
+              "t": "the gap between the finishes is the grain",
+              "sz": 2.7,
+              "c": "g",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-g3-steps-20260821",
+      "type": "lesson-update",
+      "target": "g3",
+      "lesson": {
+        "drill": "Nine holes of guessing the break with your feet before you read it.",
+        "steps": [
+          "Stand halfway along the putt, level with the middle of it.",
+          "Close your eyes. Feel which foot is lower. That is the break.",
+          "Say it out loud BEFORE you do your normal read.",
+          "Then read it normally and putt as usual.",
+          "Count how often the feet-read was right."
+        ],
+        "score": "Most players start trusting their feet by hole five. Count the hits — the count is the whole drill.",
+        "viz": {
+          "h": 58,
+          "cap": "Read from the low side, feet only",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 8,
+              "y1": 40,
+              "x2": 92,
+              "y2": 18,
+              "c": "g",
+              "w": 1.4
+            },
+            {
+              "k": "ball",
+              "x": 22,
+              "y": 36,
+              "r": 1.9
+            },
+            {
+              "k": "hole",
+              "x": 78,
+              "y": 21,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "text",
+              "x": 72,
+              "y": 15,
+              "t": "hole",
+              "sz": 2.4,
+              "c": "f",
+              "a": "end"
+            },
+            {
+              "k": "dot",
+              "x": 50,
+              "y": 26,
+              "c": "i",
+              "r": 2.3
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 20,
+              "t": "you",
+              "sz": 2.4,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 6,
+              "y": 47,
+              "t": "LOW side",
+              "sz": 2.6,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 96,
+              "y": 14,
+              "t": "HIGH side",
+              "sz": 2.6,
+              "c": "f",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 8,
+              "t": "count how often the feet-read was right",
+              "sz": 2.7,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 54,
+              "t": "stand halfway · eyes closed · then read it normally",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-g4-steps-20260821",
+      "type": "lesson-update",
+      "target": "g4",
+      "lesson": {
+        "drill": "The same 12-foot breaker at three different speeds.",
+        "steps": [
+          "Pick one 12-foot breaker and stay on it.",
+          "One putt that dies at the front edge. Watch the line it needed.",
+          "One that finishes a foot past. Then one two feet past.",
+          "Watch how much the line changes between them. Dying speed doubles the break.",
+          "Then three at CAPTURE speed on the capture-speed line. That pairing is the one to groove."
+        ],
+        "score": "Capture speed is about a foot past — it keeps the hole biggest and matches how you practise. Pick the speed first, then the line.",
+        "viz": {
+          "h": 58,
+          "cap": "One putt, three correct lines",
+          "parts": [
+            {
+              "k": "ball",
+              "x": 12,
+              "y": 40,
+              "r": 1.9
+            },
+            {
+              "k": "hole",
+              "x": 82,
+              "y": 21,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "ring",
+              "x": 82,
+              "y": 21,
+              "r": 6,
+              "c": "g"
+            },
+            {
+              "k": "curve",
+              "x1": 14,
+              "y1": 39,
+              "cx": 28,
+              "cy": 14,
+              "x2": 79,
+              "y2": 21,
+              "c": "b",
+              "w": 0.7
+            },
+            {
+              "k": "curve",
+              "x1": 14,
+              "y1": 39,
+              "cx": 40,
+              "cy": 22,
+              "x2": 79,
+              "y2": 21,
+              "c": "g",
+              "w": 0.7
+            },
+            {
+              "k": "curve",
+              "x1": 14,
+              "y1": 39,
+              "cx": 55,
+              "cy": 33,
+              "x2": 79,
+              "y2": 21,
+              "c": "f",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 12,
+              "t": "✗ dying — doubles the break",
+              "sz": 2.5,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 96,
+              "y": 45,
+              "t": "✗ too firm — takes it out",
+              "sz": 2.5,
+              "c": "f",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 54,
+              "t": "✓ capture speed: a foot past. Speed first, then line.",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-g5-steps-20260821",
+      "type": "lesson-update",
+      "target": "g5",
+      "lesson": {
+        "drill": "Around the clock at four feet — but find the fall line before you start.",
+        "steps": [
+          "Find the fall line through the hole FIRST. Everything else follows from it.",
+          "Place 8 balls in a circle at 4 ft.",
+          "Before each putt, say its clock position and the break you expect out loud.",
+          "The two balls sitting ON the fall line are dead straight. Know which they are.",
+          "This stacks straight onto your 20-ball five-footer test."
+        ],
+        "score": "Saying the break out loud before each one. A putt you cannot describe is a putt you guessed.",
+        "viz": {
+          "h": 62,
+          "cap": "Find the fall line first",
+          "parts": [
+            {
+              "k": "ring",
+              "x": 50,
+              "y": 28,
+              "r": 16,
+              "c": "f"
+            },
+            {
+              "k": "hole",
+              "x": 50,
+              "y": 28,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "line",
+              "x1": 50,
+              "y1": 10,
+              "x2": 50,
+              "y2": 46,
+              "c": "g",
+              "w": 1.1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 62,
+              "y": 9,
+              "t": "fall line",
+              "sz": 2.5,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "ball",
+              "x": 66,
+              "y": 28,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 61.3,
+              "y": 39.3,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 44,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 38.7,
+              "y": 39.3,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 34,
+              "y": 28,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 38.7,
+              "y": 16.7,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 12,
+              "r": 1.9
+            },
+            {
+              "k": "ball",
+              "x": 61.3,
+              "y": 16.7,
+              "r": 1.9
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 52,
+              "t": "the two putts ON the fall line are straight",
+              "sz": 2.7,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 58,
+              "t": "say the position and the break out loud, every ball",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-w1-steps-20260821",
+      "type": "lesson-update",
+      "target": "w1",
+      "lesson": {
+        "drill": "Three swing lengths per wedge, five balls each, at the range.",
+        "steps": [
+          "Feel the three swings as a clock: hands to 9 o'clock (half), 10:30 (three-quarter), and full.",
+          "5 balls per swing length per wedge. Ignore the best and the worst; average the middle three.",
+          "Three wedges × three swings = nine numbers covering 45 to 110 yards.",
+          "Enter them in the wedge matrix in the Bag tab.",
+          "Re-check twice a season."
+        ],
+        "score": "Nine numbers in the matrix. Six of them do not exist yet — only the full swings have ever been written down.",
+        "viz": {
+          "h": 68,
+          "cap": "Nine numbers · six of them are still blank",
+          "parts": [
+            {
+              "k": "text",
+              "x": 39,
+              "y": 12,
+              "t": "9:00",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 61,
+              "y": 12,
+              "t": "10:30",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 83,
+              "y": 12,
+              "t": "FULL",
+              "sz": 2.6,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 10,
+              "y": 23,
+              "t": "50°",
+              "sz": 2.8,
+              "c": "i",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 10,
+              "y": 35,
+              "t": "56°",
+              "sz": 2.8,
+              "c": "i",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 10,
+              "y": 47,
+              "t": "60°",
+              "sz": 2.8,
+              "c": "i",
+              "a": "start"
+            },
+            {
+              "k": "box",
+              "x": 30,
+              "y": 16,
+              "bw": 18,
+              "bh": 10,
+              "c": "b",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 39,
+              "y": 23,
+              "t": "?",
+              "sz": 3.2,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 52,
+              "y": 16,
+              "bw": 18,
+              "bh": 10,
+              "c": "b",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 61,
+              "y": 23,
+              "t": "?",
+              "sz": 3.2,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 74,
+              "y": 16,
+              "bw": 18,
+              "bh": 10,
+              "c": "i",
+              "r": 1
+            },
+            {
+              "k": "text",
+              "x": 83,
+              "y": 23,
+              "t": "108",
+              "sz": 2.8,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 30,
+              "y": 28,
+              "bw": 18,
+              "bh": 10,
+              "c": "b",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 39,
+              "y": 35,
+              "t": "?",
+              "sz": 3.2,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 52,
+              "y": 28,
+              "bw": 18,
+              "bh": 10,
+              "c": "b",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 61,
+              "y": 35,
+              "t": "?",
+              "sz": 3.2,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 74,
+              "y": 28,
+              "bw": 18,
+              "bh": 10,
+              "c": "i",
+              "r": 1
+            },
+            {
+              "k": "text",
+              "x": 83,
+              "y": 35,
+              "t": "95",
+              "sz": 2.8,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 30,
+              "y": 40,
+              "bw": 18,
+              "bh": 10,
+              "c": "b",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 39,
+              "y": 47,
+              "t": "?",
+              "sz": 3.2,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 52,
+              "y": 40,
+              "bw": 18,
+              "bh": 10,
+              "c": "b",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 61,
+              "y": 47,
+              "t": "?",
+              "sz": 3.2,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 74,
+              "y": 40,
+              "bw": 18,
+              "bh": 10,
+              "c": "i",
+              "r": 1
+            },
+            {
+              "k": "text",
+              "x": 83,
+              "y": 47,
+              "t": "80",
+              "sz": 2.8,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 59,
+              "t": "six of the nine numbers have never been measured",
+              "sz": 2.7,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 65,
+              "t": "5 balls per cell · average the middle three",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-w2-steps-20260821",
+      "type": "lesson-update",
+      "target": "w2",
+      "lesson": {
+        "drill": "No ball. Chipping swings that brush the grass with the SOLE. Listen for it.",
+        "steps": [
+          "No ball. Make chipping swings that brush the grass with the sole of the club.",
+          "Listen. You want a THUMP, not the scrape of the leading edge.",
+          "Your 56° has 10° of bounce and the 50° has 8° — let the sole skid, do not dig.",
+          "Then hit 10 chips trying to reproduce that same thump.",
+          "Judge it by the sound, not by the shot."
+        ],
+        "score": "Ten chips that sounded like the practice swings. A scrape means the leading edge got there first.",
+        "viz": {
+          "h": 56,
+          "cap": "Listen, do not look",
+          "parts": [
+            {
+              "k": "band",
+              "y": 32,
+              "h": 14,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 9,
+              "t": "no ball first · listen for the sound",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "club",
+              "x1": 18,
+              "y1": 14,
+              "x2": 28,
+              "y2": 30,
+              "c": "b",
+              "w": 1.5
+            },
+            {
+              "k": "line",
+              "x1": 28,
+              "y1": 30,
+              "x2": 30.5,
+              "y2": 37,
+              "c": "b",
+              "w": 1.7
+            },
+            {
+              "k": "text",
+              "x": 26,
+              "y": 44,
+              "t": "✗ scrape",
+              "sz": 2.7,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "club",
+              "x1": 56,
+              "y1": 14,
+              "x2": 66,
+              "y2": 30,
+              "c": "g",
+              "w": 1.5
+            },
+            {
+              "k": "line",
+              "x1": 62,
+              "y1": 32,
+              "x2": 74,
+              "y2": 32,
+              "c": "g",
+              "w": 1.7
+            },
+            {
+              "k": "text",
+              "x": 70,
+              "y": 44,
+              "t": "✓ thump",
+              "sz": 2.7,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 52,
+              "t": "then 10 chips reproducing it",
+              "sz": 2.6,
+              "c": "i",
+              "a": "middle"
+            }
+          ]
+        },
+        "where": "green"
+      }
+    },
+    {
+      "id": "lesson-w3-steps-20260821",
+      "type": "lesson-update",
+      "target": "w3",
+      "lesson": {
+        "drill": "One lie, three clubs, one pin. 50° runner, 56° standard, 60° pitch.",
+        "steps": [
+          "Same greenside lie for all three. Do not improve it between clubs.",
+          "Play a 50° runner, a 56° standard and a 60° pitch — all to the same pin.",
+          "Note which finishes closest.",
+          "Repeat from two more lies before you believe the answer.",
+          "The 60° is the one that feels best and finishes worst. That is the lesson."
+        ],
+        "score": "Nine times out of ten it is the LOWEST-lofted option that was available. Pick the boring one.",
+        "viz": {
+          "h": 58,
+          "cap": "Same lie, same pin, three clubs",
+          "parts": [
+            {
+              "k": "band",
+              "y": 38,
+              "h": 10,
+              "c": "g"
+            },
+            {
+              "k": "box",
+              "x": 52,
+              "y": 34,
+              "bw": 44,
+              "bh": 4,
+              "c": "g",
+              "r": 1,
+              "f": "g",
+              "o": 0.18
+            },
+            {
+              "k": "flag",
+              "x": 86,
+              "y": 36,
+              "c": "i"
+            },
+            {
+              "k": "ball",
+              "x": 12,
+              "y": 36,
+              "r": 1.9
+            },
+            {
+              "k": "curve",
+              "x1": 15,
+              "y1": 36,
+              "cx": 34,
+              "cy": 26,
+              "x2": 58,
+              "y2": 37,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "curve",
+              "x1": 15,
+              "y1": 36,
+              "cx": 40,
+              "cy": 18,
+              "x2": 68,
+              "y2": 37,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "curve",
+              "x1": 15,
+              "y1": 36,
+              "cx": 48,
+              "cy": 10,
+              "x2": 76,
+              "y2": 37,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 62,
+              "y": 12,
+              "t": "60° — highest, stops fastest",
+              "sz": 2.5,
+              "c": "f",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 62,
+              "y": 17,
+              "t": "56° — middle",
+              "sz": 2.5,
+              "c": "f",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 62,
+              "y": 22,
+              "t": "50° — lowest, runs out",
+              "sz": 2.5,
+              "c": "f",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 6,
+              "y": 44,
+              "t": "same lie",
+              "sz": 2.5,
+              "c": "f",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 52,
+              "t": "the lowest loft that was available usually wins",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-w4-steps-20260821",
+      "type": "lesson-update",
+      "target": "w4",
+      "lesson": {
+        "drill": "A towel three paces onto the green. Five balls each with all three wedges.",
+        "steps": [
+          "Lay a towel 3 paces onto the green. That is your landing spot, not the pin.",
+          "5 balls with the 50°, all landing on the towel.",
+          "5 with the 56°, then 5 with the 60° — same towel every time.",
+          "Watch how differently they finish from the SAME landing spot.",
+          "That difference is what club selection around the green actually is."
+        ],
+        "score": "Fifteen balls on one towel. If you are chasing the flag instead of the towel, the drill is not running.",
+        "viz": {
+          "h": 58,
+          "cap": "One landing spot, three finishes",
+          "parts": [
+            {
+              "k": "band",
+              "y": 34,
+              "h": 10,
+              "c": "g"
+            },
+            {
+              "k": "box",
+              "x": 30,
+              "y": 30,
+              "bw": 66,
+              "bh": 4,
+              "c": "g",
+              "r": 1,
+              "f": "g",
+              "o": 0.15
+            },
+            {
+              "k": "ball",
+              "x": 10,
+              "y": 32,
+              "r": 1.9
+            },
+            {
+              "k": "curve",
+              "x1": 13,
+              "y1": 32,
+              "cx": 26,
+              "cy": 22,
+              "x2": 43,
+              "y2": 30,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "curve",
+              "x1": 13,
+              "y1": 32,
+              "cx": 28,
+              "cy": 15,
+              "x2": 43,
+              "y2": 30,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "curve",
+              "x1": 13,
+              "y1": 32,
+              "cx": 31,
+              "cy": 9,
+              "x2": 43,
+              "y2": 30,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "box",
+              "x": 38,
+              "y": 29.5,
+              "bw": 10,
+              "bh": 3,
+              "c": "i",
+              "r": 0.6,
+              "f": "i",
+              "o": 0.35
+            },
+            {
+              "k": "dot",
+              "x": 74,
+              "y": 32,
+              "c": "i",
+              "r": 1.5
+            },
+            {
+              "k": "text",
+              "x": 74,
+              "y": 39,
+              "t": "50°",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "dot",
+              "x": 63,
+              "y": 32,
+              "c": "i",
+              "r": 1.5
+            },
+            {
+              "k": "text",
+              "x": 63,
+              "y": 39,
+              "t": "56°",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "dot",
+              "x": 53,
+              "y": 32,
+              "c": "i",
+              "r": 1.5
+            },
+            {
+              "k": "text",
+              "x": 53,
+              "y": 39,
+              "t": "60°",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 43,
+              "y": 46,
+              "t": "towel · 3 paces on",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 54,
+              "t": "same landing spot · watch how differently they finish",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-c1-steps-20260821",
+      "type": "lesson-update",
+      "target": "c1",
+      "lesson": {
+        "drill": "On every tee next round, say the dead side out loud before you pick a club.",
+        "steps": [
+          "Stand on the tee and find the DEAD side first — OB, water, trees, the drop.",
+          "Say it out loud. 'Dead right.'",
+          "Only then pick the club and the target, biased away from it.",
+          "The fat side is wherever a miss still leaves you a shot.",
+          "Log how many penalty strokes you take off the tee, and compare to your average."
+        ],
+        "score": "Penalty strokes off the tee, down. The order matters — naming the trouble before choosing the club is the whole drill.",
+        "viz": {
+          "h": 62,
+          "cap": "Name the dead side before you choose",
+          "parts": [
+            {
+              "k": "box",
+              "x": 18,
+              "y": 8,
+              "bw": 30,
+              "bh": 42,
+              "c": "g",
+              "r": 1.5,
+              "d": 1,
+              "f": "g",
+              "o": 0.1
+            },
+            {
+              "k": "text",
+              "x": 33,
+              "y": 15,
+              "t": "FAT",
+              "sz": 2.8,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 70,
+              "y": 8,
+              "bw": 26,
+              "bh": 42,
+              "c": "b",
+              "r": 1.5,
+              "d": 1,
+              "f": "b",
+              "o": 0.15
+            },
+            {
+              "k": "text",
+              "x": 83,
+              "y": 15,
+              "t": "DEAD",
+              "sz": 2.8,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 53,
+              "r": 1.9
+            },
+            {
+              "k": "arrow",
+              "x1": 50,
+              "y1": 51,
+              "x2": 36,
+              "y2": 16,
+              "c": "g",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 60,
+              "t": "say the dead side out loud BEFORE you pick a club",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-c2-steps-20260821",
+      "type": "lesson-update",
+      "target": "c2",
+      "lesson": {
+        "drill": "One round: aim at the dead centre of every green, whatever the pin is doing.",
+        "steps": [
+          "Every approach, every par 3, for one full round.",
+          "Take the number to the MIDDLE of the green. Not the flag.",
+          "Club to cover the middle — your standing miss is short, so this is where the two findings meet.",
+          "Ignore where the pin is. Completely.",
+          "Count greens hit and compare to your average."
+        ],
+        "score": "Greens in regulation, up. A tucked pin is a way to turn a good shot into a bad score.",
+        "viz": {
+          "h": 58,
+          "cap": "The middle, whatever the flag is doing",
+          "parts": [
+            {
+              "k": "box",
+              "x": 20,
+              "y": 8,
+              "bw": 60,
+              "bh": 32,
+              "c": "g",
+              "r": 10,
+              "f": "g",
+              "o": 0.12
+            },
+            {
+              "k": "flag",
+              "x": 70,
+              "y": 20,
+              "c": "i"
+            },
+            {
+              "k": "text",
+              "x": 80,
+              "y": 15,
+              "t": "pin",
+              "sz": 2.4,
+              "c": "f",
+              "a": "start"
+            },
+            {
+              "k": "ring",
+              "x": 50,
+              "y": 24,
+              "r": 7,
+              "c": "g"
+            },
+            {
+              "k": "dot",
+              "x": 50,
+              "y": 24,
+              "c": "g",
+              "r": 1.7
+            },
+            {
+              "k": "arrow",
+              "x1": 50,
+              "y1": 50,
+              "x2": 50,
+              "y2": 34,
+              "c": "g",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 46,
+              "y": 45,
+              "t": "aim HERE, every time",
+              "sz": 2.7,
+              "c": "g",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 56,
+              "t": "one round · count greens hit",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-c3-steps-20260821",
+      "type": "lesson-update",
+      "target": "c3",
+      "lesson": {
+        "drill": "Pick your money number. For three rounds, every lay-up finishes at it.",
+        "steps": [
+          "Pick the number — for most players a full gap wedge. For you the PW at 122 or the 50° at 108.",
+          "Next three rounds, every single lay-up finishes at that number.",
+          "That sometimes means hitting LESS club than you want to. Do it anyway.",
+          "A half wedge is the hardest shot in the bag and you have never measured one.",
+          "Track proximity from that number."
+        ],
+        "score": "Proximity from your money number. Three rounds of laying up to a full swing beats three rounds of laying up 'near the green'.",
+        "viz": {
+          "h": 56,
+          "cap": "Lay up to a full swing, not to the green",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 6,
+              "y1": 26,
+              "x2": 96,
+              "y2": 26,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "ball",
+              "x": 8,
+              "y": 26,
+              "r": 1.9
+            },
+            {
+              "k": "flag",
+              "x": 93,
+              "y": 26,
+              "c": "i"
+            },
+            {
+              "k": "box",
+              "x": 56,
+              "y": 20,
+              "bw": 14,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "d": 1,
+              "f": "g",
+              "o": 0.2
+            },
+            {
+              "k": "box",
+              "x": 72,
+              "y": 20,
+              "bw": 12,
+              "bh": 12,
+              "c": "b",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 60,
+              "y": 15,
+              "t": "your number",
+              "sz": 2.5,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 79,
+              "y": 15,
+              "t": "✗ half wedge",
+              "sz": 2.4,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 63,
+              "y": 40,
+              "t": "a FULL swing in",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 50,
+              "t": "next three rounds · track proximity from that number",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-c4-steps-20260821",
+      "type": "lesson-update",
+      "target": "c4",
+      "lesson": {
+        "drill": "From any trouble, play the shot you would bet $100 you can pull off 9 times in 10.",
+        "steps": [
+          "You are in trouble. Before anything else, accept that the score for this hole just went up.",
+          "List the options honestly, including the sideways one.",
+          "Pick the club and line you would bet $100 you can execute 9 times out of 10.",
+          "Nothing fancier. A hero shot that comes off once in four costs more than the bogey did.",
+          "Run this rule for one month."
+        ],
+        "score": "Doubles and others, down. Bogey is not an emergency — the shot that turns it into a triple is.",
+        "viz": {
+          "h": 58,
+          "cap": "The $100 question",
+          "parts": [
+            {
+              "k": "band",
+              "y": 46,
+              "h": 12,
+              "c": "g"
+            },
+            {
+              "k": "ball",
+              "x": 12,
+              "y": 42,
+              "r": 1.9
+            },
+            {
+              "k": "obj",
+              "x": 34,
+              "y": 30,
+              "c": "i"
+            },
+            {
+              "k": "obj",
+              "x": 38,
+              "y": 40,
+              "c": "i"
+            },
+            {
+              "k": "obj",
+              "x": 33,
+              "y": 20,
+              "c": "i"
+            },
+            {
+              "k": "box",
+              "x": 76,
+              "y": 36,
+              "bw": 20,
+              "bh": 4,
+              "c": "g",
+              "r": 1,
+              "f": "g",
+              "o": 0.18
+            },
+            {
+              "k": "flag",
+              "x": 88,
+              "y": 38,
+              "c": "i"
+            },
+            {
+              "k": "curve",
+              "x1": 15,
+              "y1": 41,
+              "cx": 52,
+              "cy": 12,
+              "x2": 80,
+              "y2": 36,
+              "c": "b",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 16,
+              "t": "✗ the hero shot",
+              "sz": 2.5,
+              "c": "b",
+              "a": "start"
+            },
+            {
+              "k": "arrow",
+              "x1": 15,
+              "y1": 43,
+              "x2": 44,
+              "y2": 52,
+              "c": "g",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 48,
+              "y": 55,
+              "t": "✓ the one you'd bet $100 on",
+              "sz": 2.5,
+              "c": "g",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 8,
+              "t": "the score already went up — do not let it go up twice",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-c5-steps-20260821",
+      "type": "lesson-update",
+      "target": "c5",
+      "lesson": {
+        "drill": "Nine holes of naming the lie and the correction out loud before every shot.",
+        "steps": [
+          "Before every full shot off a slope, say the lie out loud.",
+          "Then say the correction — 'above my feet, it goes left, aim right'.",
+          "THEN pick the club. Then swing.",
+          "Note on the card where each miss actually finished.",
+          "Score the CALLS, not the shots."
+        ],
+        "score": "The lies where your prediction and the ball disagreed. Those two are the ones to work on — the rest you already know.",
+        "viz": {
+          "h": 58,
+          "cap": "Four lies, four corrections",
+          "parts": [
+            {
+              "k": "box",
+              "x": 4,
+              "y": 10,
+              "bw": 44,
+              "bh": 16,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 26,
+              "y": 17,
+              "t": "ball ABOVE feet",
+              "sz": 2.4,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 26,
+              "y": 22.5,
+              "t": "goes LEFT — aim right",
+              "sz": 2.4,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 52,
+              "y": 10,
+              "bw": 44,
+              "bh": 16,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 74,
+              "y": 17,
+              "t": "ball BELOW feet",
+              "sz": 2.4,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 74,
+              "y": 22.5,
+              "t": "goes RIGHT — aim left",
+              "sz": 2.4,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 4,
+              "y": 30,
+              "bw": 44,
+              "bh": 16,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 26,
+              "y": 37,
+              "t": "UPHILL lie",
+              "sz": 2.4,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 26,
+              "y": 42.5,
+              "t": "higher, shorter — club up",
+              "sz": 2.3,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 52,
+              "y": 30,
+              "bw": 44,
+              "bh": 16,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 74,
+              "y": 37,
+              "t": "DOWNHILL lie",
+              "sz": 2.4,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 74,
+              "y": 42.5,
+              "t": "lower, longer — club down",
+              "sz": 2.3,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 54,
+              "t": "say it out loud BEFORE you pick a club",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-m1-steps-20260821",
+      "type": "lesson-update",
+      "target": "m1",
+      "lesson": {
+        "drill": "Never hit two balls at the same target. Twenty balls, twenty targets.",
+        "steps": [
+          "Every ball gets a NEW small target. A specific one — a flag, a post, a patch of grass.",
+          "Full routine on every ball, including the walk-in.",
+          "No re-hits. A bad one is gone, same as on the course.",
+          "20 balls = 20 first swings.",
+          "This is the only range format that trains what the course asks."
+        ],
+        "score": "Twenty different targets in twenty balls. The moment you hit two at the same thing, it has become block practice.",
+        "viz": {
+          "h": 58,
+          "cap": "Twenty first swings",
+          "parts": [
+            {
+              "k": "box",
+              "x": 4,
+              "y": 10,
+              "bw": 42,
+              "bh": 32,
+              "c": "b",
+              "r": 1.5,
+              "d": 1
+            },
+            {
+              "k": "flag",
+              "x": 25,
+              "y": 28,
+              "c": "b"
+            },
+            {
+              "k": "dot",
+              "x": 11,
+              "y": 36,
+              "c": "f",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 15,
+              "y": 36,
+              "c": "f",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 19,
+              "y": 36,
+              "c": "f",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 23,
+              "y": 36,
+              "c": "f",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 27,
+              "y": 36,
+              "c": "f",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 31,
+              "y": 36,
+              "c": "f",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 35,
+              "y": 36,
+              "c": "f",
+              "r": 1.1
+            },
+            {
+              "k": "dot",
+              "x": 39,
+              "y": 36,
+              "c": "f",
+              "r": 1.1
+            },
+            {
+              "k": "text",
+              "x": 25,
+              "y": 48,
+              "t": "✗ one target, 20 balls",
+              "sz": 2.6,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 54,
+              "y": 10,
+              "bw": 42,
+              "bh": 32,
+              "c": "g",
+              "r": 1.5,
+              "d": 1,
+              "f": "g",
+              "o": 0.1
+            },
+            {
+              "k": "flag",
+              "x": 60,
+              "y": 22,
+              "c": "g"
+            },
+            {
+              "k": "flag",
+              "x": 72,
+              "y": 18,
+              "c": "g"
+            },
+            {
+              "k": "flag",
+              "x": 84,
+              "y": 24,
+              "c": "g"
+            },
+            {
+              "k": "flag",
+              "x": 64,
+              "y": 34,
+              "c": "g"
+            },
+            {
+              "k": "flag",
+              "x": 78,
+              "y": 37,
+              "c": "g"
+            },
+            {
+              "k": "flag",
+              "x": 90,
+              "y": 31,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 75,
+              "y": 48,
+              "t": "✓ 20 balls, 20 targets",
+              "sz": 2.6,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 55,
+              "t": "a new target and a full routine, every ball",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-m2-steps-20260821",
+      "type": "lesson-update",
+      "target": "m2",
+      "lesson": {
+        "drill": "Ten yards to review it. After that, present tense only.",
+        "steps": [
+          "The shot is hit. You get ten yards of walking to be annoyed about it.",
+          "In those ten yards: what happened, what you'd do differently. Once.",
+          "At the ten-yard mark it is over. From there it is present tense only — this lie, this number, this shot.",
+          "Practise it on GOOD holes too, not just after a bad one.",
+          "The ritual has to be automatic before it is needed."
+        ],
+        "score": "Used on a good hole as often as a bad one. A reset you only reach for when you're angry is a reset you have never rehearsed.",
+        "viz": {
+          "h": 56,
+          "cap": "Ten yards, then it is over",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 6,
+              "y1": 32,
+              "x2": 94,
+              "y2": 32,
+              "c": "f",
+              "w": 0.8
+            },
+            {
+              "k": "dot",
+              "x": 6,
+              "y": 32,
+              "c": "i",
+              "r": 1.7
+            },
+            {
+              "k": "box",
+              "x": 8,
+              "y": 20,
+              "bw": 30,
+              "bh": 12,
+              "c": "b",
+              "r": 1,
+              "d": 1,
+              "f": "b",
+              "o": 0.15
+            },
+            {
+              "k": "text",
+              "x": 23,
+              "y": 27.5,
+              "t": "10 yds: review",
+              "sz": 2.4,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 40,
+              "y": 20,
+              "bw": 54,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "d": 1,
+              "f": "g",
+              "o": 0.15
+            },
+            {
+              "k": "text",
+              "x": 67,
+              "y": 27.5,
+              "t": "present tense only",
+              "sz": 2.5,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "arrow",
+              "x1": 8,
+              "y1": 42,
+              "x2": 92,
+              "y2": 42,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 48,
+              "t": "you are walking",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 54,
+              "t": "practise it on GOOD holes too",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-m3-steps-20260821",
+      "type": "lesson-update",
+      "target": "m3",
+      "lesson": {
+        "drill": "Three straight five-footers with the full routine. Miss one and start over.",
+        "steps": [
+          "End every practice session with this. Every one.",
+          "Three five-footers in a row, full routine on each.",
+          "Miss one and you start again at one.",
+          "You are not allowed to leave until it is done.",
+          "That is the only pressure available to you in practice — use it."
+        ],
+        "score": "Three in a row, or you are still there. The value is entirely in not being allowed to walk away.",
+        "viz": {
+          "h": 58,
+          "cap": "Three to leave",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 10,
+              "t": "three straight 5-footers · full routine on each",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 10,
+              "y": 16,
+              "bw": 22,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "f": "g",
+              "o": 0.16
+            },
+            {
+              "k": "text",
+              "x": 21,
+              "y": 24,
+              "t": "1",
+              "sz": 3.2,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 38,
+              "y": 16,
+              "bw": 22,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "f": "g",
+              "o": 0.16
+            },
+            {
+              "k": "text",
+              "x": 49,
+              "y": 24,
+              "t": "2",
+              "sz": 3.2,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 66,
+              "y": 16,
+              "bw": 22,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "f": "g",
+              "o": 0.16
+            },
+            {
+              "k": "text",
+              "x": 77,
+              "y": 24,
+              "t": "3",
+              "sz": 3.2,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "curve",
+              "x1": 77,
+              "y1": 32,
+              "cx": 49,
+              "cy": 46,
+              "x2": 21,
+              "y2": 32,
+              "c": "b",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 44,
+              "t": "✗ miss one and you start again at one",
+              "sz": 2.6,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 54,
+              "t": "you are not allowed to leave until it is done",
+              "sz": 2.7,
+              "c": "b",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-m4-steps-20260821",
+      "type": "lesson-update",
+      "target": "m4",
+      "lesson": {
+        "drill": "The full pre-shot routine twenty times, at home, with no ball.",
+        "steps": [
+          "Read, one rehearsal beside the ball, step in, trail-thumb press, go.",
+          "No ball. Nothing to hit and nothing to judge it by.",
+          "Twenty reps, with the SAME beat count on every one.",
+          "Time them if you have to. Any rep that runs a different length is the one to watch.",
+          "A routine that varies in length is a pace variable, and pace is the open fault."
+        ],
+        "score": "Twenty reps of the same length. This is the only place the routine can be trained without a result to react to.",
+        "viz": {
+          "h": 50,
+          "cap": "The same beat, twenty times",
+          "parts": [
+            {
+              "k": "text",
+              "x": 50,
+              "y": 10,
+              "t": "READ · REHEARSE · STEP IN · PRESS · GO",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 4,
+              "y": 18,
+              "bw": 16,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 12,
+              "y": 25.6,
+              "t": "read",
+              "sz": 2.3,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 22,
+              "y": 18,
+              "bw": 16,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 30,
+              "y": 25.6,
+              "t": "rehearse",
+              "sz": 2.2,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 40,
+              "y": 18,
+              "bw": 16,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 48,
+              "y": 25.6,
+              "t": "step in",
+              "sz": 2.3,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 58,
+              "y": 18,
+              "bw": 16,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 66,
+              "y": 25.6,
+              "t": "press",
+              "sz": 2.3,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 76,
+              "y": 18,
+              "bw": 16,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "f": "g",
+              "o": 0.16
+            },
+            {
+              "k": "text",
+              "x": 84,
+              "y": 25.6,
+              "t": "go",
+              "sz": 2.5,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 42,
+              "t": "no ball · a routine that varies in length is a pace variable",
+              "sz": 2.5,
+              "c": "b",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-m5-steps-20260821",
+      "type": "lesson-update",
+      "target": "m5",
+      "lesson": {
+        "drill": "Putt and chip at home with the thing that grates actually running.",
+        "steps": [
+          "Music on, a timer counting, someone talking — whatever actually gets to you.",
+          "Ten balls with the interference for every ten in silence.",
+          "Then rehearse the WAIT specifically: stand over the ball doing nothing for a full minute before the stroke.",
+          "A full minute. That is slow play in its pure form, and it is what you said sets you off.",
+          "The point is not to enjoy it. It is to have done it before it happens to you."
+        ],
+        "score": "Ten noisy for every ten quiet, and one full minute of standing still. Practising only in silence is practising the easy version.",
+        "viz": {
+          "h": 50,
+          "cap": "Practise the version that annoys you",
+          "parts": [
+            {
+              "k": "box",
+              "x": 6,
+              "y": 14,
+              "bw": 40,
+              "bh": 12,
+              "c": "i",
+              "r": 1,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 26,
+              "y": 21.6,
+              "t": "10 in silence",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "box",
+              "x": 54,
+              "y": 14,
+              "bw": 40,
+              "bh": 12,
+              "c": "b",
+              "r": 1,
+              "f": "b",
+              "o": 0.18
+            },
+            {
+              "k": "text",
+              "x": 74,
+              "y": 21.6,
+              "t": "10 with the noise",
+              "sz": 2.4,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 36,
+              "t": "then stand over the ball doing NOTHING for a full minute",
+              "sz": 2.5,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 44,
+              "t": "that is slow play in its pure form",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-b1-steps-20260821",
+      "type": "lesson-update",
+      "target": "b1",
+      "lesson": {
+        "drill": "Draw a line in the practice bunker. Splash sand starting at the line, no ball.",
+        "steps": [
+          "Draw a line in the sand. No ball at all to begin with.",
+          "Make swings that splash sand starting AT the line — the club never digs, it skids.",
+          "Face slightly open before you grip, ball forward of centre, weight on the front foot.",
+          "Then put balls two inches ahead of the line and keep hitting the line.",
+          "The club never touches the ball. The sand throws it out."
+        ],
+        "score": "Sand starting at the line every time, with the ball two inches in front untouched. Your 56° has 10° of bounce — it is built for exactly this.",
+        "viz": {
+          "h": 60,
+          "cap": "Side on · hit the line, not the ball",
+          "parts": [
+            {
+              "k": "band",
+              "y": 30,
+              "h": 20,
+              "c": "f"
+            },
+            {
+              "k": "line",
+              "x1": 44,
+              "y1": 26,
+              "x2": 44,
+              "y2": 38,
+              "c": "i",
+              "w": 1.4
+            },
+            {
+              "k": "text",
+              "x": 44,
+              "y": 45,
+              "t": "the line",
+              "sz": 2.5,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 52,
+              "y": 28,
+              "r": 1.9
+            },
+            {
+              "k": "text",
+              "x": 58,
+              "y": 19,
+              "t": "ball, 2\" ahead",
+              "sz": 2.5,
+              "c": "i",
+              "a": "start"
+            },
+            {
+              "k": "arrow",
+              "x1": 24,
+              "y1": 10,
+              "x2": 42,
+              "y2": 26,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 22,
+              "y": 8,
+              "t": "club enters HERE",
+              "sz": 2.5,
+              "c": "i",
+              "a": "end"
+            },
+            {
+              "k": "curve",
+              "x1": 48,
+              "y1": 32,
+              "cx": 64,
+              "cy": 18,
+              "x2": 80,
+              "y2": 28,
+              "c": "g",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 86,
+              "y": 34,
+              "t": "sand throws",
+              "sz": 2.5,
+              "c": "g",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 86,
+              "y": 38.5,
+              "t": "the ball out",
+              "sz": 2.5,
+              "c": "g",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 52,
+              "t": "the club never touches the ball",
+              "sz": 2.8,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 58,
+              "t": "let the sole SKID — do not dig the leading edge",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-b2-steps-20260821",
+      "type": "lesson-update",
+      "target": "b2",
+      "lesson": {
+        "drill": "Three targets from one bunker. Five balls each, changing only the follow-through.",
+        "steps": [
+          "Pick a short, a middle and a long target from the same bunker.",
+          "5 balls at each.",
+          "Same swing, same speed, same entry point, same everything.",
+          "The ONLY thing that changes is how far through you go.",
+          "Short finish, short shot. Full finish, long shot."
+        ],
+        "score": "Three distances out of one swing. If you are changing speed to change distance, the drill is not running.",
+        "viz": {
+          "h": 58,
+          "cap": "Same swing · three follow-throughs",
+          "parts": [
+            {
+              "k": "box",
+              "x": 4,
+              "y": 28,
+              "bw": 18,
+              "bh": 12,
+              "c": "f",
+              "r": 1,
+              "f": "f",
+              "o": 0.3
+            },
+            {
+              "k": "text",
+              "x": 13,
+              "y": 46,
+              "t": "same bunker",
+              "sz": 2.4,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "ball",
+              "x": 13,
+              "y": 32,
+              "r": 1.9
+            },
+            {
+              "k": "flag",
+              "x": 40,
+              "y": 26,
+              "c": "i"
+            },
+            {
+              "k": "text",
+              "x": 40,
+              "y": 34,
+              "t": "short",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "flag",
+              "x": 64,
+              "y": 26,
+              "c": "i"
+            },
+            {
+              "k": "text",
+              "x": 64,
+              "y": 34,
+              "t": "middle",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "flag",
+              "x": 90,
+              "y": 26,
+              "c": "i"
+            },
+            {
+              "k": "text",
+              "x": 90,
+              "y": 34,
+              "t": "long",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "curve",
+              "x1": 17,
+              "y1": 31,
+              "cx": 28,
+              "cy": 20,
+              "x2": 38,
+              "y2": 26,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "curve",
+              "x1": 17,
+              "y1": 31,
+              "cx": 42,
+              "cy": 12,
+              "x2": 62,
+              "y2": 26,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "curve",
+              "x1": 17,
+              "y1": 31,
+              "cx": 56,
+              "cy": 6,
+              "x2": 88,
+              "y2": 26,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 10,
+              "t": "same speed · same entry point · same everything",
+              "sz": 2.6,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 54,
+              "t": "5 balls each · only the follow-through length changes",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-b3-steps-20260821",
+      "type": "lesson-update",
+      "target": "b3",
+      "lesson": {
+        "drill": "Step on three balls in the practice bunker and play them out.",
+        "steps": [
+          "Tread three balls into the sand until they are half buried.",
+          "Close the face — the opposite of a normal splash shot — and set up ball back.",
+          "Swing steeply and DIG. Commit to it.",
+          "It comes out low and running, with no spin. Expect that and plan where it finishes.",
+          "Walk away. There is no version of this shot that stops by the flag."
+        ],
+        "score": "Three plugged lies played out where it does not count. Learning the shot in advance is what removes the panic when it turns up.",
+        "viz": {
+          "h": 60,
+          "cap": "Steep, closed, and it will run",
+          "parts": [
+            {
+              "k": "band",
+              "y": 28,
+              "h": 22,
+              "c": "f"
+            },
+            {
+              "k": "ball",
+              "x": 50,
+              "y": 30,
+              "r": 1.9
+            },
+            {
+              "k": "line",
+              "x1": 43,
+              "y1": 28,
+              "x2": 57,
+              "y2": 28,
+              "c": "f",
+              "w": 1.4
+            },
+            {
+              "k": "arrow",
+              "x1": 34,
+              "y1": 6,
+              "x2": 47,
+              "y2": 26,
+              "c": "i",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 4,
+              "y": 9,
+              "t": "steep · closed face",
+              "sz": 2.5,
+              "c": "i",
+              "a": "start"
+            },
+            {
+              "k": "arrow",
+              "x1": 56,
+              "y1": 34,
+              "x2": 86,
+              "y2": 34,
+              "c": "g",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 88,
+              "y": 30,
+              "t": "it runs",
+              "sz": 2.5,
+              "c": "g",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 48,
+              "t": "it comes out low with no spin — plan for that",
+              "sz": 2.7,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 56,
+              "t": "learn it where it does not count",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-e1-steps-20260821",
+      "type": "lesson-update",
+      "target": "e1",
+      "lesson": {
+        "drill": "Ten balls from five feet with the Newport 2, then ten with the LINK.2.1.",
+        "steps": [
+          "Five feet, same hole, full routine on every ball.",
+          "10 with the Newport 2 — the toe-hang blade. Then 10 with the LINK.2.1.",
+          "Read MISS DIRECTION, not feel. Feel is what got the Phantom 7.5 bought.",
+          "The arc-suited head should start more of them LEFT against your straight stroke.",
+          "Log both numbers, then put the Newport back in the bullpen."
+        ],
+        "score": "Two miss-direction tallies. You own both sides of this experiment, so it costs nothing to check once and never re-open it.",
+        "viz": {
+          "h": 56,
+          "cap": "Miss direction decides it, not feel",
+          "parts": [
+            {
+              "k": "box",
+              "x": 4,
+              "y": 12,
+              "bw": 44,
+              "bh": 26,
+              "c": "i",
+              "r": 1.5,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 26,
+              "y": 18,
+              "t": "Newport 2 · toe hang",
+              "sz": 2.4,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "hole",
+              "x": 28,
+              "y": 29,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "dot",
+              "x": 19,
+              "y": 30,
+              "c": "b",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 21,
+              "y": 32.5,
+              "c": "b",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 17,
+              "y": 27.5,
+              "c": "b",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 36,
+              "y": 29,
+              "c": "f",
+              "r": 1.3
+            },
+            {
+              "k": "box",
+              "x": 52,
+              "y": 12,
+              "bw": 44,
+              "bh": 26,
+              "c": "i",
+              "r": 1.5,
+              "d": 1
+            },
+            {
+              "k": "text",
+              "x": 74,
+              "y": 18,
+              "t": "LINK.2.1 · zero torque",
+              "sz": 2.4,
+              "c": "i",
+              "a": "middle"
+            },
+            {
+              "k": "hole",
+              "x": 74,
+              "y": 29,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "dot",
+              "x": 67,
+              "y": 30,
+              "c": "b",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 81,
+              "y": 29,
+              "c": "f",
+              "r": 1.3
+            },
+            {
+              "k": "dot",
+              "x": 79,
+              "y": 32,
+              "c": "f",
+              "r": 1.3
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 45,
+              "t": "read MISS DIRECTION, not feel",
+              "sz": 2.8,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 52,
+              "t": "10 balls each · then the Newport goes back in the bullpen",
+              "sz": 2.5,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-e2-steps-20260821",
+      "type": "lesson-update",
+      "target": "e2",
+      "lesson": {
+        "drill": "Drag a fingernail across the face. Compare the centre against the heel.",
+        "steps": [
+          "Take the 56° — it does the most work, so it wears first.",
+          "Drag a fingernail across the grooves at the CENTRE of the face.",
+          "Now do the same out on the heel, where you never hit it.",
+          "Grooves the nail does not catch in are worn.",
+          "The difference between the two spots is how much life the club has lost."
+        ],
+        "score": "A nail that catches on the heel and slides at the centre. Worn grooves do not look worn — that is why nobody replaces them in time.",
+        "viz": {
+          "h": 58,
+          "cap": "The heel is your control sample",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 22,
+              "y1": 16,
+              "x2": 78,
+              "y2": 16,
+              "c": "f",
+              "w": 0.5
+            },
+            {
+              "k": "line",
+              "x1": 22,
+              "y1": 19,
+              "x2": 78,
+              "y2": 19,
+              "c": "f",
+              "w": 0.5
+            },
+            {
+              "k": "line",
+              "x1": 22,
+              "y1": 22,
+              "x2": 78,
+              "y2": 22,
+              "c": "f",
+              "w": 0.5
+            },
+            {
+              "k": "line",
+              "x1": 22,
+              "y1": 25,
+              "x2": 78,
+              "y2": 25,
+              "c": "f",
+              "w": 0.5
+            },
+            {
+              "k": "line",
+              "x1": 22,
+              "y1": 28,
+              "x2": 78,
+              "y2": 28,
+              "c": "f",
+              "w": 0.5
+            },
+            {
+              "k": "line",
+              "x1": 22,
+              "y1": 31,
+              "x2": 78,
+              "y2": 31,
+              "c": "f",
+              "w": 0.5
+            },
+            {
+              "k": "line",
+              "x1": 22,
+              "y1": 34,
+              "x2": 78,
+              "y2": 34,
+              "c": "f",
+              "w": 0.5
+            },
+            {
+              "k": "box",
+              "x": 20,
+              "y": 12,
+              "bw": 60,
+              "bh": 24,
+              "c": "i",
+              "r": 2
+            },
+            {
+              "k": "box",
+              "x": 40,
+              "y": 13,
+              "bw": 20,
+              "bh": 22,
+              "c": "b",
+              "r": 1,
+              "d": 1,
+              "f": "b",
+              "o": 0.15
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 44,
+              "t": "centre — worn",
+              "sz": 2.5,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 27,
+              "y": 50,
+              "t": "heel — never used",
+              "sz": 2.5,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 56,
+              "t": "grooves a nail does not catch in are done",
+              "sz": 2.7,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-e3-steps-20260821",
+      "type": "lesson-update",
+      "target": "e3",
+      "lesson": {
+        "drill": "At address, hold the club at 3 out of 10. See whether it feels like it could slip.",
+        "steps": [
+          "Take your normal address position.",
+          "Deliberately soften the grip to about 3 out of 10 — light enough to feel odd.",
+          "That is the pressure you should be able to hold a full swing at.",
+          "If at 3 it feels like the club could slip out of your hands, the grips are done.",
+          "Check it on the driver and a wedge — they wear at different rates."
+        ],
+        "score": "A club that stays put at 3 out of 10. Worn grips do not fail by slipping — they fail by making you squeeze, and squeezing kills speed.",
+        "viz": {
+          "h": 52,
+          "cap": "Three out of ten",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 8,
+              "y1": 26,
+              "x2": 92,
+              "y2": 26,
+              "c": "f",
+              "w": 1
+            },
+            {
+              "k": "line",
+              "x1": 8.0,
+              "y1": 23,
+              "x2": 8.0,
+              "y2": 29,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 17.33,
+              "y1": 23,
+              "x2": 17.33,
+              "y2": 29,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 26.66,
+              "y1": 23,
+              "x2": 26.66,
+              "y2": 29,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 35.99,
+              "y1": 23,
+              "x2": 35.99,
+              "y2": 29,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 45.32,
+              "y1": 23,
+              "x2": 45.32,
+              "y2": 29,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 54.65,
+              "y1": 23,
+              "x2": 54.65,
+              "y2": 29,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 63.980000000000004,
+              "y1": 23,
+              "x2": 63.980000000000004,
+              "y2": 29,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 73.31,
+              "y1": 23,
+              "x2": 73.31,
+              "y2": 29,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 82.64,
+              "y1": 23,
+              "x2": 82.64,
+              "y2": 29,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "line",
+              "x1": 91.97,
+              "y1": 23,
+              "x2": 91.97,
+              "y2": 29,
+              "c": "f",
+              "w": 0.6
+            },
+            {
+              "k": "box",
+              "x": 20,
+              "y": 20,
+              "bw": 12,
+              "bh": 12,
+              "c": "g",
+              "r": 1,
+              "d": 1,
+              "f": "g",
+              "o": 0.2
+            },
+            {
+              "k": "dot",
+              "x": 26,
+              "y": 26,
+              "c": "g",
+              "r": 1.7
+            },
+            {
+              "k": "text",
+              "x": 26,
+              "y": 16,
+              "t": "3",
+              "sz": 3.2,
+              "c": "g",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 8,
+              "y": 36,
+              "t": "light",
+              "sz": 2.5,
+              "c": "f",
+              "a": "start"
+            },
+            {
+              "k": "text",
+              "x": 92,
+              "y": 36,
+              "t": "strangling it",
+              "sz": 2.5,
+              "c": "f",
+              "a": "end"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 48,
+              "t": "feels like it could slip at 3? the grips are done",
+              "sz": 2.7,
+              "c": "b",
+              "a": "middle"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-e4-steps-20260821",
+      "type": "lesson-update",
+      "target": "e4",
+      "lesson": {
+        "drill": "Two weeks of noting every approach where you were 'between clubs', and the yardage.",
+        "steps": [
+          "Every time you are between clubs, write the yardage down. On the card, in the moment.",
+          "Two weeks. Do not filter — write down every one.",
+          "Then look at the numbers. Three or more at the SAME yardage is a real gap.",
+          "One at 103 and one at 118 is not a gap; it is two ordinary shots.",
+          "A real gap gets fixed by a loft, not by trying harder."
+        ],
+        "score": "Three or more at one number. Anything less is a bad day, and re-lofting a wedge for a bad day is how bags get worse.",
+        "viz": {
+          "h": 54,
+          "cap": "Where the numbers cluster",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 8,
+              "y1": 32,
+              "x2": 92,
+              "y2": 32,
+              "c": "f",
+              "w": 1
+            },
+            {
+              "k": "line",
+              "x1": 14,
+              "y1": 29,
+              "x2": 14,
+              "y2": 35,
+              "c": "f",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 14,
+              "y": 42,
+              "t": "80",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "line",
+              "x1": 36,
+              "y1": 29,
+              "x2": 36,
+              "y2": 35,
+              "c": "f",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 36,
+              "y": 42,
+              "t": "95",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "line",
+              "x1": 58,
+              "y1": 29,
+              "x2": 58,
+              "y2": 35,
+              "c": "f",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 58,
+              "y": 42,
+              "t": "108",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "line",
+              "x1": 84,
+              "y1": 29,
+              "x2": 84,
+              "y2": 35,
+              "c": "f",
+              "w": 0.7
+            },
+            {
+              "k": "text",
+              "x": 84,
+              "y": 42,
+              "t": "122",
+              "sz": 2.5,
+              "c": "f",
+              "a": "middle"
+            },
+            {
+              "k": "dot",
+              "x": 47,
+              "y": 26,
+              "c": "b",
+              "r": 1.4
+            },
+            {
+              "k": "dot",
+              "x": 47,
+              "y": 21,
+              "c": "b",
+              "r": 1.4
+            },
+            {
+              "k": "dot",
+              "x": 47,
+              "y": 16,
+              "c": "b",
+              "r": 1.4
+            },
+            {
+              "k": "text",
+              "x": 47,
+              "y": 11,
+              "t": "3 × \"between clubs\"",
+              "sz": 2.5,
+              "c": "b",
+              "a": "middle"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 50,
+              "t": "three or more at one number is a gap, not a bad day",
+              "sz": 2.6,
+              "c": "s",
+              "a": "middle"
+            }
+          ]
+        }
+      }
     }
   ]
 }

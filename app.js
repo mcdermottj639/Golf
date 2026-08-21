@@ -100,13 +100,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v53';
+const BUILD = 'v54';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v54', d:'2026-08-21', items:[
+    'The whole drill bench is drawn now \u2014 all 63 drills, not just the new ones. Every one opens with a diagram of the setup, then numbered steps, then a PASS MARK saying what a good session looks like.',
+    'Some of those diagrams answer a question on their own. The wedge matrix shows that six of your nine clock numbers have never been measured. The green-reading one shows the same putt needing three different lines at three speeds. The groove test makes the heel of the club the control sample for the worn middle.',
+    'Kill the laid-off top is now Kill the ACROSS-THE-LINE top. The drill was always the right one \u2014 the name was left over from before the fault was re-read on Aug 20, and the two words mean opposite things.',
+    'The bounce drill moved off the Range filter to the practice green, where it is actually done.' ] },
   { b:'v53', d:'2026-08-21', items:[
     'Your standing course plans now sort NEAREST FIRST. Round Prep puts the closest one at the top and prints the miles beside each name, so the plan for the course you are actually driving to is the one you land on.',
     'It uses the location your phone already gives the weather card \u2014 that fix is now kept instead of thrown away, and the sorting happens on the phone. Nothing about where you are is sent anywhere to do it.',
