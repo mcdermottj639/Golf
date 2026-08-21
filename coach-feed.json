@@ -17598,6 +17598,25 @@
           }
         ]
       }
+    },
+    {
+      "id": "lesson-range-wedge-strike-20260821",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "r9",
+        "shelf": "At the Range",
+        "title": "Your wedge numbers assume a good strike — go and check the strike",
+        "min": 4,
+        "where": "range",
+        "kit": [],
+        "tags": [
+          "wedge-distance",
+          "approach",
+          "missing-short"
+        ],
+        "body": "The clock system gives you nine numbers and the carry ladder writes them down: PW 122, 50 at 108, 56 at 95, 60 at 80. Every one of those is a CARRY off a good strike, and that is the quiet assumption underneath the biggest scoring pattern you have. Sterling Farms missed twelve greens and seven of them finished SHORT, and a fat wedge is short by a distance nobody can predict — half a groove low costs more yards than a whole club does. So there are two completely different reasons a 95-yard shot finishes at 88, and the wedge matrix cannot tell them apart: either the number is wrong, or the strike was. This drill answers the second one, which is worth doing FIRST, because re-baselining a ladder off a session of thin and fat contact just writes bad numbers down more carefully. The bounce is on your side here — the 50 is an 8-degree F grind, the 56 a 10-degree S, the 60 an 8-degree M — and bounce only works if the club is still travelling down when it reaches the ball.",
+        "drill": "Lay a club or an alignment stick on the ground perpendicular to your target line and put the ball just ahead of it, or spray a line in the turf if the range lets you. 10 balls each with the 56 and the PW at a three-quarter swing: the divot has to START at or AFTER the line. Score each set out of 10 for ball-first contact — not for where it finished, and not for how it felt. Under 7 and you have found the short miss, and no amount of clubbing up fixes it. Then hit five more of whichever club scored worse, this time calling out loud before each one whether the last strike was ball-first, fat or thin, and check yourself against the divot: knowing which one you just hit is the skill that lets you trust a yardage on the course."
+      }
     }
   ]
 }
