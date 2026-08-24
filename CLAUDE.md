@@ -880,6 +880,28 @@ Next actions → Score history.** Before this the bench was the sixth block and 
 last, under a to-do list and a link to Scores — the two pages Coach exists to reach were the
 two furthest from the top. Don't push anything above the focus card.
 
+**The four areas (Aug 24 2026).** Jack's instruction: the top of Coach reads high level
+across **off the tee · irons · short game · putting**, off the live round data. `gameAreas()`
+is a READER over `scoreStats()` and `shortGameStats()` — both now take an optional card set —
+rather than a fourth place that counts holes for itself. Two numbers disagreeing about the
+same round would be worse than no numbers, so never compute a fifth tally here.
+
+- **Live cards alone, once they can carry it.** At 18+ live holes the older cards stand down
+  and the header counts them out. This deliberately skips `evOf()`'s at-least-half clause:
+  that rule stops a number computed from MIXED cards wearing a live badge, and computing
+  live-only removes the mixture, so the badge is earned by construction.
+- **No benchmark column** (Jack's call). The only snapshot carrying fairway/GIR/scrambling
+  detail is a 47-round archive from an old tracking app; a years-old baseline dressed up as a
+  target is worse than the bare number. Bring the comparison back when there are enough live
+  rounds to compare against each other — and **only one tile is ever coloured**, the focus
+  area's, because with nothing to measure against, a red tile is a verdict the page can't
+  support.
+- **The putting headline switches itself.** Putts-a-hole until `PUTT_HEADLINE_MIN` (10) putts
+  carry a distance, then the **4–6 ft make rate** — the range the putter saga lives in and the
+  only number directly comparable to the mat test.
+- **`AREA_OF`** maps a ranked finding to its tile, and admits gaps the way `FOCUS_TAG` does:
+  a finding about doubles or the opening hole belongs to no single area and highlights none.
+
 **`coachHero()` is a renderer, not a new source of truth.** It states no claim the page below
 doesn't already make: the focus is whatever `coachSignals()` ranked first, carrying its own
 `ev` badge, so the strongest evidence still leads and the top of the page cannot quietly

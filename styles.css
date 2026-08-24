@@ -68,6 +68,26 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 .chip.grn{background:var(--green);color:var(--green-ink);border-color:var(--green)}
 .chip.static{cursor:default}
 
+/* The four-area read at the top of Coach. Two by two so all four fit above the fold on a
+   phone, and the only coloured tile is the one the focus belongs to — there is no benchmark
+   behind these numbers, so a red tile would be a verdict the page cannot support. */
+.areagrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px}
+.area{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--line2);
+  border-radius:var(--r);padding:10px 11px}
+.area.focus{border-top-color:var(--burg)}
+.area .l{font-size:8.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);
+  font-family:var(--sans);font-weight:800}
+.area.focus .l{color:var(--btext)}
+.area .v{font-size:22px;font-weight:700;color:var(--gtext);line-height:1.1;margin-top:3px}
+.area.focus .v{color:var(--burg)}
+.area .v.faint{color:var(--faint)}
+.area .u{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);
+  font-family:var(--sans);font-weight:700}
+.area .rd{font-size:11.5px;color:var(--ink);line-height:1.45;margin-top:6px;
+  padding-top:6px;border-top:1px dotted var(--line)}
+body.night .area{border-top-color:rgba(255,255,255,.14)}
+body.night .area.focus{border-top-color:var(--burg)}
+
 .tipcard{border-left:4px solid var(--burg);background:var(--card2);padding:12px 13px;
   border-radius:0 6px 6px 0;margin:10px 0}
 .tipcard .src{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);

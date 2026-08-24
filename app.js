@@ -100,13 +100,19 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v60';
+const BUILD = 'v61';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v61', d:'2026-08-24', items:[
+    'Where your game is now reads across FOUR AREAS \u2014 off the tee, irons, short game, putting \u2014 each with its headline number and the one thing its misses say.',
+    'It computes off your LIVE rounds alone as soon as they carry a round\u2019s worth of holes, and the older cards stand down and are counted out loud. Until then it says exactly which cards it read and when.',
+    'No benchmark column, on your call \u2014 the only detailed baseline is a years-old archive, and a target dressed up out of it is worse than the bare number. The comparison comes back when there are enough live rounds to measure against each other.',
+    'The putting tile switches itself from putts-a-hole to your MAKE RATE FROM 4\u20136 FT as soon as ten putts carry a distance \u2014 the number that is directly comparable to your mat test.',
+    'One tile is outlined: the area the focus belongs to. Nothing else is coloured, because with no benchmark behind it a red tile would be a verdict the page cannot support.' ] },
   { b:'v60', d:'2026-08-24', items:[
     'The build number now sits in the top right of Home. It is read out of the code actually running on your phone, so it is the way to check a change really landed \u2014 if it does not match what you were told shipped, it did not ship. Tap it for the update check.',
     'Worth knowing why it earns the space: v59 was pushed but never published \u2014 the job that copies the site across was cancelled part-way, so your phone stayed on v58 while everything looked fine from this end.' ] },
@@ -2310,6 +2316,102 @@ function coachSignals(){
     || EV_RANK[a.ev || 'snapshot'] - EV_RANK[b.ev || 'snapshot']);
 }
 
+// ----- The four areas -----
+// Jack's instruction (Aug 24 2026): the top of Coach reads high level across off the tee,
+// irons, short game and putting, off the live round data. So this is a READER over the
+// stats the app already computes — scoreStats() and shortGameStats(), both scoped to a
+// card set — rather than a fourth place that counts holes for itself. Two numbers that
+// disagree about the same round would be worse than no numbers.
+//
+// There is deliberately NO benchmark column. Jack's call: the only snapshot carrying
+// fairway / GIR / scrambling detail is a 47-round archive from an older tracking app, and
+// measuring today's game against a years-old baseline dressed up as a target is worse than
+// showing the number on its own. When there are enough live rounds to compare against each
+// other, that is the comparison worth building.
+const AREAS = ['tee', 'app', 'short', 'putt'];
+const AREA_LAB = { tee:'Off the tee', app:'Irons', short:'Short game', putt:'Putting' };
+// Which area a ranked finding belongs to. Written down rather than inferred, and it admits
+// gaps: a finding about doubles or the opening hole belongs to no single area, and one that
+// maps nowhere simply highlights no tile. Same rule as FOCUS_TAG — a wrong join reads
+// exactly like a right one.
+const AREA_OF = {
+  // scoreTips keys
+  'tee-club':'tee', 'greens-lost-at-tee':'tee', 'ob':'tee',
+  'approach-dir':'app', 'par-3s':'app', 'par-5s':'app',
+  'three-putts':'putt', 'putt-short':'putt', 'putt-lag':'putt', 'putt-tap':'putt',
+  // fault + struggle tags
+  'off-tee':'tee', 'missing-short':'app', 'approach':'app', 'wedge-distance':'app',
+  'up-and-down':'short', 'chipping':'short', 'bunkers':'short',
+  'short-putts':'putt', 'pace-calibration':'putt', 'strike-location':'putt',
+  'delivery-unverified':'putt', 'start-line-left':'putt', 'early-lift':'putt',
+  'stance-creep':'putt',
+};
+const areaOf = f => !f ? null : (AREA_OF[f.key] || AREA_OF[f.tag] || null);
+
+// The putting headline switches once the data exists to carry a better one. Putts-a-hole
+// is what a scorecard can always give, and it is a blunt number: it cannot tell a two-putt
+// from forty feet from a two-putt from five. The make rate from 4–6 ft can, it is the range
+// the whole putter saga lives in, and it is the one number directly comparable to the mat
+// test — so as soon as enough putts carry a distance, that becomes the headline.
+const PUTT_HEADLINE_MIN = 10;
+
+// Returns the four areas AND the stats they were computed from, so every line on the card
+// speaks about the same set of cards. Reading the tiles off the live rounds and the summary
+// line off everything would be a quiet lie about what the card is showing.
+function gameAreas(rounds){
+  const st = scoreStats(rounds);
+  const sg = shortGameStats(rounds);
+  const pct = (n, d) => d ? Math.round(n / d * 100) : null;
+  // topDir() yields an [key, count] entry, and it filters to the real directions — OB is a
+  // price, not an aim reading, so it never becomes "your miss goes OB".
+  const dirs = m => { const t = topDir(m); return t ? { k:t[0], n:t[1] } : null; };
+  const out = {};
+
+  // OFF THE TEE. Fairways, then the two things that price a miss: a tee shot that left no
+  // play at all, and one that went out of bounds — two strokes before there is a ball in
+  // play. Neither is a direction, which is why they are named rather than folded in.
+  const fwMiss = dirs(st.fw.miss), ob = st.fw.miss.OB || 0;
+  out.tee = st.fw.n ? {
+    v:`${pct(st.fw.hit, st.fw.n)}%`, u:'fairways', raw:`${st.fw.hit}/${st.fw.n}`, n:st.fw.n,
+    read:[ fwMiss ? `${fwMiss.n} of ${st.fw.n - st.fw.hit} misses went <b>${esc((MISS_LAB[fwMiss.k] || fwMiss.k).toLowerCase())}</b>` : '',
+           st.green.noshot ? `${st.green.noshot} left <b>no play</b> at the green` : '',
+           ob ? `${ob} <b>out of bounds</b> — ${ob * 2} strokes` : '' ].filter(Boolean).join('. ') + '.'
+  } : null;
+
+  // IRONS. Greens in regulation, and where the misses finish — with the conceded ones held
+  // out, because a green the tee shot already took away asks a driving question, not a club
+  // one. That split is the whole point of the noshot flag.
+  const gMiss = dirs(st.green.miss);
+  const playable = Object.entries(st.green.miss).reduce((a, [, v]) => a + v, 0);
+  out.app = st.green.n ? {
+    v:`${pct(st.green.hit, st.green.n)}%`, u:'greens', raw:`${st.green.hit}/${st.green.n}`, n:st.green.n,
+    read:[ gMiss ? `${gMiss.n} of ${playable} playable misses finished <b>${esc((MISS_LAB[gMiss.k] || gMiss.k).toLowerCase())}</b>` : '',
+           st.green.noshot ? `${st.green.noshot} charged to the tee` : '' ].filter(Boolean).join('. ') + '.'
+  } : null;
+
+  // SHORT GAME. Up and down off every missed green — including the ones the tee shot ruined,
+  // because you scramble from where the ball is, not from where you meant to be.
+  out.short = sg.chances ? {
+    v:`${sg.saved}/${sg.chances}`, u:'up & down', raw:`${pct(sg.saved, sg.chances)}%`, n:sg.chances,
+    read:`${sg.chances} chance${sg.chances === 1 ? '' : 's'} to save a hole, ${sg.saved ? `<b>${sg.saved}</b> taken` : '<b>none</b> taken'}.`
+  } : null;
+
+  // PUTTING. See PUTT_HEADLINE_MIN — the 4–6 ft make rate as soon as the distances exist,
+  // putts a hole until then.
+  const z = st.putts.dist.get('s');
+  const zoneReady = z && z.att >= PUTT_HEADLINE_MIN;
+  out.putt = st.putts.holes ? (zoneReady ? {
+    v:`${pct(z.made, z.att)}%`, u:'made from 4–6 ft', raw:`${z.made}/${z.att}`, n:st.putts.distN,
+    read:`${st.putts.three} three-putt${st.putts.three === 1 ? '' : 's'} over ${st.putts.holes} holes, at ${(st.putts.total / st.putts.holes).toFixed(2)} putts a hole.`
+  } : {
+    v:(st.putts.total / st.putts.holes).toFixed(2), u:`putts a hole · ${st.putts.total}`, raw:'', n:st.putts.holes,
+    read:`${st.putts.three} three-putt${st.putts.three === 1 ? '' : 's'} and ${st.putts.one} one-putt${st.putts.one === 1 ? '' : 's'} over ${st.putts.holes} holes.`
+      + (st.putts.distN < PUTT_HEADLINE_MIN ? ' <b>No putt distances logged</b> — tap them on the green and this becomes a make rate.' : '')
+  }) : null;
+
+  return { areas:out, st, sg };
+}
+
 // ----- The top of Coach: where the game is, and the one thing to work on -----
 // Jack's instruction (Aug 24 2026): the only thing above the drills and the library is a
 // high-level read of where he is and what to focus on right now. So this is deliberately
@@ -2354,31 +2456,64 @@ function coachSince(){
   if(week.length) bits.push(`${week.length} drill${week.length === 1 ? '' : 's'} logged this week`);
   return bits;
 }
-function coachHero(st, sig, dr){
-  const blow = st.mix.double * 2 + st.mix.triple * 3;
-  const read = [];
-  if(st.holes) read.push(`<b>${st.holes} holes</b> on record at ${(st.over/st.holes).toFixed(2)} a hole over par`);
-  if(st.over > 0 && blow) read.push(`doubles and worse are <b>${Math.round(blow/st.over*100)}%</b> of everything you've lost`);
-  const lf = latestFiveFt();
-  if(lf) read.push(`<b>${fiveFtScore(lf).makes}/${fiveFtScore(lf).total}</b> from 5 feet last test`);
-  const f = coachFocus(sig);
+function coachHero(sig, dr){
+  // LIVE FIRST (standing instruction, Aug 19 2026), and the way scoreTips() already does it:
+  // once the live cards can carry the read on their own, they carry it ALONE and the older
+  // cards stand down. A round's worth of live holes is the bar.
+  //
+  // Note this deliberately does NOT use evOf()'s second clause — at-least-half-the-sample.
+  // That rule exists to stop a number computed from MIXED cards wearing a badge saying he
+  // logged it live, which would be laundering. Computing from the live cards only removes
+  // the mixture, so the badge is earned by construction rather than by a threshold. The
+  // header says how many older cards were set aside, so nothing disappears quietly.
+  const all = withHoles();
+  const liveCards = all.filter(r => r.live);
+  const holesIn = rs => rs.reduce((a, r) => a + r.holes.filter(h => h.s != null).length, 0);
+  const liveHoles = holesIn(liveCards), allHoles = holesIn(all);
+  const ev = liveHoles >= 18 ? 'live' : 'round';
+  const cards = ev === 'live' ? liveCards : all;
+  const setAside = ev === 'live' ? all.length - liveCards.length : 0;
+  const { areas: A, st: stC } = gameAreas(cards);
+  const f = coachFocus(sig), fArea = areaOf(f);
   const since = coachSince();
   const up = coursePlans().up[0];
   // The focus is a fault → say exactly what trains it, which is the same row the labs use.
-  // Anything else → the bench's own due count, because "go and practise" with no number on
-  // it is the sort of advice this app exists not to give.
+  // Anything else → the bench, claiming nothing about a match it cannot vouch for.
   const ft = focusTag(f);
   const work = ft ? faultDrillRow(ft)
     : `<div class="linkrow" data-action="go" data-view="drills">
          <span class="sm"><b>${dr.ready} drills on the bench</b> — nothing on the shelf trains this one
            directly; it is a decision, not a stroke.</span><span class="arr">→</span></div>`;
+  // What this was read off, with dates on it. The only tile that gets a coloured top is the
+  // one the focus belongs to — with no benchmark to measure against, a red tile would be an
+  // invented verdict, whereas "this is the one we are working on" is a fact about the page.
+  const tile = k => {
+    const a = A[k], on = fArea === k;
+    return `<div class="area${on ? ' focus' : ''}">
+      <div class="l">${esc(AREA_LAB[k])}${on ? ' · focus' : ''}</div>
+      ${a ? `<div class="v">${esc(a.v)}</div><div class="u">${esc(a.u)}${a.raw ? ` · ${esc(a.raw)}` : ''}</div>
+             <div class="rd">${a.read}</div>`
+          : `<div class="v faint">—</div><div class="u">not logged yet</div>
+             <div class="rd">Log a live round and this fills itself in.</div>`}
+    </div>`;
+  };
+  const counted = AREAS.filter(k => A[k]);
+  const thin = counted.length && Math.min(...counted.map(k => A[k].n)) < 36;
+  const rounds = cards.length;
   return `
   <div class="card">
     <h2>Where your game is</h2>
-    ${read.length
-      ? `<p class="sm">${read.join(' · ')}.</p>
-         ${since.length ? `<p class="sm faint">Read off ${since.join(' · ')}.</p>` : ''}`
-      : `<p class="sm">Nothing measured yet. Log a round, or send Claude your GHIN summaries — everything on this page is built from your own numbers, so it stays blank until there are some.</p>`}
+    ${allHoles ? `
+      <p class="sm">${ev === 'live'
+        ? `<b>${rounds} live round${rounds === 1 ? '' : 's'}</b> · ${liveHoles} holes you logged on the hole`
+        : `<b>${rounds} card${rounds === 1 ? '' : 's'}</b> · ${allHoles} holes on record`}${
+        stC.holes ? ` at ${(stC.over / stC.holes).toFixed(2)} a hole over par` : ''}.${evTag(ev)}
+        ${setAside ? `<span class="faint">${setAside} older card${setAside === 1 ? '' : 's'} set aside — these are your live rounds only.</span>` : ''}</p>
+      ${since.length ? `<p class="sm faint">Read off ${since.join(' · ')}.</p>` : ''}
+      <div class="areagrid">${AREAS.map(tile).join('')}</div>
+      ${thin ? `<p class="sm faint">Thin sample — some of these rest on fewer than 36 recorded
+        holes, which is a flag rather than a rate. They redraw off every live round you log.</p>` : ''}`
+      : `<p class="sm">Nothing measured yet. Log a live round — everything on this page is built from your own numbers, so it stays blank until there are some.</p>`}
     ${f ? `<div class="tipcard ${f.sev === 'good' ? 'green' : ''}" style="margin-top:12px">
       <div class="src">Focus right now · ${esc(f.src)}${evTag(f.ev)}</div>
       <h4>${f.h}</h4>${expandable(f.b)}
@@ -2417,7 +2552,7 @@ function coach(){
   // the sixth block on the page and the library the last, under a to-do list and a link to
   // Scores: the two pages Coach exists to reach were the two furthest from the top.
   return `
-  ${coachHero(st, sig, dr)}
+  ${coachHero(sig, dr)}
 
   <h2>Drills · what you can do right now</h2>
   <div class="card">
@@ -2718,9 +2853,12 @@ function briefing(id){
 // ----- Short game -----
 // Nothing new is logged for this: it is the green-miss and up-and-down data already sitting
 // in the hole arrays, asked as a short-game question instead of a scoring one.
-function shortGameStats(){
-  const a = { holes:0, gir:0, miss:{}, chances:0, saved:0, noshot:0, rounds:0 };
-  withHoles().forEach(r => {
+// Takes an optional card set, exactly as scoreStats() does, so the same arithmetic can be
+// asked of the live cards alone or of everything — one implementation, two scopes, and no
+// way for the lab's number and the Coach card's number to drift apart.
+function shortGameStats(rounds){
+  const a = { holes:0, gir:0, miss:{}, chances:0, saved:0, noshot:0, rounds:0, live:0 };
+  (rounds || withHoles()).forEach(r => {
     let counted = false;
     r.holes.forEach(h => {
       if(h.gir === undefined || h.gir === null) return;
@@ -2733,6 +2871,7 @@ function shortGameStats(){
       // You scramble from where the ball IS — a conceded green still counts, same rule the
       // round card uses, so the two numbers can never disagree.
       a.chances++;
+      if(r.live) a.live++;
       if(h.s != null && h.par != null && h.s - h.par <= 0) a.saved++;
     });
   });
