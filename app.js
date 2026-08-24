@@ -100,13 +100,19 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v63';
+const BUILD = 'v64';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v64', d:'2026-08-24', items:[
+    'The three ball-height stroke clips got read properly, and they were written off too early \u2014 the head fills 224 to 365 pixels in them, which is the closest look at the club anywhere in this project.',
+    'PATH goes to a tick on the Aug 24 column: SBST confirmed from a second camera, by a test that needs no scale at all. The head travels a straight line back and through and essentially retraces it. Two unrelated methods agreeing is the strongest evidence on that page.',
+    'TEMPO is running quick. Six strokes now, across two sessions and two mats \u2014 mean about 1.79 against a 2:1 target, five of six under 2.0. Read the direction as real and the number as not yet, because the way backswing start is detected shortens the ratio.',
+    'EARLY LIFT was challenged by those clips and the challenge did not survive \u2014 so it stays closed. Two ways of finding the head\u2019s edge give OPPOSITE answers on the same footage, because the head is more motion-blurred coming down than going back. Its grid mark is now a question mark: the angle was tried and could not settle it.',
+    'First thing in the record that points at STRIKE LOCATION rather than inferring it: at address the ball sits toward the toe side of the head. Eyeball read, so it proves nothing \u2014 but that camera plus impact tape closes the fault in one session.' ] },
   { b:'v63', d:'2026-08-24', items:[
     'Four more putts on the AirBreak landed, same mat and same tilt as the first three \u2014 so the stroke evolution grid\u2019s Aug 24 column now reads off SEVEN putts, and two of its rows moved off a dash.',
     'START LINE is measurable on this mat after all, and the rule it was written under this morning was half wrong. Break only bends the ball about 0.02 in over the first 8 in of roll, so the line a putt LEAVES on reads to roughly a third of a degree. What the mat cannot tell you is whether you aimed it there \u2014 a 2.9\u00b0 right start is either a perfect allowance or a shove, and no camera can separate those.',
@@ -1876,7 +1882,7 @@ function putting(){
     </table>
     ${S.evolution.metrics.map(m => `<p class="sm" style="margin-top:7px"><b style="color:${m.s==='good'?'var(--green)':m.s==='warn'?'var(--burg)':'var(--ink)'}">${esc(m.name)}:</b> ${esc(m.verdict)}</p>`).join('')}
     <p class="sm faint" style="margin-top:8px">✓ good · ✗ fault · ~ partial · ? that angle couldn't see it · — not assessed.
-    Four columns, all on the putter you play: <b>Jul 30</b> (23 clips, every angle) · <b>Aug 10 pm</b> (outdoor, ~20 putts scored, direction unscored — all clips oblique) · <b>Aug 10 mat</b> (indoor, 3 putts, direction only) · <b>Aug 24 AirBreak</b> (indoor, 7 putts at a PuttOut trainer on a BREAKING mat, two batches on one tilt — start line, tempo and pace; a curving mat can score the line a putt LEAVES on but never whether you aimed it there). A dash means that batch couldn't answer that row, not that it went badly.
+    Four columns, all on the putter you play: <b>Jul 30</b> (23 clips, every angle) · <b>Aug 10 pm</b> (outdoor, ~20 putts scored, direction unscored — all clips oblique) · <b>Aug 10 mat</b> (indoor, 3 putts, direction only) · <b>Aug 24 AirBreak</b> (indoor, 7 putts at a PuttOut trainer on a BREAKING mat, two batches on one tilt, plus three ball-height stroke clips — path, start line, tempo and pace. A curving mat can score the line a putt LEAVES on but never whether you aimed it there). A dash means that batch couldn't answer that row, not that it went badly.
     Pre-LINK film was cleared on Aug 14; every number it produced is kept in the Workshop Log.</p>
   </div>
 
