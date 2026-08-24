@@ -100,13 +100,19 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v62';
+const BUILD = 'v63';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v63', d:'2026-08-24', items:[
+    'Four more putts on the AirBreak landed, same mat and same tilt as the first three \u2014 so the stroke evolution grid\u2019s Aug 24 column now reads off SEVEN putts, and two of its rows moved off a dash.',
+    'START LINE is measurable on this mat after all, and the rule it was written under this morning was half wrong. Break only bends the ball about 0.02 in over the first 8 in of roll, so the line a putt LEAVES on reads to roughly a third of a degree. What the mat cannot tell you is whether you aimed it there \u2014 a 2.9\u00b0 right start is either a perfect allowance or a shove, and no camera can separate those.',
+    'The one that matters: the mat wants about 2.5\u00b0 of right start line, and THE ONLY MISS IN THAT BATCH IS THE ONE THAT STARTED AT THE TARGET. The three that allowed 1.6\u20132.9\u00b0 right all went in. Every miss across both batches went left, and on a mat falling left that is an under-read break, not the old aim fault.',
+    'TEMPO got its first re-measurement since Jul 30 \u2014 1.64 to 2.13 across four putts, mean about 1.86. Consistent with the settled 2.0 and too soft to move it, so the row reads as holding. The firmer number underneath it is the down-stroke duration, which varied 32% across four strokes.',
+    'A new to-do: shoot the OVERHEAD set. It is the only angle that separates stroke path from head rise and the only route to face angle at impact \u2014 two open faults for one clip.' ] },
   { b:'v62', d:'2026-08-24', items:[
     'The stroke evolution grid has a fourth column \u2014 Aug 24 AirBreak \u2014 for the three putts filmed on the new mat at the PuttOut trainer.',
     'One row moved: PACE. Nothing ran long — both misses finished five to six inches past on a six-foot putt, a dying pace rather than a firm one, and the holed one stayed in the cup. Same answer the Aug 10 outdoor session gave, and the first time an indoor batch has given it.',
@@ -1870,7 +1876,7 @@ function putting(){
     </table>
     ${S.evolution.metrics.map(m => `<p class="sm" style="margin-top:7px"><b style="color:${m.s==='good'?'var(--green)':m.s==='warn'?'var(--burg)':'var(--ink)'}">${esc(m.name)}:</b> ${esc(m.verdict)}</p>`).join('')}
     <p class="sm faint" style="margin-top:8px">✓ good · ✗ fault · ~ partial · ? that angle couldn't see it · — not assessed.
-    Four columns, all on the putter you play: <b>Jul 30</b> (23 clips, every angle) · <b>Aug 10 pm</b> (outdoor, ~20 putts scored, direction unscored — all clips oblique) · <b>Aug 10 mat</b> (indoor, 3 putts, direction only) · <b>Aug 24 AirBreak</b> (indoor, 3 putts at a PuttOut trainer on a BREAKING mat — pace only, because on a mat that curves the ball, aim and break are the same number). A dash means that batch couldn't answer that row, not that it went badly.
+    Four columns, all on the putter you play: <b>Jul 30</b> (23 clips, every angle) · <b>Aug 10 pm</b> (outdoor, ~20 putts scored, direction unscored — all clips oblique) · <b>Aug 10 mat</b> (indoor, 3 putts, direction only) · <b>Aug 24 AirBreak</b> (indoor, 7 putts at a PuttOut trainer on a BREAKING mat, two batches on one tilt — start line, tempo and pace; a curving mat can score the line a putt LEAVES on but never whether you aimed it there). A dash means that batch couldn't answer that row, not that it went badly.
     Pre-LINK film was cleared on Aug 14; every number it produced is kept in the Workshop Log.</p>
   </div>
 
