@@ -870,6 +870,39 @@ July. What that means for writing:
   gone longest unrun, and the ones that don't make the cut keep their badge in the group
   below rather than vanishing.
 
+### Coach's shape is fixed: focus, then the bench, then the library (Aug 24 2026)
+
+Jack's instruction, in his words: *"move the drill bench and the library to top of coach tab.
+Only thing above it should be a high level coaching of where the coach thinks I am/should be
+focusing on at that time based on the recent info we have."* The order is now **Where your
+game is → Drills → The library → Keep the streak → Everything else on the board · ranked →
+Next actions → Score history.** Before this the bench was the sixth block and the library the
+last, under a to-do list and a link to Scores — the two pages Coach exists to reach were the
+two furthest from the top. Don't push anything above the focus card.
+
+**`coachHero()` is a renderer, not a new source of truth.** It states no claim the page below
+doesn't already make: the focus is whatever `coachSignals()` ranked first, carrying its own
+`ev` badge, so the strongest evidence still leads and the top of the page cannot quietly
+outrank the rest of it. Three parts, in the order a coach says them:
+
+1. **Where you are** — the old *read* line, plus **`coachSince()`**: which cards it was read
+   off and how recent they are. "Based on the recent info we have" only means something if
+   the page says *which* info — a focus built on a three-week-old card is a different thing
+   from one built on Saturday's round.
+2. **The focus** — ONE finding, never a list. `coachFocus()` takes the first warning, else the
+   first mid. The rest stay in the ranked block further down, which now **excludes** the
+   focus rather than repeating it.
+3. **The work** — the drills that train *that* finding, via `focusTag()`.
+
+**`FOCUS_TAG` is a written-down join, and it must stay honest.** A finding computed off
+scorecards and a drill that trains it are two vocabularies; only add an entry where the drill
+really does train the thing the finding names. A finding with no entry is normal and fine —
+"your opening hole runs +1.4" is a routine problem, and the plan it already links to is the
+right answer. Where there's no tag the card says so plainly and claims nothing. The first
+version of this shipped as *"40 drills matched to this"* when 40 was simply every matched
+drill on the bench; a wrong join reads exactly like a right one, which is the whole reason
+this table is explicit rather than inferred.
+
 ### The practice record — read is not done (Aug 24 2026)
 
 `S.drillDays` records only *that* something was practised on a date, which is enough for the

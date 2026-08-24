@@ -100,13 +100,19 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v58';
+const BUILD = 'v59';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v59', d:'2026-08-24', items:[
+    'Coach opens with one thing now: where your game is, and the single thing to focus on. It says what it read to get there \u2014 your last round, the last film, the drills you logged this week \u2014 so a focus built on a card from three weeks ago cannot pass for one built on Saturday.',
+    'Under the focus is the work: the drills that train THAT finding, with how many are due. Miss short off 44% of your playable misses and it hands you the three drills for missing short, not a general nudge to go and practise.',
+    'The drill bench and the library are now second and third on the page. They were sixth and last, under the to-do list and a link to Scores \u2014 the two pages Coach exists to reach were the two furthest from the top.',
+    'The rest of the findings are still there, ranked, further down \u2014 with the focus left out rather than repeated.',
+    'An open fault now links to ITS OWN lab. Every one of them pointed at the Putting Lab whatever it was of, so a swing fault sent you to the wrong page.' ] },
   { b:'v58', d:'2026-08-24', items:[
     'The drill bench now records WHICH drill you did, not just that you did one. Every drill has a Did it \u2713 button with a box for the result \u2014 7/10, 18, whatever that drill scores in \u2014 and it keeps the last run, the whole history, and a trend line once there are three numbers.',
     'Reading a lesson no longer counts as doing its drill. Tapping \u201cwhy this drill exists\u201d used to quietly drop the drill off your shortlist \u2014 the one tap the page invites. Now a drill leaves the shortlist when you LOG it, and comes back when it has gone ten days unrun.',
@@ -2252,7 +2258,7 @@ function planIdBy(re, disc){
 // which outrank to-dos — a number you can point at beats an opinion.
 function coachSignals(){
   const st = scoreStats();
-  const out = scoreTips(st).map(t => ({ sev:t.s, src:t.src, h:t.h, b:t.b, ev:t.ev, link:null }));
+  const out = scoreTips(st).map(t => ({ sev:t.s, src:t.src, h:t.h, b:t.b, ev:t.ev, key:t.key, link:null }));
   out.forEach(t => {
     if(/opening hole/i.test(t.h)){ const id = planIdBy(/routine/i, 'full-swing'); if(id) t.link = { a:'open-briefing', id, lab:'Open the swing routine' }; }
     else if(/par 3/i.test(t.h)) t.link = { a:'go', view:'swing', lab:'Swing lab' };
@@ -2276,15 +2282,102 @@ function coachSignals(){
   // Open ones only — a closed fault is a record, not a to-do, and listing it under
   // "Open fault" was telling him to work on early lift and stance creep months after both
   // were measured shut.
-  S.faults.filter(f => faultState(f) === 'open').forEach(f => out.push({ sev:'mid', src:'Open fault', ev:'measured',
-    h:faultLabel(f.tag), b:f.why,
-    link:{ a:'go', view:'putting', lab:'Putting lab' } }));
+  // Each one links to ITS OWN lab, and carries its tag so the focus card can name the
+  // drills that train it. Both were wrong before: every fault linked to the Putting Lab
+  // whatever it was of, so a swing fault sent him to the wrong page — the same bug the
+  // film log had in v50, in the one place it is most confusing.
+  S.faults.filter(f => faultState(f) === 'open').forEach(f => {
+    const disc = faultDisc(f), lab = LABS.find(l => l.disc === disc);
+    out.push({ sev:'mid', src:`Open fault · ${lab ? lab.name : disc}`, ev:'measured',
+      h:faultLabel(f.tag), b:f.why, tag:f.tag,
+      link:{ a:'go', view:LAB_VIEW[disc] || 'putting', lab:`${lab ? lab.name : 'Putting'} lab` } });
+  });
   // Severity decides the band, evidence decides the order inside it — so the warnings
   // still lead, but within them his own rounds speak before a pasted season average.
   // Array.sort is stable, so scoreTips' evidence order survives this pass.
   const order = { warn:0, mid:1, good:2 };
   return out.sort((a,b) => order[a.sev] - order[b.sev]
     || EV_RANK[a.ev || 'snapshot'] - EV_RANK[b.ev || 'snapshot']);
+}
+
+// ----- The top of Coach: where the game is, and the one thing to work on -----
+// Jack's instruction (Aug 24 2026): the only thing above the drills and the library is a
+// high-level read of where he is and what to focus on right now. So this is deliberately
+// ONE focus, not a ranked list — the ranked list still exists further down and is where
+// the other findings live. Three parts, in the order a coach would say them: what the
+// record currently says, what that makes the priority, and what to go and do about it.
+//
+// Everything here is derived from what is already computed. No new claim is invented at
+// the top of the page: the focus is the highest-ranked signal `coachSignals()` produced,
+// carrying its own evidence badge, so the strongest evidence still leads and the card
+// cannot quietly outrank the page below it.
+// A finding computed from scorecards and a drill that trains it are two vocabularies, so
+// the join has to be written down rather than guessed. Only entries where the drill really
+// does train the thing the finding names belong here — a wrong join reads exactly like a
+// right one, which is why the fallback below claims nothing at all rather than pointing at
+// the nearest tag. A finding with no entry is fine and common: "your opening hole runs
+// +1.4" is a routine problem, and the plan it links to is the right answer, not a drill.
+const FOCUS_TAG = {
+  'approach-dir':'missing-short',  // the short-miss finding IS the missing-short fault
+  'three-putts':'three-putts', 'putt-lag':'pace-calibration', 'putt-short':'short-putts',
+  'putt-tap':'short-putts', 'tee-club':'off-tee', 'greens-lost-at-tee':'off-tee',
+  'ob':'off-tee', 'par-5s':'wedge-distance', 'worst-hole':'mental',
+};
+const focusTag = f => f ? (f.tag || FOCUS_TAG[f.key] || null) : null;
+function coachFocus(sig){
+  // Warnings first, then whatever leads. `coachSignals()` has already sorted by severity
+  // and then by evidence, so the first of each band is the right pick without re-sorting.
+  return sig.find(t => t.sev === 'warn') || sig.find(t => t.sev === 'mid') || sig[0] || null;
+}
+// What the read is standing on, said plainly and with dates. "Based on the recent info we
+// have" is only meaningful if the page says WHICH info and HOW recent — a focus built on a
+// card from three weeks ago is a different thing from one built on Saturday's round.
+function coachSince(){
+  const bits = [];
+  const rs = S.rounds.filter(r => r.date).slice().sort((a,b) => a.date.localeCompare(b.date));
+  const lr = rs[rs.length - 1];
+  if(lr) bits.push(`your last round${lr.course ? ` at ${lr.course}` : ''} on ${fmtDate(lr.date)}${lr.live ? ' (logged live)' : ''}`);
+  const ss = S.sessions.filter(x => x.date).slice().sort((a,b) => a.date.localeCompare(b.date));
+  const ls = ss[ss.length - 1];
+  if(ls) bits.push(`film from ${fmtDate(ls.date)}`);
+  const week = (S.drillLog || []).filter(r => daysSince(r.date) <= 6);
+  if(week.length) bits.push(`${week.length} drill${week.length === 1 ? '' : 's'} logged this week`);
+  return bits;
+}
+function coachHero(st, sig, dr){
+  const blow = st.mix.double * 2 + st.mix.triple * 3;
+  const read = [];
+  if(st.holes) read.push(`<b>${st.holes} holes</b> on record at ${(st.over/st.holes).toFixed(2)} a hole over par`);
+  if(st.over > 0 && blow) read.push(`doubles and worse are <b>${Math.round(blow/st.over*100)}%</b> of everything you've lost`);
+  const lf = latestFiveFt();
+  if(lf) read.push(`<b>${fiveFtScore(lf).makes}/${fiveFtScore(lf).total}</b> from 5 feet last test`);
+  const f = coachFocus(sig);
+  const since = coachSince();
+  const up = coursePlans().up[0];
+  // The focus is a fault → say exactly what trains it, which is the same row the labs use.
+  // Anything else → the bench's own due count, because "go and practise" with no number on
+  // it is the sort of advice this app exists not to give.
+  const ft = focusTag(f);
+  const work = ft ? faultDrillRow(ft)
+    : `<div class="linkrow" data-action="go" data-view="drills">
+         <span class="sm"><b>${dr.ready} drills on the bench</b> — nothing on the shelf trains this one
+           directly; it is a decision, not a stroke.</span><span class="arr">→</span></div>`;
+  return `
+  <div class="card">
+    <h2>Where your game is</h2>
+    ${read.length
+      ? `<p class="sm">${read.join(' · ')}.</p>
+         ${since.length ? `<p class="sm faint">Read off ${since.join(' · ')}.</p>` : ''}`
+      : `<p class="sm">Nothing measured yet. Log a round, or send Claude your GHIN summaries — everything on this page is built from your own numbers, so it stays blank until there are some.</p>`}
+    ${f ? `<div class="tipcard ${f.sev === 'good' ? 'green' : ''}" style="margin-top:12px">
+      <div class="src">Focus right now · ${esc(f.src)}${evTag(f.ev)}</div>
+      <h4>${f.h}</h4>${expandable(f.b)}
+      ${work}
+    </div>
+    ${sig.length > 1 ? `<p class="sm faint">${sig.length - 1} other finding${sig.length === 2 ? '' : 's'} on the board, ranked further down this page.</p>` : ''}` : ''}
+    ${up ? `<div class="linkrow" data-action="open-briefing" data-id="${esc(up.id)}">
+      <span class="sm"><b>Next up: ${esc(up.course || 'your round')}</b> · ${fmtDate(up.date)} — the plan is written</span><span class="arr">→</span></div>` : ''}
+  </div>`;
 }
 
 function coach(){
@@ -2295,14 +2388,10 @@ function coach(){
   const streak = weekStreak();
   const dl = drillList().filter(d => !d.missing.length);
   const dr = { ready: dl.length, home: dl.filter(d => d.where === 'home').length,
-               forYou: dl.filter(d => d.why && d.due).length };
+               forYou: dl.filter(d => d.why && d.due).length,
+               week: (S.drillLog || []).filter(r => daysSince(r.date) <= 6).length };
   const open = S.actions.filter(a => !a.done);
-  const blow = st.mix.double * 2 + st.mix.triple * 3;
-  const read = [];
-  if(st.holes) read.push(`<b>${st.holes} holes</b> on record at ${(st.over/st.holes).toFixed(2)} a hole over par`);
-  if(st.over > 0 && blow) read.push(`doubles and worse are <b>${Math.round(blow/st.over*100)}%</b> of everything you've lost`);
-  const lf = latestFiveFt();
-  if(lf) read.push(`<b>${fiveFtScore(lf).makes}/${fiveFtScore(lf).total}</b> from 5 feet last test`);
+  const others = sig.filter(t => t !== coachFocus(sig));
   // No plan list here on purpose. Coach owns LESSONS, DRILLS and the to-do list; a plan
   // belongs to its lab, and a course plan to Round Prep. Listing every standing plan here
   // as well put each one in two places and flattened the discipline split that the labs
@@ -2312,19 +2401,45 @@ function coach(){
   const linkFor = l => !l ? '' :
     `<div class="linkrow" data-action="${l.a}"${l.id ? ` data-id="${esc(l.id)}"` : ''}${l.view ? ` data-view="${l.view}"` : ''}>
        <span class="sm"><b>${esc(l.lab)}</b></span><span class="arr">→</span></div>`;
+  // ORDER (Jack's instruction, Aug 24 2026): one high-level read of where he is and what
+  // to focus on, then the two things he actually came here to open — the bench and the
+  // library. Everything else is detail and sits below them. Before this, the drills were
+  // the sixth block on the page and the library the last, under a to-do list and a link to
+  // Scores: the two pages Coach exists to reach were the two furthest from the top.
   return `
+  ${coachHero(st, sig, dr)}
+
+  <h2>Drills · what you can do right now</h2>
   <div class="card">
-    <h2>The read</h2>
-    ${read.length ? `<p class="sm">${read.join(' · ')}.</p>`
-      : `<p class="sm">Nothing measured yet. Log a round below, or send Claude your GHIN summaries — the coaching on this page is built from your own numbers, so it stays blank until there are some.</p>`}
+    <div class="linkrow" data-action="go" data-view="drills">
+      <span><b>Open the drill bench</b><br><span class="sm">${dr.ready} drills you have the kit for${dr.home ? ` · ${dr.home} at home` : ''}${dr.forYou ? ` · <b>${dr.forYou} matched to your game</b>` : ''}</span></span><span class="arr">→</span></div>
+    ${dr.week ? `<p class="sm">${dr.week} logged in the last seven days.</p>` : ''}
+    <p class="sm faint">Every lesson's drill in one list, filtered by the kit in the house and where you're standing.</p>
   </div>
 
-  ${sig.length ? `<h2>Work on this · ranked</h2>
+  <h2>The library · always open</h2>
+  <div class="shelf-grid">
+    ${Object.entries(counts).map(([name,c]) => `
+      <div class="shelf" data-action="open-shelf" data-shelf="${esc(name)}">
+        <div class="nm">${esc(name)}</div>
+        <div class="ct">${c.n} lessons</div>
+        ${c.forYou ? `<span class="new">${c.forYou} FOR YOU</span>` : ''}
+      </div>`).join('')}
+  </div>
+
+  <h2>Keep the streak</h2>
   <div class="card">
-    ${sig.slice(0,6).map(t => `<div class="tipcard ${t.sev === 'good' ? 'green' : ''}">
+    ${picks.length ? picks.map(tipHTML).join('') : '<p class="sm">Lessons matched to your struggles appear here as you log rounds.</p>'}
+    <button class="btn" data-action="drill-done">Mark today's work done · keep streak</button>
+    <div class="streak">${streak.map(d=>`<div class="day ${d.hit?'hit':''}">${d.lab}</div>`).join('')}</div>
+  </div>
+
+  ${others.length ? `<h2>Everything else on the board · ranked</h2>
+  <div class="card">
+    ${others.slice(0,6).map(t => `<div class="tipcard ${t.sev === 'good' ? 'green' : ''}">
       <div class="src">${esc(t.src)}${evTag(t.ev)}</div><h4>${t.h}</h4>${expandable(t.b)}
       ${linkFor(t.link)}</div>`).join('')}
-    <p class="sm faint">Ranked by how good the evidence is: rounds you logged hole by hole lead, then what you've measured, then the GHIN summaries — those are somebody else's arithmetic over a season, so they speak last. Within that, the warnings come first.</p>
+    <p class="sm faint">The focus at the top of this page is left out of this list rather than repeated. Ranked by how good the evidence is: rounds you logged hole by hole lead, then what you've measured, then the GHIN summaries — those are somebody else's arithmetic over a season, so they speak last. Within that, the warnings come first.</p>
   </div>` : ''}
 
   <h2>Next actions${open.length ? ` · ${open.length}` : ''}</h2>
@@ -2341,33 +2456,8 @@ function coach(){
     </div>
   </div>
 
-
   <div class="card flat"><div class="linkrow" data-action="go" data-view="scores">
-    <span><b>Score history &amp; analytics</b><br><span class="sm">${S.rounds.length ? `${S.rounds.length} rounds · scoring mix, par splits, worst holes` : 'Log a round — the coaching above is built from them'} · logging lives there</span></span><span class="arr">→</span></div></div>
-
-  <h2>Drills · what you can do right now</h2>
-  <div class="card">
-    <div class="linkrow" data-action="go" data-view="drills">
-      <span><b>Open the drill bench</b><br><span class="sm">${dr.ready} drills you have the kit for${dr.home ? ` · ${dr.home} at home` : ''}${dr.forYou ? ` · <b>${dr.forYou} matched to your game</b>` : ''}</span></span><span class="arr">→</span></div>
-    <p class="sm faint">Every lesson's drill in one list, filtered by the kit in the house and where you're standing.</p>
-  </div>
-
-  <h2>Keep the streak</h2>
-  <div class="card">
-    ${picks.length ? picks.map(tipHTML).join('') : '<p class="sm">Lessons matched to your struggles appear here as you log rounds.</p>'}
-    <button class="btn" data-action="drill-done">Mark today's work done · keep streak</button>
-    <div class="streak">${streak.map(d=>`<div class="day ${d.hit?'hit':''}">${d.lab}</div>`).join('')}</div>
-  </div>
-
-  <h2>The library · always open</h2>
-  <div class="shelf-grid">
-    ${Object.entries(counts).map(([name,c]) => `
-      <div class="shelf" data-action="open-shelf" data-shelf="${esc(name)}">
-        <div class="nm">${esc(name)}</div>
-        <div class="ct">${c.n} lessons</div>
-        ${c.forYou ? `<span class="new">${c.forYou} FOR YOU</span>` : ''}
-      </div>`).join('')}
-  </div>`;
+    <span><b>Score history &amp; analytics</b><br><span class="sm">${S.rounds.length ? `${S.rounds.length} rounds · scoring mix, par splits, worst holes` : 'Log a round — the coaching above is built from them'} · logging lives there</span></span><span class="arr">→</span></div></div>`;
 }
 
 function shelf(name){
@@ -2484,7 +2574,8 @@ function drills(){
 
   ${tag ? `<div class="card">
     <h2>Training one fault</h2>
-    <p class="sm">Showing only what trains <b class="warn">${esc(faultLabel(tag))}</b> — sent here from the lab that diagnosed it.
+    <p class="sm">Showing only what trains <b class="warn">${esc(faultLabel(tag))}</b> — the finding that sent you
+      here is on the page you came from.
       ${shown.length ? `${shown.length} drill${shown.length === 1 ? '' : 's'}.` : 'Nothing in the library trains it yet.'}</p>
     <div class="chips"><span class="chip on" data-action="clear-drill-tag">✕ Show every drill</span></div>
   </div>` : ''}
