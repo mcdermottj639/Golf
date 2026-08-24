@@ -100,13 +100,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v59';
+const BUILD = 'v60';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v60', d:'2026-08-24', items:[
+    'The build number now sits in the top right of Home. It is read out of the code actually running on your phone, so it is the way to check a change really landed \u2014 if it does not match what you were told shipped, it did not ship. Tap it for the update check.',
+    'Worth knowing why it earns the space: v59 was pushed but never published \u2014 the job that copies the site across was cancelled part-way, so your phone stayed on v58 while everything looked fine from this end.' ] },
   { b:'v59', d:'2026-08-24', items:[
     'Coach opens with one thing now: where your game is, and the single thing to focus on. It says what it read to get there \u2014 your last round, the last film, the drills you logged this week \u2014 so a focus built on a card from three weeks ago cannot pass for one built on Saturday.',
     'Under the focus is the work: the drills that train THAT finding, with how many are due. Miss short off 44% of your playable misses and it hands you the three drills for missing short, not a general nudge to go and practise.',
@@ -867,6 +870,13 @@ function render(view, arg, keepScroll){
   // hands roughly a fifth of the phone back to the rows he is actually tapping.
   document.body.classList.toggle('lvfocus',
     view === 'live' && !!S.live && S.live.stage === 'play');
+  // The build chip, top right of Home. It reads BUILD out of the code that is actually
+  // executing, which is the only honest answer to "did the update land?" — a published
+  // version is not the same claim as an installed one, and the two have disagreed twice
+  // now (a suspended PWA serving stale code in August, and a publish job that was
+  // cancelled before it ever reached the branch Pages serves).
+  const bt = $('#buildTag');
+  if(bt){ bt.textContent = BUILD; bt.hidden = view !== 'home'; }
   // The four labs live behind one nav button, so they all light it.
   const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game',
                    drills:'coach', shelf:'coach', lesson:'coach' };

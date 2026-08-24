@@ -14,6 +14,12 @@
 
 <header class="hero">
   <button class="themebtn" data-action="toggle-theme" title="Toggle night mode">☾</button>
+  <!-- The running build, top right of Home. It is filled in by render() from BUILD in
+       app.js, so it is proof of what is ACTUALLY on the phone rather than what was
+       published: if a deploy fails or an installed PWA is serving stale code, this is the
+       number that disagrees. Tap it for the Data tab's update check. -->
+  <button class="buildtag" id="buildTag" data-action="go" data-view="data" hidden
+          title="The build running on this phone — tap to check for a new one"></button>
   <div class="badge">Caddie HQ · Jack McDermott</div>
   <h1 id="pageTitle">Caddie HQ</h1>
   <div class="tag" id="pageTag">Your bag, your stroke, your game — one book.</div>

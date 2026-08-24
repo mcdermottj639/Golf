@@ -416,6 +416,20 @@ body.night input,body.night select,body.night textarea{background:#1a1f24;color:
 
 .themebtn{float:right;font-size:17px;background:var(--card);border:1px solid var(--line);
   border-radius:50%;width:38px;height:38px;cursor:pointer;color:var(--ink);margin-top:2px}
+/* The build chip beside it. Quiet by default — it is a thing to check, not to read every
+   time — but a real tap target, and it sits on the same line as the theme toggle. */
+.buildtag{float:right;font-family:var(--sans);font-size:10.5px;font-weight:800;letter-spacing:.06em;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:0 7px;height:28px;margin:7px 6px 0 0;cursor:pointer;color:var(--faint)}
+.buildtag[hidden]{display:none}
+body.night .buildtag{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+/* On a 320px phone the masthead badge is 232px wide, which left no room for a second
+   control beside the theme toggle and bounced the title down a line. The badge gives up
+   a little tracking rather than the build chip giving up its place — the chip is the one
+   that has a job to do. */
+@media (max-width:360px){
+  .badge{font-size:9px;letter-spacing:.12em;padding:4px 8px}
+}
 .charttile{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
   border-radius:var(--r);padding:12px 13px}
 .charttile .lab{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);
