@@ -100,13 +100,19 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v57';
+const BUILD = 'v58';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v58', d:'2026-08-24', items:[
+    'The drill bench now records WHICH drill you did, not just that you did one. Every drill has a Did it \u2713 button with a box for the result \u2014 7/10, 18, whatever that drill scores in \u2014 and it keeps the last run, the whole history, and a trend line once there are three numbers.',
+    'Reading a lesson no longer counts as doing its drill. Tapping \u201cwhy this drill exists\u201d used to quietly drop the drill off your shortlist \u2014 the one tap the page invites. Now a drill leaves the shortlist when you LOG it, and comes back when it has gone ten days unrun.',
+    'Every lab now says what trains its faults. Each open fault on a diagnosis card carries a line \u2014 how many drills train it, how many are due \u2014 that opens the bench filtered to that fault. Where nothing trains it, it says so rather than staying quiet.',
+    'And it did: three open faults had NO drill attached to them at all \u2014 the face-on film the putting lab is waiting on, nought-from-twelve up-and-downs, and your across-the-line top, whose own drill was not tagged with it. Thirteen lessons were re-tagged; every open fault in every lab now reaches at least one drill.',
+    'Opening a section no longer snaps shut when the page updates underneath you.' ] },
   { b:'v57', d:'2026-08-24', items:[
     'The AirBreak putting mat is on the kit list and marked owned — you said you got it, so the drill bench counts it, the same as tapping the chip yourself.',
     'Four new drills are built for it on the At-Home Putting shelf: an owner’s manual for the pumps, breakers in both directions (the pair that catches a left aim before a green does), the uphill–downhill pace ladder, and a nine-hole pump game where no two putts are alike.',
@@ -325,6 +331,14 @@ function seed(){
     carriesCalibrated: false,
     lessonsRead: [],
     drillDays: [],        // ISO dates a drill was marked done
+    // WHICH drill was done, and what it scored. `drillDays` records only that SOMETHING
+    // was practised that day, so it can keep a streak alive and nothing else — it cannot
+    // say the tape test has never been run, or that the coin gate is climbing. Every drill
+    // now carries a pass mark that produces a number, and a number with nowhere to go is
+    // the one kind of evidence this app has always refused to lose. {id, date, v} — `v` is
+    // the result as he typed it ("7/10", "18"), optional, because doing the drill is worth
+    // recording even on a night he didn't count.
+    drillLog: [],
     briefings: [],        // {id, course, date, focus, sections:[{t,b}]} — pushed by Claude pre-round
     // Published scorecards pushed by feed — {course, par:[], si:[], nine, src}. Ranks
     // below Jack's own cards and above the course-cards.js baseline. See holeLayout().
@@ -364,6 +378,7 @@ function migrate(s){
   if(!s.lessonAdds) s.lessonAdds = [];
   if(!s.lessonHidden) s.lessonHidden = [];
   if(!s.kit) s.kit = seed().kit;
+  if(!s.drillLog) s.drillLog = [];   // per-drill practice record — see drillRuns()
   if(s.live === undefined) s.live = null;   // a round being logged hole-by-hole
   if(!s.updates) s.updates = [];            // the What's new log — see recordUpdate()
   if(s.updatesInit === undefined) s.updatesInit = false;
@@ -438,6 +453,22 @@ const faultLabel = t => String(t).replace(/-/g, ' ').replace(/^./, c => c.toUppe
 // without a `discipline` is putting — that keeps the six existing faults where they are.
 const faultDisc = f => f.discipline || 'putting';
 const faultsFor = disc => S.faults.filter(f => faultDisc(f) === disc);
+// The line that keeps a lab and the drill bench honest with each other. A fault is a thing
+// to FIX, so the diagnosis has to be able to say what fixes it — but drills have exactly one
+// home, so this is a pointer to the bench filtered to that fault, never a drill rendered
+// here. When the answer is nothing it says so out loud: an untrained open fault is a real
+// gap in the library, and a silent one is how a diagnosis goes on being restated for weeks
+// with no work attached. Same principle as the evolution grid's row of question marks —
+// naming what is missing is the most useful thing the page can do.
+function faultDrillRow(tag){
+  const ds = drillsForTag(tag);
+  if(!ds.length) return `<p class="sm faint" style="margin-top:6px">No drill trains this yet —
+    it is a diagnosis without a fix, which is worth saying out loud.</p>`;
+  const due = ds.filter(d => d.due).length;
+  return `<div class="linkrow" data-action="drills-for" data-tag="${esc(tag)}">
+    <span class="sm"><b>${ds.length} drill${ds.length === 1 ? '' : 's'} train${ds.length === 1 ? 's' : ''} this</b>${
+      due ? ` · <b class="warn">${due} due</b>` : ' · all run recently'}</span><span class="arr">→</span></div>`;
+}
 // The shared diagnosis card, used by every lab: open faults with their detail, settled
 // ones collapsed to a line. One renderer so a new lab gets a real diagnosis for free.
 function diagnosisCard(disc, emptyMsg){
@@ -449,7 +480,8 @@ function diagnosisCard(disc, emptyMsg){
     <h2>The diagnosis</h2>
     ${open.length
       ? `<p class="sm"><b class="warn">Open: ${open.map(f => esc(faultLabel(f.tag))).join(' · ')}</b></p>
-         ${open.map(f => `<div class="tipcard"><h4>${esc(faultLabel(f.tag))}</h4>${expandable(f.why)}</div>`).join('')}`
+         ${open.map(f => `<div class="tipcard"><h4>${esc(faultLabel(f.tag))}</h4>${expandable(f.why)}
+           ${faultDrillRow(f.tag)}</div>`).join('')}`
       : `<p class="sm">No open faults on the card — everything tracked here has been measured shut.</p>`}
     ${settled.length ? `<p class="sm faint" style="margin-top:8px"><b>Settled:</b> ${settled.map(f =>
         esc(faultLabel(f.tag)) + (faultState(f) === 'downgraded' ? ' (downgraded)' : ' ✓')).join(' · ')}</p>` : ''}
@@ -610,6 +642,25 @@ const DRILL_KIT = {
   e1:{ where:'green' }, e2:{ where:'home' }, e3:{ where:'home' }, e4:{ where:'course' },
 };
 const haveKit = k => (S.kit || []).includes(k);
+
+// ----- The practice record -----
+// What was actually DONE, per drill. The streak answers "did I practise on Tuesday"; this
+// answers "when did I last run the tape test, and is the coin gate climbing" — which is the
+// question the pass marks were written for. Results are stored as typed, because a drill
+// scores in whatever unit it scores in (7/10, 18, a streak length); `drillNum()` pulls the
+// leading number out for a trend and gives up quietly when there isn't one, rather than
+// forcing every drill onto one scale.
+const drillRuns = id => (S.drillLog || []).filter(r => r.id === id);
+const lastRun = id => { const r = drillRuns(id); return r.length ? r[r.length - 1] : null; };
+const drillNum = v => { const m = /-?\d+(\.\d+)?/.exec(String(v || '')); return m ? +m[0] : null; };
+const daysSince = iso => iso == null ? null
+  : Math.max(0, Math.round((new Date(today() + 'T12:00:00') - new Date(iso + 'T12:00:00')) / 86400000));
+// A drill run inside this window counts as current work, so it stops crowding the
+// shortlist while the ones going stale move up. Ten days is a fortnight with a bad week in
+// it — long enough that a drill done properly isn't nagging by the weekend, short enough
+// that nothing sits at the top of the page for a month unattended.
+const STALE_DAYS = 10;
+
 function drillList(){
   const tags = struggles();
   // A struggle tag arrives from one of two places and they are not equal evidence: a
@@ -620,11 +671,23 @@ function drillList(){
     const m = DRILL_KIT[l.id] || {};
     const kit = l.kit || m.kit || [];
     const hit = l.tags.find(t => tags.has(t));
+    const runs = drillRuns(l.id), last = runs.length ? runs[runs.length - 1] : null;
+    const since = last ? daysSince(last.date) : null;
     return { l, kit, where: l.where || m.where || null,
              missing: kit.filter(k => !haveKit(k)),
-             why: hit ? tags.get(hit) : null, filmed: hit ? faultTags.has(hit) : false };
+             tag: hit || null,
+             why: hit ? tags.get(hit) : null, filmed: hit ? faultTags.has(hit) : false,
+             runs, last, since,
+             // DUE, not unread. Reading a lesson is not doing its drill, and keying this off
+             // `lessonsRead` meant tapping "why this drill exists" quietly dropped the drill
+             // off the shortlist — the one tap the page invites you to make.
+             due: !last || since >= STALE_DAYS };
   });
 }
+// Which drills train a given fault. The labs diagnose and Coach trains, so this is the
+// join between them: a lab names its open faults, and this says what the bench has for
+// each one — including, honestly, when the answer is nothing.
+const drillsForTag = tag => drillList().filter(d => d.l.tags.includes(tag));
 // ----- Drill diagrams -----
 // A drill is instructions, and instructions about where to stand, what goes on the ground
 // and which way the club travels are read off a picture in a second and out of a paragraph
@@ -781,8 +844,14 @@ const TITLES = {
   preps:['Round Prep','Every course plan, kept for the next time.'],
 };
 
+// Which fault the bench is filtered to, set by a lab's diagnosis card. Deliberately a
+// module variable rather than a saved setting: it is a question asked once, and a filter
+// still quietly on next week would make the bench lie about what is due. It survives a
+// rerender (a chip tap) and is cleared by navigating anywhere else.
+let drillTag = null;
 function render(view, arg, keepScroll){
   closeCheat();  // the cheat sheet overlay lives on <body>, so navigation must clear it
+  if(view !== 'drills') drillTag = null;
   current = { view, arg };
   const [title, tag] = TITLES[view] || TITLES.home;
   $('#pageTitle').textContent = title;
@@ -799,7 +868,15 @@ function render(view, arg, keepScroll){
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === navView));
   const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
+  // An in-place update must not close what he has open. Redrawing the view replaces the
+  // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
+  // a drill collapsed the drill you were reading. Same distinction as the scroll position:
+  // preserved on a rerender (an update), reset on a render (a navigation). Only sections
+  // carrying an id take part, so nothing else has to change.
+  const wasOpen = keepScroll
+    ? [...$('#view').querySelectorAll('details[id][open]')].map(d => d.id) : [];
   $('#view').innerHTML = R(arg);
+  wasOpen.forEach(id => { const d = document.getElementById(id); if(d) d.open = true; });
   buildJumpBar();
   if(!keepScroll) window.scrollTo(0,0);
 }
@@ -2218,7 +2295,7 @@ function coach(){
   const streak = weekStreak();
   const dl = drillList().filter(d => !d.missing.length);
   const dr = { ready: dl.length, home: dl.filter(d => d.where === 'home').length,
-               forYou: dl.filter(d => d.why && !S.lessonsRead.includes(d.l.id)).length };
+               forYou: dl.filter(d => d.why && d.due).length };
   const open = S.actions.filter(a => !a.done);
   const blow = st.mix.double * 2 + st.mix.triple * 3;
   const read = [];
@@ -2323,39 +2400,78 @@ function lesson(id){
   </div>`;
 }
 
+// One drill's practice record, and the form that adds to it. The result box is optional on
+// purpose: logging that the work happened is worth something on its own, and a required
+// number would just teach him to skip the button on a night he didn't count. The trend line
+// only appears once there are three numbers to draw, because two points are a line through
+// anything. Input font-size is left to the stylesheet — see the 16px rule; a smaller one
+// here zooms the whole page on iOS and never zooms back.
+function runRecord(d){
+  const nums = d.runs.map(r => drillNum(r.v)).filter(v => v != null);
+  const hist = d.runs.slice(-6).reverse();
+  return `<div class="drun">
+    <p class="sm">${d.last
+      ? `<b>Last run ${fmtDate(d.last.date)}</b>${d.since === 0 ? ' · today' : d.since === 1 ? ' · yesterday' : ` · ${d.since} days ago`}${
+          d.last.v ? ` · scored <b>${esc(d.last.v)}</b>` : ''}${d.runs.length > 1 ? ` · ${d.runs.length} runs on record` : ''}`
+      : '<b>Never run.</b> Nothing on record for this one yet.'}</p>
+    ${nums.length >= 3 ? `<div class="sm faint">Last ${nums.length} results ${spark(nums, 26, 'var(--gtext)')}</div>` : ''}
+    ${hist.length > 1 ? `<details class="more"><summary>${d.runs.length} runs</summary>
+      <p class="sm faint">${hist.map(r => `${fmtDate(r.date)}${r.v ? ` · ${esc(r.v)}` : ''}`).join(' · ')}</p></details>` : ''}
+    <div class="formrow" style="margin-top:8px">
+      <input id="dres-${esc(d.l.id)}" placeholder="Result (optional) — e.g. ${esc(passHint(d.l))}">
+      <button class="minibtn" data-action="log-drill" data-id="${esc(d.l.id)}">Did it ✓</button>
+    </div>
+  </div>`;
+}
+// A placeholder taken from the drill's own pass mark, so the box asks for the unit that
+// drill actually scores in rather than a generic number.
+function passHint(l){
+  const m = /(\d+\s*\/\s*\d+)/.exec(l.score || '');
+  return m ? m[1].replace(/\s+/g, '') : '7/10';
+}
+
 // ----- The drill bench -----
 // Sorted the way a decision actually gets made: is it for me, can I do it here, do I own
 // the thing. Blocked drills stay on the page under their own heading — see drillList().
 function drills(){
   const all = drillList();
   const place = S.settings.drillPlace || 'all';
+  // A fault filter arrives from a lab's diagnosis card, so the bench can answer "what
+  // trains THIS" without a lab ever growing a drill section of its own. It is deliberately
+  // not sticky in settings: it is a question asked once, and a filter still silently on
+  // next week would make the page lie about what is due.
+  const tag = drillTag;
   const here = d => place === 'all' || !d.where || d.where === place;
-  const shown = all.filter(here);
+  const inTag = d => !tag || d.l.tags.includes(tag);
+  const shown = all.filter(d => here(d) && inTag(d));
   const ready = shown.filter(d => !d.missing.length);
   // Matching on tags alone flags roughly half the library, which is a list, not a
-  // priority. So the top group is capped at six and ordered filmed-fault first — and the
-  // ones that don't make the cut keep their FOR YOU badge in the group below rather than
-  // disappearing, so the page never claims the shortlist is everything.
-  const matched = ready.filter(d => d.why && !S.lessonsRead.includes(d.l.id))
-    .sort((a,b) => (b.filmed ? 1 : 0) - (a.filmed ? 1 : 0));
+  // priority. So the top group is capped at six and ordered filmed-fault first, then by
+  // what has gone longest without being run — and the ones that don't make the cut keep
+  // their FOR YOU badge in the group below rather than disappearing, so the page never
+  // claims the shortlist is everything.
+  const matched = ready.filter(d => d.why && d.due)
+    .sort((a,b) => (b.filmed ? 1 : 0) - (a.filmed ? 1 : 0)
+                || (b.since == null ? 1e6 : b.since) - (a.since == null ? 1e6 : a.since));
   const forYou = matched.slice(0,6);
   const rest = ready.filter(d => !forYou.includes(d));
   const spill = matched.length - forYou.length;
   const blocked = shown.filter(d => d.missing.length);
+  const week = (S.drillLog || []).filter(r => daysSince(r.date) <= 6);
   const chip = (k, lab, n) => `<span class="chip ${place === k ? 'on' : ''}" data-action="pick-place" data-place="${k}">${esc(lab)}${n ? ` · ${n}` : ''}</span>`;
   const card = d => {
     // Naming the place is only worth a line when the list spans more than one of them.
-    const tag = [d.l.shelf].concat(place === 'all' ? [d.where ? PLACES[d.where] : 'Anywhere'] : []).join(' · ');
-    return `<details class="sect">
-      <summary><b>${esc(tag)}${d.why && !S.lessonsRead.includes(d.l.id) ? ' <span class="warn">FOR YOU</span>' : ''}</b>
+    const label = [d.l.shelf].concat(place === 'all' ? [d.where ? PLACES[d.where] : 'Anywhere'] : []).join(' · ');
+    return `<details class="sect" id="drill-${esc(d.l.id)}">
+      <summary><b>${esc(label)}${d.why && d.due ? ' <span class="warn">FOR YOU</span>' : ''}</b>
         <span class="gist">${esc(d.l.title)}</span></summary>
       ${d.missing.length ? `<p class="sm warn"><b>Needs ${esc(d.missing.map(k => KIT_LAB[k] || k).join(' + '))}</b> — mark it above once you have it.</p>` : ''}
       ${d.why ? `<p class="sm faint">Matched to your game: ${esc(splitLead(d.why)[0])}</p>` : ''}
       ${drillBody(d.l)}
       ${d.kit.length ? `<div class="chips">${d.kit.map(k => `<span class="chip static ${haveKit(k) ? 'grn' : 'ns'}">${esc(KIT_LAB[k] || k)}</span>`).join('')}</div>` : ''}
+      ${runRecord(d)}
       <div class="linkrow" data-action="open-lesson" data-id="${esc(d.l.id)}">
         <span class="sm"><b>Why this drill exists</b> — read the lesson</span><span class="arr">→</span></div>
-      <div style="margin-top:10px"><button class="minibtn" data-action="drill-done">Did it ✓ keep the streak</button></div>
     </details>`;
   };
   const group = (title, list, note) => !list.length ? '' : `
@@ -2365,6 +2481,22 @@ function drills(){
     <div class="card">${list.map(card).join('')}</div>`;
   return `
   <button class="backlink" data-action="go" data-view="coach">← Coach</button>
+
+  ${tag ? `<div class="card">
+    <h2>Training one fault</h2>
+    <p class="sm">Showing only what trains <b class="warn">${esc(faultLabel(tag))}</b> — sent here from the lab that diagnosed it.
+      ${shown.length ? `${shown.length} drill${shown.length === 1 ? '' : 's'}.` : 'Nothing in the library trains it yet.'}</p>
+    <div class="chips"><span class="chip on" data-action="clear-drill-tag">✕ Show every drill</span></div>
+  </div>` : ''}
+
+  <div class="card">
+    <h2>Your practice week</h2>
+    <p class="sm">${week.length
+      ? `<b>${week.length} drill${week.length === 1 ? '' : 's'}</b> logged in the last seven days${
+          (S.drillLog || []).length > week.length ? ` · ${(S.drillLog || []).length} on record all told` : ''}.`
+      : 'Nothing logged in the last seven days. Tap <b>Did it ✓</b> under a drill when you run it — that is what turns a pass mark into a trend.'}</p>
+    <p class="sm faint">Logging a drill records WHICH one and what it scored, so the bench can put the ones going stale back at the top. It keeps the streak alive too.</p>
+  </div>
 
   <h2>What you've got</h2>
   <div class="card">
@@ -2385,12 +2517,12 @@ function drills(){
   </div>
 
   ${group('For you right now', forYou,
-    `Matched to a fault or a struggle that is currently open, film-measured ones first, and you have the kit for every one.${spill ? ` ${spill} more carry the badge below.` : ''}`)}
+    `Matched to a fault or a struggle that is currently open, film-measured ones first, then whatever has gone longest unrun — and you have the kit for every one.${spill ? ` ${spill} more carry the badge below.` : ''}`)}
   ${group('Ready to go', rest)}
   ${group('Needs kit you haven\'t marked', blocked,
     'Not hidden, just parked — every one of these is a tap on the kit list away.')}
   ${!shown.length ? '<div class="card"><p class="sm">Nothing filed under that place yet.</p></div>' : ''}
-  <p class="sm faint" style="margin:10px 0">Every drill here belongs to a lesson in the library — this page is the same shelf sorted by what you can actually do today.</p>`;
+  <p class="sm faint" style="margin:10px 0">Every drill here belongs to a lesson in the library — this page is the same shelf sorted by what you can actually do today. A drill drops off the shortlist when you log it, and comes back when it goes stale; close the fault it trains in a lab and it stops being flagged at all.</p>`;
 }
 
 // ----- Session deep-dive -----
@@ -5110,6 +5242,24 @@ const ACTIONS = {
     if(!S.drillDays.includes(d)) S.drillDays.push(d);
     save(); rerender(); toast('Streak alive 🔥');
   },
+  // Logging a SPECIFIC drill. Keeps the streak too — the day's work happened either way,
+  // and making him tap two buttons for one session is how a log stops being kept.
+  'log-drill': el => {
+    const id = el.dataset.id;
+    const box = $(`#dres-${CSS.escape(id)}`);
+    const v = box ? box.value.trim() : '';
+    S.drillLog.push({ id, date: today(), v });
+    if(!S.drillDays.includes(today())) S.drillDays.push(today());
+    save(); rerender();
+    toast(v ? `Logged · ${v} 🔥` : 'Logged 🔥');
+  },
+  // Sent here from a lab's diagnosis card: show only what trains that fault.
+  'drills-for': el => {
+    drillTag = el.dataset.tag || null;
+    S.settings.drillPlace = 'all';   // a fault is trained wherever it is trained
+    save(); render('drills');        // render() only clears the tag when leaving the bench
+  },
+  'clear-drill-tag': () => { drillTag = null; rerender(); },
   // ----- Mental game -----
   'mental-focus': el => {
     const on = el.classList.contains('grn');

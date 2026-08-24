@@ -26683,6 +26683,172 @@
           ]
         }
       }
+    },
+    {
+      "id": "lesson-tag-h4-20260824",
+      "type": "lesson-update",
+      "target": "h4",
+      "lesson": {
+        "tags": [
+          "early-lift",
+          "short-putts",
+          "delivery-unverified"
+        ]
+      },
+      "note": "Face-on is the angle the putting lab has never shot, and this is the drill that shoots it — so it now answers the delivery-unverified fault directly."
+    },
+    {
+      "id": "lesson-tag-h13-20260824",
+      "type": "lesson-update",
+      "target": "h13",
+      "lesson": {
+        "tags": [
+          "short-putts",
+          "early-lift",
+          "delivery-unverified"
+        ]
+      },
+      "note": "Filming the beam is a face-on set, which is exactly what the open delivery-unverified fault is waiting on."
+    },
+    {
+      "id": "lesson-tag-p1-20260824",
+      "type": "lesson-update",
+      "target": "p1",
+      "lesson": {
+        "tags": [
+          "three-putts",
+          "pace-calibration"
+        ]
+      },
+      "note": "The pace fault names the 30-ft ladder by name as the thing still unrun. This is that ladder, so it is now flagged against the fault."
+    },
+    {
+      "id": "lesson-tag-h6-20260824",
+      "type": "lesson-update",
+      "target": "h6",
+      "lesson": {
+        "tags": [
+          "three-putts",
+          "mental",
+          "pace-calibration"
+        ]
+      },
+      "note": "Calling a putt before you look is distance-control training, which is the open fault — it now says so."
+    },
+    {
+      "id": "lesson-tag-sw2-20260824",
+      "type": "lesson-update",
+      "target": "sw2",
+      "lesson": {
+        "tags": [
+          "off-tee",
+          "tempo",
+          "across-the-line-top",
+          "over-the-top-slice"
+        ]
+      },
+      "note": "One-handed reps are the confirmed fix-feel for the across-the-line top and the anti-cast move for the over-the-top miss. Both faults are open; neither reached this drill."
+    },
+    {
+      "id": "lesson-tag-sw3-20260824",
+      "type": "lesson-update",
+      "target": "sw3",
+      "lesson": {
+        "tags": [
+          "tempo",
+          "off-tee",
+          "over-the-top-slice"
+        ]
+      },
+      "note": "Load and wait is the sequencing drill for the over-the-top miss."
+    },
+    {
+      "id": "lesson-tag-sw5-20260824",
+      "type": "lesson-update",
+      "target": "sw5",
+      "lesson": {
+        "tags": [
+          "off-tee",
+          "posture-through-impact"
+        ]
+      },
+      "note": "The transition drill starts the downswing from the ground, which is the entry point the refined posture fault asks for."
+    },
+    {
+      "id": "lesson-tag-sw6-20260824",
+      "type": "lesson-update",
+      "target": "sw6",
+      "lesson": {
+        "tags": [
+          "off-tee",
+          "across-the-line-top"
+        ]
+      },
+      "note": "The drill is literally named for this fault and was not tagged with it."
+    },
+    {
+      "id": "lesson-tag-w2-20260824",
+      "type": "lesson-update",
+      "target": "w2",
+      "lesson": {
+        "tags": [
+          "chipping",
+          "bunkers",
+          "equipment",
+          "up-and-down"
+        ]
+      },
+      "note": "Nought up-and-downs from twelve missed greens is the open short-game fault; using the bounce is the first thing that changes it."
+    },
+    {
+      "id": "lesson-tag-w3-20260824",
+      "type": "lesson-update",
+      "target": "w3",
+      "lesson": {
+        "tags": [
+          "chipping",
+          "approach",
+          "up-and-down"
+        ]
+      },
+      "note": "Pick the boring shot — the scrambling decision itself."
+    },
+    {
+      "id": "lesson-tag-w4-20260824",
+      "type": "lesson-update",
+      "target": "w4",
+      "lesson": {
+        "tags": [
+          "chipping",
+          "wedge-distance",
+          "up-and-down"
+        ]
+      },
+      "note": "Landing-spot control is what turns a chip into a one-putt."
+    },
+    {
+      "id": "lesson-tag-b1-20260824",
+      "type": "lesson-update",
+      "target": "b1",
+      "lesson": {
+        "tags": [
+          "bunkers",
+          "up-and-down"
+        ]
+      },
+      "note": "A greenside bunker is an up-and-down chance like any other."
+    },
+    {
+      "id": "lesson-tag-c2-20260824",
+      "type": "lesson-update",
+      "target": "c2",
+      "lesson": {
+        "tags": [
+          "approach",
+          "missing-short"
+        ]
+      },
+      "note": "Seven of twelve green misses finished short, and the club candidate for it is exactly this lesson: enough club, middle of the green."
     }
   ]
 }

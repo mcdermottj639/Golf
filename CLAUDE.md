@@ -681,7 +681,7 @@ against the card before writing it up** — it can invert the conclusion — and
 card he means** when the date is ambiguous (Jul 10 had a front and a back; front finished
 par-par, back finished bogey-double, and the answer changes the whole finding).
 
-### Re-rendering must not move the page
+### Re-rendering must not move the page — or close what's open
 
 `render()` resets scroll to the top — that's right for navigation. `rerender()` **preserves
 the scroll position**, because redrawing the view you're already on is an update, not a
@@ -689,6 +689,12 @@ navigation. Every chip tap in the live logger re-renders, and jumping to the top
 made scoring a hole mean scrolling back down six times. Use `rerender()` for in-place
 changes and `render()` only when the user has actually gone somewhere (including moving to
 the next hole, which is a navigation).
+
+Same rule for **open `<details>`**: `render()` replaces the view's DOM, so a section he had
+expanded snapped shut on every in-place update — which on the drill bench meant logging a
+drill collapsed the drill he was reading. A `rerender()` now restores any `<details>` that
+carries an **`id`** and was open; a `render()` deliberately doesn't. Give a section an `id`
+if it should survive an update, and nothing else has to change.
 
 ### Form controls never go below 16px (Aug 14 2026)
 
@@ -860,8 +866,54 @@ July. What that means for writing:
 - **`struggles()` returns OPEN faults only** (fixed Aug 14). A `CLOSED` fault already drops
   off the diagnosis card and Coach's to-dos; it used to go on matching lessons anyway, which
   is how the bench opened flagging a tempo drill FOR YOU under the words "CLOSED Jul 30 ✓".
-- The *For you right now* group is **capped at six**, filmed faults first, and the ones that
-  don't make the cut keep their badge in the group below rather than vanishing.
+- The *For you right now* group is **capped at six**, filmed faults first, then whatever has
+  gone longest unrun, and the ones that don't make the cut keep their badge in the group
+  below rather than vanishing.
+
+### The practice record — read is not done (Aug 24 2026)
+
+`S.drillDays` records only *that* something was practised on a date, which is enough for the
+streak and nothing else. **`S.drillLog`** — `{id, date, v}` — records **which** drill and what
+it scored, and it is what makes the pass marks worth writing:
+
+- **`v` is the result exactly as he typed it** (`"7/10"`, `"18"`), and it is **optional**: a
+  drill run on a night he didn't count is still worth recording, and a required number just
+  teaches him to skip the button. `drillNum()` pulls a leading number out for the trend line
+  and gives up quietly when there isn't one, so no drill has to be forced onto one scale. The
+  trend needs **three** results before it draws — two points are a line through anything.
+- **`due` replaced "unread" as the shortlist gate.** The *For you right now* group used to
+  filter on `!S.lessonsRead.includes(id)`, so tapping *"why this drill exists"* — the one tap
+  the card invites — quietly dropped the drill off the shortlist. **Reading a lesson is not
+  doing its drill.** A drill now leaves the shortlist when it is LOGGED and returns after
+  **`STALE_DAYS`** (10). `lessonsRead` still does what it should: the library's *read ✓*.
+- **Logging keeps the streak too.** One tap, both records — making him tap twice for one
+  session is how a log stops being kept.
+
+### The labs and the bench are joined (Aug 24 2026)
+
+Jack's rule: *"the whole app should be connected working in unison."* The labs diagnose and
+Coach trains, so the join is a **pointer, never a drill rendered in a lab** — the one-home
+rule above is unchanged.
+
+- **`faultDrillRow(tag)`** puts a line under every open fault on a `diagnosisCard`: how many
+  drills train it, how many are due, opening the bench filtered to that fault. The filter is
+  a module variable (`drillTag`), NOT a saved setting — it is a question asked once, and a
+  filter still quietly on next week would make the bench lie about what is due. `render()`
+  clears it on the way to any other view.
+- **The coverage guard is the part that matters going forward.** Where a fault matches no
+  lesson, the card says *"No drill trains this yet"* out loud. An open fault with nothing
+  training it is a real gap in the library, and a silent one is how a diagnosis goes on being
+  restated for weeks with no work attached — same principle as the evolution grid's row of
+  question marks. **So when you push a `faults` entry, check its tag reaches a drill**, and
+  if it doesn't, either tag the lessons that train it or write the lesson. The lab will
+  otherwise say so on Jack's phone, which is the point.
+- **The join key is the lesson's `tags`.** Fault tags and round-trouble tags share that one
+  field, which is why a `faults` push and a `lesson-update` are often the same job. The
+  Aug 24 audit found three open faults reaching **zero** drills — `delivery-unverified`,
+  `up-and-down`, and `across-the-line-top`, whose own drill (`sw6`, *Kill the across-the-line
+  top*) was not tagged with it. Thirteen lessons were re-tagged; nothing else changed.
+- **`lesson-update` is an `Object.assign`, so `tags` REPLACES the array.** Always send the
+  full list, existing tags included.
 
 **`lessons.js` is a FROZEN BASELINE — same rule as `seed()`** (standing instruction, Aug 13
 2026). Do NOT edit a lesson in place: append a `lesson-update` / `lesson-add` /
