@@ -100,13 +100,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v64';
+const BUILD = 'v65';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v65', d:'2026-08-24', items:[
+    'The film room log on every lab \u2014 Putting, Swing, Short Game \u2014 is now a scannable list instead of a three-column table. A row is the date, how big the batch was, and ONE line saying what it concluded.',
+    'The full breakdown is unchanged and one tap away, same as before. Nothing was thrown out; it just stopped being printed on the page you use to find things.',
+    'The reason it needed doing: the findings have grown to paragraphs, and three columns at phone width meant you had to READ the log to navigate it.',
+    'Putting now lists newest first, like the other two labs already did.' ] },
   { b:'v64', d:'2026-08-24', items:[
     'The three ball-height stroke clips got read properly, and they were written off too early \u2014 the head fills 224 to 365 pixels in them, which is the closest look at the club anywhere in this project.',
     'PATH goes to a tick on the Aug 24 column: SBST confirmed from a second camera, by a test that needs no scale at all. The head travels a straight line back and through and essentially retraces it. Two unrelated methods agreeing is the strongest evidence on that page.',
@@ -1343,6 +1348,35 @@ function sessionDiscipline(s){
   return /full[\s-]?swing|driver|\biron\b|\bwedge\b|mini/i.test(t) ? 'swing' : 'putting';
 }
 
+// ----- The film room log -----
+// The lab pages get a SCANNABLE list, not the full text. Findings here run to
+// paragraphs, and three table columns at phone width turned the log into a wall of
+// prose you had to read to navigate. A row is now the date, how big the batch was,
+// and ONE line saying what it concluded; the whole breakdown stays one tap away in
+// sessionView(). Same rule as a briefing section's `k`: an authored one-liner wins,
+// the finding's opening sentence is the fallback, so older sessions still read fine.
+// Write `detail.gist` on any session whose finding does not open with its headline.
+function sessionGist(s){
+  if(s.detail && s.detail.gist) return s.detail.gist;
+  const lead = splitLead(s.finding)[0];
+  return lead.length > 150 ? lead.slice(0, 132).replace(/\s+\S*$/, '') + '…' : lead;
+}
+// "23 clips" off the front of the setup line. Filmed sessions all start with a count;
+// one he logs himself by hand usually doesn't, and then the chip is simply absent.
+function sessionSize(s){
+  const m = /(\d+)\s*(?:phone\s+)?(clips?|strokes?|stills?|putts?)/i.exec(s.setup || '');
+  return m ? m[1] + ' ' + m[2].toLowerCase() : '';
+}
+// NEWEST FIRST everywhere — a log you scan reads down from the last time you filmed.
+function sessionLog(list, empty){
+  if(!list.length) return `<p class="sm">${empty}</p>`;
+  return `<p class="sm faint" style="margin-bottom:2px">Tap a session for the full film breakdown.</p>
+  ${list.map(({s,i}) => `<div class="seslog" data-action="open-session" data-i="${i}">
+    <div class="sesh"><b>${fmtDate(s.date)}</b><span class="sesm">${esc(sessionSize(s))}${s.detail ? ' ▸' : ''}</span></div>
+    <div class="sesg">${esc(sessionGist(s))}</div>
+  </div>`).join('')}`;
+}
+
 // ----- Lab plan blocks -----
 // Pre-shot routines head every lab: they're what you read standing on the first tee,
 // so they sit above the diagnosis rather than buried under it.
@@ -1652,10 +1686,7 @@ function swing(){
 
   <h2>Film room</h2>
   <div class="card">
-    ${sessions.length ? `<p class="sm faint" style="margin-bottom:4px">Tap a session for the full breakdown.</p>
-    <table><tr><th>Date</th><th>Setup</th><th>Finding</th></tr>
-    ${sessions.map(({s,i}) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)} ${s.detail?'<span class="faint">▸</span>':''}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
-    </table>` : '<p class="sm">No swing sessions logged yet. Send Claude swing clips — down-the-line and face-on — and the breakdowns land here.</p>'}
+    ${sessionLog(sessions, 'No swing sessions logged yet. Send Claude swing clips — down-the-line and face-on — and the breakdowns land here.')}
   </div>
 
   <h2>Filming guide</h2>
@@ -1888,10 +1919,7 @@ function putting(){
 
   <h2>Stroke session log</h2>
   <div class="card">
-    <p class="sm faint" style="margin-bottom:4px">Tap a session for the full film breakdown.</p>
-    <table><tr><th>Date</th><th>Setup</th><th>Finding</th></tr>
-    ${S.sessions.map((s,i) => ({s,i})).filter(o => sessionDiscipline(o.s) === 'putting').map(({s,i}) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)} ${s.detail?'<span class="faint">▸</span>':''}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
-    </table>
+    ${sessionLog(S.sessions.map((s,i) => ({s,i})).filter(o => sessionDiscipline(o.s) === 'putting').reverse(), 'No putting film yet — send clips and the breakdowns land here.')}
     <details><summary>+ Log a session</summary>
       <label>Setup (angle · strokes)</label><input id="sesSetup" placeholder="e.g. 5 strokes · overhead, zero-torque demo">
       <label>Finding</label><input id="sesFind" placeholder="What the film showed">
@@ -2926,9 +2954,7 @@ function shortgame(){
 
   <h2>Film room</h2>
   <div class="card">
-    ${sessions.length ? `<table><tr><th>Date</th><th>Setup</th><th>Finding</th></tr>
-    ${sessions.map(({s,i}) => `<tr data-action="open-session" data-i="${i}" style="cursor:pointer"><td style="white-space:nowrap">${fmtDate(s.date)}</td><td class="sm">${esc(s.setup)}</td><td class="sm">${esc(s.finding)}</td></tr>`).join('')}
-    </table>` : '<p class="sm">No short-game film yet. Send chipping, pitching or bunker clips — name the shot in the message and they file themselves here.</p>'}
+    ${sessionLog(sessions, 'No short-game film yet. Send chipping, pitching or bunker clips — name the shot in the message and they file themselves here.')}
   </div>
 
   <h2>Train it</h2>

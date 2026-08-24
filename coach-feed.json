@@ -27886,6 +27886,411 @@
           }
         ]
       }
+    },
+    {
+      "id": "gist-s6-swing-sim-20260824",
+      "type": "session-update",
+      "target": "s6-swing-sim",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Shoulder turn",
+            "v": "Full coil",
+            "s": "good",
+            "n": "back to target at the top"
+          },
+          {
+            "k": "Tempo",
+            "v": "Unhurried ~3:1",
+            "s": "good",
+            "n": "no snatch from the top"
+          },
+          {
+            "k": "Finish",
+            "v": "Balanced · held",
+            "s": "good",
+            "n": "weight fully left, toe up"
+          },
+          {
+            "k": "Ball flight",
+            "v": "Up the middle",
+            "s": "good",
+            "n": "tracer on the visible shot"
+          },
+          {
+            "k": "Face/path detail",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "compressed screen-record, one angle"
+          }
+        ],
+        "story": "Two simulator-bay swings, captured as screen-recorded story clips. The good stuff is structural and it's all there: a genuinely full shoulder coil at the top (not an arms lift), an unhurried transition — the backswing takes roughly three times the downswing, which is right where a full swing should live — and a committed, balanced finish that holds while the ball flies. The one readable tracer runs straight up the middle of the fairway. Notably, the up-and-out habit from the putting baseline does not appear here: the follow-through wraps full and low.",
+        "compare": "First full-swing entry, so this IS the baseline. The putting project's faults look putting-specific — encouraging for the long game.",
+        "limits": "Screen-recorded social clips: heavy compression, UI overlays, and one camera angle per swing. Club face, path, plane, and strike location can't be judged from this. For a real swing breakdown, film direct slo-mo (240fps) — down-the-line at hand height and face-on — and send the raw clips.",
+        "gist": "First long-game film on record: full coil, ~3:1 tempo, balanced finish, tracer straight."
+      }
+    },
+    {
+      "id": "gist-s9-driver-20260726-20260824",
+      "type": "session-update",
+      "target": "s9-driver-20260726",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Shoulder turn",
+            "v": "Full coil",
+            "s": "good",
+            "n": "back to target, head behind ball"
+          },
+          {
+            "k": "Transition",
+            "v": "Lower body first",
+            "s": "good",
+            "n": "hips start down, no cast"
+          },
+          {
+            "k": "Top of swing",
+            "v": "Across the line",
+            "s": "warn",
+            "n": "shaft points right of target, trail elbow drifts behind"
+          },
+          {
+            "k": "Hips thru impact",
+            "v": "Slide > rotate",
+            "s": "warn",
+            "n": "level/slidey — wants to clear up & around"
+          },
+          {
+            "k": "Finish",
+            "v": "Balanced · held",
+            "s": "good",
+            "n": "weight left, trail toe up"
+          },
+          {
+            "k": "Launch data",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "no path/AoA/spin numbers in frame"
+          }
+        ],
+        "story": "Five phone stills spanning top-of-backswing to finish. The bones are good: a genuinely full shoulder coil with the head staying behind the ball, a transition that starts from the ground up (hips opening while the hands still drop into the slot — not a cast from the top), and a committed, balanced finish that holds. Two things to fine-tune. (1) At the top the club is slightly across the line / laid off — shaft pointing right of target with the trail elbow drifting behind the body; that forces a small re-route coming down. (2) Through the delivery the hips look to slide level toward the target rather than clearing rotationally — which is exactly the 'great at the top, loses it through contact' feel. More lead-hip clearance would add speed and help hit UP on the driver.",
+        "compare": "Second full-swing entry on record (after the Jul 19 sim baseline). Same across-the-line top shows here AND in the wedge swing filmed the same day — a shared pattern, so it's worth fixing at the source rather than per-club.",
+        "limits": "Phone stills, one angle, no launch monitor readout captured — face angle, club path, attack angle and spin can't be measured. For a real breakdown film DTL slo-mo at hand height + face-on, and grab the sim's path/AoA/spin numbers so the visual read can be tied to data.",
+        "gist": "Athletic and well-sequenced. Two items: across the line at the top, and hips sliding not clearing."
+      }
+    },
+    {
+      "id": "gist-s10-wedge-20260726-20260824",
+      "type": "session-update",
+      "target": "s10-wedge-20260726",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Backswing length",
+            "v": "Compact",
+            "s": "good",
+            "n": "shortened from driver — correct"
+          },
+          {
+            "k": "Transition",
+            "v": "Lower body first",
+            "s": "good",
+            "n": "drops into slot, no cast"
+          },
+          {
+            "k": "Top of swing",
+            "v": "Across the line",
+            "s": "warn",
+            "n": "same laid-off look as the driver"
+          },
+          {
+            "k": "Spine / posture thru impact",
+            "v": "Held · covers ball",
+            "s": "good",
+            "n": "stays down, hits down — ideal"
+          },
+          {
+            "k": "Strike look",
+            "v": "Ball-first / descending",
+            "s": "good",
+            "n": "on top of it, not hanging back"
+          },
+          {
+            "k": "Finish / distance ctrl",
+            "v": "Near-full",
+            "s": "mid",
+            "n": "fine for stock; flight partials for control"
+          }
+        ],
+        "story": "Five phone stills, top to finish. The wedge swing's standout is impact: forward tilt and spine angle are well maintained, you stay 'on top of' the ball and cover it — a descending, ball-first strike, which is exactly what you want with a wedge and the mirror image of hitting up on the driver. Sequencing is the same good story as the driver — lower body leads, no cast. The one shared item is the top: slightly across the line / laid off, trail elbow drifting behind — the identical pattern to the driver frame, which is why the fix is one feel for both clubs. The finish runs close to full; for stock shots that's fine, just make sure partial-wedge distances come from controlled length and flight, not a full send every time.",
+        "compare": "Filmed the same day as the driver. Two things carry across both clubs: good ground-up sequencing (keep it) and the across-the-line top (fix it once, for both). The wedge's maintained spine angle is a nice contrast to the driver's slidey hips.",
+        "limits": "Phone stills, one angle, no launch data — face control, spin, launch and carry can't be read. Film DTL + face-on slo-mo and capture the sim's spin/launch/carry to flight and gap the wedges precisely.",
+        "gist": "Spine angle held through impact — the opposite of the driver. Same across-the-line top, though."
+      }
+    },
+    {
+      "id": "gist-s9-link21-session-20260730-20260824",
+      "type": "session-update",
+      "target": "s9-link21-session-20260730",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Tempo",
+            "v": "2.0 : 1",
+            "n": "7 of 8 down-the-line clips 1.9–2.1",
+            "s": "good"
+          },
+          {
+            "k": "Path",
+            "v": "Straight",
+            "n": "¼–½\" inside at the top, on line by impact",
+            "s": "good"
+          },
+          {
+            "k": "Start line",
+            "v": "2 of 3 LEFT",
+            "n": "1.5° and 1.7° — 1.3–1.4\" left at 4 ft",
+            "s": "warn"
+          },
+          {
+            "k": "Stance",
+            "v": "Square",
+            "n": "toe line 0.6–3.6° CLOSED, never open",
+            "s": "good"
+          },
+          {
+            "k": "Early lift",
+            "v": "Not there",
+            "n": "sole within 0.05–0.08\" for 83 ms into impact",
+            "s": "good"
+          },
+          {
+            "k": "Address shaft",
+            "v": "Vertical",
+            "n": "sd 0.3° over 59 frames — the 0° design spec",
+            "s": "good"
+          },
+          {
+            "k": "Lie presented",
+            "v": "~68°",
+            "n": "against a 69° build spec",
+            "s": "good"
+          },
+          {
+            "k": "Lean at impact",
+            "v": "Still open",
+            "n": "shaft blurs out; needs tape + 240 fps",
+            "s": "warn"
+          }
+        ],
+        "story": "Twenty-one clips across five camera positions, all in one day. Overhead (3), ground-level down-the-line (5), target-side down-the-line (5), face-on (6, one of them genuine 120 fps slow motion), and an elevated overhead showing the hands (2). This is the single record for the day.\n\nWHAT IS NOW SETTLED. Tempo is 2.0:1 and repeatable — seven of eight down-the-line clips landed between 1.9 and 2.1, measured two independent ways that agreed. Path is straight: the head works a quarter to a half inch inside at the top and is back on the line by impact, which is SBST confirmed on the new head. The stance is square to slightly CLOSED (toe line 0.6°, 2.9°, 3.6°), so the trail-foot creep that headed the fault list for two days is fixed and closed. Early lift — open since Session 1 — is gone: at 120 fps and 37.5 px/inch the sole held within 0.05–0.08\" of its address height for the full 83 ms into impact, flat across ten consecutive frames, and never dropped below address height. And the address shaft is dead vertical, repeating to a third of a degree across 59 frames, which is exactly the LINK.2.1's published 0° shaft-lean spec with the Pistol 0 grip. Lie presented at about 68° against a 69° build. The setup is doing what the putter was designed for.\n\nTHE ONE RED. Two of three overhead putts started 1.5° and 1.7° LEFT of the mat's centre line — 1.3–1.4 inches left at four feet, about two inches at six — with the third dead straight. The third putt is the control: same fixed camera, same measurement, no drift, so the left reading is real. Path measured neutral and start direction on a putt is dominated by the face, so the face was pointing left at impact. The feet are ruled out. It is aim or it is the face closing, and neither has been separated yet.\n\nWHAT THE ELEVATED OVERHEAD ADDED. The last two clips look down from in front and catch the hands, shaft and ball together. Ball position reads correct — well forward, toward the lead foot, matching the off-the-left-breast cue — and the hands sit over the ball line with the shaft running essentially straight down, consistent with the face-on measurement. Note these two also contain practice strokes before the real one, which is worth knowing when reading them back.",
+        "compare": "Against Session 5 on the DF3i: that session showed 5 of 5 balls starting on the centre line by eye, and two mat blocks ran 10/10. This is the first time start line has been MEASURED in degrees, and 1.5° is small enough to have looked fine on those earlier clips — 1.3\" at four feet still finds the middle of a 4.25\" hole. That is exactly why it hid on the mat and showed on the course: a make at four feet, an edge at six, a miss at ten. Tempo also moved, 2.4:1 with the DF3i to 2.0:1 with the LINK — both inside the window, the blade perhaps wanting a slightly quicker transition.",
+        "limits": "Lean AT impact is still not measured, and that is a measurement failure rather than a finding: the thin black shaft blurs against a dim floor at impact speed, only one frame in the window fit reliably, and two independent methods disagreed on it by 1.6° — the size of the effect itself. White tape on the shaft, 240 fps and more light fixes it.\n\nThe two elevated-overhead clips could not be measured numerically at all. They are dim (mean brightness 78 of 255), not slow motion (22.6 and 25.7 fps), and shot from an angle where a vertical object's projection depends on where it sits relative to the camera — so absolute shaft lean cannot be recovered from them. They are a good qualitative check on ball position and a poor instrument for hands and shaft. Face-on remains the angle for that question.\n\nAlso untouched: face ANGLE, which no face-on camera can see and which is what separates aimed-left from closing-through-impact. That needs the overhead. And pace — every clip today was a flat mat rep with no lag work, so the fault with the least evidence against it still has none.",
+        "gist": "First full day on the LINK: five ticks, and one red — the ball starting 1.5–1.7° left on two of three."
+      }
+    },
+    {
+      "id": "gist-s12-beekman-oncourse-20260801-20260824",
+      "type": "session-update",
+      "target": "s12-beekman-oncourse-20260801",
+      "detail": {
+        "gist": "No film, his report only: pace felt dialled and no left miss all day — friendliest conditions."
+      }
+    },
+    {
+      "id": "gist-s13-putter-ab-20260810-20260824",
+      "type": "session-update",
+      "target": "s13-putter-ab-20260810",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Clips filmed",
+            "v": "23",
+            "n": "120 fps · 5 camera positions",
+            "s": "mid"
+          },
+          {
+            "k": "Putts scored",
+            "v": "~20",
+            "n": "above-ground cups — every finish visible",
+            "s": "good"
+          },
+          {
+            "k": "Dead finishes",
+            "v": "9",
+            "n": "touching base or inside ~6 in",
+            "s": "good"
+          },
+          {
+            "k": "Worst putt",
+            "v": "~4 ft",
+            "n": "one, set D · zero long all day",
+            "s": "good"
+          },
+          {
+            "k": "Blue-ball spread",
+            "v": "1.2–1.5 ft ×3",
+            "n": "same base target — white died on same putts",
+            "s": "warn"
+          },
+          {
+            "k": "Mat clips",
+            "v": "6",
+            "n": "3 putts · 2 angles · complete",
+            "s": "mid"
+          },
+          {
+            "k": "Start lines measured",
+            "v": "3",
+            "n": "first full set since Jul 30",
+            "s": "good"
+          },
+          {
+            "k": "Putt A / B / C",
+            "v": "0.8R · 1.0L · 0.6R",
+            "n": "degrees vs the printed line",
+            "s": "warn"
+          },
+          {
+            "k": "Mean bias",
+            "v": "≈0.1° right",
+            "n": "was 1.5–1.7° LEFT on Jul 30",
+            "s": "good"
+          },
+          {
+            "k": "Median miss",
+            "v": "0.8°",
+            "n": "gate is 0.5° — not passed",
+            "s": "warn"
+          },
+          {
+            "k": "Angles owed",
+            "v": "face-on",
+            "n": "both cameras were ON the line",
+            "s": "warn"
+          }
+        ],
+        "story": "WHY THE RE-SCORE. These cups sit ON the green, not in it. A ball can't disappear, so the last frame of every clip is a scorecard — and that turned a session shot from diagnostic-useless angles into a ~20-putt pace ledger. Distances measured against the ball's own diameter at rest (1.68\"), the one scale in a golf video that can't lie.\n\nTHE LEDGER, SET BY SET. Set A — DF3i, 14:26–14:47, medium-to-long: one long putt rolled the width of the green and stopped touching the base; a second finished dead from mid-range; one rep left both balls 2.5–3.5 ft short; one putt never reached the two-foot circle; one finished about a foot away. Set B — LINK, 14:48–14:49: the long right-to-left putt tracked ball-to-rest arrived at dying speed and stopped AT the base. Set C — DF3i, 14:51, five-footers: blue dead against the base, whites inside 8–14 inches, the whole cluster inside 2.5 ft. Set D — LINK, ~20 ft: one dead (2–4 in), one ~2 ft, one ~3.5–4 ft — the day's worst. Set E — LINK, 14:56–14:58, 6–8 ft: the white ball ran 2.3 ft, dead, 5 in, dead, dead across five putts; the blue took three putts and finished 1.2–1.5 ft every time.\n\nWHAT THE TALLY SAYS. Nine of ~20 dead, most of the rest inside a foot and a half, worst ~4 ft, zero long. For a player whose pace card carries 'lags come up short' as the open conviction, the telling part is WHERE the short ones died: clustered around the base, not three feet before it. That is what calibrated-but-conservative looks like, and on the two speeds now sampled — Beekman's 8–9 stimp and this practice green — the curve is holding.\n\nTHE BLUE BALL, CLOSED AND REOPENED. The original oddity — 'blue finishes 1.2–1.5 ft in five straight finals' — was half camera artifact: frame-by-frame comparison shows the blue parked in the identical spot across clips 19–21, so it was putted three times, not five. The corrected fact is stranger: three blue putts, three finishes at 1.2–1.5 ft, spread across BOTH sides of the base, while the white died on the same putts from the same distance with the same putter. Jack confirms both were aimed at the same base, which rules out the easy explanation. Two remain. Small sample — three putts is three putts. Or the ball: a colored ball of a different model comes off the face at a different speed, and a repeating ~1.4 ft distance error at 7 feet is exactly what a firmer or softer cover does. Either way the operational rule is the same and it's cheap: pace work and the lag ladder happen with the gamer ball model only. And if that blue IS the same model as the white — then the scatter has no ball excuse, and the foot-powder strike test just became more interesting.\n\nTHE HONEST CAVEATS. An above-ground base STOPS a ball that touches it — some of the nine dead finishes would have trickled a foot past on a real green, so 'dead at base' means make-or-tap-in, not perfect dying weight; the tracked arrivals all came in soft with no ricochet, so none were hot. Balls can carry over between clips, and every parked ball was counted once — the set-E correction above is exactly that rule doing its job. And direction is still unscored: left/right of the base in any frame here is camera geometry, not a miss pattern.\n\nTHE EVENING MAT SESSION — DIRECTION, AT LAST. Five clips arrived from an indoor lined mat (19:54), three putts on the LINK.2.1 shot from two angles, both ALONG the target line: down-the-line from floor level behind the ball (img0015/16/17, one clip per putt) and reverse down-the-line from the hole end (IMG_3476, img3478). A sixth clip is still to come.\n\nThese are the RIGHT angles, and that is worth saying after a session of 23 oblique clips settled nothing. A camera on the target line is what makes start line measurable, and the mat supplies a printed centre line to measure against. Two putts were tracked frame by frame, with the ball's own 1.68\" diameter setting the scale at every depth. The reference checks out: a stationary printed dash ON the centre line reads 0.00\" offset in both clips, so the method is unbiased to about a thirtieth of an inch.\n\nTHE THIRD CLIP LANDED, so all three putts are measured from the hole end (IMG_3476, img3477, img3478 — one putt each) with the down-the-line set (img0015/16/17) as the matching pair. PUTT A (IMG_3476) rolled DEAD STRAIGHT — within about 0.1\" of the printed line for its entire visible roll, which is roughly 0.8° and inside the measurement noise. PUTT B (img3478) started on the line and drifted steadily to the LEFT, reaching about 1.0–1.3\" left by the time it got to the hole — call it 1°. So: one square, one a degree left, no consistent bias across the two.\n\nSet that against the Jul 30 baseline of 1.5–1.7° LEFT on two of three overhead putts and it is a genuine improvement. It is also two putts, with an uncertainty of roughly ±0.5° once lens distortion and motion blur are allowed for, so it is encouraging rather than conclusive.\n\nALL THREE, AND THE SHAPE OF IT CHANGED. Putt A ran about 0.8° RIGHT of the printed line (0.09\" at the hole). Putt B ran about 1.0° LEFT (1.33\"). Putt C started dead on the line and finished about 0.6° RIGHT (0.17\"). Mean bias: roughly 0.1° right, which is zero. Median miss: 0.8°.\n\nThat is a different fault from the one on the card. Jul 30 measured 1.5° LEFT, 1.7° LEFT and one straight — three putts pulling the same way, which is what an AIM error looks like, because aim does not change between reps. Tonight is 0.8 right, 1.0 left, 0.6 right — scattered either side of zero. The one-way pull did not reproduce on any of the three.\n\nSo the signature left miss, measured, is GONE from these putts, and what is sitting in its place is DISPERSION. That distinction is worth more than the improvement itself, because the two point at different causes. A bias points at aim, and the barely-open setup is the obvious candidate for having removed it. A two-way scatter points at something that varies stroke to stroke — and the leading candidate, unmeasured on all four putters Jack has owned this month, is STRIKE LOCATION. Heel and toe contact rotate the face in opposite directions, which is exactly a scatter with no bias. That is an inference, not a measurement, and the foot-powder test settles it in twelve minutes.\n\nBy the project's own gate — median inside 0.5° — this does NOT come off the card. 0.8° is better than 1.6° and it is not yet passed.",
+        "compare": "Beekman (Aug 1) said pace felt dialled; it was a feeling, from a scramble, on slow greens, with no camera. This is ~20 measured finishes landing on the same side: the pace curve is real, and the LINK matched the DF3i from every distance it was given. What today adds that Beekman couldn't: the short range — the closing 6–8 ft set went dead three times out of five with a 5-incher besides, and the five-foot DF3i set clustered inside 2.5 ft.\n\nAgainst the Jul 30 indoor sessions, the same trade as before: the mat measured DIRECTION but had no green; today measured DISTANCE but has no line. The two halves of the diagnosis still haven't been in the same shot.\n\nOn the head-to-head, the sets never played the same putt from the same spot, so nothing ranks the putters — but both heads posting dead finishes everywhere means neither head is the variable that mattered today. The stroke behind them did the work. The one variable that DID separate results was the ball.\n\nAND THE HALVES MET — partly. The line above about the two halves of the diagnosis never being in the same shot is now half-answered: Jul 30 measured direction indoors, the Aug 10 afternoon measured distance outdoors, and the Aug 10 evening measured direction again, on the first putts filmed since the barely-open discovery. What is still true is that direction has only ever been measured INDOORS, on a mat with a printed line, and distance has only ever been measured OUTDOORS. Neither session has yet measured both at once, and the mat is the reason the direction half keeps looking better than the scorecard does.",
+        "limits": "THE CAVEAT THAT DECIDES WHAT THIS IS WORTH: this was a mat with a printed target line, and a printed line does the AIMING for you. The oldest unexplained split in this whole project is 10/10 start lines on the mat against a left miss that only ever shows up on the course, and the barely-open discovery is an explanation for exactly that split — an AIM error, not a stroke error. So this session tests whether the stroke can send the ball down a line it has been handed. It cannot test whether Jack aims correctly when nothing is drawn on the ground, which is the open question. Three putts on a lined mat are consistent with the aim hypothesis and do not confirm it. Note the scatter makes this sharper rather than softer: if the remaining misses are strike-driven, they will show up on a green too, because a printed line cannot fix where the ball meets the face.\n\nFACE ANGLE IS NOT MEASURABLE IN THIS FOOTAGE. The putter head spans about 70 pixels in the reverse clip; a 1.5° rotation of the face would move its ends by under two pixels, well below the noise. So these clips cannot say what 'barely open' actually is in degrees — that still needs a close-up, phone directly above the ball with the head filling the frame, against a drawn line.\n\nSTILL OWED, and now the ONLY unshot angle: FACE-ON, square to the target line. Both cameras this evening were ON the line — excellent for start line, useless for shaft lean, because lean lives in the plane those cameras are looking down. So lean at address versus impact, the hands-behind-the-ball position the Pistol 0 wants, and ball position rep-to-rep are all still unmeasured. White tape on the shaft: still not on.\n\nALSO UNTOUCHED: strike location (foot-powder, still unrun) and pace — a 6-to-10-foot indoor mat cannot hold a 30-ft lag ladder, and distance control is the live priority and the reason the last putter went back.\n\nON THE PRECISION: each putt carries roughly ±0.5° of uncertainty once lens distortion, motion blur and the extrapolated centre line are allowed for, so a 0.6° reading and a 1.0° reading are not reliably different from each other. What IS robust across all three is the sign pattern — two right, one left, no one-way pull — because a 1.5–1.7° bias of the Jul 30 kind would have been far larger than the error bars and would have shown on every putt. Absence of the bias is the finding; the size of the residual scatter is not yet resolvable with a phone on a mat.",
+        "gist": "The one-way left pull is gone — 0.8° right, 1.0° left, 0.6° right against a printed mat line."
+      }
+    },
+    {
+      "id": "gist-s14-driver-lakeside-20260820-20260824",
+      "type": "session-update",
+      "target": "s14-driver-lakeside-20260820",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Finish",
+            "v": "Complete · held",
+            "s": "good",
+            "n": "trail toe up, weight fully left, chest and hips through, balanced"
+          },
+          {
+            "k": "Transition",
+            "v": "Lower body first",
+            "s": "good",
+            "n": "clubhead still well behind at hands-hip-high — no cast"
+          },
+          {
+            "k": "Shoulder turn",
+            "v": "Full coil",
+            "s": "good",
+            "n": "back to target, head stayed behind the ball"
+          },
+          {
+            "k": "Ball position",
+            "v": "Forward · off lead heel",
+            "s": "good",
+            "n": "right for driver; stance width fine"
+          },
+          {
+            "k": "Address posture",
+            "v": "Rounded upper back",
+            "s": "warn",
+            "n": "chin down on the chest; spine curved rather than hinged from the hips"
+          },
+          {
+            "k": "Trail leg at top",
+            "v": "Straightens",
+            "s": "warn",
+            "n": "pelvis gives up its forward tilt before transition starts"
+          },
+          {
+            "k": "Posture thru delivery",
+            "v": "Stands up",
+            "s": "warn",
+            "n": "taller than at address — but a rear-quarter angle exaggerates this"
+          },
+          {
+            "k": "Top of swing",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "angle can't read the shaft against the target line — Jul 26 reading still stands"
+          },
+          {
+            "k": "Path · face · AoA",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "no launch data. Unmeasured since Jul 27"
+          }
+        ],
+        "story": "Seven stills spanning address, early takeaway, top, transition, past impact and a held finish. The bones are the same ones Jul 26 found and they are good: a genuinely full coil with the head behind the ball, and a transition that starts from the ground — at hands-hip-high the clubhead is still well behind him, which is the opposite of a cast.\n\nThe new frame is the finish, and it is the best one in the set. Fully up on the trail toe, weight completely on the lead side, chest and hips turned past the target, hands high with the club wrapped behind the lead shoulder, and he holds it. Post-impact backs it up: head still down and behind the ball well past the strike.\n\nThat finish is what forces the refinement. The open fault said the hips stall and slide instead of clearing. A swing that truly stalls does not finish like this — it hangs back on the trail foot or the lead arm collapses. So the rotation is not what is missing. What IS missing is the posture it rotates around: the upper back is rounded and the chin is down at address, the trail leg straightens at the top so the pelvis loses its forward tilt before the downswing begins, and by the delivery frame the body is plainly taller than it was at address. Three frames, one story — he turns around a rising spine rather than the one he set. The useful consequence is that the cheapest entry point is now the earliest one: address posture and a little trail-knee flex, both checkable in a mirror before a ball is hit.",
+        "compare": "Third full-swing entry on record, after the Jul 19 sim baseline and the Jul 26 driver/wedge stills. Confirms Jul 26's three positives a second time and on the course rather than in a bay — coil, head behind the ball, ground-up transition, balanced finish. Revises Jul 26's 'hips slide level through impact' from a rotation fault to a posture fault. Does NOT re-grade Jul 26's across-the-line top, which needs an angle this film does not have.",
+        "limits": "Rear-quarter camera — behind and off the rear shoulder, elevated — so shaft plane at the top, club path, face-to-path and attack angle are all unreadable, and nothing here can confirm or refute the over-the-top slice. No true impact frame: the sequence jumps from hands-hip-high to well past the strike. The apparent standing-up in the delivery frame is partly perspective, since a rear-quarter lens exaggerates it as the body rotates toward the camera — the ADDRESS frames are the solid evidence, because a static position does not depend on rotation. DATE AND COURSE ARE AN INFERENCE, not Jack's report: he described the film only as recent, and it is dated to the Aug 20 Lakeside Country Club round on the strength of the terrain and the day it arrived. Correct it and this row gets removed and re-added.",
+        "gist": "First swing film that catches the finish — it's complete, which argues against the hip stall."
+      }
+    },
+    {
+      "id": "gist-s15-airbreak-20260824-20260824",
+      "type": "session-update",
+      "target": "s15-airbreak-20260824",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Path",
+            "v": "SBST confirmed",
+            "s": "good",
+            "n": "2nd camera · scale-free test · straight back & through"
+          },
+          {
+            "k": "Tempo",
+            "v": "≈1.79 : 1",
+            "s": "mid",
+            "n": "6 strokes, 2 sessions · quick of 2:1 · method biases low"
+          },
+          {
+            "k": "Early lift",
+            "v": "Challenged, held",
+            "s": "good",
+            "n": "2 methods, opposite signs · blur artifact"
+          },
+          {
+            "k": "Outcome",
+            "v": "4 in, 3 left",
+            "s": "mid",
+            "n": "7 putts, one tilt · every miss LEFT"
+          },
+          {
+            "k": "The break",
+            "v": "≈3.3\" over 6.4 ft",
+            "s": "mid",
+            "n": "grows as distance² · 4/4 monotonic in pace"
+          },
+          {
+            "k": "Strike location",
+            "v": "Not visible",
+            "s": "warn",
+            "n": "10 clips, no view of the face"
+          }
+        ],
+        "story": "SEVEN PUTTS, ONE MAT, ONE TILT — the mat was not touched between the two AirBreak batches, only the phone was moved.\n\nTHE AIRBREAK, BATCH 1 — putt 1 starts barely right, is taken left, catches the trainer's LEFT shoulder and runs around the outside of the rim to rest 0.5 in left and about 6 in past. Putt 2 misses 6.3 in LEFT, about 5 in past. Putt 3 runs right, turns back and finishes IN the trainer.\n\nCORRECTION TO PUTT 2, and it strengthens the read rather than weakening it. This entry said the ball \"never moves right at all, left from the first frame.\" That overstates it. Tracked over 366 points, its lateral offset is FLAT at +1.37 to +1.40 in for the first 42 inches of roll and only then accelerates left. That matters, because a start-line error produces LINEAR drift from the very first inch and there is none here. Measured start line −0.29° against the mat axis — a hair right, effectively no allowance — and the entire leftward movement is accumulated break. Its raw-pixel curvature coefficient is 2.59e-4, sitting inside the 1.3–2.5e-4 band measured across batch 2. Same mat, same break signature.\n\nTHE AIRBREAK, BATCH 2 — four putts. A started +0.10°, dead at the target: MISSED 4 in LEFT and ran at least 10.5 in past into the near bumper. B started 1.64° right: HOLED. C started 2.70° right: HOLED. D started 2.93° right: HOLED. The break is quadratic in distance rolled and monotonic in pace with no exceptions, and it cross-checks itself — project each start line to the hole, subtract its measured break, and the three makes land 0.86 in right, 0.81 in left and 0.26 in left of centre while the miss lands 3.7 in left against a reported 4.0.\n\nTHE STROKE CLIPS, AND AN EARLIER CLAIM WITHDRAWN. This entry previously said the three ball-height clips \"measure nothing.\" That was wrong, and wrong twice over. The head fills 224 to 365 pixels in them — the highest-resolution look at the club anywhere in this project — and they carry the best path measurement on file.\n\nPATH: SBST CONFIRMED FROM A SECOND CAMERA. The test is the good part. For a head at depth Z, the image gives lateral position as (x − principal point)/W and depth as 1/W, where W is the head's apparent width; a STRAIGHT line in three dimensions makes the first linear in the second, and that holds whatever the focal length and whatever the head's real size. Run on two clips it returns residuals under 1% of the head's own lateral excursion, back and through, with the two directions fitting slopes within 2% of each other — the head essentially retraces its own line. No loop, no arc, no over-the-top.\n\nA caveat found by re-running it here: the test is free of focal length and head size but NOT of the PRINCIPAL POINT, which is unknown. Sweeping that assumption across a plausible range moves the residual from about 3% to about 9% and the back-versus-through slope agreement from 17% to 42%. And if this really was shot on the ultra-wide — which the frame geometry suggests — barrel distortion bends straight lines, which is precisely what a straightness test measures. So: SBST is CONFIRMED in shape, from a second and independent camera, and the sub-1% precision should be read as softer than quoted. Given SBST was already settled across 20+ clips and four putters, that is exactly the weight this deserves.\n\nTEMPO, RE-MEASURED AND RUNNING QUICK. Two stroke clips give 1.71:1 and 1.56:1. Pooled with the four AirBreak strokes (1.64, 1.82, 1.86, 2.13) that is SIX STROKES, mean about 1.79, five of six under 2:1 — two sessions, two mats, two camera positions, same direction. The mechanism is a backswing short relative to the downswing rather than a fast downswing: the down-stroke durations cluster tightly (42 and 41 frames in the stroke clips) while the backswings do not. The caveat that keeps this off the fault card for now: backswing START is detected as a departure from a plateau, which is threshold-sensitive in both analyses and biases in ONE direction — it clips the slow first inches of the takeaway and therefore shortens the ratio. Six strokes is a finding; the absolute number needs one hand-checked stroke to calibrate the method against Jul 30's.\n\nBALL START LINE ON THE STRIP MAT: the two putts started on lines 1.25 px apart, under 0.1° however the focal length resolves, with sub-pixel residuals over the whole visible roll — so that mat puts no measurable break on the ball. But the horizon row differs by 2.7 px between clips, so the phone moved, and the whole 1.25 px could be that. Read as indistinguishable within setup error, n=2.",
+        "limits": "EARLY LIFT WAS CHALLENGED AND THE CHALLENGE DID NOT SURVIVE — this is the most important thing on the page, because a settled fault nearly came back on it.\n\nThe challenge, which is a good method: compare the head at MATCHED APPARENT WIDTH, so the two passes are at the same depth, the mat's convex profile cancels and no scale enters; any difference in the sole's image row is then real height. Done that way it reported the head coming through HIGHER than it went back by 3.6 px near the top rising to 19.5 and 29.6 px approaching the ball — 0.3 to 0.5 in — which is the exact shape early lift has, and two to six times the 0.05–0.08 in Jul 30 measured.\n\nTwo checks were run against it here and it does not hold up. FIRST, the bucketing was right: address sits at a head width of 224 px and the top of the backswing at 365, so the 220–226 px bucket where the effect is largest really is at ball depth, not somewhere in the follow-through. That part is sound. SECOND, and decisively, an independent replication using a background-difference mask instead of a darkness threshold returns the OPPOSITE SIGN at every matched depth — the head reads 2 to 19 px LOWER coming through, not higher.\n\nWhy the two disagree is measurable rather than speculative. At matched depth the downswing silhouette carries 5 to 18% fewer core-dark pixels than the backswing, and the deficit is LARGEST NEAR IMPACT, where the soft-edge fraction jumps from 0.26 to 0.42. The head is about 1.7 times faster through the same depths on the way down (72 frames back against 42 down), so it is more motion-blurred there. A threshold that EXCLUDES the blur halo eats the smeared bottom edge and raises the apparent sole; one that INCLUDES it extends the blob downward and lowers it. Two methods, opposite signs, and each in the direction its own bias predicts. That is the signature of a measurement dominated by artifact at the size of the effect.\n\nSo early lift stays CLOSED, and this is recorded rather than dropped so the next reader who finds the same apparent effect knows it was chased. What settles it is a reshoot, spec'd below.\n\nSTILL NEVER MEASURED after ten clips: FACE ANGLE at impact — one indirect attempt via start-line-minus-path gave 0.30° and 0.80° on the two clips, which do not agree well enough to publish. STRIKE LOCATION — no clip shows the face. SHAFT LEAN at impact — every camera today looks along the target line, which is the plane lean lives in.\n\nONE OBSERVATION THAT IS NOT A MEASUREMENT: at address the ball sits toward the TOE side of the head's silhouette centre, read at roughly 7% of head width by eye, ±4%, from a single frame — two automated attempts were contaminated by the bright wall behind. It is address position, not strike location. But it points straight at the fault that has never been measured on any of four putters, and this camera position is one change away from closing it: impact tape or dry shampoo on the face, one set.\n\nTWO CALIBRATION GAPS worth fixing at source rather than arguing about. The lens is unknown and the geometry only reconciles at a focal length around 700–780 px, i.e. the 0.5x ultra-wide — which makes every quoted ANGLE scale with an unknown and adds barrel distortion on top. And there is no scale in frame. Both cost nothing to fix.\n\nONE FLAG ON POOLING, RAISED AND CLOSED. A shirt-colour difference was spotted between the two AirBreak batches and read off the film as two separate sessions, which would have meant the seven putts could not be pooled. Jack: he changed shirts, and all of it is one day. So the pooling stands — one day, one mat, one untouched tilt, seven putts. Worth keeping as a worked example of the standing rule rather than deleting: WHAT HE DID is his to state and film does not outrank it. Film wins on positions and sensations; it does not get to tell him which afternoon he was standing in.\n\nn=7 putts on one mat, n=2 stroke clips, n=6 strokes for tempo. Nothing here is a baseline.",
+        "compare": "VERSUS JUL 30, which is the session this batch actually argues with. Tempo was 2.0:1 there across 7 of 8 clips landing 1.9–2.1; six strokes now average 1.79 with five under 2.0. Different method on both sides, and the current method biases low, so treat the DIRECTION as the finding and the gap as unquantified. Path was straight there from three overhead clips and is straight here from a ball-height camera by a completely different test — that is the strongest thing in this comparison, because two unrelated methods agreeing is worth more than either. Early lift was closed there at 120 fps with the sole held within 0.05–0.08 in of address height across ten consecutive frames; the challenge raised here did not survive its own replication and does not overturn it.\n\nVERSUS AUG 10 PM and AUG 10 MAT: unchanged by this batch. The mat set could score AIM because it was flat and lined; the AirBreak can score the LINE but not the aim, and the strip mat's two putts are too few and too confounded with camera movement to add anything.\n\nWITHIN THE DAY: batch 1 of the AirBreak read as a dying ball at five to six inches past; batch 2 kept 80–95% of its speed over six feet and ran one putt into the bumper; and IMG_3665, tracked frame by frame, was still rolling past the hole when its clip ended. Two pace bands on one surface in one session — which is itself the finding, and the clearest argument yet that pace is not repeatable enough to carry a single number.",
+        "gist": "Seven putts on one tilt: the mat's break gets a number, SBST confirmed twice, early lift held."
+      }
     }
   ]
 }

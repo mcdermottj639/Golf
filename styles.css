@@ -291,6 +291,17 @@ body.night .dscore{border-left-color:var(--gtext)}
 .linkrow{display:flex;justify-content:space-between;align-items:center;padding:10px 2px;
   border-bottom:1px dotted #c9bd9d;cursor:pointer}
 .linkrow .arr{color:var(--faint)}
+/* Film-room rows on the labs. The findings run to paragraphs now, and three table
+   columns at phone width turned the session log into a wall of prose you had to read
+   in order to navigate. A row is the date, the batch size and one concluding line;
+   the breakdown is one tap away. See sessionLog() in app.js. */
+.seslog{padding:9px 2px;border-bottom:1px dotted #c9bd9d;cursor:pointer}
+.seslog:last-child{border-bottom:none;padding-bottom:2px}
+.sesh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.sesh b{font-size:14.5px}
+.sesm{font-family:var(--sans);font-size:9.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--faint);white-space:nowrap}
+.sesg{font-size:12.5px;line-height:1.45;color:var(--soft);margin-top:3px}
 .backlink{display:inline-block;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--gtext);
   margin:14px 0 0;cursor:pointer;background:none;border:none;padding:0}
 

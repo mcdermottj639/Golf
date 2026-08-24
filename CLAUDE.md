@@ -156,7 +156,13 @@ Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 �
 - **Bag change** (new club, spec fix, status change): append a `club-add` or
   `club-update` entry + usually a `history` entry. Use a unique dated `id`.
 - **Log a filmed putting session**: append a `session` entry; update `evolution` /
-  `faults` if the read changed.
+  `faults` if the read changed. **Give its `detail` a `gist`** — ONE line, ~95 characters,
+  saying what the session concluded. That is what the labs' film-room list renders
+  (`sessionLog()` in `app.js`), and it follows the same rule as a briefing section's `k`:
+  an authored line wins, the finding's opening sentence is the fallback, so older sessions
+  still read. Findings run to paragraphs now, and a session without a `gist` is a row you
+  have to read in order to navigate past it. Note `session-update` sets `detail` WHOLESALE,
+  so send the existing metrics/story back with it.
 - **Close out a to-do**: append an `action-done` targeting the action's id.
 ### Logging a round (the hole array is the whole point)
 
