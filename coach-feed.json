@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-08-21",
+  "updated": "2026-08-24",
   "entries": [
     {
       "id": "s4-session",
@@ -26246,6 +26246,442 @@
         "prec": "town",
         "place": "Nekoosa, WI",
         "src": "TOWN CENTRE: Nekoosa WI is 44.319080, -89.899940 (latlong.net). The resort is several miles out of town, so good to about 8 miles. Put on the row Jack already had, after the import's duplicate of it was removed. Read Aug 21 2026."
+      }
+    },
+    {
+      "id": "kit-airbreak-20260824",
+      "type": "kit",
+      "add": [
+        "airbreak"
+      ]
+    },
+    {
+      "id": "lesson-airbreak-owners-20260824",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "h14",
+        "shelf": "At-Home Putting",
+        "title": "The AirBreak: an 8-foot green with the slopes built in",
+        "min": 4,
+        "tags": [
+          "short-putts",
+          "equipment"
+        ],
+        "where": "home",
+        "kit": [
+          "putter",
+          "airbreak"
+        ],
+        "body": "The mat you just added is closer to a small green than to carpet, and three of its facts change how home practice reads. THE SPEED: it runs about 10 on the stimp meter — one known, repeatable pace, where carpet was always a guess. THE HOLE: a real 4.25-inch cup sunk into the base, so a putt hit too hard lips out the way it would outdoors. A coaster on carpet could never reject a putt, and rejection is the feedback that teaches dying pace. THE PUMPS: eight of them under the turf. Step on one and that section rises; press its release and it drops. Up to about 7.5% of side slope and about 3% of continuous uphill or downhill — more break than most greens you play.\n\nThree standing rules for it. FIRST: flat is a setting. Open every session flat, ten putts with the full routine, before touching a pump — the flat baseline is what makes a missed breaker readable afterwards, because if you miss the flat ones too, the problem is the stroke, not the read. SECOND: it is ONE green speed. Pace learned here is mat pace — carry the habit, not the number, and say ‘on the mat’ when you log a session so a 10-stimp result never masquerades as a reading from a real green. THIRD: eight feet is its whole world. It trains exactly your scoring zone — the left miss, the tap-in band, and the short third putt that turns a lag into a three-putt — and it cannot train the lag itself. The 30-ft ladder still lives on a real green; the mat protects the putts that come after it.\n\nEverything already on this shelf transfers: the coin gate, the yardstick, 20-in-a-row and the pop stroke all run on the mat as written, now with a real hole for a target. The specs above are the maker’s numbers (PuttOut’s product page, confirmed by the review press), not measured here.",
+        "drill": "The session opener — flat mat, ten balls, before any pump is touched.",
+        "steps": [
+          "Mat flat: every pressure release pressed, surface checked by eye down its length.",
+          "Ball at 6 ft — the middle of your scoring zone. Full routine on every putt, barely-open face exactly as on the course.",
+          "Ten putts. Count makes, and note the miss side of every miss.",
+          "Only now pump in whatever the session is about — breakers, slope, or the nine-hole game."
+        ],
+        "score": "7 of 10 or better flat says the stroke is travelling — go build breaks on it. Under that, or two misses on the same side, stay flat and run the coin gate instead: a break added on top of a leak just hides it.",
+        "viz": {
+          "h": 58,
+          "cap": "Side on · step a pump and that section rises",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 6,
+              "y1": 40,
+              "x2": 38,
+              "y2": 40,
+              "c": "i",
+              "w": 0.9
+            },
+            {
+              "k": "line",
+              "x1": 38,
+              "y1": 40,
+              "x2": 54,
+              "y2": 33,
+              "c": "i",
+              "w": 0.9
+            },
+            {
+              "k": "line",
+              "x1": 54,
+              "y1": 33,
+              "x2": 70,
+              "y2": 40,
+              "c": "i",
+              "w": 0.9
+            },
+            {
+              "k": "line",
+              "x1": 70,
+              "y1": 40,
+              "x2": 94,
+              "y2": 40,
+              "c": "i",
+              "w": 0.9
+            },
+            {
+              "k": "ball",
+              "x": 9,
+              "y": 38
+            },
+            {
+              "k": "hole",
+              "x": 88,
+              "y": 40,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "obj",
+              "x": 46,
+              "y": 48,
+              "c": "b"
+            },
+            {
+              "k": "arrow",
+              "x1": 46,
+              "y1": 45.5,
+              "x2": 46,
+              "y2": 36,
+              "c": "b",
+              "w": 0.8
+            },
+            {
+              "k": "text",
+              "x": 46,
+              "y": 55,
+              "t": "step = up · button = down",
+              "sz": 2.6,
+              "c": "b"
+            },
+            {
+              "k": "text",
+              "x": 18,
+              "y": 28,
+              "t": "8 ft · stimp ~10",
+              "sz": 2.5,
+              "c": "f"
+            },
+            {
+              "k": "text",
+              "x": 84,
+              "y": 30,
+              "t": "real 4.25-inch cup",
+              "sz": 2.5,
+              "c": "f"
+            },
+            {
+              "k": "text",
+              "x": 54,
+              "y": 25,
+              "t": "up to 7.5% side · 3% up/down",
+              "sz": 2.5,
+              "c": "i"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-airbreak-breakers-20260824",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "h15",
+        "shelf": "At-Home Putting",
+        "title": "Breakers both ways: the pair that catches a left aim",
+        "min": 4,
+        "tags": [
+          "short-putts"
+        ],
+        "where": "home",
+        "kit": [
+          "putter",
+          "airbreak"
+        ],
+        "body": "A green never gives you the same breaking putt twice — the mat gives you nothing else, and that repeatability is the whole edge. The method does not change from the green-reading shelf: pick the spot where the ball has to enter the break — the apex, or the point on the lip — and hit a STRAIGHT putt at that spot, barely-open face and all. The feel you calibrated is about your start line, never about the hole; on a breaker those are two different directions, which is exactly why a breaker is where an aim bias hides. ‘I misread it’ and ‘I aimed left again’ produce the same miss, and on a course you can never replay the putt to find out which it was.\n\nThe mat can split them, because the two break directions treat a left leak differently. On a RIGHT-TO-LEFT putt you borrow to the right; an aim-left leak eats the borrow, the ball starts low and the break drags it further low — the miss is amplified. On a LEFT-TO-RIGHT putt the same leak just adds borrow and half hides. So run them as a PAIR with the same borrow, and read the gap between the two make counts: a stroke problem misses both directions roughly equally, a left-aim leak shows up as right-to-left lagging far behind. That is a diagnosis a practice green can’t run and film can’t see.",
+        "drill": "Same borrow, both directions, ten putts each — the gap between the counts is the reading.",
+        "steps": [
+          "Two pumps up on one side, mid-mat. Ball 6–7 ft out: a right-to-left breaker.",
+          "Stand behind it and pick the entry spot. Putt STRAIGHT at the spot — full routine, barely-open face on that start line, then let the slope do the rest.",
+          "Ten putts. Count makes, and count low-side misses separately.",
+          "Release those pumps and pump the mirror side to the same height. Ten more, left-to-right, same distance, same routine.",
+          "Write both counts in your notes — the PAIR is the result, not either number."
+        ],
+        "score": "Counts within 2 of each other: the face is holding on both start lines, so your misses are reads — and reads improve fast here. Right-to-left trailing by 3+ with low misses: the left aim is leaking back. Stop reading break and run the coin gate flat until it passes.",
+        "viz": {
+          "h": 58,
+          "cap": "Top down · right-to-left: a straight putt at the spot",
+          "parts": [
+            {
+              "k": "band",
+              "y": 8,
+              "h": 9,
+              "c": "g"
+            },
+            {
+              "k": "text",
+              "x": 17,
+              "y": 14,
+              "t": "pumped side · HIGH",
+              "sz": 2.5,
+              "c": "g"
+            },
+            {
+              "k": "ball",
+              "x": 12,
+              "y": 44
+            },
+            {
+              "k": "hole",
+              "x": 86,
+              "y": 36,
+              "c": "i",
+              "r": 2.1
+            },
+            {
+              "k": "dot",
+              "x": 52,
+              "y": 25,
+              "c": "b",
+              "r": 1.4
+            },
+            {
+              "k": "line",
+              "x1": 14,
+              "y1": 42.8,
+              "x2": 50.5,
+              "y2": 25.9,
+              "c": "b",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "curve",
+              "x1": 14,
+              "y1": 43.5,
+              "cx": 56,
+              "cy": 23,
+              "x2": 85,
+              "y2": 33.5,
+              "c": "i",
+              "w": 0.8
+            },
+            {
+              "k": "text",
+              "x": 55,
+              "y": 20,
+              "t": "the spot — aim at THIS, not the hole",
+              "sz": 2.6,
+              "c": "b"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 53,
+              "t": "aim-left here eats the borrow → low miss, amplified",
+              "sz": 2.6,
+              "c": "i"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-airbreak-downhill-20260824",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "h16",
+        "shelf": "At-Home Putting",
+        "title": "Downhill is the putt the mat was bought for",
+        "min": 4,
+        "tags": [
+          "pace-calibration",
+          "three-putts"
+        ],
+        "where": "home",
+        "kit": [
+          "putter",
+          "airbreak"
+        ],
+        "body": "Pace is the open fault — it retired a putter, and at Sterling Farms it handed back three strokes in three-putts. But look at where a three-putt actually ENDS: with a short putt, usually with slope in it, hit by someone still annoyed about the lag. That last putt fits on eight feet of mat, and the mat can tilt it — about 3% of continuous slope either way. Downhill is the direction to overweight, because the cost is asymmetric: leave an uphill putt short and the next one is a flat tap; run a downhill putt three feet past and the next one is another slick breaker coming back. Most players learn one stroke and apply it to both directions, which is why downhill putts race past far more often than uphill ones die short.\n\nThe target on a downhiller is DYING pace. A ball arriving dead uses the full width of the cup; one arriving hot has only the middle couple of inches, and this mat will actually lip it out and tell you — feedback a target on carpet was never able to give. Vary the distance putt to putt rather than grooving one number — a groove flatters, variation trains. Two honesty guards. The up-versus-down ratio you learn is a 10-stimp mat ratio, not your Saturday green’s: what transfers is the HABIT of asking ‘up or down?’ before every putt, and the downhill die itself, which is a skill rather than a number. And this drill does not touch the lag — the 30-ft ladder is still unrun and still lives on a real green.",
+        "drill": "Five up, five down from mixed distances — and call every putt before you look.",
+        "steps": [
+          "Pump the hole end up: every putt is now uphill. Five balls at 5, 6, 7, 8, then 6 ft — never the same distance twice in a row.",
+          "Call each one ‘long’, ‘short’ or ‘flush’ at contact, eyes still down, before you watch it. The call is the rep — being wrong is what recalibrates.",
+          "Release, pump the BALL end up the same amount: now every putt is downhill. Same five distances, same calls, dying pace — fall in the front door or stop beside the cup.",
+          "Finish with one sentence in your notes: ‘on this tilt, downhill takes about X less.’ The asking is the part that goes to the course."
+        ],
+        "score": "8 of 10 calls correct is the pass — you are grading the calls, not the makes. And nothing downhill finishes more than a foot past: a downhiller that races 3 ft by is the lag-into-three-putt pattern, run indoors.",
+        "viz": {
+          "h": 62,
+          "cap": "Side on · the same 7-footer is two different putts",
+          "parts": [
+            {
+              "k": "line",
+              "x1": 8,
+              "y1": 26,
+              "x2": 44,
+              "y2": 16,
+              "c": "i",
+              "w": 0.9
+            },
+            {
+              "k": "ball",
+              "x": 10,
+              "y": 23.6
+            },
+            {
+              "k": "flag",
+              "x": 42,
+              "y": 16.5,
+              "c": "i"
+            },
+            {
+              "k": "text",
+              "x": 24,
+              "y": 34,
+              "t": "UPHILL · more stroke · short miss is safe",
+              "sz": 2.5,
+              "c": "f"
+            },
+            {
+              "k": "line",
+              "x1": 54,
+              "y1": 40,
+              "x2": 92,
+              "y2": 50,
+              "c": "i",
+              "w": 0.9
+            },
+            {
+              "k": "ball",
+              "x": 56,
+              "y": 37.7
+            },
+            {
+              "k": "flag",
+              "x": 89,
+              "y": 49.2,
+              "c": "b"
+            },
+            {
+              "k": "text",
+              "x": 72,
+              "y": 59,
+              "t": "DOWNHILL · dying pace — a dead ball uses the whole cup",
+              "sz": 2.5,
+              "c": "b"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-airbreak-pumpgame-20260824",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "h17",
+        "shelf": "At-Home Putting",
+        "title": "The pump game: nine holes, never the same putt twice",
+        "min": 3,
+        "tags": [
+          "three-putts",
+          "short-putts",
+          "mental"
+        ],
+        "where": "home",
+        "kit": [
+          "putter",
+          "airbreak"
+        ],
+        "body": "Block practice flatters you: by the tenth ball from the same spot you are not putting, you are repeating, and the course never asks the same question twice. Random practice tests worse in the session and transfers better to the round — the same reason the practice-green drills say to change something every few balls. The pumps make random practice effortless at home for the first time: one step changes the hole you are playing.\n\nSo play nine. Before every hole, change exactly ONE thing — a pump up, a release down, the distance, the line you play down the mat. One change keeps the setup honest (you cannot drift back to a favourite putt) and keeps the game moving. Every ball gets the full routine, because the routine under a FRESH read is precisely the on-course skill — a new putt, read from behind, spot picked, committed. And the game is scored, because consequences are what turn rolling balls into practice: the same muscle as 20-in-a-row, asked a different question. One loud result to watch for: three-putting a hole on an eight-foot mat means the first putt ignored the slope entirely. Whatever that hole’s setting was, it opens your next session.",
+        "drill": "Nine holes on the mat, par 18, one pump change between each. Log the total, beat your best.",
+        "steps": [
+          "Hole 1: mat flat, 6 ft. Hole everything out from wherever it finishes — no gimmes here.",
+          "Between holes, change exactly one thing: a pump, a release, the distance (4–8 ft), or the line down the mat.",
+          "Full routine on every ball — read the new putt from behind, pick the spot, then go.",
+          "Count every putt, cap a hole at 3. Par is 18.",
+          "Write the total in your notes with the date. The number only means anything against your own last one."
+        ],
+        "score": "18 is a par round; 15 or better is a good night. Any 3 gets its setting named in your notes — that configuration is your next session’s opener.",
+        "viz": {
+          "h": 56,
+          "cap": "Top down · one hole, nine different questions",
+          "parts": [
+            {
+              "k": "hole",
+              "x": 84,
+              "y": 27,
+              "c": "i",
+              "r": 2.2
+            },
+            {
+              "k": "ball",
+              "x": 12,
+              "y": 14
+            },
+            {
+              "k": "curve",
+              "x1": 14,
+              "y1": 14.5,
+              "cx": 48,
+              "cy": 7,
+              "x2": 83,
+              "y2": 25,
+              "c": "i",
+              "w": 0.8
+            },
+            {
+              "k": "ball",
+              "x": 10,
+              "y": 30
+            },
+            {
+              "k": "line",
+              "x1": 13,
+              "y1": 30,
+              "x2": 80,
+              "y2": 27.8,
+              "c": "f",
+              "w": 0.7,
+              "d": 1
+            },
+            {
+              "k": "ball",
+              "x": 14,
+              "y": 44
+            },
+            {
+              "k": "curve",
+              "x1": 16,
+              "y1": 43.5,
+              "cx": 52,
+              "cy": 50,
+              "x2": 84,
+              "y2": 30,
+              "c": "i",
+              "w": 0.8
+            },
+            {
+              "k": "text",
+              "x": 26,
+              "y": 8,
+              "t": "9 holes · par 18",
+              "sz": 2.6,
+              "c": "f"
+            },
+            {
+              "k": "text",
+              "x": 50,
+              "y": 53,
+              "t": "change ONE pump between holes",
+              "sz": 2.7,
+              "c": "b"
+            }
+          ]
+        }
       }
     }
   ]

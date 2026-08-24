@@ -91,6 +91,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `lesson-update` | Patch a Coach lesson by `target` (its id); `Object.assign` of `lesson`. Patches accumulate, so two updates to one lesson both survive. A `target` matching no lesson is ignored |
 | `lesson-add`    | Add a whole Coach lesson (`lesson` object carrying its own `id`). Naming a new `shelf` creates one |
 | `lesson-remove` | Retire a lesson by `target` — a later `lesson-add` with the same id un-retires it |
+| `kit`            | Mark practice kit owned (`add`) or gone (`remove`) — arrays of `KIT` keys from `app.js`. **Only ever a relay of Jack's own declaration** ("got this for at home practice"); ownership is his to state and is never inferred, so never send one on a guess. Added Aug 24 2026 with the PuttOut AirBreak mat (`airbreak`) |
 | `geo`            | Put a course's location on file (`geo:{course, lat, lon, prec, place, src}`). Round Prep sorts the standing plans and Courses sorts the rankings **nearest first** off it — see *Nearest first* below. Replaces any earlier fix for that course, matching on the name **before the em dash**, so one fix serves every course at a facility |
 | `deadline`       | Set the return-window deadline (clears "estimated") |
 
@@ -847,8 +848,8 @@ July. What that means for writing:
 
 - **A new lesson should carry `where` and `kit`** in its `lesson-add` object. `where` is one
   of `home` · `green` · `range` · `bunker` · `course`; `kit` is keys from **`KIT`** in
-  `app.js` (`putter` `phone` `laser` `m201` `coins` `ruler` `metro` `powder` `mirror`
-  `sticks`). Baseline lessons are mapped in **`DRILL_KIT`** instead, which is presentation
+  `app.js` (`putter` `airbreak` `phone` `laser` `m201` `coins` `ruler` `metro` `powder`
+  `mirror` `sticks`). Baseline lessons are mapped in **`DRILL_KIT`** instead, which is presentation
   metadata and so lives in `app.js` rather than in frozen `lessons.js`. A lesson in neither
   reads as "anywhere, nothing needed" and shows under every filter, so it can never fall off
   the page for want of a table row.

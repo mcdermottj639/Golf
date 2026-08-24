@@ -100,13 +100,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v56';
+const BUILD = 'v57';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v57', d:'2026-08-24', items:[
+    'The AirBreak putting mat is on the kit list and marked owned — you said you got it, so the drill bench counts it, the same as tapping the chip yourself.',
+    'Four new drills are built for it on the At-Home Putting shelf: an owner’s manual for the pumps, breakers in both directions (the pair that catches a left aim before a green does), the uphill–downhill pace ladder, and a nine-hole pump game where no two putts are alike.',
+    'Every carpet drill you already had — the coin gate, 20-in-a-row, the pop stroke — runs on the mat unchanged, now with one known speed and a real hole that can lip a putt out.' ] },
   { b:'v56', d:'2026-08-21', items:[
     'Courses now flags TWO ROWS FOR ONE COURSE. Adding your round history brought in names that did not always match the ones you had already typed, and the list quietly grew a second row for the same place.',
     'Sand Valley Golf Resort \u2014 Mammoth Dunes is gone; your own Mammoth Dunes row stays, with your rating and your PR on it, and it now has a location so it sorts by distance like the rest.',
@@ -563,6 +567,7 @@ function shelfCounts(){
 // declare, never inferred: reading a lesson about a yardstick is not evidence he owns one.
 const KIT = [
   { k:'putter', lab:'Putter + carpet',  n:'Six feet of floor is a putting lab' },
+  { k:'airbreak', lab:'AirBreak putting mat', n:'PuttOut AirBreak · pumps put break and slope under 8 ft of mat · Aug 24 2026' },
   { k:'phone',  lab:'Phone + a prop',   n:'Every fault in this app came off it' },
   { k:'laser',  lab:'PUTTLAZR laser',   n:'Shaft-clamp aim laser · bought Aug 13 2026' },
   { k:'m201',   lab:'Miracle 201',      n:'The swing trainer that clicks' },
@@ -5452,6 +5457,10 @@ function updateLine(e){
     case 'lesson-update': return { h:`Lesson updated${ls.title ? ` · ${ls.title}` : ''}`, s:clip(ls.body || ls.drill, 104),
       act: e.target ? { a:'open-lesson', id:e.target } : go('coach') };
     case 'lesson-remove': return { h:'Lesson retired', s:'', act:go('coach') };
+    case 'kit':           return { h:'Practice kit marked owned',
+      s:[...(e.add || []).map(k => KIT_LAB[k] || k),
+         ...(e.remove || []).map(k => `${KIT_LAB[k] || k} removed`)].join(' · '),
+      act:go('drills') };
     case 'deadline':      return { h: e.date ? 'Return deadline set' : 'Return deadline cleared', s:'', act:go('decisions') };
     default:              return { h:`Update · ${e.type || 'change'}`, s:'', act:null };
   }
@@ -5656,6 +5665,14 @@ function applyFeed(feed){
     }
     else if(e.type === 'lesson-remove' && e.target){
       if(!S.lessonHidden.includes(e.target)) S.lessonHidden.push(e.target);
+    }
+    // Kit through the feed is Jack's own declaration RELAYED — "got this for at home
+    // practice" said in chat is him marking the chip, the same as tapping it on the bench.
+    // Nothing else may write S.kit: reading a lesson about a yardstick is still not
+    // evidence he owns one, and no entry is ever sent on an inference.
+    else if(e.type === 'kit'){
+      (e.add || []).forEach(k => { if(!S.kit.includes(k)) S.kit.push(k); });
+      if(Array.isArray(e.remove)) S.kit = S.kit.filter(k => !e.remove.includes(k));
     }
     // A debrief Jack RECOUNTED rather than typed. Same schema as the in-app form, and the
     // entry id becomes the debrief id so the × still deletes it and an update can find it.
