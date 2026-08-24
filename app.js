@@ -100,13 +100,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v61';
+const BUILD = 'v62';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v62', d:'2026-08-24', items:[
+    'The stroke evolution grid has a fourth column \u2014 Aug 24 AirBreak \u2014 for the three putts filmed on the new mat at the PuttOut trainer.',
+    'One row moved: PACE. Nothing ran long — both misses finished five to six inches past on a six-foot putt, a dying pace rather than a firm one, and the holed one stayed in the cup. Same answer the Aug 10 outdoor session gave, and the first time an indoor batch has given it.',
+    'Start line got a DASH, and the reason is the useful part: on a mat that makes the ball curve, aim and break are the same number and there is no way to pull them apart. The AirBreak is the wrong mat for the aim question and the right one for pace. Flat mat with a line for start line; this one for speed.',
+    'Strike location took a fourth column of question marks. Six clips on the day and not one shows the face.' ] },
   { b:'v61', d:'2026-08-24', items:[
     'Where your game is now reads across FOUR AREAS \u2014 off the tee, irons, short game, putting \u2014 each with its headline number and the one thing its misses say.',
     'It computes off your LIVE rounds alone as soon as they carry a round\u2019s worth of holes, and the older cards stand down and are counted out loud. Until then it says exactly which cards it read and when.',
@@ -1865,7 +1870,7 @@ function putting(){
     </table>
     ${S.evolution.metrics.map(m => `<p class="sm" style="margin-top:7px"><b style="color:${m.s==='good'?'var(--green)':m.s==='warn'?'var(--burg)':'var(--ink)'}">${esc(m.name)}:</b> ${esc(m.verdict)}</p>`).join('')}
     <p class="sm faint" style="margin-top:8px">✓ good · ✗ fault · ~ partial · ? that angle couldn't see it · — not assessed.
-    Three columns, all on the putter you play: <b>Jul 30</b> (23 clips, every angle) · <b>Aug 10 pm</b> (outdoor, ~20 putts scored, direction unscored — all clips oblique) · <b>Aug 10 mat</b> (indoor, 3 putts, direction only). A dash means that batch couldn't answer that row, not that it went badly.
+    Four columns, all on the putter you play: <b>Jul 30</b> (23 clips, every angle) · <b>Aug 10 pm</b> (outdoor, ~20 putts scored, direction unscored — all clips oblique) · <b>Aug 10 mat</b> (indoor, 3 putts, direction only) · <b>Aug 24 AirBreak</b> (indoor, 3 putts at a PuttOut trainer on a BREAKING mat — pace only, because on a mat that curves the ball, aim and break are the same number). A dash means that batch couldn't answer that row, not that it went badly.
     Pre-LINK film was cleared on Aug 14; every number it produced is kept in the Workshop Log.</p>
   </div>
 
