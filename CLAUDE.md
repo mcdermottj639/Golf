@@ -1120,6 +1120,69 @@ measurement over self-report — and say which one you're using.
   log; the append-only rule belongs to the workshop plan. Verdicts reached 9,200 characters
   across seven rows by appending a paragraph per session before being rewritten to 4,800.
 
+### Film reports arrive through Drive (Aug 25 2026)
+
+Video analysis no longer happens here. It runs in a separate Claude project with two
+installed skills and a **geometry gate** that decides, before any processing, whether the
+capture can answer the metric being asked — so a blocked metric comes back reported as
+blocked instead of silently producing a wrong number. That session saves its report to
+**`Golf/Putting/Analysis Reports/`**, named `YYYY-MM-DD — description`.
+
+**This session reads that folder directly** through the Drive connector — Jack pastes
+nothing, he says *"pull the latest putting report."* Sort on the **date prefix in the
+filename**, not on modified time: a report can be edited after the fact without its
+findings changing. A session that genuinely cannot reach Drive says so and asks for a
+paste; it never reports a finding as missing because it failed to fetch it.
+
+Evidence tags map onto the ladder with no conversion: `[VERIFIED]`, `[DERIVED]` and
+`[OBSERVED]` all land at **`ev:"measured"`**, above a snapshot and below a logged round.
+`[UNKNOWN]` is **not a finding** — it is a capture problem. An `[OBSERVED]` magnitude
+**must carry its uncertainty in the visible text**, because no feed type has an
+uncertainty field: `test` is `{date, putter, makes, note}`, a 10-ball make count and
+nothing else. Drop the uncertainty and an observation is promoted to a measurement, which
+is the exact failure the tagging exists to prevent.
+
+**Read what the app already knows BEFORE drafting entries. That is the job, not a
+preliminary to it.** The first report through this pipeline — Aug 25, *Findings to Date
+(Sessions 1–2)* — was correctly ingested as **nothing at all**. Every headline number in
+it was already in the app from the Aug 24 push, and in four places the record was
+*stronger* than the report:
+
+| Report said | The app already had |
+|---|---|
+| Tempo 1.79:1 pooled, n=6 `[DERIVED]` | The same 1.79 pooled from the same six strokes, *plus* the Jul 30 comparison (7 of 8 at 1.9–2.1) the report omits |
+| SBST retrace within 0.6–0.9% `[VERIFIED]` | Residuals under 1%, *plus* the unnamed principal-point assumption that moves them to 3–9%, and the 0.5x barrel distortion that bends the very lines a straightness test measures |
+| Mat break ~4.9" at the hole `[VERIFIED]` | The break resolved *by pace* — 95% of speed breaks 2.54", 80% breaks 3.95" — which is what makes "on a breaking putt, pace IS line" sayable |
+| Early lift reopened `[OBSERVED, ±50%]` | Challenged and **kept closed**: an independent background-difference replication returns the *opposite sign* at every matched depth, so the effect is a motion-blur artifact and the ±50% understates it — the **sign** is method-dependent, not just the magnitude |
+
+Ingesting it would have reopened a settled fault, laundered a caveated figure into a
+`[VERIFIED]` one, traded a pace-resolved table for a single pooled number, and minted a
+fourth capture action beside three that already exist. **A newer report is not
+automatically a better one** — "newest wins on a contested subject" is too coarse when the
+older reading has the larger n or names an assumption the newer one doesn't. Resolve
+contradictions on **n and method**, and when the record is stronger, say so and push
+nothing.
+
+Four rules follow, and they are the standing protocol:
+
+- **Demand the provenance line.** Every report opens with `FILM: NEW — n clips, shot
+  <date>` or `FILM: RE-ANALYSIS — re-measures <report>`. Without it a recount of ingested
+  footage is indistinguishable from a fresh session, and the evolution grid is one column
+  per *batch of film*, not one per time somebody looked at it.
+- **Stamp `"src": "drive:<fileId>"` on every film-derived entry.** `applyFeed()` ignores
+  unknown keys, so it is inert on the phone and a permanent ledger in the repo:
+  `grep src coach-feed.json` answers "has this report been ingested" as a check you can
+  run rather than something you have to remember.
+- **Capture problems reuse the standing action, never mint a new one.** The same blockers
+  recur every session until the reshoot happens. `faceon-action-20260730`,
+  `tape-action-20260730` and `action-overhead-20260824` are the open ones — `action-update`
+  them; a duplicate to-do is how an unfinished item stops meaning anything.
+- **Reports state numbers; they never propose feed JSON.** `applyFeed()` is the authority
+  and its shapes drift. A wrongly-shaped entry that looks authoritative reads as done.
+
+The reciprocal brief to the analysis side lives in `Golf/Caddie HQ/` on Drive. Where the
+two disagree about a **finding**, the report wins; about **protocol**, this file wins.
+
 - **Jack mentions a course he's playing** (standing instruction, Jul 29 2026): don't wait
   to be asked — append a `course-add` for it alongside whatever else the message calls
   for, so it's already in Courses for him to rate afterward. Use the plain course name
