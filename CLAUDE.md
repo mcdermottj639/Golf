@@ -1125,14 +1125,20 @@ measurement over self-report — and say which one you're using.
 Video analysis no longer happens here. It runs in a separate Claude project with two
 installed skills and a **geometry gate** that decides, before any processing, whether the
 capture can answer the metric being asked — so a blocked metric comes back reported as
-blocked instead of silently producing a wrong number. That session saves its report to
-**`Golf/Putting/Analysis Reports/`**, named `YYYY-MM-DD — description`.
+blocked instead of silently producing a wrong number. Reports are named
+`YYYY-MM-DD — description` and save **per discipline** — `Golf/Putting/Analysis Reports/`,
+`Golf/Short Game/Analysis Reports/`. The discipline is not cosmetic: short game and putting
+are separate labs with separate faults lists and separate workshop logs, and a chipping
+report filed under Putting will be read against putting metrics that do not transfer (there
+is no tempo ratio, no arc-vs-SBST and no mat break in a chip).
 
-**This session reads that folder directly** through the Drive connector — Jack pastes
-nothing, he says *"pull the latest putting report."* Sort on the **date prefix in the
-filename**, not on modified time: a report can be edited after the fact without its
-findings changing. A session that genuinely cannot reach Drive says so and asks for a
-paste; it never reports a finding as missing because it failed to fetch it.
+**A session MAY be able to read that folder directly, and must check rather than assume.**
+This session could, on Aug 25 2026, through the Drive connector — Jack pasted nothing, he
+said *"pull the latest report."* But Drive access is a per-session connector, not a property
+of the project: verify it in the session you are in. Where it works, sort on the **date
+prefix in the filename**, not on modified time — a report can be edited after the fact
+without its findings changing. Where it doesn't, say so and ask for a paste; never report a
+finding as missing because you failed to fetch it.
 
 Evidence tags map onto the ladder with no conversion: `[VERIFIED]`, `[DERIVED]` and
 `[OBSERVED]` all land at **`ev:"measured"`**, above a snapshot and below a logged round.
@@ -1179,6 +1185,12 @@ Four rules follow, and they are the standing protocol:
   them; a duplicate to-do is how an unfinished item stops meaning anything.
 - **Reports state numbers; they never propose feed JSON.** `applyFeed()` is the authority
   and its shapes drift. A wrongly-shaped entry that looks authoritative reads as done.
+- **The duty to check what is already shipped is OURS, not the analysis side's.** It is a
+  chat project with no view of this repo, so it cannot know what has landed and will
+  re-derive from scratch every time — which is not a fault, it is the arrangement. All it
+  owes is the provenance line saying which footage it looked at. Everything downstream of
+  that — has this been ingested, is the record already stronger — is a `coach-feed.json`
+  read on this side, before drafting.
 
 The reciprocal brief to the analysis side lives in `Golf/Caddie HQ/` on Drive. Where the
 two disagree about a **finding**, the report wins; about **protocol**, this file wins.
