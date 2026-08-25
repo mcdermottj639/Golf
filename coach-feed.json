@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-08-24",
+  "updated": "2026-08-25",
   "entries": [
     {
       "id": "s4-session",
@@ -28396,6 +28396,156 @@
           }
         ]
       }
+    },
+    {
+      "id": "plan-shortgame-20260825-v2",
+      "type": "briefing",
+      "briefing": {
+        "course": "Short Game — Around the Green",
+        "discipline": "short-game",
+        "focus": "Mostly general best practice, and it says so wherever it matters — the tailoring comes as you send lies, misses and results. One idea runs through all of it: pick the shot with the LEAST air time that still works, land it on a spot you chose, and let the ground do the rest. One section is now yours rather than the textbook's: the through-the-ball delivery you found on Aug 25.",
+        "rules": [
+          "PUTT if you can · CHIP if you can't putt · PITCH only to carry something",
+          "Pick a LANDING SPOT, never the pin — and a flat, predictable one",
+          "Least loft that clears the trouble. The boring shot wins",
+          "From a bad lie or short-sided: GET IT ON THE GREEN. Two putts is fine",
+          "Hands LEVEL, not jammed forward — let the bounce slide, don't dig",
+          "THROUGH the ball, not DOWN into it — the club keeps travelling low past impact",
+          "Bunkers: same splash every time, distance is FOLLOW-THROUGH length",
+          "Never short-side yourself on the approach — that is where this gets hard"
+        ],
+        "sections": [
+          {
+            "t": "THE LADDER — putt, then chip, then pitch",
+            "k": "Take the least air time that still works; a ball on the ground behaves, a ball in the air does not.",
+            "b": "The default order around a green, and it settles most shots before you think about technique. PUTT IT if the ground between you and the hole is reasonable — fringe, firm collar, even light rough. A bad putt finishes ten feet away; a bad chip finishes anywhere. CHIP IT if you cannot putt it: minimum loft, ball runs most of the way. PITCH IT only when you must carry something — a bunker, rough, a tier.\n\nThe reason is error size, not elegance. Every foot of air time is a foot where strike quality decides the outcome. On the ground the ball is just rolling, and rolling is the thing you do best. The best short-game players are the most boring ones."
+          },
+          {
+            "t": "THE LANDING SPOT — the only decision that matters",
+            "k": "Choose a spot on the green and hit that; the pin is a distraction and the roll-out does the rest.",
+            "b": "Most amateurs aim at the hole, which is the single most common short-game error. You are not trying to hit the hole — you are trying to land the ball on a chosen spot and let a predictable roll take it there.\n\nHow to pick one. Get it ON THE GREEN, usually a couple of paces on, and choose FLAT ground: a landing spot on a slope or on the fringe gives you a bounce nobody can predict. Give yourself a big spot rather than a coin — you want room for error, and a big target reduces tension by itself.\n\nThen commit to it and stop looking at the flag. Once you can land the ball in the same area reliably, the roll-out becomes arithmetic instead of a guess, and you get closer to the hole without changing anything about the swing."
+          },
+          {
+            "t": "CLUB BY ROLL-OUT — the ratios you are choosing between",
+            "k": "Same landing spot, three clubs, three finishing distances — that is the whole short game in one sentence.",
+            "b": "Rough working ratios off a standard chipping motion: the 50° runs about 2× its carry, the 56° about 1×, the 60° about half. So land all three on the same spot and you get three different finishing distances — which means the club is how you control distance, not the size of the swing.\n\nUse it backwards on the course: measure the carry to your landing spot and the roll from there to the hole, take the ratio, and the club picks itself. Lots of green to work with is a 50°. Short-sided over a bunker is the 60°.\n\nThese are STARTING numbers, not yours. The Coach lesson 'Distance control is landing-spot control' trains them, and the real ratios come from you hitting the three clubs to one spot and pacing the roll — send those and this section gets replaced with your figures."
+          },
+          {
+            "t": "THE SETUP THAT REPEATS",
+            "k": "Narrow stance, ball just back of centre, weight a touch forward, hands LEVEL — and let the bounce slide instead of digging.",
+            "b": "Standard chipping setup, and it exists to make the low point repeatable rather than to look like anything. Feet about one clubhead apart. Ball slightly back of centre. Weight favouring the lead foot and staying there — hanging back is what produces the thin one. Hands slightly ahead of the ball, and no more than slightly.\n\nThat last one matters more for you than the rest, because it is the one that is easy to overdo. Your wedges run mid bounce (10° on the 56, 8° on the 50 and 60), which is built to SLIDE under the ball. Jam the hands forward and you present the leading edge to the turf, which digs — and digging is where both the chunk and the blade come from. Hands level, let the sole do its job.\n\nThen it is a putting-stroke motion: rock the shoulders, quiet wrists, accelerate through. Deceleration is the fault that produces most bad chips, exactly as it does on short putts — which is the same instruction as the section below, arriving from the other side."
+          },
+          {
+            "t": "THROUGH THE BALL, NOT DOWN INTO IT",
+            "k": "On a greenside wedge the strike is a shallow pass THROUGH the ball, not a chop down at it — you already have more loft on the face than the ball can grip.",
+            "b": "Your Aug 25 finding, and it is the first thing on this page that came from you rather than from a textbook. You have always been told to hit DOWN into a chip to get backspin; hitting THROUGH it gave you more zip and more control off all three wedges. That reads as correct, and it is worth knowing WHY so it survives a bad day.\n\nWHAT 'THROUGH' MEANS HERE. Same setup as the section above — narrow stance, ball just back of centre, weight forward, hands level. From there the clubhead travels low and long: it arrives shallow, the sole skims the turf, and it keeps going down the target line after the ball has gone. The follow-through is at least as long as the backswing. What you are not doing is driving the handle down and quitting on it.\n\nWHY IT MAKES MORE SPIN, NOT LESS. Spin comes mostly from SPIN LOFT — how much loft is on the face relative to how steeply the club is travelling. More of it does make more spin, but only to a point: above roughly 45–50° the ball stops gripping and starts SLIDING up the face, friction is lost, and spin falls. A 56° or a 60° delivered at greenside speed is already at or past that line before you add any attack angle at all. So every extra degree of down is spin loft you cannot cash — and you pay for it twice, in clubhead speed and in the leading edge going into the turf ahead of the bounce. What is left that genuinely makes spin at this speed is a clean, centred strike and a club that is still accelerating. Both are exactly what 'through' buys you, which is why the 50° feels better too.\n\nTHE ONE WAY TO GET THIS WRONG. 'Through' is not 'up'. Hanging back, adding loft with the hands, or scooping at it is the opposite fault and it produces the thin one. The low point still lives at or just past the ball, the weight still stays on the lead side, the hands stay level rather than behind. Shallow THROUGH the ball, not early OUT of it.\n\nWHERE YOU STILL GO DOWN. Two, and both are already on this page. A buried or grabby lie in thick rough needs a steeper arrival, or the club never reaches the ball — ball back, stance wider, weight into the lead leg. A plugged bunker lie is a deliberate chop. And this is a SHORT-GAME rule only: a full iron off the turf still wants a descending strike and a divot after the ball.\n\nHONEST STATUS: this is your feel, from one session, indoors, and nothing has measured it. The Workshop Log says what a measurement would look like and there is a to-do on the board for it."
+          },
+          {
+            "t": "THE MEDICINE RULE — bad lie, short side, or both",
+            "k": "From a genuinely bad spot the shot is 'on the green', not 'close' — the hero flop is where doubles come from.",
+            "b": "Two situations where the goal changes: a buried or grabby lie, and being short-sided with almost no green between you and the flag. In both, the honest play is to get the ball ON THE GREEN, take two putts, and walk off with a bogey.\n\nThis is the same rule as the recovery rule in Golf Mind, applied thirty yards from the hole: pick the shot you would bet a hundred dollars you can execute nine times in ten. From a tight lie over a bunker, the flop is not that shot for anybody.\n\nAnd the cheapest version of this rule is played earlier, on the approach: aim at the MIDDLE of the green. Short-siding yourself is what turns a routine up-and-down into the shot you cannot play."
+          },
+          {
+            "t": "BUNKERS — one shot, and the finish sets the distance",
+            "k": "Never touch the ball: enter the sand two inches behind it, same swing every time, and let follow-through length decide the distance.",
+            "b": "The standard splash shot does not contact the ball at all — the club enters the sand about two inches behind it and the sand throws the ball out. Setup does most of the work: face slightly open BEFORE you take your grip, ball forward of centre, weight favouring the lead foot, and swing along your body line with commitment. Your 56° with 10° of bounce is built for this — let the sole skid, do not dig the leading edge.\n\nDISTANCE IS FOLLOW-THROUGH LENGTH. Keep the entry point and the effort identical and change only how far the club swings through: a short finish throws it a few paces, a full high finish sends it twenty yards or more. Deceleration is the one unforgivable sin in sand — always finish.\n\nPLUGGED LIES reverse the rules: square or slightly closed face, ball back of centre, steep chop right behind the ball. It comes out low with no spin and runs, so plan for the roll and just get it on the green."
+          },
+          {
+            "t": "THE AWKWARD ZONE — 30 to 70 yards",
+            "k": "The worst shot in golf for most amateurs, and the fix is calibrated swings rather than feel.",
+            "b": "Too long for a chip, too short for a full wedge, and the reason it hurts is that a half swing has infinite speeds while a full swing has one. Guessing at it is how you end up between clubs on a shot you should own.\n\nThe fix is the clock system, trained in Coach: give each wedge three calibrated swings — hands to 9 o'clock, 10:30, and full — which turns three wedges into nine reliable numbers covering roughly 45 to 110 yards. Fill the matrix once at the range with five balls per swing, then trust it on the course.\n\nThis also feeds your par-5 job: lay up to one of those numbers deliberately rather than to wherever a comfortable swing finishes."
+          },
+          {
+            "t": "WHAT GOOD ACTUALLY LOOKS LIKE",
+            "k": "Tour scrambling is 57–60%, low single figures save par about half the time, and a 10-handicap converts around a third.",
+            "b": "Benchmarks, so a number on your card means something. PGA Tour scrambling runs about 57–60%. Scratch-to-3 handicaps save par close to half the time they miss a green. A 10-handicap sits roughly 25 points below tour, so around a third. And a typical 10-handicap loses about 1.5 to 2.0 strokes a round around the green against a scratch player.\n\nThat last figure is the one worth holding onto: around the green is one of the biggest single pools of strokes available to you, and it is skill rather than speed or distance, so it is available at any age and in any weather.\n\nA fair first target is 25–30% up-and-down. That is not close to tour and it does not need to be — it is two or three saved shots a round against where the cards currently sit."
+          },
+          {
+            "t": "WHAT YOUR OWN CARDS SAY — and how little that is",
+            "k": "One round: 0 up-and-downs from 12 chances, 7 of 12 misses short. A flag, not a rate.",
+            "b": "The honest state of the evidence, because this plan is otherwise generic. ONE round is recorded with green data: Sterling Farms, Aug 12, 18 holes. Six greens in regulation, twelve missed, ZERO up-and-downs, and 7 of the 12 misses finished SHORT against 2 left, 1 right and 1 long.\n\nWhat that supports: a flag worth chasing. Twelve chances cannot separate a bad short game from a bad day, so nothing here is a rate yet and the 0% should not be read as your ability.\n\nWhat the short-miss pattern hints at, with the same caveat: it points upstream of the short game. Missing short means the approach club or the strike is leaving you the LONGEST recovery every time, which is the hardest place to get up and down from. Taking enough club and aiming at the middle is the cheapest fix on this page and it is not a short-game change at all.\n\nWHAT WOULD MAKE THIS PLAN YOURS: log greens and where the misses finished on the next two live rounds — at 36 recorded holes the app stops hedging. Beyond that, tell me what shot you reach for by default, what lie frightens you, and where the bad ones actually finish (chunked short, bladed long, or fine but 25 feet away). Each of those replaces a paragraph of general advice with something built for you."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "Written as general best practice on purpose, with the sources and the one thing that came from your own cards.",
+            "b": "Written Aug 13 2026 at Jack's request as GENERAL best practice, to be tailored as he sends information. Nothing in the first seven sections came from his game.\n\nRESEARCHED: the putt-chip-pitch default and the landing-spot method are standard short-game teaching; the setup (narrow stance, ball back of centre, weight forward, hands only slightly ahead) and the bounce-versus-dig mechanism likewise. Benchmarks: PGA Tour scrambling 57–60%, low single-figure handicaps near 50%, a 10-handicap roughly 25 points below tour, and a 1.5–2.0 stroke-per-round around-the-green gap between a 10 and scratch.\n\nFROM THE BAG: the 50/56/60 with mid bounce (F/8°, S/10°, M/8°) off a 44° PW, and the roll-out ratios as starting figures rather than measured ones.\n\nFROM HIS CARDS, and it is one round: Sterling Farms Aug 12, 6 GIR, 0 up-and-downs from 12, 7 of 12 misses short.\n\nDELIBERATELY NOT RESTATED HERE: the drills. The clock system, bounce, chip-versus-pitch and landing-spot control are Coach lessons on the Wedges & Short Game shelf, and the bunker work is on the Bunker Play shelf. Plans say what to do on the course; Coach trains it.\n\nAUG 25 2026 — added THROUGH THE BALL, NOT DOWN INTO IT, plus a rule chip, and pointed the setup section at it so there is one source for the instruction rather than two. FROM JACK: the change and the result he felt — more zip and more control off the 50°, 56° and 60° — reported after practising at home. RESEARCHED: the spin-loft friction limit (spin climbs with spin loft only to roughly 45–50°, past which the ball slides up the face and spin drops), the shallow-versus-steep leading-edge argument, and the deep-rough exception. UNMEASURED: the result, entirely. Worked through end to end in Short Game — The Workshop Log, Aug 25."
+          }
+        ]
+      }
+    },
+    {
+      "id": "plan-shortgame-workshops-20260825",
+      "type": "briefing",
+      "briefing": {
+        "course": "Short Game — The Workshop Log",
+        "discipline": "short-game",
+        "focus": "Every short-game question worked through end to end, one per section, newest first. This is the reference shelf — what you actually do lives in Short Game — Around the Green.",
+        "rules": [
+          "One section per workshop, NEWEST FIRST — tap to open",
+          "Every section says WHAT CHANGED in the short-game plan as a result",
+          "Every section says what is STILL UNMEASURED. That line is not optional",
+          "This is a REFERENCE. What you actually do lives in Short Game — Around the Green"
+        ],
+        "sections": [
+          {
+            "t": "Aug 25 2026 — Hit down for spin, or through the ball?",
+            "k": "'Hit down for backspin' is a full-swing rule that travels badly: at chipping speed a lofted wedge is already past the friction limit, so extra steepness only costs speed and puts the leading edge into the turf.",
+            "b": "THE QUESTION. Jack has always been taught that you hit DOWN into a chip to get backspin. Practising at home on Aug 25 he found the opposite works better — hitting THROUGH the ball — and reported more zip and more control off the 50°, the 56° and the 60°. Is the received cue simply wrong, or is he describing something narrower?\n\nWHAT HE REPORTED, and which half of it stands on his say-so. The change and the intent are his: he is now delivering the club through the ball rather than down at it on short wedge shots, and he likes it on the 50° chips as much as on the two higher-lofted wedges. Nobody else can report that, so it stands. The RESULT — 'more zip, more control' — is a feel, and nothing has measured it.\n\nWHAT CHECKED OUT — the mechanism, and it is specific to this shot. Spin comes mostly from SPIN LOFT: dynamic loft minus attack angle, i.e. how much loft is on the face relative to how steeply the club is moving. More spin loft does make more spin, but only up to a limit. Above roughly 45–50° the ball stops gripping and starts SLIDING up the face, friction is lost, and the spin rate falls. A 56° or 60° delivered at greenside speed sits at or past that number before any attack angle is added at all — so extra 'down' adds spin loft that cannot be converted into spin. Meanwhile it subtracts the two things that DO make spin at this speed: clubhead speed, and a clean centred strike. Where you catch it on the face matters more here than how steeply you arrive. And a steeper arrival presents the leading edge rather than the sole, which is the digging mechanism the plan already warns about in its setup section. So on a greenside wedge from a decent lie, shallower-and-through is the HIGHER-spin, higher-control delivery. His feel and the physics agree, which is not always how these end.\n\nWHAT DID NOT CHECK OUT — 'hit down' as a blanket error. The cue is not nonsense; it is a full-swing rule that travels badly. On a full iron off the turf the low point genuinely belongs after the ball and a descending strike is right. And there are two greenside cases where you deliberately steepen: a buried or grabby lie in thick rough, where a shallow club never reaches the ball, and a plugged bunker lie, which is a chop by design and already written up that way. Sieckmann teaches the rough version through setup — ball back, stance wider, weight into the lead leg — so the exception is real teaching rather than a hedge. Both are now stated in the plan, because an instruction this good is exactly the kind that gets over-applied.\n\nALSO NOT ESTABLISHED — that 'through' licenses hanging back. The opposite fault is the flip: weight staying back, loft added with the hands, thin. The plan says so explicitly, because that is the predictable way to hear this instruction wrong.\n\nWHAT CHANGED IN THE PLANS. Short Game — Around the Green gained a section, THROUGH THE BALL, NOT DOWN INTO IT, and a rule chip with it. THE SETUP THAT REPEATS was already saying the compatible half — hands level, let the bounce slide, don't dig — and now points forward to the new section rather than standing as a second source for one instruction. Two Coach drills were added to train it: 'Through the ball, not down into it' for the practice green, and a no-ball version for the room. No fault was opened: nothing was filmed, and a fault with no film behind it is a feel wearing a badge.\n\nWHAT IS STILL UNMEASURED, and it is very nearly everything. Nothing in this app has ever recorded a chip. There is no launch-monitor number, no film of the delivery, and no scorecard field that sees a greenside shot — the live logger records whether the green was missed and where it finished, not what the recovery did. Beyond that, the session was indoors: carpet or a mat punishes a digging strike far harder than grass does, so the room may be rewarding the change for reasons that will not survive turf. Three things would settle it, cheapest first. FILM ten chips face-on and look at where the low point actually sits and whether the club keeps travelling past it. RUN THE ROLL-OUT TEST already owed for the club-by-roll-out ratios, with the new delivery — a change in spin shows up as a change in ROLL long before it shows up anywhere else, and it fills in the ratios that are still textbook figures rather than yours. Then the up-and-down rate over the next handful of live rounds, which is the outcome number and much the slowest to move: one round is 12 chances, which decided nothing last time either.\n\nSOURCES. Spin loft and the friction limit: TrackMan's spin-rate guidance and GolfWRX's spin-loft explainers, which give the same 45–50° figure past which the ball slides up the face and spin drops. The shallow-versus-steep leading-edge argument, and 'where you hit the face matters more than how steep you come in': TrackMan's chip-shot material and Performance Golf's pitching and chipping guide. Deceleration as the chipping fault that costs spin: Practical Golf and Golf Distillery. Steepening from deep rough: James Sieckmann via Titleist's 18 Shots series. All of it read through search snippets — the sites themselves were blocked from here — so the figures are consistent across independent sources but none was read in full. Flagging that rather than letting a snippet read like a paper."
+          },
+          {
+            "t": "How this log works",
+            "k": "Anything worked through end to end lands here as one section, so the doing-plan stays short.",
+            "b": "When a short-game question gets worked through properly — research, a claim checked, a decision reached — it lands here as ONE section rather than being spread through the plan that tells you what to do.\n\nThat keeps the split clean. Short Game — Around the Green says what you do NOW. This log says how those instructions were arrived at and what was rejected on the way.\n\nEach section carries the same skeleton: the question, what checked out, what did not, what changed in the plan as a result, what remains unmeasured, and the sources. The unmeasured line is not optional — a workshop that cannot say what it still does not know is a sales pitch.\n\nAnd a log is a record, so a section is not rewritten when a later decision overtakes it. It gets a SINCE UPDATED line appended instead."
+          }
+        ]
+      }
+    },
+    {
+      "id": "lesson-through-the-ball-20260825",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "w5",
+        "shelf": "Wedges & Short Game",
+        "title": "Through the ball, not down into it",
+        "min": 4,
+        "tags": [
+          "chipping",
+          "up-and-down",
+          "wedge-distance"
+        ],
+        "where": "green",
+        "kit": [
+          "coins"
+        ],
+        "body": "The cue you grew up with — hit DOWN to make it check — is a full-swing rule that does not survive the trip to a greenside wedge. Spin comes mostly from spin loft, which is loft on the face relative to how steeply the club is travelling, and it only buys you spin up to about 45–50 degrees. Past that the ball slides up the face instead of gripping it and the spin rate goes DOWN. A 56 or a 60 at chipping speed is already there before you add a single degree of attack angle — so steepening costs you clubhead speed and puts the leading edge into the turf ahead of the bounce, and buys you nothing back. What actually makes a chip check at this speed is a clean, centred strike with a club that is still accelerating, and both of those come from the club travelling low and long THROUGH the ball. Two guards. This is not permission to hang back and scoop — the low point still sits at or just past the ball and the weight stays forward; shallow through it, not early out of it. And you still steepen deliberately from a buried lie in thick rough or a plugged bunker lie, where the club has to dig to reach the ball at all.",
+        "drill": "The tee gate ahead. Push a tee into the ground four inches AHEAD of the ball on the target line, standing just proud of the grass. Hit ten with the 56 and check two things after each: the sole reached and passed over the tee (the club kept going), and the mark left on the turf starts at or just past the ball and is a long shallow bruise rather than a short deep gouge. A gouge behind the tee is the old steep pattern showing itself. Score out of ten, then ten more with the 50 and ten with the 60, and log the total out of 30."
+      }
+    },
+    {
+      "id": "lesson-room-through-strike-20260825",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "hs1",
+        "shelf": "At-Home Short Game",
+        "title": "Train the through-strike in the room — no ball needed",
+        "min": 3,
+        "tags": [
+          "chipping",
+          "up-and-down"
+        ],
+        "where": "home",
+        "kit": [
+          "coins",
+          "phone"
+        ],
+        "body": "The room is where you found this, and it is the right place to keep it, because the motion is the whole drill — there is no outcome to chase and nothing to judge afterwards. Two things it trains: the club arriving shallow rather than chopping down, and the club still TRAVELLING after the ball would have gone. One honest warning about carpet, and it is the same warning the workshop log gives. A hard floor under a rug punishes a digging strike far harder than grass does, so the room flatters a shallow delivery for reasons that have nothing to do with whether it works off turf. So train the motion here and grade it on the green — and film it, because a feel that has never been filmed is the one thing this app keeps learning not to trust.",
+        "drill": "Two coins on the carpet: one where the ball would be, one four inches ahead on the target line. With the 56, brush the carpet — the low point at the near coin, and the sole must reach and pass OVER the far coin every single time. Twenty slow reps listening for one continuous brush rather than a thump that stops, then twenty at chipping speed, then ten with the 60. Once a week, prop the phone at hand height face-on and film five: you are looking for the shaft staying quiet and the head chasing low past the near coin, not the handle diving."
+      }
+    },
+    {
+      "id": "action-chip-measure-20260825",
+      "type": "action",
+      "text": "SHORT GAME — MEASURE THE THROUGH-STRIKE. The Aug 25 change (through the ball, not down into it) is a feel, from one indoor session, and this app has never recorded a chip of any kind. Two jobs settle most of it. (1) FILM ten chips with the 56 FACE-ON at hand height — where the low point actually sits, and whether the club keeps travelling low past the ball or the handle dives. (2) RUN THE ROLL-OUT TEST that the short-game plan's club-by-roll-out ratios have been owed since Aug 13, with the new delivery: 5 balls each with the 50, 56 and 60 onto one towel three paces on, and pace the roll from there. A spin change shows up as a change in ROLL before it shows up anywhere else — and it replaces the textbook 2x / 1x / half ratios with yours in the same session."
     }
   ]
 }
