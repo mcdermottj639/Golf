@@ -291,6 +291,30 @@ body.night .dscore{border-left-color:var(--gtext)}
 .linkrow{display:flex;justify-content:space-between;align-items:center;padding:10px 2px;
   border-bottom:1px dotted #c9bd9d;cursor:pointer}
 .linkrow .arr{color:var(--faint)}
+/* Stroke evolution. The grid IS the interface now: seven verdicts running to
+   paragraphs used to print in full under the table, which made the most useful block
+   on the page the one you scroll past. Each row carries its marks and a short state,
+   and its reasoning is one tap away. CSS grid rather than a <table> so a row can be a
+   <details> and still column-align with the header. See evolutionCard() in app.js. */
+.evo{--n:4}
+.evohead,.evorow>summary{display:grid;grid-template-columns:minmax(0,1fr) repeat(var(--n),34px);
+  gap:0 4px;align-items:center}
+.evohead{padding:0 20px 5px 0;border-bottom:1px solid var(--gtext)}
+.evohead span{font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.02em;
+  text-transform:uppercase;color:var(--gtext);text-align:center;line-height:1.25}
+.evorow{border-bottom:1px dotted #c9bd9d}
+.evorow:last-of-type{border-bottom:none}
+.evorow>summary{list-style:none;cursor:pointer;position:relative;padding:9px 20px 9px 0}
+.evorow>summary::-webkit-details-marker{display:none}
+.evorow>summary::after{content:'+';position:absolute;right:2px;top:50%;margin-top:-10px;
+  font-family:var(--sans);font-size:15px;font-weight:700;color:var(--faint)}
+.evorow[open]>summary::after{content:'–'}
+.evon{min-width:0}
+.evon b{display:block;font-size:14px;line-height:1.25}
+.evos{display:block;font-family:var(--sans);font-size:9px;font-weight:800;letter-spacing:.06em;
+  text-transform:uppercase;margin-top:2px}
+.evom{text-align:center;font-weight:800;font-size:15px}
+.evorow>p{margin:0 0 10px}
 /* Film-room rows on the labs. The findings run to paragraphs now, and three table
    columns at phone width turned the session log into a wall of prose you had to read
    in order to navigate. A row is the date, the batch size and one concluding line;

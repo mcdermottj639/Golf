@@ -72,7 +72,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `session`        | Add a filmed putting session (`date`, `setup`, `finding`, `detail`) |
 | `session-update` | Patch a session by `target` (its feed id) or `setupMatch` prefix |
 | `session-remove` | Drop a session by `target` (its feed id), **or** by a `setupMatch` prefix optionally narrowed by `date` — the second form is the only way to remove a `seed()` session, which has no feed id. Used to fold duplicates and to clear out retired-gear film |
-| `evolution`      | Replace the metric-evolution grid |
+| `evolution`      | Replace the metric-evolution grid. Carries `sessions` (short column labels), `notes` + `foot` (the legend, now data not code), and per metric `name` / `marks` / `s` / `state` / `verdict` |
 | `faults`         | Replace the faults list. **`discipline`** (`putting` default / `swing` / `short-game`) scopes the replace to that lab only, so pushing swing faults can't wipe the putting ones; omit it and it replaces everything. **Start a `why` with `CLOSED` or `DOWNGRADED`** to settle one — `faultState()` reads that first word, which is what drops it off the Putting tab's diagnosis card and out of Coach's open-fault to-dos. Anything else reads as open |
 | `action`         | Add an open action item |
 | `action-done`    | Mark action `target` done |
@@ -1098,8 +1098,27 @@ measurement over self-report — and say which one you're using.
   new rows for the things nothing has ever measured** — `Strike location` (all `?`, the
   leading candidate for the Aug 10 scatter) and `Pace / distance` (the open fault, which the
   old grid didn't track at all). A row of question marks is the most useful row on the page:
-  it is the only one that says what to go and film next. The grid heading and legend are
-  hardcoded in `putting()`, so a future rebuild has to update those too.
+  it is the only one that says what to go and film next.
+
+  **The grid is the interface, and the verdicts hide behind it** (Aug 24 2026). Seven verdicts
+  running to paragraphs used to print in full under the table — the most useful block on the
+  page was the one you scrolled past. `evolutionCard()` now renders each metric as a
+  `<details>` whose summary carries the marks and a **`state`**: two or three words —
+  *Settled · Closed · Open · Quick of 2:1 · Never measured · The open fault* — coloured off
+  the metric's `s`. That is what makes the grid readable without reading anything, so **give
+  every metric a `state`**; one without renders bare rather than breaking. The rows are CSS
+  grid rather than a `<table>` so a `<details>` still column-aligns with the header, and each
+  carries an `id` so a tapped-open row survives a `rerender()`.
+
+  Two things that WERE hardcoded in `putting()` now live in the data, so a rebuild is a feed
+  push rather than a code change: **`notes`** (one line per column, parallel to `sessions`,
+  rendered behind a collapsed *What the N columns are*) and **`foot`** (the closing caveat).
+  Only the `<h2>` and the mark legend are still in the view. Keep the `sessions` labels SHORT
+  — they render in 34px columns — and put the batch description in `notes`.
+
+  **Consolidate a verdict rather than appending to it.** The grid is a live summary, not a
+  log; the append-only rule belongs to the workshop plan. Verdicts reached 9,200 characters
+  across seven rows by appending a paragraph per session before being rewritten to 4,800.
 
 - **Jack mentions a course he's playing** (standing instruction, Jul 29 2026): don't wait
   to be asked — append a `course-add` for it alongside whatever else the message calls

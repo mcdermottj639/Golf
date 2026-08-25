@@ -100,13 +100,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v65';
+const BUILD = 'v66';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v66', d:'2026-08-24', items:[
+    'The stroke evolution grid stopped printing seven paragraphs under the table. Every row now shows its marks AND a two-word state \u2014 Settled, Closed, Open, Never measured \u2014 so you can read where the stroke stands without reading anything.',
+    'Tap any row for the full reasoning behind it. Nothing was cut; it just stopped being printed on the page you use to find things.',
+    'What each column was is now behind one collapsed line instead of a paragraph of legend.',
+    'Under the hood: the column blurbs moved out of the app and into the data, so rebuilding the grid is a feed push rather than a code change. That was a documented trap \u2014 the old legend was hardcoded and had to be edited by hand every time a column was added.' ] },
   { b:'v65', d:'2026-08-24', items:[
     'The film room log on every lab \u2014 Putting, Swing, Short Game \u2014 is now a scannable list instead of a three-column table. A row is the date, how big the batch was, and ONE line saying what it concluded.',
     'The full breakdown is unchanged and one tap away, same as before. Nothing was thrown out; it just stopped being printed on the page you use to find things.',
@@ -812,10 +817,14 @@ function drillBody(l){
 // is the real 13-club list and is already ordered longest to shortest. A hole stores the
 // key, never the label, so renaming a ladder row can't orphan old cards — an unknown key
 // falls back to printing itself.
-function clubKey(name){
+// One slugger, used for club keys and for the DOM ids that let a <details> survive a
+// rerender(). Brackets and the degree sign go first so "Cobra KING TEC (16.5°)" and
+// "Start line / aim" both come out as something stable and readable.
+function slug(name){
   return String(name).toLowerCase().replace(/\(.*?\)/g, '').replace(/°/g, '')
     .trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
+const clubKey = slug;
 function clubAbbr(name){
   const n = String(name || '');
   if(/mini/i.test(n)) return 'Mini';
@@ -1346,6 +1355,40 @@ function sessionDiscipline(s){
   const t = s.setup || '';
   if(/chip|pitch|bunker|short[\s-]?game|greenside/i.test(t)) return 'short-game';
   return /full[\s-]?swing|driver|\biron\b|\bwedge\b|mini/i.test(t) ? 'swing' : 'putting';
+}
+
+// ----- Stroke evolution grid -----
+// The grid IS the interface. Seven verdicts running to paragraphs used to print in
+// full under the table, which made the most useful block on the page the one you
+// scroll past. Every row now shows its marks and a two-or-three-word STATE, and its
+// reasoning is one tap away. Two things moved out of this function and into the DATA
+// so a future rebuild is a feed push rather than an app change: the per-column blurbs
+// (`notes`, parallel to `sessions`) and the closing footnote (`foot`). A metric with
+// no `state` renders without one, so an older grid still reads.
+function evolutionCard(){
+  const e = S.evolution;
+  if(!e || !e.metrics || !e.metrics.length) return '';
+  const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
+  const mc = mk => mk === '\u2713' ? 'var(--green)' : mk === '\u2717' ? 'var(--burg)' : 'var(--faint)';
+  const notes = e.notes || [];
+  return `<div class="card">
+    <p class="sm faint" style="margin-bottom:6px">Tap a row for the reasoning behind it.</p>
+    <div class="evo" style="--n:${e.sessions.length}">
+      <div class="evohead"><span></span>${e.sessions.map(x => `<span>${esc(x)}</span>`).join('')}</div>
+      ${e.metrics.map(m => `<details class="evorow" id="evo-${slug(m.name)}">
+        <summary><span class="evon"><b>${esc(m.name)}</b>${m.state
+          ? `<span class="evos" style="color:${sc[m.s] || 'var(--ink)'}">${esc(m.state)}</span>` : ''}</span>${
+          m.marks.map(mk => `<span class="evom" style="color:${mc(mk)}">${esc(mk)}</span>`).join('')}</summary>
+        <p class="sm">${esc(m.verdict)}</p>
+      </details>`).join('')}
+    </div>
+    <p class="sm faint" style="margin-top:10px">\u2713 good \u00b7 \u2717 fault \u00b7 ~ partial \u00b7 ? that angle couldn't see it \u00b7 \u2014 not assessed.
+    A dash means that batch couldn't answer that row, not that it went badly.</p>
+    ${notes.length ? `<details class="more"><summary>What the ${e.sessions.length} columns are</summary>
+      ${e.sessions.map((x,i) => `<p class="sm" style="margin:5px 0"><b>${esc(x)}</b> \u2014 ${esc(notes[i] || '')}</p>`).join('')}
+      ${e.foot ? `<p class="sm faint" style="margin-top:7px">${esc(e.foot)}</p>` : ''}
+    </details>` : ''}
+  </div>`;
 }
 
 // ----- The film room log -----
@@ -1906,16 +1949,7 @@ function putting(){
     <span><b>Training lives in Coach</b><br><span class="sm">${putDrills} putting drills you have the kit for — the drill bench keeps them all, with the streak</span></span><span class="arr">→</span></div></div>
 
   <h2>Stroke evolution · on the LINK.2.1</h2>
-  <div class="card">
-    <table><tr><th></th>${S.evolution.sessions.map(x=>`<th style="text-align:center">${esc(x)}</th>`).join('')}</tr>
-    ${S.evolution.metrics.map(m => `<tr><td class="sm" style="white-space:nowrap"><b>${esc(m.name)}</b></td>
-      ${m.marks.map(mk => `<td style="text-align:center;font-weight:800;color:${mk==='✓'?'var(--green)':mk==='✗'?'var(--burg)':'var(--faint)'}">${esc(mk)}</td>`).join('')}</tr>`).join('')}
-    </table>
-    ${S.evolution.metrics.map(m => `<p class="sm" style="margin-top:7px"><b style="color:${m.s==='good'?'var(--green)':m.s==='warn'?'var(--burg)':'var(--ink)'}">${esc(m.name)}:</b> ${esc(m.verdict)}</p>`).join('')}
-    <p class="sm faint" style="margin-top:8px">✓ good · ✗ fault · ~ partial · ? that angle couldn't see it · — not assessed.
-    Four columns, all on the putter you play: <b>Jul 30</b> (23 clips, every angle) · <b>Aug 10 pm</b> (outdoor, ~20 putts scored, direction unscored — all clips oblique) · <b>Aug 10 mat</b> (indoor, 3 putts, direction only) · <b>Aug 24 AirBreak</b> (indoor, 7 putts at a PuttOut trainer on a BREAKING mat, two batches on one tilt, plus three ball-height stroke clips — path, start line, tempo and pace. A curving mat can score the line a putt LEAVES on but never whether you aimed it there). A dash means that batch couldn't answer that row, not that it went badly.
-    Pre-LINK film was cleared on Aug 14; every number it produced is kept in the Workshop Log.</p>
-  </div>
+  ${evolutionCard()}
 
   <h2>Stroke session log</h2>
   <div class="card">

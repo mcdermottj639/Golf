@@ -28291,6 +28291,111 @@
         "compare": "VERSUS JUL 30, which is the session this batch actually argues with. Tempo was 2.0:1 there across 7 of 8 clips landing 1.9–2.1; six strokes now average 1.79 with five under 2.0. Different method on both sides, and the current method biases low, so treat the DIRECTION as the finding and the gap as unquantified. Path was straight there from three overhead clips and is straight here from a ball-height camera by a completely different test — that is the strongest thing in this comparison, because two unrelated methods agreeing is worth more than either. Early lift was closed there at 120 fps with the sole held within 0.05–0.08 in of address height across ten consecutive frames; the challenge raised here did not survive its own replication and does not overturn it.\n\nVERSUS AUG 10 PM and AUG 10 MAT: unchanged by this batch. The mat set could score AIM because it was flat and lined; the AirBreak can score the LINE but not the aim, and the strip mat's two putts are too few and too confounded with camera movement to add anything.\n\nWITHIN THE DAY: batch 1 of the AirBreak read as a dying ball at five to six inches past; batch 2 kept 80–95% of its speed over six feet and ran one putt into the bumper; and IMG_3665, tracked frame by frame, was still rolling past the hole when its clip ended. Two pace bands on one surface in one session — which is itself the finding, and the clearest argument yet that pace is not repeatable enough to carry a single number.",
         "gist": "Seven putts on one tilt: the mat's break gets a number, SBST confirmed twice, early lift held."
       }
+    },
+    {
+      "id": "evolution-consolidated-20260824",
+      "type": "evolution",
+      "evolution": {
+        "sessions": [
+          "Jul 30",
+          "Aug 10 pm",
+          "Aug 10 mat",
+          "Aug 24"
+        ],
+        "notes": [
+          "23 clips and 4 stills, every angle — the first full day on the LINK.2.1",
+          "Outdoor practice green, ~20 putts scored for pace. Direction unscored: every clip was oblique",
+          "Indoor mat with a printed centre line, 3 putts. Direction only",
+          "10 clips — 7 putts at a PuttOut trainer on the BREAKING AirBreak mat, two batches on one tilt, plus 3 ball-height stroke clips"
+        ],
+        "foot": "A curving mat can score the line a putt LEAVES on, never whether you aimed it there — which is why Aug 24 moves Start line without closing it. Pre-LINK film was cleared on Aug 14; every number it produced is kept in the Workshop Log.",
+        "metrics": [
+          {
+            "name": "Path",
+            "state": "Settled",
+            "s": "good",
+            "marks": [
+              "✓",
+              "—",
+              "—",
+              "✓"
+            ],
+            "verdict": "SETTLED — straight back, straight through, and now confirmed twice by unrelated methods. Jul 30, three overhead clips: a quarter to a half inch inside at the top, back on line by impact. Aug 24, the ball-height stroke clips: the head travels a straight line back AND through and essentially retraces it, by a test that needs no scale — residuals under 1% of its own lateral excursion. Two caveats on that second one: it is not free of the principal point, and barrel distortion bends straight lines if it was shot on the ultra-wide. Neither Aug 10 batch could see this row. It is the finding the whole zero-torque case rests on, and nothing has argued with it."
+          },
+          {
+            "name": "Tempo / load",
+            "state": "Quick of 2:1",
+            "s": "mid",
+            "marks": [
+              "✓",
+              "—",
+              "—",
+              "~"
+            ],
+            "verdict": "HOLDING, BUT RUNNING QUICK. Jul 30 measured 2.0:1, with 7 of 8 clips landing 1.9–2.1. Aug 24 measured six strokes across two mats and two cameras: 1.56 to 2.13, mean about 1.79, five of six under 2:1. The direction is consistent enough to be a finding. The number is not — both analyses detect the start of the backswing as a departure from a plateau, which clips the slow first inches of the takeaway and shortens the ratio in ONE direction. If it is real the mechanism is a short backswing rather than a fast downswing, because the down-stroke durations cluster tightly and the backswings do not. ONE HAND-COUNTED STROKE calibrates the method against Jul 30's and settles this."
+          },
+          {
+            "name": "Early lift",
+            "state": "Closed",
+            "s": "good",
+            "marks": [
+              "✓",
+              "—",
+              "—",
+              "?"
+            ],
+            "verdict": "CLOSED Jul 30 — at 120 fps the sole held within 0.05–0.08 inches of its address height for the full 83 ms into impact, flat across ten consecutive frames. CHALLENGED Aug 24, AND THE CHALLENGE DID NOT SURVIVE, which is why that column is a question mark rather than a dash: the angle was tried and could not settle it. Comparing the head at matched depth reported it coming through up to half an inch higher — the exact shape lift has — but an independent replication using a different edge threshold returns the OPPOSITE sign, because the head is about 1.7× faster coming down and therefore more motion-blurred. Two methods, opposite signs, each in the direction its own bias predicts. Stays on the grid as maintenance; this is the fault that comes back quietly."
+          },
+          {
+            "name": "Start line / aim",
+            "state": "Open",
+            "s": "warn",
+            "marks": [
+              "✗",
+              "—",
+              "~",
+              "~"
+            ],
+            "verdict": "THE BIAS IS GONE. THE SCATTER IS NOT. Jul 30: 1.5° and 1.7° LEFT plus one straight — three putts pulling the same way, which is what an AIM error looks like, because aim does not vary between reps. Aug 10 against a printed line: 0.8° right, 1.0° left, 0.6° right, mean bias about 0.1°, and the one-way pull did not reproduce once. Aug 24 splits the row in two, and the split is the finding: on a BREAKING mat the start line IS measurable, to about ±0.3°, but aim ERROR is not, because nothing in the picture supplies intent — a 2.9° right start is either a perfect allowance or a shove. Four putts spread 3.0°, roughly 4 in at the hole, and THE ONLY MISS IS THE ONE THAT STARTED AT THE TARGET. Moving this row to AIM takes a FLAT mat with a printed line."
+          },
+          {
+            "name": "Face at impact",
+            "state": "Never measured",
+            "s": "warn",
+            "marks": [
+              "✗",
+              "—",
+              "?",
+              "—"
+            ],
+            "verdict": "NEVER DIRECTLY MEASURED — every reading here is inferred. Jul 30 was a red by deduction: neutral path, square stance, and the ball still starting left, so the face was pointing left at impact. Aug 10 could not resolve it — the head spans about 70 pixels in those clips and 1.5° is under two of them. Aug 24 could not either: all ten clips were shot along the target line, none overhead, none face-on. On a zero-torque head this is the same question as AIM, since the face you set is the face you deliver. An OVERHEAD set is the only realistic route, and it pays this row and Path at the same time."
+          },
+          {
+            "name": "Strike location",
+            "state": "Never measured",
+            "s": "warn",
+            "marks": [
+              "?",
+              "?",
+              "?",
+              "?"
+            ],
+            "verdict": "NEVER MEASURED, on any of the four putters owned this month, and still the leading candidate for what is left. Heel and toe contact rotate the face in opposite directions, which produces scatter with NO bias — the exact shape the Aug 10 mat set came back in. That is an inference, not a finding. Aug 24 added the first thing in the record that POINTS at it rather than inferring it: at address the ball sits toward the TOE side of the head, read by eye at roughly 7% of head width, ±4%. That is address position, not strike, and it proves nothing. The foot-powder or impact-tape test settles the whole row in twelve minutes and has been owed since Jul 30."
+          },
+          {
+            "name": "Pace / distance",
+            "state": "The open fault",
+            "s": "warn",
+            "marks": [
+              "—",
+              "~",
+              "—",
+              "~"
+            ],
+            "verdict": "THE OPEN FAULT, and still the least-measured thing on this page — it has decided the fate of two putters. Aug 10 afternoon: about 20 putts off above-ground cups, nine finishing dead, the worst about 4 ft, nothing long all day. Aug 24 on the AirBreak: seven putts, the first batch dying at five to six inches past and the second keeping 80–95% of its speed over six feet with one running into the bumper. TWO PACE BANDS IN ONE SESSION is itself the finding — pace is not repeatable enough yet to carry a single number. On that mat it also decides LINE, because the break is monotonic in speed. The 30-ft ladder is what turns this row into a number, and it has still never been run."
+          }
+        ]
+      }
     }
   ]
 }
