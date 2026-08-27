@@ -472,6 +472,45 @@ act on (`play`, else the prose note, else his record for the hole), so the defau
 still delivers the decision and it is the reasoning under it that costs a tap. Never make
 the collapsed state a bare header — the whole design rests on the gist being there.
 
+### The hole screen redesigned (Aug 27 2026 — Jack's redesign)
+
+The logging RULES did not change; how the screen says them did. What is worth knowing
+before touching `livePlay()`:
+
+- **The header is the identity of the screen** and the only part of it that is not a chip:
+  a mono eyebrow `LIVE · COURSE · TEES`, `Hole N` in the display serif with `PAR n · SI n`
+  beside it, a `Finish` button (`live-finish` — the same route the last hole's Next button
+  takes, so the troubles still come pre-ticked off the card), the par picker and the Card
+  link, the hole strip, and the footer line `THRU n · +n` with a **pulsing ● SAVED**.
+- **The pulse is the save receipt.** Every tap writes `S.live` to localStorage before the
+  screen redraws, and this is the only thing on the phone that says so. Don't make it a
+  static label — a static label reads as decoration.
+- **The hole strip is 18 bars**, always visible, tappable to jump (the old fold-away
+  numbered strip and its `holesOpen` flag are gone). Solid = here; 72% = played at or under
+  par; 40% = played over; 16% = unplayed; a burgundy inset marks a hole he wrote a note on.
+  Eighteen targets across one phone cannot each be 44px wide — no arrangement of them can —
+  so the strip is a **shortcut** with a 30px hit area and the 52px footer Back / Next
+  buttons stay the primary way between holes. Jumping is a `render()` (a navigation); every
+  chip tap is still a `rerender()`.
+- **One section per question, and a section exists only once it can be answered.** `qRows()`
+  is the single source of that order for BOTH layouts. The addition on Aug 27 is the
+  **fairway, which now waits for a tee club** — where the ball finished is not a question
+  until there is a shot to ask it about — and the tee section carries the line saying so, so
+  the row can never look like something the app forgot to show. On a par 3 the green section
+  reads **“Green · from the tee”**.
+- **Chips light in one of two accents: green for a neutral or good outcome, burgundy for
+  everything that costs strokes** — OB, a penalty, a green the drive took away, a conceded
+  putt, and every miss direction (`bad` is the class that says which). The colour is a
+  property of the ANSWER, not of the row. A suggested-but-unconfirmed tee club is still
+  half-lit, now in the green accent, with `LAST TIME: <club>` in the section header — that
+  distinction is what the whole driver-vs-mini comparison rests on, so never fill it solid.
+- **Motion has two jobs and no more**: a section that has just appeared rises 10px over
+  .26s, and arriving at a hole slides the whole card in from the right over .3s. Which
+  sections were on screen last draw lives in the module variables `lvHoleSeen` / `lvSeen` —
+  **not** on `S.live`, because nothing about an animation belongs in the round.
+- **The logger still gets NO `fold()` sections.** It already hides what cannot exist yet;
+  the hole-prep card's own collapse (above) is the one disclosure control on the screen.
+
 ### A note on any hole (Aug 19 2026)
 
 Jack asked to be able to write a note on **any hole**, the way he already could at the end
@@ -1267,6 +1306,37 @@ Three behaviours worth not breaking:
   banner on the first open after an upgrade counts only what is genuinely new. Boot renders
   Home before the feed is fetched, so the first render is deliberately read-only; the one
   after it commits.
+
+**Aug 27 2026 (Jack's redesign): the block is titled *What's landed*, folds behind a
+`fold()` header, and each row leads with a mono TYPE column** (`UP_TYPE` / `upType()` in
+`app.js`) tinted by how strong the evidence behind that kind of change is — burgundy for
+film and scorecards, green for a round, green accent for the coaching library, gold for a
+number nobody measured, neutral ink for everything else. The day heading moved into the
+rows as a right-aligned date. **None of the three behaviours above changed**, and a type
+with no `UP_TYPE` row falls through to a neutral `UPDATE` for the same forward-compat
+reason `updateLine()` has a default case. Above the changelog, Today now opens with three
+blocks — the green **weather card** (a restyle of what the Conditions tile already
+computed, `playsFactor()` unchanged and temperature-only, which the card says out loud),
+**The one thing** (`oneThing()` — `coachFocus()` over `coachSignals()`, i.e. the same pick
+Coach leads with, so the top of Today can never quietly outrank the page below it), and the
+**start/resume round button**, which absorbed the old round-in-progress banner: one
+affordance for one intention, matching the TEE tab.
+
+### The evidence drawer (Aug 27 2026 — build a finding's provenance once)
+
+`evDrawer(id, label, ev, sample, more)` in `app.js` is the disclosure behind a tier chip:
+tapping the header opens **EVIDENCE USED** — the sample, the source, and *what is not
+measured*. Reuse it wherever a finding renders; the tiers must never be explained two
+different ways on two screens.
+
+- The **sample** is the finding's own `src` — pass it, never a number you computed here.
+- The **source** and the **not measured** lines come from `EV_SOURCE` / `EV_BLIND`, written
+  down **per tier** rather than per finding, because they are properties of the source and
+  not of the number: a scorecard cannot see a stroke however many holes of it there are.
+  An invented per-finding limitation reads exactly like a real one — the failure the whole
+  ladder exists to prevent — so anything finding-specific goes in the optional `more`.
+- It is a plain `<details id=…>`, so an open drawer survives a `rerender()` on the
+  machinery that already reopens folds. Never build a parallel open/closed store for it.
 
 After any feed change: `python3 -c "import json; json.load(open('coach-feed.json'))"`,
 `node --check app.js`, bump `"updated"`, commit, push.

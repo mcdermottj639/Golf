@@ -1119,6 +1119,30 @@ function preps(){
 const actionLi = a => `<li class="${a.done ? 'done' : ''}" data-action="toggle-action" data-id="${a.id}">
   <span class="box"></span><span class="txt">${esc(a.text)}${a.pri && !a.done ? '<span class="pri">HIGH</span>' : ''}</span></li>`;
 
+// The type column: three-to-six mono characters saying what KIND of change a row is,
+// tinted by the strength of the evidence behind that kind — burgundy for a measurement or
+// a scorecard read off the real card, green for a round he played, green accent for the
+// coaching library, gold for a number nobody measured, neutral ink for everything else.
+// It is presentation metadata over the feed's own `type`, which is why it lives here and
+// not in the feed: a tint is a reading of the entry, and the entry is the record.
+// A type with no row falls through to a neutral UPDATE — the same forward-compatibility
+// rule updateLine() follows, so a new feed type can never render as a blank column.
+const UP_TYPE = {
+  session:['FILM','u-m'], 'session-update':['FILM','u-m'], 'session-remove':['FILM','u-m'],
+  evolution:['GRID','u-m'], faults:['FAULT','u-m'], test:['TEST','u-m'], layout:['CARD','u-m'],
+  round:['ROUND','u-l'], 'round-update':['ROUND','u-l'],
+  'lesson-add':['LESSON','u-k'], 'lesson-update':['LESSON','u-k'], 'lesson-remove':['LESSON','u-k'],
+  kit:['KIT','u-k'],
+  stats:['GHIN','u-u'], carries:['CARRY','u-u'], 'carry-update':['CARRY','u-u'],
+  'club-add':['BAG',''], 'club-update':['BAG',''], history:['BAG',''], 'history-edit':['BAG',''],
+  briefing:['PLAN',''], 'briefing-remove':['PLAN',''],
+  action:['TO-DO',''], 'action-done':['TO-DO',''], 'action-update':['TO-DO',''],
+  'course-add':['COURSE',''], 'course-remove':['COURSE',''], geo:['GEO',''],
+  debrief:['DEBRIEF',''], 'debrief-update':['DEBRIEF',''],
+  shortlist:['PUTTER',''], deadline:['WINDOW',''], build:['BUILD',''],
+};
+const upType = t => { const r = UP_TYPE[t] || ['UPDATE','']; return { l:r[0], c:r[1] }; };
+
 // ----- What's new -----
 // Everything that has changed, newest first, in one place — Jack asked for it on Home
 // under the coach tip, and asked for ALL of it rather than the latest one. Two streams
@@ -1130,10 +1154,10 @@ const actionLi = a => `<li class="${a.done ? 'done' : ''}" data-action="toggle-a
 // of the block: it is a table of contents for what is different, not a substitute for it.
 function whatsNew(){
   const rows = [];
-  (S.updates || []).forEach(u => rows.push({ d:u.d, k:u.id, h:u.h, s:u.s, act:u.act }));
+  (S.updates || []).forEach(u => rows.push({ d:u.d, k:u.id, t:u.t, h:u.h, s:u.s, act:u.act }));
   // One row per RELEASE, not per note: three sentences of release copy set as three
   // headlines shouts over the data changes around it, and a build is one event anyway.
-  RELEASES.forEach(r => rows.push({ d:r.d, k:`build:${r.b}`, h:'The app updated',
+  RELEASES.forEach(r => rows.push({ d:r.d, k:`build:${r.b}`, t:'build', h:'The app updated',
     b:r.b, items:r.items, s:'', act:null }));
   if(!rows.length) return '';
   // Stable sort on the date alone, so within one day the feed's own order survives and
@@ -1173,23 +1197,97 @@ function whatsNew(){
     S.settings.seenUpdates = keys;
     save();
   }
-  return `
-  <h2>What's new</h2>
-  <div class="card">
+  const body = `
     ${fresh ? `<p class="sm"><b class="warn">${fresh} new</b> since you last opened this page.</p>` : ''}
     ${days.map(day => `<div class="upday">
-      <div class="update-d">${fmtDate(day.d)}</div>
-      <div>${day.rows.map(r => `<div class="uprow${r.keys.every(k => seen.has(k)) ? '' : ' fresh'}${
+      <div>${day.rows.map(r => { const ty = upType(r.t);
+        return `<div class="uprow${r.keys.every(k => seen.has(k)) ? '' : ' fresh'}${
         r.act ? ' opens' : ''}"${attrs(r.act)}>
-        <div class="uph">${esc(r.h)}${r.b ? `<span class="upb">${esc(r.b)}</span>` : ''}${
-          r.n > 1 ? `<span class="upn">${r.n} updates</span>` : ''}</div>
-        ${r.s ? `<div class="ups">${esc(r.s)}</div>` : ''}
-        ${r.items ? `<ul class="upli">${r.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
-        ${r.act ? '<span class="arr">→</span>' : ''}
-      </div>`).join('')}</div>
+        <div class="upt ${ty.c}">${esc(ty.l)}</div>
+        <div class="upm">
+          <div class="uph">${esc(r.h)}${r.b ? `<span class="upb">${esc(r.b)}</span>` : ''}${
+            r.n > 1 ? `<span class="upn">${r.n} updates</span>` : ''}</div>
+          ${r.s ? `<div class="ups">${esc(r.s)}</div>` : ''}
+          ${r.items ? `<ul class="upli">${r.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+        </div>
+        <div class="upd">${fmtDate(day.d)}${r.act ? '<span class="arr">→</span>' : ''}</div>
+      </div>`; }).join('')}</div>
     </div>`).join('')}
-    <p class="sm faint" style="margin-top:10px">Every change Claude has pushed, newest first — plans, bag changes, rounds, lessons and coaching, plus what changed in the app itself. Tap any row to open what it changed. Dated by the day the change was made. Older entries drop off the bottom once there are ${UPDATE_CAP}; nothing is lost — the change itself lives in the bag, the plan or the card it landed on.</p>
+    <p class="sm faint" style="margin-top:10px">Every change Claude has pushed, newest first — plans, bag changes, rounds, lessons and coaching, plus what changed in the app itself. Tap any row to open what it changed. Dated by the day the change was made. Older entries drop off the bottom once there are ${UPDATE_CAP}; nothing is lost — the change itself lives in the bag, the plan or the card it landed on.</p>`;
+  const n = days.reduce((a, d) => a + d.rows.length, 0);
+  return `<div class="card">${fold('fold-landed', "What's landed",
+    `${fresh ? fresh + ' new · ' : ''}${n} change${n === 1 ? '' : 's'}`, body)}</div>`;
+}
+
+// ----- Today: the three blocks above the existing page (Aug 27 2026, Jack's redesign) -----
+// Conditions, the one thing, and the way onto the tee. Everything below them — the stat
+// row, round prep, the numbers, the coach tip, the changelog, the return window and the
+// data links — keeps the order it already had.
+
+// The weather, at arm's length in sun: the temperature at display size, the reading under
+// it, and the only thing the weather actually changes about his golf in a mono block on
+// the right. The arithmetic is playsFactor()'s and is unchanged — roughly 1% of carry per
+// 10°F below 70 — and it is TEMPERATURE ONLY, which the card says out loud rather than
+// letting a wind reading sitting beside it imply otherwise. A stale reading is shown as
+// stale instead of being quietly recomputed: playsFactor() returns null past three hours.
+function wxCard(){
+  const wx = S.weather, f = playsFactor();
+  const mins = wx ? Math.round((Date.now() - wx.ts) / 60000) : null;
+  const ago = mins == null ? '' : mins < 60 ? `${mins} min ago`
+    : `${Math.round(mins / 60)}h ago`;
+  if(!wx) return `<div class="wx" data-action="get-weather">
+    <div><div class="wxt">—°</div><div class="wxc">Tap to load the conditions where you are</div></div>
+    <div class="wxr"><b>Plays like</b><span>needs a location fix</span></div></div>`;
+  const p150 = f ? Math.round(150 / f) : null;
+  const d = p150 == null ? null : p150 - 150;
+  return `<div class="wx" data-action="get-weather">
+    <div><div class="wxt">${WX_ICON(wx.code)} ${Math.round(wx.t)}°</div>
+      <div class="wxc">Wind ${Math.round(wx.wind)} mph · read ${esc(ago)} · tap to refresh</div></div>
+    <div class="wxr"><b>Plays like</b>${f
+      ? `<span>150 → <i>${p150}</i></span>
+         <span>${d === 0 ? 'no change at 150' : `${d > 0 ? '+' : ''}${d} yds · ${Math.round(wx.t)}°F air`}</span>
+         <span class="wxn">Temperature only — the wind is not in this number.</span>`
+      : `<span>reading is over 3h old</span><span class="wxn">Tap to refresh and the carry effect comes back.</span>`}</div>
   </div>`;
+}
+
+// The one thing. Not a list — the single finding the ranked board leads with, which is the
+// same pick Coach makes (coachFocus over coachSignals), so the top of Today can never
+// quietly outrank the rest of the app. It carries its own tier: the 4px rail down the
+// side, and a tappable chip that opens what the claim is actually standing on.
+function oneThing(){
+  const f = coachFocus(coachSignals());
+  if(!f) return '';
+  const L = f.link;
+  return `<div class="card one${rail(f.ev)}">
+    ${evDrawer('ev-onething', 'The one thing', f.ev, f.src)}
+    <div class="oneh">${f.h}</div>
+    ${expandable(f.b)}
+    ${L ? `<div class="linkrow" data-action="${L.a}"${L.view ? ` data-view="${L.view}"` : ''}${
+      L.id ? ` data-id="${esc(L.id)}"` : ''}><span class="sm"><b>${esc(L.lab)}</b></span><span class="arr">→</span></div>` : ''}
+  </div>`;
+}
+
+// The way onto the tee, at the size of the decision. One button, which is a START when
+// there is no round on the go and a RESUME when there is — the same tap for the same
+// intention, exactly like the TEE button in the tab bar. The discard link only exists on
+// the resume face, because there is nothing to discard on the other one.
+function startRound(){
+  const L = S.live;
+  if(L){
+    const t = liveThru(L), h = L.holes[L.cur];
+    return `<button class="bigbtn" data-action="live-new">
+      <span class="bb-l">Resume your round<em>${esc(L.course)}</em></span>
+      <span class="bb-r">${t.n ? `${t.over > 0 ? '+' : ''}${t.over} THRU ${t.n} ›` : `HOLE ${h ? h.n : 1} ›`}</span></button>
+    <div class="bbfoot"><button class="btn ghost tiny" data-action="live-discard">Discard this round</button></div>`;
+  }
+  // "Card ready" is a claim about the scorecards on file, so it is only made where there
+  // are some — otherwise the first course he types gets eighteen placeholder par 4s and
+  // the card check screen says so.
+  const ready = coursesWithLayout().length;
+  return `<button class="bigbtn" data-action="live-new">
+    <span class="bb-l">Play a live round<em>One screen a hole · saves on every tap</em></span>
+    <span class="bb-r">${ready ? 'CARD READY ›' : 'NEW CARD ›'}</span></button>`;
 }
 
 // ----- Home -----
@@ -1201,7 +1299,9 @@ function home(){
   const sc = last ? fiveFtScore(last) : null;
   const picks = pickedLessons().slice(0,1);
   return `
-  ${liveBanner()}
+  ${wxCard()}
+  ${oneThing()}
+  ${startRound()}
   <div class="rowgrid">
     <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div></div>
     <div class="stat"><div class="v">${S.courses.filter(c=>!c.bucket).length}</div><div class="l">Courses</div></div>
@@ -3607,6 +3707,50 @@ const EV_LAB = { live:'you logged this live', round:'from your rounds', measured
   snapshot:'GHIN summary', self:'your own read' };
 const evTag = ev => ev ? ` <span class="ev ${ev}">${EV_LAB[ev]}</span>` : '';
 
+// ----- The evidence disclosure (Aug 27 2026) -----
+// Every finding already says where it came from; this is the door behind that badge.
+// Tapping the tier chip opens EVIDENCE USED: what was counted, what it was read off, and —
+// the part that matters — what this source CANNOT tell you. The first two come from the
+// finding itself (its own `src` is the sample it fired on); the third is written down PER
+// TIER rather than per finding, because it is a property of the source and not of the
+// number: a scorecard cannot see a stroke however many holes of it there are, and a season
+// summary cannot be broken back down to a hole. Nothing here is invented about a specific
+// finding — a made-up limitation reads exactly like a real one, which is the whole failure
+// the tier ladder exists to prevent.
+//
+// It is ONE `<details id=…>`, deliberately: render() reopens any open <details> carrying an
+// id after a rerender(), so the open state costs no store and cannot drift out of sync.
+// Reuse it wherever a finding renders — Today, the labs, the round card — so a tier is
+// never explained two different ways on two screens.
+const EV_SOURCE = {
+  live:'Cards you logged hole by hole in the live logger — recorded on the hole, between shots, with the bag you are playing today.',
+  round:'Your own scorecards, typed up after the round rather than tapped in on the hole.',
+  measured:'A measurement — film of the stroke, or a scored test.',
+  snapshot:'A season summary somebody else computed, pasted in.',
+  self:'Your own account of a round, written afterwards.' };
+const EV_BLIND = {
+  live:'A card records WHAT happened, never why. Nothing on it measures the stroke that produced it, and nothing reads the notes you wrote on it.',
+  round:'One remove from the shot — written up after the round, so a hole detail is only as good as the memory of it. And a scorecard still cannot see a stroke.',
+  measured:'Measured in one place on one day. Whether it holds up on the course is a different question, and this is not it.',
+  snapshot:'It cannot be broken back down to a hole, and it may predate the bag you are playing. It is an average, not an event.',
+  self:'Not a measurement. Nothing on a card confirms or contradicts it — it is the only witness for what a scorecard cannot see, and it is still a feel.' };
+// id     unique and STABLE — the key the reopen-after-rerender works off
+// label  the header text left of the chip
+// ev     the tier, one of the five
+// sample what was counted — pass the finding's own `src`, never a number you invented
+// more   optional extra sentence about what THIS finding leaves unmeasured
+function evDrawer(id, label, ev, sample, more){
+  const tier = ev || 'snapshot';
+  return `<details class="evdis" id="${esc(id)}">
+    <summary><span class="evdl">${esc(label)}</span><span class="ev ${tier}">${esc(EV_LAB[tier] || tier)}</span></summary>
+    <div class="evpanel"><b>Evidence used</b>
+      <dl>${sample ? `<dt>Sample</dt><dd>${esc(sample)}</dd>` : ''}
+        <dt>Source</dt><dd>${esc(EV_SOURCE[tier] || '')}</dd>
+        <dt>Not measured</dt><dd>${esc(EV_BLIND[tier] || '')}${more ? ' ' + esc(more) : ''}</dd></dl>
+    </div>
+  </details>`;
+}
+
 // Tips fire off thresholds in the data, so they only appear once there's
 // enough of it to mean anything. Each one carries the number that triggered it.
 // Every finding this page can make out of hole data, computed over whatever set of cards
@@ -4740,6 +4884,19 @@ function suggestTee(L){
   h.tee = key; h.teeAuto = true;
 }
 
+// Changing a hole's par changes which questions the hole HAS, so it is one function and
+// never two: a par 3 has no fairway, no separate approach and always a shot at the green,
+// and a tee-club suggestion made for a par 4 is not valid for it.
+function setHolePar(L, h, p){
+  h.par = p;
+  // Touching a par settles it: it is his number now, not a placeholder.
+  delete h.parAuto; h.parFrom = 'mine';
+  if(h.par === 3){ delete h.fw; delete h.fmiss; delete h.app; delete h.noshot; }
+  if(h.teeAuto){ delete h.tee; delete h.teeAuto; suggestTee(L); }
+  // The par decides which rows exist, so the open one is re-derived too.
+  delete h.qOpen;
+}
+
 // The open note lives in the DOM between keystrokes, so anything that leaves the hole
 // pulls it back onto the draft first. iOS can kill a suspended PWA mid-sentence.
 function syncHoleNote(){
@@ -4811,20 +4968,8 @@ function liveTroubles(a){
   return out;
 }
 
-function liveBanner(){
-  const L = S.live;
-  if(!L) return '';
-  const t = liveThru(L);
-  return `<div class="card livebar">
-    <div class="lvtag">Round in progress</div>
-    <h3>${esc(L.course)}</h3>
-    <p class="sm">${t.n ? `${t.over > 0 ? '+' : ''}${t.over} thru ${t.n}` : 'Nothing scored yet'} · on hole ${L.holes[L.cur] ? L.holes[L.cur].n : 1}</p>
-    <div class="formrow" style="margin-top:10px">
-      <button class="btn" data-action="live-new">Resume →</button>
-      <button class="btn ghost" data-action="live-discard">Discard</button>
-    </div>
-  </div>`;
-}
+// (The round-in-progress banner folded into Today's start-round button on Aug 27 2026 —
+// one affordance for one intention, and the same one the TEE tab carries.)
 
 function live(){
   const L = S.live;
@@ -5002,8 +5147,12 @@ function liveStart(){
 // The row order IS the logging order — tee shot through score, note last. A par 3 has no
 // fairway and no separate approach, and the putting detail rows follow the total the same
 // way the full card gates them: Putt made needs a putt, First putt needs two or more.
+// The fairway waits for a tee club (Aug 27 2026): where the ball finished is not a
+// question until there is a shot to ask it about. A par 3 has neither a fairway nor a
+// separate approach either way — there the tee shot IS the shot at the green.
 function qRows(h){
-  return ['tee', h.par === 3 ? null : 'fw', h.par === 3 ? null : 'app', 'green', 'putts',
+  return ['tee', h.par === 3 || !h.tee ? null : 'fw', h.par === 3 ? null : 'app',
+    'green', 'putts',
     h.putts ? 'pm' : null, h.putts >= 2 ? 'pd' : null, 's', 'note'].filter(Boolean);
 }
 // A carried-over tee suggestion is NOT an answer — the row opens so he confirms it with
@@ -5035,6 +5184,11 @@ function qAdvance(h, from){
   h.qOpen = rows.slice(rows.indexOf(from) + 1).find(r => r !== 'note' && !qAnswered(h, r)) || '';
 }
 
+// Which hole the screen last drew, and which of its sections were on it. Pure UI state,
+// and deliberately module-scoped rather than parked on S.live: nothing about an animation
+// belongs in the round, and this way it cannot reach the saved card even by accident.
+let lvHoleSeen = null, lvSeen = new Set();
+
 function livePlay(L){
   const h = L.holes[L.cur];
   const t = liveThru(L);
@@ -5043,11 +5197,13 @@ function livePlay(L){
   // Nobody tees off a par 4 with a 56°, but a short par 3 is exactly a wedge — so the
   // tee row carries the whole bag only where that's a real shot.
   const teeClubs = par3 ? clubs : clubs.filter(c => !c.wedge);
+  // A chip is 44px tall whatever is in it, and lights in ONE of two accents: green for a
+  // neutral or good outcome, burgundy for the ones that cost strokes — OB, a penalty, a
+  // green the drive took away, a conceded putt and every miss direction. `bad` is the class
+  // that says which, so the colour is a property of the answer rather than of the row.
   const chip = (k, v, lab, on, cls) =>
     `<span class="chip big${cls ? ' ' + cls : ''}${on ? ' on' : ''}" data-action="live-set" data-k="${k}" data-v="${esc(v)}">${lab}</span>`;
-  const row = (lab, body, hint) => `<div class="lvrow"><div class="lvlab">${lab}${
-    hint ? `<span>${hint}</span>` : ''}</div>${body}</div>`;
-  const clubRow = (k, list) => `<div class="clubgrid">${list.map(c => {
+  const clubRow = (k, list, cols) => `<div class="lvgrid g${cols}">${list.map(c => {
     const on = h[k] === c.key;
     const auto = on && k === 'tee' && h.teeAuto;
     return `<span class="chip big${on ? (auto ? ' on auto' : ' on') : ''}" data-action="live-set" data-k="${k}" data-v="${c.key}">${esc(c.abbr)}</span>`;
@@ -5067,39 +5223,42 @@ function livePlay(L){
   // One body per row, shared verbatim by both layouts — same chips, same data-actions,
   // so the full card and quick view can never drift apart on what a tap records.
   const bodies = {
-    tee: clubRow('tee', teeClubs),
-    fw: `<div class="chips">
+    tee: clubRow('tee', teeClubs, 4),
+    fw: `<div class="lvgrid g5">
       ${chip('fw', 'hit', 'Hit', h.fw === true)}
-      ${chip('fw', 'L', 'Left', h.fw === false && h.fmiss === 'L')}
-      ${chip('fw', 'R', 'Right', h.fw === false && h.fmiss === 'R')}
-      ${chip('fw', 'X', 'Other', h.fw === false && !h.fmiss)}
+      ${chip('fw', 'L', 'Left', h.fw === false && h.fmiss === 'L', 'bad')}
+      ${chip('fw', 'R', 'Right', h.fw === false && h.fmiss === 'R', 'bad')}
+      ${chip('fw', 'X', 'Other', h.fw === false && !h.fmiss, 'bad')}
       ${chip('fw', 'OB', 'OB', h.fw === false && h.fmiss === 'OB', 'ob')}</div>`,
-    app: clubRow('app', clubs),
-    green: `<div class="chips">
+    app: clubRow('app', clubs, 5),
+    green: `<div class="lvgrid g3">
       ${chip('green', 'hit', 'Hit', h.gir === true)}
-      ${chip('green', 'S', 'Short', h.gir === false && h.gmiss === 'S')}
-      ${chip('green', 'L', 'Left', h.gir === false && h.gmiss === 'L')}
-      ${chip('green', 'R', 'Right', h.gir === false && h.gmiss === 'R')}
-      ${chip('green', 'Lg', 'Long', h.gir === false && h.gmiss === 'Lg')}
+      ${chip('green', 'S', 'Short', h.gir === false && h.gmiss === 'S', 'bad')}
+      ${chip('green', 'L', 'Left', h.gir === false && h.gmiss === 'L', 'bad')}
+      ${chip('green', 'R', 'Right', h.gir === false && h.gmiss === 'R', 'bad')}
+      ${chip('green', 'Lg', 'Long', h.gir === false && h.gmiss === 'Lg', 'bad')}
       ${chip('green', 'OB', 'OB', h.gir === false && h.gmiss === 'OB', 'ob')}</div>${
       // Separate toggle, not a sixth direction: a short one you had no play at is both
       // short AND conceded, and only the second fact tells you which club to blame.
-      par3 ? '' : `<div class="chips"><span class="chip big ns${h.noshot ? ' on' : ''}"
+      par3 ? '' : `<div class="lvgrid g1"><span class="chip big ns${h.noshot ? ' on' : ''}"
         data-action="live-set" data-k="noshot" data-v="1">No shot at it</span></div>`}`,
-    putts: `<div class="chips">${[0,1,2,3,4,5].map(p =>
+    putts: `<div class="lvgrid g6">${[0,1,2,3,4,5].map(p =>
       chip('putts', p, p === 5 ? '5+' : p, h.putts === p)).join('')}</div>`,
-    pm: `<div class="chips">${PUTT_DIST.map(d =>
+    pm: `<div class="lvgrid g6">${PUTT_DIST.map(d =>
       chip('pm', d.k, d.lab, h.pm === d.k && !h.gimme)).join('')}
-      ${chip('gimme', '1', 'Given', !!h.gimme, 'ns')}</div>`,
-    pd: `<div class="chips">${PUTT_DIST.map(d =>
+      ${chip('gimme', '1', 'Given', !!h.gimme, 'ns span')}</div>`,
+    pd: `<div class="lvgrid g6">${PUTT_DIST.map(d =>
       chip('pd', d.k, d.lab, h.pd === d.k)).join('')}</div>`,
-    s: `<div class="chips">${scores}${outlier}
+    s: `<div class="lvgrid g5">${scores}</div>
+      <div class="lvgrid g3 lvsub">${outlier}
       <span class="chip big" data-action="live-bump" data-d="1">+1</span>
       <span class="chip big" data-action="live-bump" data-d="-1">−1</span></div>`,
+    // The one thing on this screen that wants a keyboard, and the only field that records
+    // WHY. Carried, never parsed — nothing in the app reads it, and the header says so.
     note: (h.note || h.noteOpen)
       ? `<textarea id="lvHoleNote" class="lvnote" rows="2"
-          placeholder="What actually happened here">${esc(h.note || '')}</textarea>`
-      : `<div class="chips"><span class="chip big note" data-action="live-note">＋ Add a note</span></div>`,
+          placeholder="Quoted back to you on this hole. Nothing reads it.">${esc(h.note || '')}</textarea>`
+      : `<div class="lvgrid g1"><span class="chip big note" data-action="live-note">＋ Add a note</span></div>`,
   };
 
   const quick = !!S.settings.liveQuick;
@@ -5123,13 +5282,17 @@ function livePlay(L){
     if(r === 'note') return h.note ? { txt: '✎' } : null;
     return null;
   };
-  const QLAB = { tee:'Off the tee', fw:'Fairway', app:'Into the green', green:'Green',
+  // One label and one hint per row, shared by both layouts — a row can't be called two
+  // things on two screens. On a par 3 the tee shot IS the approach, so the green section
+  // says so rather than sitting there looking like a second shot he never hit.
+  const QLAB = { tee:'Tee club', fw:'Fairway', app:'Club in',
+    green: par3 ? 'Green · from the tee' : 'Green',
     putts:'Putts', pm:'Putt made', pd:'First putt', s:'Score', note:'Note' };
-  const QHINT = { tee: h.teeAuto ? 'carried over — tap to keep or change' : '',
+  const QHINT = { tee: h.teeAuto ? `LAST TIME: ${clubName(h.tee)}` : '',
     fw:'OB is two strokes — tap it and the app counts them', app:'optional',
     green: par3 ? '' : 'the drive left you nothing', putts:'the total',
     pm:'feet — how long the one you holed was', pd:'feet — where you started from',
-    note:'saved to this hole, on the card forever' };
+    note:'CARRIED · NEVER PARSED' };
   const open = qOpenRow(h);
   const quickCard = `<div class="card lvcard qcard">
     ${qRows(h).map(r => {
@@ -5144,18 +5307,28 @@ function livePlay(L){
     }).join('')}
   </div>`;
 
-  const fullCard = `<div class="card lvcard">
-    ${row('Off the tee', bodies.tee,
-      h.teeAuto ? 'carried over — tap to keep or change' : '')}
-    ${par3 ? '' : row('Fairway', bodies.fw, 'OB is two strokes — tap it and the app counts them')}
-    ${par3 ? '' : row('Into the green', bodies.app, 'optional')}
-    ${row('Green', bodies.green, par3 ? '' : 'the drive left you nothing')}
-    ${row('Putts', bodies.putts, 'the total')}
-    ${!h.putts ? '' : row('Putt made', bodies.pm, 'feet — how long the one you holed was')}
-    ${h.putts >= 2 ? row('First putt', bodies.pd, 'feet — where you started from') : ''}
-    ${row('Score', bodies.s)}
-    ${row('Note', bodies.note, 'saved to this hole, on the card forever')}
-  </div>`;
+  // ---- Progressive disclosure: a section exists only once it CAN be answered ----
+  // Most of this the logger already did (a par 3 has no fairway and no separate approach;
+  // the made-putt row needs a putt and the first-putt row needs two). The one addition is
+  // the fairway, which now waits for a tee club: "where did that go" is not a question
+  // until there is a shot to ask it about, and the tee section carries the line that says
+  // so, so the row can never look like something the app forgot to show.
+  const secs = qRows(h).map(k => ({ k, lab:QLAB[k], hint:QHINT[k], body:bodies[k] }));
+  // Only sections that have JUST appeared animate. Which ones were on screen last draw is
+  // a property of the screen and not of the round, so it is a module variable — it never
+  // touches S.live and so can never reach the saved card. Arriving at a hole resets it:
+  // there the whole hole slides in and animating nine sections on top of that would be a
+  // fairground, not a reveal.
+  const arrived = lvHoleSeen !== L.cur;
+  if(arrived){ lvHoleSeen = L.cur; lvSeen = new Set(secs.map(s => s.k)); }
+  secs.forEach(s => { if(!lvSeen.has(s.k)){ s.rev = true; lvSeen.add(s.k); } });
+  const section = s => `<section class="card lvsec${s.rev ? ' rev' : ''}" data-sec="${s.k}">
+    <div class="lvsl">${esc(s.lab)}${s.hint
+      ? `<span${s.k === 'tee' && h.teeAuto ? ' class="lit"' : ''}>${esc(s.hint)}</span>` : ''}</div>
+    ${s.body}${s.k === 'tee' && !par3 && !h.tee
+      ? '<p class="lvwait">Pick the club and the fairway opens underneath.</p>' : ''}
+  </section>`;
+  const fullCard = secs.map(section).join('');
 
   // The hole's prep is built here and rendered BELOW the scoring card (Jack's call,
   // Aug 20): on the hole he wants the next-hole button and the chips at the top of
@@ -5218,26 +5391,37 @@ function livePlay(L){
     </div>`;
   })();
 
+  // ---- The hole strip: eighteen bars, the round at a glance and a way to any hole ----
+  // Solid = where you are. Filled at 72% = played, at or under par. At 40% = played, over.
+  // At 16% = not played. It is deliberately NOT a scorecard: it is a progress bar you can
+  // tap, and the number it carries is "how is this going" rather than a score per hole.
+  // Eighteen targets across one phone cannot each be 44px wide — no arrangement of them
+  // can — so the strip is a shortcut with a 30px-tall hit area, and the 44px+ Back / Next
+  // buttons in the footer remain the primary way between holes.
+  const bar = (x, i) => `<span class="lvbar${i === L.cur ? ' cur'
+    : x.s == null ? '' : x.s <= x.par ? ' ok' : ' over'}${x.note ? ' noted' : ''}"
+    data-action="live-goto" data-i="${i}" title="Hole ${x.n}"></span>`;
+
   return `
   <div class="lvhead">
-    <div class="lvh1">Hole ${h.n}<span> · par ${h.par}${h.si ? ` · SI ${h.si}` : ''}</span></div>
-    <div class="lvh2">${t.n ? `<b>${t.over > 0 ? '+' : ''}${t.over}</b> thru ${t.n}` : esc(L.course)}</div>
-    <div class="parpick"><em>Par</em>${[3,4,5].map(p =>
-      // A par nobody has confirmed renders HALF-LIT, the same language as a carried-over
-      // tee club — so a placeholder can never sit there looking like a scorecard.
-      chip('par', p, p, h.par === p, h.parAuto && h.par === p ? 'auto' : '')).join('')}
-      <span class="lvctl">
-        <span class="cardlink" data-action="live-holes">${L.holesOpen ? '▾' : '▸'} 1–18</span>
-        <span class="cardlink" data-action="live-card-open">Card</span>
-      </span></div>
-  </div>
-  ${L.holesOpen ? `<div class="hstriprow">${L.holes.map((x, i) =>
-    `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}${x.note ? ' noted' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>` : ''}
-
-
-  <div class="formrow">
-    <button class="btn ghost"${L.cur === 0 ? ' disabled' : ''} data-action="live-nav" data-d="-1">← ${L.cur === 0 ? 'Start' : 'Hole ' + L.holes[L.cur - 1].n}</button>
-    <button class="btn" data-action="live-nav" data-d="1">${last ? 'Finish round →' : 'Hole ' + L.holes[L.cur + 1].n + ' →'}</button>
+    <div class="lvhe">LIVE · ${esc((L.course || '').toUpperCase())}${
+      L.tees ? ` · ${esc(String(L.tees).toUpperCase())}` : ''}</div>
+    <div class="lvhr">
+      <div class="lvhn">Hole ${h.n}<span class="lvhs">
+        <button class="lvpar${h.parAuto ? ' auto' : ''}" data-action="live-par">PAR ${h.par}</button>${
+        // A par nobody has confirmed renders HALF-LIT — dashed, the same "this is not a
+        // record" language the guessed cells on the card check use — so a placeholder can
+        // never sit there looking like a scorecard. One tap cycles 3 · 4 · 5, which is the
+        // whole card check in miniature; the Card button opens all eighteen.
+        h.si ? `<i>SI ${h.si}</i>` : ''}</span></div>
+      <div class="lvhb">
+        <button class="lvfin ghost" data-action="live-card-open">Card</button>
+        <button class="lvfin" data-action="live-finish">Finish</button>
+      </div>
+    </div>
+    <div class="lvbars">${L.holes.map(bar).join('')}</div>
+    <div class="lvhf"><span>${t.n ? `THRU ${t.n} · ${t.over > 0 ? '+' : ''}${t.over}` : 'NOT STARTED'}</span>
+      <span class="lvsaved">● SAVED</span></div>
   </div>
 
   <div class="lvseg">
@@ -5245,10 +5429,18 @@ function livePlay(L){
     <span class="${quick ? 'on' : ''}" data-action="live-view" data-v="1">⚡ Quick view</span>
   </div>
 
-  ${quick ? quickCard : fullCard}
+  <div class="lvwrap${arrived ? ' slide' : ''}">
+    ${quick ? quickCard : fullCard}
+  </div>
 
   ${prep}
   <p class="sm faint" style="margin-top:10px">Everything except the score is optional — skip a row and it simply isn't recorded, rather than being guessed. Tap a lit chip again to clear it. A <b>half-lit</b> tee club is one carried over from the last time you played this hole, or from earlier in this round: leave it if it's right, tap another club if it isn't.</p>
+
+  <div class="lvfoot">
+    <button class="lvback"${L.cur === 0 ? ' disabled' : ''} data-action="live-nav" data-d="-1">‹</button>
+    <button class="lvnext" data-action="live-nav" data-d="1">${
+      last ? 'Finish card' : `Hole ${L.holes[L.cur + 1].n}`} ›</button>
+  </div>
   <div class="formrow" style="margin-top:6px">
     <button class="btn ghost tiny" data-action="go" data-view="home">Pause · back to Home</button>
     <button class="btn ghost tiny" data-action="live-discard">Discard round</button>
@@ -5426,37 +5618,36 @@ const ACTIONS = {
     save(); render('live');
     toast('Round started — good luck');
   },
-  // Back to the card from the first tee, for the hole he notices on the walk up.
-  // The jump strip is for going somewhere, not for reading, so it folds away and stays
-  // folded: every arrival at a hole closes it again. Two rows of eighteen buttons is the
-  // tallest block on the screen and he is looking at it between shots, not navigating.
-  'live-holes': () => {
+  // Finish from the header, on whatever hole he is standing on — a nine that stops at the
+  // seventh, a match conceded on 15. Same route the last hole's Next button takes, so the
+  // troubles come pre-ticked off the card either way.
+  'live-finish': () => {
     const L = S.live; if(!L) return;
     syncHoleNote();
-    if(L.holesOpen) delete L.holesOpen; else L.holesOpen = true;
-    save(); rerender();
+    L.stage = 'finish';
+    L.troubles = liveTroubles(roundAnalysis(liveRound(L)));
+    save(); render('live');
   },
   'live-card-open': () => {
     const L = S.live; if(!L) return;
     syncHoleNote();
     L.stage = 'card'; save(); render('live');
   },
+  // Par, on the hole he is standing on: one tap cycles 3 · 4 · 5. It is one control rather
+  // than three chips because the header is sticky — every pixel it takes it takes for all
+  // eighteen holes — and the Card button beside it opens the full eighteen-par check.
+  'live-par': () => {
+    const L = S.live, h = L && L.holes[L.cur];
+    if(!h) return;
+    setHolePar(L, h, h.par >= 5 ? 3 : h.par + 1);
+    save(); rerender();
+  },
   'live-set': el => {
     const L = S.live, h = L && L.holes[L.cur];
     if(!h) return;
     const k = el.dataset.k, v = el.dataset.v;
     const lit = el.classList.contains('on');   // re-tapping a lit chip clears it
-    if(k === 'par'){
-      h.par = +v;
-      // Touching a par settles it: it is his number now, not a placeholder.
-      delete h.parAuto; h.parFrom = 'mine';
-      // A par 3 has no fairway, no separate approach, and always a shot at the green.
-      if(h.par === 3){ delete h.fw; delete h.fmiss; delete h.app; delete h.noshot; }
-      // A suggestion made for a par 4 isn't valid for a par 3, so re-derive it.
-      if(h.teeAuto){ delete h.tee; delete h.teeAuto; suggestTee(L); }
-      // The par decides which quick-view rows exist, so the open one is re-derived too.
-      delete h.qOpen;
-    }
+    if(k === 'par'){ setHolePar(L, h, +v); }
     else if(k === 'tee'){
       // Tapping the suggested club CONFIRMS it rather than clearing it — clearing a chip
       // he never chose would be a confusing way to spend the tap this feature just saved.
@@ -5557,7 +5748,7 @@ const ACTIONS = {
   },
   // Changing hole IS a navigation — that one should land at the top of the new hole.
   'live-goto': el => { if(S.live){ syncHoleNote(); S.live.cur = +el.dataset.i;
-    delete S.live.holesOpen; suggestTee(S.live); save(); render('live'); } },
+    suggestTee(S.live); save(); render('live'); } },
   'live-nav': el => {
     const L = S.live; if(!L) return;
     syncHoleNote();
@@ -5569,7 +5760,7 @@ const ACTIONS = {
       L.troubles = liveTroubles(roundAnalysis(liveRound(L)));
       save(); return render('live');
     }
-    L.cur = to; delete L.holesOpen; suggestTee(L); save(); render('live');
+    L.cur = to; suggestTee(L); save(); render('live');
   },
   'live-save': () => {
     const L = S.live; if(!L) return;
