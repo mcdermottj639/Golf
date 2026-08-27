@@ -100,13 +100,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v66';
+const BUILD = 'v67';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v67', d:'2026-08-27', items:[
+    'Your film history is easier to find. Every lab now calls it the same thing \u2014 FILM ROOM \u2014 where Putting used to call it "Stroke session log" and Swing and Short Game called it something else. The jump bar at the top of a lab now says the same word whichever lab you are in.',
+    'In Putting it also moved UP, above the stroke evolution grid. The grid is a summary OF the film, so the film itself should not have been the thing you scroll past it to reach.',
+    'Nothing was ever lost: every session is still there, ten of them across the three labs, and tapping one still opens the full breakdown. It was findable-only-if-you-knew-where, which is the same as missing.' ] },
   { b:'v66', d:'2026-08-24', items:[
     'The stroke evolution grid stopped printing seven paragraphs under the table. Every row now shows its marks AND a two-word state \u2014 Settled, Closed, Open, Never measured \u2014 so you can read where the stroke stands without reading anything.',
     'Tap any row for the full reasoning behind it. Nothing was cut; it just stopped being printed on the page you use to find things.',
@@ -1948,10 +1952,7 @@ function putting(){
   <div class="card flat"><div class="linkrow" data-action="go" data-view="drills">
     <span><b>Training lives in Coach</b><br><span class="sm">${putDrills} putting drills you have the kit for — the drill bench keeps them all, with the streak</span></span><span class="arr">→</span></div></div>
 
-  <h2>Stroke evolution · on the LINK.2.1</h2>
-  ${evolutionCard()}
-
-  <h2>Stroke session log</h2>
+  <h2>Film room</h2>
   <div class="card">
     ${sessionLog(S.sessions.map((s,i) => ({s,i})).filter(o => sessionDiscipline(o.s) === 'putting').reverse(), 'No putting film yet — send clips and the breakdowns land here.')}
     <details><summary>+ Log a session</summary>
@@ -1960,6 +1961,9 @@ function putting(){
       <div style="margin-top:10px"><button class="btn" data-action="add-session">Save session</button></div>
     </details>
   </div>
+
+  <h2>Stroke evolution · on the LINK.2.1</h2>
+  ${evolutionCard()}
 
   <h2>Filming guide</h2>
   <div class="card flat">
