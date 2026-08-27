@@ -1,12 +1,38 @@
-/* Caddie HQ — Scorecard Heritage theme */
+/* Caddie HQ — Scorecard Heritage theme
+   ------------------------------------------------------------------
+   Aug 27 2026 (Jack's redesign): the palette moved onto the redesign values, but the
+   TOKEN NAMES did not change — everything in app.js still asks for var(--green) or
+   var(--card), so a colour is edited in exactly one place. Do not scatter hex literals
+   through app.js; if a shade is missing, add a token here.
+
+   Three type voices, all LOCAL stacks — this is an offline-first PWA and a webfont is a
+   network request it cannot make: --serif for display numbers and headlines, --sans for
+   body, --mono for labels (tiers, section headers, meta). The three-voice structure is
+   what makes the density readable; the exact faces are not the point. */
 :root{
-  --paper:#f6efdd; --card:#fffdf6; --card2:#fbf6e8; --line:#d8cdb0; --line2:#e2d8bd;
-  --ink:#26221a; --soft:#5a5344; --faint:#9a9077;
-  --green:#123c26; --green-ink:#e9dfc5; --burg:#8e1f2f; --burg-ink:#f6ecd9;
-  --shadow:2px 2px 0 #e5dcc4;
-  --gtext:#123c26; --btext:#8e1f2f; --r:6px;
+  /* Ink scale — one ramp, so a secondary colour is never invented at the call site. */
+  --ink:#23201A; --ink62:rgba(35,32,26,.62); --ink50:rgba(35,32,26,.5);
+  --ink36:rgba(35,32,26,.36); --ink18:rgba(35,32,26,.18);
+  --paper:#F2ECDD; --card:#FBF7EC; --card2:#F6F1E5; --sunk:#EFE8D6;
+  --line:rgba(35,32,26,.16); --line2:rgba(35,32,26,.1); --dot:#cdc0a2;
+  --soft:var(--ink62); --faint:var(--ink50);
+  --green:#14512E; --green-ink:#F4EFE2; --green-accent:#2E7D51;
+  --burg:#6E2230; --burg-ink:#F6EFE6; --burg-deep:#4E1722;
+  --gold:#B08A2E; --gold-ink:#8A6A1C;
+  --shadow:0 1px 2px rgba(35,32,26,.05);
+  --gtext:#14512E; --btext:#6E2230;
+  --nav:#F6F1E4;
+  --r:12px; --r-card:16px; --r-sm:9px;
+  /* Evidence tiers. Provenance is structural, not a word at the end of a sentence:
+     SOLID fills mean the tier was earned by observation (live, measured), OUTLINES mean
+     it was not (round is a weaker card; snapshot and self are claims). Every rail, chip
+     and tint in the app reads these five and nothing else — see EV_RANK in app.js. */
+  --t-live:#14512E; --t-round:#2E7D51; --t-measured:#6E2230;
+  --t-snapshot:#B08A2E; --t-snapshot-ink:#8A6A1C;
+  --t-self:rgba(35,32,26,.35); --t-self-ink:rgba(35,32,26,.5);
   --serif:Georgia,'Times New Roman',serif;
   --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
@@ -40,7 +66,9 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 .good{color:var(--gtext);font-weight:700}
 
 .card{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
-  border-radius:var(--r);padding:15px;margin:12px 0}
+  border-radius:var(--r-card);padding:15px;margin:12px 0}
+/* The label voice, wherever a class of its own would be overkill. */
+.mono{font-family:var(--mono)}
 .card h2{margin-top:0}
 .card.flat{box-shadow:none;background:var(--card2)}
 .rowgrid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:14px 0}
@@ -63,7 +91,7 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
 .chip{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;font-family:var(--sans);
-  background:#ece4cd;color:var(--soft);border:1px solid var(--line);cursor:pointer;user-select:none}
+  background:var(--card2);color:var(--soft);border:1px solid var(--line);cursor:pointer;user-select:none}
 .chip.on{background:var(--burg);color:var(--burg-ink);border-color:var(--burg)}
 .chip.grn{background:var(--green);color:var(--green-ink);border-color:var(--green)}
 .chip.static{cursor:default}
@@ -98,7 +126,7 @@ body.night .area.focus{border-top-color:var(--burg)}
 /* What's new: the change log on Home. One row per change, grouped under the day it was
    made — a date column on the left the eye can skip down, the change itself on the right. */
 .upday{display:grid;grid-template-columns:62px 1fr;gap:10px;padding:9px 0;
-  border-bottom:1px dotted #c9bd9d}
+  border-bottom:1px dotted var(--dot)}
 .upday:last-of-type{border-bottom:none}
 .update-d{font-family:var(--sans);font-size:9.5px;font-weight:800;letter-spacing:.08em;
   text-transform:uppercase;color:var(--faint);padding-top:3px}
@@ -134,18 +162,47 @@ body.night .area.focus{border-top-color:var(--burg)}
 body.night .upday{border-bottom-color:#2a3138}
 body.night .uprow + .uprow{border-top-color:#2a3138}
 
-/* Where a finding came from. The weakest source is the one worth flagging. */
-.ev{display:inline-block;font-size:8.5px;font-weight:800;letter-spacing:.07em;
-  text-transform:uppercase;padding:1px 6px;border-radius:9px;margin-left:6px;
-  vertical-align:1px;border:1px solid var(--line)}
-.ev.live{background:var(--green);color:var(--green-ink);border-color:var(--green)}
-.ev.round{background:#dfe8dc;color:var(--green);border-color:#a8c0ad}
-.ev.measured{background:#efe6c8;color:#7a6414;border-color:#cdbd7e}
-.ev.snapshot, .ev.self{background:transparent;color:var(--faint)}
-.ev.self{font-style:italic;letter-spacing:.04em}
+/* ---- The evidence rail: where a finding came from, said in shape not in words ----
+   SOLID fill = the tier was earned by observation (live, measured). OUTLINE = it was not
+   (round is a weaker card; snapshot and self are claims). The weakest source is the one
+   worth flagging, and the strongest is the one allowed to shout. `.ev` is the chip and
+   `.tierrail` + `.t-<tier>` is the 4px rail down the left of the card it belongs to —
+   one vocabulary, so a tier can never be coloured two ways on one screen. */
+.ev{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:6px;
+  margin-left:6px;vertical-align:1px;border:1px solid transparent}
+.ev.live{background:var(--t-live);color:var(--green-ink);border-color:var(--t-live)}
+.ev.round{background:transparent;color:var(--t-round);border-color:var(--t-round)}
+.ev.measured{background:var(--t-measured);color:var(--burg-ink);border-color:var(--t-measured)}
+.ev.snapshot{background:transparent;color:var(--t-snapshot-ink);border-color:var(--t-snapshot)}
+.ev.self{background:transparent;color:var(--t-self-ink);border-color:var(--t-self);
+  font-style:italic;letter-spacing:.06em}
+/* Tappable: the chip is the door to the evidence panel (what the sample was, where it
+   came from, what is NOT measured). Only chips that carry a data-action get the cue. */
+.ev[data-action]{cursor:pointer}
+.ev[data-action]::after{content:' ?';opacity:.55}
 body.night .ev.live{background:#2f6b46;color:#eaf6ee;border-color:#3f8159}
-body.night .ev.round{background:#1c2b22;color:#8fd0a8;border-color:#33503f}
-body.night .ev.measured{background:#33301c;color:#dfc76a;border-color:#5a5533}
+body.night .ev.round{color:#8fd0a8;border-color:#33503f}
+body.night .ev.measured{background:var(--burg);color:var(--burg-ink);border-color:var(--burg)}
+body.night .ev.snapshot{color:#dfc76a;border-color:#5a5533}
+body.night .ev.self{color:var(--faint);border-color:rgba(255,255,255,.18)}
+
+/* The rail. Put it on any card carrying a finding: `class="card tierrail t-live"`. */
+.tierrail{border-left:4px solid var(--tier,var(--line))}
+.t-live{--tier:var(--t-live)}
+.t-round{--tier:var(--t-round)}
+.t-measured{--tier:var(--t-measured)}
+.t-snapshot{--tier:var(--t-snapshot)}
+.t-self{--tier:var(--t-self)}
+/* The disclosure panel behind a tappable tier chip: the sample, the source, and what is
+   NOT measured. Sunk paper so it reads as a drawer pulled out of the card, not a card. */
+.evpanel{background:var(--sunk);border-radius:var(--r);padding:11px 12px;margin-top:9px;
+  font-family:var(--sans);font-size:12px;line-height:1.5;color:var(--soft)}
+.evpanel b{display:block;font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+.evpanel dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);margin-top:6px}
+body.night .evpanel{background:rgba(255,255,255,.05)}
 
 table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
 th,td{padding:7px 8px;text-align:left;vertical-align:top}
@@ -154,7 +211,7 @@ th{color:var(--faint);border-bottom:2px solid var(--green);font-family:var(--san
 td{border-bottom:1px solid var(--line2)}
 td b{font-size:14px}
 
-.meter{height:8px;border-radius:5px;overflow:hidden;background:#ece4cd;border:1px solid var(--line);margin:7px 0 4px}
+.meter{height:8px;border-radius:5px;overflow:hidden;background:var(--card2);border:1px solid var(--line);margin:7px 0 4px}
 .meter span{display:block;height:100%;background:var(--burg)}
 .meter.grn span{background:var(--green)}
 
@@ -180,7 +237,7 @@ td b{font-size:14px}
   background:var(--card2);border:1px solid var(--line);border-radius:4px;padding:2px 7px;font-family:var(--sans)}
 
 .check{list-style:none}
-.check li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dotted #c9bd9d;
+.check li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dotted var(--dot);
   font-size:13px;cursor:pointer}
 .box{flex:0 0 17px;width:17px;height:17px;border-radius:4px;border:1.5px solid var(--faint);margin-top:2px;position:relative}
 .check li.done .box{background:var(--green);border-color:var(--green)}
@@ -199,13 +256,13 @@ td b{font-size:14px}
 
 .spark{display:flex;align-items:flex-end;gap:7px;height:64px;margin-top:10px}
 .spark .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px}
-.spark .b{width:100%;max-width:40px;border-radius:4px 4px 0 0;background:#c9bd9d;min-height:2px}
+.spark .b{width:100%;max-width:40px;border-radius:4px 4px 0 0;background:var(--dot);min-height:2px}
 .spark .b.hot{background:var(--green)}
 .spark .b.goal{background:var(--burg)}
 .spark .t{font-size:9px;color:var(--faint);font-family:var(--sans)}
 
 .crs{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:8px 0;
-  border-bottom:1px dotted #c9bd9d}
+  border-bottom:1px dotted var(--dot)}
 .crs .nm{font-weight:700;font-size:13.5px}
 .crs .st{font-size:10.5px;color:var(--faint);margin-left:5px;font-family:var(--sans)}
 .crs .rt{font-weight:700;font-size:13.5px;color:var(--btext);white-space:nowrap}
@@ -218,7 +275,7 @@ td b{font-size:14px}
   border-radius:4px;padding:2px 6px;margin-top:5px;font-family:var(--sans);letter-spacing:.08em}
 
 .streak{display:flex;gap:5px;margin-top:8px}
-.day{width:26px;height:26px;border-radius:5px;border:1px solid var(--line);background:#ece4cd;
+.day{width:26px;height:26px;border-radius:5px;border:1px solid var(--line);background:var(--card2);
   display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--green);
   font-weight:700;font-family:var(--sans)}
 .day.hit{background:var(--green);color:var(--green-ink)}
@@ -272,7 +329,7 @@ body.night .dscore{border-left-color:var(--gtext)}
 .pkgrp.pknone{text-transform:none;letter-spacing:0;font-weight:400;font-style:italic;
   font-size:11.5px;position:static}
 .pkrow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
-  padding:11px;border-bottom:1px dotted #c9bd9d;cursor:pointer}
+  padding:11px;border-bottom:1px dotted var(--dot);cursor:pointer}
 .pkrow:last-child{border-bottom:none}
 .pkrow:active{background:var(--card2)}
 .pkn{font-size:14px;color:var(--ink);font-weight:600}
@@ -280,7 +337,7 @@ body.night .dscore{border-left-color:var(--gtext)}
 
 .formrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .formrow.g3{grid-template-columns:1fr 1fr 1fr}
-.note-preview{border:1px dashed #c9bd9d;border-radius:var(--r);background:var(--card);padding:10px 12px;
+.note-preview{border:1px dashed var(--dot);border-radius:var(--r);background:var(--card);padding:10px 12px;
   font-size:12px;color:var(--soft);font-style:italic;margin-top:6px}
 /* Distance chip on a course-plan row. It sits with the course name rather than out on
    the right, so the eye reads "Sterling Farms, 12 miles" as one thing — and so a long
@@ -289,7 +346,7 @@ body.night .dscore{border-left-color:var(--gtext)}
   color:var(--gtext);background:rgba(18,60,38,.07);border:1px solid var(--line2);
   border-radius:10px;padding:1px 7px;margin-left:6px;white-space:nowrap}
 .linkrow{display:flex;justify-content:space-between;align-items:center;padding:10px 2px;
-  border-bottom:1px dotted #c9bd9d;cursor:pointer}
+  border-bottom:1px dotted var(--dot);cursor:pointer}
 .linkrow .arr{color:var(--faint)}
 /* Stroke evolution. The grid IS the interface now: seven verdicts running to
    paragraphs used to print in full under the table, which made the most useful block
@@ -302,7 +359,7 @@ body.night .dscore{border-left-color:var(--gtext)}
 .evohead{padding:0 20px 5px 0;border-bottom:1px solid var(--gtext)}
 .evohead span{font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.02em;
   text-transform:uppercase;color:var(--gtext);text-align:center;line-height:1.25}
-.evorow{border-bottom:1px dotted #c9bd9d}
+.evorow{border-bottom:1px dotted var(--dot)}
 .evorow:last-of-type{border-bottom:none}
 .evorow>summary{list-style:none;cursor:pointer;position:relative;padding:9px 20px 9px 0}
 .evorow>summary::-webkit-details-marker{display:none}
@@ -319,7 +376,7 @@ body.night .dscore{border-left-color:var(--gtext)}
    columns at phone width turned the session log into a wall of prose you had to read
    in order to navigate. A row is the date, the batch size and one concluding line;
    the breakdown is one tap away. See sessionLog() in app.js. */
-.seslog{padding:9px 2px;border-bottom:1px dotted #c9bd9d;cursor:pointer}
+.seslog{padding:9px 2px;border-bottom:1px dotted var(--dot);cursor:pointer}
 .seslog:last-child{border-bottom:none;padding-bottom:2px}
 .sesh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .sesh b{font-size:14.5px}
@@ -344,21 +401,102 @@ body.night .dscore{border-left-color:var(--gtext)}
 .poslegend i{width:14px;height:5px;border-radius:3px;display:inline-block}
 .poslegend i.arc{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--burg);border-left-color:transparent;border-bottom-color:transparent;transform:rotate(45deg)}
 
+/* ---- The tab bar: five tabs and a tee button (Aug 27 2026, Jack's redesign) ----
+   TODAY · BAG · [TEE] · GAME · ROUNDS · COACH. The tee button is burgundy and sits in the
+   middle because starting or resuming a live round is the one thing that has to be one
+   thumb away from every screen — it goes to the logger, which resumes a round in progress
+   rather than starting a second one.
+
+   The glyphs are CSS shapes, not icons: a 19px box with a 2px border, round or square,
+   filled when the tab is active. No SVG, no emoji, nothing to load — and they stay legible
+   at the size a label sits under. Items are 52px tall (the tee 58px), well clear of the
+   44px tap-target floor. */
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:30;
-  /* Auto-fit the columns to however many buttons there are — hardcoding a count left the
-     tabs squeezed into part of the bar the moment the nav went from eight to six. */
-  display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:7px 2px calc(9px + env(safe-area-inset-bottom));
-  text-align:center;background:var(--green);color:#a8bfa8;font-family:var(--sans)}
-nav button{background:none;border:none;color:#a8bfa8;font-size:11px;font-weight:700;padding:4px 0;letter-spacing:-.01em}
-nav button .ic{font-size:23px;display:block;margin-bottom:2px;line-height:1.05}
-nav button.on{color:#f2e9d0}
+  display:flex;align-items:flex-end;gap:2px;
+  padding:7px 8px calc(10px + env(safe-area-inset-bottom));
+  text-align:center;background:var(--nav);border-top:1px solid rgba(35,32,26,.12);
+  font-family:var(--mono)}
+nav button{flex:1;min-height:52px;background:none;border:none;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  color:var(--ink36);padding:4px 0;transition:color .15s,background .15s}
+nav button .ic{width:19px;height:19px;border:2px solid currentColor;border-radius:4px;display:block}
+nav button.rnd .ic{border-radius:50%}
+nav button .nl{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.06em;
+  line-height:1;white-space:nowrap}
+nav button.on{color:var(--green)}
+nav button.on .ic{background:currentColor}
+/* The tee button. Filled glyph always — it is not a place you are, it is a thing you do. */
+nav button.navtee{flex:0 0 auto;min-width:66px;min-height:58px;background:var(--burg);
+  color:var(--burg-ink);box-shadow:0 2px 0 var(--burg-deep)}
+nav button.navtee .ic{border-radius:50%;background:currentColor}
+nav button.navtee:active{transform:translateY(1px);box-shadow:0 1px 0 var(--burg-deep)}
+body.night nav button{color:rgba(255,255,255,.42)}
+body.night nav button.on{color:var(--gtext)}
+body.night nav button.navtee{color:var(--burg-ink)}
+/* 320px is the narrowest phone and ROUNDS is the longest label: five 45px tabs beside a
+   66px tee button leave it about a pixel of room at 9.5px, so the tracking goes first.
+   After the .navtee rules on purpose — a media query adds no specificity, so an earlier
+   block would simply lose to them. */
+@media (max-width:360px){
+  nav{padding-left:5px;padding-right:5px}
+  nav button .nl{font-size:9px;letter-spacing:.01em}
+  nav button.navtee{min-width:60px}
+}
 
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--green);
   color:var(--green-ink);font-family:var(--sans);font-size:12.5px;font-weight:700;padding:10px 18px;
   border-radius:20px;z-index:50;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
-.hr{border:none;border-top:1px dotted #c9bd9d;margin:12px 0}
+.hr{border:none;border-top:1px dotted var(--dot);margin:12px 0}
 details summary{cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--gtext);padding:6px 0}
+
+/* ---- Collapsible sections (Aug 27 2026): one pattern, every tab ----
+   A section folds away behind a 44px header row: the section label on the left in the
+   mono label voice, its meta and a caret on the right. It is a plain <details id=…> with
+   a styled <summary>, deliberately — the app already restores any open <details> carrying
+   an id across a rerender(), so the open/closed state costs no store, no bookkeeping and
+   cannot drift out of sync with the DOM. Never build a parallel open/closed map for this.
+   Use fold() in app.js to write one; the id is what makes it survive an in-place update.
+
+   Two rules that are NOT style: a toggle is a rerender() (it preserves scroll — this is
+   the drill-bench bug CLAUDE.md records), and the LIVE LOGGER gets none of these. That
+   screen already hides what cannot exist yet, and two disclosure systems on the strictest
+   screen in the app is one too many. */
+.fold{border-top:1px dotted var(--dot)}
+.fold:first-of-type{border-top:none}
+.card>.fold:first-child>summary{padding-top:0}
+.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;
+  justify-content:space-between;gap:10px;min-height:44px;padding:6px 0;
+  font-family:var(--mono);font-weight:400;color:var(--ink)}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary:hover{opacity:.65}
+.fold>summary::after{content:'▸';font-family:var(--mono);font-size:11px;color:var(--ink36);
+  flex:none;margin-left:-3px}
+.fold[open]>summary::after{content:'▾'}
+.foldl{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink50);min-width:0}
+.foldm{font-family:var(--mono);font-size:11px;color:var(--ink36);white-space:nowrap;
+  margin-left:auto;flex:none}
+.foldb{padding:2px 0 12px}
+/* On the two green cards (the read on Coach, the weather block on Today) the same header
+   runs in cream tints instead — same shape, inverted ink. */
+.oncard .foldl,.oncard .foldm,.oncard>summary,.oncard>summary::after{color:rgba(244,239,226,.62)}
+.oncard{border-top-color:rgba(244,239,226,.2)}
+body.night .fold{border-top-color:rgba(255,255,255,.1)}
+
+/* ---- Segmented control (Rounds: Cards · Round prep · Courses) ----
+   Three views of the same subject, so they are segments of one tab rather than three
+   places to be. The choice is view-local state in app.js (roundsSeg) and switching is a
+   rerender(), not a navigation — you have not gone anywhere, the page is showing you a
+   different face of where you already are. */
+.segbar{display:flex;gap:8px;margin:14px 0 2px}
+.seg{flex:1;min-height:44px;padding:0 4px;border-radius:var(--r);white-space:nowrap;
+  font-family:var(--sans);font-size:12.5px;font-weight:600;
+  border:1px solid var(--ink18);background:var(--card);color:var(--ink)}
+.seg.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+.seg:active{transform:translateY(1px)}
+body.night .seg{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+body.night .seg.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
 
 /* ---- Layered reading: scan the index, open only what you want ---- */
 .secthead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
@@ -368,7 +506,7 @@ details summary{cursor:pointer;font-family:var(--sans);font-size:12px;font-weigh
   border:1px solid var(--line);border-radius:20px;padding:5px 11px;white-space:nowrap}
 .minibtn:active{background:var(--green);color:var(--green-ink)}
 
-.sect{border-top:1px dotted #c9bd9d}
+.sect{border-top:1px dotted var(--dot)}
 .sect:first-of-type{border-top:none}
 .sect>summary{list-style:none;cursor:pointer;position:relative;padding:11px 24px 11px 0;
   font-family:var(--serif);font-weight:400;color:var(--ink)}
@@ -430,7 +568,7 @@ body.night .sheettabs span.on{background:var(--green);color:var(--green-ink);bor
    number column on every row so the eye runs down it without reading. */
 .hzlist{margin-top:4px}
 .hzlist div{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:baseline;
-  padding:5px 0;border-bottom:1px dotted #c9bd9d}
+  padding:5px 0;border-bottom:1px dotted var(--dot)}
 .hzlist div:last-child{border-bottom:none}
 .hzlist b{font-family:var(--sans);font-size:12px;font-weight:800;color:var(--btext)}
 .hzlist span{font-size:12.5px;line-height:1.4;color:var(--ink)}
@@ -444,11 +582,17 @@ body.night .sheet.card{background:#15191d;border-radius:16px;backdrop-filter:non
 
 /* ---- Night mode: the command-center skin ---- */
 body.night{
-  --paper:#0d1013; --card:#15191d; --card2:#1a1f24; --line:#2b3238; --line2:#242b31;
+  --paper:#0d1013; --card:#15191d; --card2:#1a1f24; --sunk:#1f252b;
+  --line:#2b3238; --line2:#242b31; --dot:#2a3138;
   --ink:#e9e7dd; --soft:#b5b2a4; --faint:#8b8879;
+  --ink62:#b5b2a4; --ink50:#8b8879; --ink36:rgba(255,255,255,.36); --ink18:rgba(255,255,255,.18);
   --green:#174a2f; --green-ink:#dfe8d8; --burg:#a33344; --burg-ink:#f3e3d9;
+  --burg-deep:#5f1d27; --nav:#0a0f0c;
   --shadow:2px 2px 0 #0a0d0f;
   --gtext:#8fd0a8; --btext:#e0a63c;
+  --t-live:#2f6b46; --t-round:#8fd0a8; --t-measured:#a33344;
+  --t-snapshot:#5a5533; --t-snapshot-ink:#dfc76a;
+  --t-self:rgba(255,255,255,.2); --t-self-ink:#8b8879;
 }
 body.night .chip{background:#22292e;color:var(--soft);border-color:var(--line)}
 body.night .chip.on{background:var(--burg);color:var(--burg-ink);border-color:var(--burg)}
@@ -554,7 +698,7 @@ h2{scroll-margin-top:14px}
 /* ---- Routine steps: the scan-in-five-seconds block ---- */
 .steps{list-style:none;counter-reset:st;margin:2px 0 0}
 .steps li{counter-increment:st;display:flex;gap:10px;align-items:flex-start;padding:8px 0;
-  border-bottom:1px dotted #c9bd9d;font-size:13.5px;line-height:1.45}
+  border-bottom:1px dotted var(--dot);font-size:13.5px;line-height:1.45}
 .steps li:last-child{border-bottom:none;padding-bottom:0}
 .steps li::before{content:counter(st);flex:0 0 20px;height:20px;border-radius:50%;
   background:var(--green);color:var(--green-ink);font-family:var(--sans);font-size:11px;
@@ -635,7 +779,7 @@ body.night .hi-gist{color:#9ed4b2}
 /* The decision row: same grid as the rest, just carries a little more weight. */
 .hi-grid dd.lead{font-size:14px;color:var(--gtext);font-weight:600}
 /* Full-width rule: a border on the two cells would break across the column gap. */
-.hi-sep{grid-column:1/-1;border-top:1px dotted #c9bd9d;margin:3px 0 0}
+.hi-sep{grid-column:1/-1;border-top:1px dotted var(--dot);margin:3px 0 0}
 .hi-grid dd.was{color:var(--faint);font-size:12.5px}
 .hi-grid dd.was b{color:var(--ink)}
 .hi-grid dd.was b.hot{color:var(--btext)}
@@ -710,7 +854,7 @@ body.night .cardlink{background:rgba(255,255,255,.06);border-color:rgba(255,255,
   color:var(--gtext);background:var(--card);cursor:pointer;user-select:none}
 .lvseg span.on{background:var(--green);color:var(--green-ink)}
 .qcard{padding:2px 13px 8px}
-.qrow{border-bottom:1px dotted #c9bd9d}
+.qrow{border-bottom:1px dotted var(--dot)}
 .qrow:last-child{border-bottom:none}
 .qhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
   padding:11px 2px;cursor:pointer;user-select:none}
@@ -731,7 +875,7 @@ body.night .qval.carry{background:rgba(163,51,68,.3);color:#eab4bd}
 .qbody .clubgrid{grid-template-columns:repeat(5,1fr);margin:6px 0 0}
 .qbody .clubgrid .chip{padding:13px 1px;font-size:13px}
 .lvcard{padding:2px 13px 11px}
-.lvrow{padding:8px 0;border-bottom:1px dotted #c9bd9d}
+.lvrow{padding:8px 0;border-bottom:1px dotted var(--dot)}
 .lvrow:last-child{border-bottom:none;padding-bottom:2px}
 .lvlab{font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;
   letter-spacing:.1em;color:var(--faint)}

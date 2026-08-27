@@ -476,6 +476,33 @@ function gist(s){
   const lead = splitLead(s.b)[0];
   return lead.length > 190 ? lead.slice(0, 170).replace(/\s+\S*$/, '') + '…' : lead;
 }
+// ----- A collapsible section (Aug 27 2026) -----
+// One pattern for every foldable section in the app. It is a plain <details> carrying an
+// ID, deliberately: render() already restores any open <details id=…> across a rerender(),
+// so the open/closed state costs no store, no bookkeeping, and cannot drift out of sync
+// with what is actually on screen. Never build a parallel open/closed map for this — the
+// drill-bench bug CLAUDE.md records (an expanded section snapping shut on every in-place
+// update) is exactly what that machinery exists to prevent.
+//
+//   id    unique and STABLE — it is the key the reopen-after-rerender works off
+//   label the section name, in the mono label voice (rendered uppercase by CSS)
+//   meta  the right-hand line: a count, a date, a hint. Optional.
+//   body  the section's HTML
+//   open  default state (true unless you have a reason)
+//   cls   extra classes — `oncard` for the cream-on-green variant
+// The one screen that gets NO folds is the live logger: it already hides what cannot exist
+// yet, and two disclosure systems on the strictest screen in the app is one too many.
+function fold(id, label, meta, body, open = true, cls = ''){
+  return `<details class="fold ${cls}" id="${esc(id)}"${open ? ' open' : ''}>
+    <summary><span class="foldl">${esc(label)}</span>${
+      meta ? `<span class="foldm">${esc(meta)}</span>` : '<span class="foldm"></span>'}</summary>
+    <div class="foldb">${body}</div>
+  </details>`;
+}
+// The 4px rail down the left of a card carrying a finding, in the finding's own evidence
+// tier. Pair it with evTag() for the chip — same five tiers, one vocabulary.
+const rail = ev => ev ? ` tierrail t-${ev}` : '';
+
 // Lead sentence up front, the rest one tap away.
 function expandable(t, cls){
   const [lead, rest] = splitLead(t);
@@ -877,9 +904,8 @@ const TITLES = {
   mental:['Mental Game','Staying locked in for eighteen — decided off the course.'],
   coach:['Coach','Lessons that follow your game — not generic tips.'],
   drills:['Drills','What you can actually do — with the kit you own.'],
-  courses:['Courses','Everywhere you’ve played, rated and remembered.'],
+  rounds:['Rounds','Your cards, the plans behind them, and the courses.'],
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
-  scores:['Scores','Every round, what it cost you, and what to fix.'],
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
@@ -887,8 +913,38 @@ const TITLES = {
   lesson:['Coach','One lesson, and the drill that trains it.'],
   round:['Round Detail','One card, hole by hole, and what it cost you.'],
   live:['Live Round','Tap it in as you play — it scores itself.'],
-  preps:['Round Prep','Every course plan, kept for the next time.'],
 };
+
+// ----- Rounds: one tab, three segments (Aug 27 2026, Jack's redesign) -----
+// Cards, the plans written for them, and the courses they were played on are three faces
+// of one subject, so they are segments of one tab rather than three places to be. Courses
+// stopped being a top-level tab (you reach a course through a round or a ranking, never
+// cold) and Round Prep moved out of the Game hub, which is now the four labs only.
+//
+// The three OLD view names stay alive as entry points — every `go('courses')`, every
+// `render('scores')` in an action, and every `act:go('preps')` in the changelog still
+// resolve, they just land on the segment instead of a page of their own. Nothing
+// dead-ends, and no caller had to learn the new shape.
+const ROUND_SEGS = [
+  { k:'cards',   lab:'Cards',      view:'scores',
+    tag:'Every round, what it cost you, and what to fix.' },
+  { k:'prep',    lab:'Round prep', view:'preps',
+    tag:'Every course plan, kept for the next time.' },
+  { k:'courses', lab:'Courses',    view:'courses',
+    tag:'Everywhere you’ve played, rated and remembered.' },
+];
+const SEG_OF = Object.fromEntries(ROUND_SEGS.map(s => [s.view, s.k]));
+// View-local state, exactly as the design specifies: which face of Rounds is showing is a
+// property of the view, not of the player, so it is a module variable and never saved.
+let roundsSeg = 'cards';
+function rounds(seg){
+  if(seg && ROUND_SEGS.some(s => s.k === seg)) roundsSeg = seg;
+  const cur = ROUND_SEGS.find(s => s.k === roundsSeg) || ROUND_SEGS[0];
+  const body = { cards:scores, prep:preps, courses }[cur.k];
+  return `<div class="segbar">${ROUND_SEGS.map(s =>
+    `<button class="seg ${s.k === cur.k ? 'on' : ''}" data-action="rounds-seg" data-k="${s.k}">${s.lab}</button>`).join('')}</div>
+  ${body()}`;
+}
 
 // Which fault the bench is filtered to, set by a lab's diagnosis card. Deliberately a
 // module variable rather than a saved setting: it is a question asked once, and a filter
@@ -898,8 +954,18 @@ let drillTag = null;
 function render(view, arg, keepScroll){
   closeCheat();  // the cheat sheet overlay lives on <body>, so navigation must clear it
   if(view !== 'drills') drillTag = null;
+  // Scores / Round Prep / Courses are segments of Rounds now. Resolving the old names
+  // here rather than at every call site is the whole reason nothing dead-ended when the
+  // nav changed shape: a link written a month ago still lands where it always meant to.
+  if(SEG_OF[view]){ arg = SEG_OF[view]; view = 'rounds'; }
   current = { view, arg };
-  const [title, tag] = TITLES[view] || TITLES.home;
+  let [title, tag] = TITLES[view] || TITLES.home;
+  // The Rounds masthead says which face you're on — the tab is one place, the segments
+  // are three subjects, and the strapline is the only thing that can tell them apart.
+  if(view === 'rounds'){
+    const s = ROUND_SEGS.find(x => x.k === (arg || roundsSeg));
+    if(s) tag = s.tag;
+  }
   $('#pageTitle').textContent = title;
   $('#pageTag').textContent = tag;
   // Standing over a shot, the app's own masthead is pure overhead — the hole screen
@@ -914,13 +980,19 @@ function render(view, arg, keepScroll){
   // cancelled before it ever reached the branch Pages serves).
   const bt = $('#buildTag');
   if(bt){ bt.textContent = BUILD; bt.hidden = view !== 'home'; }
-  // The four labs live behind one nav button, so they all light it.
+  // The four labs live behind one nav button, so they all light it — and so does every
+  // view that hangs off Rounds: a round card, and a course plan you opened from one.
   const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game',
-                   drills:'coach', shelf:'coach', lesson:'coach' };
+                   drills:'coach', shelf:'coach', lesson:'coach',
+                   round:'rounds', rounds:'rounds' };
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === navView));
-  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
+  // The tee button is both "start" and "resume" — the same tap, because from the player's
+  // side it is the same intention and live() already knows which one it is.
+  const teeLab = $('#navTeeLab');
+  if(teeLab) teeLab.textContent = S.live ? 'RESUME' : 'TEE';
+  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
@@ -955,7 +1027,10 @@ function buildJumpBar(){
     b.textContent = h.textContent.split('·')[0].replace(/\s*\([^)]*\)\s*$/, '').trim();
     bar.appendChild(b);
   });
-  view.prepend(bar);
+  // Below the segmented control where there is one: the segments say WHICH LIST you are
+  // looking at and the jump bar says where you are in it, so they can't be reordered.
+  const seg = view.querySelector('.segbar');
+  if(seg) seg.after(bar); else view.prepend(bar);
 }
 let current = { view:'home' };
 // Redrawing the view you're already on is an UPDATE, not a navigation — jumping to the
@@ -1029,8 +1104,9 @@ function preps(){
     <div class="card">${list.map(planRow).join('')}
       ${note ? `<p class="sm faint" style="margin-top:8px">${note}</p>` : ''}</div>`;
   const any = p.up.length + p.standing.length + p.past.length;
+  // No back link: this is the Round prep SEGMENT of Rounds now (Aug 27 2026), not a page
+  // you arrived at from somewhere — the segmented control above it is the way back out.
   return `
-  <button class="backlink" data-action="go" data-view="home">← Home</button>
   ${any ? cheatBtn('prep') : ''}
   ${!any ? `<div class="card"><p class="sm">No course plans yet. Tell Claude where you're playing and one lands here — tee strategy, the holes that cost you, lay-up numbers off your ladder, and a note on every hole the research can support.</p></div>` : ''}
   ${block('Coming up', p.up)}
@@ -1143,7 +1219,7 @@ function home(){
       <h2>Round prep</h2>
       ${next ? planRow(next)
       : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Swing Positions, Swing Thoughts) live in the <b>Swing</b> lab, and the at-home training lives in <b>Coach</b>.</p>`}
-      ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="preps">
+      ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="rounds" data-seg="prep">
         <span class="sm"><b>All round prep</b> · ${rest} more plan${rest === 1 ? '' : 's'} on file</span><span class="arr">→</span></div>` : ''}
       ${S.live ? '' : `<div class="linkrow" data-action="live-new">
         <span><b>Play a live round</b><br><span class="sm">Tap each hole in as you go — clubs, fairways, greens, putts</span></span><span class="arr">→</span></div>`}
@@ -2680,7 +2756,7 @@ function coach(){
     </div>
   </div>
 
-  <div class="card flat"><div class="linkrow" data-action="go" data-view="scores">
+  <div class="card flat"><div class="linkrow" data-action="go" data-view="rounds" data-seg="cards">
     <span><b>Score history &amp; analytics</b><br><span class="sm">${S.rounds.length ? `${S.rounds.length} rounds · scoring mix, par splits, worst holes` : 'Log a round — the coaching above is built from them'} · logging lives there</span></span><span class="arr">→</span></div></div>`;
 }
 
@@ -2879,11 +2955,15 @@ function briefing(id){
   // An undated plan is usually a lab routine, but a COURSE plan is undated too — course
   // knowledge doesn't expire — and sending that one back to the Swing Lab is nonsense.
   const isCourse = !!played || S.rounds.some(r => courseMatches(r.course, b.course));
+  // Back where it came from. A discipline plan belongs to its lab; a COURSE plan belongs
+  // to Round Prep — which is the second segment of Rounds since Aug 27 2026, so the link
+  // names the tab and the segment rather than a page of its own.
   const LAB = { putting:['putting','Putting Lab'], mental:['mental','Mental Game'], 'short-game':['shortgame','Short Game'] };
   const lab = LAB[b.discipline] || ['swing','Swing Lab'];
-  const [backView, backLabel] = b.date || isCourse ? ['preps','Round Prep'] : lab;
+  const [backView, backLabel] = b.date || isCourse ? ['rounds','Round Prep'] : lab;
+  const backSeg = backView === 'rounds' ? ' data-seg="prep"' : '';
   return `
-  <button class="backlink" data-action="go" data-view="${backView}">← ${backLabel}</button>
+  <button class="backlink" data-action="go" data-view="${backView}"${backSeg}>← ${backLabel}</button>
   <div class="card">
     <h2>${b.date ? 'Round prep · ' + fmtDate(b.date) : 'Standing plan'}</h2>
     <h3 style="font-size:19px">${esc(b.course)}</h3>
@@ -3003,7 +3083,9 @@ function shortgame(){
 // Four labs behind one nav button. The bar was at eight tabs and a short-game lab would
 // have made nine; these four are the same KIND of thing — a discipline with faults, film
 // and plans — so they belong behind one door. Training is deliberately NOT on that list:
-// drills live on the bench in Coach, one home for all of them.
+// drills live on the bench in Coach, one home for all of them. Nor is Round Prep, as of
+// Aug 27 2026 — a course plan is about the round you are about to play, not about a part
+// of your game, so it sits in Rounds beside the cards it gets judged against.
 // `short` is the cheat sheet's tab label — four have to sit in one row on a phone.
 const LABS = [
   { view:'swing',     disc:'swing',       ic:'🏌', name:'Full Swing',  short:'Swing', sub:'Driver to wedge — film, plans, speed work.' },
@@ -3011,25 +3093,29 @@ const LABS = [
   { view:'putting',   disc:'putting',     ic:'◎', name:'Putting',     short:'Putting', sub:'Stroke, pace and the short ones.' },
   { view:'mental',    disc:'mental',      ic:'🧠', name:'Mental',      short:'Mental', sub:'Staying locked in — decided off the course.' },
 ];
-function labRow(l){
+function labRow(l, last){
   const open = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;
   const plans = plansFor(l.disc).length;
-  return `<div class="linkrow" data-action="go" data-view="${l.view}">
+  return `<div class="linkrow" data-action="go" data-view="${l.view}"${last ? ' style="border-bottom:none"' : ''}>
     <span><b>${l.ic} ${esc(l.name)}</b><br><span class="sm">${esc(l.sub)}</span>
     <br><span class="sm faint">${open ? `${open} open fault${open>1?'s':''}` : 'no open faults'} · ${plans} plan${plans===1?'':'s'}</span></span>
     <span class="arr">→</span></div>`;
 }
 // FIXED ORDER, always (Jack's instruction, Aug 14 2026): Swing · Short Game · Putting ·
-// Mental · Round Prep, top down. It used to float the last-opened lab to the top, which
+// Mental, top down — LABS order. It used to float the last-opened lab to the top, which
 // meant the row you wanted was in a different place every visit — muscle memory beats
-// recency on a page whose whole job is to get you somewhere else in one tap.
+// recency on a page whose whole job is to get you somewhere else in one tap. Add a new lab
+// to the END of LABS rather than reordering it.
+//
+// The hub is the four labs and NOTHING ELSE (Aug 27 2026, Jack's redesign). Round Prep
+// used to sit at the bottom of this list; it lives in Rounds now, beside the cards its
+// plans get judged against. This page is the game you are working on, not the round you
+// are about to play.
 function game(){
   return `
   <h2>The labs</h2>
   <div class="card flat">
-    ${LABS.map(labRow).join('')}
-    <div class="linkrow" data-action="go" data-view="preps" style="border-bottom:none">
-      <span><b>🗒 Round Prep</b><br><span class="sm">Every course plan, kept for the next time.</span></span><span class="arr">→</span></div>
+    ${LABS.map((l, i) => labRow(l, i === LABS.length - 1)).join('')}
   </div>`;
 }
 
@@ -4333,7 +4419,7 @@ function roundView(i){
   if(a.fw.n) tiles.push(['Fairways', `${a.fw.hit}/${a.fw.n}`]);
   if(a.scramble.chances) tiles.push(['Up & down', `${a.scramble.saved}/${a.scramble.chances}`]);
   return `
-  <button class="backlink" data-action="go" data-view="scores">← Scores</button>
+  <button class="backlink" data-action="go" data-view="rounds" data-seg="cards">← Rounds</button>
   <div class="card">
     <h2>${esc(r.course || 'Round')}</h2>
     <p class="sm faint">${fmtDate(r.date)}${r.tees ? ` · ${esc(r.tees)} tees` : ''}${
@@ -4908,7 +4994,7 @@ function liveStart(){
   </div>
 
   <div class="card flat">
-    <p class="sm"><b>What it records.</b> Which club you hit off every tee (and optionally into every green), whether you found the fairway and the green and where the miss went, putts, and the score. That's the input side of every number on the Scores page — and the tee-club table can't exist without it.</p>
+    <p class="sm"><b>What it records.</b> Which club you hit off every tee (and optionally into every green), whether you found the fairway and the green and where the miss went, putts, and the score. That's the input side of every number on the Rounds page — and the tee-club table can't exist without it.</p>
   </div>`;
 }
 
@@ -5218,7 +5304,7 @@ function liveFinish(L){
   </div>
 
   <div class="card flat">
-    <p class="sm">Saving drops you straight into this round's own card, where the hole-by-hole detail you just logged turns into the miss patterns, the scrambling rate and the coaching. Everything also folds into the season numbers on <b>Scores</b>.</p>
+    <p class="sm">Saving drops you straight into this round's own card, where the hole-by-hole detail you just logged turns into the miss patterns, the scrambling rate and the coaching. Everything also folds into the season numbers on <b>Rounds</b>.</p>
     <button class="btn ghost tiny" data-action="live-discard" style="margin-top:8px">Discard this round</button>
   </div>`;
 }
@@ -5265,7 +5351,13 @@ function bumpGearCounters(){
 
 // ---------- Actions ----------
 const ACTIONS = {
-  'go': el => { editingCourse = null; render(el.dataset.view); },
+  // `data-seg` is how a link asks for one FACE of a multi-segment view (Rounds). Every
+  // other view ignores it, so one action still covers every link in the app.
+  'go': el => { editingCourse = null; render(el.dataset.view, el.dataset.seg); },
+  // Switching segment is not going anywhere — it is the same tab showing a different face
+  // of the same subject — so it redraws in place and keeps the scroll. current.arg has to
+  // move with it, or the next rerender() (a chip tap, a saved course) would snap back.
+  'rounds-seg': el => { roundsSeg = el.dataset.k; current.arg = roundsSeg; rerender(); },
   'open-round': el => render('round', +el.dataset.i),
 
   // ----- Live round -----

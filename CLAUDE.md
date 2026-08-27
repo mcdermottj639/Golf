@@ -806,16 +806,44 @@ Keep `h2`s few: the jump bar at the top of every view is built from them.
 ### The labs live behind one nav button (Aug 13 2026)
 
 The bar was at eight tabs and a short-game lab would have made nine, so **Swing · Short Game ·
-Putting · Mental now sit behind a single `Game` tab** (`game()` — the hub). Nav is six: Home ·
-Bag · Game · Scores · Coach · Courses. `NAV_OF` in `render()` maps every lab view back to the
-`game` button so it stays lit. Adding a fifth lab now costs nothing in the nav.
+Putting · Mental now sit behind a single `Game` tab** (`game()` — the hub). `NAV_OF` in
+`render()` maps every lab view back to the `game` button so it stays lit. Adding a fifth lab
+costs nothing in the nav.
 
 **The hub order is FIXED and must stay that way** (standing instruction, Aug 14 2026): Swing ·
-Short Game · Putting · Mental · Round Prep, top down — i.e. `LABS` order, with Round Prep last.
-It used to float the last-opened lab into a "Pick up where you were" block at the top
-(`S.settings.lastLab`, now removed); Jack asked for the fixed order instead, because a row that
-moves defeats the muscle memory that makes a hub worth having. Don't reintroduce recency
-sorting here, and add a new lab to the END of `LABS` rather than reordering it.
+Short Game · Putting · Mental, top down — i.e. `LABS` order. It used to float the last-opened
+lab into a "Pick up where you were" block at the top (`S.settings.lastLab`, now removed); Jack
+asked for the fixed order instead, because a row that moves defeats the muscle memory that
+makes a hub worth having. Don't reintroduce recency sorting here, and add a new lab to the END
+of `LABS` rather than reordering it. **The hub is the four labs and nothing else** since
+Aug 27 2026 — Round Prep used to sit under them and now lives in Rounds (see below).
+
+### The nav is five tabs and a tee button (Aug 27 2026 — Jack's redesign)
+
+Jack commissioned a redesign; this supersedes the six-tab bar described above. The nav is
+**TODAY · BAG · [TEE] · GAME · ROUNDS · COACH** — five tabs and a burgundy centre button.
+
+- **TEE** goes to the live logger from any screen (`data-view="live"`). It is both *start* and
+  *resume*, because from the player's side that is one intention and `live()` already knows
+  which it is; `render()` relabels it `RESUME` while `S.live` exists. It is the only thing in
+  the app that has to be one thumb away everywhere, which is why it gets the middle.
+- **Courses is no longer a tab** and **Round Prep is no longer in the Game hub.** Both are
+  segments of **Rounds**, whose three faces are `Cards · Round prep · Courses` — a card, the
+  plan written for it, and the course it was played on are three views of one subject, and
+  the plan now sits beside the cards it gets judged against (`planHeld()`).
+- The segment lives in `roundsSeg`, a **module variable, never saved** — it is a property of
+  the view, not of the player. Switching is a `rerender()` (you have not gone anywhere), so
+  `current.arg` moves with it.
+- **The old view names still work and must keep working.** `SEG_OF` in `render()` resolves
+  `scores` → Cards, `preps` → Round prep, `courses` → Courses before anything else happens, so
+  every `go('courses')` link, every `render('scores')` in an action, and every `act:go('preps')`
+  already sitting in a user's saved `S.updates` still lands where it meant to. Those stored
+  update rows are why the aliases are permanent, not a migration step. A link may also carry
+  `data-seg` to ask for a face directly (`data-view="rounds" data-seg="prep"`).
+- `NAV_OF` maps `round` (a round card) to the Rounds button as well as the four labs to Game.
+
+The tab glyphs are **CSS shapes** — a 19px bordered box, round or square, filled when active.
+No SVG, no icon font, no emoji: nothing to load, and legible at label size.
 
 **Every lab shares one diagnosis renderer.** `diagnosisCard(discipline)` draws open faults with
 their detail and collapses settled ones to a line; `faultState()` reads the first word of a
