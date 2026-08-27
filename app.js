@@ -100,17 +100,28 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v67';
+const BUILD = 'v68';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v68', d:'2026-08-27', items:[
+    'Your film history is easier to find. Every lab now calls it the same thing \u2014 FILM ROOM. Putting was still calling it "Stroke session log" while Swing and Short Game called it Film room, and the jump bar at the top of a lab is built from those headings, so the same block announced itself with a different word depending on which lab you were in.',
+    'In Putting it also moved UP, above the stroke evolution grid. The grid is a summary OF the film, so the film itself should not have been the thing you scroll past the summary to reach.',
+    'Nothing was ever lost: every session is still there, ten across the three labs, and tapping one still opens the full breakdown. It was findable-only-if-you-knew-where, which is the same as missing.' ] },
   { b:'v67', d:'2026-08-27', items:[
-    'Your film history is easier to find. Every lab now calls it the same thing \u2014 FILM ROOM \u2014 where Putting used to call it "Stroke session log" and Swing and Short Game called it something else. The jump bar at the top of a lab now says the same word whichever lab you are in.',
-    'In Putting it also moved UP, above the stroke evolution grid. The grid is a summary OF the film, so the film itself should not have been the thing you scroll past it to reach.',
-    'Nothing was ever lost: every session is still there, ten of them across the three labs, and tapping one still opens the full breakdown. It was findable-only-if-you-knew-where, which is the same as missing.' ] },
+    'The whole app has been redrawn. The tab bar is five tabs with the TEE button in the middle of them — one thumb, any screen, and it starts a round or picks the one you are in the middle of back up.',
+    'Courses moved under Rounds, and your round prep moved there too. Cards · Round prep · Courses are now three faces of one tab, so the plans sit next to the cards that judge them. The Game tab is the four labs and nothing else.',
+    'The live logger only asks what can exist. Putts appear once there is a score; the first-putt distance only when you actually had two putts; say nought putts and it stops asking about putting at all. The fairway question waits until you have named the club you hit, and on a par 3 it asks for the green off the tee rather than pretending there was a second shot.',
+    'Your round card now prints the FULL scorecard — par, stroke index, score and putts across the nine, with circles on the birdies and squares on the bogeys, doubled for eagles and doubles. Tap the header to fold it away.',
+    'Under it: a miss map of where the greens went, the distances you actually holed from, putting by distance, and a by-club table for that round alone.',
+    'Every finding carries a coloured rail in the tier of its evidence, and tapping the badge now opens EVIDENCE USED — what was counted, what it was read off, and what that source cannot tell you. Same panel on Today, on the labs and on a round card.',
+    'The bag leads with the clubs instead of the numbers: type, make, loft, what it measures and where it stands. Then a section on grinds and bounce — what an F, an S and an M sole actually do differently, which of your three sits in which bounce band, and the four Vokey grinds you do not have and why each exists.',
+    'The carry ladder is bars against a 300-yard scale with the number in its own column, gaps flagged where they are wide, and the 5-wood showing UNMEASURED rather than a guess. It says out loud that the ladder IS the club list the logger offers you.',
+    'The labs hub is four cards; pick one and its diagnosis is right there, a row per open fault with its evidence rail and the drills that train it.',
+    'Every section on every tab folds away, and what you left open stays open when the page redraws.' ] },
   { b:'v66', d:'2026-08-24', items:[
     'The stroke evolution grid stopped printing seven paragraphs under the table. Every row now shows its marks AND a two-word state \u2014 Settled, Closed, Open, Never measured \u2014 so you can read where the stroke stands without reading anything.',
     'Tap any row for the full reasoning behind it. Nothing was cut; it just stopped being printed on the page you use to find things.',
@@ -480,6 +491,33 @@ function gist(s){
   const lead = splitLead(s.b)[0];
   return lead.length > 190 ? lead.slice(0, 170).replace(/\s+\S*$/, '') + '…' : lead;
 }
+// ----- A collapsible section (Aug 27 2026) -----
+// One pattern for every foldable section in the app. It is a plain <details> carrying an
+// ID, deliberately: render() already restores any open <details id=…> across a rerender(),
+// so the open/closed state costs no store, no bookkeeping, and cannot drift out of sync
+// with what is actually on screen. Never build a parallel open/closed map for this — the
+// drill-bench bug CLAUDE.md records (an expanded section snapping shut on every in-place
+// update) is exactly what that machinery exists to prevent.
+//
+//   id    unique and STABLE — it is the key the reopen-after-rerender works off
+//   label the section name, in the mono label voice (rendered uppercase by CSS)
+//   meta  the right-hand line: a count, a date, a hint. Optional.
+//   body  the section's HTML
+//   open  default state (true unless you have a reason)
+//   cls   extra classes — `oncard` for the cream-on-green variant
+// The one screen that gets NO folds is the live logger: it already hides what cannot exist
+// yet, and two disclosure systems on the strictest screen in the app is one too many.
+function fold(id, label, meta, body, open = true, cls = ''){
+  return `<details class="fold ${cls}" id="${esc(id)}"${open ? ' open' : ''}>
+    <summary><span class="foldl">${esc(label)}</span>${
+      meta ? `<span class="foldm">${esc(meta)}</span>` : '<span class="foldm"></span>'}</summary>
+    <div class="foldb">${body}</div>
+  </details>`;
+}
+// The 4px rail down the left of a card carrying a finding, in the finding's own evidence
+// tier. Pair it with evTag() for the chip — same five tiers, one vocabulary.
+const rail = ev => ev ? ` tierrail t-${ev}` : '';
+
 // Lead sentence up front, the rest one tap away.
 function expandable(t, cls){
   const [lead, rest] = splitLead(t);
@@ -517,20 +555,19 @@ function faultDrillRow(tag){
 }
 // The shared diagnosis card, used by every lab: open faults with their detail, settled
 // ones collapsed to a line. One renderer so a new lab gets a real diagnosis for free.
+// One row per open fault, each with its own evidence rail — see faultRows() below, which
+// is the renderer both this and the labs hub draw, so a fault can never be presented two
+// different ways on two screens. `emptyMsg` is the lab's own words for a genuinely empty
+// list; it is a FALLBACK for a lab with no faults at all, never copy to lead with.
 function diagnosisCard(disc, emptyMsg){
   const all = faultsFor(disc);
-  if(!all.length) return `<div class="card"><h2>The diagnosis</h2><p class="sm">${esc(emptyMsg || 'Nothing measured yet for this part of the game.')}</p></div>`;
-  const open = all.filter(f => faultState(f) === 'open');
-  const settled = all.filter(f => faultState(f) !== 'open');
+  const open = all.filter(f => faultState(f) === 'open').length;
   return `<div class="card">
     <h2>The diagnosis</h2>
-    ${open.length
-      ? `<p class="sm"><b class="warn">Open: ${open.map(f => esc(faultLabel(f.tag))).join(' · ')}</b></p>
-         ${open.map(f => `<div class="tipcard"><h4>${esc(faultLabel(f.tag))}</h4>${expandable(f.why)}
-           ${faultDrillRow(f.tag)}</div>`).join('')}`
-      : `<p class="sm">No open faults on the card — everything tracked here has been measured shut.</p>`}
-    ${settled.length ? `<p class="sm faint" style="margin-top:8px"><b>Settled:</b> ${settled.map(f =>
-        esc(faultLabel(f.tag)) + (faultState(f) === 'downgraded' ? ' (downgraded)' : ' ✓')).join(' · ')}</p>` : ''}
+    ${all.length ? faultRows(disc)
+      : `<p class="sm">${esc(emptyMsg || 'Nothing measured yet for this part of the game.')}</p>`}
+    ${open ? `<p class="sm faint" style="margin-top:8px">Tap a tier badge to see what the fault
+      was read off — and what that source cannot tell you.</p>` : ''}
   </div>`;
 }
 function readMins(b){
@@ -881,9 +918,8 @@ const TITLES = {
   mental:['Mental Game','Staying locked in for eighteen — decided off the course.'],
   coach:['Coach','Lessons that follow your game — not generic tips.'],
   drills:['Drills','What you can actually do — with the kit you own.'],
-  courses:['Courses','Everywhere you’ve played, rated and remembered.'],
+  rounds:['Rounds','Your cards, the plans behind them, and the courses.'],
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
-  scores:['Scores','Every round, what it cost you, and what to fix.'],
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
@@ -891,8 +927,38 @@ const TITLES = {
   lesson:['Coach','One lesson, and the drill that trains it.'],
   round:['Round Detail','One card, hole by hole, and what it cost you.'],
   live:['Live Round','Tap it in as you play — it scores itself.'],
-  preps:['Round Prep','Every course plan, kept for the next time.'],
 };
+
+// ----- Rounds: one tab, three segments (Aug 27 2026, Jack's redesign) -----
+// Cards, the plans written for them, and the courses they were played on are three faces
+// of one subject, so they are segments of one tab rather than three places to be. Courses
+// stopped being a top-level tab (you reach a course through a round or a ranking, never
+// cold) and Round Prep moved out of the Game hub, which is now the four labs only.
+//
+// The three OLD view names stay alive as entry points — every `go('courses')`, every
+// `render('scores')` in an action, and every `act:go('preps')` in the changelog still
+// resolve, they just land on the segment instead of a page of their own. Nothing
+// dead-ends, and no caller had to learn the new shape.
+const ROUND_SEGS = [
+  { k:'cards',   lab:'Cards',      view:'scores',
+    tag:'Every round, what it cost you, and what to fix.' },
+  { k:'prep',    lab:'Round prep', view:'preps',
+    tag:'Every course plan, kept for the next time.' },
+  { k:'courses', lab:'Courses',    view:'courses',
+    tag:'Everywhere you’ve played, rated and remembered.' },
+];
+const SEG_OF = Object.fromEntries(ROUND_SEGS.map(s => [s.view, s.k]));
+// View-local state, exactly as the design specifies: which face of Rounds is showing is a
+// property of the view, not of the player, so it is a module variable and never saved.
+let roundsSeg = 'cards';
+function rounds(seg){
+  if(seg && ROUND_SEGS.some(s => s.k === seg)) roundsSeg = seg;
+  const cur = ROUND_SEGS.find(s => s.k === roundsSeg) || ROUND_SEGS[0];
+  const body = { cards:scores, prep:preps, courses }[cur.k];
+  return `<div class="segbar">${ROUND_SEGS.map(s =>
+    `<button class="seg ${s.k === cur.k ? 'on' : ''}" data-action="rounds-seg" data-k="${s.k}">${s.lab}</button>`).join('')}</div>
+  ${body()}`;
+}
 
 // Which fault the bench is filtered to, set by a lab's diagnosis card. Deliberately a
 // module variable rather than a saved setting: it is a question asked once, and a filter
@@ -902,8 +968,18 @@ let drillTag = null;
 function render(view, arg, keepScroll){
   closeCheat();  // the cheat sheet overlay lives on <body>, so navigation must clear it
   if(view !== 'drills') drillTag = null;
+  // Scores / Round Prep / Courses are segments of Rounds now. Resolving the old names
+  // here rather than at every call site is the whole reason nothing dead-ended when the
+  // nav changed shape: a link written a month ago still lands where it always meant to.
+  if(SEG_OF[view]){ arg = SEG_OF[view]; view = 'rounds'; }
   current = { view, arg };
-  const [title, tag] = TITLES[view] || TITLES.home;
+  let [title, tag] = TITLES[view] || TITLES.home;
+  // The Rounds masthead says which face you're on — the tab is one place, the segments
+  // are three subjects, and the strapline is the only thing that can tell them apart.
+  if(view === 'rounds'){
+    const s = ROUND_SEGS.find(x => x.k === (arg || roundsSeg));
+    if(s) tag = s.tag;
+  }
   $('#pageTitle').textContent = title;
   $('#pageTag').textContent = tag;
   // Standing over a shot, the app's own masthead is pure overhead — the hole screen
@@ -918,22 +994,33 @@ function render(view, arg, keepScroll){
   // cancelled before it ever reached the branch Pages serves).
   const bt = $('#buildTag');
   if(bt){ bt.textContent = BUILD; bt.hidden = view !== 'home'; }
-  // The four labs live behind one nav button, so they all light it.
+  // The four labs live behind one nav button, so they all light it — and so does every
+  // view that hangs off Rounds: a round card, and a course plan you opened from one.
   const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game',
-                   drills:'coach', shelf:'coach', lesson:'coach' };
+                   drills:'coach', shelf:'coach', lesson:'coach',
+                   round:'rounds', rounds:'rounds' };
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === navView));
-  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, courses, decisions, scores, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, preps }[view] || home;
+  // The tee button is both "start" and "resume" — the same tap, because from the player's
+  // side it is the same intention and live() already knows which one it is.
+  const teeLab = $('#navTeeLab');
+  if(teeLab) teeLab.textContent = S.live ? 'RESUME' : 'TEE';
+  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
   // preserved on a rerender (an update), reset on a render (a navigation). Only sections
   // carrying an id take part, so nothing else has to change.
-  const wasOpen = keepScroll
-    ? [...$('#view').querySelectorAll('details[id][open]')].map(d => d.id) : [];
+  // BOTH states are restored, not just the open ones (Aug 27 2026): a section that defaults
+  // open would otherwise spring back open on the next in-place update, so folding the
+  // scorecard away and then tapping anything else would undo the fold. The DOM is still the
+  // only store — this reads the state off the elements that were on screen a moment ago and
+  // puts it back — which is the whole reason this pattern needs no bookkeeping.
+  const was = keepScroll
+    ? [...$('#view').querySelectorAll('details[id]')].map(d => [d.id, d.open]) : [];
   $('#view').innerHTML = R(arg);
-  wasOpen.forEach(id => { const d = document.getElementById(id); if(d) d.open = true; });
+  was.forEach(([id, open]) => { const d = document.getElementById(id); if(d) d.open = open; });
   buildJumpBar();
   if(!keepScroll) window.scrollTo(0,0);
 }
@@ -959,7 +1046,10 @@ function buildJumpBar(){
     b.textContent = h.textContent.split('·')[0].replace(/\s*\([^)]*\)\s*$/, '').trim();
     bar.appendChild(b);
   });
-  view.prepend(bar);
+  // Below the segmented control where there is one: the segments say WHICH LIST you are
+  // looking at and the jump bar says where you are in it, so they can't be reordered.
+  const seg = view.querySelector('.segbar');
+  if(seg) seg.after(bar); else view.prepend(bar);
 }
 let current = { view:'home' };
 // Redrawing the view you're already on is an UPDATE, not a navigation — jumping to the
@@ -1033,8 +1123,9 @@ function preps(){
     <div class="card">${list.map(planRow).join('')}
       ${note ? `<p class="sm faint" style="margin-top:8px">${note}</p>` : ''}</div>`;
   const any = p.up.length + p.standing.length + p.past.length;
+  // No back link: this is the Round prep SEGMENT of Rounds now (Aug 27 2026), not a page
+  // you arrived at from somewhere — the segmented control above it is the way back out.
   return `
-  <button class="backlink" data-action="go" data-view="home">← Home</button>
   ${any ? cheatBtn('prep') : ''}
   ${!any ? `<div class="card"><p class="sm">No course plans yet. Tell Claude where you're playing and one lands here — tee strategy, the holes that cost you, lay-up numbers off your ladder, and a note on every hole the research can support.</p></div>` : ''}
   ${block('Coming up', p.up)}
@@ -1047,6 +1138,30 @@ function preps(){
 const actionLi = a => `<li class="${a.done ? 'done' : ''}" data-action="toggle-action" data-id="${a.id}">
   <span class="box"></span><span class="txt">${esc(a.text)}${a.pri && !a.done ? '<span class="pri">HIGH</span>' : ''}</span></li>`;
 
+// The type column: three-to-six mono characters saying what KIND of change a row is,
+// tinted by the strength of the evidence behind that kind — burgundy for a measurement or
+// a scorecard read off the real card, green for a round he played, green accent for the
+// coaching library, gold for a number nobody measured, neutral ink for everything else.
+// It is presentation metadata over the feed's own `type`, which is why it lives here and
+// not in the feed: a tint is a reading of the entry, and the entry is the record.
+// A type with no row falls through to a neutral UPDATE — the same forward-compatibility
+// rule updateLine() follows, so a new feed type can never render as a blank column.
+const UP_TYPE = {
+  session:['FILM','u-m'], 'session-update':['FILM','u-m'], 'session-remove':['FILM','u-m'],
+  evolution:['GRID','u-m'], faults:['FAULT','u-m'], test:['TEST','u-m'], layout:['CARD','u-m'],
+  round:['ROUND','u-l'], 'round-update':['ROUND','u-l'],
+  'lesson-add':['LESSON','u-k'], 'lesson-update':['LESSON','u-k'], 'lesson-remove':['LESSON','u-k'],
+  kit:['KIT','u-k'],
+  stats:['GHIN','u-u'], carries:['CARRY','u-u'], 'carry-update':['CARRY','u-u'],
+  'club-add':['BAG',''], 'club-update':['BAG',''], history:['BAG',''], 'history-edit':['BAG',''],
+  briefing:['PLAN',''], 'briefing-remove':['PLAN',''],
+  action:['TO-DO',''], 'action-done':['TO-DO',''], 'action-update':['TO-DO',''],
+  'course-add':['COURSE',''], 'course-remove':['COURSE',''], geo:['GEO',''],
+  debrief:['DEBRIEF',''], 'debrief-update':['DEBRIEF',''],
+  shortlist:['PUTTER',''], deadline:['WINDOW',''], build:['BUILD',''],
+};
+const upType = t => { const r = UP_TYPE[t] || ['UPDATE','']; return { l:r[0], c:r[1] }; };
+
 // ----- What's new -----
 // Everything that has changed, newest first, in one place — Jack asked for it on Home
 // under the coach tip, and asked for ALL of it rather than the latest one. Two streams
@@ -1058,10 +1173,10 @@ const actionLi = a => `<li class="${a.done ? 'done' : ''}" data-action="toggle-a
 // of the block: it is a table of contents for what is different, not a substitute for it.
 function whatsNew(){
   const rows = [];
-  (S.updates || []).forEach(u => rows.push({ d:u.d, k:u.id, h:u.h, s:u.s, act:u.act }));
+  (S.updates || []).forEach(u => rows.push({ d:u.d, k:u.id, t:u.t, h:u.h, s:u.s, act:u.act }));
   // One row per RELEASE, not per note: three sentences of release copy set as three
   // headlines shouts over the data changes around it, and a build is one event anyway.
-  RELEASES.forEach(r => rows.push({ d:r.d, k:`build:${r.b}`, h:'The app updated',
+  RELEASES.forEach(r => rows.push({ d:r.d, k:`build:${r.b}`, t:'build', h:'The app updated',
     b:r.b, items:r.items, s:'', act:null }));
   if(!rows.length) return '';
   // Stable sort on the date alone, so within one day the feed's own order survives and
@@ -1101,23 +1216,97 @@ function whatsNew(){
     S.settings.seenUpdates = keys;
     save();
   }
-  return `
-  <h2>What's new</h2>
-  <div class="card">
+  const body = `
     ${fresh ? `<p class="sm"><b class="warn">${fresh} new</b> since you last opened this page.</p>` : ''}
     ${days.map(day => `<div class="upday">
-      <div class="update-d">${fmtDate(day.d)}</div>
-      <div>${day.rows.map(r => `<div class="uprow${r.keys.every(k => seen.has(k)) ? '' : ' fresh'}${
+      <div>${day.rows.map(r => { const ty = upType(r.t);
+        return `<div class="uprow${r.keys.every(k => seen.has(k)) ? '' : ' fresh'}${
         r.act ? ' opens' : ''}"${attrs(r.act)}>
-        <div class="uph">${esc(r.h)}${r.b ? `<span class="upb">${esc(r.b)}</span>` : ''}${
-          r.n > 1 ? `<span class="upn">${r.n} updates</span>` : ''}</div>
-        ${r.s ? `<div class="ups">${esc(r.s)}</div>` : ''}
-        ${r.items ? `<ul class="upli">${r.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
-        ${r.act ? '<span class="arr">→</span>' : ''}
-      </div>`).join('')}</div>
+        <div class="upt ${ty.c}">${esc(ty.l)}</div>
+        <div class="upm">
+          <div class="uph">${esc(r.h)}${r.b ? `<span class="upb">${esc(r.b)}</span>` : ''}${
+            r.n > 1 ? `<span class="upn">${r.n} updates</span>` : ''}</div>
+          ${r.s ? `<div class="ups">${esc(r.s)}</div>` : ''}
+          ${r.items ? `<ul class="upli">${r.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+        </div>
+        <div class="upd">${fmtDate(day.d)}${r.act ? '<span class="arr">→</span>' : ''}</div>
+      </div>`; }).join('')}</div>
     </div>`).join('')}
-    <p class="sm faint" style="margin-top:10px">Every change Claude has pushed, newest first — plans, bag changes, rounds, lessons and coaching, plus what changed in the app itself. Tap any row to open what it changed. Dated by the day the change was made. Older entries drop off the bottom once there are ${UPDATE_CAP}; nothing is lost — the change itself lives in the bag, the plan or the card it landed on.</p>
+    <p class="sm faint" style="margin-top:10px">Every change Claude has pushed, newest first — plans, bag changes, rounds, lessons and coaching, plus what changed in the app itself. Tap any row to open what it changed. Dated by the day the change was made. Older entries drop off the bottom once there are ${UPDATE_CAP}; nothing is lost — the change itself lives in the bag, the plan or the card it landed on.</p>`;
+  const n = days.reduce((a, d) => a + d.rows.length, 0);
+  return `<div class="card">${fold('fold-landed', "What's landed",
+    `${fresh ? fresh + ' new · ' : ''}${n} change${n === 1 ? '' : 's'}`, body)}</div>`;
+}
+
+// ----- Today: the three blocks above the existing page (Aug 27 2026, Jack's redesign) -----
+// Conditions, the one thing, and the way onto the tee. Everything below them — the stat
+// row, round prep, the numbers, the coach tip, the changelog, the return window and the
+// data links — keeps the order it already had.
+
+// The weather, at arm's length in sun: the temperature at display size, the reading under
+// it, and the only thing the weather actually changes about his golf in a mono block on
+// the right. The arithmetic is playsFactor()'s and is unchanged — roughly 1% of carry per
+// 10°F below 70 — and it is TEMPERATURE ONLY, which the card says out loud rather than
+// letting a wind reading sitting beside it imply otherwise. A stale reading is shown as
+// stale instead of being quietly recomputed: playsFactor() returns null past three hours.
+function wxCard(){
+  const wx = S.weather, f = playsFactor();
+  const mins = wx ? Math.round((Date.now() - wx.ts) / 60000) : null;
+  const ago = mins == null ? '' : mins < 60 ? `${mins} min ago`
+    : `${Math.round(mins / 60)}h ago`;
+  if(!wx) return `<div class="wx" data-action="get-weather">
+    <div><div class="wxt">—°</div><div class="wxc">Tap to load the conditions where you are</div></div>
+    <div class="wxr"><b>Plays like</b><span>needs a location fix</span></div></div>`;
+  const p150 = f ? Math.round(150 / f) : null;
+  const d = p150 == null ? null : p150 - 150;
+  return `<div class="wx" data-action="get-weather">
+    <div><div class="wxt">${WX_ICON(wx.code)} ${Math.round(wx.t)}°</div>
+      <div class="wxc">Wind ${Math.round(wx.wind)} mph · read ${esc(ago)} · tap to refresh</div></div>
+    <div class="wxr"><b>Plays like</b>${f
+      ? `<span>150 → <i>${p150}</i></span>
+         <span>${d === 0 ? 'no change at 150' : `${d > 0 ? '+' : ''}${d} yds · ${Math.round(wx.t)}°F air`}</span>
+         <span class="wxn">Temperature only — the wind is not in this number.</span>`
+      : `<span>reading is over 3h old</span><span class="wxn">Tap to refresh and the carry effect comes back.</span>`}</div>
   </div>`;
+}
+
+// The one thing. Not a list — the single finding the ranked board leads with, which is the
+// same pick Coach makes (coachFocus over coachSignals), so the top of Today can never
+// quietly outrank the rest of the app. It carries its own tier: the 4px rail down the
+// side, and a tappable chip that opens what the claim is actually standing on.
+function oneThing(){
+  const f = coachFocus(coachSignals());
+  if(!f) return '';
+  const L = f.link;
+  return `<div class="card one${rail(f.ev)}">
+    ${evDrawer('ev-onething', 'The one thing', f.ev, f.src)}
+    <div class="oneh">${f.h}</div>
+    ${expandable(f.b)}
+    ${L ? `<div class="linkrow" data-action="${L.a}"${L.view ? ` data-view="${L.view}"` : ''}${
+      L.id ? ` data-id="${esc(L.id)}"` : ''}><span class="sm"><b>${esc(L.lab)}</b></span><span class="arr">→</span></div>` : ''}
+  </div>`;
+}
+
+// The way onto the tee, at the size of the decision. One button, which is a START when
+// there is no round on the go and a RESUME when there is — the same tap for the same
+// intention, exactly like the TEE button in the tab bar. The discard link only exists on
+// the resume face, because there is nothing to discard on the other one.
+function startRound(){
+  const L = S.live;
+  if(L){
+    const t = liveThru(L), h = L.holes[L.cur];
+    return `<button class="bigbtn" data-action="live-new">
+      <span class="bb-l">Resume your round<em>${esc(L.course)}</em></span>
+      <span class="bb-r">${t.n ? `${t.over > 0 ? '+' : ''}${t.over} THRU ${t.n} ›` : `HOLE ${h ? h.n : 1} ›`}</span></button>
+    <div class="bbfoot"><button class="btn ghost tiny" data-action="live-discard">Discard this round</button></div>`;
+  }
+  // "Card ready" is a claim about the scorecards on file, so it is only made where there
+  // are some — otherwise the first course he types gets eighteen placeholder par 4s and
+  // the card check screen says so.
+  const ready = coursesWithLayout().length;
+  return `<button class="bigbtn" data-action="live-new">
+    <span class="bb-l">Play a live round<em>One screen a hole · saves on every tap</em></span>
+    <span class="bb-r">${ready ? 'CARD READY ›' : 'NEW CARD ›'}</span></button>`;
 }
 
 // ----- Home -----
@@ -1129,7 +1318,9 @@ function home(){
   const sc = last ? fiveFtScore(last) : null;
   const picks = pickedLessons().slice(0,1);
   return `
-  ${liveBanner()}
+  ${wxCard()}
+  ${oneThing()}
+  ${startRound()}
   <div class="rowgrid">
     <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div></div>
     <div class="stat"><div class="v">${S.courses.filter(c=>!c.bucket).length}</div><div class="l">Courses</div></div>
@@ -1147,7 +1338,7 @@ function home(){
       <h2>Round prep</h2>
       ${next ? planRow(next)
       : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Swing Positions, Swing Thoughts) live in the <b>Swing</b> lab, and the at-home training lives in <b>Coach</b>.</p>`}
-      ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="preps">
+      ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="rounds" data-seg="prep">
         <span class="sm"><b>All round prep</b> · ${rest} more plan${rest === 1 ? '' : 's'} on file</span><span class="arr">→</span></div>` : ''}
       ${S.live ? '' : `<div class="linkrow" data-action="live-new">
         <span><b>Play a live round</b><br><span class="sm">Tap each hole in as you go — clubs, fairways, greens, putts</span></span><span class="arr">→</span></div>`}
@@ -1219,35 +1410,273 @@ function tipHTML(p){
 }
 
 // ----- Bag -----
-function bag(){
-  // Order the bag the way it sits in real life: driver → woods → hybrids →
-  // irons → wedges → putter, then by loft within each category.
-  const CAT_RANK = { wood:0, hybrid:1, iron:2, wedge:3, putter:4, ball:5, other:6 };
-  const clubLoft = c => {
-    if(typeof c.loft === 'number') return c.loft;
-    const deg = ((c.spec||'') + ' ' + (c.name||'')).match(/(\d+(?:\.\d+)?)\s*°/);
-    if(deg) return parseFloat(deg[1]);
-    const iron = (c.name||'').match(/(\d+)\s*-?\s*iron/i);   // "2-iron" sorts ahead of the 4–PW set
-    if(iron) return 15 + parseInt(iron[1],10) * 3.5;
-    return 999;
-  };
-  const bagSort = (a,b) => (CAT_RANK[a.cat] ?? 5) - (CAT_RANK[b.cat] ?? 5) || clubLoft(a) - clubLoft(b);
-  const lineup = S.clubs.filter(c => c.status==='gaming' || c.status==='ordered').sort(bagSort);
-  const bullpen = S.clubs.filter(c => c.status==='backup').sort(bagSort);
-  const wishlist = S.clubs.filter(c => c.status==='wishlist').sort(bagSort);
-  const wedges = S.clubs.filter(c=>c.cat==='wedge' && c.loft).sort((a,b)=>a.loft-b.loft);
+// Order the bag the way it sits in real life: driver → woods → hybrids →
+// irons → wedges → putter, then by loft within each category.
+const CAT_RANK = { wood:0, hybrid:1, iron:2, wedge:3, putter:4, ball:5, other:6 };
+function clubLoft(c){
+  if(typeof c.loft === 'number') return c.loft;
+  const deg = ((c.spec || '') + ' ' + (c.name || '')).match(/(\d+(?:\.\d+)?)\s*°/);
+  if(deg) return parseFloat(deg[1]);
+  const iron = (c.name || '').match(/(\d+)\s*-?\s*iron/i);   // "2-iron" sorts ahead of the 4–PW set
+  if(iron) return 15 + parseInt(iron[1], 10) * 3.5;
+  return 999;
+}
+const bagSort = (a, b) => (CAT_RANK[a.cat] ?? 5) - (CAT_RANK[b.cat] ?? 5) || clubLoft(a) - clubLoft(b);
+// The mono type label down the left of a roster row. It is read off the club's OWN NAME
+// wherever the name says what the club is ("Utility 2-iron" → UTILITY, "5-wood" → 5-WOOD),
+// and off its loft where the name doesn't, so nothing here is a classification invented on
+// the club's behalf. Anything unrecognised falls back to the category, which is data.
+function clubType(c){
+  const n = c.name || '';
+  if(c.cat === 'putter') return 'PUTTER';
+  if(c.cat === 'wedge') return c.loft ? `${c.loft}° WEDGE` : 'WEDGE';
+  if(/mini\s*driver/i.test(n)) return 'MINI DRIVER';
+  if(/driver/i.test(n)) return 'DRIVER';
+  const wood = n.match(/(\d+)\s*-?\s*wood/i);
+  if(wood) return `${wood[1]}-WOOD`;
+  if(/utility/i.test(n)) return 'UTILITY';
+  const iron = n.match(/(\d+)\s*-?\s*iron/i);
+  if(iron) return `${iron[1]}-IRON`;
+  if(c.cat === 'iron') return 'IRONS';
+  return String(c.cat || 'club').toUpperCase();
+}
+// The Vokey shorthand, composed out of the club's real loft and its real spec string —
+// "50.08F" is loft, bounce and grind, and every one of those three is on `S.clubs`. Where
+// the spec doesn't carry a bounce and a grind (every club that isn't a wedge), this is
+// simply the loft, and where there is no loft either it is the spec as written.
+function wedgeSpec(c){
+  const m = /(\d+(?:\.\d+)?)\s*°?\s*bounce\s*·?\s*([A-Z])\s*grind/i.exec(c.spec || '');
+  return m && c.loft ? `${c.loft}.${String(Math.round(+m[1])).padStart(2, '0')}${m[2].toUpperCase()}` : null;
+}
+// The loft line, and it will only print a loft it can actually SOURCE. `clubLoft()` guesses
+// one from the iron number so the bag can be sorted, which is fine for an ordering and a
+// lie about a club: the KING TEC utility comes out of it at 22° when the record says ~17°.
+// So: the club's own `loft`, else a degree figure written in its spec, else the ladder
+// row's loft, else the spec's own first phrase. A putter's spec carries a LIE angle rather
+// than a loft, and an iron SET has no single loft at all — both are named, not numbered.
+function clubSpecLine(c){
+  const head = () => (c.spec || '').split('·')[0].replace(/\(.*?\)/g, '').trim().toUpperCase();
+  const w = wedgeSpec(c);
+  if(w) return w;
+  if(c.cat === 'putter') return head() || 'PUTTER';
+  if(typeof c.loft === 'number') return `${c.loft}°`;
+  const deg = ((c.spec || '') + ' ' + (c.name || '')).match(/(\d+(?:\.\d+)?)\s*°/);
+  if(deg && clubType(c) !== 'IRONS') return `${deg[1]}°`;
+  const row = carryRow(c);
+  if(row && row.loft) return String(row.loft);
+  return head();
+}
+// A bag club, joined to its row on the carry ladder. `clubAbbr()` is the app's existing
+// authority for turning a club name into a short key, so running it over both sides is a
+// join the app already trusts everywhere else rather than a new piece of string-matching —
+// and it is deliberately strict: an abbreviation that fell through to the name-slice
+// fallback is not a match, and the iron SET matches nothing, which is right, because it
+// spans seven ladder rows and no single one of them is "the irons".
+const ABBR_OK = /^(Mini|Dr|PW|\d+i|\d+°|\d+W)$/;
+// Hyphens are spelling, not meaning: the bag says "5-wood" and the ladder says "5 wood".
+// Normalised here rather than in clubAbbr(), which is what every saved card's club chip
+// renders through and is not worth disturbing for a join.
+const abbrOf = n => clubAbbr(String(n || '').replace(/[-–—]/g, ' '));
+function carryRow(c){
+  if(c.cat === 'wedge' && c.loft) return S.carries.find(x => x.club === `${c.loft}° wedge`) || null;
+  const k = abbrOf(c.name);
+  if(!ABBR_OK.test(k)) return null;
+  return S.carries.find(x => abbrOf(x.club) === k) || null;
+}
+const ladderLoft = row => { const m = /(\d+(?:\.\d+)?)/.exec(row.loft || ''); return m ? +m[0] : null; };
+// Two clubs within a degree and a half of each other on the ladder are fighting for one
+// number — the classic gapping trap, and in this bag a live question rather than a general
+// one. It is arithmetic over the ladder's own lofts, so it says nothing the data doesn't.
+function ladderOverlap(row){
+  const i = S.carries.indexOf(row), l = ladderLoft(row);
+  if(i < 0 || l == null) return null;
+  return [S.carries[i - 1], S.carries[i + 1]].find(o => {
+    const ol = o ? ladderLoft(o) : null;
+    return ol != null && Math.abs(ol - l) <= 1.5;
+  }) || null;
+}
+// The status pill. Every state here is something the club's own record SAYS, never a read
+// of its notes: a closed return window is `returnWindow:false`, an unmeasured carry is a
+// null on the ladder row, an overlap is two ladder lofts inside a degree and a half. A club
+// with none of them in play is simply in the bag.
+function clubPill(c){
+  const mismatch = c.cat === 'putter' && c.flow === 'toe' && S.profile.stroke === 'SBST';
+  if(mismatch) return ['MISMATCH', 'p-burg'];
+  if(c.returnWindow === true) return ['IN RETURN WINDOW', 'p-gold'];
+  if(c.returnWindow === false) return ['DECIDED', 'p-burg'];
+  if(c.status === 'ordered') return ['ON ORDER', 'p-gold'];
+  if(c.status === 'wishlist') return ['SCOUTING', 'p-gold'];
+  if(c.status !== 'gaming') return ['BENCHED', 'p-plain'];
+  const row = carryRow(c);
+  if(row && row.carry == null) return ['UNMEASURED', 'p-gold'];
+  if(row && ladderOverlap(row)) return ['OVERLAP', 'p-gold'];
+  return ['IN PLAY', 'p-green'];
+}
+// The roster row: what it is, what it is, what it measures, and where it stands.
+function clubRow(c){
+  const [pill, pcls] = clubPill(c);
+  const row = carryRow(c);
+  const mismatch = c.cat === 'putter' && c.flow === 'toe' && S.profile.stroke === 'SBST';
+  const ov = row ? ladderOverlap(row) : null;
+  return `<div class="crow">
+    <div class="ct">${esc(clubType(c))}</div>
+    <div class="cm">
+      <div class="cn">${esc(c.name)}</div>
+      <div class="cs">${esc(clubSpecLine(c))}${row && row.carry != null ? ` · carries ${row.carry}` : ''}${
+        row && row.carry == null ? ' · carry unmeasured' : ''}</div>
+      ${c.note ? expandable(c.note) : ''}
+      ${mismatch ? `<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>` : ''}
+      ${ov ? `<p class="sm faint">Sits ${Math.abs(ladderLoft(ov) - ladderLoft(row)).toFixed(1)}° off the
+        ${esc(ov.club)} on the ladder.</p>` : ''}
+      ${c.cat === 'wedge' && c.status === 'gaming'
+        ? `<div class="meter grn" title="groove life"><span style="width:${groovePct(c)}%"></span></div>
+           <div class="sm faint">Groove life ${groovePct(c)}% · ${c.rounds || 0} rounds</div>` : ''}
+    </div>
+    <div class="cp"><span class="pill ${pcls}">${esc(pill)}</span></div>
+  </div>`;
+}
+// ----- Grinds & bounce -----
+// The one explanatory block in the bag, and it is here because the three wedges are three
+// deliberately different tools and nothing on the card said so. The letters and bounces are
+// read out of `S.clubs` — his real Vokey specs — and the copy explains what those numbers
+// mean, which is knowledge about wedges rather than a claim about his game. The one claim
+// about his game is the closing note, and it says it is UNMEASURED, because it is.
+const GRIND_LORE = {
+  F:['Full sole', 'The sweeper. A full, unrelieved sole with the most material behind the leading edge — it resists digging on a square face and a shallow strike. Built for full swings, which is what this club mostly gets.', 'FULL SWINGS · SQUARE FACE'],
+  S:['Sole grind, trailing-edge relief', 'The workhorse. Heel and trailing edge trimmed just enough to sit down on a slightly open face without the leading edge lifting. Mid bounce, so it works on firm and normal turf alike — the reason it can take full shots, half shots and bunker shots all day.', 'DO-EVERYTHING · FULL TO OPEN'],
+  M:['Crescent, heel-toe-trailing relief', 'The creative one. Material removed from heel, toe and trailing edge so the face can open wide, lie flat, and slide under the ball without the leading edge rising. Low bounce, so it wants a shallow attack and firm-to-normal turf — it punishes a steep, digging strike.', 'FLOPS · SPLASH · OPEN FACE'],
+  K:['Widest sole, highest bounce', 'The widest, highest-bounce sole Vokey makes. A bunker specialist for soft sand and fluffy lies — it refuses to dig, which is exactly why it is clumsy off a tight fairway.'],
+  D:['Crescent with high bounce', 'The M shape with the bounce turned up. Made for a steep, digging attack angle: the relief lets you open it, and the bounce keeps a steep strike from burying.'],
+  L:['Fully relieved, very low bounce', 'The most relieved sole in the range. Firm turf and tight lies only, and it demands a shallow, precise strike — a low-handicap tool with almost no margin.'],
+  T:['Narrow tour sole, low bounce', 'A narrow, tour-shaped low-bounce sole. Similar brief to the L, made for players who slide the club rather than dig it.'],
+};
+// Bands are inclusive of their top figure and matched in order, so an 8° sole reads LOW and
+// a 12° reads MID — which is how a fitter would call them, and how Jack's three land.
+const BOUNCE_BANDS = [
+  ['LOW · 4–8°', 'Firm turf, tight lies, a shallow attack. Less protection from a fat strike.', 4, 8],
+  ['MID · 8–12°', 'The all-conditions band. Forgiving on both turf types and out of sand.', 8, 12],
+  ['HIGH · OVER 12°', 'Soft turf, fluffy sand, a steep attack. Skids rather than digs — and can bounce off firm ground into the middle of the ball.', 12, 99],
+];
+function grindsCard(wedges){
+  const mine = wedges.map(w => {
+    const m = /(\d+(?:\.\d+)?)\s*°?\s*bounce\s*·?\s*([A-Z])\s*grind/i.exec(w.spec || '');
+    return m ? { w, bounce:+m[1], g:m[2].toUpperCase() } : null;
+  }).filter(Boolean);
+  if(!mine.length) return '';
+  const band = b => BOUNCE_BANDS.findIndex(([, , lo, hi]) => b >= lo && b <= hi);
+  const absent = ['K', 'D', 'L', 'T'].filter(k => !mine.some(x => x.g === k));
   return `
-  <h2>The starting lineup · in the bag now</h2>
-  ${lineup.length ? lineup.map(clubCard).join('') : '<p class="sm faint">Nothing gaming yet.</p>'}
-  ${bullpen.length ? `<h2>The bullpen · owned, not in the 14</h2>
-  ${bullpen.map(clubCard).join('')}` : ''}
-  ${wishlist.length ? `<h2>Scouting list</h2>
-  ${wishlist.map(clubCard).join('')}` : ''}
+  <p class="sm"><b>Bounce</b> is the angle between the leading edge and the sole — how hard the
+    club resists digging. <b>Grind</b> is what has been shaved off that sole, which decides how
+    the club sits when you open the face. Your three are deliberately different tools.</p>
+  ${mine.map(x => `<div class="grind">
+    <div class="gl">${esc(x.g)}</div>
+    <div class="gm">
+      <div class="gs">${esc(x.w.loft ? `${x.w.loft}°` : '')} · ${x.bounce}° BOUNCE${
+        wedgeSpec(x.w) ? ` · ${esc(wedgeSpec(x.w))}` : ''}</div>
+      <div class="gn">${esc(GRIND_LORE[x.g] ? GRIND_LORE[x.g][0] : 'Grind')}</div>
+      <p class="sm">${esc(GRIND_LORE[x.g] ? GRIND_LORE[x.g][1] : '')}</p>
+      ${GRIND_LORE[x.g] && GRIND_LORE[x.g][2] ? `<div class="gu">${esc(GRIND_LORE[x.g][2])}</div>` : ''}
+    </div>
+  </div>`).join('')}
+  <div class="bbands">${BOUNCE_BANDS.map(([lab, body], i) => {
+    const here = mine.filter(x => band(x.bounce) === i);
+    return `<div class="bband">
+      <div class="bl">${esc(lab)}</div>
+      <p class="sm">${esc(body)}</p>
+      <div class="bm ${here.length ? '' : 'none'}">${here.length
+        ? esc(here.map(x => `your ${x.w.loft}°`).join(' · ')) : 'nothing of yours here'}</div>
+    </div>`; }).join('')}
+  ${absent.length ? `<p class="sm" style="margin-top:10px"><b>The grinds you don't have</b>, and why
+    each exists — so the three above read as choices rather than as what came in the box.</p>
+  ${absent.map(k => `<div class="gabs"><span class="gk">${esc(k)}</span>
+    <span class="sm"><b>${esc(GRIND_LORE[k][0])}.</b> ${esc(GRIND_LORE[k][1])}</span></div>`).join('')}` : ''}
+  <div class="goldnote">
+    <div class="gnl">What this cannot tell you</div>
+    <p class="sm">Whether the M grind on the 60° suits your attack angle is a <b>measurement</b>
+      question, and no film of your pitching motion exists. A low-bounce crescent is the least
+      forgiving choice there is for a steep, digging strike — and nothing on file says which kind
+      of strike you have. Until there is film, this section describes the tools, not the fit.</p>
+  </div>`;
+}
+// ----- The carry ladder -----
+// Bars against a fixed 300-yard scale, so the shape of the ladder is the shape of the bag
+// and every row shares one axis. Three rules the design turns on: the CARRY LIVES IN ITS
+// OWN COLUMN and never inside the bar (an editable number laid over a coloured bar is
+// unreadable in sun and untappable with a thumb); a null carry draws NO BAR at all, because
+// a guessed length is a measurement claim; and the ESTIMATED badge appears only while
+// `S.carriesCalibrated` is false — once he has calibrated, saying otherwise would be a lie
+// about his own numbers.
+const LADDER_MAX = 300;
+function ladderCard(){
+  const pf = playsFactor();
+  return `
+  ${S.carriesCalibrated ? '' : `<div class="goldnote">
+    <div class="gnl">Estimated · not calibrated</div>
+    <p class="sm">No number here has been measured yet — they are starting points for your game.
+      Edit any row as a real carry comes in from the range or the course.</p>
+  </div>`}
+  <div class="ladr">${S.carries.map((c, i) => {
+    const next = S.carries[i + 1];
+    const gap = next && c.carry && next.carry ? c.carry - next.carry : null;
+    return `<div class="lrow">
+      <span class="lc">${esc(clubAbbr(c.club))}</span>
+      <span class="lb">${c.carry != null
+        ? `<i style="width:${Math.min(100, Math.round(c.carry / LADDER_MAX * 100))}%"></i>`
+        : '<em>unmeasured</em>'}</span>
+      <span class="lv"><input data-carry="${i}" inputmode="numeric" value="${c.carry ?? ''}" placeholder="—">${
+        pf && c.carry ? `<b>${Math.round(c.carry * pf)} today</b>` : ''}</span>
+      <span class="lg ${gap !== null && (gap >= 15 || gap <= 5) ? 'wide' : ''}">${
+        gap !== null ? `${gap}` : '·'}</span>
+    </div>`; }).join('')}</div>
+  <div class="lfoot"><span>0</span><span>${LADDER_MAX} yd scale</span></div>
+  <button class="btn ghost tiny" data-action="save-carries">Save carries</button>
+  ${pf ? `<p class="sm faint" style="margin-top:8px">"Today" = carry adjusted for ${Math.round(S.weather.t)}°F air (${
+    pf > 1 ? '+' : ''}${((pf - 1) * 100).toFixed(1)}%).</p>` : ''}
+  <div class="goldnote">
+    <div class="gnl">The ladder IS the roster</div>
+    <p class="sm">This list is what the live logger offers you off the tee and into the green, so
+      it stays as long as the bag is — a club leaving or joining is a ladder change as much as a
+      bag change. Gap column: <b>15 yd or more</b> is a hole in the bag, <b>5 or less</b> is two
+      clubs fighting for one number.</p>
+  </div>`;
+}
+function bag(){
+  const lineup = S.clubs.filter(c => c.status === 'gaming' || c.status === 'ordered').sort(bagSort);
+  const bullpen = S.clubs.filter(c => c.status === 'backup').sort(bagSort);
+  const wishlist = S.clubs.filter(c => c.status === 'wishlist').sort(bagSort);
+  const wedges = S.clubs.filter(c => c.cat === 'wedge' && c.loft).sort((a, b) => a.loft - b.loft);
+  // Grouped the way the bag is carried: the long clubs, the irons, the wedges, the putter.
+  // Every group is drawn from `S.clubs` by CATEGORY, so a club can only appear where its own
+  // record puts it, and an empty group doesn't render.
+  const GROUPS = [['Woods &amp; long clubs', ['wood', 'hybrid']], ['Irons', ['iron']],
+    ['Wedges', ['wedge']], ['Putter', ['putter']], ['Everything else', ['ball', 'other']]];
+  const groups = GROUPS.map(([lab, cats]) => [lab, lineup.filter(c => cats.includes(c.cat))])
+    .filter(([, cs]) => cs.length);
+  return `
+  <div class="card">
+    ${fold('bag-roster', 'In the bag', `${lineup.length} CLUB${lineup.length === 1 ? '' : 'S'}`,
+      groups.length ? groups.map(([lab, cs]) => `<div class="cgrp">${lab}</div>
+        ${cs.map(clubRow).join('')}`).join('')
+        : '<p class="sm faint">Nothing gaming yet.</p>')}
+  </div>
+
+  ${wedges.length ? `<div class="card">
+    ${fold('bag-grinds', 'Grinds & bounce', `${wedges.length} WEDGES`, grindsCard(wedges), false)}
+  </div>` : ''}
+
+  ${bullpen.length || wishlist.length ? `<div class="card bench">
+    ${fold('bag-bench', 'On the bench', `${bullpen.length + wishlist.length} OWNED, NOT IN THE 14`, `
+      ${bullpen.map(clubRow).join('')}
+      ${wishlist.length ? `<div class="cgrp">Scouting list</div>${wishlist.map(clubRow).join('')}` : ''}
+      <p class="rdf">Kept, not gone. What a benched club did is still true — the mini driver's
+        tee-shot record stays in the off-the-tee table as history, it just stops accumulating.</p>`, false)}
+  </div>` : ''}
   <div class="formrow" style="margin-top:6px">
     <button class="btn" data-action="show-add-club">+ Add a club</button>
   </div>
   <div id="addClubForm" class="card" style="display:none">
-    <h2>New club</h2>
+    <div class="cgrp">New club</div>
     <label>Name</label><input id="clNa" placeholder="e.g. TaylorMade Qi35 driver">
     <div class="formrow">
       <div><label>Category</label><select id="clCat"><option value="wood">Driver / wood</option><option value="hybrid">Hybrid</option><option value="iron">Irons</option><option value="wedge">Wedge</option><option value="putter">Putter</option><option value="ball">Ball</option><option value="other">Other</option></select></div>
@@ -1273,23 +1702,9 @@ function bag(){
     </div>`;
   })()}
 
-  <h2>Full-bag distance ladder</h2>
   <div class="card">
-    ${S.carriesCalibrated ? '' : `<p class="sm"><span class="warn">Estimated</span> for your game until you calibrate — edit any number as real carries come in from the range or course.</p>`}
-    <table><tr><th>Club</th><th>Loft</th><th>Carry</th>${playsFactor() ? '<th>Today</th>' : ''}<th>Gap</th></tr>
-      ${S.carries.map((c,i) => {
-        const next = S.carries[i+1];
-        const gap = next && c.carry && next.carry ? c.carry - next.carry : null;
-        const pf = playsFactor();
-        return `<tr><td><b>${esc(c.club)}</b></td><td class="sm faint">${esc(c.loft)}</td>
-          <td><input data-carry="${i}" inputmode="numeric" style="width:58px;text-align:center;padding:5px 4px" value="${c.carry ?? ''}"></td>
-          ${pf ? `<td class="sm" style="color:var(--btext);font-weight:700">${c.carry ? Math.round(c.carry*pf) : '—'}</td>` : ''}
-          <td class="sm ${gap!==null && (gap>=20||gap<=5) ? 'warn':'faint'}">${gap!==null ? gap+' yd' : '—'}</td></tr>`;
-      }).join('')}
-    </table>
-    ${playsFactor() ? `<p class="sm faint">"Today" = carry adjusted for ${Math.round(S.weather.t)}°F air (${playsFactor()>1?'+':''}${((playsFactor()-1)*100).toFixed(1)}%).</p>` : ''}
-    <button class="btn ghost tiny" data-action="save-carries">Save carries</button>
-    <p class="sm faint" style="margin-top:8px">Gap flags: over 20 yd = a hole in the bag · 5 yd or less = two clubs fighting for one number. Watch the mini → 2-iron → 4-iron stack.</p>
+    ${fold('bag-ladder', 'Carry ladder',
+      S.carriesCalibrated ? `${S.carries.length} CLUBS` : 'ESTIMATED · NOT CALIBRATED', ladderCard())}
   </div>
 
   ${wedges.length ? `<h2>Wedge gapping ladder</h2>
@@ -1306,33 +1721,19 @@ function bag(){
     <button class="btn ghost tiny" data-action="save-matrix">Save carries</button>
   </div>
 
-  <h2>Change history</h2>
   <div class="card">
-    <table><tr><th>When</th><th>What & why</th></tr>
-    ${S.bagHistory.map(h => `<tr><td style="white-space:nowrap">${esc(h.date)}</td><td>${esc(h.text)}</td></tr>`).join('')}
-    </table>
-    <div class="formrow" style="margin-top:8px">
-      <input id="newHist" placeholder="Log a change (what & why)…">
-      <button class="btn ghost" data-action="add-history">Log it</button>
-    </div>
+    ${fold('bag-history', 'Bag history', `${S.bagHistory.length} CHANGES`, `
+      <div class="bhist">${S.bagHistory.map(h => `<div class="bhr">
+        <span class="d">${esc(h.date)}</span><span class="t">${esc(h.text)}</span></div>`).join('')}</div>
+      <div class="formrow" style="margin-top:10px">
+        <input id="newHist" placeholder="Log a change (what & why)…">
+        <button class="btn ghost" data-action="add-history">Log it</button>
+      </div>`, false)}
   </div>`;
 }
 
-function clubCard(c){
-  const flags = { gaming:['GAMING','f-ok'], ordered:['ON ORDER','f-new'], backup:['BACKUP','f-warn'], wishlist:['WISHLIST','f-new'] };
-  const mismatch = c.cat==='putter' && c.flow==='toe' && S.profile.stroke==='SBST';
-  const [txt, cls] = mismatch ? ['MISMATCH','f-burg'] : (flags[c.status]||['','f-ok']);
-  const groove = c.cat==='wedge' && c.status==='gaming'
-    ? `<div class="meter grn" title="groove life"><span style="width:${groovePct(c)}%"></span></div>
-       <div class="sm faint">Groove life ${groovePct(c)}% · ${c.rounds||0} rounds</div>` : '';
-  return `<div class="clubcard"><div class="flag ${cls}">${txt}</div>
-    <div class="name">${esc(c.name)}</div>
-    <div class="spec">${esc(c.spec||'')}</div>
-    ${c.note ? `<div class="note">${esc(c.note)}</div>` : ''}
-    ${mismatch ? `<div class="note warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</div>` : ''}
-    ${groove}
-  </div>`;
-}
+// `clubCard()` — the old boxed club tile — was removed on Aug 27 2026 when the roster
+// became a grouped list. `clubRow()` above replaces it, and nothing else rendered it.
 
 function ladderHTML(wedges){
   const pw = S.pwLoft;
@@ -2583,21 +2984,35 @@ function coachHero(sig, dr){
   const counted = AREAS.filter(k => A[k]);
   const thin = counted.length && Math.min(...counted.map(k => A[k].n)) < 36;
   const rounds = cards.length;
+  // The read, at the size of a thing somebody said to you. It states nothing the page below
+  // doesn't — it is the same sentence the card always carried, set in the display voice,
+  // with the three standing facts about the player under it. The profile is the only thing
+  // here that isn't computed, and every one of its three is on `S.profile`.
+  const read = allHoles
+    ? `${ev === 'live'
+        ? `${rounds} live round${rounds === 1 ? '' : 's'} — ${liveHoles} holes you logged standing on them`
+        : `${rounds} card${rounds === 1 ? '' : 's'} on record — ${allHoles} holes`}${
+      stC.holes ? `, running ${(stC.over / stC.holes).toFixed(2)} a hole over par` : ''}.`
+    : 'Nothing measured yet. Everything on this page is built from your own numbers, so it stays blank until there are some.';
+  const facts = [[S.profile.handicap, 'Handicap'], [S.profile.stroke, 'Stroke · confirmed'],
+    [S.profile.miss, 'Signature miss']].filter(x => x[0] != null && x[0] !== '');
   return `
+  <div class="card readcard">
+    ${fold('coach-read', 'Where the game is', allHoles ? EV_LAB[ev].toUpperCase() : '', `
+      <p class="readh">${esc(read)}</p>
+      ${setAside ? `<p class="reads">${setAside} older card${setAside === 1 ? '' : 's'} set aside — this is your live rounds only.</p>` : ''}
+      ${since.length ? `<p class="reads">Read off ${esc(since.join(' · '))}.</p>` : ''}
+      <div class="readst">${facts.map(([v, k]) =>
+        `<div><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join('')}</div>`, true, 'oncard')}
+  </div>
+
   <div class="card">
-    <h2>Where your game is</h2>
     ${allHoles ? `
-      <p class="sm">${ev === 'live'
-        ? `<b>${rounds} live round${rounds === 1 ? '' : 's'}</b> · ${liveHoles} holes you logged on the hole`
-        : `<b>${rounds} card${rounds === 1 ? '' : 's'}</b> · ${allHoles} holes on record`}${
-        stC.holes ? ` at ${(stC.over / stC.holes).toFixed(2)} a hole over par` : ''}.${evTag(ev)}
-        ${setAside ? `<span class="faint">${setAside} older card${setAside === 1 ? '' : 's'} set aside — these are your live rounds only.</span>` : ''}</p>
-      ${since.length ? `<p class="sm faint">Read off ${since.join(' · ')}.</p>` : ''}
       <div class="areagrid">${AREAS.map(tile).join('')}</div>
       ${thin ? `<p class="sm faint">Thin sample — some of these rest on fewer than 36 recorded
         holes, which is a flag rather than a rate. They redraw off every live round you log.</p>` : ''}`
-      : `<p class="sm">Nothing measured yet. Log a live round — everything on this page is built from your own numbers, so it stays blank until there are some.</p>`}
-    ${f ? `<div class="tipcard ${f.sev === 'good' ? 'green' : ''}" style="margin-top:12px">
+      : `<p class="sm">Log a live round and these four fill themselves in.</p>`}
+    ${f ? `<div class="tipcard ${f.sev === 'good' ? 'green' : ''}${rail(f.ev)}" style="margin-top:12px">
       <div class="src">Focus right now · ${esc(f.src)}${evTag(f.ev)}</div>
       <h4>${f.h}</h4>${expandable(f.b)}
       ${work}
@@ -2637,22 +3052,26 @@ function coach(){
   return `
   ${coachHero(sig, dr)}
 
-  <h2>Drills · what you can do right now</h2>
   <div class="card">
-    <div class="linkrow" data-action="go" data-view="drills">
-      <span><b>Open the drill bench</b><br><span class="sm">${dr.ready} drills you have the kit for${dr.home ? ` · ${dr.home} at home` : ''}${dr.forYou ? ` · <b>${dr.forYou} matched to your game</b>` : ''}</span></span><span class="arr">→</span></div>
-    ${dr.week ? `<p class="sm">${dr.week} logged in the last seven days.</p>` : ''}
-    <p class="sm faint">Every lesson's drill in one list, filtered by the kit in the house and where you're standing.</p>
+    ${fold('coach-drills', 'Drill bench',
+      `${dr.ready} READY${dr.forYou ? ` · ${dr.forYou} FOR YOU` : ''}`, `
+      <div class="linkrow" data-action="go" data-view="drills">
+        <span><b>Open the drill bench</b><br><span class="sm">${dr.ready} drills you have the kit for${dr.home ? ` · ${dr.home} at home` : ''}${dr.forYou ? ` · <b>${dr.forYou} matched to your game</b>` : ''}</span></span><span class="arr">→</span></div>
+      ${dr.week ? `<p class="sm">${dr.week} logged in the last seven days.</p>` : ''}
+      <p class="sm faint">Every lesson's drill in one list, filtered by the kit in the house and where you're standing. Drills live here and nowhere else.</p>`)}
   </div>
 
-  <h2>The library · always open</h2>
-  <div class="shelf-grid">
-    ${Object.entries(counts).map(([name,c]) => `
-      <div class="shelf" data-action="open-shelf" data-shelf="${esc(name)}">
-        <div class="nm">${esc(name)}</div>
-        <div class="ct">${c.n} lessons</div>
-        ${c.forYou ? `<span class="new">${c.forYou} FOR YOU</span>` : ''}
-      </div>`).join('')}
+  <div class="card">
+    ${fold('coach-library', 'The library',
+      `${Object.values(counts).reduce((a, c) => a + c.n, 0)} LESSONS`, `
+      <div class="shelf-grid">
+        ${Object.entries(counts).map(([name,c]) => `
+          <div class="shelf" data-action="open-shelf" data-shelf="${esc(name)}">
+            <div class="nm">${esc(name)}</div>
+            <div class="ct">${c.n} lessons</div>
+            ${c.forYou ? `<span class="new">${c.forYou} FOR YOU</span>` : ''}
+          </div>`).join('')}
+      </div>`)}
   </div>
 
   <h2>Keep the streak</h2>
@@ -2684,7 +3103,7 @@ function coach(){
     </div>
   </div>
 
-  <div class="card flat"><div class="linkrow" data-action="go" data-view="scores">
+  <div class="card flat"><div class="linkrow" data-action="go" data-view="rounds" data-seg="cards">
     <span><b>Score history &amp; analytics</b><br><span class="sm">${S.rounds.length ? `${S.rounds.length} rounds · scoring mix, par splits, worst holes` : 'Log a round — the coaching above is built from them'} · logging lives there</span></span><span class="arr">→</span></div></div>`;
 }
 
@@ -2883,11 +3302,15 @@ function briefing(id){
   // An undated plan is usually a lab routine, but a COURSE plan is undated too — course
   // knowledge doesn't expire — and sending that one back to the Swing Lab is nonsense.
   const isCourse = !!played || S.rounds.some(r => courseMatches(r.course, b.course));
+  // Back where it came from. A discipline plan belongs to its lab; a COURSE plan belongs
+  // to Round Prep — which is the second segment of Rounds since Aug 27 2026, so the link
+  // names the tab and the segment rather than a page of its own.
   const LAB = { putting:['putting','Putting Lab'], mental:['mental','Mental Game'], 'short-game':['shortgame','Short Game'] };
   const lab = LAB[b.discipline] || ['swing','Swing Lab'];
-  const [backView, backLabel] = b.date || isCourse ? ['preps','Round Prep'] : lab;
+  const [backView, backLabel] = b.date || isCourse ? ['rounds','Round Prep'] : lab;
+  const backSeg = backView === 'rounds' ? ' data-seg="prep"' : '';
   return `
-  <button class="backlink" data-action="go" data-view="${backView}">← ${backLabel}</button>
+  <button class="backlink" data-action="go" data-view="${backView}"${backSeg}>← ${backLabel}</button>
   <div class="card">
     <h2>${b.date ? 'Round prep · ' + fmtDate(b.date) : 'Standing plan'}</h2>
     <h3 style="font-size:19px">${esc(b.course)}</h3>
@@ -3007,7 +3430,9 @@ function shortgame(){
 // Four labs behind one nav button. The bar was at eight tabs and a short-game lab would
 // have made nine; these four are the same KIND of thing — a discipline with faults, film
 // and plans — so they belong behind one door. Training is deliberately NOT on that list:
-// drills live on the bench in Coach, one home for all of them.
+// drills live on the bench in Coach, one home for all of them. Nor is Round Prep, as of
+// Aug 27 2026 — a course plan is about the round you are about to play, not about a part
+// of your game, so it sits in Rounds beside the cards it gets judged against.
 // `short` is the cheat sheet's tab label — four have to sit in one row on a phone.
 const LABS = [
   { view:'swing',     disc:'swing',       ic:'🏌', name:'Full Swing',  short:'Swing', sub:'Driver to wedge — film, plans, speed work.' },
@@ -3015,25 +3440,108 @@ const LABS = [
   { view:'putting',   disc:'putting',     ic:'◎', name:'Putting',     short:'Putting', sub:'Stroke, pace and the short ones.' },
   { view:'mental',    disc:'mental',      ic:'🧠', name:'Mental',      short:'Mental', sub:'Staying locked in — decided off the course.' },
 ];
-function labRow(l){
+function labRow(l, last){
   const open = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;
   const plans = plansFor(l.disc).length;
-  return `<div class="linkrow" data-action="go" data-view="${l.view}">
+  return `<div class="linkrow" data-action="go" data-view="${l.view}"${last ? ' style="border-bottom:none"' : ''}>
     <span><b>${l.ic} ${esc(l.name)}</b><br><span class="sm">${esc(l.sub)}</span>
     <br><span class="sm faint">${open ? `${open} open fault${open>1?'s':''}` : 'no open faults'} · ${plans} plan${plans===1?'':'s'}</span></span>
     <span class="arr">→</span></div>`;
 }
+// ----- What a fault was read off (Aug 27 2026) -----
+// A fault carries `{tag, why}` and nothing else, so the evidence tier it renders with has
+// to be WRITTEN DOWN rather than guessed at, exactly like FOCUS_TAG and DRILL_KIT. Every
+// entry below is grounded in what that fault's own text says its basis is, and the `src`
+// is the sample it names — nothing here is a number or a source invented on its behalf.
+//
+// A tag with NO entry is normal and fine: it renders with no rail and no chip, and the card
+// claims nothing about where it came from. That is the honest failure mode, and it is why
+// this table is explicit rather than inferred from the prose — a fault text saying "filmed"
+// and one saying "the film could not settle it" read identically to a keyword scan.
+const FAULT_EV = {
+  // Read off the Aug 12 Sterling Farms card — a scorecard, hole by hole, typed up after.
+  'pace-calibration':['round', '18 holes at Sterling Farms, Aug 12 — 38 putts, three 3-putts'],
+  'up-and-down':['round', '12 missed greens on one card — Sterling Farms, Aug 12'],
+  'missing-short':['round', '12 green misses on one card — 7 of them short'],
+  // Read off film, and each says so: the measurement exists, or it is the measurement that
+  // could not be made from the angles shot.
+  'strike-location':['measured', 'Aug 10 evening start lines — ~0.8° scatter either side, no bias'],
+  'delivery-unverified':['measured', 'Aug 10 — 23 oblique clips and six on the target line, neither able to see lean'],
+  'across-the-line-top':['measured', 'Jul 26 film, both clubs'],
+  'posture-through-impact':['measured', 'Aug 20 film — the first that caught a finish'],
+  // Its own text says NOT MEASURED: seven stills neither confirm nor refute it. It is his
+  // lifelong read of his own miss, which is exactly what the `self` tier is for.
+  'over-the-top-slice':['self', 'Your own lifelong read — Aug 20 stills could neither confirm nor refute it'],
+};
+const faultEv = f => FAULT_EV[f.tag] || null;
+// The diagnosis, one row per open fault, each carrying its own tier rail and a tappable
+// chip that opens what the fault was read off. Settled ones collapse to a line — the same
+// behaviour `faultState()` has always produced, drawn instead of listed.
+function faultRows(disc){
+  const all = faultsFor(disc);
+  const open = all.filter(f => faultState(f) === 'open');
+  const settled = all.filter(f => faultState(f) !== 'open');
+  if(!all.length) return `<p class="sm">Nothing here is measured yet. No film, no faults —
+    this lab fills itself the moment something gets shot or logged.</p>`;
+  return `${open.length ? open.map(f => { const e = faultEv(f);
+    return `<div class="faultrow${rail(e ? e[0] : null)}">
+      ${e ? evDrawer(`ev-fault-${f.tag}`, 'Diagnosis', e[0], e[1])
+          : '<div class="evdl">Diagnosis</div>'}
+      <h4>${esc(faultLabel(f.tag))}</h4>
+      ${expandable(f.why)}
+      ${faultDrillRow(f.tag)}
+    </div>`; }).join('')
+    : `<p class="sm">No open faults here — everything tracked in this lab has been measured shut.</p>`}
+  ${settled.length ? `<p class="sm faint" style="margin-top:10px"><b>Settled:</b> ${settled.map(f =>
+      esc(faultLabel(f.tag)) + (faultState(f) === 'downgraded' ? ' (downgraded)' : ' ✓')).join(' · ')}</p>` : ''}`;
+}
 // FIXED ORDER, always (Jack's instruction, Aug 14 2026): Swing · Short Game · Putting ·
-// Mental · Round Prep, top down. It used to float the last-opened lab to the top, which
+// Mental, top down — LABS order. It used to float the last-opened lab to the top, which
 // meant the row you wanted was in a different place every visit — muscle memory beats
-// recency on a page whose whole job is to get you somewhere else in one tap.
+// recency on a page whose whole job is to get you somewhere else in one tap. Add a new lab
+// to the END of LABS rather than reordering it.
+//
+// The hub is the four labs and NOTHING ELSE (Aug 27 2026, Jack's redesign). Round Prep
+// used to sit at the bottom of this list; it lives in Rounds now, beside the cards its
+// plans get judged against. This page is the game you are working on, not the round you
+// are about to play.
+// Which lab the hub is showing. View-local state, like `roundsSeg`: which face of the hub
+// you last looked at is a property of the page, not of the player, so it is a module
+// variable and never saved. Switching is a rerender() — you have not gone anywhere.
+let gameLab = LABS[0].disc;
 function game(){
+  const cur = LABS.find(l => l.disc === gameLab) || LABS[0];
+  const clips = S.sessions.filter(s => sessionDiscipline(s) === cur.disc).length;
+  const plans = plansFor(cur.disc).length;
+  const open = faultsFor(cur.disc).filter(f => faultState(f) === 'open').length;
   return `
-  <h2>The labs</h2>
+  <div class="labgrid">${LABS.map(l => {
+    const on = l.disc === cur.disc;
+    const n = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;
+    return `<button class="labsel ${on ? 'on' : ''}" data-action="${on ? 'go' : 'game-lab'}"
+      data-view="${l.view}" data-disc="${l.disc}">
+      <span class="k">${n ? `${n} OPEN` : 'CLEAR'}${on ? ' · OPEN LAB ›' : ''}</span>
+      <span class="nm">${esc(l.name)}</span>
+      <span class="sb">${esc(l.sub)}</span></button>`; }).join('')}</div>
+
+  <div class="card">
+    ${fold('game-diag', 'Diagnosis', `${cur.name.toUpperCase()} · ${
+      open ? `${open} OPEN FAULT${open === 1 ? '' : 'S'}` : 'NOTHING OPEN'}`, faultRows(cur.disc))}
+  </div>
+
+  <div class="twoup">
+    <div class="card tu"><div class="rdl">Film room</div>
+      <b>${clips || '—'}</b>
+      <span>${clips ? `session${clips === 1 ? '' : 's'} on file` : 'no film on file'}</span></div>
+    <div class="card tu"><div class="rdl">Standing plans</div>
+      <b>${plans || '—'}</b>
+      <span>${plans ? 'sliced by situation' : 'none written yet'}</span></div>
+  </div>
+
   <div class="card flat">
-    ${LABS.map(labRow).join('')}
-    <div class="linkrow" data-action="go" data-view="preps" style="border-bottom:none">
-      <span><b>🗒 Round Prep</b><br><span class="sm">Every course plan, kept for the next time.</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="${cur.view}" style="border-bottom:none">
+      <span><b>Open the ${esc(cur.name)} lab</b><br><span class="sm">The film room, the plans,
+        and everything this diagnosis is built on</span></span><span class="arr">→</span></div>
   </div>`;
 }
 
@@ -3524,6 +4032,50 @@ const EV_RANK = { live:0, round:1, measured:2, snapshot:3, self:4 };
 const EV_LAB = { live:'you logged this live', round:'from your rounds', measured:'measured',
   snapshot:'GHIN summary', self:'your own read' };
 const evTag = ev => ev ? ` <span class="ev ${ev}">${EV_LAB[ev]}</span>` : '';
+
+// ----- The evidence disclosure (Aug 27 2026) -----
+// Every finding already says where it came from; this is the door behind that badge.
+// Tapping the tier chip opens EVIDENCE USED: what was counted, what it was read off, and —
+// the part that matters — what this source CANNOT tell you. The first two come from the
+// finding itself (its own `src` is the sample it fired on); the third is written down PER
+// TIER rather than per finding, because it is a property of the source and not of the
+// number: a scorecard cannot see a stroke however many holes of it there are, and a season
+// summary cannot be broken back down to a hole. Nothing here is invented about a specific
+// finding — a made-up limitation reads exactly like a real one, which is the whole failure
+// the tier ladder exists to prevent.
+//
+// It is ONE `<details id=…>`, deliberately: render() reopens any open <details> carrying an
+// id after a rerender(), so the open state costs no store and cannot drift out of sync.
+// Reuse it wherever a finding renders — Today, the labs, the round card — so a tier is
+// never explained two different ways on two screens.
+const EV_SOURCE = {
+  live:'Cards you logged hole by hole in the live logger — recorded on the hole, between shots, with the bag you are playing today.',
+  round:'Your own scorecards, typed up after the round rather than tapped in on the hole.',
+  measured:'A measurement — film of the stroke, or a scored test.',
+  snapshot:'A season summary somebody else computed, pasted in.',
+  self:'Your own account of a round, written afterwards.' };
+const EV_BLIND = {
+  live:'A card records WHAT happened, never why. Nothing on it measures the stroke that produced it, and nothing reads the notes you wrote on it.',
+  round:'One remove from the shot — written up after the round, so a hole detail is only as good as the memory of it. And a scorecard still cannot see a stroke.',
+  measured:'Measured in one place on one day. Whether it holds up on the course is a different question, and this is not it.',
+  snapshot:'It cannot be broken back down to a hole, and it may predate the bag you are playing. It is an average, not an event.',
+  self:'Not a measurement. Nothing on a card confirms or contradicts it — it is the only witness for what a scorecard cannot see, and it is still a feel.' };
+// id     unique and STABLE — the key the reopen-after-rerender works off
+// label  the header text left of the chip
+// ev     the tier, one of the five
+// sample what was counted — pass the finding's own `src`, never a number you invented
+// more   optional extra sentence about what THIS finding leaves unmeasured
+function evDrawer(id, label, ev, sample, more){
+  const tier = ev || 'snapshot';
+  return `<details class="evdis" id="${esc(id)}">
+    <summary><span class="evdl">${esc(label)}</span><span class="ev ${tier}">${esc(EV_LAB[tier] || tier)}</span></summary>
+    <div class="evpanel"><b>Evidence used</b>
+      <dl>${sample ? `<dt>Sample</dt><dd>${esc(sample)}</dd>` : ''}
+        <dt>Source</dt><dd>${esc(EV_SOURCE[tier] || '')}</dd>
+        <dt>Not measured</dt><dd>${esc(EV_BLIND[tier] || '')}${more ? ' ' + esc(more) : ''}</dd></dl>
+    </div>
+  </details>`;
+}
 
 // Tips fire off thresholds in the data, so they only appear once there's
 // enough of it to mean anything. Each one carries the number that triggered it.
@@ -4285,6 +4837,125 @@ function roundVsBaseline(a){
   </div>`;
 }
 
+// ----- The round card, drawn as a card (Aug 27 2026, Jack's redesign) -----
+// Everything below this line is PRESENTATION over `roundAnalysis()` — it counts nothing of
+// its own, on purpose. Two numbers disagreeing about the same round would be worse than no
+// numbers, so a new block here is always a reader over `a`, never a fourth place that walks
+// the hole array. Same rule `gameAreas()` follows on Coach.
+
+// Scorecard convention, and the only place in the app that draws it: circle under par,
+// square over, doubled for two or more either way. `mark()` inside roundView() draws the
+// same four states for the detail table — one vocabulary, two sizes.
+const SC_MARK = h => { const d = h.s - h.par;
+  return d <= -2 ? 'eag' : d === -1 ? 'bird' : d === 0 ? 'par' : d === 1 ? 'bog' : 'dbl'; };
+
+// One nine, as a scorecard: five rows sharing one set of column widths, so HOLE, PAR, SI,
+// SCORE and PUTTS line up under each other the way they do on paper. Each row hides itself
+// when the card never carried it — a score-only round still draws, it just draws less.
+function cardBlock(hs, lab){
+  const anySI = hs.some(h => h.si != null), anyPutt = hs.some(h => h.putts != null);
+  const allPutt = hs.every(h => h.putts != null);
+  const cells = (cls, f) => hs.map(h => `<div class="scc ${cls}">${esc(f(h))}</div>`).join('');
+  const tot = f => hs.reduce((x, h) => x + (f(h) || 0), 0);
+  return `<div class="scblk">
+    <div class="scr"><div class="sck">HOLE</div>${cells('n', h => h.n ?? '')}<div class="sct lab">${esc(lab)}</div></div>
+    <div class="scr"><div class="sck">PAR</div>${cells('p', h => h.par)}<div class="sct">${tot(h => h.par)}</div></div>
+    ${anySI ? `<div class="scr"><div class="sck">SI</div>${cells('si', h => h.si ?? '')}<div class="sct"></div></div>` : ''}
+    <div class="scr"><div class="sck">SCORE</div>${hs.map(h =>
+      `<div class="scc"><span class="scm ${SC_MARK(h)}">${h.s}</span></div>`).join('')}<div class="sct big">${tot(h => h.s)}</div></div>
+    ${anyPutt ? `<div class="scr"><div class="sck">PUTTS</div>${cells('pu', h => h.putts ?? '')}<div class="sct">${
+      allPutt ? tot(h => h.putts) : ''}</div></div>` : ''}
+  </div>`;
+}
+// The round in eighteen bars. They grow from a FIXED 48px track rather than being scaled
+// to fill one, so every bar on the card shares a baseline and the score row underneath
+// reads as a row — the whole point of the graphic is the shape of the round at a glance.
+function roundBars(a){
+  if(!a.holes.length) return '';
+  const max = Math.max(...a.holes.map(h => h.s));
+  return `<div class="rdbars">${a.holes.map(h => `<div class="rdb">
+    <div class="n">${h.n ?? ''}</div>
+    <div class="tr"><i class="${SC_MARK(h)}" style="height:${Math.max(8, Math.round(h.s / max * 100))}%"></i></div>
+    <div class="s">${h.s}</div></div>`).join('')}</div>`;
+}
+// Where the greens went, as a picture. DIRECTIONS ONLY — `topDir()`'s rule, drawn: OB is
+// where a ball finished but it is not a way to miss, so it is priced in the caption in
+// strokes instead of taking a cell, and a green the drive already took away is counted
+// beside the map rather than inside it, because it asks a driving question and not a club
+// one. Both of those are the same distinctions the round's own findings draw.
+function missMap(a){
+  if(!a.gir.n) return '';
+  const m = a.gir.miss, at = k => m[k] || 0;
+  const peak = Math.max(1, ...DIRS.map(at));
+  const lvl = v => !v ? 0 : v >= peak ? 3 : v >= peak / 2 ? 2 : 1;
+  const cell = k => !k ? '<div class="mmc off"></div>'
+    : k === 'H' ? `<div class="mmc hit"><b>${a.gir.hit}</b><i>hit</i></div>`
+    : `<div class="mmc l${lvl(at(k))}"><b>${at(k) || '·'}</b><i>${esc(MISS_LAB[k])}</i></div>`;
+  const ob = (a.holes.filter(h => h.gmiss === 'OB').length);
+  const foot = [`Centre is a green hit`,
+    a.gir.noshot ? `${a.gir.noshot} the drive left no play at` : '',
+    ob ? `${ob} out of bounds · ${ob * 2} strokes` : '',
+    at('X') ? `${at('X')} recorded without a direction` : ''].filter(Boolean).join(' · ');
+  return `<div class="card mmap">
+    <div class="rdl">Miss map</div>
+    <div class="mmg">${['', 'Lg', '', 'L', 'H', 'R', '', 'S', ''].map(cell).join('')}</div>
+    <p class="rdf">${esc(foot)}. Directions only — out of bounds is a price, not a way to miss.</p>
+  </div>`;
+}
+// The distances he actually holed from, which is the question "how many putts" cannot ask.
+// Reads `puttAttempts()`'s made column through the same map the by-distance table uses, so
+// the two can never disagree; the longest one is called out because it is the ceiling of
+// the day and a single number he will remember.
+function madeFrom(P){
+  const rows = puttRows(P.dist);
+  const made = rows.filter(e => e.made);
+  if(!made.length) return '';
+  const peak = Math.max(...made.map(e => e.made));
+  const longest = made[made.length - 1];
+  return `<div class="card mfrom">
+    <div class="rdl">Putts made from</div>
+    <div class="mfl">${made.map(e => `<div class="mfr">
+      <span class="d">${esc(PD[e.k].lab)}′</span>
+      <span class="b"><i style="width:${Math.round(e.made / peak * 100)}%"></i></span>
+      <span class="n">${e.made}</span></div>`).join('')}</div>
+    <p class="rdf">Longest holed · ${esc(PD[longest.k].lab)} ft${
+      longest.k === PUTT_DIST[PUTT_DIST.length - 1].k ? '' : ` · nothing dropped beyond it`}.</p>
+  </div>`;
+}
+// By club, on this card alone. "In play" is fairways for a club hit off a par 4 or 5 and
+// greens for one hit off a par 3 — on a par 3 the tee shot IS the approach — which is the
+// same split `clubTables()` makes for the season, computed off the same `bagShot()` record.
+function roundClubs(a){
+  const tee = [...a.tee.values()].sort((x, y) => y.n - x.n);
+  const app = [...a.app.values()].filter(e => e.girN).sort((x, y) => y.n - x.n);
+  if(!tee.length && !app.length) return '';
+  const pct = (n, d) => d ? `${Math.round(n / d * 100)}%` : '—';
+  const row = (e, kind) => {
+    const par3 = kind === 'tee' && !e.fwN && e.girN;
+    const n = kind === 'app' || par3 ? e.girN : e.fwN;
+    const hit = kind === 'app' || par3 ? e.girHit : e.fwHit;
+    const miss = kind === 'app' || par3 ? e.girMiss : e.fwMiss;
+    const top = topDir(miss);
+    const bad = [e.noshot ? `${e.noshot} dead` : '',
+      (miss.OB || 0) ? `${miss.OB} OB` : ''].filter(Boolean).join(' · ');
+    return `<div class="rcr">
+      <span class="c">${esc(clubName(e.key))}${par3 ? '<i> par 3s</i>' : ''}</span>
+      <span class="n">${e.n}</span>
+      <span class="p">${n ? `${pct(hit, n)} <i>${hit}/${n}</i>` : '—'}</span>
+      <span class="t">${top ? `${top[1]} ${esc(MISS_LAB[top[0]] || top[0])}` : '—'}${
+        bad ? ` <b>${esc(bad)}</b>` : ''}</span></div>`;
+  };
+  return `${tee.length ? `<div class="rchead"><span class="c">Off the tee</span><span class="n">shots</span>
+      <span class="p">in play</span><span class="t">tendency</span></div>
+    ${tee.map(e => row(e, 'tee')).join('')}` : ''}
+  ${app.length ? `<div class="rchead" style="margin-top:10px"><span class="c">Into the green</span><span class="n">shots</span>
+      <span class="p">greens</span><span class="t">tendency</span></div>
+    ${app.map(e => row(e, 'app')).join('')}` : ''}
+  <p class="rdf">"In play" is the fairway for a club hit off a par 4 or 5 and the green for one
+    hit off a par 3. <b>Dead</b> is a tee shot that left no play at the green; <b>OB</b> is two
+    strokes each. This card only — the season version is on Cards.</p>`;
+}
+
 function roundView(i){
   const r = S.rounds[+i];
   if(!r) return scores();
@@ -4328,24 +4999,35 @@ function roundView(i){
   if(a.nines.length === 2) rows.push(subRow(a.nines[1]));
   const bar = [['birdie','Birdie or better',a.mix.eagle+a.mix.birdie],['par','Par',a.mix.par],
                ['bogey','Bogey',a.mix.bogey],['double','Double+',a.mix.double+a.mix.triple]];
-  const tiles = [
-    ['Score', a.score ?? '—'],
-    ['vs par', a.vs == null ? '—' : `${a.vs > 0 ? '+' : ''}${a.vs}`],
-    ['Putts', a.putts.total || '—'],
-  ];
+  // The score and its to-par are the headline in the header, so the strip carries the four
+  // things underneath them — and only the ones this card actually recorded.
+  const tiles = [['Putts', a.putts.total || '—']];
   if(a.gir.n) tiles.push(['Greens', `${a.gir.hit}/${a.gir.n}`]);
   if(a.fw.n) tiles.push(['Fairways', `${a.fw.hit}/${a.fw.n}`]);
   if(a.scramble.chances) tiles.push(['Up & down', `${a.scramble.saved}/${a.scramble.chances}`]);
+  if(tiles.length < 4) tiles.push(['Holes', a.holes.length || '—']);
+  if(tiles.length < 4) tiles.unshift(['vs par', a.vs == null ? '—' : `${a.vs > 0 ? '+' : ''}${a.vs}`]);
+  // The tees are named on the scorecard header only where the card actually carries them —
+  // a round logged without them gets no invented set, same rule as the rating and slope.
+  const pub = publishedCard(r.course, r.nine);
+  const ev = r.live ? 'live' : 'round';
   return `
-  <button class="backlink" data-action="go" data-view="scores">← Scores</button>
-  <div class="card">
-    <h2>${esc(r.course || 'Round')}</h2>
-    <p class="sm faint">${fmtDate(r.date)}${r.tees ? ` · ${esc(r.tees)} tees` : ''}${
-      r.nine ? ` · ${r.nine === 'F' ? 'front' : 'back'} nine` : ''}${
-      a.par != null ? ` · par ${a.par}` : ''}${r.rating != null && r.slope ? ` · ${r.rating}/${r.slope}` : ''}${
-      r.live ? ' · <span class="ev live">you logged this live</span>' : ''}</p>
-    <div class="rowgrid ${tiles.length === 4 ? '' : 'g3'}" style="margin-bottom:4px">
-      ${tiles.map(([l,v]) => `<div class="stat"><div class="v">${esc(v)}</div><div class="l">${l}</div></div>`).join('')}
+  <button class="backlink" data-action="go" data-view="rounds" data-seg="cards">← Rounds</button>
+  <div class="card rdhead">
+    <div class="rdtop">
+      <div class="rdid">
+        <div class="rdd">${esc(fmtDate(r.date))}${r.tees ? ` · ${esc(r.tees)}` : ''}${
+          r.nine ? ` · ${r.nine === 'F' ? 'front' : 'back'} nine` : ''}</div>
+        <h2>${esc(r.course || 'Round')}</h2>
+        <div class="sm faint">${a.par != null ? `par ${a.par}` : ''}${
+          r.rating != null && r.slope ? ` · ${r.rating}/${r.slope}` : ''}${
+          r.live ? ' · <span class="ev live">you logged this live</span>' : ''}</div>
+      </div>
+      <div class="rdsc">${esc(a.score ?? '—')}<i>${a.vs == null ? '' : `${a.vs > 0 ? '+' : ''}${a.vs}`}</i></div>
+    </div>
+    ${roundBars(a)}
+    <div class="rdstats">
+      ${tiles.slice(0, 4).map(([l, v]) => `<div class="rds"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}
     </div>
     ${r.note ? `<p class="sm" style="margin-top:8px">"${esc(r.note)}"</p>` : ''}
     ${r.troubles && r.troubles.length ? `<div class="chips">${r.troubles.map(k => {
@@ -4356,23 +5038,38 @@ function roundView(i){
   </div>
 
   ${a.holes.length ? `
-  <h2>Hole by hole</h2>
   <div class="card">
-    <table class="scard">
-      <tr><th>Hole</th><th>Par</th><th>Score</th><th>Putts</th><th>Green</th><th>Tee</th></tr>
-      ${rows.join('')}
-    </table>
-    <p class="sm faint">Small grey number is the stroke index. Circle = under par, square = over.
-    ${a.putts.distN ? 'Under the putt count is how long the putt you holed was, and where the first one started when that was a different putt.' : ''}
-    ${a.gir.n ? 'Green and Tee show where the shot finished, where it was recorded; a dot means it was not. <b>OB</b> is out of bounds — two strokes each.' : ''}
-    ${a.tee.size ? 'The club under each result is what you hit.' : ''}
-    ${a.holes.some(h => h.note) ? '✎ marks a hole you wrote a note on — they are below.' : ''}</p>
+    ${fold(`rd-card-${i}`, 'Full scorecard',
+      `${r.tees ? `${String(r.tees).toUpperCase()} TEES · ` : ''}TAP TO COLLAPSE`,
+      `${(a.holes.length > 9
+          ? [cardBlock(a.holes.slice(0, 9), 'OUT'), cardBlock(a.holes.slice(9), 'IN')]
+          : [cardBlock(a.holes, 'TOT')]).join('')}
+      <div class="sclegend">
+        <span><i class="scm bird"></i>Birdie</span><span><i class="scm eag"></i>Eagle</span>
+        <span><i class="scm bog"></i>Bogey</span><span><i class="scm dbl"></i>Double +</span>
+      </div>
+      <p class="rdf">${a.holes.some(h => h.si != null)
+        ? `SI is the stroke index recorded on this card.${pub ? ` The published card on file for this course is ${esc(pub.src)}.` : ''}`
+        : `No stroke index on this card, so that row is left off rather than filled in.`}</p>`)}
+    ${fold(`rd-holes-${i}`, 'Hole by hole', 'GREEN · TEE · CLUB', `
+      <table class="scard">
+        <tr><th>Hole</th><th>Par</th><th>Score</th><th>Putts</th><th>Green</th><th>Tee</th></tr>
+        ${rows.join('')}
+      </table>
+      <p class="rdf">Small grey number is the stroke index.
+      ${a.putts.distN ? 'Under the putt count is how long the putt you holed was, and where the first one started when that was a different putt.' : ''}
+      ${a.gir.n ? 'Green and Tee show where the shot finished, where it was recorded; a dot means it was not. <b>OB</b> is out of bounds — two strokes each.' : ''}
+      ${a.tee.size ? 'The club under each result is what you hit.' : ''}
+      ${a.holes.some(h => h.note) ? '✎ marks a hole you wrote a note on — they are below.' : ''}</p>`, false)}
   </div>
 
-  ${(notes => notes.length ? `<h2>What you wrote on the course</h2>
-  <div class="card">
-    <dl class="holenotes">${notes.map(h => `<dt>${h.n}</dt><dd>${esc(h.note)}</dd>`).join('')}</dl>
-    <p class="sm faint" style="margin-top:8px">Logged on the hole itself, while you could still see the shot. This is the only part of the card that remembers WHY — everything else records what.</p>
+  ${(notes => notes.length ? `<div class="card notecard">
+    ${fold(`rd-note-${i}`, 'What you wrote on the course',
+      `${notes.length} HOLE${notes.length === 1 ? '' : 'S'}`,
+      `<dl class="holenotes big">${notes.map(h => `<dt>${h.n}</dt><dd>${esc(h.note)}</dd>`).join('')}</dl>
+      <p class="rdf">Logged on the hole itself, while you could still see the shot. This is the only
+      part of the card that remembers WHY — everything else records what.
+      <b>Delivered back, not counted. No finding derives from this.</b></p>`)}
   </div>` : '')(a.holes.filter(h => h.note))}
 
   ${(P => !P ? '' : `<h2>How the plan held up</h2>
@@ -4430,9 +5127,11 @@ function roundView(i){
       a.nines[0].putts != null ? ` · putts ${a.nines[0].putts}/${a.nines[1].putts}` : ''}.</p>` : ''}
   </div>` : `<div class="card"><p class="sm faint">No hole-by-hole detail on this round — send Claude the card and it lands here with every hole, which is what fills in everything below.</p></div>`}
 
-  ${(a.gir.n && a.gir.hit < a.gir.n) || (a.fw.n && a.fw.hit < a.fw.n) ? `
-  <h2>Where the misses went</h2>
-  <div class="card">
+  ${a.gir.n || a.fw.n || a.putts.distN ? `
+  <h2>Miss map &amp; putting</h2>
+  <div class="rdsplit">${missMap(a)}${madeFrom(a.putts)}</div>
+  ${puttDistTable(a.putts, 'How long the putt you holed was and where the first one started, tapped in on each hole as you played.')}
+  ${(a.gir.n && a.gir.hit < a.gir.n) || (a.fw.n && a.fw.hit < a.fw.n) ? `<div class="card">
     ${a.gir.n ? `<p class="sm"><b>Greens</b> — ${a.gir.hit} of ${a.gir.n} hit${
       a.gir.hit < a.gir.n ? `. Misses: ${missSplit(a.gir.miss) || '—'}${
         a.gir.noshot ? `, plus <b class="warn">${a.gir.noshot} with no shot at it</b> (hole${a.gir.noshot === 1 ? '' : 's'} ${a.gir.noshotHoles.join(', ')})` : ''}.` : '.'}</p>` : ''}
@@ -4441,16 +5140,21 @@ function roundView(i){
     ${a.putts.n ? `<p class="sm" style="margin-top:6px"><b>Putting</b> — ${a.putts.one} one-putt${
       a.putts.one === 1 ? '' : 's'} · ${a.putts.two} two-putts · ${a.putts.three} three-putt${
       a.putts.three === 1 ? '' : 's'} · ${(a.putts.total / a.putts.n).toFixed(2)} a hole.</p>` : ''}
-  </div>` : ''}
+  </div>` : ''}` : ''}
+
+  ${(c => c ? `<div class="card">${fold(`rd-club-${i}`, 'By club', 'SHOTS · IN PLAY · TENDENCY', c)}</div>` : '')(roundClubs(a))}
 
   ${tips.length ? `<h2>What this round says</h2>
   <div class="card">
-    ${tips.map(t => `<div class="tipcard ${t.s === 'good' ? 'green' : ''}">
-      <div class="src">${esc(t.src)}</div><h4>${t.h}</h4>${expandable(t.b)}</div>`).join('')}
-    <p class="sm faint">Computed from this card alone — every line carries the number that triggered it.</p>
+    ${tips.map((t, n) => `<div class="tipcard ${t.s === 'good' ? 'green' : ''}${rail(ev)}">
+      ${evDrawer(`ev-rd${i}-${n}`, t.src, ev,
+        `${a.holes.length} hole${a.holes.length === 1 ? '' : 's'} on this card${
+          r.course ? ` — ${r.course}` : ''}${r.date ? `, ${fmtDate(r.date)}` : ''}`)}
+      <div class="tipn">${a.holes.length} hole${a.holes.length === 1 ? '' : 's'} on this card</div>
+      <h4>${t.h}</h4>${expandable(t.b)}</div>`).join('')}
+    <p class="sm faint">Computed from this card alone — every line carries the number that
+      triggered it, and the badge says what that card is worth as evidence.</p>
   </div>` : ''}
-
-  ${puttDistTable(a.putts, 'How long the putt you holed was and where the first one started, tapped in on each hole as you played.')}
 
   ${roundVsBaseline(a)}`;
 }
@@ -4658,6 +5362,19 @@ function suggestTee(L){
   h.tee = key; h.teeAuto = true;
 }
 
+// Changing a hole's par changes which questions the hole HAS, so it is one function and
+// never two: a par 3 has no fairway, no separate approach and always a shot at the green,
+// and a tee-club suggestion made for a par 4 is not valid for it.
+function setHolePar(L, h, p){
+  h.par = p;
+  // Touching a par settles it: it is his number now, not a placeholder.
+  delete h.parAuto; h.parFrom = 'mine';
+  if(h.par === 3){ delete h.fw; delete h.fmiss; delete h.app; delete h.noshot; }
+  if(h.teeAuto){ delete h.tee; delete h.teeAuto; suggestTee(L); }
+  // The par decides which rows exist, so the open one is re-derived too.
+  delete h.qOpen;
+}
+
 // The open note lives in the DOM between keystrokes, so anything that leaves the hole
 // pulls it back onto the draft first. iOS can kill a suspended PWA mid-sentence.
 function syncHoleNote(){
@@ -4729,20 +5446,8 @@ function liveTroubles(a){
   return out;
 }
 
-function liveBanner(){
-  const L = S.live;
-  if(!L) return '';
-  const t = liveThru(L);
-  return `<div class="card livebar">
-    <div class="lvtag">Round in progress</div>
-    <h3>${esc(L.course)}</h3>
-    <p class="sm">${t.n ? `${t.over > 0 ? '+' : ''}${t.over} thru ${t.n}` : 'Nothing scored yet'} · on hole ${L.holes[L.cur] ? L.holes[L.cur].n : 1}</p>
-    <div class="formrow" style="margin-top:10px">
-      <button class="btn" data-action="live-new">Resume →</button>
-      <button class="btn ghost" data-action="live-discard">Discard</button>
-    </div>
-  </div>`;
-}
+// (The round-in-progress banner folded into Today's start-round button on Aug 27 2026 —
+// one affordance for one intention, and the same one the TEE tab carries.)
 
 function live(){
   const L = S.live;
@@ -4912,7 +5617,7 @@ function liveStart(){
   </div>
 
   <div class="card flat">
-    <p class="sm"><b>What it records.</b> Which club you hit off every tee (and optionally into every green), whether you found the fairway and the green and where the miss went, putts, and the score. That's the input side of every number on the Scores page — and the tee-club table can't exist without it.</p>
+    <p class="sm"><b>What it records.</b> Which club you hit off every tee (and optionally into every green), whether you found the fairway and the green and where the miss went, putts, and the score. That's the input side of every number on the Rounds page — and the tee-club table can't exist without it.</p>
   </div>`;
 }
 
@@ -4920,8 +5625,12 @@ function liveStart(){
 // The row order IS the logging order — tee shot through score, note last. A par 3 has no
 // fairway and no separate approach, and the putting detail rows follow the total the same
 // way the full card gates them: Putt made needs a putt, First putt needs two or more.
+// The fairway waits for a tee club (Aug 27 2026): where the ball finished is not a
+// question until there is a shot to ask it about. A par 3 has neither a fairway nor a
+// separate approach either way — there the tee shot IS the shot at the green.
 function qRows(h){
-  return ['tee', h.par === 3 ? null : 'fw', h.par === 3 ? null : 'app', 'green', 'putts',
+  return ['tee', h.par === 3 || !h.tee ? null : 'fw', h.par === 3 ? null : 'app',
+    'green', 'putts',
     h.putts ? 'pm' : null, h.putts >= 2 ? 'pd' : null, 's', 'note'].filter(Boolean);
 }
 // A carried-over tee suggestion is NOT an answer — the row opens so he confirms it with
@@ -4953,6 +5662,11 @@ function qAdvance(h, from){
   h.qOpen = rows.slice(rows.indexOf(from) + 1).find(r => r !== 'note' && !qAnswered(h, r)) || '';
 }
 
+// Which hole the screen last drew, and which of its sections were on it. Pure UI state,
+// and deliberately module-scoped rather than parked on S.live: nothing about an animation
+// belongs in the round, and this way it cannot reach the saved card even by accident.
+let lvHoleSeen = null, lvSeen = new Set();
+
 function livePlay(L){
   const h = L.holes[L.cur];
   const t = liveThru(L);
@@ -4961,11 +5675,13 @@ function livePlay(L){
   // Nobody tees off a par 4 with a 56°, but a short par 3 is exactly a wedge — so the
   // tee row carries the whole bag only where that's a real shot.
   const teeClubs = par3 ? clubs : clubs.filter(c => !c.wedge);
+  // A chip is 44px tall whatever is in it, and lights in ONE of two accents: green for a
+  // neutral or good outcome, burgundy for the ones that cost strokes — OB, a penalty, a
+  // green the drive took away, a conceded putt and every miss direction. `bad` is the class
+  // that says which, so the colour is a property of the answer rather than of the row.
   const chip = (k, v, lab, on, cls) =>
     `<span class="chip big${cls ? ' ' + cls : ''}${on ? ' on' : ''}" data-action="live-set" data-k="${k}" data-v="${esc(v)}">${lab}</span>`;
-  const row = (lab, body, hint) => `<div class="lvrow"><div class="lvlab">${lab}${
-    hint ? `<span>${hint}</span>` : ''}</div>${body}</div>`;
-  const clubRow = (k, list) => `<div class="clubgrid">${list.map(c => {
+  const clubRow = (k, list, cols) => `<div class="lvgrid g${cols}">${list.map(c => {
     const on = h[k] === c.key;
     const auto = on && k === 'tee' && h.teeAuto;
     return `<span class="chip big${on ? (auto ? ' on auto' : ' on') : ''}" data-action="live-set" data-k="${k}" data-v="${c.key}">${esc(c.abbr)}</span>`;
@@ -4985,39 +5701,42 @@ function livePlay(L){
   // One body per row, shared verbatim by both layouts — same chips, same data-actions,
   // so the full card and quick view can never drift apart on what a tap records.
   const bodies = {
-    tee: clubRow('tee', teeClubs),
-    fw: `<div class="chips">
+    tee: clubRow('tee', teeClubs, 4),
+    fw: `<div class="lvgrid g5">
       ${chip('fw', 'hit', 'Hit', h.fw === true)}
-      ${chip('fw', 'L', 'Left', h.fw === false && h.fmiss === 'L')}
-      ${chip('fw', 'R', 'Right', h.fw === false && h.fmiss === 'R')}
-      ${chip('fw', 'X', 'Other', h.fw === false && !h.fmiss)}
+      ${chip('fw', 'L', 'Left', h.fw === false && h.fmiss === 'L', 'bad')}
+      ${chip('fw', 'R', 'Right', h.fw === false && h.fmiss === 'R', 'bad')}
+      ${chip('fw', 'X', 'Other', h.fw === false && !h.fmiss, 'bad')}
       ${chip('fw', 'OB', 'OB', h.fw === false && h.fmiss === 'OB', 'ob')}</div>`,
-    app: clubRow('app', clubs),
-    green: `<div class="chips">
+    app: clubRow('app', clubs, 5),
+    green: `<div class="lvgrid g3">
       ${chip('green', 'hit', 'Hit', h.gir === true)}
-      ${chip('green', 'S', 'Short', h.gir === false && h.gmiss === 'S')}
-      ${chip('green', 'L', 'Left', h.gir === false && h.gmiss === 'L')}
-      ${chip('green', 'R', 'Right', h.gir === false && h.gmiss === 'R')}
-      ${chip('green', 'Lg', 'Long', h.gir === false && h.gmiss === 'Lg')}
+      ${chip('green', 'S', 'Short', h.gir === false && h.gmiss === 'S', 'bad')}
+      ${chip('green', 'L', 'Left', h.gir === false && h.gmiss === 'L', 'bad')}
+      ${chip('green', 'R', 'Right', h.gir === false && h.gmiss === 'R', 'bad')}
+      ${chip('green', 'Lg', 'Long', h.gir === false && h.gmiss === 'Lg', 'bad')}
       ${chip('green', 'OB', 'OB', h.gir === false && h.gmiss === 'OB', 'ob')}</div>${
       // Separate toggle, not a sixth direction: a short one you had no play at is both
       // short AND conceded, and only the second fact tells you which club to blame.
-      par3 ? '' : `<div class="chips"><span class="chip big ns${h.noshot ? ' on' : ''}"
+      par3 ? '' : `<div class="lvgrid g1"><span class="chip big ns${h.noshot ? ' on' : ''}"
         data-action="live-set" data-k="noshot" data-v="1">No shot at it</span></div>`}`,
-    putts: `<div class="chips">${[0,1,2,3,4,5].map(p =>
+    putts: `<div class="lvgrid g6">${[0,1,2,3,4,5].map(p =>
       chip('putts', p, p === 5 ? '5+' : p, h.putts === p)).join('')}</div>`,
-    pm: `<div class="chips">${PUTT_DIST.map(d =>
+    pm: `<div class="lvgrid g6">${PUTT_DIST.map(d =>
       chip('pm', d.k, d.lab, h.pm === d.k && !h.gimme)).join('')}
-      ${chip('gimme', '1', 'Given', !!h.gimme, 'ns')}</div>`,
-    pd: `<div class="chips">${PUTT_DIST.map(d =>
+      ${chip('gimme', '1', 'Given', !!h.gimme, 'ns span')}</div>`,
+    pd: `<div class="lvgrid g6">${PUTT_DIST.map(d =>
       chip('pd', d.k, d.lab, h.pd === d.k)).join('')}</div>`,
-    s: `<div class="chips">${scores}${outlier}
+    s: `<div class="lvgrid g5">${scores}</div>
+      <div class="lvgrid g3 lvsub">${outlier}
       <span class="chip big" data-action="live-bump" data-d="1">+1</span>
       <span class="chip big" data-action="live-bump" data-d="-1">−1</span></div>`,
+    // The one thing on this screen that wants a keyboard, and the only field that records
+    // WHY. Carried, never parsed — nothing in the app reads it, and the header says so.
     note: (h.note || h.noteOpen)
       ? `<textarea id="lvHoleNote" class="lvnote" rows="2"
-          placeholder="What actually happened here">${esc(h.note || '')}</textarea>`
-      : `<div class="chips"><span class="chip big note" data-action="live-note">＋ Add a note</span></div>`,
+          placeholder="Quoted back to you on this hole. Nothing reads it.">${esc(h.note || '')}</textarea>`
+      : `<div class="lvgrid g1"><span class="chip big note" data-action="live-note">＋ Add a note</span></div>`,
   };
 
   const quick = !!S.settings.liveQuick;
@@ -5041,13 +5760,17 @@ function livePlay(L){
     if(r === 'note') return h.note ? { txt: '✎' } : null;
     return null;
   };
-  const QLAB = { tee:'Off the tee', fw:'Fairway', app:'Into the green', green:'Green',
+  // One label and one hint per row, shared by both layouts — a row can't be called two
+  // things on two screens. On a par 3 the tee shot IS the approach, so the green section
+  // says so rather than sitting there looking like a second shot he never hit.
+  const QLAB = { tee:'Tee club', fw:'Fairway', app:'Club in',
+    green: par3 ? 'Green · from the tee' : 'Green',
     putts:'Putts', pm:'Putt made', pd:'First putt', s:'Score', note:'Note' };
-  const QHINT = { tee: h.teeAuto ? 'carried over — tap to keep or change' : '',
+  const QHINT = { tee: h.teeAuto ? `LAST TIME: ${clubName(h.tee)}` : '',
     fw:'OB is two strokes — tap it and the app counts them', app:'optional',
     green: par3 ? '' : 'the drive left you nothing', putts:'the total',
     pm:'feet — how long the one you holed was', pd:'feet — where you started from',
-    note:'saved to this hole, on the card forever' };
+    note:'CARRIED · NEVER PARSED' };
   const open = qOpenRow(h);
   const quickCard = `<div class="card lvcard qcard">
     ${qRows(h).map(r => {
@@ -5062,18 +5785,28 @@ function livePlay(L){
     }).join('')}
   </div>`;
 
-  const fullCard = `<div class="card lvcard">
-    ${row('Off the tee', bodies.tee,
-      h.teeAuto ? 'carried over — tap to keep or change' : '')}
-    ${par3 ? '' : row('Fairway', bodies.fw, 'OB is two strokes — tap it and the app counts them')}
-    ${par3 ? '' : row('Into the green', bodies.app, 'optional')}
-    ${row('Green', bodies.green, par3 ? '' : 'the drive left you nothing')}
-    ${row('Putts', bodies.putts, 'the total')}
-    ${!h.putts ? '' : row('Putt made', bodies.pm, 'feet — how long the one you holed was')}
-    ${h.putts >= 2 ? row('First putt', bodies.pd, 'feet — where you started from') : ''}
-    ${row('Score', bodies.s)}
-    ${row('Note', bodies.note, 'saved to this hole, on the card forever')}
-  </div>`;
+  // ---- Progressive disclosure: a section exists only once it CAN be answered ----
+  // Most of this the logger already did (a par 3 has no fairway and no separate approach;
+  // the made-putt row needs a putt and the first-putt row needs two). The one addition is
+  // the fairway, which now waits for a tee club: "where did that go" is not a question
+  // until there is a shot to ask it about, and the tee section carries the line that says
+  // so, so the row can never look like something the app forgot to show.
+  const secs = qRows(h).map(k => ({ k, lab:QLAB[k], hint:QHINT[k], body:bodies[k] }));
+  // Only sections that have JUST appeared animate. Which ones were on screen last draw is
+  // a property of the screen and not of the round, so it is a module variable — it never
+  // touches S.live and so can never reach the saved card. Arriving at a hole resets it:
+  // there the whole hole slides in and animating nine sections on top of that would be a
+  // fairground, not a reveal.
+  const arrived = lvHoleSeen !== L.cur;
+  if(arrived){ lvHoleSeen = L.cur; lvSeen = new Set(secs.map(s => s.k)); }
+  secs.forEach(s => { if(!lvSeen.has(s.k)){ s.rev = true; lvSeen.add(s.k); } });
+  const section = s => `<section class="card lvsec${s.rev ? ' rev' : ''}" data-sec="${s.k}">
+    <div class="lvsl">${esc(s.lab)}${s.hint
+      ? `<span${s.k === 'tee' && h.teeAuto ? ' class="lit"' : ''}>${esc(s.hint)}</span>` : ''}</div>
+    ${s.body}${s.k === 'tee' && !par3 && !h.tee
+      ? '<p class="lvwait">Pick the club and the fairway opens underneath.</p>' : ''}
+  </section>`;
+  const fullCard = secs.map(section).join('');
 
   // The hole's prep is built here and rendered BELOW the scoring card (Jack's call,
   // Aug 20): on the hole he wants the next-hole button and the chips at the top of
@@ -5136,26 +5869,37 @@ function livePlay(L){
     </div>`;
   })();
 
+  // ---- The hole strip: eighteen bars, the round at a glance and a way to any hole ----
+  // Solid = where you are. Filled at 72% = played, at or under par. At 40% = played, over.
+  // At 16% = not played. It is deliberately NOT a scorecard: it is a progress bar you can
+  // tap, and the number it carries is "how is this going" rather than a score per hole.
+  // Eighteen targets across one phone cannot each be 44px wide — no arrangement of them
+  // can — so the strip is a shortcut with a 30px-tall hit area, and the 44px+ Back / Next
+  // buttons in the footer remain the primary way between holes.
+  const bar = (x, i) => `<span class="lvbar${i === L.cur ? ' cur'
+    : x.s == null ? '' : x.s <= x.par ? ' ok' : ' over'}${x.note ? ' noted' : ''}"
+    data-action="live-goto" data-i="${i}" title="Hole ${x.n}"></span>`;
+
   return `
   <div class="lvhead">
-    <div class="lvh1">Hole ${h.n}<span> · par ${h.par}${h.si ? ` · SI ${h.si}` : ''}</span></div>
-    <div class="lvh2">${t.n ? `<b>${t.over > 0 ? '+' : ''}${t.over}</b> thru ${t.n}` : esc(L.course)}</div>
-    <div class="parpick"><em>Par</em>${[3,4,5].map(p =>
-      // A par nobody has confirmed renders HALF-LIT, the same language as a carried-over
-      // tee club — so a placeholder can never sit there looking like a scorecard.
-      chip('par', p, p, h.par === p, h.parAuto && h.par === p ? 'auto' : '')).join('')}
-      <span class="lvctl">
-        <span class="cardlink" data-action="live-holes">${L.holesOpen ? '▾' : '▸'} 1–18</span>
-        <span class="cardlink" data-action="live-card-open">Card</span>
-      </span></div>
-  </div>
-  ${L.holesOpen ? `<div class="hstriprow">${L.holes.map((x, i) =>
-    `<span class="hstrip${i === L.cur ? ' cur' : ''}${x.s != null ? ' done' : ''}${x.note ? ' noted' : ''}" data-action="live-goto" data-i="${i}">${x.n}</span>`).join('')}</div>` : ''}
-
-
-  <div class="formrow">
-    <button class="btn ghost"${L.cur === 0 ? ' disabled' : ''} data-action="live-nav" data-d="-1">← ${L.cur === 0 ? 'Start' : 'Hole ' + L.holes[L.cur - 1].n}</button>
-    <button class="btn" data-action="live-nav" data-d="1">${last ? 'Finish round →' : 'Hole ' + L.holes[L.cur + 1].n + ' →'}</button>
+    <div class="lvhe">LIVE · ${esc((L.course || '').toUpperCase())}${
+      L.tees ? ` · ${esc(String(L.tees).toUpperCase())}` : ''}</div>
+    <div class="lvhr">
+      <div class="lvhn">Hole ${h.n}<span class="lvhs">
+        <button class="lvpar${h.parAuto ? ' auto' : ''}" data-action="live-par">PAR ${h.par}</button>${
+        // A par nobody has confirmed renders HALF-LIT — dashed, the same "this is not a
+        // record" language the guessed cells on the card check use — so a placeholder can
+        // never sit there looking like a scorecard. One tap cycles 3 · 4 · 5, which is the
+        // whole card check in miniature; the Card button opens all eighteen.
+        h.si ? `<i>SI ${h.si}</i>` : ''}</span></div>
+      <div class="lvhb">
+        <button class="lvfin ghost" data-action="live-card-open">Card</button>
+        <button class="lvfin" data-action="live-finish">Finish</button>
+      </div>
+    </div>
+    <div class="lvbars">${L.holes.map(bar).join('')}</div>
+    <div class="lvhf"><span>${t.n ? `THRU ${t.n} · ${t.over > 0 ? '+' : ''}${t.over}` : 'NOT STARTED'}</span>
+      <span class="lvsaved">● SAVED</span></div>
   </div>
 
   <div class="lvseg">
@@ -5163,10 +5907,18 @@ function livePlay(L){
     <span class="${quick ? 'on' : ''}" data-action="live-view" data-v="1">⚡ Quick view</span>
   </div>
 
-  ${quick ? quickCard : fullCard}
+  <div class="lvwrap${arrived ? ' slide' : ''}">
+    ${quick ? quickCard : fullCard}
+  </div>
 
   ${prep}
   <p class="sm faint" style="margin-top:10px">Everything except the score is optional — skip a row and it simply isn't recorded, rather than being guessed. Tap a lit chip again to clear it. A <b>half-lit</b> tee club is one carried over from the last time you played this hole, or from earlier in this round: leave it if it's right, tap another club if it isn't.</p>
+
+  <div class="lvfoot">
+    <button class="lvback"${L.cur === 0 ? ' disabled' : ''} data-action="live-nav" data-d="-1">‹</button>
+    <button class="lvnext" data-action="live-nav" data-d="1">${
+      last ? 'Finish card' : `Hole ${L.holes[L.cur + 1].n}`} ›</button>
+  </div>
   <div class="formrow" style="margin-top:6px">
     <button class="btn ghost tiny" data-action="go" data-view="home">Pause · back to Home</button>
     <button class="btn ghost tiny" data-action="live-discard">Discard round</button>
@@ -5222,7 +5974,7 @@ function liveFinish(L){
   </div>
 
   <div class="card flat">
-    <p class="sm">Saving drops you straight into this round's own card, where the hole-by-hole detail you just logged turns into the miss patterns, the scrambling rate and the coaching. Everything also folds into the season numbers on <b>Scores</b>.</p>
+    <p class="sm">Saving drops you straight into this round's own card, where the hole-by-hole detail you just logged turns into the miss patterns, the scrambling rate and the coaching. Everything also folds into the season numbers on <b>Rounds</b>.</p>
     <button class="btn ghost tiny" data-action="live-discard" style="margin-top:8px">Discard this round</button>
   </div>`;
 }
@@ -5269,7 +6021,17 @@ function bumpGearCounters(){
 
 // ---------- Actions ----------
 const ACTIONS = {
-  'go': el => { editingCourse = null; render(el.dataset.view); },
+  // `data-seg` is how a link asks for one FACE of a multi-segment view (Rounds). Every
+  // other view ignores it, so one action still covers every link in the app.
+  'go': el => { editingCourse = null; render(el.dataset.view, el.dataset.seg); },
+  // Switching segment is not going anywhere — it is the same tab showing a different face
+  // of the same subject — so it redraws in place and keeps the scroll. current.arg has to
+  // move with it, or the next rerender() (a chip tap, a saved course) would snap back.
+  'rounds-seg': el => { roundsSeg = el.dataset.k; current.arg = roundsSeg; rerender(); },
+  // Same rule for the labs hub: picking a lab is the page showing a different face of
+  // itself, so it redraws in place. Tapping the lab that is already selected OPENS it,
+  // which is a navigation and goes through `go`.
+  'game-lab': el => { gameLab = el.dataset.disc; rerender(); },
   'open-round': el => render('round', +el.dataset.i),
 
   // ----- Live round -----
@@ -5338,37 +6100,36 @@ const ACTIONS = {
     save(); render('live');
     toast('Round started — good luck');
   },
-  // Back to the card from the first tee, for the hole he notices on the walk up.
-  // The jump strip is for going somewhere, not for reading, so it folds away and stays
-  // folded: every arrival at a hole closes it again. Two rows of eighteen buttons is the
-  // tallest block on the screen and he is looking at it between shots, not navigating.
-  'live-holes': () => {
+  // Finish from the header, on whatever hole he is standing on — a nine that stops at the
+  // seventh, a match conceded on 15. Same route the last hole's Next button takes, so the
+  // troubles come pre-ticked off the card either way.
+  'live-finish': () => {
     const L = S.live; if(!L) return;
     syncHoleNote();
-    if(L.holesOpen) delete L.holesOpen; else L.holesOpen = true;
-    save(); rerender();
+    L.stage = 'finish';
+    L.troubles = liveTroubles(roundAnalysis(liveRound(L)));
+    save(); render('live');
   },
   'live-card-open': () => {
     const L = S.live; if(!L) return;
     syncHoleNote();
     L.stage = 'card'; save(); render('live');
   },
+  // Par, on the hole he is standing on: one tap cycles 3 · 4 · 5. It is one control rather
+  // than three chips because the header is sticky — every pixel it takes it takes for all
+  // eighteen holes — and the Card button beside it opens the full eighteen-par check.
+  'live-par': () => {
+    const L = S.live, h = L && L.holes[L.cur];
+    if(!h) return;
+    setHolePar(L, h, h.par >= 5 ? 3 : h.par + 1);
+    save(); rerender();
+  },
   'live-set': el => {
     const L = S.live, h = L && L.holes[L.cur];
     if(!h) return;
     const k = el.dataset.k, v = el.dataset.v;
     const lit = el.classList.contains('on');   // re-tapping a lit chip clears it
-    if(k === 'par'){
-      h.par = +v;
-      // Touching a par settles it: it is his number now, not a placeholder.
-      delete h.parAuto; h.parFrom = 'mine';
-      // A par 3 has no fairway, no separate approach, and always a shot at the green.
-      if(h.par === 3){ delete h.fw; delete h.fmiss; delete h.app; delete h.noshot; }
-      // A suggestion made for a par 4 isn't valid for a par 3, so re-derive it.
-      if(h.teeAuto){ delete h.tee; delete h.teeAuto; suggestTee(L); }
-      // The par decides which quick-view rows exist, so the open one is re-derived too.
-      delete h.qOpen;
-    }
+    if(k === 'par'){ setHolePar(L, h, +v); }
     else if(k === 'tee'){
       // Tapping the suggested club CONFIRMS it rather than clearing it — clearing a chip
       // he never chose would be a confusing way to spend the tap this feature just saved.
@@ -5469,7 +6230,7 @@ const ACTIONS = {
   },
   // Changing hole IS a navigation — that one should land at the top of the new hole.
   'live-goto': el => { if(S.live){ syncHoleNote(); S.live.cur = +el.dataset.i;
-    delete S.live.holesOpen; suggestTee(S.live); save(); render('live'); } },
+    suggestTee(S.live); save(); render('live'); } },
   'live-nav': el => {
     const L = S.live; if(!L) return;
     syncHoleNote();
@@ -5481,7 +6242,7 @@ const ACTIONS = {
       L.troubles = liveTroubles(roundAnalysis(liveRound(L)));
       save(); return render('live');
     }
-    L.cur = to; delete L.holesOpen; suggestTee(L); save(); render('live');
+    L.cur = to; suggestTee(L); save(); render('live');
   },
   'live-save': () => {
     const L = S.live; if(!L) return;

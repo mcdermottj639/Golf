@@ -102,8 +102,11 @@ does nothing — double-check against `applyFeed()`.
 
 `gaming` (in the bag), `ordered` (on order), `backup` (owned, not in the 14),
 `wishlist` (scouting), and `returned` (sent back — drops out of every bag list).
-`clubCard()` also renders a **MISMATCH** flag for a `flow:'toe'` putter against an
-`SBST` stroke.
+`clubRow()` also renders a **MISMATCH** flag for a `flow:'toe'` putter against an
+`SBST` stroke. Its other status pills are read off the club's own record and nothing else
+(Aug 27 2026): `DECIDED` is `returnWindow:false`, `IN RETURN WINDOW` is `returnWindow:true`,
+`UNMEASURED` is a null carry on the club's ladder row, and `OVERLAP` is two ladder lofts
+inside 1.5° of each other. A club's `note` is never scanned for any of them.
 
 ## Player profile (drives the diagnosis logic)
 
@@ -472,6 +475,45 @@ act on (`play`, else the prose note, else his record for the hole), so the defau
 still delivers the decision and it is the reasoning under it that costs a tap. Never make
 the collapsed state a bare header — the whole design rests on the gist being there.
 
+### The hole screen redesigned (Aug 27 2026 — Jack's redesign)
+
+The logging RULES did not change; how the screen says them did. What is worth knowing
+before touching `livePlay()`:
+
+- **The header is the identity of the screen** and the only part of it that is not a chip:
+  a mono eyebrow `LIVE · COURSE · TEES`, `Hole N` in the display serif with `PAR n · SI n`
+  beside it, a `Finish` button (`live-finish` — the same route the last hole's Next button
+  takes, so the troubles still come pre-ticked off the card), the par picker and the Card
+  link, the hole strip, and the footer line `THRU n · +n` with a **pulsing ● SAVED**.
+- **The pulse is the save receipt.** Every tap writes `S.live` to localStorage before the
+  screen redraws, and this is the only thing on the phone that says so. Don't make it a
+  static label — a static label reads as decoration.
+- **The hole strip is 18 bars**, always visible, tappable to jump (the old fold-away
+  numbered strip and its `holesOpen` flag are gone). Solid = here; 72% = played at or under
+  par; 40% = played over; 16% = unplayed; a burgundy inset marks a hole he wrote a note on.
+  Eighteen targets across one phone cannot each be 44px wide — no arrangement of them can —
+  so the strip is a **shortcut** with a 30px hit area and the 52px footer Back / Next
+  buttons stay the primary way between holes. Jumping is a `render()` (a navigation); every
+  chip tap is still a `rerender()`.
+- **One section per question, and a section exists only once it can be answered.** `qRows()`
+  is the single source of that order for BOTH layouts. The addition on Aug 27 is the
+  **fairway, which now waits for a tee club** — where the ball finished is not a question
+  until there is a shot to ask it about — and the tee section carries the line saying so, so
+  the row can never look like something the app forgot to show. On a par 3 the green section
+  reads **“Green · from the tee”**.
+- **Chips light in one of two accents: green for a neutral or good outcome, burgundy for
+  everything that costs strokes** — OB, a penalty, a green the drive took away, a conceded
+  putt, and every miss direction (`bad` is the class that says which). The colour is a
+  property of the ANSWER, not of the row. A suggested-but-unconfirmed tee club is still
+  half-lit, now in the green accent, with `LAST TIME: <club>` in the section header — that
+  distinction is what the whole driver-vs-mini comparison rests on, so never fill it solid.
+- **Motion has two jobs and no more**: a section that has just appeared rises 10px over
+  .26s, and arriving at a hole slides the whole card in from the right over .3s. Which
+  sections were on screen last draw lives in the module variables `lvHoleSeen` / `lvSeen` —
+  **not** on `S.live`, because nothing about an animation belongs in the round.
+- **The logger still gets NO `fold()` sections.** It already hides what cannot exist yet;
+  the hole-prep card's own collapse (above) is the one disclosure control on the screen.
+
 ### A note on any hole (Aug 19 2026)
 
 Jack asked to be able to write a note on **any hole**, the way he already could at the end
@@ -698,9 +740,13 @@ the next hole, which is a navigation).
 
 Same rule for **open `<details>`**: `render()` replaces the view's DOM, so a section he had
 expanded snapped shut on every in-place update — which on the drill bench meant logging a
-drill collapsed the drill he was reading. A `rerender()` now restores any `<details>` that
-carries an **`id`** and was open; a `render()` deliberately doesn't. Give a section an `id`
-if it should survive an update, and nothing else has to change.
+drill collapsed the drill he was reading. A `rerender()` now restores the open/closed state
+of any `<details>` that carries an **`id`** — **both ways** as of Aug 27 2026, because a
+section that defaults open (every `fold()`) would otherwise spring back open on the next
+in-place update, so folding the scorecard away and then tapping anything else undid the
+fold. A `render()` deliberately restores nothing. Give a section an `id` if it should
+survive an update, and nothing else has to change. The DOM stays the only store for this —
+never build a parallel open/closed map.
 
 ### Form controls never go below 16px (Aug 14 2026)
 
@@ -806,16 +852,44 @@ Keep `h2`s few: the jump bar at the top of every view is built from them.
 ### The labs live behind one nav button (Aug 13 2026)
 
 The bar was at eight tabs and a short-game lab would have made nine, so **Swing · Short Game ·
-Putting · Mental now sit behind a single `Game` tab** (`game()` — the hub). Nav is six: Home ·
-Bag · Game · Scores · Coach · Courses. `NAV_OF` in `render()` maps every lab view back to the
-`game` button so it stays lit. Adding a fifth lab now costs nothing in the nav.
+Putting · Mental now sit behind a single `Game` tab** (`game()` — the hub). `NAV_OF` in
+`render()` maps every lab view back to the `game` button so it stays lit. Adding a fifth lab
+costs nothing in the nav.
 
 **The hub order is FIXED and must stay that way** (standing instruction, Aug 14 2026): Swing ·
-Short Game · Putting · Mental · Round Prep, top down — i.e. `LABS` order, with Round Prep last.
-It used to float the last-opened lab into a "Pick up where you were" block at the top
-(`S.settings.lastLab`, now removed); Jack asked for the fixed order instead, because a row that
-moves defeats the muscle memory that makes a hub worth having. Don't reintroduce recency
-sorting here, and add a new lab to the END of `LABS` rather than reordering it.
+Short Game · Putting · Mental, top down — i.e. `LABS` order. It used to float the last-opened
+lab into a "Pick up where you were" block at the top (`S.settings.lastLab`, now removed); Jack
+asked for the fixed order instead, because a row that moves defeats the muscle memory that
+makes a hub worth having. Don't reintroduce recency sorting here, and add a new lab to the END
+of `LABS` rather than reordering it. **The hub is the four labs and nothing else** since
+Aug 27 2026 — Round Prep used to sit under them and now lives in Rounds (see below).
+
+### The nav is five tabs and a tee button (Aug 27 2026 — Jack's redesign)
+
+Jack commissioned a redesign; this supersedes the six-tab bar described above. The nav is
+**TODAY · BAG · [TEE] · GAME · ROUNDS · COACH** — five tabs and a burgundy centre button.
+
+- **TEE** goes to the live logger from any screen (`data-view="live"`). It is both *start* and
+  *resume*, because from the player's side that is one intention and `live()` already knows
+  which it is; `render()` relabels it `RESUME` while `S.live` exists. It is the only thing in
+  the app that has to be one thumb away everywhere, which is why it gets the middle.
+- **Courses is no longer a tab** and **Round Prep is no longer in the Game hub.** Both are
+  segments of **Rounds**, whose three faces are `Cards · Round prep · Courses` — a card, the
+  plan written for it, and the course it was played on are three views of one subject, and
+  the plan now sits beside the cards it gets judged against (`planHeld()`).
+- The segment lives in `roundsSeg`, a **module variable, never saved** — it is a property of
+  the view, not of the player. Switching is a `rerender()` (you have not gone anywhere), so
+  `current.arg` moves with it.
+- **The old view names still work and must keep working.** `SEG_OF` in `render()` resolves
+  `scores` → Cards, `preps` → Round prep, `courses` → Courses before anything else happens, so
+  every `go('courses')` link, every `render('scores')` in an action, and every `act:go('preps')`
+  already sitting in a user's saved `S.updates` still lands where it meant to. Those stored
+  update rows are why the aliases are permanent, not a migration step. A link may also carry
+  `data-seg` to ask for a face directly (`data-view="rounds" data-seg="prep"`).
+- `NAV_OF` maps `round` (a round card) to the Rounds button as well as the four labs to Game.
+
+The tab glyphs are **CSS shapes** — a 19px bordered box, round or square, filled when active.
+No SVG, no icon font, no emoji: nothing to load, and legible at label size.
 
 **Every lab shares one diagnosis renderer.** `diagnosisCard(discipline)` draws open faults with
 their detail and collapses settled ones to a line; `faultState()` reads the first word of a
@@ -968,6 +1042,13 @@ rule above is unchanged.
   question marks. **So when you push a `faults` entry, check its tag reaches a drill**, and
   if it doesn't, either tag the lessons that train it or write the lesson. The lab will
   otherwise say so on Jack's phone, which is the point.
+- **A fault also needs a row in `FAULT_EV`** (`app.js`, Aug 27 2026) to render an evidence
+  tier and a tappable "what this was read off" panel. A fault object is only `{tag, why}`,
+  so the tier has to be written down rather than inferred from the prose — a `why` saying
+  "filmed Jul 26" and one saying "the film could not settle it" are the same keywords and
+  opposite claims. Each entry is `[tier, sample]` and both come from what that fault's own
+  text says its basis is. **A tag with no entry is fine**: the row renders with no rail and
+  no chip and claims nothing, which is the honest failure mode.
 - **The join key is the lesson's `tags`.** Fault tags and round-trouble tags share that one
   field, which is why a `faults` push and a `lesson-update` are often the same job. The
   Aug 24 audit found three open faults reaching **zero** drills — `delivery-unverified`,
@@ -1239,6 +1320,37 @@ Three behaviours worth not breaking:
   banner on the first open after an upgrade counts only what is genuinely new. Boot renders
   Home before the feed is fetched, so the first render is deliberately read-only; the one
   after it commits.
+
+**Aug 27 2026 (Jack's redesign): the block is titled *What's landed*, folds behind a
+`fold()` header, and each row leads with a mono TYPE column** (`UP_TYPE` / `upType()` in
+`app.js`) tinted by how strong the evidence behind that kind of change is — burgundy for
+film and scorecards, green for a round, green accent for the coaching library, gold for a
+number nobody measured, neutral ink for everything else. The day heading moved into the
+rows as a right-aligned date. **None of the three behaviours above changed**, and a type
+with no `UP_TYPE` row falls through to a neutral `UPDATE` for the same forward-compat
+reason `updateLine()` has a default case. Above the changelog, Today now opens with three
+blocks — the green **weather card** (a restyle of what the Conditions tile already
+computed, `playsFactor()` unchanged and temperature-only, which the card says out loud),
+**The one thing** (`oneThing()` — `coachFocus()` over `coachSignals()`, i.e. the same pick
+Coach leads with, so the top of Today can never quietly outrank the page below it), and the
+**start/resume round button**, which absorbed the old round-in-progress banner: one
+affordance for one intention, matching the TEE tab.
+
+### The evidence drawer (Aug 27 2026 — build a finding's provenance once)
+
+`evDrawer(id, label, ev, sample, more)` in `app.js` is the disclosure behind a tier chip:
+tapping the header opens **EVIDENCE USED** — the sample, the source, and *what is not
+measured*. Reuse it wherever a finding renders; the tiers must never be explained two
+different ways on two screens.
+
+- The **sample** is the finding's own `src` — pass it, never a number you computed here.
+- The **source** and the **not measured** lines come from `EV_SOURCE` / `EV_BLIND`, written
+  down **per tier** rather than per finding, because they are properties of the source and
+  not of the number: a scorecard cannot see a stroke however many holes of it there are.
+  An invented per-finding limitation reads exactly like a real one — the failure the whole
+  ladder exists to prevent — so anything finding-specific goes in the optional `more`.
+- It is a plain `<details id=…>`, so an open drawer survives a `rerender()` on the
+  machinery that already reopens folds. Never build a parallel open/closed store for it.
 
 After any feed change: `python3 -c "import json; json.load(open('coach-feed.json'))"`,
 `node --check app.js`, bump `"updated"`, commit, push.

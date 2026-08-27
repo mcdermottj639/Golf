@@ -1,12 +1,38 @@
-/* Caddie HQ — Scorecard Heritage theme */
+/* Caddie HQ — Scorecard Heritage theme
+   ------------------------------------------------------------------
+   Aug 27 2026 (Jack's redesign): the palette moved onto the redesign values, but the
+   TOKEN NAMES did not change — everything in app.js still asks for var(--green) or
+   var(--card), so a colour is edited in exactly one place. Do not scatter hex literals
+   through app.js; if a shade is missing, add a token here.
+
+   Three type voices, all LOCAL stacks — this is an offline-first PWA and a webfont is a
+   network request it cannot make: --serif for display numbers and headlines, --sans for
+   body, --mono for labels (tiers, section headers, meta). The three-voice structure is
+   what makes the density readable; the exact faces are not the point. */
 :root{
-  --paper:#f6efdd; --card:#fffdf6; --card2:#fbf6e8; --line:#d8cdb0; --line2:#e2d8bd;
-  --ink:#26221a; --soft:#5a5344; --faint:#9a9077;
-  --green:#123c26; --green-ink:#e9dfc5; --burg:#8e1f2f; --burg-ink:#f6ecd9;
-  --shadow:2px 2px 0 #e5dcc4;
-  --gtext:#123c26; --btext:#8e1f2f; --r:6px;
+  /* Ink scale — one ramp, so a secondary colour is never invented at the call site. */
+  --ink:#23201A; --ink62:rgba(35,32,26,.62); --ink50:rgba(35,32,26,.5);
+  --ink36:rgba(35,32,26,.36); --ink18:rgba(35,32,26,.18);
+  --paper:#F2ECDD; --card:#FBF7EC; --card2:#F6F1E5; --sunk:#EFE8D6;
+  --line:rgba(35,32,26,.16); --line2:rgba(35,32,26,.1); --dot:#cdc0a2;
+  --soft:var(--ink62); --faint:var(--ink50);
+  --green:#14512E; --green-ink:#F4EFE2; --green-accent:#2E7D51; --green-deep:#0E3A21;
+  --burg:#6E2230; --burg-ink:#F6EFE6; --burg-deep:#4E1722;
+  --gold:#B08A2E; --gold-ink:#8A6A1C;
+  --shadow:0 1px 2px rgba(35,32,26,.05);
+  --gtext:#14512E; --btext:#6E2230;
+  --nav:#F6F1E4;
+  --r:12px; --r-card:16px; --r-sm:9px;
+  /* Evidence tiers. Provenance is structural, not a word at the end of a sentence:
+     SOLID fills mean the tier was earned by observation (live, measured), OUTLINES mean
+     it was not (round is a weaker card; snapshot and self are claims). Every rail, chip
+     and tint in the app reads these five and nothing else — see EV_RANK in app.js. */
+  --t-live:#14512E; --t-round:#2E7D51; --t-measured:#6E2230;
+  --t-snapshot:#B08A2E; --t-snapshot-ink:#8A6A1C;
+  --t-self:rgba(35,32,26,.35); --t-self-ink:rgba(35,32,26,.5);
   --serif:Georgia,'Times New Roman',serif;
   --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
@@ -40,7 +66,9 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 .good{color:var(--gtext);font-weight:700}
 
 .card{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
-  border-radius:var(--r);padding:15px;margin:12px 0}
+  border-radius:var(--r-card);padding:15px;margin:12px 0}
+/* The label voice, wherever a class of its own would be overkill. */
+.mono{font-family:var(--mono)}
 .card h2{margin-top:0}
 .card.flat{box-shadow:none;background:var(--card2)}
 .rowgrid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:14px 0}
@@ -63,7 +91,7 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
 .chip{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;font-family:var(--sans);
-  background:#ece4cd;color:var(--soft);border:1px solid var(--line);cursor:pointer;user-select:none}
+  background:var(--card2);color:var(--soft);border:1px solid var(--line);cursor:pointer;user-select:none}
 .chip.on{background:var(--burg);color:var(--burg-ink);border-color:var(--burg)}
 .chip.grn{background:var(--green);color:var(--green-ink);border-color:var(--green)}
 .chip.static{cursor:default}
@@ -95,26 +123,71 @@ body.night .area.focus{border-top-color:var(--burg)}
 .tipcard h4{font-size:14.5px;color:var(--ink);margin-bottom:4px}
 .tipcard .why{font-size:11.5px;color:var(--btext);font-style:italic;margin-top:6px}
 .tipcard.green{border-left-color:var(--green)}
-/* What's new: the change log on Home. One row per change, grouped under the day it was
-   made — a date column on the left the eye can skip down, the change itself on the right. */
-.upday{display:grid;grid-template-columns:62px 1fr;gap:10px;padding:9px 0;
-  border-bottom:1px dotted #c9bd9d}
-.upday:last-of-type{border-bottom:none}
-.update-d{font-family:var(--sans);font-size:9.5px;font-weight:800;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--faint);padding-top:3px}
-.uprow{position:relative;padding:3px 0 4px}
-.uprow + .uprow{margin-top:7px;border-top:1px dotted #e2d8bd;padding-top:8px}
+/* ---- Today: conditions, the one thing, the way onto the tee (Aug 27 2026) ----
+   The weather is a green card because it is a condition of play rather than a finding,
+   and the only number on it that changes his golf — what the air does to a carry — sits
+   in the mono voice on the right, where the label column of the whole app lives. */
+.wx{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;
+  background:var(--green);color:var(--green-ink);border-radius:18px;padding:16px;
+  margin:14px 0;cursor:pointer}
+.wxt{font-family:var(--serif);font-size:44px;line-height:1}
+.wxc{font-family:var(--sans);font-size:11.5px;color:rgba(244,239,226,.66);margin-top:5px}
+.wxr{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-align:right;
+  color:rgba(244,239,226,.8);max-width:48%;flex:none}
+.wxr b{display:block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(244,239,226,.55);margin-bottom:6px}
+.wxr span{display:block;margin-top:3px}
+.wxr i{font-style:normal;font-family:var(--serif);font-size:19px;letter-spacing:0}
+.wxn{text-transform:none;letter-spacing:.01em;font-size:9px;line-height:1.45;
+  color:rgba(244,239,226,.5);margin-top:7px}
+body.night .wx{border:1px solid var(--line)}
+/* The one thing: one finding, at the size of a headline, wearing its own tier rail. */
+.one{padding:13px 15px 15px}
+.oneh{font-family:var(--serif);font-size:21px;line-height:1.25;color:var(--ink);
+  margin:4px 0 6px}
+/* The way onto the tee. Full width and 62px because it is the one thing on this page he
+   might be about to do standing in a car park. */
+.bigbtn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+  min-height:62px;padding:0 16px;border:none;border-radius:var(--r-card);text-align:left;
+  background:var(--burg);color:var(--burg-ink);box-shadow:0 3px 0 var(--burg-deep);
+  margin:14px 0 4px}
+.bigbtn:active{transform:translateY(1px);box-shadow:0 2px 0 var(--burg-deep)}
+.bb-l{font-family:var(--sans);font-size:15px;font-weight:700}
+.bb-l em{display:block;font-style:normal;font-family:var(--mono);font-size:9.5px;
+  font-weight:400;letter-spacing:.06em;color:rgba(246,239,230,.62);margin-top:3px}
+.bb-r{font-family:var(--mono);font-size:10px;letter-spacing:.12em;white-space:nowrap;
+  color:rgba(246,239,230,.85)}
+.bbfoot{text-align:right;margin-bottom:8px}
+
+/* What's landed: the change log on Today. One row per change — a mono TYPE column on the
+   left tinted by the strength of the evidence behind that kind of change, the change
+   itself in the middle, the day it was made on the right. The type column is what makes
+   the list skimmable: film and scorecards read burgundy, rounds green, the coaching
+   library green accent, a number nobody measured gold. The grouping behind it is still by
+   day (that is what collapses three pushes to one plan into one row) — the day heading
+   simply moved into the rows, where it can sit beside the change it dates. */
+.upday{padding:2px 0}
+.uprow{position:relative;display:grid;grid-template-columns:56px 1fr auto;gap:10px;
+  align-items:baseline;padding:9px 0;border-bottom:1px dotted var(--dot)}
+.uprow:last-child{border-bottom:none}
+.upt{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;
+  color:var(--ink36);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upt.u-m{color:var(--t-measured)}
+.upt.u-l{color:var(--t-live)}
+.upt.u-k{color:var(--green-accent)}
+.upt.u-u{color:var(--t-snapshot-ink)}
+.upd{font-family:var(--mono);font-size:9.5px;color:var(--ink36);white-space:nowrap;
+  text-align:right}
 /* `opens`, not `tap` — .tap is the 5-ft test grid and would turn every row into a square. */
-.uprow.opens{cursor:pointer;padding-right:16px}
-.uprow.opens .arr{position:absolute;right:0;top:3px;color:var(--faint);font-size:13px}
+.uprow.opens{cursor:pointer}
+.uprow.opens .arr{color:var(--faint);font-size:12px;margin-left:5px}
 .uph{font-size:13.5px;line-height:1.35;color:var(--ink);font-weight:600}
 .ups{font-size:12px;line-height:1.45;color:var(--soft);margin-top:2px}
-/* Unseen since he last opened Home. A rule down the left rather than a badge — it marks
+/* Unseen since he last opened Today. A rule down the left rather than a badge — it marks
    the row without competing with the text for the eye. */
 .uprow.fresh{padding-left:9px}
-.uprow.fresh::before{content:'';position:absolute;left:0;top:3px;bottom:3px;width:2px;
+.uprow.fresh::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:2px;
   border-radius:2px;background:var(--burg)}
-.uprow.fresh.opens{padding-left:9px}
 /* Release notes under an app row. Sentences, so they read as prose rather than as more
    headlines — the bold line above already said what kind of change this is. */
 .upli{list-style:none;margin:5px 0 0}
@@ -131,21 +204,63 @@ body.night .area.focus{border-top-color:var(--burg)}
 .upb{display:inline-block;font-family:var(--sans);font-size:8.5px;font-weight:800;
   letter-spacing:.07em;text-transform:uppercase;margin-left:6px;vertical-align:1px;
   padding:1px 6px;border-radius:9px;border:1px solid var(--line);color:var(--faint)}
-body.night .upday{border-bottom-color:#2a3138}
-body.night .uprow + .uprow{border-top-color:#2a3138}
+body.night .uprow{border-bottom-color:#2a3138}
 
-/* Where a finding came from. The weakest source is the one worth flagging. */
-.ev{display:inline-block;font-size:8.5px;font-weight:800;letter-spacing:.07em;
-  text-transform:uppercase;padding:1px 6px;border-radius:9px;margin-left:6px;
-  vertical-align:1px;border:1px solid var(--line)}
-.ev.live{background:var(--green);color:var(--green-ink);border-color:var(--green)}
-.ev.round{background:#dfe8dc;color:var(--green);border-color:#a8c0ad}
-.ev.measured{background:#efe6c8;color:#7a6414;border-color:#cdbd7e}
-.ev.snapshot, .ev.self{background:transparent;color:var(--faint)}
-.ev.self{font-style:italic;letter-spacing:.04em}
+/* ---- The evidence rail: where a finding came from, said in shape not in words ----
+   SOLID fill = the tier was earned by observation (live, measured). OUTLINE = it was not
+   (round is a weaker card; snapshot and self are claims). The weakest source is the one
+   worth flagging, and the strongest is the one allowed to shout. `.ev` is the chip and
+   `.tierrail` + `.t-<tier>` is the 4px rail down the left of the card it belongs to —
+   one vocabulary, so a tier can never be coloured two ways on one screen. */
+.ev{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border-radius:6px;
+  margin-left:6px;vertical-align:1px;border:1px solid transparent}
+.ev.live{background:var(--t-live);color:var(--green-ink);border-color:var(--t-live)}
+.ev.round{background:transparent;color:var(--t-round);border-color:var(--t-round)}
+.ev.measured{background:var(--t-measured);color:var(--burg-ink);border-color:var(--t-measured)}
+.ev.snapshot{background:transparent;color:var(--t-snapshot-ink);border-color:var(--t-snapshot)}
+.ev.self{background:transparent;color:var(--t-self-ink);border-color:var(--t-self);
+  font-style:italic;letter-spacing:.06em}
+/* Tappable: the chip is the door to the evidence panel (what the sample was, where it
+   came from, what is NOT measured). Only chips that carry a data-action get the cue. */
+.ev[data-action]{cursor:pointer}
+.ev[data-action]::after{content:' ?';opacity:.55}
 body.night .ev.live{background:#2f6b46;color:#eaf6ee;border-color:#3f8159}
-body.night .ev.round{background:#1c2b22;color:#8fd0a8;border-color:#33503f}
-body.night .ev.measured{background:#33301c;color:#dfc76a;border-color:#5a5533}
+body.night .ev.round{color:#8fd0a8;border-color:#33503f}
+body.night .ev.measured{background:var(--burg);color:var(--burg-ink);border-color:var(--burg)}
+body.night .ev.snapshot{color:#dfc76a;border-color:#5a5533}
+body.night .ev.self{color:var(--faint);border-color:rgba(255,255,255,.18)}
+
+/* The rail. Put it on any card carrying a finding: `class="card tierrail t-live"`. */
+.tierrail{border-left:4px solid var(--tier,var(--line))}
+.t-live{--tier:var(--t-live)}
+.t-round{--tier:var(--t-round)}
+.t-measured{--tier:var(--t-measured)}
+.t-snapshot{--tier:var(--t-snapshot)}
+.t-self{--tier:var(--t-self)}
+/* The disclosure panel behind a tappable tier chip: the sample, the source, and what is
+   NOT measured. Sunk paper so it reads as a drawer pulled out of the card, not a card. */
+.evpanel{background:var(--sunk);border-radius:var(--r);padding:11px 12px;margin-top:9px;
+  font-family:var(--sans);font-size:12px;line-height:1.5;color:var(--soft)}
+.evpanel b{display:block;font-family:var(--mono);font-size:9px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+.evpanel dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);margin-top:6px}
+.evpanel dd{margin-top:2px}
+body.night .evpanel{background:rgba(255,255,255,.05)}
+/* The disclosure itself: a header row that IS the <summary>, so the whole 44px row opens
+   the drawer and the tier chip is the affordance saying what is behind it. A plain
+   <details id=…> again — the same machinery that reopens a fold after a rerender()
+   reopens this, so an open panel survives a chip tap with no store of its own. */
+.evdis>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;
+  justify-content:space-between;min-height:44px;font-family:var(--mono)}
+.evdis>summary::-webkit-details-marker{display:none}
+.evdis>summary:hover{opacity:.65}
+.evdl{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink50)}
+.evdis>summary .ev{margin-left:0;flex:none}
+.evdis>summary .ev::after{content:' ?';opacity:.55}
+.evdis[open]>summary .ev::after{content:' ×';opacity:.55}
 
 table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
 th,td{padding:7px 8px;text-align:left;vertical-align:top}
@@ -154,7 +269,7 @@ th{color:var(--faint);border-bottom:2px solid var(--green);font-family:var(--san
 td{border-bottom:1px solid var(--line2)}
 td b{font-size:14px}
 
-.meter{height:8px;border-radius:5px;overflow:hidden;background:#ece4cd;border:1px solid var(--line);margin:7px 0 4px}
+.meter{height:8px;border-radius:5px;overflow:hidden;background:var(--card2);border:1px solid var(--line);margin:7px 0 4px}
 .meter span{display:block;height:100%;background:var(--burg)}
 .meter.grn span{background:var(--green)}
 
@@ -180,7 +295,7 @@ td b{font-size:14px}
   background:var(--card2);border:1px solid var(--line);border-radius:4px;padding:2px 7px;font-family:var(--sans)}
 
 .check{list-style:none}
-.check li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dotted #c9bd9d;
+.check li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dotted var(--dot);
   font-size:13px;cursor:pointer}
 .box{flex:0 0 17px;width:17px;height:17px;border-radius:4px;border:1.5px solid var(--faint);margin-top:2px;position:relative}
 .check li.done .box{background:var(--green);border-color:var(--green)}
@@ -199,13 +314,13 @@ td b{font-size:14px}
 
 .spark{display:flex;align-items:flex-end;gap:7px;height:64px;margin-top:10px}
 .spark .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px}
-.spark .b{width:100%;max-width:40px;border-radius:4px 4px 0 0;background:#c9bd9d;min-height:2px}
+.spark .b{width:100%;max-width:40px;border-radius:4px 4px 0 0;background:var(--dot);min-height:2px}
 .spark .b.hot{background:var(--green)}
 .spark .b.goal{background:var(--burg)}
 .spark .t{font-size:9px;color:var(--faint);font-family:var(--sans)}
 
 .crs{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:8px 0;
-  border-bottom:1px dotted #c9bd9d}
+  border-bottom:1px dotted var(--dot)}
 .crs .nm{font-weight:700;font-size:13.5px}
 .crs .st{font-size:10.5px;color:var(--faint);margin-left:5px;font-family:var(--sans)}
 .crs .rt{font-weight:700;font-size:13.5px;color:var(--btext);white-space:nowrap}
@@ -218,7 +333,7 @@ td b{font-size:14px}
   border-radius:4px;padding:2px 6px;margin-top:5px;font-family:var(--sans);letter-spacing:.08em}
 
 .streak{display:flex;gap:5px;margin-top:8px}
-.day{width:26px;height:26px;border-radius:5px;border:1px solid var(--line);background:#ece4cd;
+.day{width:26px;height:26px;border-radius:5px;border:1px solid var(--line);background:var(--card2);
   display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--green);
   font-weight:700;font-family:var(--sans)}
 .day.hit{background:var(--green);color:var(--green-ink)}
@@ -272,7 +387,7 @@ body.night .dscore{border-left-color:var(--gtext)}
 .pkgrp.pknone{text-transform:none;letter-spacing:0;font-weight:400;font-style:italic;
   font-size:11.5px;position:static}
 .pkrow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
-  padding:11px;border-bottom:1px dotted #c9bd9d;cursor:pointer}
+  padding:11px;border-bottom:1px dotted var(--dot);cursor:pointer}
 .pkrow:last-child{border-bottom:none}
 .pkrow:active{background:var(--card2)}
 .pkn{font-size:14px;color:var(--ink);font-weight:600}
@@ -280,7 +395,7 @@ body.night .dscore{border-left-color:var(--gtext)}
 
 .formrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .formrow.g3{grid-template-columns:1fr 1fr 1fr}
-.note-preview{border:1px dashed #c9bd9d;border-radius:var(--r);background:var(--card);padding:10px 12px;
+.note-preview{border:1px dashed var(--dot);border-radius:var(--r);background:var(--card);padding:10px 12px;
   font-size:12px;color:var(--soft);font-style:italic;margin-top:6px}
 /* Distance chip on a course-plan row. It sits with the course name rather than out on
    the right, so the eye reads "Sterling Farms, 12 miles" as one thing — and so a long
@@ -289,7 +404,7 @@ body.night .dscore{border-left-color:var(--gtext)}
   color:var(--gtext);background:rgba(18,60,38,.07);border:1px solid var(--line2);
   border-radius:10px;padding:1px 7px;margin-left:6px;white-space:nowrap}
 .linkrow{display:flex;justify-content:space-between;align-items:center;padding:10px 2px;
-  border-bottom:1px dotted #c9bd9d;cursor:pointer}
+  border-bottom:1px dotted var(--dot);cursor:pointer}
 .linkrow .arr{color:var(--faint)}
 /* Stroke evolution. The grid IS the interface now: seven verdicts running to
    paragraphs used to print in full under the table, which made the most useful block
@@ -302,7 +417,7 @@ body.night .dscore{border-left-color:var(--gtext)}
 .evohead{padding:0 20px 5px 0;border-bottom:1px solid var(--gtext)}
 .evohead span{font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:.02em;
   text-transform:uppercase;color:var(--gtext);text-align:center;line-height:1.25}
-.evorow{border-bottom:1px dotted #c9bd9d}
+.evorow{border-bottom:1px dotted var(--dot)}
 .evorow:last-of-type{border-bottom:none}
 .evorow>summary{list-style:none;cursor:pointer;position:relative;padding:9px 20px 9px 0}
 .evorow>summary::-webkit-details-marker{display:none}
@@ -319,7 +434,7 @@ body.night .dscore{border-left-color:var(--gtext)}
    columns at phone width turned the session log into a wall of prose you had to read
    in order to navigate. A row is the date, the batch size and one concluding line;
    the breakdown is one tap away. See sessionLog() in app.js. */
-.seslog{padding:9px 2px;border-bottom:1px dotted #c9bd9d;cursor:pointer}
+.seslog{padding:9px 2px;border-bottom:1px dotted var(--dot);cursor:pointer}
 .seslog:last-child{border-bottom:none;padding-bottom:2px}
 .sesh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .sesh b{font-size:14.5px}
@@ -344,21 +459,102 @@ body.night .dscore{border-left-color:var(--gtext)}
 .poslegend i{width:14px;height:5px;border-radius:3px;display:inline-block}
 .poslegend i.arc{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--burg);border-left-color:transparent;border-bottom-color:transparent;transform:rotate(45deg)}
 
+/* ---- The tab bar: five tabs and a tee button (Aug 27 2026, Jack's redesign) ----
+   TODAY · BAG · [TEE] · GAME · ROUNDS · COACH. The tee button is burgundy and sits in the
+   middle because starting or resuming a live round is the one thing that has to be one
+   thumb away from every screen — it goes to the logger, which resumes a round in progress
+   rather than starting a second one.
+
+   The glyphs are CSS shapes, not icons: a 19px box with a 2px border, round or square,
+   filled when the tab is active. No SVG, no emoji, nothing to load — and they stay legible
+   at the size a label sits under. Items are 52px tall (the tee 58px), well clear of the
+   44px tap-target floor. */
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:30;
-  /* Auto-fit the columns to however many buttons there are — hardcoding a count left the
-     tabs squeezed into part of the bar the moment the nav went from eight to six. */
-  display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:7px 2px calc(9px + env(safe-area-inset-bottom));
-  text-align:center;background:var(--green);color:#a8bfa8;font-family:var(--sans)}
-nav button{background:none;border:none;color:#a8bfa8;font-size:11px;font-weight:700;padding:4px 0;letter-spacing:-.01em}
-nav button .ic{font-size:23px;display:block;margin-bottom:2px;line-height:1.05}
-nav button.on{color:#f2e9d0}
+  display:flex;align-items:flex-end;gap:2px;
+  padding:7px 8px calc(10px + env(safe-area-inset-bottom));
+  text-align:center;background:var(--nav);border-top:1px solid rgba(35,32,26,.12);
+  font-family:var(--mono)}
+nav button{flex:1;min-height:52px;background:none;border:none;border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  color:var(--ink36);padding:4px 0;transition:color .15s,background .15s}
+nav button .ic{width:19px;height:19px;border:2px solid currentColor;border-radius:4px;display:block}
+nav button.rnd .ic{border-radius:50%}
+nav button .nl{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.06em;
+  line-height:1;white-space:nowrap}
+nav button.on{color:var(--green)}
+nav button.on .ic{background:currentColor}
+/* The tee button. Filled glyph always — it is not a place you are, it is a thing you do. */
+nav button.navtee{flex:0 0 auto;min-width:66px;min-height:58px;background:var(--burg);
+  color:var(--burg-ink);box-shadow:0 2px 0 var(--burg-deep)}
+nav button.navtee .ic{border-radius:50%;background:currentColor}
+nav button.navtee:active{transform:translateY(1px);box-shadow:0 1px 0 var(--burg-deep)}
+body.night nav button{color:rgba(255,255,255,.42)}
+body.night nav button.on{color:var(--gtext)}
+body.night nav button.navtee{color:var(--burg-ink)}
+/* 320px is the narrowest phone and ROUNDS is the longest label: five 45px tabs beside a
+   66px tee button leave it about a pixel of room at 9.5px, so the tracking goes first.
+   After the .navtee rules on purpose — a media query adds no specificity, so an earlier
+   block would simply lose to them. */
+@media (max-width:360px){
+  nav{padding-left:5px;padding-right:5px}
+  nav button .nl{font-size:9px;letter-spacing:.01em}
+  nav button.navtee{min-width:60px}
+}
 
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--green);
   color:var(--green-ink);font-family:var(--sans);font-size:12.5px;font-weight:700;padding:10px 18px;
   border-radius:20px;z-index:50;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
-.hr{border:none;border-top:1px dotted #c9bd9d;margin:12px 0}
+.hr{border:none;border-top:1px dotted var(--dot);margin:12px 0}
 details summary{cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--gtext);padding:6px 0}
+
+/* ---- Collapsible sections (Aug 27 2026): one pattern, every tab ----
+   A section folds away behind a 44px header row: the section label on the left in the
+   mono label voice, its meta and a caret on the right. It is a plain <details id=…> with
+   a styled <summary>, deliberately — the app already restores any open <details> carrying
+   an id across a rerender(), so the open/closed state costs no store, no bookkeeping and
+   cannot drift out of sync with the DOM. Never build a parallel open/closed map for this.
+   Use fold() in app.js to write one; the id is what makes it survive an in-place update.
+
+   Two rules that are NOT style: a toggle is a rerender() (it preserves scroll — this is
+   the drill-bench bug CLAUDE.md records), and the LIVE LOGGER gets none of these. That
+   screen already hides what cannot exist yet, and two disclosure systems on the strictest
+   screen in the app is one too many. */
+.fold{border-top:1px dotted var(--dot)}
+.fold:first-of-type{border-top:none}
+.card>.fold:first-child>summary{padding-top:0}
+.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;
+  justify-content:space-between;gap:10px;min-height:44px;padding:6px 0;
+  font-family:var(--mono);font-weight:400;color:var(--ink)}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary:hover{opacity:.65}
+.fold>summary::after{content:'▸';font-family:var(--mono);font-size:11px;color:var(--ink36);
+  flex:none;margin-left:-3px}
+.fold[open]>summary::after{content:'▾'}
+.foldl{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink50);min-width:0}
+.foldm{font-family:var(--mono);font-size:11px;color:var(--ink36);white-space:nowrap;
+  margin-left:auto;flex:none}
+.foldb{padding:2px 0 12px}
+/* On the two green cards (the read on Coach, the weather block on Today) the same header
+   runs in cream tints instead — same shape, inverted ink. */
+.oncard .foldl,.oncard .foldm,.oncard>summary,.oncard>summary::after{color:rgba(244,239,226,.62)}
+.oncard{border-top-color:rgba(244,239,226,.2)}
+body.night .fold{border-top-color:rgba(255,255,255,.1)}
+
+/* ---- Segmented control (Rounds: Cards · Round prep · Courses) ----
+   Three views of the same subject, so they are segments of one tab rather than three
+   places to be. The choice is view-local state in app.js (roundsSeg) and switching is a
+   rerender(), not a navigation — you have not gone anywhere, the page is showing you a
+   different face of where you already are. */
+.segbar{display:flex;gap:8px;margin:14px 0 2px}
+.seg{flex:1;min-height:44px;padding:0 4px;border-radius:var(--r);white-space:nowrap;
+  font-family:var(--sans);font-size:12.5px;font-weight:600;
+  border:1px solid var(--ink18);background:var(--card);color:var(--ink)}
+.seg.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+.seg:active{transform:translateY(1px)}
+body.night .seg{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+body.night .seg.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
 
 /* ---- Layered reading: scan the index, open only what you want ---- */
 .secthead{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
@@ -368,7 +564,7 @@ details summary{cursor:pointer;font-family:var(--sans);font-size:12px;font-weigh
   border:1px solid var(--line);border-radius:20px;padding:5px 11px;white-space:nowrap}
 .minibtn:active{background:var(--green);color:var(--green-ink)}
 
-.sect{border-top:1px dotted #c9bd9d}
+.sect{border-top:1px dotted var(--dot)}
 .sect:first-of-type{border-top:none}
 .sect>summary{list-style:none;cursor:pointer;position:relative;padding:11px 24px 11px 0;
   font-family:var(--serif);font-weight:400;color:var(--ink)}
@@ -430,7 +626,7 @@ body.night .sheettabs span.on{background:var(--green);color:var(--green-ink);bor
    number column on every row so the eye runs down it without reading. */
 .hzlist{margin-top:4px}
 .hzlist div{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:baseline;
-  padding:5px 0;border-bottom:1px dotted #c9bd9d}
+  padding:5px 0;border-bottom:1px dotted var(--dot)}
 .hzlist div:last-child{border-bottom:none}
 .hzlist b{font-family:var(--sans);font-size:12px;font-weight:800;color:var(--btext)}
 .hzlist span{font-size:12.5px;line-height:1.4;color:var(--ink)}
@@ -444,11 +640,17 @@ body.night .sheet.card{background:#15191d;border-radius:16px;backdrop-filter:non
 
 /* ---- Night mode: the command-center skin ---- */
 body.night{
-  --paper:#0d1013; --card:#15191d; --card2:#1a1f24; --line:#2b3238; --line2:#242b31;
+  --paper:#0d1013; --card:#15191d; --card2:#1a1f24; --sunk:#1f252b;
+  --line:#2b3238; --line2:#242b31; --dot:#2a3138;
   --ink:#e9e7dd; --soft:#b5b2a4; --faint:#8b8879;
-  --green:#174a2f; --green-ink:#dfe8d8; --burg:#a33344; --burg-ink:#f3e3d9;
+  --ink62:#b5b2a4; --ink50:#8b8879; --ink36:rgba(255,255,255,.36); --ink18:rgba(255,255,255,.18);
+  --green:#174a2f; --green-ink:#dfe8d8; --green-deep:#0d2c1c; --burg:#a33344; --burg-ink:#f3e3d9;
+  --burg-deep:#5f1d27; --nav:#0a0f0c;
   --shadow:2px 2px 0 #0a0d0f;
   --gtext:#8fd0a8; --btext:#e0a63c;
+  --t-live:#2f6b46; --t-round:#8fd0a8; --t-measured:#a33344;
+  --t-snapshot:#5a5533; --t-snapshot-ink:#dfc76a;
+  --t-self:rgba(255,255,255,.2); --t-self-ink:#8b8879;
 }
 body.night .chip{background:#22292e;color:var(--soft);border-color:var(--line)}
 body.night .chip.on{background:var(--burg);color:var(--burg-ink);border-color:var(--burg)}
@@ -554,7 +756,7 @@ h2{scroll-margin-top:14px}
 /* ---- Routine steps: the scan-in-five-seconds block ---- */
 .steps{list-style:none;counter-reset:st;margin:2px 0 0}
 .steps li{counter-increment:st;display:flex;gap:10px;align-items:flex-start;padding:8px 0;
-  border-bottom:1px dotted #c9bd9d;font-size:13.5px;line-height:1.45}
+  border-bottom:1px dotted var(--dot);font-size:13.5px;line-height:1.45}
 .steps li:last-child{border-bottom:none;padding-bottom:0}
 .steps li::before{content:counter(st);flex:0 0 20px;height:20px;border-radius:50%;
   background:var(--green);color:var(--green-ink);font-family:var(--sans);font-size:11px;
@@ -583,25 +785,142 @@ h2{scroll-margin-top:14px}
 .scard .cl{display:block;font-family:var(--sans);font-size:9px;font-weight:700;color:var(--faint);
   letter-spacing:.02em;margin-top:1px}
 
-/* ---- Live round: built for one thumb, walking, in sunlight ---- */
-.livebar{border-left:4px solid var(--burg)}
-.livebar .lvtag{font-family:var(--sans);font-size:9.5px;font-weight:800;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--btext);margin-bottom:3px}
-.lvhead{position:sticky;top:0;z-index:20;background:var(--paper);padding:10px 0 8px;
-  border-bottom:2px solid var(--green);margin-bottom:2px}
-.lvh1{font-size:21px;font-weight:700;color:var(--gtext);line-height:1.1}
-.lvh1 span{font-size:13px;font-weight:400;color:var(--faint);font-family:var(--sans)}
-.lvh2{font-family:var(--sans);font-size:12px;color:var(--soft);margin-top:2px}
-.lvh2 b{font-size:14px;color:var(--btext)}
-/* Jump strip: every hole reachable, current one obvious, scored ones filled in.
-   Nine to a row on purpose — the top row IS the front nine, the bottom the back — and
-   sized for a thumb on a tee box, not a cursor. */
-.hstriprow{display:grid;grid-template-columns:repeat(9,1fr);gap:5px;margin:8px 0 2px}
-.hstrip{text-align:center;font-family:var(--sans);font-size:14px;
-  font-weight:700;padding:10px 0;border-radius:9px;border:1px solid var(--line);
-  background:var(--card2);color:var(--faint);cursor:pointer;user-select:none}
-.hstrip.done{background:#dfe8dc;color:var(--green);border-color:#a8c0ad}
-.hstrip.cur{background:var(--green);color:var(--green-ink);border-color:var(--green)}
+/* ---- Live round: built for one thumb, walking, in sunlight (redesigned Aug 27 2026) ----
+   The header is the identity of the screen and the only part of it that is not a chip:
+   where you are, which hole, how the round stands, and the receipt saying the last tap is
+   already on disk. It sticks to the top and bleeds to both edges — the body carries 16px
+   of padding, which the negative margin cancels. */
+.lvhead{position:sticky;top:0;z-index:20;margin:0 -16px 13px;padding:12px 18px 11px;
+  background:var(--green);color:var(--green-ink)}
+.lvhe{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;
+  color:rgba(244,239,226,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvhr{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:6px}
+.lvhn{font-family:var(--serif);font-size:38px;line-height:1;letter-spacing:-.01em;min-width:0}
+.lvhs{margin-left:7px;white-space:nowrap}
+.lvhs i{font-family:var(--mono);font-size:11.5px;font-style:normal;letter-spacing:.08em;
+  color:rgba(244,239,226,.6);margin-left:6px}
+/* Par is a 44px control rather than three chips, because this header is STICKY: every
+   pixel it takes it takes for all eighteen holes. One tap cycles 3 · 4 · 5 and the Card
+   button opens the full eighteen. A par nobody has confirmed renders dashed — the same
+   "this is not a record" language the guessed cells on the card check use, so a
+   placeholder can never sit there looking like a scorecard. */
+.lvpar{min-height:44px;padding:0 10px;background:transparent;border:1px solid rgba(244,239,226,.3);
+  border-radius:var(--r);color:rgba(244,239,226,.85);
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.08em}
+.lvpar.auto{border-style:dashed;border-color:rgba(244,239,226,.7)}
+.lvpar:active{background:rgba(244,239,226,.12)}
+.lvhb{display:flex;gap:6px;flex:none}
+.lvfin{min-height:44px;padding:0 14px;border-radius:var(--r);background:transparent;
+  border:1px solid rgba(244,239,226,.38);color:var(--green-ink);flex:none;
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.lvfin.ghost{border-color:rgba(244,239,226,.22);color:rgba(244,239,226,.72);padding:0 11px}
+.lvfin:active{background:rgba(244,239,226,.12)}
+/* The hole strip: eighteen bars, the round at a glance and a tap to any hole. Solid = here.
+   72% = played at or under par, 40% = played over, 16% = not played yet. Eighteen targets
+   across one phone cannot each be 44px wide, so this is a shortcut with a 30px-tall hit
+   area — the primary way between holes stays the 52px Back / Next buttons in the footer. */
+.lvbars{display:flex;gap:3px;margin-top:11px}
+.lvbar{flex:1;height:30px;display:flex;align-items:center;cursor:pointer}
+.lvbar::before{content:'';display:block;width:100%;height:5px;border-radius:3px;
+  background:rgba(244,239,226,.16)}
+.lvbar.ok::before{background:rgba(244,239,226,.72)}
+.lvbar.over::before{background:rgba(244,239,226,.4)}
+.lvbar.cur::before{background:var(--green-ink);height:7px}
+/* A hole he wrote on. The strip is a scoring view first, so the note is a mark on the bar
+   rather than a badge beside it. */
+.lvbar.noted::before{box-shadow:inset 0 0 0 1.5px var(--burg)}
+.lvhf{display:flex;justify-content:space-between;align-items:center;margin-top:1px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:rgba(244,239,226,.7)}
+/* The save receipt. Every tap writes S.live to localStorage BEFORE the screen redraws, and
+   this is the only thing on the phone that says so — which is why it pulses rather than
+   sitting there. A static label reads as decoration; a pulse reads as a heartbeat. */
+.lvsaved{animation:lvpulse 2.6s ease-in-out infinite}
+@keyframes lvpulse{0%,100%{opacity:.3}50%{opacity:1}}
+/* 320px is the narrowest phone, and "Hole 18" at 38px beside PAR 5 · SI 13 beside a 44px
+   Finish button does not fit on one line there. The hole number keeps its display size;
+   the par and stroke index drop underneath it, which is the pair that reads fine stacked. */
+@media (max-width:360px){
+  .lvhn{font-size:32px}
+  .lvhs{display:block;margin-left:0;margin-top:5px}
+  .lvhead{padding-left:14px;padding-right:14px}
+  .lvfin{padding:0 10px;font-size:10px}
+}
+
+/* ---- One section per question, and a section exists only once it can be answered ----
+   The disclosure itself is in app.js (qRows()); this is what it looks like. A section that
+   has just appeared rises 10px; arriving at a hole slides the whole card in from the right
+   instead, because animating nine sections on top of that is a fairground, not a reveal. */
+.lvwrap{display:flex;flex-direction:column;gap:13px}
+.lvwrap>.card{margin:0}
+.lvsec{padding:13px}
+.lvsl{display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink50);margin-bottom:9px}
+/* The right-hand half of a section header: the hint, in the quiet ink. `lit` is the one
+   that isn't a hint — the club he hit here last time, which is what makes the half-lit
+   chip beneath it legible, so it takes the same green accent the chip does. */
+.lvsl span{font-family:var(--sans);font-size:10.5px;font-weight:400;letter-spacing:0;
+  text-transform:none;color:var(--ink36);text-align:right;flex:1 1 auto}
+.lvsl span.lit{font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--green-accent)}
+.lvwait{font-family:var(--sans);font-size:11.5px;color:var(--faint);margin-top:9px}
+.lvgrid{display:grid;gap:6px}
+.lvgrid.g1{grid-template-columns:1fr}
+.lvgrid.g3{grid-template-columns:repeat(3,1fr)}
+.lvgrid.g4{grid-template-columns:repeat(4,1fr)}
+.lvgrid.g5{grid-template-columns:repeat(5,1fr)}
+.lvgrid.g6{grid-template-columns:repeat(6,1fr)}
+.lvgrid + .lvgrid{margin-top:6px}
+.lvgrid .chip.span{grid-column:1/-1}
+.lvsub{opacity:.9}
+/* The logger's chips. Scoped to the logger deliberately — `.chip` elsewhere in the app is
+   a smaller, different thing, and the 44px floor is a rule about a thumb on a tee box. */
+.lvwrap .chip.big{display:flex;align-items:center;justify-content:center;text-align:center;
+  min-height:44px;padding:0 6px;border-radius:var(--r);font-family:var(--sans);
+  font-size:13px;font-weight:700;background:var(--card2);border:1px solid var(--ink18);
+  color:var(--ink);transition:background .12s,border-color .12s,transform .1s}
+.lvwrap .chip.big:active{transform:scale(.97)}
+.lvwrap .chip.big.sc{flex-direction:column;gap:1px;line-height:1.1}
+/* Not a direction but a qualifier, and a keyboard nobody has asked for yet: both stay
+   dashed and unfilled until they are actually the answer. */
+.lvwrap .chip.big.ns,.lvwrap .chip.big.ob{background:transparent;
+  border:1px dashed var(--burg);color:var(--btext)}
+.lvwrap .chip.big.note{background:transparent;border:1px dashed var(--ink18);
+  color:var(--soft);font-weight:600}
+/* Green for a neutral or good outcome… */
+.lvwrap .chip.big.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+/* …burgundy for everything that costs strokes: OB, a penalty, a green the drive took away,
+   a conceded putt, and every miss direction. The colour is a property of the answer. */
+.lvwrap .chip.big.on.bad,.lvwrap .chip.big.ns.on,.lvwrap .chip.big.ob.on{
+  background:var(--burg);border-color:var(--burg);border-style:solid;color:var(--burg-ink)}
+/* The suggested-but-unconfirmed tee club: half-lit, with LAST TIME in the section header
+   saying whose suggestion it is. It must never look like a record — the whole
+   driver-vs-mini question rests on a confirmed club and a carried-over one being
+   different things. */
+.lvwrap .chip.big.on.auto{background:rgba(46,125,81,.1);border:1px solid rgba(46,125,81,.35);
+  color:var(--green-accent)}
+body.night .lvwrap .chip.big{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14)}
+body.night .lvwrap .chip.big.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+body.night .lvwrap .chip.big.on.bad,body.night .lvwrap .chip.big.ns.on,
+body.night .lvwrap .chip.big.ob.on{background:var(--burg);border-color:var(--burg)}
+/* ---- The footer: back a hole, on to the next ---- */
+.lvfoot{display:flex;gap:8px;margin-top:14px}
+.lvback{flex:0 0 58px;min-height:52px;border-radius:var(--r);background:var(--card);
+  border:1px solid var(--ink18);color:var(--ink);font-size:20px;line-height:1}
+.lvnext{flex:1;min-height:52px;border-radius:var(--r);background:var(--green);border:none;
+  color:var(--green-ink);font-family:var(--sans);font-size:15px;font-weight:700;
+  box-shadow:0 2px 0 var(--green-deep)}
+.lvnext:active{transform:translateY(1px);box-shadow:0 1px 0 var(--green-deep)}
+.lvback[disabled]{opacity:.4}
+body.night .lvback{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+/* ---- Motion: .26s reveal, .3s hole slide, one easing ---- */
+.lvwrap.slide{animation:lvslide .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes lvslide{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+.lvsec.rev{animation:lvrise .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes lvrise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .lvwrap.slide,.lvsec.rev,.lvsaved{animation:none}
+}
 /* What this hole has cost you before, and what the prep says about it — read with a club
    already in your hand, so it sits above the card and ahead of the taps. */
 .holeintel{margin:8px 0 0;padding:11px 13px;border-left:3px solid var(--green)}
@@ -635,35 +954,22 @@ body.night .hi-gist{color:#9ed4b2}
 /* The decision row: same grid as the rest, just carries a little more weight. */
 .hi-grid dd.lead{font-size:14px;color:var(--gtext);font-weight:600}
 /* Full-width rule: a border on the two cells would break across the column gap. */
-.hi-sep{grid-column:1/-1;border-top:1px dotted #c9bd9d;margin:3px 0 0}
+.hi-sep{grid-column:1/-1;border-top:1px dotted var(--dot);margin:3px 0 0}
 .hi-grid dd.was{color:var(--faint);font-size:12.5px}
 .hi-grid dd.was b{color:var(--ink)}
 .hi-grid dd.was b.hot{color:var(--btext)}
 .hi-why + .hi-grid, .hi-grid + .hi-why{margin-top:9px}
 /* ---- Live hole: give the screen back to the rows (Aug 20 2026) ----
-   Everything above OFF THE TEE was costing about a third of the phone before a single
-   chip appeared. Two changes, and neither touches the view switch or the hole buttons:
-   the app masthead collapses to the theme toggle on this one screen, and the 1-18 jump
-   strip folds away behind a control in the par row so it costs no height until asked
-   for. The hole title, the course and the par row all stay — that is the identity of
-   the screen and it reads in one line. */
+   Everything above the first chip was costing about a third of the phone. The app's own
+   masthead is pure overhead here — the green header already says where he is — so on this
+   one view it collapses to the theme toggle, and the hole header takes the top of the
+   screen for itself. */
 body.lvfocus .hero{padding:10px 0 0;min-height:0}
 body.lvfocus .hero .badge,
 body.lvfocus .hero h1,
 body.lvfocus .hero .tag{display:none}
 body.lvfocus .hero::after{content:'';display:block;clear:both}
 body.lvfocus .themebtn{width:32px;height:32px;font-size:15px;margin-top:0}
-/* With the masthead gone the sticky header is the top of the screen, so it carries the
-   breathing room itself rather than inheriting it. */
-body.lvfocus .lvhead{padding:6px 0 7px}
-body.lvfocus .lvh1{font-size:19px}
-body.lvfocus .lvh2{margin-top:1px}
-/* 2px over on a 320px phone put the two controls on a second line; a 1px gap trim
-   lands the whole row — par picker and both controls — back on one. */
-body.lvfocus .parpick{margin-top:6px;gap:4px}
-body.lvfocus .cardlink{padding:4px 8px}
-/* The strip, when he opens it, sits directly under the par row. */
-body.lvfocus .hstriprow{margin:7px 0 0}
 
 /* ---- The card check (Aug 20 2026): eighteen pars and a total, before the first tee.
    The total is the error detector — a course that should be 71 reading 72 is one glance,
@@ -689,17 +995,6 @@ body.lvfocus .hstriprow{margin:7px 0 0}
 .pcell.guess b{color:var(--btext)}
 body.night .pcell{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
 body.night .pcell.guess{background:transparent;border-color:var(--burg)}
-/* Back to the card from the hole screen, for the one he notices on the walk up. */
-.parpick{flex-wrap:wrap}
-.cardlink{font-family:var(--sans);font-size:10px;font-weight:800;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--gtext);background:var(--card2);
-  border:1px solid var(--line);border-radius:20px;padding:4px 10px;cursor:pointer;
-  white-space:nowrap;user-select:none}
-/* The pair sits right, as one unit. The auto margin belongs on the GROUP, never on a
-   flex item inside a wrapping row: there it swallows the free space and pushes whatever
-   follows onto the next line, which is what put Card on its own row at 320px. */
-.lvctl{margin-left:auto;display:flex;gap:4px;align-items:center}
-body.night .cardlink{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
 
 /* ---- Quick view (Aug 20 2026): the Full card / Quick view switch under the hole's
    prep, and the hole as one-line rows. The open row gets FULL-SIZE chips — that's the
@@ -710,7 +1005,7 @@ body.night .cardlink{background:rgba(255,255,255,.06);border-color:rgba(255,255,
   color:var(--gtext);background:var(--card);cursor:pointer;user-select:none}
 .lvseg span.on{background:var(--green);color:var(--green-ink)}
 .qcard{padding:2px 13px 8px}
-.qrow{border-bottom:1px dotted #c9bd9d}
+.qrow{border-bottom:1px dotted var(--dot)}
 .qrow:last-child{border-bottom:none}
 .qhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
   padding:11px 2px;cursor:pointer;user-select:none}
@@ -725,32 +1020,15 @@ body.night .cardlink{background:rgba(255,255,255,.06);border-color:rgba(255,255,
 body.night .qval.carry{background:rgba(163,51,68,.3);color:#eab4bd}
 .qhint{font-family:var(--sans);font-size:11px;font-style:italic;color:var(--faint)}
 .qbody{padding:0 0 12px}
-.qbody .chips{margin:6px 0 0}
-/* The open row's targets: bigger than the full card's, because it has the row to itself. */
-.qbody .chip.big{font-size:14px;padding:12px 16px}
-.qbody .clubgrid{grid-template-columns:repeat(5,1fr);margin:6px 0 0}
-.qbody .clubgrid .chip{padding:13px 1px;font-size:13px}
+.qbody .lvgrid{margin-top:6px}
 .lvcard{padding:2px 13px 11px}
-.lvrow{padding:8px 0;border-bottom:1px dotted #c9bd9d}
-.lvrow:last-child{border-bottom:none;padding-bottom:2px}
 .lvlab{font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;
   letter-spacing:.1em;color:var(--faint)}
 .lvlab span{text-transform:none;letter-spacing:0;font-weight:400;font-style:italic;margin-left:6px}
-.lvrow .chips{margin:6px 0 0}
-/* Big chips: a 44px-ish target is the difference between logging a hole and giving up. */
+/* Big chips: a 44px target is the difference between logging a hole and giving up. The
+   logger's own chips are styled with .lvwrap above; this is the baseline everything else
+   (the card check, the finish screen) still uses. */
 .chip.big{font-size:13px;padding:10px 15px;border-radius:22px;min-width:44px;text-align:center}
-/* Seven across fits the full bag in two rows, so the whole hole stays on one screen. */
-.clubgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:6px 0 0}
-.clubgrid .chip{padding:11px 1px;min-width:0;font-size:12px}
-/* Par is right nine times in ten off a saved layout, so it rides small in the header. */
-.parpick{display:flex;gap:5px;align-items:center;margin-top:5px}
-.parpick .chip{padding:4px 11px;font-size:11px}
-.parpick em{font-family:var(--sans);font-size:9.5px;font-style:normal;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-right:2px}
-/* A carried-over suggestion: half-lit. Tinted rather than dashed, because dashed is
-   already spoken for by the no-shot toggle's off state and one language per shape. */
-.chip.on.auto{background:#f0dbde;color:var(--burg);border:1.5px solid var(--burg)}
-body.night .chip.on.auto{background:rgba(163,51,68,.3);color:#eab4bd;border-color:var(--burg)}
 /* Not a direction — a qualifier on the miss, so it reads as its own kind of tap. */
 .chip.ns, .chip.ob{background:transparent;border:1px dashed var(--burg);color:var(--btext);padding:8px 14px}
 .chip.ns.on, .chip.ob.on{background:var(--burg);color:var(--burg-ink);border-style:solid}
@@ -762,13 +1040,7 @@ body.night .chip.ns.on, body.night .chip.ob.on{background:var(--burg);color:var(
    behind a chip until he asks for it — the logger is thumbs-only by default. */
 .chip.note{background:transparent;border:1px dashed var(--line);color:var(--soft);padding:8px 14px}
 .lvnote{margin-top:6px;min-height:62px;line-height:1.45}
-/* A hole carrying a note, on the jump strip: a dot, not a badge — the strip is a scoring
-   view first and the note is a footnote to it. */
-.hstrip{position:relative}
-.hstrip.noted::after{content:'';position:absolute;left:50%;bottom:3px;transform:translateX(-50%);
-  width:4px;height:4px;border-radius:50%;background:var(--burg)}
-.hstrip.cur.noted::after{background:var(--green-ink)}
-/* Same mark on the scorecard, next to the hole number. */
+/* The note mark on the scorecard, next to the hole number. */
 .nmark{font-size:10px;color:var(--burg);margin-left:3px;vertical-align:1px}
 /* A conceded last putt, beside the count on the scorecard. */
 .giv{font-family:var(--sans);font-size:9px;font-weight:800;color:var(--btext);
@@ -782,10 +1054,6 @@ body.night .chip.ns.on, body.night .chip.ob.on{background:var(--burg);color:var(
 .chip.sc b{font-size:16px}
 .chip.sc i{font-size:8.5px;font-style:normal;letter-spacing:.05em;text-transform:uppercase;opacity:.75}
 .btn[disabled]{opacity:.4}
-body.night .hstrip{background:#22292e;border-color:var(--line);color:var(--faint)}
-body.night .hstrip.done{background:#1c2b22;color:#8fd0a8;border-color:#33503f}
-body.night .hstrip.cur{background:var(--green);color:var(--green-ink);border-color:var(--green)}
-body.night .lvhead{background:#0b0e11}
 
 /* Plan-vs-card marks on the round card's "How the plan held up" table. Green = the call
    the plan named was the club he took; burgundy = it wasn't, or the miss the plan warned
@@ -799,3 +1067,256 @@ body.night .lvhead{background:#0b0e11}
 /* Two rows, one course? — a flagged pair reads as one block, not two loose rows. */
 .dupe{border-left:2px solid var(--burg);padding-left:10px;margin:10px 0}
 .dupe .crs:last-child{border-bottom:none}
+
+/* ==================================================================
+   PHASE C — the round card, the bag, the labs hub, the coach read
+   (Aug 27 2026, Jack's redesign)
+   Three voices throughout, and they mean different things: the mono
+   label voice for anything that names a thing (labels, tiers, units),
+   the display serif for numbers and headlines that get read at arm's
+   length, the sans for prose. Nothing below sets a font-size under
+   16px on a form CONTROL — the iOS auto-zoom floor — and every tap
+   target clears 44px.
+   ================================================================== */
+
+/* ---- Round detail: the header ---- */
+.rdhead{padding:15px}
+.rdtop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rdid{min-width:0}
+.rdid h2{margin:5px 0 3px;font-size:23px;line-height:1.15}
+.rdd{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink50)}
+.rdsc{flex:none;text-align:right;font-family:var(--serif);font-size:42px;line-height:.95;
+  color:var(--ink)}
+.rdsc i{display:block;font-family:var(--mono);font-style:normal;font-size:11px;
+  letter-spacing:.1em;color:var(--ink50);margin-top:6px}
+/* The eighteen bars grow from a FIXED track, so the score row under them shares one
+   baseline and the shape of the round reads without reading a number. */
+.rdbars{display:flex;gap:2px;margin-top:15px}
+.rdb{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.rdb .n{font-family:var(--mono);font-size:8px;color:var(--ink36)}
+.rdb .tr{width:100%;height:48px;display:flex;align-items:flex-end}
+.rdb .tr i{display:block;width:100%;border-radius:2px;background:var(--ink18)}
+.rdb .tr i.bird,.rdb .tr i.eag{background:var(--green)}
+.rdb .tr i.par{background:var(--green-accent)}
+.rdb .tr i.bog{background:var(--gold)}
+.rdb .tr i.dbl{background:var(--burg)}
+.rdb .s{font-family:var(--mono);font-size:9px;color:var(--ink)}
+.rdstats{display:flex;gap:12px;margin-top:15px;padding-top:13px;border-top:1px solid var(--line2)}
+.rds{flex:1;min-width:0}
+.rds b{display:block;font-family:var(--serif);font-weight:400;font-size:20px;line-height:1;color:var(--ink)}
+.rds span{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink50);margin-top:5px}
+/* The footnote voice used all over the round card and the bag: mono, small, and always
+   saying what a block is counted over or what it cannot say. */
+.rdf{font-family:var(--mono);font-size:9.5px;line-height:1.5;color:var(--ink36);margin-top:9px}
+.rdf b{color:var(--ink50)}
+.rdl{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink50)}
+
+/* ---- The scorecard, drawn as a scorecard ----
+   Five flex rows sharing one set of widths, so HOLE / PAR / SI / SCORE / PUTTS line up
+   under each other the way they do on paper. A row that the card never carried is simply
+   not rendered. */
+.scblk{margin-bottom:11px}
+.scr{display:flex;gap:1px;align-items:stretch}
+.sck{width:40px;flex:none;display:flex;align-items:center;font-family:var(--mono);
+  font-size:8px;letter-spacing:.08em;color:var(--ink50);height:20px}
+.scc{flex:1;min-width:0;height:20px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:9.5px;color:var(--ink62)}
+.scc.n{background:var(--sunk);border-radius:3px;color:var(--ink);font-weight:600}
+.scc.si{font-size:9px;color:var(--ink36)}
+.sct{width:32px;flex:none;margin-left:2px;height:20px;display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:9.5px;color:var(--ink62)}
+.sct.lab{background:rgba(20,81,46,.1);border-radius:3px;color:var(--gtext);font-weight:600;font-size:8.5px}
+.sct.big{font-weight:700;font-size:11px;color:var(--ink)}
+/* Scorecard convention: circle under par, square over, doubled for two or more. The
+   doubling is a ring drawn with box-shadow so the shape stays one 17px box. */
+.scm{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;
+  font-family:var(--mono);font-size:10px;color:var(--ink)}
+.scm.bird{border:1.4px solid var(--green);border-radius:50%;color:var(--gtext)}
+.scm.eag{border:1.4px solid var(--green);border-radius:50%;color:var(--gtext);
+  box-shadow:0 0 0 1.6px var(--card),0 0 0 3px var(--green)}
+.scm.bog{border:1.4px solid var(--burg);border-radius:2px;color:var(--btext)}
+.scm.dbl{border:1.4px solid var(--burg);border-radius:2px;color:var(--btext);
+  box-shadow:0 0 0 1.6px var(--card),0 0 0 3px var(--burg)}
+.sclegend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 11px;padding:4px 0 0}
+.sclegend span{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;
+  color:var(--ink36)}
+.sclegend i{width:13px;height:13px;flex:none}
+.sclegend i.scm{width:13px;height:13px}
+
+/* ---- Miss map, putts made from, by club ---- */
+.rdsplit{display:grid;grid-template-columns:150px 1fr;gap:11px;align-items:start}
+.rdsplit>.card{margin:0}
+@media (max-width:400px){ .rdsplit{grid-template-columns:1fr} }
+.mmg{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:10px}
+.mmc{aspect-ratio:1;border-radius:5px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;background:var(--card2)}
+.mmc b{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink62)}
+.mmc i{font-family:var(--mono);font-style:normal;font-size:7.5px;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--ink36)}
+.mmc.off{background:transparent}
+.mmc.hit{background:rgba(20,81,46,.12)}
+.mmc.hit b,.mmc.hit i{color:var(--gtext)}
+.mmc.l1{background:rgba(110,34,48,.1)}
+.mmc.l2{background:rgba(110,34,48,.2)}
+.mmc.l3{background:rgba(110,34,48,.34)}
+.mmc.l1 b,.mmc.l2 b,.mmc.l3 b{color:var(--btext)}
+.mfl{display:flex;flex-direction:column;gap:5px;margin-top:9px}
+.mfr{display:flex;align-items:center;gap:8px}
+.mfr .d{width:52px;flex:none;font-family:var(--mono);font-size:9.5px;color:var(--ink50)}
+.mfr .b{flex:1;height:9px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.mfr .b i{display:block;height:100%;background:var(--green-accent);border-radius:3px}
+.mfr .n{width:14px;text-align:right;font-family:var(--mono);font-size:9.5px;color:var(--ink50)}
+.rchead,.rcr{display:flex;align-items:baseline;gap:9px;padding:6px 0}
+.rcr{border-top:1px dotted var(--dot)}
+.rchead{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink36)}
+.rcr .c,.rchead .c{flex:1.4;min-width:0;font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--ink)}
+.rchead .c{font-family:var(--mono);font-size:8.5px;font-weight:400;color:var(--ink50)}
+.rcr .c i{font-style:normal;font-size:10px;color:var(--faint)}
+.rcr .n,.rchead .n{width:34px;flex:none;font-family:var(--mono);font-size:11px;color:var(--ink50)}
+.rcr .p,.rchead .p{width:66px;flex:none;font-family:var(--mono);font-size:11px;color:var(--ink)}
+.rcr .p i{font-style:normal;font-size:9px;color:var(--ink36)}
+.rcr .t,.rchead .t{flex:1;min-width:0;font-family:var(--mono);font-size:9.5px;color:var(--ink50)}
+.rcr .t b{color:var(--btext)}
+/* His own words, read back: the display voice, because they are the only thing on the card
+   that is language rather than a number. */
+.notecard .holenotes.big dd{font-family:var(--serif);font-size:16px;line-height:1.45}
+
+/* ---- Bag: the roster ---- */
+.cgrp{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink36);margin:14px 0 2px}
+.cgrp:first-child{margin-top:4px}
+.crow{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px dotted var(--dot)}
+.crow .ct{width:56px;flex:none;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink50);padding-top:3px}
+.crow .cm{flex:1;min-width:0}
+.crow .cn{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.3}
+.crow .cs{font-family:var(--mono);font-size:10.5px;color:var(--btext);margin-top:3px}
+.crow .cp{flex:none}
+.pill{display:inline-block;font-family:var(--mono);font-size:8.5px;font-weight:600;
+  letter-spacing:.1em;padding:4px 6px;border-radius:5px;white-space:nowrap;
+  border:1px solid transparent}
+.p-green{background:rgba(20,81,46,.1);color:var(--gtext)}
+.p-gold{border-color:var(--gold);color:var(--gold-ink)}
+.p-burg{background:var(--burg);color:var(--burg-ink)}
+.p-plain{border-color:var(--line);color:var(--ink50)}
+/* The bench is owned-not-played, and it says so before you read a word of it. */
+.bench{border-style:dashed;border-color:var(--burg)}
+
+/* ---- Bag: grinds & bounce ---- */
+.grind{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-top:1px dotted var(--dot)}
+.grind .gl{width:42px;height:42px;flex:none;border-radius:10px;background:var(--green);
+  color:var(--green-ink);font-family:var(--serif);font-size:22px;
+  display:flex;align-items:center;justify-content:center}
+.grind .gm{flex:1;min-width:0}
+.grind .gs{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--ink50)}
+.grind .gn{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink);margin-top:3px}
+.grind .gu{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;
+  color:var(--gtext);background:rgba(20,81,46,.1);border-radius:5px;padding:4px 6px;margin-top:6px}
+.bbands{display:grid;gap:8px;margin-top:12px}
+.bband{background:var(--card2);border-radius:var(--r);padding:10px 12px}
+.bband .bl{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--ink50)}
+.bband .bm{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--gtext);margin-top:5px}
+.bband .bm.none{color:var(--ink36)}
+.gabs{display:flex;gap:9px;align-items:baseline;padding:7px 0;border-top:1px dotted var(--dot)}
+.gabs .gk{width:24px;flex:none;font-family:var(--serif);font-size:19px;color:var(--ink36);text-align:center}
+/* The gold note: what a section cannot tell you. Same colour everywhere it appears,
+   because "this is unmeasured" is one idea and should look like one idea. */
+.goldnote{border-left:4px solid var(--gold);background:var(--card2);border-radius:var(--r-sm);
+  padding:11px 12px;margin-top:13px}
+.gnl{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold-ink)}
+.goldnote .sm{margin-top:6px}
+
+/* ---- Bag: the carry ladder ----
+   The number lives in its own column and never inside the bar: an editable field laid over
+   a coloured bar is unreadable in sun and untappable with a thumb. A null carry draws no
+   bar at all, because a guessed length would read as a measured one. */
+.ladr{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.lrow{display:flex;align-items:center;gap:8px}
+.lrow .lc{width:36px;flex:none;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink)}
+.lrow .lb{flex:1;min-width:0;height:26px;background:var(--sunk);border-radius:5px;
+  display:flex;align-items:center;overflow:hidden}
+.lrow .lb i{display:block;height:100%;background:var(--green);border-radius:5px}
+.lrow .lb em{font-family:var(--mono);font-style:normal;font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold-ink);padding-left:8px}
+.lrow .lv{width:62px;flex:none;text-align:center}
+.lrow .lv input{width:100%;text-align:center;padding:4px 2px;font-family:var(--mono)}
+.lrow .lv b{display:block;font-family:var(--mono);font-size:8.5px;font-weight:600;
+  color:var(--btext);margin-top:2px}
+.lrow .lg{width:30px;flex:none;text-align:right;font-family:var(--mono);font-size:10px;
+  color:var(--ink36)}
+.lrow .lg.wide{color:var(--btext);font-weight:600}
+.lfoot{display:flex;justify-content:space-between;margin:6px 0 10px;
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;color:var(--ink36)}
+.bhist{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.bhr{display:flex;gap:11px;align-items:baseline}
+.bhr .d{width:52px;flex:none;font-family:var(--mono);font-size:10px;color:var(--ink36)}
+.bhr .t{flex:1;font-size:12.5px;line-height:1.45;color:var(--ink62)}
+
+/* ---- The labs hub: four cards, then the diagnosis ---- */
+.labgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0 2px}
+.labsel{min-height:96px;border-radius:var(--r-card);border:1px solid var(--line);
+  background:var(--card);color:var(--ink);text-align:left;padding:12px;
+  display:flex;flex-direction:column;justify-content:flex-start;cursor:pointer}
+.labsel .k{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--ink36)}
+.labsel .nm{font-family:var(--serif);font-size:20px;line-height:1;margin-top:7px}
+.labsel .sb{font-family:var(--sans);font-size:11px;line-height:1.35;color:var(--ink50);margin-top:6px}
+.labsel.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+.labsel.on .k{color:rgba(244,239,226,.62)}
+.labsel.on .sb{color:rgba(244,239,226,.72)}
+.labsel:active{transform:translateY(1px)}
+/* One row per open fault, each with its own evidence rail. */
+.faultrow{border-left:4px solid var(--tier,var(--line));background:var(--card2);
+  border-radius:0 var(--r) var(--r) 0;padding:12px 13px;margin:9px 0}
+.faultrow h4{font-family:var(--serif);font-weight:400;font-size:20px;line-height:1.25;
+  color:var(--ink);margin:8px 0 4px}
+.faultrow .evdis{margin:0}
+.faultrow>.evdl{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink50)}
+.twoup{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:12px 0}
+.twoup .tu{margin:0;padding:13px 15px}
+.twoup .tu b{display:block;font-family:var(--serif);font-weight:400;font-size:24px;
+  line-height:1;color:var(--ink);margin-top:7px}
+.twoup .tu span{display:block;font-family:var(--sans);font-size:11px;line-height:1.3;
+  color:var(--ink50);margin-top:4px}
+
+/* ---- Coach: the read ----
+   A green card at the top, the read in the display voice, and the three standing facts
+   about the player underneath. It states nothing the page below doesn't — it is the same
+   sentence the card always carried, set at the size of something somebody said to you. */
+.readcard{background:var(--green);border-color:var(--green);color:var(--green-ink);padding:17px}
+.readh{font-family:var(--serif);font-size:23px;line-height:1.3;margin-top:6px}
+.reads{font-family:var(--sans);font-size:11.5px;line-height:1.5;color:rgba(244,239,226,.66);margin-top:8px}
+.readst{display:flex;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(244,239,226,.2)}
+.readst div{flex:1;min-width:0}
+.readst b{display:block;font-family:var(--serif);font-weight:400;font-size:25px;line-height:1}
+.readst span{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:rgba(244,239,226,.6);margin-top:5px;line-height:1.3}
+
+/* Night mode: the tinted cells and washes above are alpha over a cream ground, so the ones
+   that would disappear on a dark ground get their own values. */
+body.night .mmc.hit{background:rgba(143,208,168,.16)}
+body.night .sct.lab{background:rgba(143,208,168,.16)}
+body.night .p-green{background:rgba(143,208,168,.16)}
+body.night .grind .gu{background:rgba(143,208,168,.16)}
+body.night .mmc.l1{background:rgba(163,51,68,.18)}
+body.night .mmc.l2{background:rgba(163,51,68,.3)}
+body.night .mmc.l3{background:rgba(163,51,68,.45)}
+body.night .scm.eag{box-shadow:0 0 0 1.6px var(--card),0 0 0 3px var(--green)}
+body.night .readcard{color:var(--green-ink)}
+
+@media (max-width:360px){
+  .rdsc{font-size:34px}
+  .rdid h2{font-size:20px}
+  .sck{width:34px}
+  .crow .ct{width:48px}
+  .labsel .nm{font-size:18px}
+}
+/* The sample a finding fired on, said on the card rather than only inside the drawer. */
+.tipn{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink36);margin-top:6px}

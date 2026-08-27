@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#123c26">
+<meta name="theme-color" content="#14512E">
 <title>Caddie HQ</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
@@ -27,13 +27,20 @@
 
 <main id="view" class="wrap"></main>
 
+<!-- Five tabs and a tee button (Aug 27 2026, Jack's redesign).
+     TODAY · BAG · [TEE] · GAME · ROUNDS · COACH. Courses and Round Prep are no longer
+     tabs of their own: both are segments inside Rounds, next to the cards they get read
+     against. The centre TEE button is burgundy and goes to the live logger from wherever
+     you are — live() resumes a round in progress rather than starting a second one, so
+     the same button is both "start" and "resume" (render() relabels it).
+     The glyphs are CSS shapes (see styles.css) — no icon font, no SVG, nothing to load. -->
 <nav id="nav">
-  <button data-view="home"><span class="ic">⌂</span>Home</button>
-  <button data-view="bag"><span class="ic">⛳</span>Bag</button>
-  <button data-view="game"><span class="ic">🏌</span>Game</button>
-  <button data-view="scores"><span class="ic">▤</span>Scores</button>
-  <button data-view="coach"><span class="ic">🎓</span>Coach</button>
-  <button data-view="courses"><span class="ic">🗺</span>Courses</button>
+  <button data-view="home" class="rnd"><span class="ic"></span><span class="nl">TODAY</span></button>
+  <button data-view="bag"><span class="ic"></span><span class="nl">BAG</span></button>
+  <button data-view="live" id="navTee" class="navtee"><span class="ic"></span><span class="nl" id="navTeeLab">TEE</span></button>
+  <button data-view="game"><span class="ic"></span><span class="nl">GAME</span></button>
+  <button data-view="rounds"><span class="ic"></span><span class="nl">ROUNDS</span></button>
+  <button data-view="coach" class="rnd"><span class="ic"></span><span class="nl">COACH</span></button>
 </nav>
 
 <script src="./lessons.js"></script>
