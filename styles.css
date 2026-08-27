@@ -1067,3 +1067,256 @@ body.night .chip.ns.on, body.night .chip.ob.on{background:var(--burg);color:var(
 /* Two rows, one course? — a flagged pair reads as one block, not two loose rows. */
 .dupe{border-left:2px solid var(--burg);padding-left:10px;margin:10px 0}
 .dupe .crs:last-child{border-bottom:none}
+
+/* ==================================================================
+   PHASE C — the round card, the bag, the labs hub, the coach read
+   (Aug 27 2026, Jack's redesign)
+   Three voices throughout, and they mean different things: the mono
+   label voice for anything that names a thing (labels, tiers, units),
+   the display serif for numbers and headlines that get read at arm's
+   length, the sans for prose. Nothing below sets a font-size under
+   16px on a form CONTROL — the iOS auto-zoom floor — and every tap
+   target clears 44px.
+   ================================================================== */
+
+/* ---- Round detail: the header ---- */
+.rdhead{padding:15px}
+.rdtop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rdid{min-width:0}
+.rdid h2{margin:5px 0 3px;font-size:23px;line-height:1.15}
+.rdd{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink50)}
+.rdsc{flex:none;text-align:right;font-family:var(--serif);font-size:42px;line-height:.95;
+  color:var(--ink)}
+.rdsc i{display:block;font-family:var(--mono);font-style:normal;font-size:11px;
+  letter-spacing:.1em;color:var(--ink50);margin-top:6px}
+/* The eighteen bars grow from a FIXED track, so the score row under them shares one
+   baseline and the shape of the round reads without reading a number. */
+.rdbars{display:flex;gap:2px;margin-top:15px}
+.rdb{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.rdb .n{font-family:var(--mono);font-size:8px;color:var(--ink36)}
+.rdb .tr{width:100%;height:48px;display:flex;align-items:flex-end}
+.rdb .tr i{display:block;width:100%;border-radius:2px;background:var(--ink18)}
+.rdb .tr i.bird,.rdb .tr i.eag{background:var(--green)}
+.rdb .tr i.par{background:var(--green-accent)}
+.rdb .tr i.bog{background:var(--gold)}
+.rdb .tr i.dbl{background:var(--burg)}
+.rdb .s{font-family:var(--mono);font-size:9px;color:var(--ink)}
+.rdstats{display:flex;gap:12px;margin-top:15px;padding-top:13px;border-top:1px solid var(--line2)}
+.rds{flex:1;min-width:0}
+.rds b{display:block;font-family:var(--serif);font-weight:400;font-size:20px;line-height:1;color:var(--ink)}
+.rds span{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink50);margin-top:5px}
+/* The footnote voice used all over the round card and the bag: mono, small, and always
+   saying what a block is counted over or what it cannot say. */
+.rdf{font-family:var(--mono);font-size:9.5px;line-height:1.5;color:var(--ink36);margin-top:9px}
+.rdf b{color:var(--ink50)}
+.rdl{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink50)}
+
+/* ---- The scorecard, drawn as a scorecard ----
+   Five flex rows sharing one set of widths, so HOLE / PAR / SI / SCORE / PUTTS line up
+   under each other the way they do on paper. A row that the card never carried is simply
+   not rendered. */
+.scblk{margin-bottom:11px}
+.scr{display:flex;gap:1px;align-items:stretch}
+.sck{width:40px;flex:none;display:flex;align-items:center;font-family:var(--mono);
+  font-size:8px;letter-spacing:.08em;color:var(--ink50);height:20px}
+.scc{flex:1;min-width:0;height:20px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:9.5px;color:var(--ink62)}
+.scc.n{background:var(--sunk);border-radius:3px;color:var(--ink);font-weight:600}
+.scc.si{font-size:9px;color:var(--ink36)}
+.sct{width:32px;flex:none;margin-left:2px;height:20px;display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:9.5px;color:var(--ink62)}
+.sct.lab{background:rgba(20,81,46,.1);border-radius:3px;color:var(--gtext);font-weight:600;font-size:8.5px}
+.sct.big{font-weight:700;font-size:11px;color:var(--ink)}
+/* Scorecard convention: circle under par, square over, doubled for two or more. The
+   doubling is a ring drawn with box-shadow so the shape stays one 17px box. */
+.scm{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;
+  font-family:var(--mono);font-size:10px;color:var(--ink)}
+.scm.bird{border:1.4px solid var(--green);border-radius:50%;color:var(--gtext)}
+.scm.eag{border:1.4px solid var(--green);border-radius:50%;color:var(--gtext);
+  box-shadow:0 0 0 1.6px var(--card),0 0 0 3px var(--green)}
+.scm.bog{border:1.4px solid var(--burg);border-radius:2px;color:var(--btext)}
+.scm.dbl{border:1.4px solid var(--burg);border-radius:2px;color:var(--btext);
+  box-shadow:0 0 0 1.6px var(--card),0 0 0 3px var(--burg)}
+.sclegend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 11px;padding:4px 0 0}
+.sclegend span{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;
+  color:var(--ink36)}
+.sclegend i{width:13px;height:13px;flex:none}
+.sclegend i.scm{width:13px;height:13px}
+
+/* ---- Miss map, putts made from, by club ---- */
+.rdsplit{display:grid;grid-template-columns:150px 1fr;gap:11px;align-items:start}
+.rdsplit>.card{margin:0}
+@media (max-width:400px){ .rdsplit{grid-template-columns:1fr} }
+.mmg{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:10px}
+.mmc{aspect-ratio:1;border-radius:5px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;background:var(--card2)}
+.mmc b{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink62)}
+.mmc i{font-family:var(--mono);font-style:normal;font-size:7.5px;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--ink36)}
+.mmc.off{background:transparent}
+.mmc.hit{background:rgba(20,81,46,.12)}
+.mmc.hit b,.mmc.hit i{color:var(--gtext)}
+.mmc.l1{background:rgba(110,34,48,.1)}
+.mmc.l2{background:rgba(110,34,48,.2)}
+.mmc.l3{background:rgba(110,34,48,.34)}
+.mmc.l1 b,.mmc.l2 b,.mmc.l3 b{color:var(--btext)}
+.mfl{display:flex;flex-direction:column;gap:5px;margin-top:9px}
+.mfr{display:flex;align-items:center;gap:8px}
+.mfr .d{width:52px;flex:none;font-family:var(--mono);font-size:9.5px;color:var(--ink50)}
+.mfr .b{flex:1;height:9px;background:var(--sunk);border-radius:3px;overflow:hidden}
+.mfr .b i{display:block;height:100%;background:var(--green-accent);border-radius:3px}
+.mfr .n{width:14px;text-align:right;font-family:var(--mono);font-size:9.5px;color:var(--ink50)}
+.rchead,.rcr{display:flex;align-items:baseline;gap:9px;padding:6px 0}
+.rcr{border-top:1px dotted var(--dot)}
+.rchead{font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink36)}
+.rcr .c,.rchead .c{flex:1.4;min-width:0;font-family:var(--sans);font-size:12.5px;font-weight:600;color:var(--ink)}
+.rchead .c{font-family:var(--mono);font-size:8.5px;font-weight:400;color:var(--ink50)}
+.rcr .c i{font-style:normal;font-size:10px;color:var(--faint)}
+.rcr .n,.rchead .n{width:34px;flex:none;font-family:var(--mono);font-size:11px;color:var(--ink50)}
+.rcr .p,.rchead .p{width:66px;flex:none;font-family:var(--mono);font-size:11px;color:var(--ink)}
+.rcr .p i{font-style:normal;font-size:9px;color:var(--ink36)}
+.rcr .t,.rchead .t{flex:1;min-width:0;font-family:var(--mono);font-size:9.5px;color:var(--ink50)}
+.rcr .t b{color:var(--btext)}
+/* His own words, read back: the display voice, because they are the only thing on the card
+   that is language rather than a number. */
+.notecard .holenotes.big dd{font-family:var(--serif);font-size:16px;line-height:1.45}
+
+/* ---- Bag: the roster ---- */
+.cgrp{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink36);margin:14px 0 2px}
+.cgrp:first-child{margin-top:4px}
+.crow{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px dotted var(--dot)}
+.crow .ct{width:56px;flex:none;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink50);padding-top:3px}
+.crow .cm{flex:1;min-width:0}
+.crow .cn{font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.3}
+.crow .cs{font-family:var(--mono);font-size:10.5px;color:var(--btext);margin-top:3px}
+.crow .cp{flex:none}
+.pill{display:inline-block;font-family:var(--mono);font-size:8.5px;font-weight:600;
+  letter-spacing:.1em;padding:4px 6px;border-radius:5px;white-space:nowrap;
+  border:1px solid transparent}
+.p-green{background:rgba(20,81,46,.1);color:var(--gtext)}
+.p-gold{border-color:var(--gold);color:var(--gold-ink)}
+.p-burg{background:var(--burg);color:var(--burg-ink)}
+.p-plain{border-color:var(--line);color:var(--ink50)}
+/* The bench is owned-not-played, and it says so before you read a word of it. */
+.bench{border-style:dashed;border-color:var(--burg)}
+
+/* ---- Bag: grinds & bounce ---- */
+.grind{display:flex;gap:11px;align-items:flex-start;padding:11px 0;border-top:1px dotted var(--dot)}
+.grind .gl{width:42px;height:42px;flex:none;border-radius:10px;background:var(--green);
+  color:var(--green-ink);font-family:var(--serif);font-size:22px;
+  display:flex;align-items:center;justify-content:center}
+.grind .gm{flex:1;min-width:0}
+.grind .gs{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--ink50)}
+.grind .gn{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink);margin-top:3px}
+.grind .gu{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.1em;
+  color:var(--gtext);background:rgba(20,81,46,.1);border-radius:5px;padding:4px 6px;margin-top:6px}
+.bbands{display:grid;gap:8px;margin-top:12px}
+.bband{background:var(--card2);border-radius:var(--r);padding:10px 12px}
+.bband .bl{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;color:var(--ink50)}
+.bband .bm{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--gtext);margin-top:5px}
+.bband .bm.none{color:var(--ink36)}
+.gabs{display:flex;gap:9px;align-items:baseline;padding:7px 0;border-top:1px dotted var(--dot)}
+.gabs .gk{width:24px;flex:none;font-family:var(--serif);font-size:19px;color:var(--ink36);text-align:center}
+/* The gold note: what a section cannot tell you. Same colour everywhere it appears,
+   because "this is unmeasured" is one idea and should look like one idea. */
+.goldnote{border-left:4px solid var(--gold);background:var(--card2);border-radius:var(--r-sm);
+  padding:11px 12px;margin-top:13px}
+.gnl{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold-ink)}
+.goldnote .sm{margin-top:6px}
+
+/* ---- Bag: the carry ladder ----
+   The number lives in its own column and never inside the bar: an editable field laid over
+   a coloured bar is unreadable in sun and untappable with a thumb. A null carry draws no
+   bar at all, because a guessed length would read as a measured one. */
+.ladr{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.lrow{display:flex;align-items:center;gap:8px}
+.lrow .lc{width:36px;flex:none;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink)}
+.lrow .lb{flex:1;min-width:0;height:26px;background:var(--sunk);border-radius:5px;
+  display:flex;align-items:center;overflow:hidden}
+.lrow .lb i{display:block;height:100%;background:var(--green);border-radius:5px}
+.lrow .lb em{font-family:var(--mono);font-style:normal;font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold-ink);padding-left:8px}
+.lrow .lv{width:62px;flex:none;text-align:center}
+.lrow .lv input{width:100%;text-align:center;padding:4px 2px;font-family:var(--mono)}
+.lrow .lv b{display:block;font-family:var(--mono);font-size:8.5px;font-weight:600;
+  color:var(--btext);margin-top:2px}
+.lrow .lg{width:30px;flex:none;text-align:right;font-family:var(--mono);font-size:10px;
+  color:var(--ink36)}
+.lrow .lg.wide{color:var(--btext);font-weight:600}
+.lfoot{display:flex;justify-content:space-between;margin:6px 0 10px;
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;color:var(--ink36)}
+.bhist{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.bhr{display:flex;gap:11px;align-items:baseline}
+.bhr .d{width:52px;flex:none;font-family:var(--mono);font-size:10px;color:var(--ink36)}
+.bhr .t{flex:1;font-size:12.5px;line-height:1.45;color:var(--ink62)}
+
+/* ---- The labs hub: four cards, then the diagnosis ---- */
+.labgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0 2px}
+.labsel{min-height:96px;border-radius:var(--r-card);border:1px solid var(--line);
+  background:var(--card);color:var(--ink);text-align:left;padding:12px;
+  display:flex;flex-direction:column;justify-content:flex-start;cursor:pointer}
+.labsel .k{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--ink36)}
+.labsel .nm{font-family:var(--serif);font-size:20px;line-height:1;margin-top:7px}
+.labsel .sb{font-family:var(--sans);font-size:11px;line-height:1.35;color:var(--ink50);margin-top:6px}
+.labsel.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+.labsel.on .k{color:rgba(244,239,226,.62)}
+.labsel.on .sb{color:rgba(244,239,226,.72)}
+.labsel:active{transform:translateY(1px)}
+/* One row per open fault, each with its own evidence rail. */
+.faultrow{border-left:4px solid var(--tier,var(--line));background:var(--card2);
+  border-radius:0 var(--r) var(--r) 0;padding:12px 13px;margin:9px 0}
+.faultrow h4{font-family:var(--serif);font-weight:400;font-size:20px;line-height:1.25;
+  color:var(--ink);margin:8px 0 4px}
+.faultrow .evdis{margin:0}
+.faultrow>.evdl{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink50)}
+.twoup{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:12px 0}
+.twoup .tu{margin:0;padding:13px 15px}
+.twoup .tu b{display:block;font-family:var(--serif);font-weight:400;font-size:24px;
+  line-height:1;color:var(--ink);margin-top:7px}
+.twoup .tu span{display:block;font-family:var(--sans);font-size:11px;line-height:1.3;
+  color:var(--ink50);margin-top:4px}
+
+/* ---- Coach: the read ----
+   A green card at the top, the read in the display voice, and the three standing facts
+   about the player underneath. It states nothing the page below doesn't — it is the same
+   sentence the card always carried, set at the size of something somebody said to you. */
+.readcard{background:var(--green);border-color:var(--green);color:var(--green-ink);padding:17px}
+.readh{font-family:var(--serif);font-size:23px;line-height:1.3;margin-top:6px}
+.reads{font-family:var(--sans);font-size:11.5px;line-height:1.5;color:rgba(244,239,226,.66);margin-top:8px}
+.readst{display:flex;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(244,239,226,.2)}
+.readst div{flex:1;min-width:0}
+.readst b{display:block;font-family:var(--serif);font-weight:400;font-size:25px;line-height:1}
+.readst span{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:rgba(244,239,226,.6);margin-top:5px;line-height:1.3}
+
+/* Night mode: the tinted cells and washes above are alpha over a cream ground, so the ones
+   that would disappear on a dark ground get their own values. */
+body.night .mmc.hit{background:rgba(143,208,168,.16)}
+body.night .sct.lab{background:rgba(143,208,168,.16)}
+body.night .p-green{background:rgba(143,208,168,.16)}
+body.night .grind .gu{background:rgba(143,208,168,.16)}
+body.night .mmc.l1{background:rgba(163,51,68,.18)}
+body.night .mmc.l2{background:rgba(163,51,68,.3)}
+body.night .mmc.l3{background:rgba(163,51,68,.45)}
+body.night .scm.eag{box-shadow:0 0 0 1.6px var(--card),0 0 0 3px var(--green)}
+body.night .readcard{color:var(--green-ink)}
+
+@media (max-width:360px){
+  .rdsc{font-size:34px}
+  .rdid h2{font-size:20px}
+  .sck{width:34px}
+  .crow .ct{width:48px}
+  .labsel .nm{font-size:18px}
+}
+/* The sample a finding fired on, said on the card rather than only inside the drawer. */
+.tipn{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink36);margin-top:6px}

@@ -102,8 +102,11 @@ does nothing — double-check against `applyFeed()`.
 
 `gaming` (in the bag), `ordered` (on order), `backup` (owned, not in the 14),
 `wishlist` (scouting), and `returned` (sent back — drops out of every bag list).
-`clubCard()` also renders a **MISMATCH** flag for a `flow:'toe'` putter against an
-`SBST` stroke.
+`clubRow()` also renders a **MISMATCH** flag for a `flow:'toe'` putter against an
+`SBST` stroke. Its other status pills are read off the club's own record and nothing else
+(Aug 27 2026): `DECIDED` is `returnWindow:false`, `IN RETURN WINDOW` is `returnWindow:true`,
+`UNMEASURED` is a null carry on the club's ladder row, and `OVERLAP` is two ladder lofts
+inside 1.5° of each other. A club's `note` is never scanned for any of them.
 
 ## Player profile (drives the diagnosis logic)
 
@@ -737,9 +740,13 @@ the next hole, which is a navigation).
 
 Same rule for **open `<details>`**: `render()` replaces the view's DOM, so a section he had
 expanded snapped shut on every in-place update — which on the drill bench meant logging a
-drill collapsed the drill he was reading. A `rerender()` now restores any `<details>` that
-carries an **`id`** and was open; a `render()` deliberately doesn't. Give a section an `id`
-if it should survive an update, and nothing else has to change.
+drill collapsed the drill he was reading. A `rerender()` now restores the open/closed state
+of any `<details>` that carries an **`id`** — **both ways** as of Aug 27 2026, because a
+section that defaults open (every `fold()`) would otherwise spring back open on the next
+in-place update, so folding the scorecard away and then tapping anything else undid the
+fold. A `render()` deliberately restores nothing. Give a section an `id` if it should
+survive an update, and nothing else has to change. The DOM stays the only store for this —
+never build a parallel open/closed map.
 
 ### Form controls never go below 16px (Aug 14 2026)
 
@@ -1035,6 +1042,13 @@ rule above is unchanged.
   question marks. **So when you push a `faults` entry, check its tag reaches a drill**, and
   if it doesn't, either tag the lessons that train it or write the lesson. The lab will
   otherwise say so on Jack's phone, which is the point.
+- **A fault also needs a row in `FAULT_EV`** (`app.js`, Aug 27 2026) to render an evidence
+  tier and a tappable "what this was read off" panel. A fault object is only `{tag, why}`,
+  so the tier has to be written down rather than inferred from the prose — a `why` saying
+  "filmed Jul 26" and one saying "the film could not settle it" are the same keywords and
+  opposite claims. Each entry is `[tier, sample]` and both come from what that fault's own
+  text says its basis is. **A tag with no entry is fine**: the row renders with no rail and
+  no chip and claims nothing, which is the honest failure mode.
 - **The join key is the lesson's `tags`.** Fault tags and round-trouble tags share that one
   field, which is why a `faults` push and a `lesson-update` are often the same job. The
   Aug 24 audit found three open faults reaching **zero** drills — `delivery-unverified`,
