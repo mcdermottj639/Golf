@@ -1201,6 +1201,37 @@ measurement over self-report — and say which one you're using.
   log; the append-only rule belongs to the workshop plan. Verdicts reached 9,200 characters
   across seven rows by appending a paragraph per session before being rewritten to 4,800.
 
+### Say which is HIS and which is the TEXTBOOK (standing instruction, Aug 30 2026)
+
+Jack's words: *"there should always be what I'm thinking and feeling and then what best
+practices typically are. Clearly separate the two so I can see if I'm off track ever."*
+
+So a plan section, a workshop section or a lesson that carries an instruction has to make
+its provenance **scannable, not inferable**. The short-game plan is the worked example: a
+`SOURCE ·` line opens every section — `STANDARD PRACTICE`, `YOURS`, or
+`YOURS, CHECKED AGAINST STANDARD PRACTICE` — and a section built on something he said sets
+out **WHAT YOU SAID** and **WHAT STANDARD PRACTICE SAYS** as two labelled blocks before it
+draws any conclusion.
+
+This is the **film-is-king ladder seen from the other side**. That rule ranks his *feel*
+against a *measurement*; this one ranks his *read* against the *textbook*, and the two are
+independent — a read can be textbook-correct and still unmeasured, which is exactly what
+the Aug 30 loft-dial section is. Say both.
+
+Three things that make it worth the words:
+
+- **A verdict is required, and "you're on track" is a real one.** Same rule as
+  `mentalTips()` firing a finding that came out good: the point of separating the two is
+  that agreement becomes sayable. Don't blend his model into the prose so smoothly that
+  nothing says whether it was right.
+- **Never let the textbook silently overwrite him.** Where they diverge, both go on the
+  page with the divergence named. His *intent* is never overridden at all (film-is-king);
+  his claimed *positions* are subordinate to film, not to the textbook.
+- **Standard practice is somebody else's number.** A benchmark, a published ratio or a
+  stock setup gets labelled `STANDARD PRACTICE` however confident it is, so a page full of
+  general advice can't read as a page built from his game — the failure the short-game
+  plan's own *What your own cards say* section already guards against.
+
 ### Film reports arrive through Drive (Aug 25 2026)
 
 Video analysis no longer happens here. It runs in a separate Claude project with two
