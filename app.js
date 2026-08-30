@@ -94,19 +94,23 @@ const MENTAL_TRIGGERS = [
   { k:'rush', lab:'Rushed', blurb:'Played quicker than your own routine.',
     then:'Count the beats — read, one rehearsal, step in, go. Rushing shows up as the rehearsal disappearing first, every time, so that is the one to check.' },
   { k:'body', lab:'Tired · hungry · hot', blurb:'A physical state wearing a mental costume.',
-    then:'Eat before you diagnose your head. Water at every tee from the 10th and food at the turn whether you want it or not — a lot of 15th-hole collapses are blood sugar, not character.' },
+    then:'Eat before you diagnose your head. Water at every tee from the 10th and food at the turn whether you want it or not — the standing advice is that a lot of late-round collapses are blood sugar rather than character. That is general practice, not something measured about you.' },
 ];
 const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closing stretch'], ['after','After a blow-up']];
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v68';
+const BUILD = 'v69';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v69', d:'2026-08-30', items:[
+    'Every coaching page now says whether an instruction is YOURS or standard practice. You asked to always see what you are thinking and feeling separately from what best practice typically is, so you can tell when you are off track \u2014 the short-game plan is the worked example, and the whole app was audited against it.',
+    'The audit found four things that were wrong rather than just unlabelled. Your wedge bounce was listed as 10/10/8 in a Coach lesson; the build is 8/10/8. A lesson said "your proximity from 150 yards is 45+ feet" \u2014 nothing here has ever measured your proximity, that is a published amateur average. The Swing Positions page still named the hip slide as your miss, which the Aug 20 film retracted. And the Bag stated a shallow sweeping attack angle as fact one card above the card admitting nobody has filmed it.',
+    'On the Putting Routine, "barely open is square" now says out loud that it is your own read and still unconfirmed. It was stated flat on the collapsed card, which is the version you actually see \u2014 the instruction has not changed, only what it admits.' ] },
   { b:'v68', d:'2026-08-27', items:[
     'Your film history is easier to find. Every lab now calls it the same thing \u2014 FILM ROOM. Putting was still calling it "Stroke session log" while Swing and Short Game called it Film room, and the jump bar at the top of a lab is built from those headings, so the same block announced itself with a different word depending on which lab you were in.',
     'In Putting it also moved UP, above the stroke evolution grid. The grid is a summary OF the film, so the film itself should not have been the thing you scroll past the summary to reach.',
@@ -3847,7 +3851,7 @@ function statTips(live){
       b:`Roughly ${(p.three/100*18).toFixed(1)} a round, against ${p.one||0}% one-putts. Three-putts are a PACE fault, not a line fault — the first putt is finishing outside gimme range. Same signature as the lag work already on your card${thin(nAdv)}.` });
   if(ap[5] != null && ap[4] != null && (ap[5] - 5) >= 0.6)
     t.push({ ev:'snapshot', s:'mid', src:`Scoring · ${nSc} rounds`, h:'Par 5s give you nothing',
-      b:`Averaging ${ap[5].toFixed(2)} on par 5s — barely better relative to par than your ${ap[4].toFixed(2)} on par 4s. A par 5 is the one hole where a mid-handicap gets a free run at birdie. Decide the lay-up off your wedge ladder so the third shot is a number you own.` });
+      b:`Averaging ${ap[5].toFixed(2)} on par 5s — barely better relative to par than your ${ap[4].toFixed(2)} on par 4s. The textbook line is that a par 5 is where a mid-handicap gets a free run at birdie — that is general advice about mid-handicaps, not a reading of your card; the average above is yours. Decide the lay-up off your wedge ladder so the third shot is a number you own.` });
   const blow = blowUps(g);
   if(blow != null && blow >= 15)
     t.push({ ev:'snapshot', s:'warn', src:`Scoring · ${nSc} rounds`, h:`${blow}% of holes are double or worse`,
@@ -4201,7 +4205,7 @@ function holeTips(st, EV){
   if(!bigSampleSaysFine && p3.n >= 6 && p4.n >= 6 && (p3.over / p3.n) >= (p4.over / p4.n) * 0.9) t.push({ key:'par-3s', ev:EV, s:'warn', src:'Where it points', h:'Par 3s are no better than your par 4s',
     b:`+${(p3.over/p3.n).toFixed(2)} a hole on par 3s against +${(p4.over/p4.n).toFixed(2)} on par 4s. There's no driver on a par 3 and no second shot to recover with, so it should be comfortably your best hole type — level with the par 4s means the tee shot itself isn't finding greens. That's iron control, not driving. Club to cover the front edge rather than to reach the pin.` });
   if(p5.n >= 4 && p5.red === 0) t.push({ key:'par-5s', ev:EV, s:'mid', src:'Missing offense', h:'No birdies on par 5s',
-    b:`${p5.n} par-5 holes played, zero under par. Par 5s are where a mid-handicap makes his money. Decide the lay-up off your wedge ladder so the third shot is a NUMBER you own rather than whatever's left — 60°→80 · 56°→95 · 50°→108 · PW→122.` });
+    b:`${p5.n} par-5 holes played, zero under par. The textbook line is that par 5s are where a mid-handicap makes his money — general advice about mid-handicaps, not something read off your holes; the count above is yours. Decide the lay-up off your wedge ladder so the third shot is a NUMBER you own rather than whatever's left — 60°→80 · 56°→95 · 50°→108 · PW→122.` });
   const w = st.worst[0];
   if(w && (w.over / w.n) >= 1.5) t.push({ key:'worst-hole', ev:EV, s:'warn', src:'One hole', h:`${esc(w.course)} hole ${w.hole} is eating you`,
     b:`+${w.over} across ${w.n} plays on a par ${w.par} — ${(w.over/w.n).toFixed(1)} a go. One hole played a handful of times shouldn't cost this much. Next time you see it, play it as a bogey hole on purpose and take the trouble out of the equation.${

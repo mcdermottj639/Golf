@@ -30851,6 +30851,22 @@
       "lesson": {
         "body": "Three-putts almost never come from bad reads - they come from bad speed. From 30+ feet, stop aiming at the hole and start aiming at a 6-foot circle around it. Any putt that dies inside that circle is a success, because golfers in general make nearly everything from 3 feet and roughly half from 6 - STANDARD PRACTICE numbers, not yours. Yours now exist: the live logger records the distance of every putt you strike, so your real 4-6 ft conversion is on the Putting lab and on Coach. Check it against the half-from-6 assumption rather than inheriting it. Great lag putters think \"roll it into the living room,\" not \"make it.\""
       }
+    },
+    {
+      "id": "club-c5-sweeper-hedge-20260830",
+      "type": "club-update",
+      "target": "c5",
+      "club": {
+        "note": "50.08F — full-swing gap wedge. F (full) sole, 8° bounce, which suits a shallow sweeping angle of attack. That it is YOUR angle of attack is an inference, not a measurement: no film of your full wedge or pitching motion exists, and the grinds card on this page says so. Read it as why the grind was chosen, not as a fact about your strike. (Corrects an earlier 10S listing.)"
+      }
+    },
+    {
+      "id": "lesson-w2-sweeper-hedge-20260830",
+      "type": "lesson-update",
+      "target": "w2",
+      "lesson": {
+        "body": "Bounce is the sole angle that stops the leading edge digging. Your build runs mid bounce (8/10/8: the 50 is an F grind at 8 degrees, the 56 an S at 10, the 60 an M at 8) rather than 12-14 degrees, and the reasoning behind that was a shallow, sweeping angle of attack — a shallow sweeper flirts with thin strikes when bounce sits too high. SAY WHAT THAT IS, THOUGH: the shallow sweep is an INFERENCE about you, never a measurement. No film of your full wedge or pitching motion exists, so nothing on file says which kind of strike you actually have, and a low-bounce sole is the least forgiving choice there is for a steep, digging one. It is why the grind was chosen; it is not a fact about your swing. STANDARD PRACTICE, and this part is not in doubt: around the greens, use the bounce - weight only slightly forward, hands level (not dramatically pressed), and let the sole slide under the ball. The blade only digs when hands get too far ahead and the leading edge is presented to the turf. One thing worth knowing now that the loft dial is in the short-game plan: leaning the shaft BACK on the forward ball position ADDS effective bounce, which is what lets the sole skid under the ball on the high soft one - so 8 degrees under the 60 is enough for it, provided the ball is sitting on grass."
+      }
     }
   ]
 }
