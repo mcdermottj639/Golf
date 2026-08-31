@@ -1384,6 +1384,13 @@ Coach leads with, so the top of Today can never quietly outrank the page below i
 **start/resume round button**, which absorbed the old round-in-progress banner: one
 affordance for one intention, matching the TEE tab.
 
+**Aug 30 2026, Jack's call: The numbers and The one thing swapped places.** The four chart
+tiles sit directly under the weather; the focus sits below Round prep, beside the coach tip
+it belongs with. `oneThing()` itself is untouched and still renders `coachFocus()` over
+`coachSignals()`, so this is purely where a block sits — not a change to what Today claims
+or to the order in which it decides. The rule above still holds: whatever leads Coach is
+what this card shows, wherever on the page it happens to be.
+
 **Aug 31 2026: Today carries the LATEST DAY only, and the whole log moved to its own page**
 (`landed`, reachable from the button under the rows and mapped to the Today nav button).
 Jack's words: *"it should be like whatever landed actually that day and then there's a

@@ -100,13 +100,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v73';
+const BUILD = 'v74';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v74', d:'2026-08-30', items:[
+    'On Today, the numbers and the one thing swapped places. The four tiles \u2014 5-ft makes, round scores, carry ladder, conditions \u2014 now sit straight under the weather, and the one thing you are working on sits below round prep, next to the coaching that goes with it.' ] },
   { b:'v73', d:'2026-08-30', items:[
     'Your plans moved to the top of every lab, above the diagnosis. Reaching a workshop log meant scrolling past every open fault and everything it was read off \u2014 several screens on Putting and Swing. A lab now reads: which lab, the cheat sheet, the routine, the plans, then the diagnosis under them.' ] },
   { b:'v72', d:'2026-08-30', items:[
@@ -1321,6 +1323,12 @@ function landed(){
 // Conditions, the one thing, and the way onto the tee. Everything below them — the stat
 // row, round prep, the numbers, the coach tip, the changelog, the return window and the
 // data links — keeps the order it already had.
+//
+// AUG 30 2026, Jack's call: THE NUMBERS AND THE ONE THING SWAPPED PLACES. The four chart
+// tiles now sit directly under the weather and the focus sits below Round prep, next to
+// the coach tip it belongs with. oneThing() is unchanged and still renders coachFocus()
+// over coachSignals() — the same pick Coach leads with — so this is purely where it sits
+// on the page, not a change to what the page claims or in what order it decides it.
 
 // The weather, at arm's length in sun: the temperature at display size, the reading under
 // it, and the only thing the weather actually changes about his golf in a mono block on
@@ -1398,7 +1406,28 @@ function home(){
   const picks = pickedLessons().slice(0,1);
   return `
   ${wxCard()}
-  ${oneThing()}
+  <h2>The numbers</h2>
+  <div class="rowgrid g2">
+    <div class="charttile"><div class="lab">5-ft makes · trend</div>
+      <div class="big">${sc ? sc.makes+'/'+sc.total : '—'}</div>
+      <div style="color:var(--gtext)">${spark(S.fiveFt.map(e=>fiveFtScore(e).makes))}</div>
+      <div class="sub">goal: 17/20</div></div>
+    <div class="charttile"><div class="lab">Round scores</div>
+      <div class="big">${S.rounds.length ? (S.rounds.filter(r=>r.score).slice(-1)[0]?.score ?? '—') : '—'}</div>
+      <div style="color:var(--btext)">${spark(S.rounds.map(r=>r.score).filter(Boolean))}</div>
+      <div class="sub">${S.rounds.length} logged</div></div>
+    <div class="charttile"><div class="lab">Carry ladder</div>
+      <div class="big">${S.carries[0]?.carry ?? '—'}<span style="font-size:11px"> yd top</span></div>
+      <div style="color:var(--gtext)">${spark(S.carries.map(c=>c.carry).filter(Boolean))}</div>
+      <div class="sub">${S.carriesCalibrated ? 'calibrated' : 'estimated'} · 13 clubs</div></div>
+    <div class="charttile" data-action="get-weather" style="cursor:pointer"><div class="lab">Conditions</div>
+      ${S.weather && playsFactor() ? `
+      <div class="big">${WX_ICON(S.weather.code)} ${Math.round(S.weather.t)}°F</div>
+      <div class="sub">wind ${Math.round(S.weather.wind)} mph</div>
+      <div class="sub" style="margin-top:4px;color:var(--btext);font-weight:700">150 plays ~${Math.round(150/playsFactor())}</div>`
+      : `<div class="big">—</div><div class="sub">tap to load local weather<br>+ "plays like" carries</div>`}
+    </div>
+  </div>
   ${startRound()}
   <div class="rowgrid">
     <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div></div>
@@ -1427,28 +1456,7 @@ function home(){
     </div>`;
   })()}
 
-  <h2>The numbers</h2>
-  <div class="rowgrid g2">
-    <div class="charttile"><div class="lab">5-ft makes · trend</div>
-      <div class="big">${sc ? sc.makes+'/'+sc.total : '—'}</div>
-      <div style="color:var(--gtext)">${spark(S.fiveFt.map(e=>fiveFtScore(e).makes))}</div>
-      <div class="sub">goal: 17/20</div></div>
-    <div class="charttile"><div class="lab">Round scores</div>
-      <div class="big">${S.rounds.length ? (S.rounds.filter(r=>r.score).slice(-1)[0]?.score ?? '—') : '—'}</div>
-      <div style="color:var(--btext)">${spark(S.rounds.map(r=>r.score).filter(Boolean))}</div>
-      <div class="sub">${S.rounds.length} logged</div></div>
-    <div class="charttile"><div class="lab">Carry ladder</div>
-      <div class="big">${S.carries[0]?.carry ?? '—'}<span style="font-size:11px"> yd top</span></div>
-      <div style="color:var(--gtext)">${spark(S.carries.map(c=>c.carry).filter(Boolean))}</div>
-      <div class="sub">${S.carriesCalibrated ? 'calibrated' : 'estimated'} · 13 clubs</div></div>
-    <div class="charttile" data-action="get-weather" style="cursor:pointer"><div class="lab">Conditions</div>
-      ${S.weather && playsFactor() ? `
-      <div class="big">${WX_ICON(S.weather.code)} ${Math.round(S.weather.t)}°F</div>
-      <div class="sub">wind ${Math.round(S.weather.wind)} mph</div>
-      <div class="sub" style="margin-top:4px;color:var(--btext);font-weight:700">150 plays ~${Math.round(150/playsFactor())}</div>`
-      : `<div class="big">—</div><div class="sub">tap to load local weather<br>+ "plays like" carries</div>`}
-    </div>
-  </div>
+  ${oneThing()}
 
   ${picks.length ? `<div class="card">
     <h2>From your coach today</h2>
