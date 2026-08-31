@@ -798,9 +798,24 @@ narrowest phone: the tightest row (Tees · Rating · Slope) still fits at 16px.
 
 ### The numbers on Today are `gameAreas()`, not a fourth tally (Aug 30 2026)
 
-**Everything Today counts, under one heading.** A thin row of the four that barely move —
-**handicap · courses · up & down · est. index** — over four tiles of the ones that do, in
-the order a hole is played: **last score · off the tee · irons · putting**. They were three
+**Everything Today counts, under one heading.** A thin row —
+**handicap · courses · scramble · up & down** — over four tiles, in
+the order a hole is played: **last score · off the tee · irons · putting**, with one
+footnote under the lot.
+
+**`scramble` and `up & down` are a pair, and the footnote says so because the words do not.**
+Jack's definitions, in his words: *"up and down is near green, scramble is errant drive safe
+percentage."* So they are one question asked about two different mistakes — did he save the
+hole from off the **fairway**, and from off the **green**. His `scramble` is **not** the
+standard golf usage (which is up-and-down), which is exactly why the line under the block
+spells both out rather than trusting the labels. It counts in **`scoreStats()`'s `fw`**
+(`saved` = par or better, `bogey` = bogey or better, nested so the two can never drift
+apart), never in a second pass — a scramble rate that disagreed with the fairway percentage
+beside it would be worse than not having one.
+
+**The estimated index is a footnote, not a fifth tile** (Jack's call): it and `handicap` are
+two readings of one thing, and side by side as equals they read as a contradiction rather
+than as a figure and the app's own estimate of it. Keep both, rank them. They were three
 separate blocks with the start-round button in between until Jack asked for one; `up & down`
 is the fourth area, so the row and the tiles together cover all four parts of the game.
 Three of the tiles are `gameAreas()` read through **`areaCards()`**, the extracted reader that
