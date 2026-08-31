@@ -796,60 +796,71 @@ don't lower it, and don't set a smaller inline `font-size` on the narrow numeric
 viewport — is worse: it disables pinch-zoom everywhere in the app. Checked at 320px, the
 narrowest phone: the tightest row (Tees · Rating · Slope) still fits at 16px.
 
-### The numbers on Today are `gameAreas()`, not a fourth tally (Aug 30 2026)
+### The numbers on Today (Aug 30 2026)
 
-**Everything Today counts, under one heading.** A thin row —
-**handicap · courses · scramble · up & down** — over four tiles, in
-the order a hole is played: **last score · off the tee · irons · putting**, with one
-footnote under the lot.
+**Everything Today counts, under one heading**, in one block: a thin row of four stats —
+**courses · handicap · scramble · up & down** — over four tiles in the order a hole is
+played — **last score · off the tee · irons · putting** — and one paragraph under the lot.
+They were three separate blocks with the start-round button between them until Jack asked
+for one. Between the row and the tiles all four parts of the game are covered: the tiles
+carry off-the-tee, irons and putting, and `up & down` is the short game.
 
-**`scramble` and `up & down` are a pair, and the footnote says so because the words do not.**
+**The block says WHICH CARDS it read, and that line is not decoration.** `areaCards()` flips
+the whole sample from every card to the **live cards only** the moment 18 live holes exist,
+so finishing one round he logged himself moves every number here at once — by design, and
+correctly. Coach has always announced that; Today did not, and shipping these numbers without
+it is exactly how Jack came to ask why they had all changed since the last update. **A number
+that moves for a good reason still has to say what the reason was** — put the provenance line
+on the block, not just on Coach, any time these numbers are rendered somewhere new.
+
+**It is a READER, never a fifth tally.** Three tiles and both recovery stats come from
+`gameAreas()` / `scoreStats()` / `shortGameStats()` through **`areaCards()`** — the card-set
+choice extracted out of `coach()` so Today and Coach cannot quote different percentages for
+the same rounds. The **labels come from `AREA_LAB`** and the value line is formatted exactly
+as Coach formats it: a tile saying "Greens hit" over the figure Coach calls "Irons" is how
+one number quietly becomes two.
+
+**`scramble` and `up & down` are a pair, and the paragraph says so because the words do not.**
 Jack's definitions, in his words: *"up and down is near green, scramble is errant drive safe
-percentage."* So they are one question asked about two different mistakes — did he save the
-hole from off the **fairway**, and from off the **green**. His `scramble` is **not** the
-standard golf usage (which is up-and-down), which is exactly why the line under the block
-spells both out rather than trusting the labels. Each counts where its own hole tally already lives — **`scoreStats()`'s `fw`** and
-**`shortGameStats()`** — as the SAME pair of counters with the same meaning: `saved` = par or
-better, `bogey` = par or bogey, nested so the two can never drift apart. Never in a second pass — a scramble rate that disagreed with the fairway percentage
-beside it would be worse than not having one.
+percentage."* One question asked about two different mistakes — did he save the hole from off
+the **fairway**, and from off the **green**. His `scramble` is **not** the standard golf usage
+(which is up-and-down), which is exactly why the line under the block spells both out rather
+than trusting the labels to carry it. Each counts where its own hole tally already lives —
+`scoreStats()`'s `fw` and `shortGameStats()` — as the same pair with the same meaning:
+`saved` = par or better, `bogey` = par or bogey, **nested** so the two can never drift apart.
+Never in a second pass: a scramble rate that disagreed with the fairway percentage beside it
+would be worse than not having one.
 
-**A tile may carry a SECOND, smaller number (`.stat .sv`) that qualifies its headline one** —
-the estimated index under the handicap, bogey-saves under scramble. That is Jack's fix for
-the two-handicaps problem and it generalises: `handicap` and `est. index` are two readings of
-one thing, and as equal tiles they read as a contradiction rather than as a figure and the
-app's own estimate of it. **Subordinating one says which is which in a way no amount of prose
-underneath can** — the first attempt put the index in the paragraph below and he sent it
-back: he meant a smaller number in the same card. So a qualifying number goes in the tile,
-small and mono; the paragraph below is for what a number MEANS, never for more numbers.
-Both recovery tiles carry one (`63% bogey`, `75% up & 2`), and that pairing earns its place:
-up & down reads `0/12`, which looks like nothing is ever saved, while the tier under it says
-9 of those 12 still came in at bogey. A headline with no tier under it can be true and still
-leave the wrong impression.
+**A tile may carry a SECOND, smaller number (`.stat .sv`) that qualifies its headline one.**
+That is Jack's fix for the two-handicaps problem and it generalises: `handicap` and
+`est. index` are two readings of one thing, and as equal tiles they read as a contradiction
+rather than as a figure and the app's own estimate of it. **Subordinating one says which is
+which in a way no amount of prose underneath can** — the first attempt put the index in the
+paragraph below and he sent it back: he meant a smaller number in the same card. So a
+qualifying number goes in the tile, small and mono; the paragraph below is for what a number
+MEANS, never for more numbers.
+
+Both recovery tiles carry one (`63% bogey`, `75% up & 2`), and that pairing earned its place
+immediately: up & down reads `0/12`, which looks like nothing is ever saved, while the tier
+under it says 9 of those 12 still came in at bogey — three got worse, and that is the real
+damage. **A headline with no tier under it can be true and still leave the wrong impression.**
 
 **A `.stat` may be a link** (`.stat.opens` + `data-action="go"`) — Courses opens the course
-list. It stays a `div` rather than a `button` because it sits in a grid beside stats that
-are not tappable and has to line up with them exactly. They were three
-separate blocks with the start-round button in between until Jack asked for one; `up & down`
-is the fourth area, so the row and the tiles together cover all four parts of the game.
-Three of the tiles are `gameAreas()` read through **`areaCards()`**, the extracted reader that
-also feeds Coach's four areas, so the front page and the coach cannot quote different
-percentages at each other. Same rule as `gameAreas()` itself: never compute a fifth tally.
-The **labels come from `AREA_LAB`** and the value line is formatted exactly as Coach formats
-it, deliberately — a tile saying "Greens hit" over the figure Coach calls "Irons" is how one
-number quietly becomes two.
+list. It stays a `div` rather than a `button` because it sits in a grid beside stats that are
+not tappable and has to line up with them exactly.
 
-What the three replaced is worth keeping, because each was live for weeks before anyone
-looked and each failed in a different way:
+What the three retired tiles were is worth keeping, because each was live for weeks before
+anyone looked and each failed differently:
 
-- **5-ft makes** read `— · needs 2+ entries`. A mat test he has run once, so the tile
-  leading the page had never once shown a number. A tile whose empty state is its normal
-  state is worse than no tile. It was in the stat row **as well**, blank there too — when
-  you retire a dead metric, grep for it: the same number is usually rendered twice.
+- **5-ft makes** read `— · needs 2+ entries`. A mat test he has run once, so the tile leading
+  the page had never once shown a number. A tile whose empty state is its normal state is
+  worse than no tile. It was in the stat row **as well**, blank there too — when you retire a
+  dead metric, grep for it: the same number is usually rendered twice.
 - **Carry ladder** was a *fact about the bag*, not a result — the top of the ladder does not
   move between rounds, and it already lives on Bag.
-- **Conditions** was the weather card immediately above it, restated and smaller. Jack
-  caught it the moment the swap put the two adjacent, which is the transferable lesson:
-  **a duplicate is invisible until the two copies are next to each other.** When moving a
+- **Conditions** was the weather card immediately above it, restated and smaller. Jack caught
+  it the moment the swap put the two adjacent, which is the transferable lesson: **a
+  duplicate is invisible until the two copies are next to each other.** When you move a
   block, check what it now sits beside.
 
 A tile with no data renders a dash and says what would fill it — never a zero and never a
@@ -1505,8 +1516,9 @@ so the set can't grow forever either. Today's meta counts its own day; the butto
 the rest of the count and how many of those are unseen.
 
 **Aug 30 2026 — Today's running order, after Jack swapped the numbers and the one thing:**
-weather · **The numbers** · start/resume round · the stat row · Round prep · **The one
-thing** · the coach tip · What's landed · the return window · the data links. The four chart
+weather · **The numbers** (the stat row and the tiles, one block) · start/resume round ·
+Round prep · **The one thing** · the coach tip · What's landed · the return window · the
+data links. The four chart
 tiles sit directly under the weather; the focus sits below Round prep, beside the coach tip
 it belongs with. `oneThing()` itself is untouched and still renders `coachFocus()` over
 `coachSignals()`, so this was purely where a block sits — not a change to what Today claims
