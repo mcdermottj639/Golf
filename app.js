@@ -100,13 +100,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v84';
+const BUILD = 'v85';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v85', d:'2026-08-30', items:[
+    'All four tiles fit on one screen now. It was clipping the bottom two on your phone \u2014 and not on any desktop browser, because the notch and home-indicator insets that eat about 90px there report as zero everywhere else. Simulated your phone properly and it was 38px over.',
+    'Nothing shrank. The space came out of padding and gaps: a tighter masthead, a slightly shorter weather card, and The numbers closing up as one block instead of sitting like three unrelated ones. Type sizes are untouched \u2014 you already told me these read small.' ] },
   { b:'v84', d:'2026-08-30', items:[
     'IRONS is now INTO THE GREEN \u2014 on Coach as well as Today, so it is one name and not two. The tile was named for the club usually in your hand, but the area is every shot at a green: a wood into a par 5 and a wedge from 90 are both in it, which the Woods row made obvious.',
     'Its breakdown splits four ways in club order: Woods, 2i\u20135i, 6i\u2013PW, 50\u201360\u00b0. Long and short irons were sharing one hit rate, and a 4-iron from 200 and a 9-iron from 140 are not the same shot \u2014 lumping them hid the comparison the row exists to make.',
@@ -1562,6 +1565,7 @@ function theNumbers(){
   const miss = st.fw.n - st.fw.hit;
   const pc = (n, d) => d ? Math.round(n / d * 100) + '%' : '—';
   return `
+  <section class="nums">
   <h2>The numbers</h2>
   <div class="rowgrid">
     <div class="stat opens" data-action="go" data-view="rounds" data-seg="courses">
@@ -1590,7 +1594,7 @@ function theNumbers(){
       : `${C.cards.length} card${C.cards.length === 1 ? '' : 's'} on record — ${C.allHoles} holes`}.</b> ` : ''}${miss
     ? `<b>Scramble</b> is par or better after a missed fairway (${st.fw.saved} of ${miss}); <b>up &amp; down</b> is the same question off a missed green. The small figure under each is the tier below \u2014 par or bogey. `
     : 'Scramble fills in once a card records a missed fairway. '}Off the same cards Coach reads — tap any tile for the detail behind it.</p>
-`;
+  </section>`;
 }
 
 // The way onto the tee, at the size of the decision. One button, which is a START when

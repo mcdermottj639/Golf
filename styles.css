@@ -58,10 +58,10 @@ input:focus,select:focus,textarea:focus{outline:2px solid #2e5c42;outline-offset
 label{display:block;font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;
   letter-spacing:.1em;color:var(--faint);margin:10px 0 4px}
 
-.hero{padding:calc(20px + env(safe-area-inset-top)) 0 4px}
+.hero{padding:calc(12px + env(safe-area-inset-top)) 0 0}
 .badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
   padding:4px 10px;border-radius:var(--r);background:var(--green);color:var(--green-ink);font-family:var(--sans)}
-h1{font-size:26px;font-weight:700;color:var(--gtext);letter-spacing:-.01em;margin-top:8px}
+h1{font-size:26px;font-weight:700;color:var(--gtext);letter-spacing:-.01em;margin-top:5px}
 .tag{font-size:12.5px;color:#7c7460;font-style:italic;margin-top:2px}
 
 h2{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--btext);
@@ -79,6 +79,13 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 .card h2{margin-top:0}
 .card.flat{box-shadow:none;background:var(--card2)}
 .rowgrid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:14px 0}
+/* The numbers is one block, not three, so it closes up inside: the heading sits near its row
+   and the two grids sit near each other. Scoped rather than global — the same trim applied to
+   every h2 in the app would be a change to every page, checked on none of them. It exists
+   because the block ran just past the fold on Jack's phone, where env(safe-area-inset-*) adds
+   ~59px at the top and ~34px at the bottom that a desktop browser reports as zero. */
+.nums h2{margin:10px 0 5px}
+.nums .rowgrid{margin:6px 0}
 .rowgrid.g3{grid-template-columns:1fr 1fr 1fr}
 .rowgrid.g2{grid-template-columns:1fr 1fr}
 /* THREE BANDS THAT LINE UP ACROSS THE WHOLE ROW, whether or not a tile has a second number.
@@ -88,7 +95,7 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
    qualify simply has no bottom band rather than a hole in the middle of the stack. It also
    survives a label wrapping to two lines, which "UP & DOWN" does at 320px. */
 .stat{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--green);
-  border-radius:var(--r);padding:10px 6px 9px;text-align:center;
+  border-radius:var(--r);padding:8px 6px 8px;text-align:center;
   display:flex;flex-direction:column;align-items:stretch}
 .stat .v{font-size:19px;font-weight:700;color:var(--gtext);line-height:1.15}
 .stat .l{font-size:8.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);
@@ -152,8 +159,8 @@ body.night .area.focus{border-top-color:var(--burg)}
    and the only number on it that changes his golf — what the air does to a carry — sits
    in the mono voice on the right, where the label column of the whole app lives. */
 .wx{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;
-  background:var(--green);color:var(--green-ink);border-radius:18px;padding:16px;
-  margin:14px 0;cursor:pointer}
+  background:var(--green);color:var(--green-ink);border-radius:18px;padding:13px 15px;
+  margin:10px 0;cursor:pointer}
 .wxt{font-family:var(--serif);font-size:44px;line-height:1}
 .wxc{font-family:var(--sans);font-size:11.5px;color:rgba(244,239,226,.66);margin-top:5px}
 .wxr{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-align:right;
@@ -726,7 +733,7 @@ body.night .buildtag{background:rgba(255,255,255,.06);border-color:rgba(255,255,
    no sparkline, which is exactly what a broken card looks like. Slack belongs at the card's
    bottom edge, where it reads as nothing at all. */
 .charttile{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
-  border-radius:var(--r);padding:12px 13px 11px;display:flex;flex-direction:column}
+  border-radius:var(--r);padding:10px 12px 9px;display:flex;flex-direction:column}
 .charttile .lab{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);
   font-family:var(--sans);font-weight:700}
 .charttile .big{font-size:20px;font-weight:700;color:var(--gtext);margin:2px 0 4px}
@@ -802,7 +809,7 @@ body.night table{font-family:var(--sans)}
 /* ---- In-page section jump bar ---- */
 /* Wraps rather than scrolls sideways: every section on a page has to be reachable
    without hunting for a chip that's parked off the right edge. */
-.jumpbar{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 2px;padding:12px 0 6px}
+.jumpbar{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 2px;padding:9px 0 4px}
 .jump{flex:0 0 auto;font-family:var(--sans);font-size:10.5px;font-weight:700;white-space:nowrap;
   padding:5px 10px;border-radius:20px;background:var(--card2);color:var(--gtext);
   border:1px solid var(--line)}

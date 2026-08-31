@@ -950,6 +950,23 @@ keeping:
 At 320px the `.stat` labels give up tracking rather than wrap ("UP & DOWN" is the longest),
 the same trade the nav makes at that width.
 
+**THE WHOLE BLOCK IS SIZED TO FIT ABOVE THE FOLD, and only a simulated phone can prove it.**
+It ran 38px past the nav on Jack's phone while sitting 47px clear in desktop Chromium, because
+`env(safe-area-inset-top)` (~59px) and `env(safe-area-inset-bottom)` (~34px) are real on an
+iPhone and **zero everywhere else** — about 90px of the viewport that a local check cannot
+see. To check a fold, inject `.hero{padding-top:calc(12px + 59px)}` and
+`nav{padding-bottom:calc(10px + 34px)}` and measure the last tile's bottom against the nav's
+top; verify across models, because the top inset runs 44–62px (the 13 mini is the tightest
+viewport and the last to fit). Current headroom: 35px on a 13/14, 31px on a 15 Pro, 6px on a
+13 mini.
+
+The space came out of **padding and gaps only — never type size**, since Jack had already said
+these numbers read small. The masthead, the jump bar, the weather card, `.stat` and
+`.charttile` each gave back a few pixels, and `.nums` (a wrapper on this block alone) closes
+up its heading and its two grids because it is one subject, not three. That scoping is
+deliberate: the same trim applied to every `h2` in the app would be a change to every page,
+verified on none of them.
+
 ### Nearest first (Aug 21 2026)
 
 Jack asked for the standing course plans to be ordered nearest to furthest, off the
