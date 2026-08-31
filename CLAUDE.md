@@ -37,6 +37,20 @@ python3 -c "import json; json.load(open('coach-feed.json'))"
 To preview locally: `npx http-server .` then open the served URL (a plain
 `file://` open mostly works too, but the service worker + `fetch` want a server).
 
+**For a LAYOUT or ORDER change, drive it in a real browser before pushing** — `node --check`
+proves the file parses and nothing else, and the app has no tests, so a section that landed
+in the wrong place or a row of chips that wraps off a 320px phone reaches Jack's phone
+unless somebody looked. Serve the folder and drive it with Playwright against the Chromium
+already on the machine; `app.js` is an IIFE, so its functions are NOT global — navigate by
+clicking real elements (`#nav button[data-view=…]`, a `.labsel`, a `.seg`) rather than
+calling `render()`. What is worth asserting, because each of these has actually been wrong:
+the order of `#view h2`s, an element's `getBoundingClientRect()` against the viewport
+(is it above the fold?), `scrollWidth > clientWidth` on a chip (does the label clip?),
+`documentElement.scrollWidth > innerWidth` (does the page scroll sideways?), and a
+`pageerror` listener for the whole run. **Check 320px as well as 390px** — that is the
+narrowest phone and the width the form-control rule below was set at. This proves layout,
+not correctness: a number can be confidently wrong in a page that renders perfectly.
+
 ## Data model — READ THIS BEFORE CHANGING BAG / SESSION / COURSE DATA
 
 State comes from **two layers merged at runtime**, plus the user's own local edits:
@@ -856,22 +870,28 @@ Putting · Mental now sit behind a single `Game` tab** (`game()` — the hub). `
 `render()` maps every lab view back to the `game` button so it stays lit. Adding a fifth lab
 costs nothing in the nav.
 
-**Two changes on Aug 30 2026, both Jack's.** On the hub, the **"Open the ⟨lab⟩ lab" row sits
-directly under the four tiles**, not at the bottom of the page — it was below a diagnosis
-that runs several screens on any lab with faults open, so picking a lab and entering it were
-separated by everything the hub had to say about it. The diagnosis is what you read INSTEAD
-of going in, not something to scroll past on the way; the selected tile is still a second
-door (it reads `OPEN LAB ›`), which is why the row can be plain rather than shouting.
-**A lab page reads: which lab · the cheat sheet · the routine · the plans · the diagnosis ·
-the film · the rest** (Jack's instruction, Aug 30 2026). The plans used to sit UNDER the
-diagnosis, so reaching a workshop log meant scrolling past every open fault and everything
-each was read off — several screens on Putting and Swing. Same principle as the hub's
-way-in, one level down: the plans are what you came to read, and the diagnosis is what they
-are built on. Mental already read this way and was left alone. And **every lab page carries a `labBar()` across the top** — a `.segbar.labs` of all four,
-so Putting → Short Game is one tap instead of a trip back through the hub. It has the same
-relationship to the jump bar that the Rounds segmented control does (which lab, then where
-inside it), which is why `buildJumpBar()` places itself after a `.segbar` and the order
-can't invert. The lab you are in is inert rather than a link: a state, not a destination.
+**Three changes on Aug 30 2026, all Jack's, and one principle under all of them: what you
+came for goes above what it was derived from.**
+
+1. **On the hub, the "Open the ⟨lab⟩ lab" row sits directly under the four tiles**, not at
+   the bottom of the page. It was below a diagnosis that runs several screens on any lab
+   with faults open, so picking a lab and entering it were separated by everything the hub
+   had to say about it. The diagnosis is what you read INSTEAD of going in, not something to
+   scroll past on the way. The selected tile is still a second door (it reads `OPEN LAB ›`),
+   which is why the row can be plain rather than shouting.
+
+2. **A lab page reads: which lab · the cheat sheet · the routine · the plans · the
+   diagnosis · the film · the rest.** The plans used to sit UNDER the diagnosis, so reaching
+   a workshop log meant scrolling past every open fault and everything each was read off.
+   Mental already read this way and was left alone.
+
+3. **Every lab page carries a `labBar()` across the top** — a `.segbar.labs` of all four, so
+   Putting → Short Game is one tap instead of a trip back through the hub. It has the same
+   relationship to the jump bar that the Rounds segmented control does (which lab, then
+   where inside it), which is why `buildJumpBar()` places itself after a `.segbar` and the
+   order can't invert. FIXED `LABS` order, like the hub and for the same reason. The lab you
+   are in is inert rather than a link: a state, not a destination. It maps over `LABS`, so a
+   fifth lab joins the bar with nothing to add.
 
 **The hub order is FIXED and must stay that way** (standing instruction, Aug 14 2026): Swing ·
 Short Game · Putting · Mental, top down — i.e. `LABS` order. It used to float the last-opened
@@ -903,7 +923,8 @@ Jack commissioned a redesign; this supersedes the six-tab bar described above. T
   already sitting in a user's saved `S.updates` still lands where it meant to. Those stored
   update rows are why the aliases are permanent, not a migration step. A link may also carry
   `data-seg` to ask for a face directly (`data-view="rounds" data-seg="prep"`).
-- `NAV_OF` maps `round` (a round card) to the Rounds button as well as the four labs to Game.
+- `NAV_OF` maps `round` (a round card) to the Rounds button as well as the four labs to Game,
+  and `landed` — the full What's-landed log, which hangs off Today — back to the Today button.
 
 The tab glyphs are **CSS shapes** — a 19px bordered box, round or square, filled when active.
 No SVG, no icon font, no emoji: nothing to load, and legible at label size.
@@ -1376,7 +1397,7 @@ film and scorecards, green for a round, green accent for the coaching library, g
 number nobody measured, neutral ink for everything else. The day heading moved into the
 rows as a right-aligned date. **None of the three behaviours above changed**, and a type
 with no `UP_TYPE` row falls through to a neutral `UPDATE` for the same forward-compat
-reason `updateLine()` has a default case. Above the changelog, Today now opens with three
+reason `updateLine()` has a default case. Above the changelog, Today also grew three
 blocks — the green **weather card** (a restyle of what the Conditions tile already
 computed, `playsFactor()` unchanged and temperature-only, which the card says out loud),
 **The one thing** (`oneThing()` — `coachFocus()` over `coachSignals()`, i.e. the same pick
@@ -1384,15 +1405,8 @@ Coach leads with, so the top of Today can never quietly outrank the page below i
 **start/resume round button**, which absorbed the old round-in-progress banner: one
 affordance for one intention, matching the TEE tab.
 
-**Aug 30 2026, Jack's call: The numbers and The one thing swapped places.** The four chart
-tiles sit directly under the weather; the focus sits below Round prep, beside the coach tip
-it belongs with. `oneThing()` itself is untouched and still renders `coachFocus()` over
-`coachSignals()`, so this is purely where a block sits — not a change to what Today claims
-or to the order in which it decides. The rule above still holds: whatever leads Coach is
-what this card shows, wherever on the page it happens to be.
-
-**Aug 31 2026: Today carries the LATEST DAY only, and the whole log moved to its own page**
-(`landed`, reachable from the button under the rows and mapped to the Today nav button).
+**Aug 30 2026 — Today carries the LATEST DAY only, and the whole log moved to its own page**
+(`landed`, reached from the button under the rows and mapped to the Today nav button).
 Jack's words: *"it should be like whatever landed actually that day and then there's a
 button to see the entire list."* The block had reached a hundred-odd rows, so the thing
 that answers *what is different since yesterday* had become an archive of changes he had
@@ -1406,6 +1420,15 @@ fresh flag on rows he has never been shown, and a "N new" count is worth nothing
 it stops meaning what it says. It is additive and then pruned to what is still on the list,
 so the set can't grow forever either. Today's meta counts its own day; the button carries
 the rest of the count and how many of those are unseen.
+
+**Aug 30 2026 — Today's running order, after Jack swapped the numbers and the one thing:**
+weather · **The numbers** · start/resume round · the stat row · Round prep · **The one
+thing** · the coach tip · What's landed · the return window · the data links. The four chart
+tiles sit directly under the weather; the focus sits below Round prep, beside the coach tip
+it belongs with. `oneThing()` itself is untouched and still renders `coachFocus()` over
+`coachSignals()`, so this was purely where a block sits — not a change to what Today claims
+or to the order in which it decides. The rule above still holds: whatever leads Coach is
+what that card shows, wherever on the page it happens to be.
 
 ### The evidence drawer (Aug 27 2026 — build a finding's provenance once)
 
