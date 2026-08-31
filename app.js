@@ -100,14 +100,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v70';
+const BUILD = 'v71';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
-  { b:'v70', d:'2026-08-31', items:[
+  { b:'v71', d:'2026-08-30', items:[
+    'The app now keeps YOUR calendar day, not the server\u2019s. It was reading the clock in UTC, so from 8pm Eastern onwards it believed it was already tomorrow \u2014 a round finished on a Sunday evening saved itself as Monday, a drill logged at nine went on the wrong day of the streak, and What\u2019s landed stopped saying "today" hours before your day was over.',
+    'Nothing already saved was changed. If a card or a drill is sitting on the wrong date from an evening before this, tell me which and I will move it.' ] },
+  { b:'v70', d:'2026-08-30', items:[
     'What\u2019s landed on Today is now just that \u2014 what landed. It shows the latest day only, with a button to the full log. It had grown to a hundred-odd rows, so the block that answers "what is different since yesterday" had turned into an archive of changes you had already read.',
     'The full history moved to its own page, unchanged and one tap away. The "N new" count is honest about the split: Today counts what it is showing you, and the button says how many more are waiting and how many of those you have not seen.' ] },
   { b:'v69', d:'2026-08-30', items:[
@@ -581,7 +584,16 @@ function readMins(b){
   const w = (b.sections || []).reduce((n, s) => n + String(s.b || '').split(/\s+/).length, 0);
   return Math.max(1, Math.round(w / 220));
 }
-function today(){ return new Date().toISOString().slice(0,10); }
+// The local calendar day, never the UTC one. toISOString() is UTC, so east of Greenwich
+// this said tomorrow from 8pm Eastern onwards (7pm in winter) — which is prime time for
+// this app: a round finished at 8.30 on a Sunday evening saved itself as Monday, a drill
+// logged at nine went on the wrong day of the streak, and What's landed stopped saying
+// "today" hours before the day was over. Golf happens in the evening; the clock has to
+// agree with the player, not with the server.
+function isoDay(d){
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function today(){ return isoDay(new Date()); }
 function fmtDate(iso){
   if(!iso) return '—';
   const d = new Date(iso + (iso.length===10 ? 'T12:00:00' : ''));
@@ -909,7 +921,7 @@ function weekStreak(){
   const mon = new Date(now); mon.setDate(now.getDate()-dow);
   return ['M','T','W','T','F','S','S'].map((lab,i) => {
     const d = new Date(mon); d.setDate(mon.getDate()+i);
-    return { lab, hit: S.drillDays.includes(d.toISOString().slice(0,10)) };
+    return { lab, hit: S.drillDays.includes(isoDay(d)) };
   });
 }
 
@@ -1121,7 +1133,7 @@ function standingNote(list){
     ? `<button class="btn ghost tiny" data-action="locate">Sort by distance</button> — nearest first. Your location is used on this phone to do the arithmetic and is not sent anywhere.`
     : ''}`;
   const missing = list.length - placed;
-  return `${base}<br><br>Sorted <b>nearest first</b>, from your last location fix (${fmtDate(new Date(S.here.ts).toISOString().slice(0,10))}) — straight-line miles to the course, not drive time.${
+  return `${base}<br><br>Sorted <b>nearest first</b>, from your last location fix (${fmtDate(isoDay(new Date(S.here.ts)))}) — straight-line miles to the course, not drive time.${
     missing ? ` ${missing} plan${missing > 1 ? 's have' : ' has'} no location on file yet, so ${missing > 1 ? 'they sit' : 'it sits'} at the bottom.` : ''}`;
 }
 function preps(){
@@ -3677,7 +3689,7 @@ function courseSortNote(list, key){
     if(!S.here) return `Sorted by rating for now — your phone hasn't given up a location yet.<br><br>${
       placed ? `<button class="btn ghost tiny" data-action="locate">Use my location</button> — the arithmetic happens on this phone and nothing about where you are is sent anywhere.`
              : 'No course here has a location on file yet, so there is nothing to measure from.'}`;
-    return `<b>Nearest first</b>, from your last location fix (${fmtDate(new Date(S.here.ts).toISOString().slice(0,10))}) — straight-line miles to the course, <b>not drive time</b>.${
+    return `<b>Nearest first</b>, from your last location fix (${fmtDate(isoDay(new Date(S.here.ts)))}) — straight-line miles to the course, <b>not drive time</b>.${
       missing(list.length - placed, 'location')}`;
   }
   return `<b>Your rating, best first.</b>${missing(list.filter(c => c.rating == null).length, 'rating')}`;

@@ -1409,6 +1409,16 @@ feature branch never reaches his phone. Develop on the assigned branch, then fas
 
 ## Gotchas
 
+- **Dates are the player's LOCAL day, via `isoDay()` — never `toISOString()`** (fixed
+  Aug 30 2026). `today()` read the clock in UTC, so from 8pm Eastern onwards (7pm in
+  winter) the app believed it was already tomorrow: a round finished on a Sunday evening
+  saved itself as Monday, a drill logged at nine landed on the wrong day of the streak,
+  and What's landed stopped saying "today" hours before the day was over. Evening is
+  prime time for this app, so the bug fired most nights. Anything deriving a `YYYY-MM-DD`
+  from a `Date` — a saved round, a `drillDays` entry, an `entryDate()` fallback, a
+  location fix's display date — goes through `isoDay()`. Note this is only about turning
+  a moment into a calendar day; `fmtDate()` already parses a stored date at `T12:00:00`
+  precisely so a stored day never shifts on the way back out.
 - Do **not** hand-edit `S.feedApplied` or expect `seed()` edits to reach existing installs.
 - Some UI copy is hardcoded around specific gear. If the marquee gear changes, grep
   `app.js` for the old name and update the render branch too — data alone won't cover it.
