@@ -813,9 +813,14 @@ spells both out rather than trusting the labels. It counts in **`scoreStats()`'s
 apart), never in a second pass — a scramble rate that disagreed with the fairway percentage
 beside it would be worse than not having one.
 
-**The estimated index is a footnote, not a fifth tile** (Jack's call): it and `handicap` are
-two readings of one thing, and side by side as equals they read as a contradiction rather
-than as a figure and the app's own estimate of it. Keep both, rank them. They were three
+**A tile may carry a SECOND, smaller number (`.stat .sv`) that qualifies its headline one** —
+the estimated index under the handicap, bogey-saves under scramble. That is Jack's fix for
+the two-handicaps problem and it generalises: `handicap` and `est. index` are two readings of
+one thing, and as equal tiles they read as a contradiction rather than as a figure and the
+app's own estimate of it. **Subordinating one says which is which in a way no amount of prose
+underneath can** — the first attempt put the index in the paragraph below and he sent it
+back: he meant a smaller number in the same card. So a qualifying number goes in the tile,
+small and mono; the paragraph below is for what a number MEANS, never for more numbers. They were three
 separate blocks with the start-round button in between until Jack asked for one; `up & down`
 is the fourth area, so the row and the tiles together cover all four parts of the game.
 Three of the tiles are `gameAreas()` read through **`areaCards()`**, the extracted reader that

@@ -86,6 +86,11 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 .stat .v{font-size:19px;font-weight:700;color:var(--gtext);line-height:1.15}
 .stat .l{font-size:8.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);
   font-family:var(--sans);font-weight:700;margin-top:3px}
+/* The second number in a stat tile: a figure that qualifies the headline one rather than
+   competing with it — the estimated index under the handicap, bogey-saves under scramble.
+   Deliberately small and mono: two numbers the same size in one tile read as a
+   contradiction, which is exactly what putting them in separate tiles did. */
+.stat .sv{font-family:var(--mono);font-size:9px;color:var(--ink36);line-height:1.2;margin-top:2px}
 .stat.alert{border-top-color:var(--burg)}
 .stat.alert .v{color:var(--burg)}
 

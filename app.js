@@ -100,17 +100,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v76';
+const BUILD = 'v77';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
-  { b:'v76', d:'2026-08-30', items:[
-    'The two handicaps are down to one number and a footnote \u2014 HANDICAP stays a tile, the estimated index off your logged cards is now a line under the block. They were two readings of one thing sitting side by side as equals, which reads as a contradiction rather than as a figure and the app\u2019s estimate of it.',
-    'Its tile became SCRAMBLE, your definition: par or better after a missed fairway. 1 of 8 so far, with 5 of 8 getting away with bogey \u2014 both numbers are in the footnote.',
-    'Scramble and up & down are now a pair and the footnote says so, because the words do not: the same question asked about two different mistakes \u2014 did you save the hole from off the fairway, and did you save it from off the green. Worth flagging that your \u201cscramble\u201d is not the standard golf usage, which is up-and-down, so the line spells both out.' ] },
+  { b:'v77', d:'2026-08-30', items:[
+    'The two handicaps are one tile now. HANDICAP keeps the big number and the estimated index off your logged cards sits under it, small \u2014 they were two readings of one thing side by side as equals, which reads as a contradiction rather than as a figure and the app\u2019s estimate of it.',
+    'The freed tile is SCRAMBLE, your definition: par or better after a missed fairway. 1 of 8 so far, with the bogey-or-better rate under it in the same small type \u2014 63%.',
+    'Scramble and up & down are a pair and the line under the block says so, because the words do not: the same question asked about two different mistakes \u2014 did you save the hole from off the fairway, and did you save it from off the green. Worth flagging that your \u201cscramble\u201d is not the standard golf usage, which is up-and-down.' ] },
   { b:'v75', d:'2026-08-30', items:[
     'The numbers is now everything Today counts, under one heading: the handicap row you used to scroll past the round button to reach, and under it four live numbers in the order a hole is played \u2014 your last score, off the tee, irons, putting. Tap any tile for what is behind it.',
     'UP & DOWN replaced 5-ft makes in that top row, so the row and the tiles together cover all four parts of your game.',
@@ -1398,9 +1398,13 @@ function oneThing(){
 // `scramble` is NOT the standard golf usage, which is up-and-down; that is exactly why the
 // line under the row spells both out rather than trusting the labels to carry it.
 //
-// The estimated index is a footnote rather than a fifth tile (Jack's call): it and `handicap`
-// are two numbers for one thing, and side by side as equals they read as a contradiction
-// instead of as a figure and the app's own estimate of it. Three of them are `gameAreas()` read through `areaCards()` — the SAME
+// A tile may carry a SECOND, smaller number (`.sv`) that qualifies its headline one — the
+// estimated index under the handicap, bogey-saves under scramble. That is Jack's fix for the
+// two-handicaps problem and it generalises: `handicap` and `est. index` are two readings of
+// one thing, and as equal tiles they read as a contradiction rather than as a figure and the
+// app's own estimate of it. Subordinating one says which is which in a way no amount of
+// prose underneath can. So a qualifying number belongs in the tile, small; the paragraph
+// below is for what a number MEANS, not for more numbers. Three of them are `gameAreas()` read through `areaCards()` — the SAME
 // reader and the same card set Coach uses, so the front page and the coach can never quote
 // different fairway percentages at each other. Nothing here counts a hole for itself.
 //
@@ -1439,9 +1443,11 @@ function theNumbers(){
   return `
   <h2>The numbers</h2>
   <div class="rowgrid">
-    <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div></div>
+    <div class="stat"><div class="v">${esc(S.profile.handicap)}</div>${
+      idx != null ? `<div class="sv">${idx.toFixed(1)} est.</div>` : ''}<div class="l">Handicap</div></div>
     <div class="stat"><div class="v">${S.courses.filter(c => !c.bucket).length}</div><div class="l">Courses</div></div>
-    <div class="stat"><div class="v">${pc(st.fw.saved, miss)}</div><div class="l">Scramble</div></div>
+    <div class="stat"><div class="v">${pc(st.fw.saved, miss)}</div>${
+      miss ? `<div class="sv">${pc(st.fw.bogey, miss)} bogey</div>` : ''}<div class="l">Scramble</div></div>
     <div class="stat"><div class="v">${A.short ? esc(A.short.v) : '—'}</div><div class="l">Up &amp; down</div></div>
   </div>
   <div class="rowgrid g2">
@@ -1455,9 +1461,8 @@ function theNumbers(){
     ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet')}
   </div>
   <p class="sm faint" style="margin-top:8px">${miss
-    ? `<b>Scramble</b> is par or better after a missed fairway — ${st.fw.saved} of ${miss}, with ${st.fw.bogey} of ${miss} (${pc(st.fw.bogey, miss)}) getting away with bogey. <b>Up &amp; down</b> is the same question off a missed green. `
-    : 'Scramble fills in once a card records a missed fairway. '}${
-    idx != null ? `Your <b>estimated index</b> from the cards on file is ${idx.toFixed(1)}. ` : ''}Off the same cards Coach reads — tap any tile for the detail behind it.</p>
+    ? `<b>Scramble</b> is par or better after a missed fairway (${st.fw.saved} of ${miss}); <b>up &amp; down</b> is the same question off a missed green. `
+    : 'Scramble fills in once a card records a missed fairway. '}Off the same cards Coach reads — tap any tile for the detail behind it.</p>
 `;
 }
 
