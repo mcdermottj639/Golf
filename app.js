@@ -100,13 +100,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v79';
+const BUILD = 'v80';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v80', d:'2026-08-30', items:[
+    'The numbers lines up properly now. COURSES has no second number, so its label was sitting where the other three had theirs \u2014 the row read as four cards at three different heights. Value, label and the small figure are now three fixed bands across the whole row, and UP & DOWN fits on one line on a narrow phone instead of wrapping.',
+    'Same fix on the four tiles below: ROUND SCORES carries a trend line and OFF THE TEE does not, which had left their caption lines 34px apart. Both captions sit on the same baseline now.' ] },
   { b:'v79', d:'2026-08-30', items:[
     'The numbers now says which cards it was read off, at the top of the line under it. That is the answer to why they all moved: once you have 18 holes you logged yourself, the whole block switches to your live rounds ONLY and sets the older cards aside \u2014 so finishing one round you tapped in recomputes every number at once. Coach has always said so; this block was not, which is the bug.',
     'Nothing about how any of them is calculated changed. Checked line by line.' ] },
@@ -1459,12 +1462,12 @@ function theNumbers(){
   <div class="rowgrid">
     <div class="stat opens" data-action="go" data-view="rounds" data-seg="courses">
       <div class="v">${S.courses.filter(c => !c.bucket).length}</div><div class="l">Courses</div></div>
-    <div class="stat"><div class="v">${esc(S.profile.handicap)}</div>${
-      idx != null ? `<div class="sv">${idx.toFixed(1)} est.</div>` : ''}<div class="l">Handicap</div></div>
-    <div class="stat"><div class="v">${pc(st.fw.saved, miss)}</div>${
-      miss ? `<div class="sv">${pc(st.fw.bogey, miss)} bogey</div>` : ''}<div class="l">Scramble</div></div>
-    <div class="stat"><div class="v">${A.short ? esc(A.short.v) : '—'}</div>${
-      sg.chances ? `<div class="sv">${pc(sg.bogey, sg.chances)} up &amp; 2</div>` : ''}<div class="l">Up &amp; down</div></div>
+    <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div>${
+      idx != null ? `<div class="sv">${idx.toFixed(1)} est.</div>` : ''}</div>
+    <div class="stat"><div class="v">${pc(st.fw.saved, miss)}</div><div class="l">Scramble</div>${
+      miss ? `<div class="sv">${pc(st.fw.bogey, miss)} bogey</div>` : ''}</div>
+    <div class="stat"><div class="v">${A.short ? esc(A.short.v) : '—'}</div><div class="l">Up &amp; down</div>${
+      sg.chances ? `<div class="sv">${pc(sg.bogey, sg.chances)} up &amp; 2</div>` : ''}</div>
   </div>
   <div class="rowgrid g2">
     <div class="charttile opens" data-action="go" data-view="rounds" data-seg="cards">

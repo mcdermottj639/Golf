@@ -81,8 +81,15 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 .rowgrid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:14px 0}
 .rowgrid.g3{grid-template-columns:1fr 1fr 1fr}
 .rowgrid.g2{grid-template-columns:1fr 1fr}
+/* THREE BANDS THAT LINE UP ACROSS THE WHOLE ROW, whether or not a tile has a second number.
+   Value at the top, label straight under it, and the optional `.sv` pushed to the bottom by
+   margin-top:auto. That order is what makes it work: `.v` and `.l` are the two every tile
+   has, so putting them adjacent aligns them by construction, and a tile with nothing to
+   qualify simply has no bottom band rather than a hole in the middle of the stack. It also
+   survives a label wrapping to two lines, which "UP & DOWN" does at 320px. */
 .stat{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--green);
-  border-radius:var(--r);padding:10px 6px;text-align:center}
+  border-radius:var(--r);padding:10px 6px 9px;text-align:center;
+  display:flex;flex-direction:column;align-items:stretch}
 .stat .v{font-size:19px;font-weight:700;color:var(--gtext);line-height:1.15}
 .stat .l{font-size:8.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);
   font-family:var(--sans);font-weight:700;margin-top:3px}
@@ -90,7 +97,8 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
    competing with it — the estimated index under the handicap, bogey-saves under scramble.
    Deliberately small and mono: two numbers the same size in one tile read as a
    contradiction, which is exactly what putting them in separate tiles did. */
-.stat .sv{font-family:var(--mono);font-size:9px;color:var(--ink36);line-height:1.2;margin-top:2px}
+.stat .sv{font-family:var(--mono);font-size:9px;color:var(--ink36);line-height:1.2;
+  margin-top:auto;padding-top:5px}
 /* A stat that opens the page behind it. Not a <button> — it sits in a grid beside stats
    that aren't tappable and has to line up with them exactly. */
 .stat.opens{cursor:pointer}
@@ -513,6 +521,8 @@ body.night nav button.navtee{color:var(--burg-ink)}
    After the .navtee rules on purpose — a media query adds no specificity, so an earlier
    block would simply lose to them. */
 @media (max-width:360px){
+  .stat{padding-left:3px;padding-right:3px}
+  .stat .l{letter-spacing:.02em}
   nav{padding-left:5px;padding-right:5px}
   nav button .nl{font-size:9px;letter-spacing:.01em}
   nav button.navtee{min-width:60px}
@@ -710,12 +720,15 @@ body.night .buildtag{background:rgba(255,255,255,.06);border-color:rgba(255,255,
 @media (max-width:360px){
   .badge{font-size:9px;letter-spacing:.12em;padding:4px 8px}
 }
+/* Same three-band rule as .stat: the caption line goes to the bottom of the card so it lines
+   up with its neighbour's, whether or not this tile carries a sparkline between. Round scores
+   has one and Off the tee does not, which left their sub-lines 34px apart. */
 .charttile{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
-  border-radius:var(--r);padding:12px 13px}
+  border-radius:var(--r);padding:12px 13px;display:flex;flex-direction:column}
 .charttile .lab{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);
   font-family:var(--sans);font-weight:700}
 .charttile .big{font-size:20px;font-weight:700;color:var(--gtext);margin:2px 0 4px}
-.charttile .sub{font-size:10.5px;color:var(--faint);font-family:var(--sans)}
+.charttile .sub{font-size:10.5px;color:var(--faint);font-family:var(--sans);margin-top:auto;padding-top:5px}
 .charttile svg{display:block;width:100%;margin-top:4px}
 /* A tile that opens the page behind its number. Not a button element — it sits in a grid
    and has to line up with the tiles that aren't tappable. */

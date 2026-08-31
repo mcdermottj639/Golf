@@ -867,6 +867,20 @@ A tile with no data renders a dash and says what would fill it — never a zero 
 hidden tile, the same reason `sortCourses()` puts nulls last: absent and zero are different
 claims.
 
+**THREE BANDS THAT LINE UP, whether or not a tile has the optional line.** Both grids follow
+it: `.stat` is value · label · `.sv`, and `.charttile` is label · value · (sparkline) · `.sub`,
+each a flex column with the OPTIONAL band pushed to the bottom by `margin-top:auto`. The
+order is what makes it work — the elements *every* tile has go adjacent, so they align by
+construction, and a tile with nothing to put in the optional band simply has no bottom band
+rather than a hole in the middle of its stack. It also survives a label wrapping to two
+lines. Both grids had drifted the other way and it showed: Courses (no `.sv`) sat a whole
+band higher than its neighbours, and Round Scores' caption sat 34px below Off the tee's
+because only one of them carries a sparkline. **Mixing tiles with and without an optional
+row is the normal case, not the edge case** — build the bands, don't stack and hope.
+
+At 320px the `.stat` labels give up tracking rather than wrap ("UP & DOWN" is the longest),
+the same trade the nav makes at that width.
+
 ### Nearest first (Aug 21 2026)
 
 Jack asked for the standing course plans to be ordered nearest to furthest, off the
