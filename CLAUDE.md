@@ -808,9 +808,9 @@ Jack's definitions, in his words: *"up and down is near green, scramble is erran
 percentage."* So they are one question asked about two different mistakes — did he save the
 hole from off the **fairway**, and from off the **green**. His `scramble` is **not** the
 standard golf usage (which is up-and-down), which is exactly why the line under the block
-spells both out rather than trusting the labels. It counts in **`scoreStats()`'s `fw`**
-(`saved` = par or better, `bogey` = bogey or better, nested so the two can never drift
-apart), never in a second pass — a scramble rate that disagreed with the fairway percentage
+spells both out rather than trusting the labels. Each counts where its own hole tally already lives — **`scoreStats()`'s `fw`** and
+**`shortGameStats()`** — as the SAME pair of counters with the same meaning: `saved` = par or
+better, `bogey` = par or bogey, nested so the two can never drift apart. Never in a second pass — a scramble rate that disagreed with the fairway percentage
 beside it would be worse than not having one.
 
 **A tile may carry a SECOND, smaller number (`.stat .sv`) that qualifies its headline one** —
@@ -820,7 +820,15 @@ one thing, and as equal tiles they read as a contradiction rather than as a figu
 app's own estimate of it. **Subordinating one says which is which in a way no amount of prose
 underneath can** — the first attempt put the index in the paragraph below and he sent it
 back: he meant a smaller number in the same card. So a qualifying number goes in the tile,
-small and mono; the paragraph below is for what a number MEANS, never for more numbers. They were three
+small and mono; the paragraph below is for what a number MEANS, never for more numbers.
+Both recovery tiles carry one (`63% bogey`, `75% up & 2`), and that pairing earns its place:
+up & down reads `0/12`, which looks like nothing is ever saved, while the tier under it says
+9 of those 12 still came in at bogey. A headline with no tier under it can be true and still
+leave the wrong impression.
+
+**A `.stat` may be a link** (`.stat.opens` + `data-action="go"`) — Courses opens the course
+list. It stays a `div` rather than a `button` because it sits in a grid beside stats that
+are not tappable and has to line up with them exactly. They were three
 separate blocks with the start-round button in between until Jack asked for one; `up & down`
 is the fourth area, so the row and the tiles together cover all four parts of the game.
 Three of the tiles are `gameAreas()` read through **`areaCards()`**, the extracted reader that

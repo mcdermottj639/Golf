@@ -100,13 +100,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v77';
+const BUILD = 'v78';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v78', d:'2026-08-30', items:[
+    'UP & DOWN now carries its own small second number the way scramble does \u2014 the up-and-2 rate. Worth seeing together: you have saved 0 of 12 missed greens, but 75% of them still came in at bogey or better. The headline alone read like nothing was being saved; the tier under it says what actually happened.',
+    'COURSES moved to the left of the row and is now a link straight to your course list.' ] },
   { b:'v77', d:'2026-08-30', items:[
     'The two handicaps are one tile now. HANDICAP keeps the big number and the estimated index off your logged cards sits under it, small \u2014 they were two readings of one thing side by side as equals, which reads as a contradiction rather than as a figure and the app\u2019s estimate of it.',
     'The freed tile is SCRAMBLE, your definition: par or better after a missed fairway. 1 of 8 so far, with the bogey-or-better rate under it in the same small type \u2014 63%.',
@@ -1434,7 +1437,7 @@ function numTile(lab, view, a, empty){
   </div>`;
 }
 function theNumbers(){
-  const { areas: A, st } = gameAreas(areaCards().cards);
+  const { areas: A, st, sg } = gameAreas(areaCards().cards);
   const scored = S.rounds.filter(r => r.score);
   const last = scored.slice(-1)[0];
   const idx = estIndex();
@@ -1443,12 +1446,14 @@ function theNumbers(){
   return `
   <h2>The numbers</h2>
   <div class="rowgrid">
+    <div class="stat opens" data-action="go" data-view="rounds" data-seg="courses">
+      <div class="v">${S.courses.filter(c => !c.bucket).length}</div><div class="l">Courses</div></div>
     <div class="stat"><div class="v">${esc(S.profile.handicap)}</div>${
       idx != null ? `<div class="sv">${idx.toFixed(1)} est.</div>` : ''}<div class="l">Handicap</div></div>
-    <div class="stat"><div class="v">${S.courses.filter(c => !c.bucket).length}</div><div class="l">Courses</div></div>
     <div class="stat"><div class="v">${pc(st.fw.saved, miss)}</div>${
       miss ? `<div class="sv">${pc(st.fw.bogey, miss)} bogey</div>` : ''}<div class="l">Scramble</div></div>
-    <div class="stat"><div class="v">${A.short ? esc(A.short.v) : '—'}</div><div class="l">Up &amp; down</div></div>
+    <div class="stat"><div class="v">${A.short ? esc(A.short.v) : '—'}</div>${
+      sg.chances ? `<div class="sv">${pc(sg.bogey, sg.chances)} up &amp; 2</div>` : ''}<div class="l">Up &amp; down</div></div>
   </div>
   <div class="rowgrid g2">
     <div class="charttile opens" data-action="go" data-view="rounds" data-seg="cards">
@@ -1461,7 +1466,7 @@ function theNumbers(){
     ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet')}
   </div>
   <p class="sm faint" style="margin-top:8px">${miss
-    ? `<b>Scramble</b> is par or better after a missed fairway (${st.fw.saved} of ${miss}); <b>up &amp; down</b> is the same question off a missed green. `
+    ? `<b>Scramble</b> is par or better after a missed fairway (${st.fw.saved} of ${miss}); <b>up &amp; down</b> is the same question off a missed green. The small figure under each is the tier below \u2014 par or bogey. `
     : 'Scramble fills in once a card records a missed fairway. '}Off the same cards Coach reads — tap any tile for the detail behind it.</p>
 `;
 }
@@ -3522,7 +3527,11 @@ function briefing(id){
 // asked of the live cards alone or of everything — one implementation, two scopes, and no
 // way for the lab's number and the Coach card's number to drift apart.
 function shortGameStats(rounds){
-  const a = { holes:0, gir:0, miss:{}, chances:0, saved:0, noshot:0, rounds:0, live:0 };
+  // `saved` is up and down — par or better from a missed green. `bogey` is the tier below it,
+  // par OR bogey: reached the green and two-putted, or better. Exactly the same pair, counted
+  // exactly the same way, as `fw.saved` / `fw.bogey` in scoreStats() — the two tiles are one
+  // question about two different mistakes, so their second numbers have to mean one thing.
+  const a = { holes:0, gir:0, miss:{}, chances:0, saved:0, bogey:0, noshot:0, rounds:0, live:0 };
   (rounds || withHoles()).forEach(r => {
     let counted = false;
     r.holes.forEach(h => {
@@ -3537,7 +3546,8 @@ function shortGameStats(rounds){
       // round card uses, so the two numbers can never disagree.
       a.chances++;
       if(r.live) a.live++;
-      if(h.s != null && h.par != null && h.s - h.par <= 0) a.saved++;
+      // Nested, so par-or-better can never drift outside par-or-bogey.
+      if(h.s != null && h.par != null && h.s - h.par <= 1){ a.bogey++; if(h.s - h.par <= 0) a.saved++; }
     });
   });
   return a;

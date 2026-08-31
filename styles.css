@@ -91,6 +91,10 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
    Deliberately small and mono: two numbers the same size in one tile read as a
    contradiction, which is exactly what putting them in separate tiles did. */
 .stat .sv{font-family:var(--mono);font-size:9px;color:var(--ink36);line-height:1.2;margin-top:2px}
+/* A stat that opens the page behind it. Not a <button> — it sits in a grid beside stats
+   that aren't tappable and has to line up with them exactly. */
+.stat.opens{cursor:pointer}
+.stat.opens:active{transform:translateY(1px)}
 .stat.alert{border-top-color:var(--burg)}
 .stat.alert .v{color:var(--burg)}
 
