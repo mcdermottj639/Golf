@@ -100,13 +100,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v81';
+const BUILD = 'v82';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v82', d:'2026-08-30', items:[
+    'OFF THE TEE now breaks down by club in the room it had spare \u2014 driver, 2-iron, whatever you hit, with the fairway rate and the raw count beside each. Par 3s are left out of it exactly as you said: a par 3 has no fairway, so a club used only there never appears.',
+    'IRONS splits the same way, by what was in your hands: 2i\u2013PW, 50\u201360\u00b0, and Woods when you go at a green with one. Par-3 tee shots ARE counted here \u2014 on a par 3 the tee shot is the approach, so that is where the green belongs.',
+    'The PW is counted with the irons \u2014 your call. It was genuinely ambiguous: it is part of the 4\u2013PW set and it also anchors your wedge ladder at 44\u00b0.',
+    'Both are read off the same club table that already lives on Rounds, so the tile and that table can never disagree. Tap either tile for the full version with the dead-drive and OB columns.' ] },
   { b:'v81', d:'2026-08-30', items:[
     'Fixed what v80 broke on OFF THE TEE. Lining the captions up had pushed that one to the bottom of its card, leaving a gap between the 36% and the word under it \u2014 which is what a broken card looks like. The caption sits under its number again, the trend line on ROUND SCORES moved to the bottom edge, and all three text lines still line up across the row.' ] },
   { b:'v80', d:'2026-08-30', items:[
@@ -1443,13 +1448,68 @@ function oneThing(){
 // it, deliberately: these are the same three numbers in two places, and a tile calling it
 // "Greens hit" while Coach calls the identical figure "Irons" is how one number quietly
 // becomes two. One vocabulary, one reader, one card set.
-function numTile(lab, view, a, empty){
+function numTile(lab, view, a, empty, extra){
   return `<div class="charttile opens" data-action="go" data-view="${view}">
     <div class="lab">${esc(lab)}</div>
     ${a ? `<div class="big">${esc(a.v)}</div>
-           <div class="sub">${esc(a.u)}${a.raw ? ` · ${esc(a.raw)}` : ''}</div>`
+           <div class="sub">${esc(a.u)}${a.raw ? ` · ${esc(a.raw)}` : ''}</div>${extra || ''}`
         : `<div class="big faint">—</div><div class="sub">${esc(empty)}</div>`}
   </div>`;
+}
+
+// Which club found the fairway, in the room the Off-the-tee tile already had (Jack's ask,
+// Aug 30 2026): "we should add by club so we can see my driver percentage, 2 iron, any club
+// I'm hitting on par 4 or par 5s — not par three clubs, those are in greens hit."
+//
+// That exclusion is free rather than a filter: `fwN` only counts a hole that recorded a
+// fairway, and `fw` is omitted on par 3s by design (a par 3 has no fairway to hit, and its
+// tee shot IS the approach). So a club used only off par 3s has `fwN === 0` and never
+// appears here — which is the rule he stated, enforced by the shape of the data.
+//
+// Read straight off `scoreStats()`'s `tee` map, the same one the full table on Rounds uses,
+// so the tile and that table can never disagree about a club. Capped at four: the tile is a
+// glance, and the tile itself opens the full table.
+// Greens hit split by what was in his hands (Jack's ask, Aug 30 2026).
+//
+// THE UNION IS THE POINT. A shot at a green lives in one of two maps: `app` carries the
+// approach on a par 4 or 5, and `tee` carries a par 3 — where `TEE_OWNS` hands the green to
+// the tee club, because there the tee shot IS the approach. Reading only `app` would silently
+// drop every par 3, which is the half of this he asked to see counted here. Nothing is double
+// counted: a tee entry only earns `girN` when the hole is a par 3.
+//
+// THE PW SITS WITH THE IRONS — Jack's call, asked rather than guessed, because it is genuinely
+// ambiguous: it is part of the KING TEC 4–PW set AND it anchors the wedge ladder at 44°. The
+// wrong choice here would have looked exactly as authoritative as the right one.
+//
+// Rows are labelled by RANGE (`2i–PW`, `50–60°`) rather than "Irons"/"Wedges": the tile itself
+// is called Irons — AREA_LAB's word, which has to match Coach — and a row named Irons inside a
+// tile named Irons reads as a contradiction rather than a breakdown.
+const APPROACH_GROUP = k => /wedge$/.test(k) ? 'w' : (k === 'pw' || /iron$/.test(k)) ? 'i' : 'x';
+const APPROACH_LAB = { i:'2i–PW', w:'50–60°', x:'Woods' };
+function greenClubRows(st){
+  const g = { i:{ n:0, hit:0 }, w:{ n:0, hit:0 }, x:{ n:0, hit:0 } };
+  [...st.app.values(), ...st.tee.values()].forEach(e => {
+    if(!e.girN) return;
+    const b = g[APPROACH_GROUP(e.key)];
+    b.n += e.girN; b.hit += e.girHit;
+  });
+  const rows = ['i', 'w', 'x'].filter(k => g[k].n);
+  if(rows.length < 2) return '';   // one bucket is not a split, it is the headline again
+  return `<div class="tclub">${rows.map(k => `<div class="tcr">
+    <span class="tcn">${esc(APPROACH_LAB[k])}</span>
+    <span class="tcv">${Math.round(g[k].hit / g[k].n * 100)}%</span>
+    <span class="tcf">${g[k].hit}/${g[k].n}</span></div>`).join('')}</div>`;
+}
+function teeClubRows(st){
+  const rows = [...st.tee.values()].filter(e => e.fwN)
+    .sort((a, b) => b.fwN - a.fwN || b.fwHit - a.fwHit).slice(0, 4);
+  // One club is not a split — it would restate the headline underneath itself. Same guard
+  // the greens breakdown uses.
+  if(rows.length < 2) return '';
+  return `<div class="tclub">${rows.map(e => `<div class="tcr">
+    <span class="tcn">${esc(clubName(e.key))}</span>
+    <span class="tcv">${Math.round(e.fwHit / e.fwN * 100)}%</span>
+    <span class="tcf">${e.fwHit}/${e.fwN}</span></div>`).join('')}</div>`;
 }
 function theNumbers(){
   const C = areaCards();
@@ -1477,8 +1537,8 @@ function theNumbers(){
       <div class="big">${last ? esc(last.score) : '<span class="faint">—</span>'}</div>
       <div class="sub">${S.rounds.length} logged</div>
       <div class="trend" style="color:var(--btext)">${spark(scored.map(r => r.score), 24)}</div></div>
-    ${numTile(AREA_LAB.tee, 'rounds', A.tee, 'no tee shots logged yet')}
-    ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet')}
+    ${numTile(AREA_LAB.tee, 'rounds', A.tee, 'no tee shots logged yet', teeClubRows(st))}
+    ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet', greenClubRows(st))}
     ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet')}
   </div>
   <p class="sm faint" style="margin-top:8px">${C.cards.length ? `<b>Read off ${

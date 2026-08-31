@@ -732,6 +732,16 @@ body.night .buildtag{background:rgba(255,255,255,.06);border-color:rgba(255,255,
 .charttile .big{font-size:20px;font-weight:700;color:var(--gtext);margin:2px 0 4px}
 .charttile .sub{font-size:10.5px;color:var(--faint);font-family:var(--sans)}
 .charttile .trend{margin-top:auto;padding-top:6px}
+/* Which club found the fairway, inside the Off-the-tee tile. Three columns on one line each:
+   name, rate, and the raw count that keeps a 100% off one tee shot honest. Mono so the
+   percentages stack into a readable column at 9px. Sits after .sub — an optional band, so it
+   goes last and never between the number and its caption. */
+.tclub{margin-top:7px;padding-top:6px;border-top:1px solid var(--line)}
+.tcr{display:flex;align-items:baseline;gap:5px;font-family:var(--mono);font-size:9.5px;
+  line-height:1.5;color:var(--ink36)}
+.tcn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tcv{font-weight:700;color:var(--gtext)}
+.tcf{width:30px;text-align:right}
 .charttile svg{display:block;width:100%;margin-top:4px}
 /* A tile that opens the page behind its number. Not a button element — it sits in a grid
    and has to line up with the tiles that aren't tappable. */

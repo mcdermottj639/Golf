@@ -880,6 +880,29 @@ A tile with no data renders a dash and says what would fill it — never a zero 
 hidden tile, the same reason `sortCourses()` puts nulls last: absent and zero are different
 claims.
 
+**The two rate tiles break down by club** (Jack's ask, Aug 30 2026), in the room the tiles
+already had. Both read `scoreStats()`'s `tee` / `app` maps — the same maps behind the full
+tables on Rounds, so a tile and that table can never disagree about a club.
+
+- **Off the tee** — one row per club, by fairway rate, capped at four. **Par 3s are excluded
+  for free rather than by a filter**: `fwN` only counts a hole that recorded a fairway, and
+  `fw` is omitted on par 3s by design, so a club used only off par 3s has `fwN === 0` and
+  never appears. Jack's words: *"any club I'm hitting on par 4 or par 5s — not par three
+  clubs, those are in greens hit."*
+- **Irons** — grouped, and **the union is the point**: a shot at a green lives in `app` on a
+  par 4 or 5 and in `tee` on a par 3, where `TEE_OWNS` hands the green to the tee club because
+  there the tee shot IS the approach. Reading only `app` would silently drop every par 3.
+  Nothing double-counts — a tee entry earns `girN` only on a par 3.
+- **The PW is counted with the IRONS — Jack's call, asked rather than guessed.** It is
+  genuinely ambiguous (part of the KING TEC 4–PW set, and the 44° anchor of the wedge ladder),
+  which is exactly why it was worth one question: the wrong choice would have looked precisely
+  as authoritative as the right one.
+- Rows are labelled by **range** (`2i–PW`, `50–60°`, `Woods`), not "Irons"/"Wedges", because
+  the tile itself is called Irons — `AREA_LAB`'s word, which has to match Coach — and a row
+  named Irons inside a tile named Irons reads as a contradiction rather than a breakdown.
+- **One row is not a split**, in either tile: it would restate the headline underneath itself,
+  so both guard on `< 2` rows.
+
 **THE BANDS EVERY TILE HAS GO FIRST AND ADJACENT; THE OPTIONAL ONE GOES LAST.** Both grids
 follow it — `.stat` is value · label · `.sv`, `.charttile` is label · value · `.sub` ·
 `.trend` — each a flex column with only the LAST, optional band pushed down by
