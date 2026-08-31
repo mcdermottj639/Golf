@@ -862,7 +862,12 @@ that runs several screens on any lab with faults open, so picking a lab and ente
 separated by everything the hub had to say about it. The diagnosis is what you read INSTEAD
 of going in, not something to scroll past on the way; the selected tile is still a second
 door (it reads `OPEN LAB ›`), which is why the row can be plain rather than shouting.
-And **every lab page carries a `labBar()` across the top** — a `.segbar.labs` of all four,
+**A lab page reads: which lab · the cheat sheet · the routine · the plans · the diagnosis ·
+the film · the rest** (Jack's instruction, Aug 30 2026). The plans used to sit UNDER the
+diagnosis, so reaching a workshop log meant scrolling past every open fault and everything
+each was read off — several screens on Putting and Swing. Same principle as the hub's
+way-in, one level down: the plans are what you came to read, and the diagnosis is what they
+are built on. Mental already read this way and was left alone. And **every lab page carries a `labBar()` across the top** — a `.segbar.labs` of all four,
 so Putting → Short Game is one tap instead of a trip back through the hub. It has the same
 relationship to the jump bar that the Rounds segmented control does (which lab, then where
 inside it), which is why `buildJumpBar()` places itself after a `.segbar` and the order

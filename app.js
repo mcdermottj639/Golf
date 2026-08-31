@@ -100,13 +100,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v72';
+const BUILD = 'v73';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v73', d:'2026-08-30', items:[
+    'Your plans moved to the top of every lab, above the diagnosis. Reaching a workshop log meant scrolling past every open fault and everything it was read off \u2014 several screens on Putting and Swing. A lab now reads: which lab, the cheat sheet, the routine, the plans, then the diagnosis under them.' ] },
   { b:'v72', d:'2026-08-30', items:[
     'On the Labs hub, the way INTO the lab you picked now sits directly under the four tiles instead of at the very bottom of the page. Picking Putting and actually opening Putting were separated by the entire diagnosis \u2014 several screens on any lab with faults open. Picking a lab and going in is one motion.',
     'Every lab page now carries all four labs across the top, so you can go straight from Putting to Short Game without going back to the hub. Fixed order, always \u2014 Swing, Short, Putting, Mental \u2014 and the one you are already in is the lit one.' ] },
@@ -2200,15 +2202,15 @@ function swing(){
   ${cheatBtn('swing')}
   ${routineBlock(plans)}
 
-  ${diagnosisCard('swing', 'No swing faults on the card yet — send film and they land here.')}
-
-  <div class="card flat"><div class="linkrow" data-action="go" data-view="positions">
-    <span><b>📐 Swing Positions · visual guide</b><br><span class="sm">Body checkpoints, address → finish, with a slide-vs-clear hip diagram</span></span><span class="arr">→</span></div></div>
-
   ${other.length ? `<h2>Plans</h2>
   <div class="card">
     ${planLinks(other)}
   </div>` : ''}
+
+  ${diagnosisCard('swing', 'No swing faults on the card yet — send film and they land here.')}
+
+  <div class="card flat"><div class="linkrow" data-action="go" data-view="positions">
+    <span><b>📐 Swing Positions · visual guide</b><br><span class="sm">Body checkpoints, address → finish, with a slide-vs-clear hip diagram</span></span><span class="arr">→</span></div></div>
 
   <h2>Film room</h2>
   <div class="card">
@@ -2425,9 +2427,9 @@ function putting(){
   ${cheatBtn('putting')}
   ${routineBlock(plans)}
 
-  ${diagnosisCard('putting')}
-
   ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
+
+  ${diagnosisCard('putting')}
 
   <div class="card flat"><div class="linkrow" data-action="go" data-view="drills">
     <span><b>Training lives in Coach</b><br><span class="sm">${putDrills} putting drills you have the kit for — the drill bench keeps them all, with the streak</span></span><span class="arr">→</span></div></div>
@@ -3476,6 +3478,9 @@ function shortgame(){
   ${cheatBtn('short-game')}
   ${routineBlock(plans)}
 
+  ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>`
+    : `<h2>Plans</h2><div class="card"><p class="sm">No short-game plan yet — ask Claude for one and it lands here.</p></div>`}
+
   ${a.holes ? `<div class="rowgrid g3">
     <div class="stat"><div class="v">${pc(a.gir, a.holes)}%</div><div class="l">Greens hit</div></div>
     <div class="stat"><div class="v">${pc(a.saved, a.chances)}%</div><div class="l">Up &amp; down</div></div>
@@ -3490,9 +3495,6 @@ function shortgame(){
     <p class="sm">Nothing logged yet. Every green you mark missed on a live round — and where it finished — lands here as scrambling data.</p></div>`}
 
   ${diagnosisCard('short-game', 'No short-game faults on the card yet. Log a few rounds with green misses, or send chipping film, and they land here.')}
-
-  ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>`
-    : `<h2>Plans</h2><div class="card"><p class="sm">No short-game plan yet — ask Claude for one and it lands here.</p></div>`}
 
   <h2>Film room</h2>
   <div class="card">
@@ -3521,6 +3523,13 @@ const LABS = [
   { view:'putting',   disc:'putting',     ic:'◎', name:'Putting',     short:'Putting', sub:'Stroke, pace and the short ones.' },
   { view:'mental',    disc:'mental',      ic:'🧠', name:'Mental',      short:'Mental', sub:'Staying locked in — decided off the course.' },
 ];
+// THE PLANS SIT DIRECTLY UNDER THE ROUTINE, ABOVE THE DIAGNOSIS (Jack's instruction,
+// Aug 30 2026) — same reason the hub's way-in moved up, one level down. The plans are what
+// you came to READ; the diagnosis is what they are built on, and on any lab with faults
+// open it is several screens of reading between the top of the page and the workshop log.
+// A lab's order is now: which lab · the cheat sheet · the routine · the plans · the
+// diagnosis · the film · the rest. Mental already read this way and was left alone.
+//
 // The lab switcher, at the top of every lab (Jack's instruction, Aug 30 2026). Before
 // this, moving from Putting to Short Game meant going back to the hub and picking again —
 // two taps and a page you did not want, on the four pages most likely to be read one after
