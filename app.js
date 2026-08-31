@@ -100,13 +100,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v80';
+const BUILD = 'v81';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v81', d:'2026-08-30', items:[
+    'Fixed what v80 broke on OFF THE TEE. Lining the captions up had pushed that one to the bottom of its card, leaving a gap between the 36% and the word under it \u2014 which is what a broken card looks like. The caption sits under its number again, the trend line on ROUND SCORES moved to the bottom edge, and all three text lines still line up across the row.' ] },
   { b:'v80', d:'2026-08-30', items:[
     'The numbers lines up properly now. COURSES has no second number, so its label was sitting where the other three had theirs \u2014 the row read as four cards at three different heights. Value, label and the small figure are now three fixed bands across the whole row, and UP & DOWN fits on one line on a narrow phone instead of wrapping.',
     'Same fix on the four tiles below: ROUND SCORES carries a trend line and OFF THE TEE does not, which had left their caption lines 34px apart. Both captions sit on the same baseline now.' ] },
@@ -1473,8 +1475,8 @@ function theNumbers(){
     <div class="charttile opens" data-action="go" data-view="rounds" data-seg="cards">
       <div class="lab">Round scores</div>
       <div class="big">${last ? esc(last.score) : '<span class="faint">—</span>'}</div>
-      <div style="color:var(--btext)">${spark(scored.map(r => r.score))}</div>
-      <div class="sub">${S.rounds.length} logged</div></div>
+      <div class="sub">${S.rounds.length} logged</div>
+      <div class="trend" style="color:var(--btext)">${spark(scored.map(r => r.score), 24)}</div></div>
     ${numTile(AREA_LAB.tee, 'rounds', A.tee, 'no tee shots logged yet')}
     ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet')}
     ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet')}

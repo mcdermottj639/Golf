@@ -720,15 +720,18 @@ body.night .buildtag{background:rgba(255,255,255,.06);border-color:rgba(255,255,
 @media (max-width:360px){
   .badge{font-size:9px;letter-spacing:.12em;padding:4px 8px}
 }
-/* Same three-band rule as .stat: the caption line goes to the bottom of the card so it lines
-   up with its neighbour's, whether or not this tile carries a sparkline between. Round scores
-   has one and Off the tee does not, which left their sub-lines 34px apart. */
+/* Label, value and caption in three bands that line up across the row, and the OPTIONAL
+   sparkline last, pushed to the bottom edge by margin-top:auto. The caption must sit directly
+   under its number: bottom-aligning it instead opened a hole in the middle of any tile with
+   no sparkline, which is exactly what a broken card looks like. Slack belongs at the card's
+   bottom edge, where it reads as nothing at all. */
 .charttile{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
-  border-radius:var(--r);padding:12px 13px;display:flex;flex-direction:column}
+  border-radius:var(--r);padding:12px 13px 11px;display:flex;flex-direction:column}
 .charttile .lab{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);
   font-family:var(--sans);font-weight:700}
 .charttile .big{font-size:20px;font-weight:700;color:var(--gtext);margin:2px 0 4px}
-.charttile .sub{font-size:10.5px;color:var(--faint);font-family:var(--sans);margin-top:auto;padding-top:5px}
+.charttile .sub{font-size:10.5px;color:var(--faint);font-family:var(--sans)}
+.charttile .trend{margin-top:auto;padding-top:6px}
 .charttile svg{display:block;width:100%;margin-top:4px}
 /* A tile that opens the page behind its number. Not a button element — it sits in a grid
    and has to line up with the tiles that aren't tappable. */
