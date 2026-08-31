@@ -100,13 +100,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v71';
+const BUILD = 'v72';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v72', d:'2026-08-30', items:[
+    'On the Labs hub, the way INTO the lab you picked now sits directly under the four tiles instead of at the very bottom of the page. Picking Putting and actually opening Putting were separated by the entire diagnosis \u2014 several screens on any lab with faults open. Picking a lab and going in is one motion.',
+    'Every lab page now carries all four labs across the top, so you can go straight from Putting to Short Game without going back to the hub. Fixed order, always \u2014 Swing, Short, Putting, Mental \u2014 and the one you are already in is the lit one.' ] },
   { b:'v71', d:'2026-08-30', items:[
     'The app now keeps YOUR calendar day, not the server\u2019s. It was reading the clock in UTC, so from 8pm Eastern onwards it believed it was already tomorrow \u2014 a round finished on a Sunday evening saved itself as Monday, a drill logged at nine went on the wrong day of the streak, and What\u2019s landed stopped saying "today" hours before your day was over.',
     'Nothing already saved was changed. If a card or a drill is sitting on the wrong date from an evening before this, tell me which and I will move it.' ] },
@@ -2193,6 +2196,7 @@ function swing(){
   const plans = plansFor('swing');
   const other = plans.filter(b => !isRoutine(b));
   return `
+  ${labBar('swing')}
   ${cheatBtn('swing')}
   ${routineBlock(plans)}
 
@@ -2417,6 +2421,7 @@ function putting(){
   const plans = plansFor('putting');
   const other = plans.filter(b => !isRoutine(b));
   return `
+  ${labBar('putting')}
   ${cheatBtn('putting')}
   ${routineBlock(plans)}
 
@@ -2702,6 +2707,7 @@ function mental(){
   const worst = v.every(x => x != null) ? v.indexOf(Math.max(...v)) : -1;
   const THIRD = ['Opening third', 'Middle third', 'Closing third'];
   return `
+  ${labBar('mental')}
   ${cheatBtn('mental')}
   ${next ? `<div class="card">
     <h2>Next round · one job</h2>
@@ -3466,6 +3472,7 @@ function shortgame(){
   const missRow = Object.entries(a.miss).sort((x,y) => y[1]-x[1])
     .map(([k,v]) => `${v} ${MISS_LAB[k] || k}`).join(' · ');
   return `
+  ${labBar('short-game')}
   ${cheatBtn('short-game')}
   ${routineBlock(plans)}
 
@@ -3514,6 +3521,23 @@ const LABS = [
   { view:'putting',   disc:'putting',     ic:'◎', name:'Putting',     short:'Putting', sub:'Stroke, pace and the short ones.' },
   { view:'mental',    disc:'mental',      ic:'🧠', name:'Mental',      short:'Mental', sub:'Staying locked in — decided off the course.' },
 ];
+// The lab switcher, at the top of every lab (Jack's instruction, Aug 30 2026). Before
+// this, moving from Putting to Short Game meant going back to the hub and picking again —
+// two taps and a page you did not want, on the four pages most likely to be read one after
+// another. Same idiom as the Rounds segmented control, and the same relationship to the
+// jump bar underneath it: the segments say WHICH lab you are in, the jump bar says where
+// you are inside it, so buildJumpBar() puts itself after this and the order can't invert.
+//
+// FIXED ORDER, always — LABS order, the same standing instruction the hub follows. A bar
+// that reordered itself would defeat the muscle memory that is the entire reason it is
+// here. The lab you are already in is inert rather than a link: it is a state, not a
+// destination, and a tap that reloads the page you are on reads as a dead control.
+function labBar(disc){
+  return `<div class="segbar labs">${LABS.map(l => l.disc === disc
+    ? `<button class="seg on" aria-current="page">${esc(l.short)}</button>`
+    : `<button class="seg" data-action="go" data-view="${l.view}">${esc(l.short)}</button>`
+  ).join('')}</div>`;
+}
 function labRow(l, last){
   const open = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;
   const plans = plansFor(l.disc).length;
@@ -3579,6 +3603,14 @@ function faultRows(disc){
 // used to sit at the bottom of this list; it lives in Rounds now, beside the cards its
 // plans get judged against. This page is the game you are working on, not the round you
 // are about to play.
+//
+// THE WAY INTO THE LAB SITS DIRECTLY UNDER THE GRID (Jack's instruction, Aug 30 2026). It
+// was the last thing on the page, under a diagnosis that runs several screens on any lab
+// with faults open — so picking Putting and then actually opening Putting were separated
+// by everything the hub had to say about it. Picking a lab and entering it are one motion;
+// the diagnosis is what you read INSTEAD of going in, not something to scroll past on the
+// way. The selected tile is still a second door (it reads OPEN LAB ›), which is why this
+// row can be plain rather than shouting.
 // Which lab the hub is showing. View-local state, like `roundsSeg`: which face of the hub
 // you last looked at is a property of the page, not of the player, so it is a module
 // variable and never saved. Switching is a rerender() — you have not gone anywhere.
@@ -3598,6 +3630,12 @@ function game(){
       <span class="nm">${esc(l.name)}</span>
       <span class="sb">${esc(l.sub)}</span></button>`; }).join('')}</div>
 
+  <div class="card flat">
+    <div class="linkrow" data-action="go" data-view="${cur.view}" style="border-bottom:none">
+      <span><b>Open the ${esc(cur.name)} lab</b><br><span class="sm">The film room, the plans,
+        and everything this diagnosis is built on</span></span><span class="arr">→</span></div>
+  </div>
+
   <div class="card">
     ${fold('game-diag', 'Diagnosis', `${cur.name.toUpperCase()} · ${
       open ? `${open} OPEN FAULT${open === 1 ? '' : 'S'}` : 'NOTHING OPEN'}`, faultRows(cur.disc))}
@@ -3610,12 +3648,6 @@ function game(){
     <div class="card tu"><div class="rdl">Standing plans</div>
       <b>${plans || '—'}</b>
       <span>${plans ? 'sliced by situation' : 'none written yet'}</span></div>
-  </div>
-
-  <div class="card flat">
-    <div class="linkrow" data-action="go" data-view="${cur.view}" style="border-bottom:none">
-      <span><b>Open the ${esc(cur.name)} lab</b><br><span class="sm">The film room, the plans,
-        and everything this diagnosis is built on</span></span><span class="arr">→</span></div>
   </div>`;
 }
 

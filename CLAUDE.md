@@ -856,6 +856,18 @@ Putting · Mental now sit behind a single `Game` tab** (`game()` — the hub). `
 `render()` maps every lab view back to the `game` button so it stays lit. Adding a fifth lab
 costs nothing in the nav.
 
+**Two changes on Aug 30 2026, both Jack's.** On the hub, the **"Open the ⟨lab⟩ lab" row sits
+directly under the four tiles**, not at the bottom of the page — it was below a diagnosis
+that runs several screens on any lab with faults open, so picking a lab and entering it were
+separated by everything the hub had to say about it. The diagnosis is what you read INSTEAD
+of going in, not something to scroll past on the way; the selected tile is still a second
+door (it reads `OPEN LAB ›`), which is why the row can be plain rather than shouting.
+And **every lab page carries a `labBar()` across the top** — a `.segbar.labs` of all four,
+so Putting → Short Game is one tap instead of a trip back through the hub. It has the same
+relationship to the jump bar that the Rounds segmented control does (which lab, then where
+inside it), which is why `buildJumpBar()` places itself after a `.segbar` and the order
+can't invert. The lab you are in is inert rather than a link: a state, not a destination.
+
 **The hub order is FIXED and must stay that way** (standing instruction, Aug 14 2026): Swing ·
 Short Game · Putting · Mental, top down — i.e. `LABS` order. It used to float the last-opened
 lab into a "Pick up where you were" block at the top (`S.settings.lastLab`, now removed); Jack

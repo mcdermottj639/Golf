@@ -552,6 +552,12 @@ body.night .fold{border-top-color:rgba(255,255,255,.1)}
   font-family:var(--sans);font-size:12.5px;font-weight:600;
   border:1px solid var(--ink18);background:var(--card);color:var(--ink)}
 .seg.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+/* Four labs where Rounds has three, so the segments give back a little width. Checked at
+   320px, the narrowest phone: 288px of content, 6px gaps, 67px a segment — "Putting" is
+   the widest label and clears it. */
+.segbar.labs{gap:6px}
+.segbar.labs .seg{font-size:11.5px}
+.segbar.labs .seg.on{cursor:default}
 .seg:active{transform:translateY(1px)}
 body.night .seg{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
 body.night .seg.on{background:var(--green);border-color:var(--green);color:var(--green-ink)}
