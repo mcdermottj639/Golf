@@ -165,7 +165,7 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
 
 | Slot | Club | Notes |
 |------|------|-------|
-| Driver | TaylorMade Stealth 2 · 9° | |
+| Driver | **TaylorMade Stealth 2 Plus · 9°** | **Model corrected Aug 31 2026** — logged as a standard Stealth 2 since Jun 15, but the sole carries the heel-to-toe **FADE/DRAW sliding weight**, which only the *Plus* has (the standard head has 25g fixed in the Inertia Generator, no track; the HD is heel-shifted). The slider is stamped **10g** and a Stealth 2 Plus ships 15g, so either the optional lighter weight is fitted or the head is an original Stealth Plus — unresolved, and it only changes how much bias is on tap. **Shaft: Project X LZ 5.5 · REGULAR**, on an SLDR-era adapter, bought Jun 2 2026, replacing a stiff one. Jack's read, *unmeasured*: ~15 yds longer, much less curve, a straight ball that now **misses both ways**. Four build facts still unknown and all readable off the club: the **sleeve's current setting** (rebuilt with an aftermarket adapter, so 9° square is an assumption), playing **length**, and the shaft's **weight/torque** (printed on the band). Ladder still reads **235** — predates the shaft, left alone on purpose. The fade lever here is the **slider, never the loft**: see *Swing — The Workshop Log*, Aug 31 |
 | 5-wood | **Cobra Darkspeed X · 16.5°** | bumped DOWN from stock; back in Aug 12 2026 after a year out, taking the mini driver's fairway-finder slot. **Carry unmeasured** — and at 16.5° it sits ~0.5° off the 2-iron utility, so whether both belong in the bag is an open question |
 | Utility | Cobra KING TEC 2-iron · ~17° | |
 | Irons | Cobra KING TEC 4–PW | **44° PW** anchors the wedge ladder |
