@@ -826,6 +826,15 @@ it is exactly how Jack came to ask why they had all changed since the last updat
 that moves for a good reason still has to say what the reason was** — put the provenance line
 on the block, not just on Coach, any time these numbers are rendered somewhere new.
 
+**`AREA_LAB.app` is "Into the green", not "Irons"** (Jack, Aug 30 2026). The area was named
+for the club usually in hand, but it is every shot AT a green — a wood into a par 5 and a
+wedge from 90 are both in it, which the by-club breakdown made plain the moment it rendered a
+Woods row under a heading saying Irons. **Renamed in `AREA_LAB` rather than on Today**, so
+Coach and Today stay one vocabulary instead of growing a second name for one number; it also
+matches `clubTables()`, whose table has always been "Into the green · by club". When a label
+turns out to be wrong, fix it at the shared source — a local override is how one number ends
+up with two names.
+
 **It is a READER, never a fifth tally.** Three tiles and both recovery stats come from
 `gameAreas()` / `scoreStats()` / `shortGameStats()` through **`areaCards()`** — the card-set
 choice extracted out of `coach()` so Today and Coach cannot quote different percentages for
@@ -889,17 +898,22 @@ tables on Rounds, so a tile and that table can never disagree about a club.
   `fw` is omitted on par 3s by design, so a club used only off par 3s has `fwN === 0` and
   never appears. Jack's words: *"any club I'm hitting on par 4 or par 5s — not par three
   clubs, those are in greens hit."*
-- **Irons** — grouped, and **the union is the point**: a shot at a green lives in `app` on a
+- **Into the green** — grouped, and **the union is the point**: a shot at a green lives in `app` on a
   par 4 or 5 and in `tee` on a par 3, where `TEE_OWNS` hands the green to the tee club because
   there the tee shot IS the approach. Reading only `app` would silently drop every par 3.
   Nothing double-counts — a tee entry earns `girN` only on a par 3.
-- **The PW is counted with the IRONS — Jack's call, asked rather than guessed.** It is
-  genuinely ambiguous (part of the KING TEC 4–PW set, and the 44° anchor of the wedge ladder),
-  which is exactly why it was worth one question: the wrong choice would have looked precisely
-  as authoritative as the right one.
-- Rows are labelled by **range** (`2i–PW`, `50–60°`, `Woods`), not "Irons"/"Wedges", because
-  the tile itself is called Irons — `AREA_LAB`'s word, which has to match Coach — and a row
-  named Irons inside a tile named Irons reads as a contradiction rather than a breakdown.
+- **Four buckets in club order** — `Woods · 2i–5i · 6i–PW · 50–60°`, a fixed ladder
+  (`APPROACH_ORDER`) like `PUTT_DIST`, never sorted by volume. Long and short irons are split
+  because they are not the same shot: a 4-iron from 200 and a 9-iron from 140 have no business
+  sharing a hit rate, and lumping them hid the comparison the row exists to make. A bucket with
+  no attempts does not render, so **Woods appears by itself the first time he goes at a green
+  with one** and is invisible until then.
+- **The PW is counted with the IRONS (`6i–PW`) — Jack's call, asked rather than guessed.** It
+  is genuinely ambiguous (part of the KING TEC 4–PW set, and the 44° anchor of the wedge
+  ladder), which is exactly why it was worth one question: the wrong choice would have looked
+  precisely as authoritative as the right one.
+- Rows are labelled by **range**, not "Irons"/"Wedges" — they are a breakdown of the tile
+  above, not a competing name for it.
 - **Putting** — make rate by the distance the putt was struck from, off `st.putts.dist`
   (`bagPutt()`'s ladder). `att` is putts STRUCK from a range and `made` is putts holed from
   it: **a rate per putt, not per hole**, which is the whole reason the logger records the made

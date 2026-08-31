@@ -100,13 +100,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v83';
+const BUILD = 'v84';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v84', d:'2026-08-30', items:[
+    'IRONS is now INTO THE GREEN \u2014 on Coach as well as Today, so it is one name and not two. The tile was named for the club usually in your hand, but the area is every shot at a green: a wood into a par 5 and a wedge from 90 are both in it, which the Woods row made obvious.',
+    'Its breakdown splits four ways in club order: Woods, 2i\u20135i, 6i\u2013PW, 50\u201360\u00b0. Long and short irons were sharing one hit rate, and a 4-iron from 200 and a 9-iron from 140 are not the same shot \u2014 lumping them hid the comparison the row exists to make.',
+    'The Woods line only appears once you actually go at a green with one, so it stays out of the way until it has something to say.' ] },
   { b:'v83', d:'2026-08-30', items:[
     'PUTTING now breaks down the same way as the other two \u2014 your make rate by the distance you struck the putt from, in a ladder: inside 3, 4\u20136, 7\u201312 and so on, showing the four ranges you have played most.',
     'It says something before that data exists, which is the point of adding it now: until two ranges carry a putt it tells you to tap the distance on the green, so the space is an instruction rather than a hole in the card.',
@@ -1485,11 +1489,23 @@ function numTile(lab, view, a, empty, extra){
 // ambiguous: it is part of the KING TEC 4–PW set AND it anchors the wedge ladder at 44°. The
 // wrong choice here would have looked exactly as authoritative as the right one.
 //
-// Rows are labelled by RANGE (`2i–PW`, `50–60°`) rather than "Irons"/"Wedges": the tile itself
-// is called Irons — AREA_LAB's word, which has to match Coach — and a row named Irons inside a
-// tile named Irons reads as a contradiction rather than a breakdown.
-const APPROACH_GROUP = k => /wedge$/.test(k) ? 'w' : (k === 'pw' || /iron$/.test(k)) ? 'i' : 'x';
-const APPROACH_LAB = { i:'2i–PW', w:'50–60°', x:'Woods' };
+// FOUR BUCKETS IN CLUB ORDER, Jack's split: woods · 2i–5i · 6i–PW · 50–60°. Long and short
+// irons are separated because they are not the same shot — a 4-iron from 200 and a 9-iron from
+// 140 have no business sharing a hit rate, and lumping them hid exactly the comparison the row
+// exists to make. Labelled by RANGE rather than "Irons"/"Wedges" so they read as a breakdown
+// of the tile above rather than as a competing name for it.
+//
+// The PW sits with the SHORT irons (`6i–PW`) — Jack's call, and the same one he made when
+// asked directly: grouped with the irons, not the wedges.
+const APPROACH_GROUP = k => {
+  if(/wedge$/.test(k)) return 'w';
+  const m = /^(\d+)-iron$/.exec(k);
+  if(m) return +m[1] <= 5 ? 'l' : 's';
+  return k === 'pw' ? 's' : 'x';
+};
+const APPROACH_LAB = { x:'Woods', l:'2i–5i', s:'6i–PW', w:'50–60°' };
+// Longest club to shortest, always — a fixed ladder like PUTT_DIST, never sorted by volume.
+const APPROACH_ORDER = ['x', 'l', 's', 'w'];
 // Putts MADE, by the distance he struck them from (Jack's ask, Aug 30 2026) — and it renders
 // something before that data exists, which is the point of adding it now: the tile otherwise
 // just has a hole in it, and a hole explains nothing. Until two ranges carry an attempt it
@@ -1513,13 +1529,13 @@ function puttMadeRows(st){
     <span class="tcf">${e.made}/${e.att}</span></div>`).join('')}</div>`;
 }
 function greenClubRows(st){
-  const g = { i:{ n:0, hit:0 }, w:{ n:0, hit:0 }, x:{ n:0, hit:0 } };
+  const g = Object.fromEntries(APPROACH_ORDER.map(k => [k, { n:0, hit:0 }]));
   [...st.app.values(), ...st.tee.values()].forEach(e => {
     if(!e.girN) return;
     const b = g[APPROACH_GROUP(e.key)];
     b.n += e.girN; b.hit += e.girHit;
   });
-  const rows = ['i', 'w', 'x'].filter(k => g[k].n);
+  const rows = APPROACH_ORDER.filter(k => g[k].n);
   if(rows.length < 2) return '';   // one bucket is not a split, it is the headline again
   return `<div class="tclub">${rows.map(k => `<div class="tcr">
     <span class="tcn">${esc(APPROACH_LAB[k])}</span>
@@ -3074,7 +3090,13 @@ function coachSignals(){
 // showing the number on its own. When there are enough live rounds to compare against each
 // other, that is the comparison worth building.
 const AREAS = ['tee', 'app', 'short', 'putt'];
-const AREA_LAB = { tee:'Off the tee', app:'Irons', short:'Short game', putt:'Putting' };
+// `app` is INTO THE GREEN, not "Irons" (Jack, Aug 30 2026). It was named for the club he
+// usually has in hand, but the area is every shot at a green — a wood into a par 5 and a wedge
+// from 90 are both in it, and the by-club breakdown made that plain the moment it rendered a
+// Woods row under a heading saying Irons. Renamed HERE rather than on Today so Coach and Today
+// stay one vocabulary; it also matches `clubTables()`, whose table has always been called
+// "Into the green · by club".
+const AREA_LAB = { tee:'Off the tee', app:'Into the green', short:'Short game', putt:'Putting' };
 // Which area a ranked finding belongs to. Written down rather than inferred, and it admits
 // gaps: a finding about doubles or the opening hole belongs to no single area, and one that
 // maps nowhere simply highlights no tile. Same rule as FOCUS_TAG — a wrong join reads
