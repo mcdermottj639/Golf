@@ -880,8 +880,8 @@ A tile with no data renders a dash and says what would fill it — never a zero 
 hidden tile, the same reason `sortCourses()` puts nulls last: absent and zero are different
 claims.
 
-**The two rate tiles break down by club** (Jack's ask, Aug 30 2026), in the room the tiles
-already had. Both read `scoreStats()`'s `tee` / `app` maps — the same maps behind the full
+**All three rate tiles break down** (Jack's ask, Aug 30 2026), in the room the tiles already
+had. Both read `scoreStats()`'s `tee` / `app` maps — the same maps behind the full
 tables on Rounds, so a tile and that table can never disagree about a club.
 
 - **Off the tee** — one row per club, by fairway rate, capped at four. **Par 3s are excluded
@@ -900,8 +900,19 @@ tables on Rounds, so a tile and that table can never disagree about a club.
 - Rows are labelled by **range** (`2i–PW`, `50–60°`, `Woods`), not "Irons"/"Wedges", because
   the tile itself is called Irons — `AREA_LAB`'s word, which has to match Coach — and a row
   named Irons inside a tile named Irons reads as a contradiction rather than a breakdown.
-- **One row is not a split**, in either tile: it would restate the headline underneath itself,
-  so both guard on `< 2` rows.
+- **Putting** — make rate by the distance the putt was struck from, off `st.putts.dist`
+  (`bagPutt()`'s ladder). `att` is putts STRUCK from a range and `made` is putts holed from
+  it: **a rate per putt, not per hole**, which is the whole reason the logger records the made
+  putt and the first putt separately. Rows stay in `PUTT_DIST` order because these are a
+  ladder — the cap picks the four busiest ranges and then puts them BACK in distance order, so
+  it never reads as a top-four chart.
+- **One row is not a split**, in any of the three: it would restate the headline underneath
+  itself, so they all guard on `< 2` rows.
+- **Putting's empty state is an instruction, not a blank** (`.tcr.tcnote`). Until two ranges
+  carry a putt it says to tap the distance on the green. That is why it was worth building
+  before the data exists — Jack's words were "add it for once we start getting that stat", and
+  a tile with an unexplained hole in it teaches nothing. Prefer this over a hidden section
+  anywhere a breakdown is waiting on logging he has to do.
 
 **THE BANDS EVERY TILE HAS GO FIRST AND ADJACENT; THE OPTIONAL ONE GOES LAST.** Both grids
 follow it — `.stat` is value · label · `.sv`, `.charttile` is label · value · `.sub` ·

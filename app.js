@@ -100,13 +100,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v82';
+const BUILD = 'v83';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v83', d:'2026-08-30', items:[
+    'PUTTING now breaks down the same way as the other two \u2014 your make rate by the distance you struck the putt from, in a ladder: inside 3, 4\u20136, 7\u201312 and so on, showing the four ranges you have played most.',
+    'It says something before that data exists, which is the point of adding it now: until two ranges carry a putt it tells you to tap the distance on the green, so the space is an instruction rather than a hole in the card.',
+    'That rate is per PUTT STRUCK, not per hole \u2014 a two-putt records one you missed and one you holed, both with distances, which is exactly why the logger asks for the made putt and the first putt separately.' ] },
   { b:'v82', d:'2026-08-30', items:[
     'OFF THE TEE now breaks down by club in the room it had spare \u2014 driver, 2-iron, whatever you hit, with the fairway rate and the raw count beside each. Par 3s are left out of it exactly as you said: a par 3 has no fairway, so a club used only there never appears.',
     'IRONS splits the same way, by what was in your hands: 2i\u2013PW, 50\u201360\u00b0, and Woods when you go at a green with one. Par-3 tee shots ARE counted here \u2014 on a par 3 the tee shot is the approach, so that is where the green belongs.',
@@ -1486,6 +1490,28 @@ function numTile(lab, view, a, empty, extra){
 // tile named Irons reads as a contradiction rather than a breakdown.
 const APPROACH_GROUP = k => /wedge$/.test(k) ? 'w' : (k === 'pw' || /iron$/.test(k)) ? 'i' : 'x';
 const APPROACH_LAB = { i:'2i–PW', w:'50–60°', x:'Woods' };
+// Putts MADE, by the distance he struck them from (Jack's ask, Aug 30 2026) — and it renders
+// something before that data exists, which is the point of adding it now: the tile otherwise
+// just has a hole in it, and a hole explains nothing. Until two ranges carry an attempt it
+// says what to tap on the green to fill it, so the empty state is an instruction rather than
+// an absence.
+//
+// `st.putts.dist` is `bagPutt()`'s ladder: `att` is putts STRUCK from that range and `made` is
+// putts holed from it — a rate per putt, not per hole, which is the whole reason the live
+// logger records the made putt and the first putt separately. Rows stay in PUTT_DIST order
+// because these are a ladder; the cap picks the four busiest ranges and then puts them back
+// in distance order, so it never reads as a top-four chart.
+function puttMadeRows(st){
+  if(!st.putts.holes) return '';
+  const rows = PUTT_DIST.map(d => ({ d, e:st.putts.dist.get(d.k) })).filter(x => x.e && x.e.att);
+  if(rows.length < 2) return `<div class="tclub"><div class="tcr tcnote">Tap how long each putt
+    was on the green and your make rate by distance fills in here.</div></div>`;
+  const keep = new Set(rows.slice().sort((a, b) => b.e.att - a.e.att).slice(0, 4).map(x => x.d.k));
+  return `<div class="tclub">${rows.filter(x => keep.has(x.d.k)).map(({ d, e }) => `<div class="tcr">
+    <span class="tcn">${esc(d.lab)} ft</span>
+    <span class="tcv">${Math.round(e.made / e.att * 100)}%</span>
+    <span class="tcf">${e.made}/${e.att}</span></div>`).join('')}</div>`;
+}
 function greenClubRows(st){
   const g = { i:{ n:0, hit:0 }, w:{ n:0, hit:0 }, x:{ n:0, hit:0 } };
   [...st.app.values(), ...st.tee.values()].forEach(e => {
@@ -1539,7 +1565,7 @@ function theNumbers(){
       <div class="trend" style="color:var(--btext)">${spark(scored.map(r => r.score), 24)}</div></div>
     ${numTile(AREA_LAB.tee, 'rounds', A.tee, 'no tee shots logged yet', teeClubRows(st))}
     ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet', greenClubRows(st))}
-    ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet')}
+    ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet', puttMadeRows(st))}
   </div>
   <p class="sm faint" style="margin-top:8px">${C.cards.length ? `<b>Read off ${
     C.ev === 'live'

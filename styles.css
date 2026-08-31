@@ -742,6 +742,9 @@ body.night .buildtag{background:rgba(255,255,255,.06);border-color:rgba(255,255,
 .tcn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tcv{font-weight:700;color:var(--gtext)}
 .tcf{width:30px;text-align:right}
+/* The empty state of a breakdown: an instruction, not a blank. Wraps, so it drops the
+   single-line flex rules the data rows use. */
+.tcr.tcnote{display:block;font-family:var(--sans);font-size:10px;line-height:1.4;color:var(--faint)}
 .charttile svg{display:block;width:100%;margin-top:4px}
 /* A tile that opens the page behind its number. Not a button element — it sits in a grid
    and has to line up with the tiles that aren't tappable. */
