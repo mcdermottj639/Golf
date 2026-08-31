@@ -493,8 +493,10 @@ one slot** — tapping either clears the other, because the hole ended one way o
 
 The prep card at the top of a live hole is a **tee-box read**; the scoring chips are a
 between-shots one. Once he has played the hole, the plan is just pushing the chips down
-the screen — so tapping its header folds it away (`live-intel` → `h.intelShut`, UI state
-on `S.live` that never reaches the saved card).
+the screen — so tapping its header folds it away (`live-intel` → `h.intelOpen`, UI state
+on `S.live` that never reaches the saved card). The flag is `intelOpen` and not `intelShut`:
+the sense inverted when the card started life collapsed, and this file said `intelShut`
+until Aug 31 2026.
 
 **It starts collapsed** (Jack's call, Aug 20) and opens with a tap, per hole and not
 sticky. That is only safe because **shut is not empty**: the header keeps the one line to
@@ -512,6 +514,11 @@ before touching `livePlay()`:
   beside it, a `Finish` button (`live-finish` — the same route the last hole's Next button
   takes, so the troubles still come pre-ticked off the card), the par picker and the Card
   link, the hole strip, and the footer line `THRU n · +n` with a **pulsing ● SAVED**.
+  **Compacted Aug 31 2026 — see the section below.** `.lvhn` is 30px (was 38) and carries
+  `white-space:nowrap`, because at 38px `Hole N` wrapped onto two lines and `.lvhr` cost
+  88px instead of 44. The header is STICKY, so a pixel here is a pixel on all eighteen
+  holes — keep that row on ONE line, and re-measure at 320/375/390 with `Hole 18` if you
+  touch the type, the button padding or the `PAR n · SI n` group.
 - **The pulse is the save receipt.** Every tap writes `S.live` to localStorage before the
   screen redraws, and this is the only thing on the phone that says so. Don't make it a
   static label — a static label reads as decoration.
@@ -540,6 +547,51 @@ before touching `livePlay()`:
   **not** on `S.live`, because nothing about an animation belongs in the round.
 - **The logger still gets NO `fold()` sections.** It already hides what cannot exist yet;
   the hole-prep card's own collapse (above) is the one disclosure control on the screen.
+
+### The hole screen fits on one screen (Aug 31 2026 — Jack's asks)
+
+Jack, on a hole he had just finished: *"I have to scroll down for the hole 4 option."* Then
+*"bring the collapsed hole prep back up since we have room now and put it above tee club"*,
+*"all this can be moved to the bottom"* (the paragraph explaining the chips), and
+*"make the header smaller"*.
+
+**The order in `livePlay()` is now: header · prep · Full card/Quick view switch · the rows ·
+Back/Next · Pause & Discard · the explainer paragraph.** Two of those moved and the reasoning
+is worth keeping:
+
+- **The prep goes ABOVE the rows**, which is where `styles.css` had always said it belonged
+  (*"read with a club already in your hand, so it sits above the card and ahead of the
+  taps"*) — the markup had drifted from its own comment. It also makes the `.lvseg` comment
+  true again: the switch really does sit under the hole's prep now.
+- **Back/Next moved above the explainer paragraph**, and the paragraph went to the very
+  bottom. It is onboarding copy; after a few rounds it is just 97px between the card and the
+  button he actually needs.
+
+**THE FOLD IS THE POINT, and only a simulated phone can prove it** — the same trap as the
+Today numbers block. Reordering alone left `.lvnext` 37–49px BELOW the nav; the space had to
+come from somewhere, and Jack's answer was the header. What it bought, at 390px:
+
+| | before | after |
+|---|---|---|
+| `.lvhr` (the `Hole N` row) | 88px — two lines | **44px — one line** |
+| `.lvhead` total | 188 + 13 margin | **133 + 10 margin** |
+| headroom under the nav | −49px (15 Pro) | **+21px** |
+
+Everything else came from padding and gaps only — `.lvhead`, `.lvbars`, `.holeintel`,
+`.lvseg` and `.lvfoot` each gave back 2–6px. **No chip, button or row lost height**: every
+tap target on the screen is still ≥44px, which is asserted rather than assumed.
+
+**What "above the fold" means here is QUICK VIEW on a hole he has finished** — that is the
+screen Jack was on. Verified at 320/375/390 across the 13 mini, 13/14 and 15 Pro insets.
+**Full card mode does NOT fit and is not meant to**: it is a full-height form, ~690px past
+the fold, and no padding trim reaches that. If Next ever has to be reachable there too, that
+is a sticky footer and a different decision — do not try to win it back in padding.
+
+**The pre-existing bug this turned up**: `.lvgrid` used plain `1fr` tracks, which floor at
+the chip's min-content width, so a wide club abbreviation in a 5- or 6-up row pushed the last
+chip past the viewport and scrolled the whole page sideways at 320px. Now `minmax(0,1fr)`.
+It was on `main` before any of this — found only because `documentElement.scrollWidth >
+innerWidth` is on the standing check list, which is exactly why that check is on the list.
 
 ### A note on any hole (Aug 19 2026)
 

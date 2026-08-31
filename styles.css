@@ -853,36 +853,37 @@ h2{scroll-margin-top:14px}
    where you are, which hole, how the round stands, and the receipt saying the last tap is
    already on disk. It sticks to the top and bleeds to both edges — the body carries 16px
    of padding, which the negative margin cancels. */
-.lvhead{position:sticky;top:0;z-index:20;margin:0 -16px 13px;padding:12px 18px 11px;
+.lvhead{position:sticky;top:0;z-index:20;margin:0 -16px 10px;padding:9px 18px 8px;
   background:var(--green);color:var(--green-ink)}
 .lvhe{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;
   color:rgba(244,239,226,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lvhr{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:6px}
-.lvhn{font-family:var(--serif);font-size:38px;line-height:1;letter-spacing:-.01em;min-width:0}
-.lvhs{margin-left:7px;white-space:nowrap}
+.lvhr{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:4px}
+.lvhn{font-family:var(--serif);font-size:30px;line-height:1;letter-spacing:-.01em;min-width:0;
+  white-space:nowrap}
+.lvhs{margin-left:6px;white-space:nowrap}
 .lvhs i{font-family:var(--mono);font-size:11.5px;font-style:normal;letter-spacing:.08em;
-  color:rgba(244,239,226,.6);margin-left:6px}
+  color:rgba(244,239,226,.6);margin-left:5px}
 /* Par is a 44px control rather than three chips, because this header is STICKY: every
    pixel it takes it takes for all eighteen holes. One tap cycles 3 · 4 · 5 and the Card
    button opens the full eighteen. A par nobody has confirmed renders dashed — the same
    "this is not a record" language the guessed cells on the card check use, so a
    placeholder can never sit there looking like a scorecard. */
-.lvpar{min-height:44px;padding:0 10px;background:transparent;border:1px solid rgba(244,239,226,.3);
+.lvpar{min-height:44px;padding:0 8px;background:transparent;border:1px solid rgba(244,239,226,.3);
   border-radius:var(--r);color:rgba(244,239,226,.85);
   font-family:var(--mono);font-size:11.5px;letter-spacing:.08em}
 .lvpar.auto{border-style:dashed;border-color:rgba(244,239,226,.7)}
 .lvpar:active{background:rgba(244,239,226,.12)}
 .lvhb{display:flex;gap:6px;flex:none}
-.lvfin{min-height:44px;padding:0 14px;border-radius:var(--r);background:transparent;
+.lvfin{min-height:44px;padding:0 10px;border-radius:var(--r);background:transparent;
   border:1px solid rgba(244,239,226,.38);color:var(--green-ink);flex:none;
   font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
-.lvfin.ghost{border-color:rgba(244,239,226,.22);color:rgba(244,239,226,.72);padding:0 11px}
+.lvfin.ghost{border-color:rgba(244,239,226,.22);color:rgba(244,239,226,.72);padding:0 9px}
 .lvfin:active{background:rgba(244,239,226,.12)}
 /* The hole strip: eighteen bars, the round at a glance and a tap to any hole. Solid = here.
    72% = played at or under par, 40% = played over, 16% = not played yet. Eighteen targets
    across one phone cannot each be 44px wide, so this is a shortcut with a 30px-tall hit
    area — the primary way between holes stays the 52px Back / Next buttons in the footer. */
-.lvbars{display:flex;gap:3px;margin-top:11px}
+.lvbars{display:flex;gap:3px;margin-top:8px}
 .lvbar{flex:1;height:30px;display:flex;align-items:center;cursor:pointer}
 .lvbar::before{content:'';display:block;width:100%;height:5px;border-radius:3px;
   background:rgba(244,239,226,.16)}
@@ -903,8 +904,8 @@ h2{scroll-margin-top:14px}
    Finish button does not fit on one line there. The hole number keeps its display size;
    the par and stroke index drop underneath it, which is the pair that reads fine stacked. */
 @media (max-width:360px){
-  .lvhn{font-size:32px}
-  .lvhs{display:block;margin-left:0;margin-top:5px}
+  .lvhn{font-size:25px}
+  .lvhs{display:block;margin-left:0;margin-top:3px}
   .lvhead{padding-left:14px;padding-right:14px}
   .lvfin{padding:0 10px;font-size:10px}
 }
@@ -929,10 +930,13 @@ h2{scroll-margin-top:14px}
 .lvwait{font-family:var(--sans);font-size:11.5px;color:var(--faint);margin-top:9px}
 .lvgrid{display:grid;gap:6px}
 .lvgrid.g1{grid-template-columns:1fr}
-.lvgrid.g3{grid-template-columns:repeat(3,1fr)}
-.lvgrid.g4{grid-template-columns:repeat(4,1fr)}
-.lvgrid.g5{grid-template-columns:repeat(5,1fr)}
-.lvgrid.g6{grid-template-columns:repeat(6,1fr)}
+/* minmax(0,…) not 1fr: a plain 1fr track floors at the chip's min-content width, so a wide
+   club abbreviation in a 5- or 6-up row pushed the last chip past the viewport and scrolled
+   the whole page sideways at 320px. Letting the track shrink below its content is the fix. */
+.lvgrid.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.lvgrid.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.lvgrid.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.lvgrid.g6{grid-template-columns:repeat(6,minmax(0,1fr))}
 .lvgrid + .lvgrid{margin-top:6px}
 .lvgrid .chip.span{grid-column:1/-1}
 .lvsub{opacity:.9}
@@ -967,7 +971,7 @@ body.night .lvwrap .chip.big.on{background:var(--green);border-color:var(--green
 body.night .lvwrap .chip.big.on.bad,body.night .lvwrap .chip.big.ns.on,
 body.night .lvwrap .chip.big.ob.on{background:var(--burg);border-color:var(--burg)}
 /* ---- The footer: back a hole, on to the next ---- */
-.lvfoot{display:flex;gap:8px;margin-top:14px}
+.lvfoot{display:flex;gap:8px;margin-top:10px}
 .lvback{flex:0 0 58px;min-height:52px;border-radius:var(--r);background:var(--card);
   border:1px solid var(--ink18);color:var(--ink);font-size:20px;line-height:1}
 .lvnext{flex:1;min-height:52px;border-radius:var(--r);background:var(--green);border:none;
@@ -986,14 +990,14 @@ body.night .lvback{background:rgba(255,255,255,.05);border-color:rgba(255,255,25
 }
 /* What this hole has cost you before, and what the prep says about it — read with a club
    already in your hand, so it sits above the card and ahead of the taps. */
-.holeintel{margin:8px 0 0;padding:11px 13px;border-left:3px solid var(--green)}
+.holeintel{margin:6px 0 0;padding:10px 13px;border-left:3px solid var(--green)}
 /* Tap the header to fold the prep away — the plan is a tee-box read, the chips are a
    between-shots one, and on a hole he has already played the plan is just in the way. */
 .hi-head{cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
 .hi-tog{margin-left:auto;font-size:11px;color:var(--faint);font-weight:400}
 /* Shut, the card still carries the one line to act on — collapsing hides the reasoning,
    never the decision. */
-.holeintel.shut{padding-top:9px;padding-bottom:9px}
+.holeintel.shut{padding-top:7px;padding-bottom:7px}
 .hi-gist{font-size:13px;line-height:1.4;color:var(--gtext);margin-top:3px;cursor:pointer;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hi-gist b{font-weight:700}
@@ -1063,8 +1067,8 @@ body.night .pcell.guess{background:transparent;border-color:var(--burg)}
    prep, and the hole as one-line rows. The open row gets FULL-SIZE chips — that's the
    blend Jack picked: option B's one-screen scorecard rows, option A's big targets. ---- */
 .lvseg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--green);
-  border-radius:20px;overflow:hidden;margin:8px 0 0;font-family:var(--sans)}
-.lvseg span{text-align:center;font-size:11.5px;font-weight:800;padding:8px 4px;
+  border-radius:20px;overflow:hidden;margin:6px 0 0;font-family:var(--sans)}
+.lvseg span{text-align:center;font-size:11.5px;font-weight:800;padding:7px 4px;
   color:var(--gtext);background:var(--card);cursor:pointer;user-select:none}
 .lvseg span.on{background:var(--green);color:var(--green-ink)}
 .qcard{padding:2px 13px 8px}

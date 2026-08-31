@@ -100,13 +100,19 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v85';
+const BUILD = 'v86';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v86', d:'2026-08-31', items:[
+    'The NEXT HOLE button now sits above the tab bar on a hole you have finished \u2014 no scrolling to get off the hole. It was about 40px below the fold in Quick view, so every hole cost you a scroll you should never have had to make.',
+    'The header is smaller. Hole N was wrapping onto two lines on your phone, which cost 44px on its own; the hole number, par, stroke index, Card and Finish now sit on one line and the whole green block is 58px shorter. It is sticky, so that is 58px back on all eighteen holes.',
+    'The hole prep moved back ABOVE the scoring rows, where the CSS always said it belonged \u2014 it is a tee-box read, so it goes ahead of the taps. It still arrives collapsed with the one line to act on showing.',
+    'The paragraph explaining the chips moved to the very bottom. You know how it works by now; it was sitting between the card and the Next button.',
+    'Fixed a sideways scroll at the narrowest phone width: a wide club abbreviation in a five- or six-chip row was pushing the last chip past the edge and dragging the whole page with it.' ] },
   { b:'v85', d:'2026-08-30', items:[
     'All four tiles fit on one screen now. It was clipping the bottom two on your phone \u2014 and not on any desktop browser, because the notch and home-indicator insets that eat about 90px there report as zero everywhere else. Simulated your phone properly and it was 38px over.',
     'Nothing shrank. The space came out of padding and gaps: a tighter masthead, a slightly shorter weather card, and The numbers closing up as one block instead of sitting like three unrelated ones. Type sizes are untouched \u2014 you already told me these read small.' ] },
@@ -6248,6 +6254,8 @@ function livePlay(L){
       <span class="lvsaved">● SAVED</span></div>
   </div>
 
+  ${prep}
+
   <div class="lvseg">
     <span class="${quick ? '' : 'on'}" data-action="live-view" data-v="">Full card</span>
     <span class="${quick ? 'on' : ''}" data-action="live-view" data-v="1">⚡ Quick view</span>
@@ -6257,18 +6265,16 @@ function livePlay(L){
     ${quick ? quickCard : fullCard}
   </div>
 
-  ${prep}
-  <p class="sm faint" style="margin-top:10px">Everything except the score is optional — skip a row and it simply isn't recorded, rather than being guessed. Tap a lit chip again to clear it. A <b>half-lit</b> tee club is one carried over from the last time you played this hole, or from earlier in this round: leave it if it's right, tap another club if it isn't.</p>
-
   <div class="lvfoot">
     <button class="lvback"${L.cur === 0 ? ' disabled' : ''} data-action="live-nav" data-d="-1">‹</button>
     <button class="lvnext" data-action="live-nav" data-d="1">${
       last ? 'Finish card' : `Hole ${L.holes[L.cur + 1].n}`} ›</button>
   </div>
-  <div class="formrow" style="margin-top:6px">
+  <div class="formrow" style="margin-top:12px">
     <button class="btn ghost tiny" data-action="go" data-view="home">Pause · back to Home</button>
     <button class="btn ghost tiny" data-action="live-discard">Discard round</button>
-  </div>`;
+  </div>
+  <p class="sm faint" style="margin-top:10px">Everything except the score is optional — skip a row and it simply isn't recorded, rather than being guessed. Tap a lit chip again to clear it. A <b>half-lit</b> tee club is one carried over from the last time you played this hole, or from earlier in this round: leave it if it's right, tap another club if it isn't.</p>`;
 }
 
 function liveFinish(L){
