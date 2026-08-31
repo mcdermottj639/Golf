@@ -100,13 +100,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v69';
+const BUILD = 'v70';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v70', d:'2026-08-31', items:[
+    'What\u2019s landed on Today is now just that \u2014 what landed. It shows the latest day only, with a button to the full log. It had grown to a hundred-odd rows, so the block that answers "what is different since yesterday" had turned into an archive of changes you had already read.',
+    'The full history moved to its own page, unchanged and one tap away. The "N new" count is honest about the split: Today counts what it is showing you, and the button says how many more are waiting and how many of those you have not seen.' ] },
   { b:'v69', d:'2026-08-30', items:[
     'Every coaching page now says whether an instruction is YOURS or standard practice. You asked to always see what you are thinking and feeling separately from what best practice typically is, so you can tell when you are off track \u2014 the short-game plan is the worked example, and the whole app was audited against it.',
     'The audit found four things that were wrong rather than just unlabelled. Your wedge bounce was listed as 10/10/8 in a Coach lesson; the build is 8/10/8. A lesson said "your proximity from 150 yards is 45+ feet" \u2014 nothing here has ever measured your proximity, that is a published amateur average. The Swing Positions page still named the hip slide as your miss, which the Aug 20 film retracted. And the Bag stated a shallow sweeping attack angle as fact one card above the card admitting nobody has filmed it.',
@@ -931,6 +934,7 @@ const TITLES = {
   lesson:['Coach','One lesson, and the drill that trains it.'],
   round:['Round Detail','One card, hole by hole, and what it cost you.'],
   live:['Live Round','Tap it in as you play — it scores itself.'],
+  landed:['What’s landed','Every change to your app, newest first.'],
 };
 
 // ----- Rounds: one tab, three segments (Aug 27 2026, Jack's redesign) -----
@@ -1001,7 +1005,7 @@ function render(view, arg, keepScroll){
   // The four labs live behind one nav button, so they all light it — and so does every
   // view that hangs off Rounds: a round card, and a course plan you opened from one.
   const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game',
-                   drills:'coach', shelf:'coach', lesson:'coach',
+                   drills:'coach', shelf:'coach', lesson:'coach', landed:'home',
                    round:'rounds', rounds:'rounds' };
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
@@ -1010,7 +1014,7 @@ function render(view, arg, keepScroll){
   // side it is the same intention and live() already knows which one it is.
   const teeLab = $('#navTeeLab');
   if(teeLab) teeLab.textContent = S.live ? 'RESUME' : 'TEE';
-  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live }[view] || home;
+  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, landed }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
@@ -1166,32 +1170,35 @@ const UP_TYPE = {
 };
 const upType = t => { const r = UP_TYPE[t] || ['UPDATE','']; return { l:r[0], c:r[1] }; };
 
-// ----- What's new -----
+// ----- What's landed -----
 // Everything that has changed, newest first, in one place — Jack asked for it on Home
-// under the coach tip, and asked for ALL of it rather than the latest one. Two streams
-// merge here: the coach feed (data — plans, bag changes, rounds, lessons) and RELEASES
-// (the app itself, which the feed cannot carry). Grouped by the day the change was made,
-// so it reads as a log rather than a list.
+// under the coach tip. Two streams merge here: the coach feed (data — plans, bag changes,
+// rounds, lessons) and RELEASES (the app itself, which the feed cannot carry). Grouped by
+// the day the change was made, so it reads as a log rather than a list.
+//
+// It renders in TWO places, and the split is Jack's (Aug 30 2026): the whole log on Today
+// ran to a hundred-odd rows, so the page you open every morning was mostly an archive of
+// changes you had already read. Today now carries the LATEST DAY only — what actually
+// landed — and the rest is one tap away on its own page. Nothing was cut; the block that
+// answers "what is different since yesterday" stopped also being the block that answers
+// "everything that has ever changed", because those are two different questions and only
+// the first one belongs on a home page.
 //
 // A row is tappable wherever the change has somewhere to be looked at, which is the point
 // of the block: it is a table of contents for what is different, not a substitute for it.
-function whatsNew(){
+
+// The days, newest first, with a day's duplicate headlines collapsed. Shared by both
+// renderers so the two can never disagree about what landed or when.
+function upDays(){
   const rows = [];
   (S.updates || []).forEach(u => rows.push({ d:u.d, k:u.id, t:u.t, h:u.h, s:u.s, act:u.act }));
   // One row per RELEASE, not per note: three sentences of release copy set as three
   // headlines shouts over the data changes around it, and a build is one event anyway.
   RELEASES.forEach(r => rows.push({ d:r.d, k:`build:${r.b}`, t:'build', h:'The app updated',
     b:r.b, items:r.items, s:'', act:null }));
-  if(!rows.length) return '';
   // Stable sort on the date alone, so within one day the feed's own order survives and
   // the app notes sit under the data changes they shipped alongside.
   rows.sort((a, b) => (b.d || '').localeCompare(a.d || ''));
-  const seen = new Set(S.settings.seenUpdates || []);
-  // Boot renders Home before the feed has been fetched, so on the very first open after an
-  // upgrade this runs with nothing in the log yet. Marking seen there would consume this
-  // build's release notes in the same paint that introduced them, a second before the feed
-  // lands and redraws. So the first render is read-only and the one after it does the work.
-  const commit = S.updatesInit;
   const days = [];
   rows.forEach(r => {
     const last = days[days.length - 1];
@@ -1210,36 +1217,87 @@ function whatsNew(){
     });
     day.rows = [...byHead.values()];
   });
-  const fresh = days.reduce((a, day) =>
-    a + day.rows.filter(r => !r.keys.every(k => seen.has(k))).length, 0);
-  const attrs = a => !a ? '' :
-    ` data-action="${a.a}"${a.v ? ` data-view="${a.v}"` : ''}${a.id ? ` data-id="${esc(a.id)}"` : ''}`;
-  // Remember only what is still on the list, so the seen-set can't grow forever.
-  const keys = days.flatMap(day => day.rows.flatMap(r => r.keys));
-  if(commit && (fresh || keys.length !== (S.settings.seenUpdates || []).length)){
-    S.settings.seenUpdates = keys;
+  return days;
+}
+const upFresh = (days, seen) => days.reduce((a, day) =>
+  a + day.rows.filter(r => !r.keys.every(k => seen.has(k))).length, 0);
+
+// Mark seen only what was actually put on the screen. Today shows one day, so marking the
+// whole log read there would retire the "N new" flag on rows he has never been shown —
+// the count is only worth anything if it means what it says. Additive, then pruned to
+// what is still on the list, so the set can't grow forever either.
+function upMarkSeen(days, shown){
+  // Boot renders Home before the feed has been fetched, so on the very first open after an
+  // upgrade this runs with nothing in the log yet. Marking seen there would consume this
+  // build's release notes in the same paint that introduced them, a second before the feed
+  // lands and redraws. So the first render is read-only and the one after it does the work.
+  if(!S.updatesInit) return;
+  const seen = new Set(S.settings.seenUpdates || []);
+  const now = new Set(shown.flatMap(day => day.rows.flatMap(r => r.keys)));
+  const next = days.flatMap(day => day.rows.flatMap(r => r.keys))
+    .filter(k => seen.has(k) || now.has(k));
+  if(next.length !== seen.size || next.some(k => !seen.has(k))){
+    S.settings.seenUpdates = next;
     save();
   }
+}
+
+const upAttrs = a => !a ? '' :
+  ` data-action="${a.a}"${a.v ? ` data-view="${a.v}"` : ''}${a.id ? ` data-id="${esc(a.id)}"` : ''}`;
+function upRows(day, seen){
+  return `<div class="upday"><div>${day.rows.map(r => { const ty = upType(r.t);
+    return `<div class="uprow${r.keys.every(k => seen.has(k)) ? '' : ' fresh'}${
+    r.act ? ' opens' : ''}"${upAttrs(r.act)}>
+    <div class="upt ${ty.c}">${esc(ty.l)}</div>
+    <div class="upm">
+      <div class="uph">${esc(r.h)}${r.b ? `<span class="upb">${esc(r.b)}</span>` : ''}${
+        r.n > 1 ? `<span class="upn">${r.n} updates</span>` : ''}</div>
+      ${r.s ? `<div class="ups">${esc(r.s)}</div>` : ''}
+      ${r.items ? `<ul class="upli">${r.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
+    </div>
+    <div class="upd">${fmtDate(day.d)}${r.act ? '<span class="arr">→</span>' : ''}</div>
+  </div>`; }).join('')}</div></div>`;
+}
+
+// Today's card: the latest day that has anything on it, and a way to the rest.
+function whatsNew(){
+  const days = upDays();
+  if(!days.length) return '';
+  const seen = new Set(S.settings.seenUpdates || []);
+  const day = days[0];
+  const rest = days.slice(1);
+  const fresh = upFresh([day], seen), restFresh = upFresh(rest, seen);
+  const restN = rest.reduce((a, d) => a + d.rows.length, 0);
+  upMarkSeen(days, [day]);
+  const n = day.rows.length;
   const body = `
-    ${fresh ? `<p class="sm"><b class="warn">${fresh} new</b> since you last opened this page.</p>` : ''}
-    ${days.map(day => `<div class="upday">
-      <div>${day.rows.map(r => { const ty = upType(r.t);
-        return `<div class="uprow${r.keys.every(k => seen.has(k)) ? '' : ' fresh'}${
-        r.act ? ' opens' : ''}"${attrs(r.act)}>
-        <div class="upt ${ty.c}">${esc(ty.l)}</div>
-        <div class="upm">
-          <div class="uph">${esc(r.h)}${r.b ? `<span class="upb">${esc(r.b)}</span>` : ''}${
-            r.n > 1 ? `<span class="upn">${r.n} updates</span>` : ''}</div>
-          ${r.s ? `<div class="ups">${esc(r.s)}</div>` : ''}
-          ${r.items ? `<ul class="upli">${r.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
-        </div>
-        <div class="upd">${fmtDate(day.d)}${r.act ? '<span class="arr">→</span>' : ''}</div>
-      </div>`; }).join('')}</div>
-    </div>`).join('')}
-    <p class="sm faint" style="margin-top:10px">Every change Claude has pushed, newest first — plans, bag changes, rounds, lessons and coaching, plus what changed in the app itself. Tap any row to open what it changed. Dated by the day the change was made. Older entries drop off the bottom once there are ${UPDATE_CAP}; nothing is lost — the change itself lives in the bag, the plan or the card it landed on.</p>`;
-  const n = days.reduce((a, d) => a + d.rows.length, 0);
+    <p class="sm faint" style="margin:0 0 8px">${
+      day.d === today() ? 'Landed today' : `Nothing since ${fmtDate(day.d)} — that day’s changes`}.</p>
+    ${upRows(day, seen)}
+    ${restN ? `<p class="sm" style="margin-top:10px"><button class="btn ghost tiny" data-action="go" data-view="landed">See everything that’s landed →</button>
+      <span class="faint" style="margin-left:8px">${restN} more change${restN === 1 ? '' : 's'}${
+        restFresh ? ` · ${restFresh} you haven’t seen` : ''}</span></p>` : ''}`;
   return `<div class="card">${fold('fold-landed', "What's landed",
     `${fresh ? fresh + ' new · ' : ''}${n} change${n === 1 ? '' : 's'}`, body)}</div>`;
+}
+
+// The whole log, on its own page. Same rows, every day — this is the archive Today used
+// to be, and the only place the seen-flag on an older row is allowed to be cleared.
+function landed(){
+  const days = upDays();
+  const seen = new Set(S.settings.seenUpdates || []);
+  const fresh = upFresh(days, seen);
+  upMarkSeen(days, days);
+  const n = days.reduce((a, d) => a + d.rows.length, 0);
+  if(!n) return `<button class="backlink" data-action="go" data-view="home">← Today</button>
+    <div class="card"><p class="sm faint">Nothing has landed yet. Changes show up here the moment they reach your phone.</p></div>`;
+  return `<button class="backlink" data-action="go" data-view="home">← Today</button>
+  <div class="card">
+    <h2>Everything that’s landed</h2>
+    ${fresh ? `<p class="sm"><b class="warn">${fresh} new</b> since you last opened this page.</p>` : ''}
+    ${days.map(day => upRows(day, seen)).join('')}
+    <p class="sm faint" style="margin-top:10px">Every change Claude has pushed, newest first — plans, bag changes, rounds, lessons and coaching, plus what changed in the app itself. Tap any row to open what it changed. Dated by the day the change was made. Older entries drop off the bottom once there are ${UPDATE_CAP}; nothing is lost — the change itself lives in the bag, the plan or the card it landed on.</p>
+  </div>`;
 }
 
 // ----- Today: the three blocks above the existing page (Aug 27 2026, Jack's redesign) -----

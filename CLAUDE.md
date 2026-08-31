@@ -1367,6 +1367,22 @@ Coach leads with, so the top of Today can never quietly outrank the page below i
 **start/resume round button**, which absorbed the old round-in-progress banner: one
 affordance for one intention, matching the TEE tab.
 
+**Aug 31 2026: Today carries the LATEST DAY only, and the whole log moved to its own page**
+(`landed`, reachable from the button under the rows and mapped to the Today nav button).
+Jack's words: *"it should be like whatever landed actually that day and then there's a
+button to see the entire list."* The block had reached a hundred-odd rows, so the thing
+that answers *what is different since yesterday* had become an archive of changes he had
+already read — two different questions, and only the first belongs on a home page. Nothing
+was cut and none of the three behaviours above changed; `upDays()` builds and collapses the
+days once and both renderers read it, so the two can never disagree about what landed.
+
+The rule that makes the split safe is **`upMarkSeen(days, shown)`: only what was actually
+put on the screen is marked seen.** Marking the whole log read from Today would retire the
+fresh flag on rows he has never been shown, and a "N new" count is worth nothing the moment
+it stops meaning what it says. It is additive and then pruned to what is still on the list,
+so the set can't grow forever either. Today's meta counts its own day; the button carries
+the rest of the count and how many of those are unseen.
+
 ### The evidence drawer (Aug 27 2026 — build a finding's provenance once)
 
 `evDrawer(id, label, ev, sample, more)` in `app.js` is the disclosure behind a tier chip:
