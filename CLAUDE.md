@@ -762,6 +762,29 @@ fold. A `render()` deliberately restores nothing. Give a section an `id` if it s
 survive an update, and nothing else has to change. The DOM stays the only store for this —
 never build a parallel open/closed map.
 
+### The page paints under the notch, so every edge claims its own inset (Aug 30 2026)
+
+`index.html` sets **`viewport-fit=cover`**, which is what lets the nav's background reach the
+bottom of the screen — and it also means iOS stops reserving the status bar and home
+indicator for you. Every top and bottom edge has to claim its own `env(safe-area-inset-*)`.
+The bottom was accounted for from the start (`body` padding, the nav, the sheet, the cheat
+bar); **the top never was**, so on the installed PWA the clock sat on top of the masthead
+strapline for weeks. `.hero` — and `body.lvfocus .hero` — now pad by
+`calc(20px + env(safe-area-inset-top))`. Add a new fixed or full-bleed edge and it needs the
+same. Note these read as `0` in a desktop browser, so a local check can never catch this
+one; it is only visible on the phone.
+
+Two related mitigations shipped alongside, for a scrolling glitch Jack reported where the
+page shows through past the tab bar. Neither is reproducible in desktop Chromium — the nav
+is pinned at every scroll offset there — so both are standard iOS fixes applied on the
+symptom, and they are **unconfirmed**: `overscroll-behavior-y:none` on `html`/`body` (the
+rubber-band bounce drags fixed children with it on iOS and shows the page past its own end)
+and `will-change:transform` + `backface-visibility:hidden` on `nav` (iOS repaints a fixed
+child in step with the scroll rather than ahead of it, so a fast flick leaves the bar
+lagging). If it recurs, the next thing to establish is **installed PWA vs Safari** — in
+Safari the strip under the bar is Safari's own translucent toolbar with page content behind
+it, which is expected behaviour and not this bug at all.
+
 ### Form controls never go below 16px (Aug 14 2026)
 
 iOS Safari **auto-zooms the whole page** when you focus an `input`/`select`/`textarea` whose
@@ -772,6 +795,38 @@ don't lower it, and don't set a smaller inline `font-size` on the narrow numeric
 (carry ladder, gap matrix) either. The other "fix" for this — `maximum-scale=1` on the
 viewport — is worse: it disables pinch-zoom everywhere in the app. Checked at 320px, the
 narrowest phone: the tightest row (Tees · Rating · Slope) still fits at 16px.
+
+### The numbers on Today are `gameAreas()`, not a fourth tally (Aug 30 2026)
+
+**Everything Today counts, under one heading.** A thin row of the four that barely move —
+**handicap · courses · up & down · est. index** — over four tiles of the ones that do, in
+the order a hole is played: **last score · off the tee · irons · putting**. They were three
+separate blocks with the start-round button in between until Jack asked for one; `up & down`
+is the fourth area, so the row and the tiles together cover all four parts of the game.
+Three of the tiles are `gameAreas()` read through **`areaCards()`**, the extracted reader that
+also feeds Coach's four areas, so the front page and the coach cannot quote different
+percentages at each other. Same rule as `gameAreas()` itself: never compute a fifth tally.
+The **labels come from `AREA_LAB`** and the value line is formatted exactly as Coach formats
+it, deliberately — a tile saying "Greens hit" over the figure Coach calls "Irons" is how one
+number quietly becomes two.
+
+What the three replaced is worth keeping, because each was live for weeks before anyone
+looked and each failed in a different way:
+
+- **5-ft makes** read `— · needs 2+ entries`. A mat test he has run once, so the tile
+  leading the page had never once shown a number. A tile whose empty state is its normal
+  state is worse than no tile. It was in the stat row **as well**, blank there too — when
+  you retire a dead metric, grep for it: the same number is usually rendered twice.
+- **Carry ladder** was a *fact about the bag*, not a result — the top of the ladder does not
+  move between rounds, and it already lives on Bag.
+- **Conditions** was the weather card immediately above it, restated and smaller. Jack
+  caught it the moment the swap put the two adjacent, which is the transferable lesson:
+  **a duplicate is invisible until the two copies are next to each other.** When moving a
+  block, check what it now sits beside.
+
+A tile with no data renders a dash and says what would fill it — never a zero and never a
+hidden tile, the same reason `sortCourses()` puts nulls last: absent and zero are different
+claims.
 
 ### Nearest first (Aug 21 2026)
 

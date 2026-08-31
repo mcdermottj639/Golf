@@ -100,13 +100,20 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v74';
+const BUILD = 'v75';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v75', d:'2026-08-30', items:[
+    'The numbers is now everything Today counts, under one heading: the handicap row you used to scroll past the round button to reach, and under it four live numbers in the order a hole is played \u2014 your last score, off the tee, irons, putting. Tap any tile for what is behind it.',
+    'UP & DOWN replaced 5-ft makes in that top row, so the row and the tiles together cover all four parts of your game.',
+    'Three tiles went. 5-FT MAKES had never shown a number \u2014 it needs two mat tests and there is one. CARRY LADDER was a fact about your bag, not a result, and it lives on Bag. CONDITIONS was the weather card directly above it, said again and smaller \u2014 you spotted that one, and it was only visible because the swap had just put the two side by side.',
+    'The three new numbers are read off the same cards and the same reader Coach uses, so the front page and the coach cannot quote you different percentages.',
+    'The clock no longer sits on top of the masthead. The app paints under the status bar by design, but nothing was reserving room for it at the top \u2014 only at the bottom.',
+    'Two changes aimed at the scrolling glitch where the page shows through past the tab bar: the rubber-band bounce is off, and the tab bar now gets its own layer so it stops lagging behind a fast flick. Tell me if you still see it, and whether it is the home-screen app or Safari \u2014 they would be different causes.' ] },
   { b:'v74', d:'2026-08-30', items:[
     'On Today, the numbers and the one thing swapped places. The four tiles \u2014 5-ft makes, round scores, carry ladder, conditions \u2014 now sit straight under the weather, and the one thing you are working on sits below round prep, next to the coaching that goes with it.' ] },
   { b:'v73', d:'2026-08-30', items:[
@@ -1374,6 +1381,68 @@ function oneThing(){
   </div>`;
 }
 
+// ----- Today: The numbers (Aug 30 2026, Jack's call) -----
+// EVERYTHING Today counts, in one block. A thin row of the four that barely move — who you
+// are, how much you have played, how you scramble, where the index sits — over four tiles
+// of the ones that do, in the order a hole is played: the score, then off the tee, then
+// into the green, then on it. They were three separate blocks with the start button in
+// between; one heading over both is what Jack asked for and it reads as one subject.
+// `up & down` is the fourth area, so the row and the tiles together cover all four. Three of them are `gameAreas()` read through `areaCards()` — the SAME
+// reader and the same card set Coach uses, so the front page and the coach can never quote
+// different fairway percentages at each other. Nothing here counts a hole for itself.
+//
+// What it replaced, and why, because both were live for weeks before anyone looked:
+//   · 5-FT MAKES read "— · needs 2+ entries" — a mat test he has run once, so the tile that
+//     led the page had never shown a number. The putting tile answers what it was reaching
+//     for and does it off rounds he actually played.
+//   · CARRY LADDER was a yardage, not a result: the top of the ladder is a fact about the
+//     bag, it lives on Bag, and it does not move between rounds.
+//   · CONDITIONS was the weather card immediately above it, said again and smaller. Jack
+//     spotted it the moment the swap put the two next to each other, which is the useful
+//     lesson: a duplicate is invisible until the two copies are adjacent.
+//
+// A tile with no data renders a dash and says what would fill it — never a zero, and never
+// a hidden tile, for the same reason `sortCourses()` puts nulls last: absent and zero are
+// different claims.
+// The label comes from AREA_LAB and the value line is formatted exactly as Coach formats
+// it, deliberately: these are the same three numbers in two places, and a tile calling it
+// "Greens hit" while Coach calls the identical figure "Irons" is how one number quietly
+// becomes two. One vocabulary, one reader, one card set.
+function numTile(lab, view, a, empty){
+  return `<div class="charttile opens" data-action="go" data-view="${view}">
+    <div class="lab">${esc(lab)}</div>
+    ${a ? `<div class="big">${esc(a.v)}</div>
+           <div class="sub">${esc(a.u)}${a.raw ? ` · ${esc(a.raw)}` : ''}</div>`
+        : `<div class="big faint">—</div><div class="sub">${esc(empty)}</div>`}
+  </div>`;
+}
+function theNumbers(){
+  const { areas: A } = gameAreas(areaCards().cards);
+  const scored = S.rounds.filter(r => r.score);
+  const last = scored.slice(-1)[0];
+  const idx = estIndex();
+  return `
+  <h2>The numbers</h2>
+  <div class="rowgrid">
+    <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div></div>
+    <div class="stat"><div class="v">${S.courses.filter(c => !c.bucket).length}</div><div class="l">Courses</div></div>
+    <div class="stat"><div class="v">${A.short ? esc(A.short.v) : '—'}</div><div class="l">Up &amp; down</div></div>
+    <div class="stat"><div class="v">${idx != null ? idx.toFixed(1) : '—'}</div><div class="l">Est. index</div></div>
+  </div>
+  <div class="rowgrid g2">
+    <div class="charttile opens" data-action="go" data-view="rounds" data-seg="cards">
+      <div class="lab">Round scores</div>
+      <div class="big">${last ? esc(last.score) : '<span class="faint">—</span>'}</div>
+      <div style="color:var(--btext)">${spark(scored.map(r => r.score))}</div>
+      <div class="sub">${S.rounds.length} logged</div></div>
+    ${numTile(AREA_LAB.tee, 'rounds', A.tee, 'no tee shots logged yet')}
+    ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet')}
+    ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet')}
+  </div>
+  <p class="sm faint" style="margin-top:6px">Off the same cards Coach reads — tap any tile for the detail behind it.</p>
+`;
+}
+
 // The way onto the tee, at the size of the decision. One button, which is a START when
 // there is no round on the go and a RESUME when there is — the same tap for the same
 // intention, exactly like the TEE button in the tab bar. The discard link only exists on
@@ -1399,44 +1468,12 @@ function startRound(){
 // ----- Home -----
 function home(){
   const dl = daysLeft(S.settings.returnDeadline);
-  const idx = estIndex();
   const pending = pendingReturn();
-  const last = latestFiveFt();
-  const sc = last ? fiveFtScore(last) : null;
   const picks = pickedLessons().slice(0,1);
   return `
   ${wxCard()}
-  <h2>The numbers</h2>
-  <div class="rowgrid g2">
-    <div class="charttile"><div class="lab">5-ft makes · trend</div>
-      <div class="big">${sc ? sc.makes+'/'+sc.total : '—'}</div>
-      <div style="color:var(--gtext)">${spark(S.fiveFt.map(e=>fiveFtScore(e).makes))}</div>
-      <div class="sub">goal: 17/20</div></div>
-    <div class="charttile"><div class="lab">Round scores</div>
-      <div class="big">${S.rounds.length ? (S.rounds.filter(r=>r.score).slice(-1)[0]?.score ?? '—') : '—'}</div>
-      <div style="color:var(--btext)">${spark(S.rounds.map(r=>r.score).filter(Boolean))}</div>
-      <div class="sub">${S.rounds.length} logged</div></div>
-    <div class="charttile"><div class="lab">Carry ladder</div>
-      <div class="big">${S.carries[0]?.carry ?? '—'}<span style="font-size:11px"> yd top</span></div>
-      <div style="color:var(--gtext)">${spark(S.carries.map(c=>c.carry).filter(Boolean))}</div>
-      <div class="sub">${S.carriesCalibrated ? 'calibrated' : 'estimated'} · 13 clubs</div></div>
-    <div class="charttile" data-action="get-weather" style="cursor:pointer"><div class="lab">Conditions</div>
-      ${S.weather && playsFactor() ? `
-      <div class="big">${WX_ICON(S.weather.code)} ${Math.round(S.weather.t)}°F</div>
-      <div class="sub">wind ${Math.round(S.weather.wind)} mph</div>
-      <div class="sub" style="margin-top:4px;color:var(--btext);font-weight:700">150 plays ~${Math.round(150/playsFactor())}</div>`
-      : `<div class="big">—</div><div class="sub">tap to load local weather<br>+ "plays like" carries</div>`}
-    </div>
-  </div>
+  ${theNumbers()}
   ${startRound()}
-  <div class="rowgrid">
-    <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div></div>
-    <div class="stat"><div class="v">${S.courses.filter(c=>!c.bucket).length}</div><div class="l">Courses</div></div>
-    <div class="stat"><div class="v">${sc ? sc.makes+'/'+sc.total : '—'}</div><div class="l">5-ft makes</div></div>
-    <div class="stat"><div class="v">${idx != null ? idx.toFixed(1) : '—'}</div><div class="l">Est. index</div></div>
-  </div>
-
-
 
   ${(() => {
     const p = coursePlans();
@@ -2932,6 +2969,20 @@ const PUTT_HEADLINE_MIN = 10;
 // Returns the four areas AND the stats they were computed from, so every line on the card
 // speaks about the same set of cards. Reading the tiles off the live rounds and the summary
 // line off everything would be a quiet lie about what the card is showing.
+// WHICH CARDS THE AREA NUMBERS ARE READ OFF. Extracted so Today's four tiles and Coach's
+// four areas can never disagree about the same round — they are the same numbers in two
+// places, and two front pages quoting different fairway percentages would be worse than
+// neither quoting one. The live-only rule and the reasoning behind it live at coachHero().
+function areaCards(){
+  const all = withHoles();
+  const liveCards = all.filter(r => r.live);
+  const holesIn = rs => rs.reduce((a, r) => a + r.holes.filter(h => h.s != null).length, 0);
+  const liveHoles = holesIn(liveCards), allHoles = holesIn(all);
+  const ev = liveHoles >= 18 ? 'live' : 'round';
+  return { all, liveCards, liveHoles, allHoles, ev,
+    cards: ev === 'live' ? liveCards : all,
+    setAside: ev === 'live' ? all.length - liveCards.length : 0 };
+}
 function gameAreas(rounds){
   const st = scoreStats(rounds);
   const sg = shortGameStats(rounds);
@@ -3040,13 +3091,8 @@ function coachHero(sig, dr){
   // logged it live, which would be laundering. Computing from the live cards only removes
   // the mixture, so the badge is earned by construction rather than by a threshold. The
   // header says how many older cards were set aside, so nothing disappears quietly.
-  const all = withHoles();
-  const liveCards = all.filter(r => r.live);
-  const holesIn = rs => rs.reduce((a, r) => a + r.holes.filter(h => h.s != null).length, 0);
-  const liveHoles = holesIn(liveCards), allHoles = holesIn(all);
-  const ev = liveHoles >= 18 ? 'live' : 'round';
-  const cards = ev === 'live' ? liveCards : all;
-  const setAside = ev === 'live' ? all.length - liveCards.length : 0;
+  const C = areaCards();
+  const { all, liveHoles, allHoles, ev, cards, setAside } = C;
   const { areas: A, st: stC } = gameAreas(cards);
   const f = coachFocus(sig), fArea = areaOf(f);
   const since = coachSince();

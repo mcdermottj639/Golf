@@ -35,8 +35,15 @@
   --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
+/* viewport-fit=cover (index.html) lets the page paint under the status bar and the home
+   indicator, which is what we want for the nav's background — but it means every top and
+   bottom edge has to claim its own inset. The bottom was accounted for from the start; the
+   top never was, so on an installed PWA the clock sat on top of the masthead strapline.
+   overscroll-behavior stops the rubber-band bounce, which on iOS drags fixed children with
+   it and shows the page past its own end. */
+html{-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
 body{background:var(--paper);color:var(--ink);font-family:var(--serif);line-height:1.5;
+  overscroll-behavior-y:none;
   max-width:520px;margin:0 auto;padding:0 16px calc(84px + env(safe-area-inset-bottom))}
 button{font-family:inherit;cursor:pointer}
 /* 16px is a HARD FLOOR on every form control, not a style choice: iOS Safari auto-zooms
@@ -51,7 +58,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #2e5c42;outline-offset
 label{display:block;font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;
   letter-spacing:.1em;color:var(--faint);margin:10px 0 4px}
 
-.hero{padding:20px 0 4px}
+.hero{padding:calc(20px + env(safe-area-inset-top)) 0 4px}
 .badge{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;
   padding:4px 10px;border-radius:var(--r);background:var(--green);color:var(--green-ink);font-family:var(--sans)}
 h1{font-size:26px;font-weight:700;color:var(--gtext);letter-spacing:-.01em;margin-top:8px}
@@ -469,7 +476,8 @@ body.night .dscore{border-left-color:var(--gtext)}
    filled when the tab is active. No SVG, no emoji, nothing to load — and they stay legible
    at the size a label sits under. Items are 52px tall (the tee 58px), well clear of the
    44px tap-target floor. */
-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:30;
+nav{position:fixed;bottom:0;left:50%;transform:translate(-50%,0);width:100%;max-width:520px;z-index:30;
+  will-change:transform;backface-visibility:hidden;
   display:flex;align-items:flex-end;gap:2px;
   padding:7px 8px calc(10px + env(safe-area-inset-bottom));
   text-align:center;background:var(--nav);border-top:1px solid rgba(35,32,26,.12);
@@ -700,6 +708,10 @@ body.night .buildtag{background:rgba(255,255,255,.06);border-color:rgba(255,255,
 .charttile .big{font-size:20px;font-weight:700;color:var(--gtext);margin:2px 0 4px}
 .charttile .sub{font-size:10.5px;color:var(--faint);font-family:var(--sans)}
 .charttile svg{display:block;width:100%;margin-top:4px}
+/* A tile that opens the page behind its number. Not a button element — it sits in a grid
+   and has to line up with the tiles that aren't tappable. */
+.charttile.opens{cursor:pointer;text-align:left;width:100%}
+.charttile.opens:active{transform:translateY(1px)}
 
 
 /* ---- Night mode 2.0: glass + depth ---- */
@@ -970,7 +982,7 @@ body.night .hi-gist{color:#9ed4b2}
    masthead is pure overhead here — the green header already says where he is — so on this
    one view it collapses to the theme toggle, and the hole header takes the top of the
    screen for itself. */
-body.lvfocus .hero{padding:10px 0 0;min-height:0}
+body.lvfocus .hero{padding:calc(10px + env(safe-area-inset-top)) 0 0;min-height:0}
 body.lvfocus .hero .badge,
 body.lvfocus .hero h1,
 body.lvfocus .hero .tag{display:none}
