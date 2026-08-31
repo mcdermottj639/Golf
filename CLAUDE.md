@@ -37,6 +37,19 @@ python3 -c "import json; json.load(open('coach-feed.json'))"
 To preview locally: `npx http-server .` then open the served URL (a plain
 `file://` open mostly works too, but the service worker + `fetch` want a server).
 
+**UPDATING THIS FILE IS PART OF THE CHANGE, NOT A FOLLOW-UP** (standing instruction,
+Aug 30 2026). Jack should never have to ask. Same commit as the code, every time, and it is
+an AUDIT rather than an append — every pass of it so far has turned up something wrong that
+a blind append would have left: a section that had accreted across five edits into a dangling
+half-sentence, a row order still describing the layout before a tile moved, a date written by
+the UTC clock on the night that exact bug was fixed, and a paragraph still claiming Coach
+chose its own card set after that moved to `areaCards()`. So before committing, re-read the
+sections your change touches and fix what is now false — a stale line here is worse than a
+missing one, because it reads as current. Record the standing rule and the reasoning, not a
+diary of what you did; if you got it wrong first, say so, because the wrong version is what
+the next person will otherwise try again. Bump `BUILD`, add a `RELEASES` block, and update
+this file — three things, one commit.
+
 **For a LAYOUT or ORDER change, drive it in a real browser before pushing** — `node --check`
 proves the file parses and nothing else, and the app has no tests, so a section that landed
 in the wrong place or a row of chips that wraps off a 320px phone reaches Jack's phone
@@ -1118,7 +1131,11 @@ two furthest from the top. Don't push anything above the focus card.
 across **off the tee · irons · short game · putting**, off the live round data. `gameAreas()`
 is a READER over `scoreStats()` and `shortGameStats()` — both now take an optional card set —
 rather than a fourth place that counts holes for itself. Two numbers disagreeing about the
-same round would be worse than no numbers, so never compute a fifth tally here.
+same round would be worse than no numbers, so never compute a fifth tally here. **Which cards
+it reads is `areaCards()`**, extracted Aug 30 2026 because Today's numbers block renders the
+same figures: change the card-set rule here and it moves on both pages at once, which is the
+point. Anywhere these numbers are rendered must also print what they were read off — see
+*The numbers on Today*.
 
 - **Live cards alone, once they can carry it.** At 18+ live holes the older cards stand down
   and the header counts them out. This deliberately skips `evOf()`'s at-least-half clause:
