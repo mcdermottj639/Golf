@@ -100,13 +100,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v86';
+const BUILD = 'v87';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v87', d:'2026-09-06', items:[
+    'Fixed the 171% on Putting \u00b7 by distance. The count of lags that finished inside gimme range covers every distance you started a putt from, but it was being divided by your first putts from past thirteen feet only \u2014 so a card with twelve of them against seven long first putts printed a percentage over 100.',
+    'It now reads as a share of the holes where you actually had a second putt to hit, which is the only set those twelve can be part of. On that card it is 12 of 15, so 80%. The count itself was right all along, and nothing else on the table moved \u2014 the three-putt rate and the make rates were never affected.' ] },
   { b:'v86', d:'2026-08-31', items:[
     'The NEXT HOLE button now sits above the tab bar on a hole you have finished \u2014 no scrolling to get off the hole. It was about 40px below the fold in Quick view, so every hole cost you a scroll you should never have had to make.',
     'The header is smaller. Hole N was wrapping onto two lines on your phone, which cost 44px on its own; the hole number, par, stroke index, Card and Finish now sit on one line and the whole green block is 58px shorter. It is sticky, so that is 58px back on all eighteen holes.',
@@ -4675,11 +4678,18 @@ function puttDistTable(P, note){
       return bits.length ? `<p class="sm" style="margin-top:8px">${bits.join(' · ')}. Those are the two questions the putting plans are sliced by — holing the short ones, and leaving the long ones close.</p>` : '';
     })()}
     ${(() => {
-      const all = puttRows(P.dist).reduce((a, e) => ({ gim:a.gim + e.gim, lagIn:a.lagIn + e.lagIn }), { gim:0, lagIn:0 });
-      const lag = puttRoll(P.dist, PD_LAG);
+      // Numerator and denominator must count the SAME holes. `lagIn` rolls up the whole
+      // ladder — a conceded second putt is counted in the bucket the FIRST putt started
+      // from, wherever that was — so pairing it with the lag buckets' first putts alone
+      // read 171% on a card with twelve of them. The population a lag given can be a share
+      // of is the holes he had to lag: the ones that took a second putt, i.e. `first`
+      // minus the one-putt holes (`one`). Every lagIn hole is inside that set by
+      // construction (`lagGiven` needs putts >= 2), so the rate can never exceed 100%.
+      const all = puttRows(P.dist).reduce((a, e) => ({ gim:a.gim + e.gim, lagIn:a.lagIn + e.lagIn,
+        lagN:a.lagN + e.first - e.one }), { gim:0, lagIn:0, lagN:0 });
       if(!all.gim && !all.lagIn) return '';
       return `<p class="sm" style="margin-top:8px">${all.lagIn ? `<b>${all.lagIn} lag${all.lagIn === 1 ? '' : 's'} finished inside gimme range</b>${
-        lag.first ? ` — ${pct(all.lagIn, lag.first)} of your putts from past thirteen feet` : ''}. That is the closest thing this card has to a proximity measurement, and it is a straight read on distance control. ` : ''}${
+        all.lagN ? ` — ${pct(all.lagIn, all.lagN)} of the holes where you had a second putt to hit` : ''}. That is the closest thing this card has to a proximity measurement, and it is a straight read on distance control. ` : ''}${
         all.gim ? `<b>${all.gim} first putt${all.gim === 1 ? ' was' : 's were'} given.</b> Those are out of the Made column entirely rather than counted as holed — a putt nobody made you hit is not a putt you made, and the one number this project cannot afford to flatter is the short one.` : ''}</p>`;
     })()}
     <p class="sm faint" style="margin-top:8px">${note || '<b>Putts</b> and <b>Made</b> count individual putts struck from that range — a real conversion rate, because the one you holed and the one you missed are both on the card. <b>1st putts</b> and <b>3-putts</b> count HOLES that started from there, which is the pace question and only makes sense about a first putt.'}</p>

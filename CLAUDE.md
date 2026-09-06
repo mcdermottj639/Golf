@@ -489,6 +489,19 @@ whole reason the flag exists rather than being folded into the putt count:
 `gim` / `lagIn` from them alongside the attempt tallies. **Given and a made distance are
 one slot** — tapping either clears the other, because the hole ended one way or the other.
 
+**Both tallies are filed under the FIRST putt's bucket, so a rate built on either needs a
+denominator over the same holes** (fixed Sep 6 2026 — it printed **171%** on Jack's phone).
+`bagPutt()` counts a lag given in the range the first putt *started* from, wherever that
+was, so the whole-ladder sum in `puttDistTable()` includes lags that began inside thirteen
+feet — and it was being divided by `puttRoll(PD_LAG)`'s first putts, i.e. the long buckets
+alone. Twelve lags over seven long first putts is 171%, and a percentage over 100 tells the
+reader the number is broken without telling them which half. The population a lag given can
+be a share of is **the holes that took a second putt** — `first - one`, summed over the same
+rows as the numerator, and every `lagIn` hole is inside it by construction because
+`lagGiven()` requires `putts >= 2`. The version in `holeTips()` was always right for the
+opposite reason: it takes both halves off ONE `puttRoll`, which is the pattern to copy.
+Whenever a putting rate spans buckets, roll the numerator and the denominator together.
+
 ### The hole's prep collapses (Aug 20 2026)
 
 The prep card at the top of a live hole is a **tee-box read**; the scoring chips are a
