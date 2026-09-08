@@ -99,13 +99,19 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v93';
+const BUILD = 'v94';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v94', d:'2026-09-08', items:[
+    'PUTTING now shows where your makes came from. The distance ranges sit in the corner beside the number \u2014 one line per range you have actually holed from, and ranges you have nothing in do not appear \u2014 and GIVEN is the fourth row, reading like the three above it.',
+    'Given is counted off the chip you tapped, over the holes that actually recorded an ending: a made distance, or a concession. NOT over every hole you played. Your first live round did not track putts made, and this is what stops those eighteen holes being read as gimmes and inflating the number \u2014 they are simply not in it.',
+    'Coach\u2019s putting line now says how many holes recorded an ending, so a share taken over eighteen of your thirty-six can never read as though it came off all of them.',
+    'Longest made came out. It is the last line of the range list now, so keeping it said the same thing twice \u2014 and it was being cut off to "Longest mad\u2026" on the narrowest phone.',
+    'Nothing else moved. The 1-putt, 2-putt and 3+ rows still read over every hole you played, and the tile is the same height it was, so the block clears the tab bar by exactly what it did before.' ] },
   { b:'v93', d:'2026-09-08', items:[
     'The location prompt should stop turning up. The app was asking iOS for a fresh position every time you opened it \u2014 that is what put the Allow dialog on screen each morning. It now uses the fix it already had saved, so opening the app asks for nothing at all.',
     'It asks in three places now and every one of them is a tap you made: the weather card the first time on a new phone, MOVED? on that card, and the distance sorts on Round prep and Courses. Ten opens in a row went from eleven prompts to one.',
@@ -1520,12 +1526,32 @@ function oneThing(){
 // it, deliberately: these are the same three numbers in two places, and a tile calling it
 // "Greens hit" while Coach calls the identical figure "Irons" is how one number quietly
 // becomes two. One vocabulary, one reader, one card set.
-function numTile(lab, view, a, empty, extra){
-  return `<div class="charttile opens" data-action="go" data-view="${view}">
-    <div class="lab">${esc(lab)}</div>
+// `aside` is an optional block for the tile's top-right corner — the space beside the
+// label and the headline number, which every tile has and none was using (Jack, Sep 8
+// 2026, pointing at it: "where I put the red line we can putt make stats"). It is free
+// height: the corner is already as tall as the label, the number and its caption, so
+// anything up to about three lines costs the numbers block nothing, and that block ends
+// 3px above the tab bar on a 13 mini. Anything taller belongs in a row instead.
+function numTile(lab, view, a, empty, extra, aside){
+  const head = `<div class="lab">${esc(lab)}</div>
     ${a ? `<div class="big">${esc(a.v)}</div>
-           <div class="sub">${esc(a.u)}${a.raw ? ` · ${esc(a.raw)}` : ''}</div>${extra || ''}`
-        : `<div class="big faint">—</div><div class="sub">${esc(empty)}</div>`}
+           <div class="sub">${esc(a.u)}${a.raw ? ` · ${esc(a.raw)}` : ''}</div>`
+        : `<div class="big faint">—</div><div class="sub">${esc(empty)}</div>`}`;
+  return `<div class="charttile opens" data-action="go" data-view="${view}">
+    ${aside ? `<div class="ptop"><div class="pleft">${head}</div>${aside}</div>` : head}
+    ${a ? (extra || '') : ''}
+  </div>`;
+}
+// The ranges he has actually holed from, in the corner. Makes only, and it can never become
+// a make rate: that needs putts he MISSED with a distance on them, which died with the
+// first-putt field on Sep 8 — see *Putting by distance*. A range with nothing in it does not
+// render, the same rule the approach buckets follow, so this is as long as his record is.
+function puttMadeAside(st){
+  const made = puttRows(st.putts.dist).filter(e => e.made);
+  if(!made.length) return '';
+  return `<div class="pmade">
+    <div class="pml">Made from</div>
+    ${made.map(e => `<div class="pmr"><span>${esc(PD[e.k].lab)}</span><b>${e.made}</b></div>`).join('')}
   </div>`;
 }
 
@@ -1599,23 +1625,33 @@ function puttMadeRows(st){
   const P = st.putts;
   if(!P.holes) return '';
   const pc = n => `${Math.round(n / P.holes * 100)}%`;
-  const made = puttRows(P.dist).filter(e => e.made);
-  const longest = made.length ? made[made.length - 1] : null;
-  const madeN = made.reduce((a, e) => a + e.made, 0);
+  // WHAT SHARE OF HIS MAKES WERE GIVEN — and the denominator is the whole point.
+  //
+  // `known` is holes whose ending is ON THE CARD: he tapped a made distance, or he tapped
+  // Given. It is NOT `P.holes`. Jack, approving this: "First live round didn't have putts
+  // made tracking I don't think. Don't let that ruin the stats." He is right, and it would
+  // have: a round logged before he was tapping either chip records putt COUNTS and nothing
+  // about how the hole ended, so measuring against every hole played would quietly file
+  // eighteen unrecorded holes as concessions and print a number far too high.
+  //
+  // Both halves therefore come off the same population, which is the rule the 171% bug
+  // bought (see *Putting by distance*): a hole reaches this row by carrying evidence, never
+  // by failing to. A round that recorded no endings contributes nothing and cannot move it.
+  const given = P.gim + P.lagIn, known = P.distN + given;
   return `<div class="tclub">
     ${[['1-putt', P.one], ['2-putt', P.two], ['3+ putts', P.three]].map(([lab, n]) => `<div class="tcr">
       <span class="tcn">${esc(lab)}</span>
       <span class="tcv">${pc(n)}</span>
       <span class="tcf">${n}/${P.holes}</span></div>`).join('')}
-    ${longest ? `<div class="tcr">
-      <span class="tcn">Longest made</span>
-      <span class="tcv">${esc(PD[longest.k].lab)} ft</span>
-      <span class="tcf">${madeN}</span></div>`
+    ${known ? `<div class="tcr">
+      <span class="tcn">Given</span>
+      <span class="tcv">${Math.round(given / known * 100)}%</span>
+      <span class="tcf">${given}/${known}</span></div>`
       // The empty state is still an instruction rather than a blank — but it takes the SAME
       // one line the row it becomes will take. A wrapping `.tcnote` here ran to three lines
       // and made the no-data case the tallest one on the page, which is how a tile with
       // nothing in it ends up pushing the block past the tab bar.
-      : `<div class="tcr"><span class="tcn">Longest made · tap it in</span>
+      : `<div class="tcr"><span class="tcn">Putts made · tap them in</span>
       <span class="tcv">—</span></div>`}
   </div>`;
 }
@@ -1685,7 +1721,7 @@ function theNumbers(){
       <div class="trend" style="color:var(--btext)">${spark(scored.map(r => r.score), 24)}</div></div>
     ${numTile(AREA_LAB.tee, 'rounds', A.tee, 'no tee shots logged yet', teeClubRows(st))}
     ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet', greenClubRows(st))}
-    ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet', puttMadeRows(st))}
+    ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet', puttMadeRows(st), puttMadeAside(st))}
   </div>
   <p class="sm faint" style="margin-top:8px">${C.cards.length ? `<b>Read off ${
     C.ev === 'live'
@@ -3285,7 +3321,13 @@ function gameAreas(rounds){
     v:(P.total / P.holes).toFixed(2), u:`putts a hole · ${P.total}`, raw:'', n:P.holes,
     read:`${P.one} one-putt${P.one === 1 ? '' : 's'}, ${P.two} two-putt${P.two === 1 ? '' : 's'} and ${
       P.three} three-putt${P.three === 1 ? '' : 's'} over ${P.holes} holes${
-      P.zero ? `, plus ${P.zero} you chipped in` : ''}.`
+      P.zero ? `, plus ${P.zero} you chipped in` : ''}.${
+      // Putt COUNTS come off every card; how a hole ENDED — holed at a distance, or given —
+      // only off the holes where he tapped one of those chips. Where that is the smaller
+      // number, say so, because the Given share and the made distances are computed over it
+      // and a reader is entitled to know they are not over all of it.
+      (() => { const k = P.distN + P.gim + P.lagIn;
+        return k && k < P.holes ? ` ${k} of those holes recorded how the hole ended — the makes and the given share are off those.` : ''; })()}`
   } : null;
 
   return { areas:out, st, sg };

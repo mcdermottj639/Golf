@@ -811,6 +811,19 @@ body.night .buildtag{background:rgba(255,255,255,.06);border-color:rgba(255,255,
 /* The empty state of a breakdown: an instruction, not a blank. Wraps, so it drops the
    single-line flex rules the data rows use. */
 .tcr.tcnote{display:block;font-family:var(--sans);font-size:10px;line-height:1.4;color:var(--faint)}
+/* The tile's top-right corner, used by Putting for the ranges he has holed from (Jack's
+   ask, Sep 8 2026). Free height by construction: the corner is already as tall as the
+   label, the number and its caption, so a block of up to about three lines adds nothing to
+   the numbers block — which clears the tab bar by 3px on a 13 mini and has no more to give.
+   `.pleft` takes `min-width:0` so the caption ellipsises rather than shoving the corner off
+   the tile, and `.pmade` is `flex:none` so the corner keeps its width instead of collapsing. */
+.ptop{display:flex;gap:8px;justify-content:space-between;align-items:flex-start}
+.pleft{flex:1;min-width:0}
+.pmade{font-family:var(--mono);font-size:9px;color:var(--ink36);text-align:right;flex:none}
+.pml{font-family:var(--sans);font-size:8px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:1px}
+.pmr{display:flex;justify-content:flex-end;gap:6px;line-height:1.5;white-space:nowrap}
+.pmr b{color:var(--gtext);font-weight:700;min-width:9px;text-align:right}
 .charttile svg{display:block;width:100%;margin-top:4px}
 /* A tile that opens the page behind its number. Not a button element — it sits in a grid
    and has to line up with the tiles that aren't tappable. */

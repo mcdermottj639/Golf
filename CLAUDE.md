@@ -1074,9 +1074,32 @@ tables on Rounds, so a tile and that table can never disagree about a club.
   precisely as authoritative as the right one.
 - Rows are labelled by **range**, not "Irons"/"Wedges" — they are a breakdown of the tile
   above, not a competing name for it.
-- **Putting** — **`1-putt` · `2-putt` · `3+ putts` as a share of the holes played, then the
-  longest putt he holed** (Jack's ask, Sep 8 2026: *"1 putt 2 putt 3 putt %s and make
-  distances if possible"*). The headline above them is putts a hole.
+- **Putting** — **`1-putt` · `2-putt` · `3+ putts` as a share of the holes played, then
+  `Given`**, with the ranges he has holed from in the tile's top-right corner (Jack's ask,
+  Sep 8 2026: *"where I put the red line we can putt make stats. % of makes that are given
+  and then each distance range"*). The headline above them is putts a hole.
+
+  **THE CORNER IS FREE HEIGHT, AND IT IS THE ONLY ROOM LEFT ON THIS BLOCK.** `numTile()`'s
+  optional `aside` puts a block beside the label and the number, where every tile already has
+  dead space as tall as label + value + caption — about three lines. Anything taller pushes
+  the tile down and belongs in a row instead, and there is no row to spare (below).
+  `puttMadeAside()` renders one line per range with a make in it and nothing for a range
+  without, the same rule the approach buckets follow, so it is exactly as long as his record is.
+
+  **`Given` IS TAKEN OVER THE HOLES THAT RECORDED AN ENDING, NEVER OVER THE HOLES PLAYED.**
+  `known = distN + gim + lagIn` — he tapped a made distance, or he tapped Given. Jack, on
+  approving this: *"First live round didn't have putts made tracking I don't think. Don't let
+  that ruin the stats."* He was right and it would have: a round logged before he was tapping
+  either chip carries putt COUNTS and says nothing about how a hole ended, so a denominator of
+  `P.holes` would have filed eighteen unrecorded holes as concessions and printed a number far
+  too high. **A hole reaches this row by carrying evidence, never by failing to** — the same
+  rule the 171% bug bought, and the reason a round that recorded no endings cannot move the
+  figure at all. Where `known` is smaller than the holes played, `gameAreas()`'s putting read
+  line says how much smaller.
+
+  **`Longest made` came out with this**, and not only because the range list ends with it: it
+  was the row the corner block traded for, and its label was being ellipsised to *Longest mad…*
+  on a 13 mini. A four-row tile has no room for a fact stated twice.
 
   **It replaced a tile that read 100%.** It led with the share of lags finishing inside three
   feet, and on his first two live rounds that came out 15 of 15 — because 12 of those second
@@ -1094,9 +1117,12 @@ tables on Rounds, so a tile and that table can never disagree about a club.
   the taller one sets its height, and Into the green already runs to four. Each extra line
   costs the block about 18px and the 13 mini is the model that decides it. The first cut of
   this had eight rows and put the block 28–63px past the tab bar on **every** phone. So the
-  counts take three rows and the make distances take one — the longest he holed, the same fact
-  `madeFrom()` calls out on the round card, in the same words. The full distribution lives
-  there and in *Putting · by distance*, where there is room for it.
+  counts take three rows and `Given` takes the fourth; **the make distances cost no row at
+  all**, because they went into the corner instead (above). Putting the ranges in rows and
+  `Given` in the corner is the more readable arrangement, and it was measured before it was
+  rejected: the tile goes 144px → 171px and the block ends **11px past the tab bar** on a 13
+  mini. The full distribution still lives on the round card and in *Putting · by distance*,
+  where there is room to split it by one-putt versus lag.
 - **One row is not a split**, in the two club breakdowns: it would restate the headline
   underneath itself, so they guard on `< 2` rows. The putting rows are a fixed three and do
   not need the guard.
