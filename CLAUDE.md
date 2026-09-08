@@ -121,6 +121,8 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `kit`            | Mark practice kit owned (`add`) or gone (`remove`) — arrays of `KIT` keys from `app.js`. **Only ever a relay of Jack's own declaration** ("got this for at home practice"); ownership is his to state and is never inferred, so never send one on a guess. Added Aug 24 2026 with the PuttOut AirBreak mat (`airbreak`) |
 | `geo`            | Put a course's location on file (`geo:{course, lat, lon, prec, place, src}`). Round Prep sorts the standing plans and Courses sorts the rankings **nearest first** off it — see *Nearest first* below. Replaces any earlier fix for that course, matching on the name **before the em dash**, so one fix serves every course at a facility |
 | `deadline`       | Set the return-window deadline (clears "estimated") |
+| `profile`        | Patch the player profile (`profile:{handicap, stroke, miss, …}`); `Object.assign` onto `S.profile`. **The handicap on Today had no feed route at all until Sep 8 2026** — which is how the app came to say 8.5 while his GHIN index read 11.1 and the only remedy on offer was a to-do telling him to type it himself. A number the front page quotes must be pushable like every other number the front page quotes. It is still HIS number: relay what he reports, never an estimate |
+| `layout`         | Put a scorecard on file (`layout:{course, par[], si[], tot, ver, src, tees[]}`). It **replaces** the card, which is the point — an entry correcting a wrong stroke index must be able to ship without one rather than let the wrong one creep back. **`tees` is the one exception, and only downward**: an entry silent about tee ratings does not assert the course has none, so `course-cards.js`'s sourced ratings still stand behind it. See *A round has to reach the handicap* |
 
 Unknown types are left unapplied on purpose (forward-compat), so a typo'd `type` silently
 does nothing — double-check against `applyFeed()`.
@@ -1032,8 +1034,11 @@ survives a label wrapping to two lines.
 Both halves of this were learned by getting them wrong, an hour apart, and both are worth
 keeping:
 
-- **Stacking and hoping.** Courses has no `.sv`, so its label sat a whole band higher than
-  its neighbours' and the row read as four cards at three heights. Round Scores' caption sat
+- **Stacking and hoping.** Courses had no `.sv` then, so its label sat a whole band higher
+  than its neighbours' and the row read as four cards at three heights. (It carries one from
+  Sep 8 2026 — how many of his courses have a card on file — so that row now happens to be
+  four of four. The rule below is what keeps it safe when the next tile has nothing to put
+  there; it is not a rule that every tile must fill the band.) Round Scores' caption sat
   34px below Off the tee's because only one of them carries a sparkline. **Mixing tiles with
   and without an optional row is the normal case, not the edge case.**
 - **Bottom-aligning the wrong band.** The first fix pushed `.charttile .sub` down, which
@@ -1043,7 +1048,9 @@ keeping:
   middle of a stack reads as broken.** Only ever give `margin-top:auto` to the last child.
 
 At 320px the `.stat` labels give up tracking rather than wrap ("UP & DOWN" is the longest),
-the same trade the nav makes at that width.
+the same trade the nav makes at that width. **A `.sv` that wraps there costs the whole block
+11px**, because the row is only as short as its tallest card — "2 with cards" under Courses
+did exactly that and became "2 logged". Measure a new band at 320 before shipping it.
 
 **THE WHOLE BLOCK IS SIZED TO FIT ABOVE THE FOLD, and only a simulated phone can prove it.**
 It ran 38px past the nav on Jack's phone while sitting 47px clear in desktop Chromium, because
@@ -1102,9 +1109,13 @@ default and what an empty setting falls back to.
 The rules that make it safe to add a fourth:
 
 - **Nulls go last, never to zero.** A course he hasn't rated is not a course he rated 0, and
-  one with no PR on file is not one he shot nothing at. `sortCourses()` puts every null at
+  one with no score on file is not one he shot nothing at. `sortCourses()` puts every null at
   the bottom whichever key is picked, so a sort is only ever a re-ordering — nothing drops
   off the page for want of a value.
+- **PR sorts on `coursePR()`, not on the typed field** (Sep 8 2026). A round he logged that
+  beat his old PR is a fact the app can see, and a list sorting by the stale number while
+  the row beside it printed the new one would be the worst of both. See *A round has to
+  reach the handicap*.
 - **Direction is per key**: rating counts DOWN from the best, a PR and a distance both count
   UP from the lowest.
 - **`courseSortNote()` says which order the list is in**, and how many are sitting at the
@@ -1114,6 +1125,62 @@ The rules that make it safe to add a fourth:
   order and the note says so, with a button that asks for a fix; picking *Nearest* with no fix
   calls `fetchHere(true)` there and then, so the chip is the request. Deny it and nothing
   moves.
+
+### A round has to reach the handicap (Sep 8 2026)
+
+Jack's instruction: *"Make sure the whole app is linked up so as the live rounds complete
+the stats get updated. The today tab handicap and per shot stats and literally all we have
+that can be linked should be."*
+
+Almost everything already was — the tiles, Coach's areas, the miss maps, the worst-hole
+table and the Mental tab are all READERS over `S.rounds`, computed at render, so a saved
+round moves them the moment it lands. **Three things were not**, and all three failed the
+same way: they were not stale, they were *unreachable*.
+
+**1. The handicap.** A differential needs a rating and a slope, and `liveRound()` only ever
+got them from an exact prior card at that course or from Jack typing two numbers he does
+not know standing in the car park. So a round he logged himself scored, counted and coached
+— and did nothing whatever to the estimated index, silently.
+
+- `course-cards.js` cards may now carry **`tees:[{t,r,s,y}]`** — course rating and slope per
+  tee set, **eighteen holes only**, same sourcing rule as the pars. Lakeside's five rows
+  were already in the file's own comment, verified twice; they are data now.
+- The finish screen renders them as **chips**: tap the tees played and rating and slope fill
+  in. Then it says the **differential this card produces and where the index lands** —
+  because a round that visibly moves the number is the entire reason for asking.
+- A full card already saved without a rating gets the same chips **on the round card**, so
+  backfilling is a tap rather than a job for the next feed push.
+- **A nine-hole round is never offered them.** These are 18-hole ratings and a nine-hole
+  differential needs a nine-hole one; offering them would put a wrong number into the index
+  and it would look exactly like a right one.
+- **`indexBasis()`** is why the estimate can no longer just sit there: Today's tile shows
+  `N of 3 rated` where there is no estimate yet, and Rounds says how many cards carry a
+  rating and how many full ones are missing one. An absent number that says why beats a dash.
+
+**The bug this turned up is the transferable part.** Lakeside's tee ratings had been in the
+file since August and were invisible from the day the feed corrected its stroke index —
+because a `layout` entry replaces the whole card, and that entry had no `tees`. A field can
+be shipped, sourced and completely unreachable. When a feed type REPLACES a record, ask what
+the replacement is silent about rather than what it says.
+
+**2. The PR.** `c.pr` was hand-typed and never once compared against the cards he logs.
+**`coursePR()`** reconciles them: the lowest typed number OR the lowest full card, whichever
+is better, and the rankings sort by that. **His typed number is never overwritten** — courses
+he played before this app existed have a PR and no card, which is exactly what a hand-typed
+field is for — so where a card beat it the course says so and leaves his alone. A PR read off
+a card is marked (`.prq`) so a number that appeared without him typing it can never look like
+one he did.
+
+**3. His record at a course.** `courseRecord()` — rounds played, best 18 and best 9 kept
+apart (they are not comparable scores), average against par, last played — renders above the
+fields on the course sheet, as a count on each ranking row, as a line on the round card, and
+as `N logged` under Today's Courses tile. It is **read-only and never written back**: his
+rating, PR and notes are his, and a derived number quietly overwriting one is how a
+hand-typed field stops being worth having.
+
+The rule the whole pass came down to: **a number this app puts on its front page needs a
+route in.** Compute it, let the feed push it, or say what is missing — but never leave the
+only remedy a to-do telling him to go and type it.
 
 ### Two rows, one course (Aug 21 2026)
 

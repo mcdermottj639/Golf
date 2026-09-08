@@ -28,7 +28,16 @@
 //     tot: stated total par, used as a checksum against `par`
 //     ver: how well it is known — 'read' or 'reconciled', see below
 //     src: where it came from — a URL or a plainly named publication
-//     as:  the date the card was read, so a later renovation is detectable }
+//     as:  the date the card was read, so a later renovation is detectable
+//     tees: [{ t:'White', r:70.5, s:129, y:6189 }] course rating / slope per tee set,
+//           OPTIONAL and EIGHTEEN-HOLE ONLY. This is the field that lets a round he logs
+//           himself produce a handicap differential: the finish screen offers these as
+//           one-tap chips instead of asking him to know his rating standing in the car
+//           park. Same sourcing rule as the pars and harder to eyeball if it is wrong —
+//           a made-up slope moves his index and looks exactly like a real one — so ship
+//           it ONLY off the printed card or the course's own published ratings, and name
+//           the source in `src`. A nine-hole round needs a nine-hole rating, which these
+//           are not, so the app never offers them on one. }
 //
 // A 9-hole course, or one nine of a 27-hole facility, uses a 9-long `par` and `nine:'F'`
 // or `'B'` to say which half of an 18-hole round it fills.
@@ -72,6 +81,12 @@ const COURSE_CARDS = [
     par:[5,4,4,4,3,5,4,4,3, 4,4,5,5,3,4,4,3,4],
     si: [3,5,1,7,17,9,15,13,11, 6,8,16,12,14,4,2,18,10],
     src:'The club\'s own scorecard, photographed by Jack and read Aug 20 2026 — WHITE tees, 6,189 yds, 70.5/129. The card prints a separate stroke index for Blue/White, for Green, and for Gold/Red/Fwd White; this is the Blue/White row',
+    // All five tee rows off the same photographed card, and independently matched against
+    // the figures indexed from GolfLink — see the note above. These are what turn a round
+    // he logs here into a handicap differential without him typing anything.
+    tees:[{ t:'Blue', r:72.3, s:131, y:6513 }, { t:'White', r:70.5, s:129, y:6189 },
+          { t:'Green', r:68.4, s:123, y:5687 }, { t:'Gold', r:65.8, s:113, y:5211 },
+          { t:'Red', r:64.3, s:111, y:4944 }],
     as:'2026-08-20' },
 
   // --- RECONCILED ---------------------------------------------------------------------

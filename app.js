@@ -99,13 +99,21 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v88';
+const BUILD = 'v89';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v89', d:'2026-09-08', items:[
+    'A round you finish now moves your HANDICAP. The finish screen offers the tees as chips where the course\u2019s scorecard is on file — tap White and the rating and slope fill themselves in, and it tells you the differential and where your estimated index lands before you save.',
+    'Lakeside is the first course wired up: all five tee rows off the card you photographed (Blue 72.3/131 \u00b7 White 70.5/129 \u00b7 Green 68.4/123 \u00b7 Gold 65.8/113 \u00b7 Red 64.3/111). They had been sitting in the file since August and were unreachable — the feed entry that corrected the stroke index was replacing the whole card, tee ratings included.',
+    'Any full card already saved without a rating can be fixed from the card itself: open the round and the tee chips are there.',
+    'The estimated index says what it rests on. Today\u2019s handicap tile carries it, and Rounds now says how many of your cards carry a rating and how many full ones are missing one — so a number that has not moved tells you why instead of just sitting there.',
+    'Your PR keeps itself. A course\u2019s PR is now the lowest you have typed in OR the lowest full card you have logged, whichever is better, and the list sorts by that — so a good round moves it on its own. Your typed number is never overwritten; where a card beat it, the course says so and leaves yours alone.',
+    'Every course you tap now opens with YOUR RECORD HERE above the fields — rounds played, best 18 (and best 9), average against par, and when you last played it. The rankings show how many cards you have at each course, and Today counts how many of your courses have one.',
+    'Your handicap can be pushed by Claude now instead of you typing it. It was the one number on the front page with no route in — which is how the app came to say 8.5 while your GHIN index said 11.1 and the only fix on offer was a to-do telling you to go and change it yourself.' ] },
   { b:'v88', d:'2026-09-08', items:[
     'FIRST PUTT is off the live logger. A green now asks two questions instead of three — how many putts, and how long the one you holed was. Nothing else about logging a hole changed.',
     'That length does more work than it looks like. On a hole that took two putts, the putt you holed IS where your lag finished — so the app still measures distance control, and measures it as a proximity number rather than as a count of three-putts.',
@@ -1238,6 +1246,7 @@ const UP_TYPE = {
   'course-add':['COURSE',''], 'course-remove':['COURSE',''], geo:['GEO',''],
   debrief:['DEBRIEF',''], 'debrief-update':['DEBRIEF',''],
   shortlist:['PUTTER',''], deadline:['WINDOW',''], build:['BUILD',''],
+  profile:['PLAYER','u-u'],
 };
 const upType = t => { const r = UP_TYPE[t] || ['UPDATE','']; return { l:r[0], c:r[1] }; };
 
@@ -1586,10 +1595,22 @@ function theNumbers(){
   <section class="nums">
   <h2>The numbers</h2>
   <div class="rowgrid">
-    <div class="stat opens" data-action="go" data-view="rounds" data-seg="courses">
-      <div class="v">${S.courses.filter(c => !c.bucket).length}</div><div class="l">Courses</div></div>
+    ${(() => {
+      const list = S.courses.filter(c => !c.bucket), n = coursesWithCards(list);
+      // The band is the link: the big number is his list, the small one is how much of it
+      // this app has a card for — which moves the first time he logs a round somewhere new.
+      return `<div class="stat opens" data-action="go" data-view="rounds" data-seg="courses">
+        <div class="v">${list.length}</div><div class="l">Courses</div>${
+        // Short enough not to wrap at 320px, where a second line in one tile pushes the
+        // whole numbers block past the fold — the row is only as short as its tallest card.
+        n ? `<div class="sv">${n} logged</div>` : ''}</div>`;
+    })()}
     <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div>${
-      idx != null ? `<div class="sv">${idx.toFixed(1)} est.</div>` : ''}</div>
+      // The small number is the app's own estimate off his cards, and when there isn't one
+      // the band says how far off it is rather than going blank — a tile that silently
+      // drops a row is how "why has this never moved" becomes a question he has to ask.
+      idx != null ? `<div class="sv">${idx.toFixed(1)} est.</div>`
+        : `<div class="sv">${indexBasis().n} of 3 rated</div>`}</div>
     <div class="stat"><div class="v">${pc(st.fw.saved, miss)}</div><div class="l">Scramble</div>${
       miss ? `<div class="sv">${pc(st.fw.bogey, miss)} bogey</div>` : ''}</div>
     <div class="stat"><div class="v">${A.short ? esc(A.short.v) : '—'}</div><div class="l">Up &amp; down</div>${
@@ -3944,7 +3965,10 @@ function courseSortKey(){
   return COURSE_SORTS.some(x => x[0] === k) ? k : 'rating';
 }
 function sortCourses(list, key){
-  const val = c => key === 'pr' ? (c.pr != null ? +c.pr : null)
+  // PR reads `coursePR()`, not the typed field — a round he logged that beat his old PR
+  // is a fact the app can see, and a list that sorted by the stale number while the row
+  // beside it printed the new one would be the worst of both.
+  const val = c => key === 'pr' ? ((p => p ? p.v : null)(coursePR(c)))
     : key === 'dist' ? courseMiles(c.name)
     : (c.rating != null ? +c.rating : null);
   // Rating counts DOWN from the best; a PR and a distance both count up from the lowest.
@@ -3963,8 +3987,11 @@ function sortCourses(list, key){
 function courseSortNote(list, key){
   const missing = (n, what) => !n ? '' :
     ` ${n} ${n > 1 ? 'have' : 'has'} no ${what} on file, so ${n > 1 ? 'they sit' : 'it sits'} at the bottom rather than counting as a zero.`;
-  if(key === 'pr')
-    return `<b>Best score first.</b>${missing(list.filter(c => c.pr == null).length, 'PR')} A PR is the lowest score you have sent me for that course — send a better one and it moves.`;
+  if(key === 'pr'){
+    const beat = list.filter(c => (p => p && p.src === 'beat')(coursePR(c))).length;
+    return `<b>Best score first.</b>${missing(list.filter(c => !coursePR(c)).length, 'score')} A PR is the lowest you have typed in OR the lowest full card you have logged, whichever is better — so a round you log that beats it moves this list on its own.${
+      beat ? ` <b>${beat}</b> ${beat > 1 ? 'have been beaten' : 'has been beaten'} by a card you logged.` : ''}`;
+  }
   if(key === 'dist'){
     const placed = list.filter(c => courseGeo(c.name)).length;
     if(!S.here) return `Sorted by rating for now — your phone hasn't given up a location yet.<br><br>${
@@ -3987,16 +4014,23 @@ function courses(){
   const live = key === 'dist' && !S.here ? 'rating' : key;
   const sorted = sortCourses(played, live);
   // One row renderer, shared by the rankings and the duplicate check.
+  // The row carries his rating, the reconciled PR and — where he has actually logged
+  // cards there — how many. A PR the app read off one of those cards is marked, so a
+  // number that appeared without him typing it can never look like one he did.
   const row = c => {
     const mi = courseMilesLab(c.name);
+    const pr = coursePR(c), rec = courseRecord(c.name);
     return `<div class="crs" data-action="edit-course" data-id="${c.id}">
-      <span class="nm">${esc(c.name)}<span class="st">${esc(c.st||'')}</span>${mi ? `<span class="mi">${mi}</span>` : ''}</span>
-      <span class="rt">${c.rating!=null? Number(c.rating).toFixed(2) : '—'}${c.pr!=null?' · PR '+esc(c.pr):''}</span>
+      <span class="nm">${esc(c.name)}<span class="st">${esc(c.st||'')}</span>${mi ? `<span class="mi">${mi}</span>` : ''}${
+        rec ? `<span class="mi pl">${rec.n} card${rec.n === 1 ? '' : 's'}</span>` : ''}</span>
+      <span class="rt">${c.rating!=null? Number(c.rating).toFixed(2) : '—'}${
+        pr ? ` · PR ${esc(pr.v)}${pr.src === 'typed' ? '' : '<i class="prq" title="read off a card you logged">▪</i>'}` : ''}</span>
     </div>`;
   };
   return `
   <div class="rowgrid g3">
-    <div class="stat"><div class="v">${played.length}</div><div class="l">Played</div></div>
+    <div class="stat"><div class="v">${played.length}</div><div class="l">Played</div>${
+      (n => n ? `<div class="sv">${n} with cards</div>` : '')(coursesWithCards(played))}</div>
     <div class="stat"><div class="v">${states.size}</div><div class="l">States/Countries</div></div>
     <div class="stat"><div class="v">${avg}</div><div class="l">Avg rating</div></div>
   </div>
@@ -4027,6 +4061,38 @@ function courses(){
   </div>
 
   <h2 id="courseFormAnchor">${editingCourse ? 'Edit course' : 'Add a course'}</h2>
+  ${(() => {
+    // What his own cards say about this course, above the fields he types. It is READ-ONLY
+    // and nothing here is written back: the rating, PR and notes below are his, and a
+    // derived number quietly overwriting one is how a hand-typed field stops being worth
+    // having. The one place the two meet is the PR line, which says plainly when a card
+    // beat what he typed rather than changing it for him.
+    if(!editingCourse) return '';
+    const rec = courseRecord(editingCourse.name);
+    if(!rec) return `<div class="card flat"><p class="sm faint">No rounds logged here yet.
+      Play one with the live logger and this fills in with your record — plays, best, average against par —
+      and your PR starts keeping itself.</p></div>`;
+    const pr = coursePR(editingCourse);
+    const sc = r => `${r.score}${roundVsPar(r) != null ? ` (${roundVsPar(r) > 0 ? '+' : ''}${roundVsPar(r)})` : ''}`;
+    return `<div class="card">
+      <div class="rdl">Your record here</div>
+      <div class="rowgrid g3" style="margin-top:6px">
+        <div class="stat"><div class="v">${rec.n}</div><div class="l">Rounds</div>${
+          rec.live ? `<div class="sv">${rec.live} live</div>` : ''}</div>
+        <div class="stat"><div class="v">${rec.best ? rec.best.score : rec.bestNine ? rec.bestNine.score : '—'}</div>
+          <div class="l">Best ${rec.best ? '18' : rec.bestNine ? '9' : ''}</div>${
+          rec.best && rec.bestNine ? `<div class="sv">${rec.bestNine.score} for 9</div>` : ''}</div>
+        <div class="stat"><div class="v">${rec.avgVsPar == null ? '—' : `${rec.avgVsPar > 0 ? '+' : ''}${rec.avgVsPar.toFixed(1)}`}</div>
+          <div class="l">Avg vs par</div></div>
+      </div>
+      <p class="sm" style="margin-top:8px">Last played <b>${esc(fmtDate(rec.last.date))}</b> — ${sc(rec.last)}.${
+        rec.best ? ` Best round here: <b>${sc(rec.best)}</b> on ${esc(fmtDate(rec.best.date))}.` : ''}</p>
+      ${pr && pr.src === 'beat' ? `<p class="sm" style="margin-top:6px"><b>Your PR field says ${esc(pr.was)}, but you have logged a ${pr.v} here.</b>
+        The list uses the ${pr.v}. Your typed number is left exactly as you wrote it — change it below if you want to, or leave it.</p>`
+        : pr && pr.src === 'logged' ? `<p class="sm" style="margin-top:6px">PR <b>${pr.v}</b> comes off the card you logged on ${esc(fmtDate(pr.r.date))}. Type one below only if you have beaten it somewhere I have no card for.</p>` : ''}
+      <p class="sm faint" style="margin-top:6px">Read off your own cards. Nothing here overwrites what you type below.</p>
+    </div>`;
+  })()}
   <div class="card">
     <label>Name</label><input id="coNa" list="courseDbList" placeholder="Start typing — the directory suggests as you go" value="${esc(editingCourse?.name||'')}">
     <datalist id="courseDbList">${(typeof COURSE_DB!=='undefined'?COURSE_DB:[]).map(c=>`<option value="${esc(c.n)}">${esc(c.st)}</option>`).join('')}</datalist>
@@ -4292,6 +4358,61 @@ function estIndex(){
   if(d.length < 3) return null;
   const n = Math.max(1, Math.round(d.length * 0.4));
   return d.slice(0, n).reduce((a,b) => a + b, 0) / n;
+}
+// WHY THE INDEX IS OR ISN'T MOVING. An estimate that sits still after a round he logged
+// looks broken, and the reason is never visible from the number: a differential needs a
+// rating AND a slope AND a full nine or eighteen, and a live card only carries them if a
+// rated card at that course came first or he typed them on the finish screen. So every
+// place that prints the estimate can also print what it was built on and what is missing —
+// an absent number that says why is worth more than one that just says nothing.
+function indexBasis(){
+  const scored = S.rounds.filter(r => r.score != null);
+  const rated = scored.filter(r => roundDiff(r) != null);
+  return { n:rated.length, scored:scored.length, short:Math.max(0, 3 - rated.length),
+    missing: scored.filter(r => roundDiff(r) == null && fullCard(r)).length };
+}
+
+// ----- What his own cards say about a course -----
+// The course name is the join key everywhere in this app, so a record is just the rounds
+// that carry it. Everything here is DERIVED — nothing is written back onto the course row,
+// because his typed rating, PR and notes are his and a computed number must never quietly
+// overwrite one. See `coursePR()` for how the two are reconciled.
+const sameCourse = (a, b) => (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase();
+// How many of the courses on his list he has actually logged a card at. His course list is
+// his own history and rightly bigger than what this app has seen, so the two counts sit
+// together rather than one standing in for the other.
+function coursesWithCards(list){
+  return (list || S.courses).filter(c => courseRounds(c.name).some(r => r.score != null)).length;
+}
+function courseRounds(name){
+  return S.rounds.filter(r => sameCourse(r.course, name));
+}
+// A nine and an eighteen are not comparable scores, so they are kept apart rather than
+// pooled into one "best" that would flatter whichever format he happened to play short.
+function courseRecord(name){
+  const rs = courseRounds(name).filter(r => r.score != null);
+  if(!rs.length) return null;
+  const holes = r => (Array.isArray(r.holes) && r.holes.length) || (r.nine ? 9 : 18);
+  const full = rs.filter(r => holes(r) >= 18), nine = rs.filter(r => holes(r) < 18);
+  const low = list => list.length ? list.reduce((a, r) => r.score < a.score ? r : a) : null;
+  const vs = rs.map(roundVsPar).filter(v => v != null);
+  return { n:rs.length, best:low(full), bestNine:low(nine), live:rs.filter(r => r.live).length,
+    last: rs.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0],
+    avgVsPar: vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null };
+}
+// His typed PR against the lowest full card he has actually logged. HIS NUMBER IS NEVER
+// OVERWRITTEN — courses he played before this app existed have a PR and no card, and that
+// is exactly the value of a hand-typed field. But a round he logged that BEAT it is a fact
+// the app can see and he should not have to retype, so the better of the two is what the
+// list shows and sorts by, and `src` says which one it came from.
+function coursePR(c){
+  const typed = c && c.pr != null && c.pr !== '' ? +c.pr : null;
+  const rec = courseRecord(c && c.name);
+  const logged = rec && rec.best ? rec.best.score : null;
+  if(typed == null && logged == null) return null;
+  if(logged == null) return { v:typed, src:'typed' };
+  if(typed == null) return { v:logged, src:'logged', r:rec.best };
+  return logged < typed ? { v:logged, src:'beat', r:rec.best, was:typed } : { v:typed, src:'typed' };
 }
 
 function scoreStats(rounds){
@@ -4739,8 +4860,24 @@ function scores(){
   <div class="rowgrid g3">
     <div class="stat"><div class="v">${all.length}</div><div class="l">Rounds</div></div>
     <div class="stat"><div class="v">${st.holes || '—'}</div><div class="l">Holes analysed</div></div>
-    <div class="stat"><div class="v">${idx != null ? idx.toFixed(1) : '—'}</div><div class="l">Est. index</div></div>
+    <div class="stat"><div class="v">${idx != null ? idx.toFixed(1) : '—'}</div><div class="l">Est. index</div>${
+      (b => `<div class="sv">${b.n} rated card${b.n === 1 ? '' : 's'}</div>`)(indexBasis())}</div>
   </div>
+
+  ${(() => {
+    // An estimate that does not move after a round he logged looks broken, and the reason
+    // is never visible from the number: a differential needs a rating, a slope and a full
+    // nine or eighteen. So the page says which of his cards can produce one and which
+    // cannot, and what to do about the ones that cannot — the same rule the tiles follow,
+    // that an absent number explains itself rather than rendering a dash and stopping.
+    const b = indexBasis();
+    if(!b.scored) return '';
+    return `<div class="card flat"><p class="sm">${
+      idx != null ? `Estimated index off the best 40% of <b>${b.n}</b> rated card${b.n === 1 ? '' : 's'}, the way an index is built.`
+        : b.n ? `<b>${b.n} of your cards carr${b.n === 1 ? 'ies' : 'y'} a rating</b> — the estimate starts at three.`
+              : `<b>None of your cards carry a course rating yet</b>, so there is no estimated index to show.`}${
+      b.missing ? ` <b>${b.missing}</b> full card${b.missing === 1 ? '' : 's'} of yours ${b.missing === 1 ? 'has' : 'have'} no rating and slope on ${b.missing === 1 ? 'it' : 'them'} — tap the round and tell Claude which tees you played, or tap the tees on the finish screen next time if the course card is on file.` : ''}</p></div>`;
+  })()}
 
   ${vs.length > 1 ? `<div class="card">
     <div class="charttile"><div class="lab">Score vs par · by round</div>
@@ -5403,8 +5540,29 @@ function roundView(i){
     ${r.troubles && r.troubles.length ? `<div class="chips">${r.troubles.map(k => {
       const lab = (TROUBLES.find(t => t[0] === k) || [null, k])[1];
       return `<span class="chip static on">${esc(lab)}</span>`; }).join('')}</div>` : ''}
-    ${played ? `<div class="linkrow" data-action="edit-course" data-id="${played.id}">
-      <span class="sm"><b>${played.rating ? `You rated this course ${played.rating}/10` : 'Rate this course'}</b></span><span class="arr">→</span></div>` : ''}
+    ${(() => {
+      // A full card with no rating on it is a round that scored, counted and coached — and
+      // did nothing at all to his index, silently. Where the course's own card is on file
+      // it is one tap to fix, here on the card rather than as a job for the next feed push.
+      // Eighteen holes only: these are 18-hole ratings (see `tees` in course-cards.js).
+      if(!fullCard(r) || (r.rating != null && r.slope)) return '';
+      const t = a.holes.length >= 18 && pub && pub.tees && pub.tees.length ? pub.tees : null;
+      const d = roundDiff(r);
+      return `<div class="card flat" style="margin-top:10px">
+        <p class="sm"><b>No course rating on this card${d == null ? ', so it is not in your estimated index' : ''}.</b>
+        ${t ? 'Tap the tees you played and it joins.' : 'Tell Claude which tees you played and it can be backfilled.'}</p>
+        ${t ? `<div class="chips" style="margin-top:8px">${t.map(x =>
+          `<span class="chip" data-action="round-tee" data-i="${+i}" data-t="${esc(x.t)}" data-r="${x.r}" data-s="${x.s}">${esc(x.t)}<i class="teer">${x.r}/${x.s}</i></span>`).join('')}</div>
+        <p class="sm faint" style="margin-top:6px">Off ${esc(cardSrcShort(pub.src))}.</p>` : ''}
+      </div>`;
+    })()}
+    ${played ? (rec => `<div class="linkrow" data-action="edit-course" data-id="${played.id}">
+      <span class="sm"><b>${played.rating ? `You rated this course ${played.rating}/10` : 'Rate this course'}</b>${
+        // What this round is inside his record at the course — the card he is looking at
+        // is one of these, so it reads as "where does today sit" rather than as trivia.
+        rec && rec.n > 1 ? `<br><span class="faint">${rec.n} rounds here${
+          rec.best ? ` · best ${rec.best.score}${rec.best === r ? ' — this one' : ''}` : ''}</span>` : ''}</span>
+      <span class="arr">→</span></div>`)(courseRecord(r.course)) : ''}
   </div>
 
   ${a.holes.length ? `
@@ -5586,6 +5744,15 @@ function publishedCard(course, nine){
   const base = typeof COURSE_CARDS_OK !== 'undefined' ? COURSE_CARDS_OK.find(hit) : null;
   const c = fed || base;
   if(!c || !Array.isArray(c.par)) return null;
+  // A fed `layout` REPLACES the card — that is the whole point of it, and why an entry
+  // correcting a wrong stroke index must be able to ship without one rather than have the
+  // wrong one creep back. `tees` is the single exception, and only downward: an entry that
+  // says nothing about tee ratings is silent about them, not asserting the course has
+  // none, so the file's sourced ratings still stand behind it. Without this the Lakeside
+  // card's five tee rows were invisible from the day the feed corrected its stroke index —
+  // which is exactly how a field ends up shipped and unreachable.
+  const tees = Array.isArray(c.tees) ? c.tees
+    : (fed && base && Array.isArray(base.tees) ? base.tees : null);
   // A 9-long card fills the nine it names; an 18-long one is read straight.
   const first = c.par.length === 9 ? (c.nine === 'B' ? 10 : 1) : 1;
   const by = new Map();
@@ -5593,9 +5760,19 @@ function publishedCard(course, nine){
   // `ver` separates a card somebody READ from one assembled out of published data that
   // reconciles. Both beat a guess; only one is a transcription, and the card-check screen
   // says which — see the header of course-cards.js.
-  return { by, src: c.src || 'a published scorecard', fed: !!fed, ver: c.ver || 'reconciled' };
+  // `tees` rides along untouched — it is the only route by which a round he logs himself
+  // gets a course rating, and so the only route by which his estimated index moves off a
+  // live card at a course he has not played with a rated one before.
+  return { by, src: c.src || 'a published scorecard', fed: !!fed, ver: c.ver || 'reconciled', tees };
 }
 
+// The card's provenance in a few words. `src` is deliberately a paragraph — it carries
+// the whole transcription trail and the card-check screen wants every word of it — but a
+// line under a row of chips wants the first clause and nothing else.
+function cardSrcShort(src){
+  const t = String(src || 'a published scorecard').split(/[—.,;(]/)[0].trim();
+  return t.length > 64 ? t.slice(0, 61).trim() + '…' : t;
+}
 function coursesWithLayout(){
   const seen = new Map();
   S.rounds.forEach(r => {
@@ -5762,6 +5939,19 @@ function liveThru(L){
     score: played.reduce((a, h) => a + h.s, 0),
     putts: played.length && played.every(h => h.putts != null)
       ? played.reduce((a, h) => a + h.putts, 0) : null };
+}
+
+// The finish screen's own fields, captured onto the draft before anything redraws it.
+// Same reason as `syncHoleNote()`: the review screen has a keyboard on it, and a chip tap
+// that threw away a half-typed note would be the app losing something he wrote.
+function syncFinish(){
+  const L = S.live; if(!L) return;
+  const tees = $('#lvTees'); if(tees) L.tees = tees.value.trim();
+  const note = $('#lvNote'); if(note) L.note = note.value.trim();
+  const rt = $('#lvRating'); if(rt) L.rating = rt.value === '' ? null : parseFloat(rt.value);
+  const sl = $('#lvSlope'); if(sl) L.slope = sl.value === '' ? null : parseInt(sl.value, 10);
+  const chips = document.querySelectorAll('#troubleChips .chip.on');
+  if($('#troubleChips')) L.troubles = [...chips].map(c => c.dataset.trouble);
 }
 
 // Draft → the documented round shape. Holes with no score never happened: they are
@@ -6324,12 +6514,47 @@ function liveFinish(L){
   </div>` : '')(r.holes.filter(h => h.note))}
 
   <div class="card">
-    ${fullCard(r) ? `<div class="formrow g3">
+    ${fullCard(r) ? `${(() => {
+      // ONE TAP INSTEAD OF THREE FIELDS. Rating and slope are the only reason a round he
+      // logged himself reaches his index, and they are also the two numbers nobody knows
+      // standing in the car park — so where the course's card is on file with its tee
+      // rows, they are chips. Eighteen holes only: these are 18-hole ratings, and a
+      // nine-hole differential needs a nine-hole one, so offering them on a nine would
+      // quietly put a wrong number into the estimate.
+      const pub = r.holes.length >= 18 ? publishedCard(L.course, null) : null;
+      if(!pub || !pub.tees || !pub.tees.length) return '';
+      return `<label>Tees played</label>
+      <div class="chips" style="margin-bottom:10px">${pub.tees.map(t =>
+        `<span class="chip${(L.tees || '').toLowerCase() === String(t.t).toLowerCase() ? ' on' : ''}"
+          data-action="live-tee" data-t="${esc(t.t)}" data-r="${t.r}" data-s="${t.s}">${esc(t.t)}
+          <i class="teer">${t.r}/${t.s}</i></span>`).join('')}</div>
+      <p class="sm faint" style="margin-top:-4px;margin-bottom:10px">Off ${esc(cardSrcShort(pub.src))}. Tap the tees you played and the rating and slope fill in — that is what turns this card into a handicap differential.</p>`;
+    })()}<div class="formrow g3">
       <div><label>Tees</label><input id="lvTees" value="${esc(L.tees || '')}" placeholder="Blue"></div>
       <div><label>Rating</label><input id="lvRating" inputmode="decimal" value="${L.rating ?? ''}" placeholder="—"></div>
       <div><label>Slope</label><input id="lvSlope" inputmode="numeric" value="${L.slope ?? ''}" placeholder="—"></div>
     </div>
-    <p class="sm faint">Rating and slope are what turn this into a handicap differential. Both or neither — leave them blank and Claude can backfill them later.</p>`
+    ${(() => {
+      // What this card is about to DO to the number on Today. A round that visibly moves
+      // the index is the whole point of asking for a rating at all, and a round that
+      // cannot move it should say so here rather than on the way past.
+      const b = indexBasis(), now = estIndex();
+      const diff = roundDiff({ ...r, rating: L.rating, slope: L.slope });
+      if(diff == null) return `<p class="sm faint">Rating and slope are what turn this into a handicap differential. Both or neither — leave them blank and Claude can backfill them later. ${
+        b.n ? `You have <b>${b.n}</b> rated card${b.n === 1 ? '' : 's'} on file${b.short ? `, and the estimate needs ${b.short} more` : ''}.`
+            : 'None of your cards carry one yet, so the estimated index on Today has nothing to work from.'}</p>`;
+      const after = (() => {
+        const d = S.rounds.map(roundDiff).concat([diff]).filter(v => v != null).sort((x, y) => x - y);
+        if(d.length < 3) return null;
+        const n = Math.max(1, Math.round(d.length * 0.4));
+        return d.slice(0, n).reduce((x, y) => x + y, 0) / n;
+      })();
+      return `<p class="sm"><b>Differential ${diff.toFixed(1)}.</b> ${
+        after == null ? `That makes ${b.n + 1} rated card${b.n ? 's' : ''} — the estimated index starts at three.`
+        : now == null ? `Your estimated index starts here: <b>${after.toFixed(1)}</b>.`
+        : Math.abs(after - now) < 0.05 ? `Your estimated index stays at <b>${after.toFixed(1)}</b>.`
+        : `Your estimated index moves <b>${now.toFixed(1)} → ${after.toFixed(1)}</b>.`}</p>`;
+    })()}`
     : `<div><label>Tees</label><input id="lvTees" value="${esc(L.tees || '')}" placeholder="Blue"></div>
     <p class="sm faint" style="margin-top:8px">${r.holes.length} holes isn't a full nine or eighteen, so this card gets no course rating — a part-round can't produce a handicap differential, and forcing one would drag your estimated index somewhere false. Everything else about it still counts.</p>`}
     <label>What gave you trouble? (pre-ticked from your card — adjust it)</label>
@@ -6612,25 +6837,48 @@ const ACTIONS = {
     }
     L.cur = to; suggestTee(L); save(); render('live');
   },
+  // Tapping a tee set fills the rating and slope from the card on file. The screen
+  // redraws, so whatever he had already typed into the note and the other fields is
+  // captured first — the same reason every chip on a hole screen saves before it draws.
+  'live-tee': el => {
+    const L = S.live; if(!L) return;
+    syncFinish();
+    L.tees = el.dataset.t;
+    L.rating = parseFloat(el.dataset.r);
+    L.slope = parseInt(el.dataset.s, 10);
+    save(); rerender();
+  },
   'live-save': () => {
     const L = S.live; if(!L) return;
     syncHoleNote();
+    syncFinish();
     const r = liveRound(L);
     if(!r.holes.length) return toast('Score at least one hole first');
-    const tees = $('#lvTees').value.trim();
-    if(tees) r.tees = tees;
+    if(L.tees) r.tees = L.tees;
     // A course rating covers a whole nine or eighteen. On a card that stops early it
     // would produce a wildly wrong differential and drag the estimated index with it, so
     // a part-round gets no rating at all — see the note on the review screen.
-    const rt = parseFloat($('#lvRating')?.value), sl = parseInt($('#lvSlope')?.value, 10);
-    if(fullCard(r) && !isNaN(rt) && !isNaN(sl)){ r.rating = rt; r.slope = sl; }
-    r.note = $('#lvNote').value.trim();
-    r.troubles = [...document.querySelectorAll('#troubleChips .chip.on')].map(c => c.dataset.trouble);
+    if(fullCard(r) && L.rating != null && !isNaN(L.rating) && L.slope){ r.rating = L.rating; r.slope = L.slope; }
+    r.note = L.note || '';
+    r.troubles = L.troubles || [];
     S.rounds.push(r);
     bumpGearCounters();
     S.live = null; save();
     render('round', S.rounds.length - 1);
     toast('Round saved — this is your card');
+  },
+  // Backfill a rating onto a card already saved. It only ever ADDS one where there is
+  // none — a rating already on a card was either read off the course's own scorecard or
+  // sent by Claude, and a chip tap must not be able to overwrite either.
+  'round-tee': el => {
+    const r = S.rounds[+el.dataset.i];
+    if(!r || !fullCard(r) || (r.rating != null && r.slope)) return;
+    r.tees = el.dataset.t;
+    r.rating = parseFloat(el.dataset.r);
+    r.slope = parseInt(el.dataset.s, 10);
+    save(); rerender();
+    const idx = estIndex();
+    toast(idx != null ? `Rating added — est. index ${idx.toFixed(1)}` : 'Rating added');
   },
   'live-discard': () => {
     if(!S.live) return;
@@ -7062,6 +7310,9 @@ function updateLine(e){
          ...(e.remove || []).map(k => `${KIT_LAB[k] || k} removed`)].join(' · '),
       act:go('drills') };
     case 'deadline':      return { h: e.date ? 'Return deadline set' : 'Return deadline cleared', s:'', act:go('decisions') };
+    case 'profile':       return { h: (e.profile && e.profile.handicap != null)
+                            ? `Handicap updated to ${e.profile.handicap}` : 'Player profile updated',
+                            s:'', act:go('home') };
     default:              return { h:`Update · ${e.type || 'change'}`, s:'', act:null };
   }
 }
@@ -7297,6 +7548,14 @@ function applyFeed(feed){
       S.faults = disc ? S.faults.filter(f => faultDisc(f) !== disc).concat(tagged) : tagged;
     }
     else if(e.type === 'deadline'){ S.settings.returnDeadline = e.date; S.settings.deadlineEstimated = false; }
+    // His playing profile — the handicap on Today, the stroke, the signature miss. It had
+    // no feed route at all until Sep 8 2026, which is how the app came to carry 8.5 while
+    // his GHIN index read 11.1 and the only fix on offer was a to-do telling him to go and
+    // type it. A number this app quotes on its front page must be pushable like every
+    // other number this app quotes.
+    else if(e.type === 'profile' && e.profile && typeof e.profile === 'object'){
+      Object.assign(S.profile, e.profile);
+    }
     else return; // unknown type: leave unapplied so a newer app version can pick it up
     S.feedApplied.push(e.id);
     recordUpdate(e);

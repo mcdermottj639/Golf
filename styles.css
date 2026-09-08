@@ -434,6 +434,18 @@ body.night .dscore{border-left-color:var(--gtext)}
 .mi{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.04em;
   color:var(--gtext);background:rgba(18,60,38,.07);border:1px solid var(--line2);
   border-radius:10px;padding:1px 7px;margin-left:6px;white-space:nowrap}
+/* The same chip in ink rather than green, for a count of his own cards at a course —
+   it is a fact about his record, not about where the course is, and reading as a second
+   distance would be worse than not showing it. */
+.mi.pl{color:var(--soft);background:rgba(0,0,0,.04)}
+/* A PR the app read off a logged card rather than one he typed. A mark, not a word: the
+   number is the point and the provenance is a glance, the same job `evTag()` does for a
+   finding. */
+.prq{font-style:normal;font-size:8px;vertical-align:super;color:var(--gtext);margin-left:2px}
+/* The rating/slope under a tee name on a tee chip. Small and mono so the chip reads as
+   "White" first and the numbers second — he picks the tee he played, not the figures. */
+.teer{display:block;font-family:var(--mono);font-style:normal;font-size:9px;
+  letter-spacing:.02em;opacity:.7;margin-top:1px}
 .linkrow{display:flex;justify-content:space-between;align-items:center;padding:10px 2px;
   border-bottom:1px dotted var(--dot);cursor:pointer}
 .linkrow .arr{color:var(--faint)}
@@ -705,6 +717,7 @@ body.night .f-ok{background:#1c2b22;color:#8fd0a8;border-color:#33503f}
 body.night .spark .b{background:#39423e}
 body.night th{border-bottom-color:#33503f}
 body.night .mi{background:rgba(255,255,255,.07);color:var(--ink);border-color:var(--line)}
+body.night .mi.pl{background:rgba(255,255,255,.05);color:var(--soft)}
 body.night .picker{background:#1a1f24}
 body.night .pkgrp{background:#22292e}
 body.night .pkrow:active{background:#22292e}
