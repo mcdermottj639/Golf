@@ -99,13 +99,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v89';
+const BUILD = 'v90';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v90', d:'2026-09-08', items:[
+    'PUTTING now reads 1-putt, 2-putt and 3+ putts as percentages of the holes you played, with the raw counts beside them, and the longest putt you holed underneath. The headline is putts a hole.',
+    'It was showing 100%. That tile led with the share of your lags finishing inside three feet, and on your two live rounds that came out 15 of 15 — because 12 of those second putts were GIVEN, and a conceded putt is inside gimme range by definition. The number was right and told you nothing: it was measuring how freely your partners give short ones. A rate that can only land near 100% is not a measurement.',
+    'Where that proximity number still appears — the lag finding and Putting · by distance — it now says how many were conceded rather than holed, so you can see which half is yours.',
+    'The whole numbers block got a little tighter to make room, out of leading and padding only. It now clears the tab bar by 15px on the smallest phone and about 50px on yours — it was running 8px PAST it once you had live putting data on the card, which nothing had measured before.' ] },
   { b:'v89', d:'2026-09-08', items:[
     'A round you finish now moves your HANDICAP. The finish screen offers the tees as chips where the course\u2019s scorecard is on file — tap White and the rating and slope fill themselves in, and it tells you the differential and where your estimated index lands before you save.',
     'Lakeside is the first course wired up: all five tee rows off the card you photographed (Blue 72.3/131 \u00b7 White 70.5/129 \u00b7 Green 68.4/123 \u00b7 Gold 65.8/113 \u00b7 Red 64.3/111). They had been sitting in the file since August and were unreachable — the feed entry that corrected the stroke index was replacing the whole card, tee ratings included.',
@@ -1532,31 +1537,54 @@ const APPROACH_GROUP = k => {
 const APPROACH_LAB = { x:'Woods', l:'2i–5i', s:'6i–PW', w:'50–60°' };
 // Longest club to shortest, always — a fixed ladder like PUTT_DIST, never sorted by volume.
 const APPROACH_ORDER = ['x', 'l', 's', 'w'];
-// Where the LAG left him, by distance (Jack's ask, Aug 30 2026; rebuilt Sep 8 2026 when the
-// first-putt field came off the logger) — and it renders something before that data exists,
-// which is the point of having it: the tile otherwise just has a hole in it, and a hole
-// explains nothing. Until two ranges carry a lag it says what to tap on the green to fill it,
-// so the empty state is an instruction rather than an absence.
+// The putting breakdown: how many putts a hole takes, and how long the ones he holes are
+// (Jack's ask, Sep 8 2026 — "1 putt 2 putt 3 putt %s and make distances if possible").
 //
-// This is a proximity distribution, not a make rate — the card carries a distance only for
-// putts that went in, so on a hole that took two the distance IS where the first one
-// finished. The caption row says so: three columns of numbers under a tile cannot carry that
-// on their own, and read as a conversion rate if nothing says otherwise. Rows stay in
-// PUTT_DIST order because these are a ladder; the cap picks the four busiest and then puts
-// them back in distance order, so it never reads as a top-four chart.
+// IT REPLACED A NUMBER THAT READ 100%. The tile led with the share of lags finishing inside
+// three feet, and on his first two live rounds that came out 15 of 15 — because 12 of those
+// 15 second putts were CONCEDED, and a conceded putt is inside gimme range by definition.
+// The figure was arithmetically right and told him nothing: it measured how freely his
+// partners give short ones at least as much as how well he lags. A rate that can only come
+// out near 100% is not a measurement, and the fix was not to weight it — it was to lead
+// with the counts, which are unambiguous, always available, and move with every hole.
+//
+// FOUR ROWS, AND THAT IS THE WHOLE BUDGET. The numbers block is sized to fit above the fold
+// (see *The numbers on Today*), the two bottom tiles share a grid row so the taller one sets
+// its height, and Into the green already runs to four. Each extra line costs about 18px of
+// the block, and the 13 mini — the tightest viewport — had 8px of headroom to give. The
+// first version of this had eight rows and put the block 28-63px past the nav on every
+// phone. So the counts get three rows and the make distances get ONE: the longest he holed,
+// which is the same fact `madeFrom()` calls out on the round card, in the same words. The
+// full distribution lives there and in Putting · by distance on Rounds, where there is room
+// for it.
+//
+// The rows are a share of HOLES PLAYED, not of holes he putted on, so a hole he chipped in
+// is correctly none of the three and the three need not sum to 100. Chip-ins are named in
+// the read line rather than given a fourth row — a row that only sometimes exists would
+// spend the budget the make distance is using.
 function puttMadeRows(st){
-  if(!st.putts.holes) return '';
-  const den = st.putts.lagN || 0;
-  const rows = PUTT_DIST.map(d => ({ d, e:st.putts.dist.get(d.k) })).filter(x => x.e && x.e.lag);
-  if(st.putts.lagIn) rows.push({ d:{ k:'gim', lab:'given' }, e:{ lag:st.putts.lagIn } });
-  if(!den || rows.length < 2) return `<div class="tclub"><div class="tcr tcnote">Tap how long the putt
-    you holed was and where your lags finish fills in here.</div></div>`;
-  const keep = new Set(rows.slice().sort((a, b) => b.e.lag - a.e.lag).slice(0, 4).map(x => x.d.k));
-  return `<div class="tclub"><div class="tcr tcnote">Where the lag left you</div>
-    ${rows.filter(x => keep.has(x.d.k)).map(({ d, e }) => `<div class="tcr">
-    <span class="tcn">${esc(d.lab)}${d.k === 'gim' ? '' : ' ft'}</span>
-    <span class="tcv">${Math.round(e.lag / den * 100)}%</span>
-    <span class="tcf">${e.lag}/${den}</span></div>`).join('')}</div>`;
+  const P = st.putts;
+  if(!P.holes) return '';
+  const pc = n => `${Math.round(n / P.holes * 100)}%`;
+  const made = puttRows(P.dist).filter(e => e.made);
+  const longest = made.length ? made[made.length - 1] : null;
+  const madeN = made.reduce((a, e) => a + e.made, 0);
+  return `<div class="tclub">
+    ${[['1-putt', P.one], ['2-putt', P.two], ['3+ putts', P.three]].map(([lab, n]) => `<div class="tcr">
+      <span class="tcn">${esc(lab)}</span>
+      <span class="tcv">${pc(n)}</span>
+      <span class="tcf">${n}/${P.holes}</span></div>`).join('')}
+    ${longest ? `<div class="tcr">
+      <span class="tcn">Longest made</span>
+      <span class="tcv">${esc(PD[longest.k].lab)} ft</span>
+      <span class="tcf">${madeN}</span></div>`
+      // The empty state is still an instruction rather than a blank — but it takes the SAME
+      // one line the row it becomes will take. A wrapping `.tcnote` here ran to three lines
+      // and made the no-data case the tallest one on the page, which is how a tile with
+      // nothing in it ends up pushing the block past the tab bar.
+      : `<div class="tcr"><span class="tcn">Longest made · tap it in</span>
+      <span class="tcv">—</span></div>`}
+  </div>`;
 }
 function greenClubRows(st){
   const g = Object.fromEntries(APPROACH_ORDER.map(k => [k, { n:0, hit:0 }]));
@@ -3158,14 +3186,6 @@ const AREA_OF = {
 };
 const areaOf = f => !f ? null : (AREA_OF[f.key] || AREA_OF[f.tag] || null);
 
-// The putting headline switches once the data exists to carry a better one. Putts-a-hole
-// is what a scorecard can always give, and it is a blunt number: it cannot tell a two-putt
-// from forty feet from a two-putt from five. How close the lags finish can, and it is the
-// open fault stated directly — so as soon as enough lags carry a distance, that becomes the
-// headline. It was the 4–6 ft make rate until Sep 8 2026, when the first-putt field came
-// off the logger and took the only recorded MISS distance with it.
-const PUTT_HEADLINE_MIN = 10;
-
 // Returns the four areas AND the stats they were computed from, so every line on the card
 // speaks about the same set of cards. Reading the tiles off the live rounds and the summary
 // line off everything would be a quiet lie about what the card is showing.
@@ -3221,20 +3241,18 @@ function gameAreas(rounds){
     read:`${sg.chances} chance${sg.chances === 1 ? '' : 's'} to save a hole, ${sg.saved ? `<b>${sg.saved}</b> taken` : '<b>none</b> taken'}.`
   } : null;
 
-  // PUTTING. See PUTT_HEADLINE_MIN — how close the lags finish as soon as enough of them
-  // carry a distance, putts a hole until then. Proximity is the headline rather than a make
-  // rate because the card records the length of the putt he HOLED: on a two-putt hole that
-  // is where the lag left him, which is the open distance-control fault measured directly,
-  // and there is no missed putt with a distance on it to build a conversion rate out of.
-  const close = lagClose(st.putts);
-  out.putt = st.putts.holes ? (close.n >= PUTT_HEADLINE_MIN ? {
-    v:`${pct(close.in, close.n)}%`, u:'of lags finish inside 3 ft', raw:`${close.in}/${close.n}`, n:close.n,
-    read:`${st.putts.three} three-putt${st.putts.three === 1 ? '' : 's'} over ${st.putts.holes} holes, at ${(st.putts.total / st.putts.holes).toFixed(2)} putts a hole.`
-  } : {
-    v:(st.putts.total / st.putts.holes).toFixed(2), u:`putts a hole · ${st.putts.total}`, raw:'', n:st.putts.holes,
-    read:`${st.putts.three} three-putt${st.putts.three === 1 ? '' : 's'} and ${st.putts.one} one-putt${st.putts.one === 1 ? '' : 's'} over ${st.putts.holes} holes.`
-      + (close.n < PUTT_HEADLINE_MIN ? ' <b>Not enough putt distances logged</b> — tap how long the one you holed was and this becomes a proximity number.' : '')
-  }) : null;
+  // PUTTING. Putts a hole, always — it needs nothing but the putt count, it exists from the
+  // first hole he logs, and it moves with every one after. It led with the share of lags
+  // finishing inside three feet until Sep 8 2026, which came out 15 of 15 on his first two
+  // live rounds because twelve of those second putts were CONCEDED; see `puttMadeRows()`
+  // for why a rate that can only land near 100% was replaced rather than reweighted.
+  const P = st.putts;
+  out.putt = P.holes ? {
+    v:(P.total / P.holes).toFixed(2), u:`putts a hole · ${P.total}`, raw:'', n:P.holes,
+    read:`${P.one} one-putt${P.one === 1 ? '' : 's'}, ${P.two} two-putt${P.two === 1 ? '' : 's'} and ${
+      P.three} three-putt${P.three === 1 ? '' : 's'} over ${P.holes} holes${
+      P.zero ? `, plus ${P.zero} you chipped in` : ''}.`
+  } : null;
 
   return { areas:out, st, sg };
 }
@@ -4429,8 +4447,12 @@ function scoreStats(rounds){
   // off the FAIRWAY. Counted here rather than anywhere else so no second pass over the holes
   // can ever disagree with the fairway percentage sitting beside it.
   const fw = { n:0, hit:0, saved:0, bogey:0, miss:{} }, green = { n:0, hit:0, miss:{}, noshot:0 };
-  const putts = { holes:0, total:0, one:0, three:0, lagHoles:0, gim:0, lagIn:0, lagN:0,
-    dist:new Map(), distN:0 };
+  // One bucket per putt count, and ZERO is its own — a hole he chipped in is not a
+  // one-putt, it is a hole he never putted on, and rolling it in would flatter the number
+  // this page exists to move. The four are exclusive, so their shares are directly
+  // comparable and they sum to the holes that recorded a putt count.
+  const putts = { holes:0, total:0, zero:0, one:0, two:0, three:0,
+    lagHoles:0, gim:0, lagIn:0, lagN:0, dist:new Map(), distN:0 };
   // How much of this sample Jack logged himself, on the hole. It decides which evidence
   // badge the findings below carry and when the pasted GHIN claims stand down — see
   // EV_RANK. Counted per hole rather than per round, because a nine and an eighteen are
@@ -4463,7 +4485,8 @@ function scoreStats(rounds){
     if(h.putts != null){
       putts.holes++; putts.total += h.putts;
       if(L) live.putts++;
-      if(h.putts <= 1) putts.one++; else if(h.putts >= 3) putts.three++;
+      if(h.putts === 0) putts.zero++; else if(h.putts === 1) putts.one++;
+      else if(h.putts === 2) putts.two++; else putts.three++;
       puttTally(putts, h);
       if(puttMadeK(h)){ bagPutt(putts.dist, h); putts.distN++; if(L) live.puttDist++; }
     }
@@ -4634,28 +4657,35 @@ function holeTips(st, EV){
 
   // ---- What the length of the putt he HOLED answers that a putt count never could ----
   // A two-putt hole records where the second putt was struck from, which is where the LAG
-  // finished — the only proximity measurement a scorecard can make, and a straight read on
-  // the open distance-control fault. A conceded lag counts as the best result on the
-  // ladder rather than a missing one: nobody concedes a twenty-footer.
+  // finished — the only proximity measurement a scorecard can make.
+  //
+  // THE WARNING IS THE THREE-PUTT RATE, NOT THE PROXIMITY. A conceded lag finished inside
+  // gimme range, which is true and is the best result on the ladder — but on his first two
+  // live rounds twelve of fifteen second putts were given, so a proximity share built on
+  // them read 100% and was measuring his partners' generosity as much as his pace. The
+  // three-putt rate cannot be flattered that way: nobody concedes their way out of one. So
+  // that decides the verdict, and the proximity split rides along underneath with the
+  // concessions counted out loud rather than folded in silently.
   //
   // What is NOT here any more, on purpose: the 4-6 ft conversion and the inside-3 ft miss
   // count, both of which needed the distance of a putt he MISSED. The card stopped
   // recording that on Sep 8 2026, so the mat test is the short-putt number again.
-  const close = lagClose(st.putts);
-  if(close.n >= 8){
-    const P = st.putts.dist;
-    const rate = st.putts.lagHoles ? st.putts.three / st.putts.lagHoles : 0;
+  if(st.putts.lagHoles >= 8){
+    const P = st.putts.dist, close = lagClose(st.putts);
+    const rate = st.putts.three / st.putts.lagHoles;
     const far = ['l', 'xl', 'xxl'].reduce((a, k) => a + ((P.get(k) || {}).lag || 0), 0);
+    const held = close.in - st.putts.lagIn;      // lags he actually holed out from inside 3 ft
     t.push({ key:'putt-lag', ev:EV, s: rate >= 0.15 ? 'warn' : 'good',
-      src:`Putting · ${close.n} lags with a distance on them`,
+      src:`Putting · ${st.putts.lagHoles} holes that needed a second putt`,
       h: rate >= 0.15
         ? `${st.putts.three} three-putts — ${Math.round(rate * 100)}% of the holes you had to lag`
-        : `${Math.round(close.in / close.n * 100)}% of your lags finish inside three feet`,
-      b:`${close.in} of ${close.n} first putts left you a tap-in${
-        st.putts.lagIn ? ` (${st.putts.lagIn} of them conceded, which is the same result)` : ''}, and ${
-        far} finished from thirteen feet or more. ${rate >= 0.15
-          ? `That is the open fault with a number on it: you are failing to get down in two on one lag in ${(1 / rate).toFixed(1)}. A three-putt from range is pace, not line — the first putt finishes outside gimme range and the second one is a real putt. The 30-ft ladder is the drill that moves it: log shorts, spread and green speed, and watch this row rather than your total putts.`
-          : `That is what good pace looks like on a scorecard — ${st.putts.three} three-putt${st.putts.three === 1 ? '' : 's'} across ${st.putts.lagHoles} holes that needed a second putt. Distance control has been the open fault on feel alone; this is evidence, and it points the other way.`} Keep tapping in how long the putt you holed was — on a two-putt hole that IS the proximity measurement.` });
+        : `${Math.round((1 - rate) * 100)}% of your lags get down in two`,
+      b:`${rate >= 0.15
+          ? `That is the open fault with a number on it: you are failing to get down in two on one lag in ${(1 / rate).toFixed(1)}. A three-putt from range is pace, not line — the first putt finishes outside gimme range and the second one is a real putt.`
+          : `${st.putts.three} three-putt${st.putts.three === 1 ? '' : 's'} across ${st.putts.lagHoles} holes that needed a second putt is what good pace looks like on a scorecard.`}${
+        close.n ? ` Of the ${close.n} whose finish you recorded, <b>${close.in}</b> left a putt inside three feet — but ${
+          st.putts.lagIn} of those were <b>conceded</b> rather than holed${held ? ` and ${held} you actually holed out` : ''}, so read that as "the lag left a tap-in", not as a measured distance. ${
+          far} finished from thirteen feet or more.` : ''} The 30-ft ladder is the drill that moves this: log shorts, spread and green speed, and watch the three-putt row rather than your total putts.` });
   }
 
   const blowN = st.mix.double + st.mix.triple;
@@ -4803,8 +4833,13 @@ function puttDistTable(P, note){
       // before the distances existed have the hole but not the length — so pairing a
       // count off one with a total off the other would read as a rate and be neither.
       const bits = [];
-      if(close.n) bits.push(`<b>${close.in} of ${close.n}</b> lags whose finish you recorded (${pct(close.in, close.n)}) left you inside three feet`);
+      // The three-putt count leads, because it is the half nobody can concede his way out
+      // of. The proximity share follows with the conceded ones named — see the note in
+      // `holeTips()`: fold them in silently and this line reads 100% on a card where his
+      // partners simply gave everything short.
       if(P.three && P.lagHoles) bits.push(`<b>${P.three} of ${P.lagHoles}</b> holes that needed a second putt still took three`);
+      if(close.n) bits.push(`<b>${close.in} of ${close.n}</b> recorded lags (${pct(close.in, close.n)}) left a putt inside three feet${
+        P.lagIn ? `, ${P.lagIn} of them conceded rather than holed` : ''}`);
       return bits.length ? `<p class="sm" style="margin-top:8px">${bits.join(' · ')}. That is distance control stated as a proximity number rather than as a putt count, and it is the row the 30-ft ladder drill is supposed to move.</p>` : '';
     })()}
     ${P.gim ? `<p class="sm" style="margin-top:8px"><b>${P.gim} first putt${P.gim === 1 ? ' was' : 's were'} given.</b> Those are out of the Holed column entirely rather than counted as made — a putt nobody made you hit is not a putt you made, and the one number this project cannot afford to flatter is the short one.</p>` : ''}

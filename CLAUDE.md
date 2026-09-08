@@ -503,6 +503,14 @@ whole reason the flag exists rather than being folded into the putt count:
   one — nobody concedes a twenty-footer. Counted as `lagIn`, reported as its own row on
   the table, and folded into the inside-three-feet figure by `lagClose()`.
 
+  **But it is never folded in SILENTLY, and it can never carry a headline** (Sep 8 2026).
+  On Jack's first two live rounds, 12 of 15 second putts were conceded, so a proximity share
+  built on them read **100%** on his phone — a figure measuring how freely his partners give
+  short ones at least as much as how well he lags. Every place `lagClose()` renders now names
+  the conceded count beside the total, and the verdict is taken from the **three-putt rate**
+  instead, which nobody can concede their way out of. A number that is true, unflatterable in
+  one direction, and therefore uninformative is still a bad number.
+
 `conceded()` and `lagGiven()` in `app.js` are the two predicates. **Given and a made
 distance are one slot** — tapping either clears the other, because the hole ended one way
 or the other.
@@ -1009,21 +1017,38 @@ tables on Rounds, so a tile and that table can never disagree about a club.
   precisely as authoritative as the right one.
 - Rows are labelled by **range**, not "Irons"/"Wedges" — they are a breakdown of the tile
   above, not a competing name for it.
-- **Putting** — **where the lag left him**, by distance, off `st.putts.dist` (`bagPutt()`'s
-  ladder) over `lagN`. Rewritten Sep 8 2026: it was a make rate by the distance the putt was
-  struck from, which stopped being computable when the first-putt field came off the logger —
-  see *Putting by distance*. It carries a **`.tcr.tcnote` caption row** saying *Where the lag
-  left you*, because three columns of numbers under a tile read as a conversion rate unless
-  something says otherwise. Rows stay in `PUTT_DIST` order because these are a ladder — the cap
-  picks the four busiest ranges and then puts them BACK in distance order, so it never reads as
-  a top-four chart.
-- **One row is not a split**, in any of the three: it would restate the headline underneath
-  itself, so they all guard on `< 2` rows.
-- **Putting's empty state is an instruction, not a blank** (`.tcr.tcnote`). Until two ranges
-  carry a putt it says to tap the distance on the green. That is why it was worth building
-  before the data exists — Jack's words were "add it for once we start getting that stat", and
-  a tile with an unexplained hole in it teaches nothing. Prefer this over a hidden section
-  anywhere a breakdown is waiting on logging he has to do.
+- **Putting** — **`1-putt` · `2-putt` · `3+ putts` as a share of the holes played, then the
+  longest putt he holed** (Jack's ask, Sep 8 2026: *"1 putt 2 putt 3 putt %s and make
+  distances if possible"*). The headline above them is putts a hole.
+
+  **It replaced a tile that read 100%.** It led with the share of lags finishing inside three
+  feet, and on his first two live rounds that came out 15 of 15 — because 12 of those second
+  putts were **conceded**, and a conceded putt is inside gimme range by definition. The figure
+  was arithmetically right and measured his partners' generosity as much as his pace. **A rate
+  that can only land near 100% is not a measurement**, and the fix was not to reweight it: it
+  was to lead with counts, which cannot be flattered, exist from the first hole, and move with
+  every one after. Where that proximity share still appears — `holeTips()`'s `putt-lag` and
+  `puttDistTable()` — it now names how many were conceded rather than holed.
+
+  The rows are a share of **holes played**, not of holes he putted on, so a hole he chipped in
+  is correctly none of the three and the three need not sum to 100. Chip-ins are named in the
+  read line rather than given a row of their own, because of the budget below.
+- **FOUR ROWS IS THE PUTTING TILE'S WHOLE BUDGET.** The two bottom tiles share a grid row, so
+  the taller one sets its height, and Into the green already runs to four. Each extra line
+  costs the block about 18px and the 13 mini is the model that decides it. The first cut of
+  this had eight rows and put the block 28–63px past the tab bar on **every** phone. So the
+  counts take three rows and the make distances take one — the longest he holed, the same fact
+  `madeFrom()` calls out on the round card, in the same words. The full distribution lives
+  there and in *Putting · by distance*, where there is room for it.
+- **One row is not a split**, in the two club breakdowns: it would restate the headline
+  underneath itself, so they guard on `< 2` rows. The putting rows are a fixed three and do
+  not need the guard.
+- **Putting's empty state is an instruction, not a blank** — and it takes the SAME one line
+  the row it becomes will take. It was a wrapping `.tcr.tcnote`, which ran to three lines and
+  made the **no-data case the tallest one on the page**: a tile with nothing in it was pushing
+  the block past the tab bar. Jack's words were "add it for once we start getting that stat",
+  and a tile with an unexplained hole in it teaches nothing — but an empty state still has to
+  fit the budget the full one does.
 
 **THE BANDS EVERY TILE HAS GO FIRST AND ADJACENT; THE OPTIONAL ONE GOES LAST.** Both grids
 follow it — `.stat` is value · label · `.sv`, `.charttile` is label · value · `.sub` ·
@@ -1059,8 +1084,16 @@ iPhone and **zero everywhere else** — about 90px of the viewport that a local 
 see. To check a fold, inject `.hero{padding-top:calc(12px + 59px)}` and
 `nav{padding-bottom:calc(10px + 34px)}` and measure the last tile's bottom against the nav's
 top; verify across models, because the top inset runs 44–62px (the 13 mini is the tightest
-viewport and the last to fit). Current headroom: 35px on a 13/14, 31px on a 15 Pro, 6px on a
-13 mini.
+viewport and the last to fit). Current headroom: **50px on a 13/14, 46px on a 15 Pro, 15px on
+a 13 mini** — and the same on both, because of the next paragraph.
+
+**MEASURE IT WITH LIVE ROUNDS SEEDED, NOT ON A FRESH INSTALL.** The tiles GROW as he logs:
+the club and putting breakdowns only render once there are rows to render. Every headroom
+figure before Sep 8 2026 was taken on a seed install with no live putting data, and on a card
+that actually had some the block ran **8px past the nav on a 13 mini** — a fold that had been
+signed off and had never been measured in the state Jack's own phone was in. Seed two live
+18-hole rounds into `localStorage` and measure both states; a tile's empty state can be the
+TALLER one (see *Putting's empty state* above), so neither state stands in for the other.
 
 The space came out of **padding and gaps only — never type size**, since Jack had already said
 these numbers read small. The masthead, the jump bar, the weather card, `.stat` and
@@ -1374,10 +1407,12 @@ point. Anywhere these numbers are rendered must also print what they were read o
   rounds to compare against each other — and **only one tile is ever coloured**, the focus
   area's, because with nothing to measure against, a red tile is a verdict the page can't
   support.
-- **The putting headline switches itself.** Putts-a-hole until `PUTT_HEADLINE_MIN` (10) lags
-  carry a known finish, then the **share of lags that finish inside three feet** — the open
-  distance-control fault stated directly. It was the 4–6 ft make rate until Sep 8 2026, when
-  the first-putt field came off the logger and took the only recorded MISS distance with it.
+- **The putting headline is putts a hole, always.** It needs nothing but the putt count, so
+  it exists from the first hole he logs and moves with every one after. It switched to a
+  better number twice and both switches were withdrawn on Sep 8 2026: the 4–6 ft make rate
+  died with the first-putt field, and the share of lags finishing inside three feet read
+  100% because his second putts are nearly all conceded (see *The numbers on Today*). **A
+  headline that can only be right sometimes is worse than a blunt one that is always right.**
 - **`AREA_OF`** maps a ranked finding to its tile, and admits gaps the way `FOCUS_TAG` does:
   a finding about doubles or the opening hole belongs to no single area and highlights none.
 

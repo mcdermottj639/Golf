@@ -85,7 +85,7 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
    because the block ran just past the fold on Jack's phone, where env(safe-area-inset-*) adds
    ~59px at the top and ~34px at the bottom that a desktop browser reports as zero. */
 .nums h2{margin:10px 0 5px}
-.nums .rowgrid{margin:6px 0}
+.nums .rowgrid{margin:5px 0}
 .rowgrid.g3{grid-template-columns:1fr 1fr 1fr}
 .rowgrid.g2{grid-template-columns:1fr 1fr}
 /* THREE BANDS THAT LINE UP ACROSS THE WHOLE ROW, whether or not a tile has a second number.
@@ -95,7 +95,7 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
    qualify simply has no bottom band rather than a hole in the middle of the stack. It also
    survives a label wrapping to two lines, which "UP & DOWN" does at 320px. */
 .stat{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--green);
-  border-radius:var(--r);padding:8px 6px 8px;text-align:center;
+  border-radius:var(--r);padding:7px 6px 7px;text-align:center;
   display:flex;flex-direction:column;align-items:stretch}
 .stat .v{font-size:19px;font-weight:700;color:var(--gtext);line-height:1.15}
 .stat .l{font-size:8.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);
@@ -746,22 +746,32 @@ body.night .buildtag{background:rgba(255,255,255,.06);border-color:rgba(255,255,
    no sparkline, which is exactly what a broken card looks like. Slack belongs at the card's
    bottom edge, where it reads as nothing at all. */
 .charttile{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
-  border-radius:var(--r);padding:10px 12px 9px;display:flex;flex-direction:column}
+  border-radius:var(--r);padding:9px 12px 8px;display:flex;flex-direction:column}
 .charttile .lab{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);
   font-family:var(--sans);font-weight:700}
-.charttile .big{font-size:20px;font-weight:700;color:var(--gtext);margin:2px 0 4px}
+.charttile .big{font-size:20px;font-weight:700;color:var(--gtext);margin:1px 0 3px}
 .charttile .sub{font-size:10.5px;color:var(--faint);font-family:var(--sans)}
 .charttile .trend{margin-top:auto;padding-top:6px}
 /* Which club found the fairway, inside the Off-the-tee tile. Three columns on one line each:
    name, rate, and the raw count that keeps a 100% off one tee shot honest. Mono so the
    percentages stack into a readable column at 9px. Sits after .sub — an optional band, so it
-   goes last and never between the number and its caption. */
-.tclub{margin-top:7px;padding-top:6px;border-top:1px solid var(--line)}
+   goes last and never between the number and its caption.
+
+   EVERY ROW HERE COSTS THE WHOLE NUMBERS BLOCK, so the leading is as tight as 9.5px mono
+   reads at. The two bottom tiles share a grid row, the taller one sets its height, and the
+   block has to end above the tab bar on a 13 mini — which is the tightest viewport and the
+   one that decides this. Type size is untouched (Jack has already said these read small);
+   the space came out of leading and the band's own margins, the same trade as v85. */
+.tclub{margin-top:4px;padding-top:4px;border-top:1px solid var(--line)}
 .tcr{display:flex;align-items:baseline;gap:5px;font-family:var(--mono);font-size:9.5px;
-  line-height:1.5;color:var(--ink36)}
+  line-height:1.38;color:var(--ink36)}
 .tcn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tcv{font-weight:700;color:var(--gtext)}
-.tcf{width:30px;text-align:right}
+/* Fixed width so the percentages stack into a column — which means anything longer than
+   about five characters overflows it, and in a flex row that drags the whole page sideways
+   at 320px. Same class of bug as `.lvgrid`'s minmax(0,1fr): a track that cannot shrink.
+   Clipped rather than trusted, so a future row can never reintroduce it. */
+.tcf{width:30px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* The empty state of a breakdown: an instruction, not a blank. Wraps, so it drops the
    single-line flex rules the data rows use. */
 .tcr.tcnote{display:block;font-family:var(--sans);font-size:10px;line-height:1.4;color:var(--faint)}
