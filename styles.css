@@ -163,6 +163,11 @@ body.night .area.focus{border-top-color:var(--burg)}
   margin:10px 0;cursor:pointer}
 .wxt{font-family:var(--serif);font-size:44px;line-height:1}
 .wxc{font-family:var(--sans);font-size:11.5px;color:rgba(244,239,226,.66);margin-top:5px}
+/* The one routine way to a new position fix, and it sits here because the weather is the
+   only thing on the page that looks wrong when the fix is stale. Underlined rather than
+   made a button: it is inside the card's own tap target, so it has to read as a link
+   within a line rather than as a second control competing with it. */
+.wxgo{color:rgba(244,239,226,.92);text-decoration:underline;text-underline-offset:2px}
 .wxr{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-align:right;
   color:rgba(244,239,226,.8);max-width:48%;flex:none}
 .wxr b{display:block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;

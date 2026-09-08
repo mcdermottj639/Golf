@@ -99,13 +99,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v92';
+const BUILD = 'v93';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v93', d:'2026-09-08', items:[
+    'The location prompt should stop turning up. The app was asking iOS for a fresh position every time you opened it \u2014 that is what put the Allow dialog on screen each morning. It now uses the fix it already had saved, so opening the app asks for nothing at all.',
+    'It asks in three places now and every one of them is a tap you made: the weather card the first time on a new phone, MOVED? on that card, and the distance sorts on Round prep and Courses. Ten opens in a row went from eleven prompts to one.',
+    'The honest trade: the temperature now follows your saved fix rather than you. While that fix is today\u2019s you would never know the difference. Once it is older, the card names the day it was taken and moved? sits right beside it \u2014 one tap and you are current again.',
+    'Worth knowing, because it is the half nobody can code around: whether Allow sticks is iOS\u2019s decision, not the app\u2019s, and for a web app on the home screen it often does not. Nothing on a page can make it stick. What a page can do is stop asking, which is what this is.' ] },
   { b:'v92', d:'2026-09-08', items:[
     'A round you type into Log a round on the Rounds tab no longer breaks the page. It was saving fine and then vanishing \u2014 the round list and Today\u2019s handicap tile both stopped drawing, because the handicap check read the hole-by-hole array off a card that has never had one. Typed rounds are score, putts and a note by design. Anything already saved is fine and shows up now.',
     'Every round stopped scrolling the page sideways on a narrow phone. Six columns of minimum width did not fit a 320px card \u2014 or a 375px one \u2014 so the whole page slid. The table now tightens its own spacing on a phone and, if it ever still cannot fit, scrolls inside its own box instead of dragging the page with it.',
@@ -1419,6 +1424,10 @@ function landed(){
 // 10°F below 70 — and it is TEMPERATURE ONLY, which the card says out loud rather than
 // letting a wind reading sitting beside it imply otherwise. A stale reading is shown as
 // stale instead of being quietly recomputed: playsFactor() returns null past three hours.
+// The reading follows his SAVED fix, not him — see fetchWeather(). That is invisible and
+// harmless while the fix is today's, and worth naming the moment it isn't: a temperature
+// pulled at yesterday's spot is a different claim from one pulled where he is standing.
+const hereOld = () => !!S.here && isoDay(new Date(S.here.ts)) !== today();
 function wxCard(){
   const wx = S.weather, f = playsFactor();
   const mins = wx ? Math.round((Date.now() - wx.ts) / 60000) : null;
@@ -1431,7 +1440,14 @@ function wxCard(){
   const d = p150 == null ? null : p150 - 150;
   return `<div class="wx" data-action="get-weather">
     <div><div class="wxt">${WX_ICON(wx.code)} ${Math.round(wx.t)}°</div>
-      <div class="wxc">Wind ${Math.round(wx.wind)} mph · read ${esc(ago)} · tap to refresh</div></div>
+      <div class="wxc">Wind ${Math.round(wx.wind)} mph · ${esc(ago)} · ${
+        // ONE HINT, NOT TWO. Naming the fix's day AND keeping "tap to refresh" ran the line
+        // to three lines on a 13 mini and put the block 2px past the tab bar — the tightest
+        // viewport has 3px of headroom, so this caption has no room to grow. They are also
+        // the wrong pair: once the fix is yesterday's, re-reading the weather at yesterday's
+        // spot is not the useful tap, and `moved?` is. So the slot swaps rather than adding.
+        hereOld() ? `${esc(fmtDate(isoDay(new Date(S.here.ts))))} fix` : 'tap to refresh'
+      } · <span class="wxgo" data-action="relocate">moved?</span></div></div>
     <div class="wxr"><b>Plays like</b>${f
       ? `<span>150 → <i>${p150}</i></span>
          <span>${d === 0 ? 'no change at 150' : `${d > 0 ? '+' : ''}${d} yds · ${Math.round(wx.t)}°F air`}</span>
@@ -7135,6 +7151,9 @@ const ACTIONS = {
     toast(S.settings.theme === 'night' ? 'Night mode ☾' : 'Heritage mode ☀');
   },
   'get-weather': () => fetchWeather(true),
+  // The only routine way to a new fix. Deliberate, one tap, and it says what it is for —
+  // which is the trade for the weather card never asking on its own again.
+  'relocate': () => askHere(true, here => weatherAt(here, true)),
   'locate': () => fetchHere(true),
   // Picking Nearest with no fix on file asks for one there and then: the chip is the
   // request. fetchHere() re-renders on its own if the phone answers, and toasts if it
@@ -7180,28 +7199,50 @@ function setHere(pos){
   return S.here;
 }
 // Asking for a position on its own, for the sort, without pulling the weather down too.
-function fetchHere(manual){
-  if(!navigator.geolocation){ if(manual) toast('No location on this device'); return; }
-  navigator.geolocation.getCurrentPosition(pos => { setHere(pos); rerender(); },
-    () => { if(manual) toast('Location permission needed to sort by distance'); },
-    { timeout:8000, maximumAge:600000 });
-}
+function fetchHere(manual){ askHere(manual, () => rerender()); }
 
+// THE NUMBER OF PERMISSION PROMPTS IS THE NUMBER OF getCurrentPosition() CALLS, and that
+// is the only half of this the app controls (Jack, Sep 8 2026: "I have to click allow for
+// this all the time"). iOS decides whether to remember a grant, and for a home-screen web
+// app it frequently does not — so a page cannot make "Allow" stick. What it CAN do is stop
+// asking. This used to ask the phone for a fresh position on every single open, which is
+// why the prompt was there every morning: the weather went stale after 30 minutes and the
+// boot refresh went straight back to the OS for a fix it already had on disk.
+//
+// So the fix is cache-first: `S.here` is a saved position, it survives the app being
+// killed, and a coordinate rounded to 100m is not something that goes off overnight. The
+// weather is pulled AT THE SAVED FIX and no permission is involved. The phone is asked for
+// a position in exactly three places now, all of them a deliberate tap: the empty weather
+// card on a device that has never given one up, `moved?` on the card, and the distance
+// sorts (`fetchHere`). Never on boot, never on a plain refresh.
+//
+// The cost is that the reading follows his last fix rather than him, which is why the card
+// names the day that fix was taken as soon as it is not today's — a temperature from
+// eighty miles away is worth knowing about, and `moved?` is one tap beside it.
+function weatherAt(here, manual){
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${here.lat}&longitude=${here.lon}&current=temperature_2m,wind_speed_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph`)
+    .then(r => r.json())
+    .then(j => {
+      const c = j.current || {};
+      S.weather = { t:c.temperature_2m, wind:c.wind_speed_10m, code:c.weather_code ?? 0, ts:Date.now() };
+      save(); rerender();
+    })
+    .catch(() => { if(manual) toast('Weather unavailable — offline?'); });
+}
 function fetchWeather(manual){
   if(!manual && S.weather && Date.now() - S.weather.ts < 30*60*1000) return;
+  if(S.here) return weatherAt(S.here, manual);      // the whole point: no prompt
+  if(!manual) return;                               // never ask on our own initiative
+  askHere(manual, here => weatherAt(here, manual));
+}
+// The one function that talks to the OS. Everything that wants a position goes through it,
+// so there is a single place to look when a prompt turns up somewhere it shouldn't.
+function askHere(manual, then){
   if(!navigator.geolocation){ if(manual) toast('No location on this device'); return; }
-  navigator.geolocation.getCurrentPosition(pos => {
-    const { latitude, longitude } = pos.coords;
-    setHere(pos);   // free — the phone has just told us, and the sort wants it
-    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(3)}&longitude=${longitude.toFixed(3)}&current=temperature_2m,wind_speed_10m,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph`)
-      .then(r => r.json())
-      .then(j => {
-        const c = j.current || {};
-        S.weather = { t:c.temperature_2m, wind:c.wind_speed_10m, code:c.weather_code ?? 0, ts:Date.now() };
-        save(); rerender();
-      })
-      .catch(() => { if(manual) toast('Weather unavailable — offline?'); });
-  }, () => { if(manual) toast('Location permission needed for weather'); }, { timeout:8000, maximumAge:600000 });
+  navigator.geolocation.getCurrentPosition(
+    pos => { const h = setHere(pos); then ? then(h) : rerender(); },
+    () => { if(manual) toast('Location permission needed — allow it once and it is saved'); },
+    { timeout:8000, maximumAge:600000 });
 }
 
 document.addEventListener('click', e => {

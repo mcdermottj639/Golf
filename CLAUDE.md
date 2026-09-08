@@ -1141,8 +1141,20 @@ iPhone and **zero everywhere else** — about 90px of the viewport that a local 
 see. To check a fold, inject `.hero{padding-top:calc(12px + 59px)}` and
 `nav{padding-bottom:calc(10px + 34px)}` and measure the last tile's bottom against the nav's
 top; verify across models, because the top inset runs 44–62px (the 13 mini is the tightest
-viewport and the last to fit). Current headroom: **50px on a 13/14, 46px on a 15 Pro, 15px on
-a 13 mini** — and the same on both, because of the next paragraph.
+viewport and the last to fit).
+
+**PAIR EACH INSET WITH ITS OWN VIEWPORT — a 13 mini is 375×812, not 320 wide.** 320px is the
+horizontal check (chips, tables, `documentElement.scrollWidth`) and belongs to a phone with
+no notch at all; measuring a fold at 320 with a notch's insets invents a device and reports a
+failure no one can see. Re-measured Sep 8 2026 on real geometries — 13 mini 375×812/50, 13/14
+390×844/47, 15 Pro 393×852/59, Pro Max 430×932/59 — with the weather LOADED and a location fix
+granted, which is the state Jack's phone is actually in: **3px on a 13 mini, 38px on a 13/14,
+34px on a 15 Pro, 114px on a Pro Max.**
+
+Those replace the 15/50/46 recorded here before, and the gap is the same trap as the one in the
+next paragraph seen from the other side: **the weather card's EMPTY state is one line and its
+loaded state is two**, so a fold measured on a fresh install is flattered by about 12px. The 13
+mini has 3px. Treat that caption as full.
 
 **MEASURE IT WITH LIVE ROUNDS SEEDED, NOT ON A FRESH INSTALL.** The tiles GROW as he logs:
 the club and putting breakdowns only render once there are rows to render. Every headroom
@@ -1165,11 +1177,12 @@ Jack asked for the standing course plans to be ordered nearest to furthest, off 
 location the app already asks for. Three pieces:
 
 - **`S.here`** — his last position fix, `{lat, lon, ts}`, rounded to three decimals.
-  `fetchWeather()` has always asked the phone for a position and thrown it away; it now
-  calls `setHere()` on the way past, and `fetchHere()` asks for one on its own (the
-  *Sort by distance* button) without pulling the weather down. **The sort is arithmetic on
-  the phone** — nothing about where he is is sent anywhere for it, and that is worth
-  keeping true.
+  `fetchWeather()` used to ask the phone for a position and throw it away; it now stores it
+  with `setHere()` and, since Sep 8 2026, **reads it back rather than asking again** — see
+  *Never ask for a position on your own initiative* below. `fetchHere()` asks for one on its
+  own (the *Sort by distance* button) without pulling the weather down. **The sort is
+  arithmetic on the phone** — nothing about where he is is sent anywhere for it, and that is
+  worth keeping true.
 - **`geo` feed entries** — a coordinate is a researched fact about the world, so it
   arrives the way a scorecard does and carries `place`, `src` and **`prec`**. `prec` is
   `exact` when it is the club's own coordinate and `town` when it is the town centre
@@ -1189,6 +1202,40 @@ the list renders in its original order with a button, never silently re-sorted.
 own coordinate and the rest on the town centre standing in for it. Add a course and add its
 `geo` in the same push: a course with no location is not broken, but it can only ever sit at
 the bottom of a distance sort, and the sort is the reason the coordinates exist.
+
+### Never ask for a position on your own initiative (Sep 8 2026)
+
+Jack: *"I have to click allow for this all the time. Any way we can make it so once I click
+it once it saves to memory."* The honest answer is that **the page cannot make a grant
+stick** — whether "Allow" is remembered is iOS's decision, and for a home-screen web app it
+frequently is not. What a page controls is the other half, and it is the whole of the fix:
+
+> **The number of permission prompts IS the number of `getCurrentPosition()` calls.**
+
+`fetchWeather()` was making one on **every open**. The weather went stale after thirty
+minutes, the boot refresh fired, and it went straight back to the OS for a fix that was
+already sitting in `S.here` on disk. Ten opens produced eleven prompts; the same ten now
+produce one, and that one is the tap he made.
+
+The rules that keep it there:
+
+- **`askHere()` is the ONLY place in the app that talks to `navigator.geolocation`.** One
+  call site is what makes "why is it prompting?" answerable by reading rather than guessing.
+  `fetchHere()` and `fetchWeather()` both go through it.
+- **Cache first, always.** `fetchWeather()` pulls the forecast at `S.here` and involves no
+  permission at all. A coordinate rounded to 100m does not go off overnight.
+- **Only a deliberate tap may reach the OS**, and there are three: the empty weather card on
+  a device that has never given a fix up, `moved?` on that card, and the distance sorts. A
+  boot, a re-render or a plain refresh must never ask. `if(!manual) return` is the guard.
+- **Say when the reading is not from here.** The trade for not asking is that the weather
+  follows his last fix rather than him. Invisible and harmless while the fix is today's, so
+  the card says nothing; the moment it is older it names the day the fix was taken, with
+  `moved?` beside it. `hereOld()` is the predicate.
+- **That caption is a two-line budget, not a paragraph.** Naming the fix's day AND keeping
+  "tap to refresh" ran `.wxc` to three lines on a 13 mini and put the numbers block 2px past
+  the tab bar. The slot SWAPS — once the fix is stale, re-reading the weather at yesterday's
+  spot is not the useful tap anyway. Measured on real viewports, not invented ones: see
+  below.
 
 ### The rankings sort three ways (Aug 21 2026)
 
