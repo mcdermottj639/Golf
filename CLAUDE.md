@@ -177,7 +177,7 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
 | Returned | ~~L.A.B. Golf DF3i · 34"~~ | **returned Aug 10, 2026 — distance control.** Gamed Jul 18–30 and Aug 1–10. Its Press Pistol 2° went with it, so the "hands even with the ball" cue is **retired** — don't carry it to the LINK. Lost with it: the only measured scoreboard in the project (8/10 from four feet, Jul 20) and the high-MOI control head |
 | Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** |
 
-**Live putting priority: distance control.** Pace has now decided the fate of two putters (DF3i benched Jul 30, reprieved Aug 1, returned Aug 10) and had never been measured once until the live logger's first-putt distance field (Aug 20) — the three-putt rate from 21 ft + is the on-course version of it, so check that row before repeating "unmeasured". The grind is the 30-ft ladder twice a week on the LINK, logging *shorts · spread · green speed*, plus the unrun tape test — an off-centre strike bleeds ball speed, so it's a distance fault before it's a line fault. Tempo is **not** the problem (2.0:1 on this head vs a 2:1 target).
+**Live putting priority: distance control.** Pace has now decided the fate of two putters (DF3i benched Jul 30, reprieved Aug 1, returned Aug 10) and had never been measured once until the live logger started recording putt distances (Aug 20) — the share of lags that finish inside three feet is the on-course version of it, so check that row before repeating "unmeasured". The grind is the 30-ft ladder twice a week on the LINK, logging *shorts · spread · green speed*, plus the unrun tape test — an off-centre strike bleeds ball speed, so it's a distance fault before it's a line fault. Tempo is **not** the problem (2.0:1 on this head vs a 2:1 target).
 
 Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 · 60° 80.
 
@@ -205,8 +205,8 @@ differential — omit rather than guess). The value is in `holes[]`, one object 
 | `n` · `par` · `s` | hole number, par, score — the minimum; everything else is optional |
 | `si` | stroke index. Unlocks the hardest-six / easiest-six split |
 | `putts` | putts on that hole. Unlocks 1/2/3-putt counts and putts-on-GIR-vs-off |
-| `pm` | how long the putt he **holed** was, as a `PUTT_DIST` key. Absent on a conceded hole and where `putts` is 0 |
-| `pd` | where the **first** putt started, same keys. Only recorded when `putts` >= 2 — on a one-putt hole the first putt IS the made putt |
+| `pm` | how long the putt he **holed** was, as a `PUTT_DIST` key. Absent on a conceded hole and where `putts` is 0. On a hole that took two or more, this is also **where the lag left him** — see *Putting by distance* |
+| `pd` | where the **first** putt started, same keys. **RETIRED Sep 8 2026** — the logger no longer asks and nothing computes off it. Cards logged Aug 20 – Sep 8 keep it and still render it; do not send a new one |
 | `gimme` | `true` when the last putt was conceded rather than holed. Still counted in `putts` and in the score; see *Given putts* below |
 | `gir` | `true`/`false` — green in regulation |
 | `gmiss` | where a missed green finished: `S` `L` `R` `Lg` `OB` `X` (short/left/right/long/out of bounds/other) |
@@ -420,55 +420,71 @@ Where OB then speaks for itself:
 GIR% and fairway% are unchanged — a miss is a miss, and the flag prices it rather than
 erasing it. Same rule as `noshot`.
 
-### Putting by distance (Aug 20 2026)
+### Putting by distance (Aug 20 2026 · first putt removed Sep 8 2026)
 
-Three rows on the live logger, in Jack's own shape — the first version recorded only the
-first putt and he rejected it, correctly:
+**Two rows on the live logger**, and the second one carries the whole thing:
 
-1. **Putts** — the total, as before.
+1. **Putts** — the total.
 2. **Putt made** — how long the one he holed was, with **Given** as the seventh chip in
    the same row, because a hole ends either with a putt going in from somewhere or with
    nobody making him hit it.
-3. **First putt** — where he started. **Only rendered once the total says two or more**:
-   on a one-putt hole the first putt and the made putt are the same putt, and asking twice
-   is asking him to tap one fact into two rows.
 
-The pay-off is that a two-putt hole now records **one putt he missed and one he holed,
-both with distances** — so the app has a real *make rate per putt struck* rather than a
-count of holes. `puttAttempts()` is the reader: it yields the first putt as a miss and the
-made putt as a make, and leaves a three-putt's middle putts out because nothing knows how
-long they were. `puttFirstK()` / `puttMadeK()` derive the two distances and both tolerate
-cards written before `pm` existed, so nothing needed migrating.
+There were three until Sep 8 2026. **First putt** — where he started, `h.pd`, asked once
+the total said two or more — is gone on Jack's instruction: *"remove first putt distance.
+Just make it total putts and length of putt made."* Three taps on a green he is standing on
+was one too many, and the row that went is the one whose answer the other two mostly imply.
+
+**What `pm` means depends on the putt count, and that is the whole design.** On a one-putt
+hole it is a **conversion** — a putt he holed first time from that range. On a hole that
+took two or more it is where the **lag left him**: the second putt was struck from there,
+so the length of the putt he holed IS the proximity of the first one. That is the only
+proximity measurement a scorecard has ever been able to produce, and it is a direct read on
+the standing distance-control fault. `bagPutt()` splits the two into `one` and `lag` on
+the same row rather than summing them, because they answer different questions.
+
+**THERE IS NO LONGER A MAKE RATE BY DISTANCE, AND REINTRODUCING ONE WOULD BE A LIE.** A
+rate needs putts he MISSED with a distance on them, and `pd` was the only field that ever
+recorded one. Without it every putt a card knows the length of is a putt that went in, so
+any rate over them can only climb toward 100% — a denominator going missing, dressed up as
+a stroke getting better. It is the 171% bug (below) one step earlier and harder to see,
+because 100% is a number that looks possible. What died with it, and it is worth being
+plain about because two of these were the best numbers on the page:
+
+- **`putt-short`** — the 4–6 ft conversion on a green, and its comparison against the 5-ft
+  mat test. The mat test is the short-putt number again, as it was before Aug 20.
+- **`putt-tap`** — misses from inside three feet. A missed short putt now leaves no trace
+  but the putt count.
+- **`putt-lag` survives, rebuilt.** It was the three-putt rate from 21 ft +; it is now the
+  share of lags that finish inside three feet, over the lags whose finish is recorded, with
+  the three-putt count beside it over the holes that needed a second putt. Each half states
+  its own denominator because the two populations are not the same set.
+
+`puttFirstK()` is **read-only history** now: cards logged between Aug 20 and Sep 8 carry
+`pd` and the scorecard row still prints "from X ft" off them. Nothing computes a rate from
+it, and `applyFeed()` still accepts one on a `round` entry — but do not send one, because
+it would put a distance in the record that the live logger no longer produces.
 
 **The buckets are `PUTT_DIST` in `app.js`, and every boundary is a line this project
 already draws** — that is what makes them worth counting rather than generic:
 
 | Key | Range | Why that line |
 |---|---|---|
-| `t`   | ≤3 ft    | tap-in range. Splitting it out stops gimmes inflating the make rate, and a miss inside it is a real event |
+| `t`   | ≤3 ft    | tap-in range, and now the **target** for a lag: a lag that finishes here left a tap-in, and a conceded one counts with them |
 | `s`   | 4–6 ft   | the scoring zone and **his** zone: the 5-ft test sits in the middle of it, the left miss is the whole putter saga, and `Short Putts — The Pop Stroke` covers exactly this range |
 | `m`   | 7–12 ft  | the make-some window — birdie chances and par saves |
-| `l`   | 13–20 ft | two-putt territory; a make is a bonus. First real pace test |
+| `l`   | 13–20 ft | two-putt territory; a make is a bonus. A lag finishing here is a pace miss |
 | `xl`  | 21–30 ft | lag proper — three-putt risk climbs steeply through here |
 | `xxl` | 30+ ft   | the ladder distance, so the on-course number is directly comparable to the 30-ft grind |
 
 Changing a `k` orphans every hole already logged with it, the same trap as
 `MENTAL_TRIGGERS` — add a bucket rather than resplitting the existing ones.
 
-`puttDistTable()` on Scores and on every round card carries **two questions on one axis,
-counted over different things and labelled as such**: `att`/`made` are individual putts
-struck from that range (the conversion rate), while `first`/`three` are HOLES that started
-there (the pace question, which is only meaningful about a first putt). Don't merge those
-columns — a make rate over holes is the thing this rebuild exists to stop computing.
+`puttDistTable()` on Rounds and on every round card reads **Holed · One-putt · Lag left you
+here**, plus a `given inside` row for the lags that were conceded. `made` = `one` + `lag`
+by construction, so the columns can never drift; the percentage on the lag column is over
+`lagN`, the lags whose finish is known.
 
-Three findings inside `holeTips()` — `putt-short` (the 4–6 ft conversion, compared against
-the latest 5-ft mat test, which is the first mat-vs-green comparison the project can make),
-`putt-lag` (three-putt rate from 21 ft +, i.e. **the open distance-control fault with a
-number on it at last**) and `putt-tap` (misses from inside three feet). Being in `holeTips`
-with keys, they inherit live-round precedence.
-
-Tapping 0 putts (chipped in) clears all three fields; dropping the total back to 1 clears
-`pd` alone.
+Tapping 0 putts (chipped in) clears the made distance and the Given flag together.
 
 ### Given putts (Aug 20 2026)
 
@@ -476,31 +492,34 @@ Tapping 0 putts (chipped in) clears all three fields; dropping the total back to
 everyone does — but it was never struck, and that cuts two opposite ways, which is the
 whole reason the flag exists rather than being folded into the putt count:
 
-- **Given from the first putt** (`putts === 1`) — a make he never hit. It is simply not a
-  putt attempt, so `puttAttempts()` yields nothing for it and it never reaches the make
-  rate in either the numerator or the denominator. You cannot measure a putt that was not
-  attempted. Film is king, applied to a scorecard.
+- **Given from the first putt** (`putts === 1`) — a make he never hit. It reaches no
+  ladder row at all: `puttMadeK()` returns null for it, so it cannot be counted as a putt
+  holed from anywhere. You cannot measure a putt that was not attempted. Film is king,
+  applied to a scorecard.
 - **Given after a lag** (`putts >= 2`) — the opposite. The first putt finished inside
-  gimme range, which is the closest thing a scorecard can produce to a **proximity**
-  measurement, and it is a straight read on the open distance-control fault. Counted as
-  `lagIn` and reported next to the three-putt rate.
+  gimme range, which is the **best proximity result on the ladder** rather than a missing
+  one — nobody concedes a twenty-footer. Counted as `lagIn`, reported as its own row on
+  the table, and folded into the inside-three-feet figure by `lagClose()`.
 
-`conceded()` and `lagGiven()` in `app.js` are the two predicates, and `bagPutt()` counts
-`gim` / `lagIn` from them alongside the attempt tallies. **Given and a made distance are
-one slot** — tapping either clears the other, because the hole ended one way or the other.
+`conceded()` and `lagGiven()` in `app.js` are the two predicates. **Given and a made
+distance are one slot** — tapping either clears the other, because the hole ended one way
+or the other.
 
-**Both tallies are filed under the FIRST putt's bucket, so a rate built on either needs a
-denominator over the same holes** (fixed Sep 6 2026 — it printed **171%** on Jack's phone).
-`bagPutt()` counts a lag given in the range the first putt *started* from, wherever that
-was, so the whole-ladder sum in `puttDistTable()` includes lags that began inside thirteen
-feet — and it was being divided by `puttRoll(PD_LAG)`'s first putts, i.e. the long buckets
-alone. Twelve lags over seven long first putts is 171%, and a percentage over 100 tells the
-reader the number is broken without telling them which half. The population a lag given can
-be a share of is **the holes that took a second putt** — `first - one`, summed over the same
-rows as the numerator, and every `lagIn` hole is inside it by construction because
-`lagGiven()` requires `putts >= 2`. The version in `holeTips()` was always right for the
-opposite reason: it takes both halves off ONE `puttRoll`, which is the pattern to copy.
-Whenever a putting rate spans buckets, roll the numerator and the denominator together.
+**Neither tally sits in a range row, and that is deliberate: a conceded putt has no
+measured length, so filing it under a distance would be an inference wearing a
+measurement's badge.** `puttTally()` counts them onto the round's putting record instead —
+`gim`, `lagIn`, `lagHoles` (every hole that took a second putt) and `lagN` (those whose
+finish is known, by a distance or by a concession).
+
+**WHENEVER A PUTTING RATE SPANS BUCKETS, ROLL THE NUMERATOR AND THE DENOMINATOR TOGETHER**
+(learned Sep 6 2026, when the old ladder printed **171%** on Jack's phone). `bagPutt()`
+then filed a conceded lag under the range its FIRST putt started from, so the whole-ladder
+sum included lags that began inside thirteen feet — and it was divided by the long buckets'
+first putts alone. Twelve over seven is 171%, and a percentage over 100 tells the reader
+the number is broken without telling them which half. `lagClose()` exists so that cannot
+recur: it takes both halves off the same population and returns them together. The shape
+of that bug is also why the make rate came out with `pd` rather than being left to limp —
+a missing denominator does not always announce itself with a number over 100.
 
 ### The hole's prep collapses (Aug 20 2026)
 
@@ -593,6 +612,15 @@ come from somewhere, and Jack's answer was the header. What it bought, at 390px:
 Everything else came from padding and gaps only — `.lvhead`, `.lvbars`, `.holeintel`,
 `.lvseg` and `.lvfoot` each gave back 2–6px. **No chip, button or row lost height**: every
 tap target on the screen is still ≥44px, which is asserted rather than assumed.
+
+**One row is ~43px of fold, measured (Sep 8 2026).** Dropping First putt from the logger
+bought back exactly that, and it is the cheapest headroom on the screen: at 390px with the
+13/14 insets simulated, a finished hole went from 4px past the nav to 38px clear, and at
+320px from 32px past to 10px clear. **A hole that carries a prep card still overflows** —
+21px at 390, 49px at 320 — and that is pre-existing rather than new: the same hole measured
+64px and 92px over on `main` before this change. The collapsed `.holeintel` card is the
+difference. Do not spend padding chasing it; if it matters, it is the sticky-footer decision
+below.
 
 **What "above the fold" means here is QUICK VIEW on a hole he has finished** — that is the
 screen Jack was on. Verified at 320/375/390 across the 13 mini, 13/14 and 15 Pro insets.
@@ -979,12 +1007,14 @@ tables on Rounds, so a tile and that table can never disagree about a club.
   precisely as authoritative as the right one.
 - Rows are labelled by **range**, not "Irons"/"Wedges" — they are a breakdown of the tile
   above, not a competing name for it.
-- **Putting** — make rate by the distance the putt was struck from, off `st.putts.dist`
-  (`bagPutt()`'s ladder). `att` is putts STRUCK from a range and `made` is putts holed from
-  it: **a rate per putt, not per hole**, which is the whole reason the logger records the made
-  putt and the first putt separately. Rows stay in `PUTT_DIST` order because these are a
-  ladder — the cap picks the four busiest ranges and then puts them BACK in distance order, so
-  it never reads as a top-four chart.
+- **Putting** — **where the lag left him**, by distance, off `st.putts.dist` (`bagPutt()`'s
+  ladder) over `lagN`. Rewritten Sep 8 2026: it was a make rate by the distance the putt was
+  struck from, which stopped being computable when the first-putt field came off the logger —
+  see *Putting by distance*. It carries a **`.tcr.tcnote` caption row** saying *Where the lag
+  left you*, because three columns of numbers under a tile read as a conversion rate unless
+  something says otherwise. Rows stay in `PUTT_DIST` order because these are a ladder — the cap
+  picks the four busiest ranges and then puts them BACK in distance order, so it never reads as
+  a top-four chart.
 - **One row is not a split**, in any of the three: it would restate the headline underneath
   itself, so they all guard on `< 2` rows.
 - **Putting's empty state is an instruction, not a blank** (`.tcr.tcnote`). Until two ranges
@@ -1277,9 +1307,10 @@ point. Anywhere these numbers are rendered must also print what they were read o
   rounds to compare against each other — and **only one tile is ever coloured**, the focus
   area's, because with nothing to measure against, a red tile is a verdict the page can't
   support.
-- **The putting headline switches itself.** Putts-a-hole until `PUTT_HEADLINE_MIN` (10) putts
-  carry a distance, then the **4–6 ft make rate** — the range the putter saga lives in and the
-  only number directly comparable to the mat test.
+- **The putting headline switches itself.** Putts-a-hole until `PUTT_HEADLINE_MIN` (10) lags
+  carry a known finish, then the **share of lags that finish inside three feet** — the open
+  distance-control fault stated directly. It was the 4–6 ft make rate until Sep 8 2026, when
+  the first-putt field came off the logger and took the only recorded MISS distance with it.
 - **`AREA_OF`** maps a ranked finding to its tile, and admits gaps the way `FOCUS_TAG` does:
   a finding about doubles or the opening hole belongs to no single area and highlights none.
 
