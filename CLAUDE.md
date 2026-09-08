@@ -168,13 +168,13 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
 | Slot | Club | Notes |
 |------|------|-------|
 | Driver | **TaylorMade Stealth 2 Plus · 9°** | **Model corrected Aug 31 2026** — logged as a standard Stealth 2 since Jun 15, but the sole carries the heel-to-toe **FADE/DRAW sliding weight**, which only the *Plus* has (the standard head has 25g fixed in the Inertia Generator, no track; the HD is heel-shifted). The slider is stamped **10g** and a Stealth 2 Plus ships 15g, so either the optional lighter weight is fitted or the head is an original Stealth Plus — unresolved, and it only changes how much bias is on tap. **Shaft: Project X LZ 5.5 · REGULAR**, on an SLDR-era adapter, bought Jun 2 2026, replacing a stiff one. Jack's read, *unmeasured*: ~15 yds longer, much less curve, a straight ball that now **misses both ways**. Four build facts still unknown and all readable off the club: the **sleeve's current setting** (rebuilt with an aftermarket adapter, so 9° square is an assumption), playing **length**, and the shaft's **weight/torque** (printed on the band). Ladder still reads **235** — predates the shaft, left alone on purpose. The fade lever here is the **slider, never the loft**: see *Swing — The Workshop Log*, Aug 31 |
-| 5-wood | **Cobra Darkspeed X · 16.5°** | bumped DOWN from stock; back in Aug 12 2026 after a year out, taking the mini driver's fairway-finder slot. **Carry unmeasured** — and at 16.5° it sits ~0.5° off the 2-iron utility, so whether both belong in the bag is an open question |
-| Utility | Cobra KING TEC 2-iron · ~17° | |
-| Irons | Cobra KING TEC 4–PW | **44° PW** anchors the wedge ladder |
+| Mini driver | **TaylorMade r7 Quad Mini Driver · 15.5°** | **back in Sep 8 2026** after four weeks benched, and the fairway-finder slot came back with it. Turned **UP 2°** from the 13.5° it played at until Aug 12, so it is a different club from the one whose record is in the Off-the-tee table. **Carry blank on purpose** — the old ladder row said 220 and that was an estimate at 13.5°. The 15.5° is *Jack's* number: nobody has read the hosel, and shaft, flex and length have never been written down. At 15.5° it lands exactly 1.5° off the 2-iron, which is the `ladderOverlap()` threshold, so the 2-iron renders **OVERLAP** — loft arithmetic, not a verdict on a mini driver and a driving iron, which are nowhere near the same length |
+| Utility | Cobra KING TEC 2-iron · ~17° | **unchanged Sep 8 2026.** Jack said "17 degree 2 iron" describing the new build; the ladder still reads **~17°** because repeating a number the app already showed him is not the same as reading the stamp, and quietly dropping the tilde would promote an estimate to a measurement. It is the only long club left carrying any figure at all (205, estimated) |
+| 5-wood | **Cobra Darkspeed X · 19.5°** | **re-lofted Sep 8 2026** from 16.5°, and it changed the club's *job*: out of the fairway-finder slot, down the ladder into the one the 4-iron vacated. That suits it — a 16.5° wood is hard to hold a green with and a 19.5° one lands soft, which is what the long par 3 and the second into a par 5 ask for. **Carry still unmeasured**, at either loft. Open: 16.5 → 19.5 is a 3° move, the full sweep of a typical fairway sleeve, so **read the hosel stamp** — same unknown as the driver's adapter |
+| Irons | Cobra KING TEC **5–PW** | **the 4-iron came out Sep 8 2026** to hold the bag at 14 when the mini went back in — kept with the set, not sold, so there is no separate bench record for it. **44° PW** anchors the wedge ladder |
 | Wedges | **Vokey 50.08F · 56.10S · 60.08M** | 50 = F/8° sweeper · 56 = S/10° workhorse · 60 = M/8° creative |
 | Putter | **L.A.B. Golf LINK.2.1** | the only zero-torque head left. Narrow blade, gamed Jul 30 – Aug 1 and again from **Aug 10, 2026**. **KEPT for good Aug 12, 2026** — Jack closed the return window by decision, so `returnWindow:false` and `pendingReturn()` is empty: the Home return-window card is gone and Decisions reads DECIDED. The putter search is over; every remaining explanation for the left miss is aim or stroke, not gear. Carries a **Lamkin Deep Etched** grip (the app said *Pistol 0* Jul 30 – Aug 14; corrected by looking at it — both are 0° lean, so no cue changed): zero built-in lean, shaft vertical, hands ~1.35" behind the ball — that's the live cue. **Loft confirmed 2° effective** (Aug 14, L.A.B.'s spec panel on the *custom* build page — the stock page and every retailer omit it). Still unknown: **as-built length** (34" targeted, never confirmed) and **head weight** (never known on any putter Jack has owned) — both build-order facts, so they need L.A.B., not a website. Its column holds the only two reds on the evolution grid (face at impact, 1.5–1.7° left start line, both measured Jul 30) |
-| Benched | ~~TaylorMade r7 Quad Mini Driver · 13.5°~~ | **out Aug 12 2026**, kept not sold. Its tee-shot record stays in the Off-the-tee table as history |
-| Bullpen | Titleist TSR2 7-wood | used demo · HZRDUS Red CB regular · picked up Aug 12 2026, **owned not gamed**. Sits behind the 4-iron on loft if it's stock, so it is not in the 14 and not on the carry ladder |
+| Bullpen | Titleist TSR2 7-wood | used demo · HZRDUS Red CB regular · picked up Aug 12 2026, **owned not gamed**. Stock is around 21°, which since Sep 8 sits just behind the re-lofted 5-wood (19.5°) rather than the 4-iron that has left the bag — so it is still not in the 14 and still not on the carry ladder |
 | Backup putter | Scotty Newport 2 | arc-suited toe-hang blade — renders a **MISMATCH** flag against the SBST stroke. If the LINK goes back this is all that's left, i.e. the mismatch the whole saga opened with |
 | Returned | ~~L.A.B. Golf DF3i · 34"~~ | **returned Aug 10, 2026 — distance control.** Gamed Jul 18–30 and Aug 1–10. Its Press Pistol 2° went with it, so the "hands even with the ball" cue is **retired** — don't carry it to the LINK. Lost with it: the only measured scoreboard in the project (8/10 from four feet, Jul 20) and the high-MOI control head |
 | Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** |
@@ -182,6 +182,14 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
 **Live putting priority: distance control.** Pace has now decided the fate of two putters (DF3i benched Jul 30, reprieved Aug 1, returned Aug 10) and had never been measured once until the live logger started recording putt distances (Aug 20) — the share of lags that finish inside three feet is the on-course version of it, so check that row before repeating "unmeasured". The grind is the 30-ft ladder twice a week on the LINK, logging *shorts · spread · green speed*, plus the unrun tape test — an off-centre strike bleeds ball speed, so it's a distance fault before it's a line fault. Tempo is **not** the problem (2.0:1 on this head vs a 2:1 target).
 
 Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 · 60° 80.
+
+**THE LONG END OF THE LADDER HAS NO MEASURED NUMBER IN IT (Sep 8 2026).** After the switch the
+top four rows read driver 235 *(estimated, and on a shaft that changed in June)* · mini 15.5°
+*(blank)* · 2-iron 205 *(estimated)* · 5-wood 19.5° *(blank)*. Two blanks where there was one, and
+the 4-iron's 190 — the only figure that ever covered that yardage — went with the club. So a plan
+cannot put a number on a tee shot or a long approach any more, and three standing course plans had
+to be re-read off the 2-iron's 205 and the 5-iron's 180 because of it. `action-5wood-carry-20260812`
+is the standing to-do; it was widened rather than duplicated, per the reuse rule below.
 
 ## How to make common updates
 
@@ -236,10 +244,13 @@ guess reads as measured. A key that has left the ladder still renders on old car
 `clubFallback()`, so retiring a club never orphans the rounds it played.
 
 **Club keys** are slugs of the **carry-ladder** row names, not `S.clubs` ids — the bag holds
-the irons as one "KING TEC 4–PW" entry and so can't name the club that hit a shot, while
-`S.carries` is the real 13-club list: `driver`, `mini-driver`, `2-iron`, `4-iron`…`9-iron`,
-`pw`, `50-wedge`, `56-wedge`, `60-wedge` (`clubKey()` in `app.js` is the authority). An
-unrecognised key still renders — it just prints itself.
+the irons as one "KING TEC 5–PW" entry and so can't name the club that hit a shot, while
+`S.carries` is the real 13-club list: `driver`, `mini-driver`, `2-iron`, `5-wood`, `5-iron`…
+`9-iron`, `pw`, `50-wedge`, `56-wedge`, `60-wedge` (`clubKey()` in `app.js` is the authority). An
+unrecognised key still renders — it just prints itself, which is why **`4-iron` is still a live key
+on every card that hit one** even though it left the ladder on Sep 8. **A plan is not covered by
+that fallback**: a `holes[].club` entry naming a club he no longer carries is a call he cannot take,
+so a bag change means grepping the standing briefings for the retired key, not just the ladder.
 
 ### Live rounds (Jack logs these himself — do not feed them)
 
@@ -1012,7 +1023,7 @@ tables on Rounds, so a tile and that table can never disagree about a club.
   no attempts does not render, so **Woods appears by itself the first time he goes at a green
   with one** and is invisible until then.
 - **The PW is counted with the IRONS (`6i–PW`) — Jack's call, asked rather than guessed.** It
-  is genuinely ambiguous (part of the KING TEC 4–PW set, and the 44° anchor of the wedge
+  is genuinely ambiguous (part of the KING TEC iron set, and the 44° anchor of the wedge
   ladder), which is exactly why it was worth one question: the wrong choice would have looked
   precisely as authoritative as the right one.
 - Rows are labelled by **range**, not "Irons"/"Wedges" — they are a breakdown of the tile
@@ -1778,7 +1789,13 @@ Three behaviours worth not breaking:
   means different things per type — and on a briefing is the date of a round that may not
   have happened yet.
 - **Same headline, same day = one row**, with an `N updates` count. The feed versions a plan
-  by re-sending it, which is right for the data and pure noise in a changelog.
+  by re-sending it, which is right for the data and pure noise in a changelog. **The row that
+  survives is the NEWEST of the day, and it is already correct because `recordUpdate()` unshifts** —
+  `S.updates` is newest-first, so keeping the FIRST row `upDays()` hits for a headline keeps the last
+  push. That reads backwards and was "fixed" the wrong way on Sep 8 2026, which made a ladder row
+  removed and re-added a few yards down the bag announce itself as *dropped from the ladder*. Caught
+  only by opening the page in a browser. Don't re-derive the direction from the loop — check which
+  end `recordUpdate()` writes to.
 - **`updatesInit` / `seenUpdates`.** On an install that has already applied the whole feed
   the log would open empty, so `backfillUpdates()` replays the feed's tail once and marks it
   — plus every release before the current `BUILD` — already seen. That way the "N new"

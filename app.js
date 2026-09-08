@@ -99,13 +99,20 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v90';
+const BUILD = 'v91';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v91', d:'2026-09-08', items:[
+    'Your bag switch is in. The MINI DRIVER is back at 15.5\u00b0 and is the fairway finder again; the 5-WOOD dropped to 19.5\u00b0 and moved down the bag into the slot the 4-IRON just left; the 4-iron is out. Still fourteen clubs, and the tee chips in the live logger now offer exactly that set.',
+    'Both woods sit on the carry ladder with NO number, and that is on purpose. The mini\u2019s old 220 was an estimate at 13.5\u00b0 and this is not that club, and the 5-wood has never been measured at any loft. A guess reads exactly like a measurement once it is on the ladder.',
+    'The bag flags the 2-iron as an OVERLAP now. That is loft arithmetic and nothing else \u2014 at 15.5\u00b0 the mini sits exactly 1.5\u00b0 off it, which is where the rule fires. A 43-inch mini driver and a 39-inch driving iron do not carry the same distance whatever their lofts say; the flag is the app saying the question is open, not answering it.',
+    'Every plan that told you to hit a 4-iron has been re-read. Wianno, Pound Ridge and Lakeside had eleven calls between them off a club you no longer carry \u2014 they now come off the 2-iron\u2019s 205 or the 5-iron\u2019s 180, with the leaves moved to match, and each plan\u2019s paper trail says what changed. Sterling Farms\u2019 5-wood calls still name a club you carry; the note there says it is three degrees weaker than the one that hit them.',
+    'Swing Thoughts has a section per wood again, and the range drills that were comparing driver against the 5-wood are comparing driver against the mini driver instead.',
+    'Small thing on What\u2019s landed: a bag change now says which club it was rather than the id it was filed under.' ] },
   { b:'v90', d:'2026-09-08', items:[
     'PUTTING now reads 1-putt, 2-putt and 3+ putts as percentages of the holes you played, with the raw counts beside them, and the longest putt you holed underneath. The headline is putts a hole.',
     'It was showing 100%. That tile led with the share of your lags finishing inside three feet, and on your two live rounds that came out 15 of 15 — because 12 of those second putts were GIVEN, and a conceded putt is inside gimme range by definition. The number was right and told you nothing: it was measuring how freely your partners give short ones. A rate that can only land near 100% is not a measurement.',
@@ -1293,6 +1300,11 @@ function upDays(){
   // is append-only and versions a plan by re-sending it, which is right for the data and
   // pure noise in a changelog. Collapse them onto the newest, keep the count, and carry
   // every merged id so the row is fresh if ANY of them is and all of them are marked seen.
+  // `recordUpdate()` UNSHIFTS, so `S.updates` — and therefore every day here — is already
+  // newest first. Keeping the first row hit for a headline is keeping the NEWEST push of
+  // that day, which is the one still true: three versions of a plan collapse onto v3, and
+  // a ladder row removed and re-added a few yards down the bag reads as the re-add rather
+  // than as having dropped out of the ladder. Do not "fix" this to keep the last one.
   days.forEach(day => {
     const byHead = new Map();
     day.rows.forEach(r => {
@@ -2014,8 +2026,9 @@ function bag(){
     ${fold('bag-bench', 'On the bench', `${bullpen.length + wishlist.length} OWNED, NOT IN THE 14`, `
       ${bullpen.map(clubRow).join('')}
       ${wishlist.length ? `<div class="cgrp">Scouting list</div>${wishlist.map(clubRow).join('')}` : ''}
-      <p class="rdf">Kept, not gone. What a benched club did is still true — the mini driver's
-        tee-shot record stays in the off-the-tee table as history, it just stops accumulating.</p>`, false)}
+      <p class="rdf">Kept, not gone. What a benched club did is still true — its tee-shot
+        record stays in the off-the-tee table as history, it just stops accumulating. Nothing
+        here is sold, and a club has come back off this shelf before.</p>`, false)}
   </div>` : ''}
   <div class="formrow" style="margin-top:6px">
     <button class="btn" data-action="show-add-club">+ Add a club</button>
@@ -7294,7 +7307,11 @@ function updateLine(e){
   const club = e.club || {}, br = e.briefing || {}, ls = e.lesson || {}, rd = e.round || {};
   switch(e.type){
     case 'club-add':      return { h:`New club · ${nm(club) || 'in the bag'}`, s:clip(club.spec || club.note, 96), act:go('bag') };
-    case 'club-update':   return { h:`Bag update · ${e.target || 'a club'}`,
+    // `target` is a club id OR a name, and an id is what most entries carry — so read the
+    // NAME back off the club the entry just patched rather than printing "Bag update · c6".
+    // Safe here because recordUpdate() runs after the assign, so S.clubs already has it.
+    case 'club-update':   return { h:`Bag update · ${
+        nm((S.clubs || []).find(c => c.id === e.target || c.name === e.target)) || e.target || 'a club'}`,
       s: club.status ? `now ${club.status}` : clip(club.note || club.spec, 96), act:go('bag') };
     case 'history':       return { h:'Bag history', s:clip(e.text, 96), act:go('bag') };
     case 'history-edit':  return { h:'Bag history corrected', s:clip(e.text, 96), act:go('bag') };
