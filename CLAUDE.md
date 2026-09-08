@@ -227,6 +227,23 @@ differential — omit rather than guess). The value is in `holes[]`, one object 
 | `noshot` | `true` when the tee shot left **no realistic play at the green** — see *Two ways to miss a green* below. Par 4/5 only |
 | `note` | free text Jack wrote **on that hole**, in the live logger. The only field on a card that records *why* — everything else records *what*. Renders on the round card under "What you wrote on the course", and marks the hole with ✎ |
 
+**`holes` IS OPTIONAL, and everything reading it must say so** (learned Sep 8 2026). The
+Log-a-round form on Rounds writes a card with no hole array at all — date, course, score,
+putts, a note — and *"a score-only round still opens; it just shows less"* is the rule the
+whole round card is built on. `withHoles()` and `roundAnalysis()` both guard with
+`Array.isArray`, which is why almost everything is safe; **`fullCard()` did not**, and
+`indexBasis()` runs it over EVERY round for Today's handicap tile and the head of Scores.
+So one round typed into the app's own form threw, Rounds and the tile stopped drawing, and
+the round he had just saved did not appear in the list — it looked like the save had failed.
+Shipped in v89 and live for a day. Guard at the predicate, not at the call sites: six places
+call `fullCard()`. Both write paths now default `holes:[]` alongside `troubles:[]`, so a
+typed card has the same shape as a logged one.
+
+**It was found by seeding a hostile round into `localStorage` during a layout check, not by
+reading the code** — a card with no `holes`, and one whose course and tee names are single
+unbreakable words. That pair costs nothing to add to a browser pass and is worth doing on
+any change that touches how a round renders.
+
 Tapping a round in **Scores** opens `roundView()` — the hole-by-hole card, scoring mix,
 par splits, miss directions, round-scoped coaching, and a comparison against the latest
 `stats` snapshot. Every block hides itself when its data is absent, so a score-only round
@@ -922,6 +939,35 @@ don't lower it, and don't set a smaller inline `font-size` on the narrow numeric
 (carry ladder, gap matrix) either. The other "fix" for this — `maximum-scale=1` on the
 viewport — is worse: it disables pinch-zoom everywhere in the app. Checked at 320px, the
 narrowest phone: the tightest row (Tees · Rating · Slope) still fits at 16px.
+
+### A wide table scrolls in its own box (Sep 8 2026)
+
+A table cannot shrink below the sum of its columns' min-content widths — it overflows its
+card and **takes the whole page sideways with it**. *Every round* is six columns, several
+of them set by their HEADER rather than their data (SCORE and PUTTS hold two digits), and
+it was 321px of minimum inside a 256px card at 320px.
+
+**`.tscroll` marks a table as wide**, and does two things that are both needed. It scrolls
+the table inside its own box, so nothing the player types can move the page again — that is
+insurance that holds whatever the data is. And at ≤430px it buys the row about 65px so the
+insurance almost never has to pay out: cell padding halves, the headers give up their
+tracking, and *Every round*'s `▸` caret goes (its cell is `nowrap`, so the caret was setting
+that column's minimum, for an affordance the caption underneath already states in words).
+**Tracking, never type size** — the same trade the nav and the `.stat` labels already make at
+320, and these read small enough already. Scoped to `.tscroll` rather than to every table,
+because the other fourteen fit at 320 with room to spare.
+
+**`overflow-wrap:anywhere` on any column holding text the PLAYER typed** — `.rtxt` on the
+course and tee cells, and the round card's own `h2`. Nothing breaks while there is slack; it
+bites only when the row genuinely cannot fit, which is what stops one long name from setting
+a floor under the whole table. (`min-width:0` on the container is not the same thing: it lets
+the BOX shrink, not the unbreakable word inside it.)
+
+**The mistake worth not repeating: the first cut scoped the trim to ≤360px "so nothing
+changes on a 375 or 390, where every table already fits."** That was reasoned, not measured,
+and it was wrong — 375 was 10px over and 390 fit by five, which is not a margin. **Measure
+every phone width you claim about.** 320 · 360 · 375 · 390 · 430 is the sweep, and it is
+cheap once the harness is up.
 
 ### The numbers on Today (Aug 30 2026)
 

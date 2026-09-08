@@ -299,6 +299,37 @@ th{color:var(--faint);border-bottom:2px solid var(--green);font-family:var(--san
   font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
 td{border-bottom:1px solid var(--line2)}
 td b{font-size:14px}
+/* ----- Wide tables -----
+   A table cannot shrink below the sum of its columns' min-content widths. It overflows its
+   card instead and drags the whole page sideways with it, which is what "Every round" — six
+   columns, several of them set by their HEADER rather than their data, since SCORE and PUTTS
+   hold two digits — did at every phone width: 321px of minimum inside a 256px card at 320,
+   and inside 311px at 375. It fit at 390 by five pixels, which is not a margin.
+
+   `.tscroll` marks a table as wide. It does two things and both are needed. It scrolls the
+   table INSIDE ITS OWN BOX, so no content can ever move the page again — insurance that
+   holds whatever the player types. And on a phone it buys the row about 65px so that
+   insurance almost never has to pay out: horizontal cell padding halves, and the headers
+   give up their tracking, which is the same trade the nav and the `.stat` labels already
+   make at 320. Not type size — these read small enough already.
+
+   Scoped to `.tscroll` rather than to every table, because the other fourteen fit at 320
+   with room to spare and there is no reason to make them denser to fix this one. */
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tscroll>table{margin-top:0}
+/* The columns holding text the PLAYER typed — his course names, his tee names — may break a
+   word rather than set a floor under the table. Nothing breaks while there is slack; it bites
+   only when the row genuinely cannot fit, which is what stops one long name (a "Championship"
+   tee) from deciding the whole table's minimum. */
+.rtxt{overflow-wrap:anywhere}
+@media (max-width:430px){
+  .tscroll th, .tscroll td{padding:7px 4px}
+  .tscroll th{letter-spacing:.02em}
+  /* The tap-through caret in Every round's date cell. That cell is `nowrap`, so the caret
+     sets the column's minimum — 12px for an affordance the caption under the table already
+     states in words, on a row that is tappable anywhere along it. */
+  .rgo{display:none}
+}
 
 .meter{height:8px;border-radius:5px;overflow:hidden;background:var(--card2);border:1px solid var(--line);margin:7px 0 4px}
 .meter span{display:block;height:100%;background:var(--burg)}
@@ -1173,7 +1204,12 @@ body.night .chip.ns.on, body.night .chip.ob.on{background:var(--burg);color:var(
 .rdhead{padding:15px}
 .rdtop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .rdid{min-width:0}
-.rdid h2{margin:5px 0 3px;font-size:23px;line-height:1.15}
+/* Same rule as `.rtxt` on the round list, for the same reason: this heading is a course
+   name the PLAYER typed, and `min-width:0` above only lets the box shrink — it does not
+   let an unbreakable word inside it shrink with it. Not reachable with anything on his
+   list today (the longest single word across 49 courses is "Springfield"), so this is
+   closing the class rather than fixing a live symptom. */
+.rdid h2{margin:5px 0 3px;font-size:23px;line-height:1.15;overflow-wrap:anywhere}
 .rdd{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--ink50)}
 .rdsc{flex:none;text-align:right;font-family:var(--serif);font-size:42px;line-height:.95;

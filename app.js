@@ -99,13 +99,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v91';
+const BUILD = 'v92';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v92', d:'2026-09-08', items:[
+    'A round you type into Log a round on the Rounds tab no longer breaks the page. It was saving fine and then vanishing \u2014 the round list and Today\u2019s handicap tile both stopped drawing, because the handicap check read the hole-by-hole array off a card that has never had one. Typed rounds are score, putts and a note by design. Anything already saved is fine and shows up now.',
+    'Every round stopped scrolling the page sideways on a narrow phone. Six columns of minimum width did not fit a 320px card \u2014 or a 375px one \u2014 so the whole page slid. The table now tightens its own spacing on a phone and, if it ever still cannot fit, scrolls inside its own box instead of dragging the page with it.',
+    'Nothing was dropped to do it: all six columns are still there. The padding halves, the column headings give up their letter spacing, and the little \u203a on the date goes \u2014 the caption underneath already tells you the row is tappable. Type sizes are untouched.',
+    'A long course or tee name can no longer decide how wide that table has to be. It wraps instead, which matters because those are the two columns you type yourself.' ] },
   { b:'v91', d:'2026-09-08', items:[
     'Your bag switch is in. The MINI DRIVER is back at 15.5\u00b0 and is the fairway finder again; the 5-WOOD dropped to 19.5\u00b0 and moved down the bag into the slot the 4-IRON just left; the 4-iron is out. Still fourteen clubs, and the tee chips in the live logger now offer exactly that set.',
     'Both woods sit on the carry ladder with NO number, and that is on purpose. The mini\u2019s old 220 was an estimate at 13.5\u00b0 and this is not that club, and the 5-wood has never been measured at any loft. A guess reads exactly like a measurement once it is on the ladder.',
@@ -4993,16 +4998,16 @@ function scores(){
 
   <h2>Every round</h2>
   <div class="card">
-    <table><tr><th>Date</th><th>Course</th><th>Tees</th><th>Score</th><th>vs par</th><th>Putts</th></tr>
+    <div class="tscroll"><table><tr><th>Date</th><th>Course</th><th>Tees</th><th>Score</th><th>vs par</th><th>Putts</th></tr>
       ${all.slice().reverse().map(r => { const v = roundVsPar(r); return `<tr data-action="open-round" data-i="${S.rounds.indexOf(r)}" style="cursor:pointer">
-        <td style="white-space:nowrap">${fmtDate(r.date)} <span class="faint">▸</span></td>
-        <td class="sm">${esc(r.course || '—')}${r.nine ? ` <span class="faint">${r.nine === 'F' ? 'front' : 'back'}</span>` : ''}${
+        <td style="white-space:nowrap">${fmtDate(r.date)} <span class="faint rgo">▸</span></td>
+        <td class="sm rtxt">${esc(r.course || '—')}${r.nine ? ` <span class="faint">${r.nine === 'F' ? 'front' : 'back'}</span>` : ''}${
           r.live ? ' <span class="ev live">live</span>' : ''}</td>
-        <td class="sm">${esc(r.tees || '—')}</td>
+        <td class="sm rtxt">${esc(r.tees || '—')}</td>
         <td><b>${esc(r.score ?? '—')}</b></td>
         <td class="sm">${v == null ? '—' : `<b style="color:${v > 5 ? 'var(--burg)' : v <= 2 ? 'var(--green)' : 'var(--ink)'}">${v > 0 ? '+' : ''}${v}</b>`}</td>
         <td class="sm">${esc(r.putts ?? '—')}</td></tr>`; }).join('')}
-    </table>
+    </table></div>
     <p class="sm faint" style="margin-top:8px">Tap any round for the hole-by-hole card and its own breakdown.${
       st.live.rounds ? ` <b>${st.live.rounds}</b> of these you logged live, hole by hole — ${st.live.holes} of the ${st.holes} holes analysed above. Those are the cards everything here speaks from first.` : ''}${
       all.some(r => r.note) ? ` Latest note: "${esc(all.filter(r=>r.note).slice(-1)[0].note)}"` : ''}</p>
@@ -6039,7 +6044,16 @@ function liveRound(L){
 }
 
 // A handicap differential needs a whole nine or eighteen behind it.
-function fullCard(r){ return r.holes.length === 9 || r.holes.length === 18; }
+//
+// `holes` IS OPTIONAL and always has been — "a score-only round still opens; it just shows
+// less" is the rule the whole round card is built on, and the Log-a-round form on Rounds
+// writes exactly that: date, course, score, putts, a note, no hole array. Reading
+// `r.holes.length` off one of those threw, and because `indexBasis()` runs over EVERY round
+// for Today's handicap tile and the head of Scores, one hand-typed round took both views
+// down. Ask `Array.isArray` here rather than trusting the shape: this is the one predicate
+// every rating path funnels through, so guarding it once covers all six call sites.
+function fullCard(r){ const n = Array.isArray(r.holes) ? r.holes.length : 0;
+  return n === 9 || n === 18; }
 
 // The finish screen pre-lights these from what the card actually says, rather than asking
 // Jack to remember. They drive lesson matching, so they use the TROUBLES keys exactly.
@@ -7042,7 +7056,7 @@ const ACTIONS = {
     const r = { date: $('#rdDate').value || today(), course: $('#rdCourse').value.trim(),
       score: $('#rdScore').value ? parseInt($('#rdScore').value) : null,
       putts: $('#rdPutts').value ? parseInt($('#rdPutts').value) : null,
-      troubles, note: $('#rdNote').value.trim() };
+      troubles, note: $('#rdNote').value.trim(), holes: [] };
     if(r.score===null && !r.course && !troubles.length && !r.note) return toast('Log something first');
     S.rounds.push(r);
     bumpGearCounters();
@@ -7505,7 +7519,7 @@ function applyFeed(feed){
       // entry. The second one silently double-counts every stat, so it matches on the
       // round itself rather than on the entry id.
       if(!S.rounds.some(r => r.feedId === e.id) && !sameRound(S.rounds, e.round))
-        S.rounds.push({ feedId:e.id, troubles:[], putts:null, note:'', ...e.round });
+        S.rounds.push({ feedId:e.id, troubles:[], putts:null, note:'', holes:[], ...e.round });
     }
     else if(e.type === 'round-update' && e.round){
       // Backfills a live-logged card with what the phone couldn't know on the course —
