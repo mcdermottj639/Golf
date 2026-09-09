@@ -97,7 +97,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `history`        | Prepend a bag change-history row (`date`, `text`) |
 | `history-edit`   | Rewrite a history row containing `match` |
 | `session`        | Add a filmed putting session (`date`, `setup`, `finding`, `detail`) |
-| `session-update` | Patch a session by `target` (its feed id) or `setupMatch` prefix |
+| `session-update` | Patch a session by `target` (its feed id) or `setupMatch` prefix. Patches `setup`, `finding`, `detail` and — since Sep 9 2026 — **`date`**, which had no route at all: correcting a film's day used to mean removing the session and re-adding it, which orphans every later update targeting its `_fid`. `detail` is set WHOLESALE, so send the existing metrics/story back with it |
 | `session-remove` | Drop a session by `target` (its feed id), **or** by a `setupMatch` prefix optionally narrowed by `date` — the second form is the only way to remove a `seed()` session, which has no feed id. Used to fold duplicates and to clear out retired-gear film |
 | `evolution`      | Replace the metric-evolution grid. Carries `sessions` (short column labels), `notes` + `foot` (the legend, now data not code), and per metric `name` / `marks` / `s` / `state` / `verdict` |
 | `faults`         | Replace the faults list. **`discipline`** (`putting` default / `swing` / `short-game`) scopes the replace to that lab only, so pushing swing faults can't wipe the putting ones; omit it and it replaces everything. **Start a `why` with `CLOSED` or `DOWNGRADED`** to settle one — `faultState()` reads that first word, which is what drops it off the Putting tab's diagnosis card and out of Coach's open-fault to-dos. Anything else reads as open |
@@ -1749,18 +1749,37 @@ measurement over self-report — and say which one you're using.
 
   **AND THE FILM HE SENDS YOU MAY ALREADY BE ON FILE — CHECK THE FILM ROOM BEFORE WRITING A
   SESSION** (Sep 9 2026). Jack re-sent the Lakeside driver clip after being asked for it; it
-  was ingested as a new Aug 17 session and had to be folded back into `s14`, the Aug 20 entry
-  whose seven stills were pulled from that very video. His words: *"I sent it again even tho I
-  knew u had it."* Two things made the duplicate easy to miss and both generalise. **Stills
-  and the clip they were cut from do not look like the same capture** — one `setup` says "7
-  phone stills", the other "1 clip, 60 fps", and nothing about either says they are one batch.
-  And **a screenshot's Photos header is not the session date**: the frame he sent read Aug 17
-  against a session dated Aug 20, which is a discrepancy to raise, never to resolve by minting
-  a second row. So before a `session` entry: read the discipline's film room for the same
+  was ingested as a second session and had to be folded back into `s14`, the entry whose seven
+  stills were pulled from that very video. His words: *"I sent it again even tho I knew u had
+  it."* **Stills and the clip they were cut from do not look like the same capture** — one
+  `setup` says "7 phone stills", the other "1 clip, 60 fps", and nothing about either says
+  they are one batch. So before a `session` entry: read the discipline's film room for the same
   course, club and week, and where the answer is "this is the same footage seen again", the
   push is a `session-update`, not a session. This is the app-side version of the provenance
   rule below — the evolution grid is one column per BATCH OF FILM, not one per time somebody
   looked at it.
+
+  **AND THE DATE ON THAT SESSION WAS WRONG, WHICH IS THE WORSE HALF.** `s14` was dated Aug 20;
+  the film is **Aug 17** (Jack, Sep 9 2026). Aug 20 is a real and separate event — the Lakeside
+  ROUND he logged, whose pars, stroke indexes and 70.5/129 the feed corrected — so every
+  sentence reading *"the Aug 20 on-course driver film"* was implying the film came off that
+  round. It did not. **A film date and a round date at one course are two facts, and the second
+  will happily stand in for the first** if nobody asks. When correcting one, separate the three
+  senses a date carries in this record before touching anything: the day the CAMERA ROLLED, the
+  day the ROUND was played or the card was read, and the day a plan was EDITED. Only the first
+  moved here; `UPDATED Aug 20`, `REFINED Aug 20` and every round reference were left exactly as
+  they were, because a blanket find-and-replace would have rewritten his scorecard's history to
+  fix a video's timestamp.
+
+  **AND A FIELD FIX AND THE DATA THAT NEEDS IT CANNOT SHIP IN THE SAME PUSH.** `session-update`
+  had no `date` route, so v95 added one — but the shell is SERVICE-WORKER CACHED while
+  `coach-feed.json` is fetched fresh, so a phone still serving the old bundle would apply a
+  dated update under code that ignores `date`, mark the id seen, and lose the correction
+  **permanently**, because ids apply exactly once. So the correction itself went as a
+  `session-remove` plus a re-add carrying the full folded content — which lands the same on
+  either version. **Whenever a feed entry depends on a capability the same commit introduces,
+  either send it in a form the OLD code also handles, or hold it for the next push.** The
+  apply-once rule is what makes this unrecoverable rather than merely late.
 
   **The same pass over-read the camera, which is the other half of the lesson.** Three
   checkpoints (back at address, chest at the top, back at the finish) establish only that the

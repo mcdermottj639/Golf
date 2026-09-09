@@ -99,13 +99,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v94';
+const BUILD = 'v95';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v95', d:'2026-09-09', items:[
+    'Your Lakeside driver film is dated AUG 17, not Aug 20. You confirmed the clip\u2019s date, and it was on the record as Aug 20 \u2014 which was quietly claiming it came off your Aug 20 round at Lakeside. It did not: that round is a real, separate day three days later, and its scores, pars and 70.5/129 are untouched.',
+    'The correction follows the film everywhere it is cited \u2014 the swing faults, the posture plan, the checkpoint page, the capture to-do, and the evidence chip under the posture fault, which used to read \u201cAug 20 film\u201d on a card whose text now says Aug 17.',
+    'Every OTHER Aug 20 is left alone on purpose: your round, the day you photographed the scorecard, and the dates plans were edited. Only the day the camera rolled moved.',
+    'Under the hood: a filmed session\u2019s DATE can now be corrected from the feed at all. It could not before \u2014 the only way to change one was to delete the session and re-add it, which throws away everything already attached to it.' ] },
   { b:'v94', d:'2026-09-08', items:[
     'PUTTING now shows where your makes came from. The distance ranges sit in the corner beside the number \u2014 one line per range you have actually holed from, and ranges you have nothing in do not appear \u2014 and GIVEN is the fourth row, reading like the three above it.',
     'Given is counted off the chip you tapped, over the holes that actually recorded an ending: a made distance, or a concession. NOT over every hole you played. Your first live round did not track putts made, and this is what stops those eighteen holes being read as gimmes and inflating the number \u2014 they are simply not in it.',
@@ -3930,10 +3935,10 @@ const FAULT_EV = {
   'strike-location':['measured', 'Aug 10 evening start lines — ~0.8° scatter either side, no bias'],
   'delivery-unverified':['measured', 'Aug 10 — 23 oblique clips and six on the target line, neither able to see lean'],
   'across-the-line-top':['measured', 'Jul 26 film, both clubs'],
-  'posture-through-impact':['measured', 'Aug 20 film — the first that caught a finish'],
+  'posture-through-impact':['measured', 'Aug 17 film — the first that caught a finish'],
   // Its own text says NOT MEASURED: seven stills neither confirm nor refute it. It is his
   // lifelong read of his own miss, which is exactly what the `self` tier is for.
-  'over-the-top-slice':['self', 'Your own lifelong read — Aug 20 stills could neither confirm nor refute it'],
+  'over-the-top-slice':['self', 'Your own lifelong read — Aug 17 stills could neither confirm nor refute it'],
 };
 const faultEv = f => FAULT_EV[f.tag] || null;
 // The diagnosis, one row per open fault, each carrying its own tier rail and a tappable
@@ -7524,7 +7529,11 @@ function applyFeed(feed){
     else if(e.type === 'session-update'){
       const s = S.sessions.find(x => x._fid === e.target) ||
                 S.sessions.find(x => e.setupMatch && (x.setup||'').startsWith(e.setupMatch));
-      if(s){ if(e.setup) s.setup = e.setup; if(e.finding) s.finding = e.finding; if(e.detail) s.detail = e.detail; }
+      // `date` is patchable too (Sep 9 2026). It had no route at all, so a film logged under
+      // the wrong day could only be fixed by removing the session and re-adding it — which
+      // breaks the `_fid` every later update targets. A shot date is a fact like any other.
+      if(s){ if(e.setup) s.setup = e.setup; if(e.finding) s.finding = e.finding;
+             if(e.detail) s.detail = e.detail; if(e.date) s.date = e.date; }
     }
     // Remove by feed id, or — for seed()'s own baseline sessions, which have no `_fid` —
     // by a `setupMatch` prefix optionally narrowed by `date`. session-update already
