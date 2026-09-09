@@ -32898,6 +32898,191 @@
       "target": "action-swing-posture-20260820",
       "text": "SWING FILM — FOUR FIXES, LEARNED FROM THE AUG 17 CLIP (Sep 9 2026). That clip got the hardest part RIGHT: it is genuinely down the line, behind the ball, which is the camera family the across-the-line top has needed since Jul 26. It still could not grade it, for four reasons that cost one stick and a bag to fix. (1) PUT AN ALIGNMENT STICK DOWN THE TARGET LINE, in frame. This is the big one: across the line and laid off are angles measured AGAINST the target line, and nothing in that clip says where the target line is. No zero, no angle. (2) PROP THE PHONE, do not hold it — the background drifted 30 px across 8 seconds, so the reference moves during the swing. Lean it on the bag. (3) HAND HEIGHT, not head height. Apparent shaft plane moves with camera height, which is exactly why hand height is the standard. (4) 240 fps, not 60. At 60 the driver head covers about two and a half feet between frames, so there is no impact frame at all — and tempo needs 120 as a floor before the ratio means anything. Also: keep the whole club in frame, it reached the left edge at the top. SWING — THE ONE SET OF FILM THAT PAYS THREE WAYS. Widened Sep 9 2026: the grip change is aimed at COMPRESSION, and compression is low point and shaft lean — both of which live in the same face-on frame this to-do already wanted. Swing film exists — Jul 19 in a sim bay, Jul 26 and Aug 20 stills, the Aug 17 down-the-line clip — and not one of them has ever produced a number AT IMPACT. This set would be the first. SHOOT IT LIKE THIS: face-on, SQUARE to you, lens at KNEE height, 240fps slo-mo, an alignment stick on the ground in frame for scale, OUTDOORS OFF TURF, five reps with a 7-iron — then one down-the-line from ON the target line at hand height. WHAT IT CLOSES: low point (fitted across the impact window, and cross-checked against where the divot actually starts — that anchor is free and the film cannot argue with it), attack angle with honest error bars, a tempo baseline, and the address posture below. WHAT IT CANNOT: face angle and dynamic loft at impact — at 240fps the head moves six inches between frames, so impact falls between two of them. Those are launch-monitor numbers and they are on the sim to-do. SWING — POSTURE, and the film that can actually grade it. The Aug 20 driver stills show a rounded upper back and chin on the chest at address, a trail leg that straightens at the top, and a body taller through delivery than at address — so the 'lose it through contact' feel is posture, not stalling hips: the finish is complete. Two things. (1) MIRROR CHECK at address: hinge from the hips, chest tall, a fist between chin and chest, and hold a little trail-knee flex to the top. (2) NEXT RANGE SESSION, film SQUARE down the line — phone on the ground ON the target line behind the ball, at hand height — plus one face-on. The Aug 20 angle was rear-quarter, which is why the across-the-line top still has not been re-graded since Jul 26.",
       "note": "Correction: this to-do said no full-swing film existed. It does — Jul 19 sim clips, Jul 26 and Aug 20 stills. What has never existed is an impact NUMBER, which is what the shoot is actually for."
+    },
+    {
+      "id": "session-remove-s18-dup-20260909",
+      "type": "session-remove",
+      "target": "s18-driver-dtl-20260817",
+      "note": "Duplicate of s14 — the Lakeside driver clip was already on file as the Aug 20 session; the seven stills were pulled from this same video. Folded per the one-entry-per-batch-of-film rule."
+    },
+    {
+      "id": "s14-video-fold-20260909",
+      "type": "session-update",
+      "target": "s14-driver-lakeside-20260820",
+      "detail": {
+        "metrics": [
+          {
+            "k": "Finish",
+            "v": "Complete · held",
+            "s": "good",
+            "n": "trail toe up, weight fully left, chest and hips through, balanced"
+          },
+          {
+            "k": "Transition",
+            "v": "Lower body first",
+            "s": "good",
+            "n": "clubhead still well behind at hands-hip-high — no cast"
+          },
+          {
+            "k": "Shoulder turn",
+            "v": "Full coil",
+            "s": "good",
+            "n": "back to target, head stayed behind the ball"
+          },
+          {
+            "k": "Ball position",
+            "v": "Forward · off lead heel",
+            "s": "good",
+            "n": "right for driver; stance width fine"
+          },
+          {
+            "k": "Address posture",
+            "v": "Rounded upper back",
+            "s": "warn",
+            "n": "chin down on the chest; spine curved rather than hinged from the hips"
+          },
+          {
+            "k": "Trail leg at top",
+            "v": "Straightens",
+            "s": "warn",
+            "n": "pelvis gives up its forward tilt before transition starts"
+          },
+          {
+            "k": "Posture thru delivery",
+            "v": "Stands up",
+            "s": "warn",
+            "n": "taller than at address — but a rear-quarter angle exaggerates this"
+          },
+          {
+            "k": "Top of swing",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "angle can't read the shaft against the target line — Jul 26 reading still stands"
+          },
+          {
+            "k": "Path · face · AoA",
+            "v": "Can't assess",
+            "s": "mid",
+            "n": "no launch data. Unmeasured since Jul 27"
+          },
+          {
+            "k": "Source",
+            "v": "1 clip · 60 fps",
+            "s": "good",
+            "n": "512 frames, 8.5 s — the stills were pulled from this; ONE capture, not two"
+          },
+          {
+            "k": "Impact",
+            "v": "Frame 211/212",
+            "s": "good",
+            "n": "ball present in 211, gone in 212 — the timing the stills could not give"
+          },
+          {
+            "k": "Finish · held",
+            "v": "~2.9 s",
+            "s": "good",
+            "n": "frames 232 to past 400. The stills showed the pose; the clip shows he holds it"
+          },
+          {
+            "k": "Tempo (back:down)",
+            "v": "Not measurable",
+            "s": "mid",
+            "n": "60 fps against a 120 floor, and the top is locatable only to a few frames"
+          },
+          {
+            "k": "Camera motion",
+            "v": "Handheld",
+            "s": "warn",
+            "n": "background drifts ~30 px x, 40 px y; frame correlation 1.00 → 0.75"
+          },
+          {
+            "k": "Target reference",
+            "v": "None in frame",
+            "s": "warn",
+            "n": "no stick, no aim marker — so no zero to measure the top against"
+          }
+        ],
+        "story": "Seven stills spanning address, early takeaway, top, transition, past impact and a held finish. The bones are the same ones Jul 26 found and they are good: a genuinely full coil with the head behind the ball, and a transition that starts from the ground — at hands-hip-high the clubhead is still well behind him, which is the opposite of a cast.\n\nThe new frame is the finish, and it is the best one in the set. Fully up on the trail toe, weight completely on the lead side, chest and hips turned past the target, hands high with the club wrapped behind the lead shoulder, and he holds it. Post-impact backs it up: head still down and behind the ball well past the strike.\n\nThat finish is what forces the refinement. The open fault said the hips stall and slide instead of clearing. A swing that truly stalls does not finish like this — it hangs back on the trail foot or the lead arm collapses. So the rotation is not what is missing. What IS missing is the posture it rotates around: the upper back is rounded and the chin is down at address, the trail leg straightens at the top so the pelvis loses its forward tilt before the downswing begins, and by the delivery frame the body is plainly taller than it was at address. Three frames, one story — he turns around a rising spine rather than the one he set. The useful consequence is that the cheapest entry point is now the earliest one: address posture and a little trail-knee flex, both checkable in a mirror before a ball is hit.\n\nTHE CLIP ITSELF, ingested Sep 9 2026 — and it is the SAME capture the seven stills came from, not a new one. Jack sent the video after this session was already on file; it was processed as a second session and folded straight back in. What the frames add over the stills is worth keeping. It is 512 frames at 59.98 fps, 8.5 seconds, portrait, and IMPACT is pinned: the ball is present in frame 211 and gone in 212, read off its departure. The finish is not just a pose — he holds it from frame 232 to past frame 400, nearly three seconds. Gate 2 passes: real tee, real ball, full speed.\n\nWHAT THE VIDEO SETTLES ABOUT THE ANGLE, and it does not overturn the description above. Three checkpoints agree the camera is BEHIND him — back at address, chest at the top, back at the finish. That is consistent with the rear-quarter reading already on this session and does NOT establish a square down-the-line one: what separates the two is the camera's AZIMUTH, and nothing in the frame measures it. So the top of the backswing still cannot be graded, the Jul 26 across-the-line reading still stands, and what the top looks like from this camera is deliberately not recorded — with an unknown azimuth that call can flip, and this project has already carried across-the-line and laid-off the wrong way round in its own record for three weeks.\n\nWHAT 60 fps COSTS, priced rather than asserted. At driver speed the head covers roughly two and a half FEET between frames, which is why the ball is in 211 and gone in 212 with nothing between — there is no impact frame in this clip and there never was one. Shaft lean, face, attack angle and low point all need 240 fps. Tempo fails separately: the floor for a back-to-down ratio is 120 fps, and the top is locatable only to within a few frames from this angle, so the ratio's error bar would span the whole range anyone cares about. The ~3:1 tempo on the record is the Jul 19 simulator pair and stays that.\n\nFOUR FIXES came out of it, and they are on the swing capture to-do: an alignment stick down the target line so the frame carries its own zero, prop the phone (the background drifts about 30 px across eight seconds), hand height rather than head height, and 240 fps. Also keep the whole club in frame — it reaches the left edge at the top.\n\nONE THING UNRESOLVED: the Photos timestamp on the frame Jack sent reads Aug 17, while this session is dated Aug 20. Same course, same clip. The date has been left as it was rather than moved on a screenshot header.",
+        "compare": "Third full-swing entry on record, after the Jul 19 sim baseline and the Jul 26 driver/wedge stills. Confirms Jul 26's three positives a second time and on the course rather than in a bay — coil, head behind the ball, ground-up transition, balanced finish. Revises Jul 26's 'hips slide level through impact' from a rotation fault to a posture fault. Does NOT re-grade Jul 26's across-the-line top, which needs an angle this film does not have.",
+        "limits": "Rear-quarter camera — behind and off the rear shoulder, elevated — so shaft plane at the top, club path, face-to-path and attack angle are all unreadable, and nothing here can confirm or refute the over-the-top slice. No true impact frame: the sequence jumps from hands-hip-high to well past the strike. The apparent standing-up in the delivery frame is partly perspective, since a rear-quarter lens exaggerates it as the body rotates toward the camera — the ADDRESS frames are the solid evidence, because a static position does not depend on rotation. DATE AND COURSE ARE AN INFERENCE, not Jack's report: he described the film only as recent, and it is dated to the Aug 20 Lakeside Country Club round on the strength of the terrain and the day it arrived. Correct it and this row gets removed and re-added.",
+        "gist": "Same Lakeside clip as the stills — the video pins impact and prices what 60 fps costs."
+      },
+      "setup": "FULL SWING · Driver · ON COURSE, elevated tee · rear-quarter angle (behind and off the rear shoulder — NOT square DTL) · 1 clip, 8.5 s, 60 fps, HANDHELD, head height — the 7 stills (address → finish) were pulled from it",
+      "note": "Video folded into the session its stills already came from. detail is sent WHOLESALE, so the nine original metrics ride along with the six the clip adds."
+    },
+    {
+      "id": "action-swing-film-lakeside-20260909",
+      "type": "action-update",
+      "target": "action-swing-posture-20260820",
+      "text": "SWING FILM — FOUR FIXES, PRICED OFF YOUR OWN LAKESIDE CLIP (Sep 9 2026). The video behind the Aug 20 stills was measured frame by frame. The camera is BEHIND you, which is half of what the across-the-line top needs — but behind is not the same as square down the line, and nothing in the frame establishes the azimuth, so the rear-quarter reading on that session stands and the top is still not gradeable. Four fixes, all cheap, and together they are the difference between a good-looking clip and one that closes a fault open since July. (1) PUT AN ALIGNMENT STICK DOWN THE TARGET LINE, in frame. This is the big one: across the line and laid off are angles measured AGAINST the target line, and nothing in that clip says where the target line is. No zero, no angle. (2) PROP THE PHONE, do not hold it — the background drifted 30 px across 8 seconds, so the reference moves during the swing. Lean it on the bag. (3) HAND HEIGHT, not head height. Apparent shaft plane moves with camera height, which is exactly why hand height is the standard. (4) 240 fps, not 60. At 60 the driver head covers about two and a half feet between frames, so there is no impact frame at all — and tempo needs 120 as a floor before the ratio means anything. Also: keep the whole club in frame, it reached the left edge at the top. SWING — THE ONE SET OF FILM THAT PAYS THREE WAYS. Widened Sep 9 2026: the grip change is aimed at COMPRESSION, and compression is low point and shaft lean — both of which live in the same face-on frame this to-do already wanted. Swing film exists — Jul 19 in a sim bay, Jul 26 stills, and the Aug 20 Lakeside clip the stills came from — and not one of them has ever produced a number AT IMPACT. This set would be the first. SHOOT IT LIKE THIS: face-on, SQUARE to you, lens at KNEE height, 240fps slo-mo, an alignment stick on the ground in frame for scale, OUTDOORS OFF TURF, five reps with a 7-iron — then one down-the-line from ON the target line at hand height. WHAT IT CLOSES: low point (fitted across the impact window, and cross-checked against where the divot actually starts — that anchor is free and the film cannot argue with it), attack angle with honest error bars, a tempo baseline, and the address posture below. WHAT IT CANNOT: face angle and dynamic loft at impact — at 240fps the head moves six inches between frames, so impact falls between two of them. Those are launch-monitor numbers and they are on the sim to-do. SWING — POSTURE, and the film that can actually grade it. The Aug 20 driver stills show a rounded upper back and chin on the chest at address, a trail leg that straightens at the top, and a body taller through delivery than at address — so the 'lose it through contact' feel is posture, not stalling hips: the finish is complete. Two things. (1) MIRROR CHECK at address: hinge from the hips, chest tall, a fist between chin and chest, and hold a little trail-knee flex to the top. (2) NEXT RANGE SESSION, film SQUARE down the line — phone on the ground ON the target line behind the ball, at hand height — plus one face-on. The Aug 20 angle was rear-quarter, which is why the across-the-line top still has not been re-graded since Jul 26.",
+      "note": "Corrected: the clip is the Aug 20 Lakeside footage already on file, and 'behind' was over-read as 'down the line'. The four fixes are unchanged — they were measured off the file."
+    },
+    {
+      "id": "plan-grip-20260909-v4",
+      "type": "briefing",
+      "briefing": {
+        "course": "The Grip — Before the Club Moves",
+        "discipline": "full-swing",
+        "focus": "The full-swing hold, and what you are actually after with it: TIGHTER COMPRESSION. Not a slice cure — you corrected that within the hour on Sep 9 — and not something the driver has any part in, because its weight is dialled and staying where it is.\n\nCompression is the ball first, the ground after, with the shaft still leaning at the target. A stronger lead hand does not produce that by itself. What it does is remove the REASON to flip: with the hand rotated, the face is square with your lead wrist FLAT, so holding the lean stops costing you a shut face. That is a real mechanism and it is why the instinct is a good one — but it makes the strike AVAILABLE rather than delivering it, which is why the gate in this plan is the DIVOT and the FACE, never the ball flight.\n\nEvery section says SOURCE · YOURS or SOURCE · STANDARD PRACTICE, so you can see at a glance which lines are yours and which are somebody else's teaching.",
+        "rules": [
+          "You are chasing COMPRESSION — ball first, ground after, shaft still leaning",
+          "Lead hand: 2.5–3 knuckles, V outside the trail shoulder",
+          "FINGERS, not the palm — the putting grip is the opposite hold, on purpose",
+          "Both hands MATCH: the trail V runs parallel to the lead V",
+          "The grip removes the reason to FLIP. It cannot move your low point",
+          "Judge it on the DIVOT and the face tape, never on how it felt",
+          "PHOTOGRAPH it before you move it, and one knuckle at a time",
+          "Driver weight stays put — it is your control, not a second lever",
+          "Starts left AND curves left? Too strong for your path — back it off"
+        ],
+        "sections": [
+          {
+            "t": "WHAT YOU SAID, AND WHAT STANDARD PRACTICE SAYS",
+            "k": "Your description of a strong grip is textbook-accurate — the only line that needs a guard is the one calling it a slice fix.",
+            "b": "SOURCE · YOURS, CHECKED AGAINST STANDARD PRACTICE.\n\nWHAT YOU SAID (Sep 9 2026): you want a stronger left hand. Rotated further clockwise on the club, two and a half to three knuckles showing at address, the V between thumb and index finger pointing past your right shoulder toward the armpit or outside the shoulder, and the club sitting across the FINGERS rather than buried in the palm. You listed the trade yourself: it closes the face and reduces a slice, it releases without a wrist flip, it makes the club easier to get on plane — and it hooks if body rotation stalls or the grip goes too far.\n\nWHAT STANDARD PRACTICE SAYS: the same thing, close to word for word. Knuckle count, V direction, fingers over palm and the hook risk are how every teacher describes a strong lead hand, and there is nothing eccentric in what you sent.\n\nTHE VERDICT IS THAT YOU ARE ON TRACK, and that is a real result rather than a polite one. You are not about to build something odd, and the rest of this plan can be about building it properly instead of about whether to build it.\n\nWHERE IT NEEDS A GUARD, and it is one line out of the lot: 'fixes slices'. That is true of a slice caused by an open FACE. The fault open on your card is a PATH fault — over the top, out to in — and it is a different animal. That does not change the hold you build. It changes what to expect from it, and how you read the ball afterwards.\n\nAND WHAT IT IS FOR, which you said next and which changes the emphasis of this whole plan: 'just looking to tighten up my compression with the grip mainly.' That is a better reason than the one the textbook leads with, and it is a different mechanism — the next section is the one to read. The slice material below stays, but as a GUARD on how far to take this rather than as the point of it."
+          },
+          {
+            "t": "COMPRESSION — and the grip's actual share of it",
+            "k": "A grip cannot move your low point; what it removes is the REASON to flip, and the flip is what kills compression.",
+            "b": "SOURCE · YOURS for the goal, STANDARD PRACTICE for the mechanism.\n\nWHAT COMPRESSION IS, in one line: the ball first, the ground after, with the shaft still leaning toward the target at impact. Everything else people mean by the word follows from that — the lower flight, the extra spin, the sound. The physical version: the low point of the arc sits PAST the ball, so the club is still descending when it arrives, and the dynamic loft is less than the loft stamped on the sole.\n\nWHAT THE GRIP HAS TO DO WITH IT, and this is worth being precise about because it decides what to expect. A grip cannot move your low point. What it changes is what your LEAD WRIST has to do to square the face. With a weaker lead hand the face arrives open unless something rotates it, and the quickest thing available is the trail hand throwing past — a flip. A flip adds loft and throws the low point BEHIND the ball, which is the exact opposite of compression, and it is the most common reason a good player cannot compress an iron.\n\nSO A STRONGER LEAD HAND REMOVES THE REASON TO FLIP. The face is square with the lead wrist flat, which means holding the shaft leaning forward no longer costs you a shut face. Your hands stop having to choose between squaring the face and keeping the lean. That is the real case for this change and it is a good one.\n\nWHAT IT IS NOT is the mechanism itself. Compression is mostly low point and where your pressure is at impact, and a stronger grip with the same flip in it gives you a hook and no compression at all. The grip makes the strike AVAILABLE; your body still has to deliver it. Which is exactly why the gate in this plan is the divot and the face tape — a flight can flatter you, a divot cannot.\n\nAND THE IMPACT NUMBERS ARE NOT MEASURED ON YOU. Swing film does exist — a Jul 19 simulator pair, driver and wedge stills from Jul 26, and the Aug 20 Lakeside driver clip those on-course stills were pulled from — and between them they give tempo (~3:1, Jul 19), a full coil, a lower-body transition and a held finish. What none of them has ever produced is a number AT IMPACT: your low point, your attack angle and your shaft lean are all still unknown, because every capture so far was either stills, a screen recording, or shot at 60 fps where the driver head moves about two and a half feet between frames. One face-on set at 240 fps closes the first two, and it is on the swing to-do."
+          },
+          {
+            "t": "THE HOLD — build it the same way every time",
+            "k": "Lead hand across the fingers with the heel pad on top, then the trail hand MATCHES it; a strong lead and a neutral trail is two hands fighting.",
+            "b": "SOURCE · STANDARD PRACTICE — textbook teaching, and nothing of yours has moved it.\n\nLEAD HAND (left) first, with the club held out in front of you so gravity is not making the decision for you. The handle runs diagonally across the FINGERS — from the base of the index finger to just under the heel pad — and then you close the hand so the fleshy pad at the heel sits ON TOP of the handle. That pad on top is what a strong grip actually IS. The knuckles are how you check it, not the thing itself.\n\nCHECK IT THREE WAYS, and all three should agree. TWO AND A HALF TO THREE KNUCKLES visible when you look down. The V between thumb and index finger pointing OUTSIDE your trail shoulder. The lead thumb sitting slightly on the trail side of the handle rather than straight down the top.\n\nTRAIL HAND (right) MATCHES IT. Its palm faces the target and covers the lead thumb, and its own V runs roughly PARALLEL to the lead V. This is the half that gets skipped, and skipping it is worse than changing nothing: a strong lead hand under a trail hand still sitting on top of the handle is two hands trying to hold the face in two different places, and which one wins changes under pressure. Both hands rotate, or neither does.\n\nPRESSURE stays light, and mostly in the last three fingers of the lead hand. A tight hold is how a grip change turns into an arm change.\n\nWHAT IS NOT PART OF THIS: how the hands ATTACH to each other. Overlap, interlock and ten-finger are a separate choice and none of them makes a grip stronger or weaker. Keep whatever you use now, so rotation is the only thing that moved.\n\nTHE ONE CROSS-REFERENCE WORTH HOLDING: this is the OPPOSITE hold from your putting grip, on purpose. The putter runs up the LIFELINE to lock the wrists so they cannot hinge; a full-swing club sits in the FINGERS so they can. If your full-swing grip starts creeping into the palm, that is the putting hold leaking across. The putting one lives in the Putting lab's Grip & Posture plan, and nothing about it gets written here."
+          },
+          {
+            "t": "PUT A NUMBER ON IT BEFORE YOU MOVE IT",
+            "k": "You cannot go from weak to strong without knowing which one you are on today — photograph it and write the knuckle count down.",
+            "b": "SOURCE · YOURS — the method this app already learned the hard way, applied to a new setting.\n\nNOBODY HAS EVER LOOKED AT YOUR GRIP. There is no photograph, no film frame that reads knuckles, and no note anywhere in this app saying what your current hold is. So 'stronger' has no starting point, and that goes wrong two ways: you may already be neutral-to-strong and about to overshoot, or you move it and have no way of saying how far you went.\n\nThe app has been here before. 'Barely open' was the putter face cue for a month with no number on it, and it could not be checked, defended or reproduced — the plans still carry the guard about it. Same shape of problem, same fix: measure the thing before you move it.\n\nSO: photograph the grip first, from directly above your hands, looking down the way your eyes do at address, on a club you actually play. COUNT THE KNUCKLES IN THE PICTURE rather than by feel — a grip is one of the places where feel and reality come apart fastest, and feel is the least reliable instrument in this app. Write the number down. There is a standing to-do for it on the Coach board.\n\nTHEN MOVE ONE KNUCKLE, not two. If the picture says two and you want three, go to two and a half and live there for a week. A grip that jumps straight to its target is a grip that gets abandoned in the third round, the first time a ball goes left."
+          },
+          {
+            "t": "WHAT A GRIP CHANGES, AND WHAT IT CANNOT TOUCH",
+            "k": "A grip moves where the FACE points; nothing about it moves where the club TRAVELS — and your open fault is a path fault.",
+            "b": "SOURCE · STANDARD PRACTICE, applied to what is already on your card.\n\nTHE MECHANISM. A strong lead hand does not close the face by itself. What it changes is what a NEUTRAL, unforced arrival looks like: with the hand rotated clockwise at address, the lead wrist returning to flat through impact delivers a face pointing further left than it used to. That is exactly why the release feels easier — you no longer have to rotate anything actively to square it, which is the benefit you named.\n\nWHAT THAT MAKES IT: a FACE lever. And face is the powerful one for direction — standard teaching puts roughly three-quarters to four-fifths of a shot's START direction on where the face points at impact, with the curve coming from the difference between face and path. That is somebody else's measurement, off launch monitors, not one of yours; you have never been on one.\n\nWHAT IT CANNOT DO. Nothing about how you hold the club changes where the club TRAVELS. Path comes from body, plane and sequence. Your open fault 'over the top' is a path fault — out to in — and a strong grip leaves it exactly where it is while cancelling its curve. What that produces is a ball starting left of target that does not fade back.\n\nAND THIS HAS ALREADY HAPPENED TO YOU ONCE. In June the driver went from a stiff shaft to a regular one, the curve largely disappeared and the miss became two-way. The Workshop Log's Aug 31 section is explicit about what that was: a shaft that lets the face square, cancelling a path fault's curve without touching the path. That is a face-side cancellation, and it is already in place.\n\nSO THE GUARD IS ABOUT STACKING, and it is the same one the Putting lab carries about eye dominance: treat the strong grip as ONE face-side lever on a path nobody has corrected, never as a second correction on top of the shaft. Two face-side fixes stacked on one uncorrected out-to-in path is how a slice becomes a pull-hook — a worse miss than the one you have, because it starts at trouble instead of finishing there. The gate below is what catches that if it happens."
+          },
+          {
+            "t": "WHAT YOUR OWN CARDS SAY — and how thin it is",
+            "k": "On the only card in this app recording tee-shot directions the miss went LEFT more often than right, so nothing here measured a slice.",
+            "b": "SOURCE · YOURS — your own scorecards, and the honest size of them.\n\nONE CARD IN THIS APP RECORDS WHERE TEE SHOTS FINISHED: Sterling Farms, Aug 12 2026, 18 holes. Fourteen holes recorded a fairway. Six were hit. The eight misses went FIVE LEFT, TWO RIGHT and one short.\n\nWHAT THAT IS WORTH, said plainly because a number this small can mislead on its own. It is one round. It records where the ball FINISHED, not whether it started there or curved there — so it cannot tell a pull from a hook, or a push from a slice. It predates the Sep 8 bag switch. And it says nothing about which club was in your hands on any of those holes.\n\nWHAT IT STILL SAYS: nothing in this app's own record shows you have a right-miss problem right now. The slice is your own lifelong read, which is exactly how it is filed on the diagnosis card — 'your own read', the weakest evidence tier there is, and it says so out loud rather than dressing itself up as measured.\n\nAND THE LIVE CARDS ARE NOT IN THIS TEXT. Everything you have logged in the live logger since Aug 20 sits on your phone and outranks all of the above. The OFF THE TEE table in Rounds is always current and this page never will be, so read the table rather than this paragraph when you want to know which way the ball is actually going.\n\nWHAT FOLLOWS. Build the grip because a repeatable, checkable hold is worth owning and yours has never been looked at. That reason survives whichever way the ball is going this month. 'It fixes my slice' does not survive your own record."
+          },
+          {
+            "t": "THE DRIVER IS SET — which makes it a control",
+            "k": "The weight is dialled and stays put, so a shape change after the grip change has exactly one candidate.",
+            "b": "SOURCE · YOURS, corrected Sep 9 2026.\n\nTHE WEIGHT IS DIALLED. You set it at Wianno, it is where you want it, and it is not moving. So the slider job came off the Aug 31 driver to-do; what is left on it is READING the club, which is a different job and still worth doing — the sleeve setting, the shaft band and the playing length are three build facts nobody has ever written down.\n\nWHY THAT HELPS HERE, rather than just being one less thing to do. A setting that is not moving is a CONTROL. If the ball starts drawing more once the grip changes, the grip did it — there is no second variable to blame and no argument to have with yourself about which one it was.\n\nSO KEEP IT THAT WAY: do not touch the slider while the grip is bedding in, even if the shape moves on you. If it moves too far, the answer is in the grip — back it off half a knuckle — not in the sole of the driver. You already paid for that setting once, at a course where it worked."
+          },
+          {
+            "t": "THE GATE — how you will know, and when to back it off",
+            "k": "Judge it on the divot and the face tape; ball flight is the least reliable witness there is for compression.",
+            "b": "SOURCE · STANDARD PRACTICE in the tests, YOURS in the pass marks.\n\nEVERY GRIP CHANGE FEELS WRONG FOR TWO WEEKS. That is adaptation, not information, so feel cannot be the judge. And for compression specifically the BALL FLIGHT is the least reliable witness on offer — a flipped iron and a compressed one both find greens. Three things tell the truth and all three are free.\n\nTHE DIVOT. It starts AT or AFTER the ball, never before. Look at every divot for a fortnight; that one habit is worth more than anything else on this page, and it is the single measurement nobody can argue with. The drill that puts a line on the ground for it is on the bench.\n\nTHE FACE. Foot spray or impact tape, one range session a fortnight. A strike low on the face or out on the toe does not compress whatever your hands did — and if that is what is happening, the grip was never the problem and this plan is the wrong page.\n\nTHE FLIGHT, read the right way round. A compressed iron flies LOWER and goes FURTHER, with more spin. If the flight gets HIGHER and shorter after the grip change, you have added loft — the flip is still in there and the grip has not reached it.\n\nGIVE IT THREE WEEKS before any verdict, and then the DIRECTION GUARD, which is the other half of the gate and the reason the slice material in this plan is still here.\n\nTOOK, AND WORKING — the ball starts on line or a touch right and holds, or draws gently, and the divots start after the ball. Keep it.\n\nTOO STRONG FOR YOUR PATH — the ball starts LEFT and curves further LEFT. That is the pull-hook the sections above warn about, and the answer is to BACK THE GRIP OFF half a knuckle. Not to aim right, not to hold the face open, not to add anything: a compensation on top of a compensation is the opposite of what a simpler grip was for.\n\nHAS NOT TAKEN — nothing moved, in the divots or the flight. Check the TRAIL hand first, because it is the half that gets skipped, and check the photograph rather than the feel.\n\nON THE COURSE the app is already counting the part it can see: log the tee club and the approach club, and the Off the tee and Into the green tables do the rest. They cannot see a strike, which is why the divot is the one you watch yourself.\n\nThe drills are on the Coach bench — 'Build the grip the same way every time' at home, 'Read the strike, not the feel' at the range for the compression test, and the ball-first divot-line drill for the divot itself. They live there rather than here because the bench is the one place drills are allowed to be."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "Where this plan came from, and the six weeks a putting verdict spent sitting on a swing page.",
+            "b": "Sep 9 2026 — plan created from your ask for a stronger left hand, then REFRAMED the same day when you said what it was for: compression, not the slice. The first cut led with the textbook's headline and reasoned against the miss the app already had on file; that material is still here as the guard on how far to take the change, which is what it is good for. The full working is in the Swing Workshop Log's Sep 9 section, including the correction.\n\nALSO CORRECTED Sep 9: the driver's sliding weight is dialled — set at Wianno, no change wanted. The first cut of this plan worked out an ordering between the grip and that slider, which was moot. The to-do kept its reading jobs and lost the slider job.\n\nTHE GRIP EXPERIMENT (Jul 2026) was a PUTTING plan — conventional against left-hand-low against the claw, run on the DF3i — and conventional won it. It was retired into the putting plans when they were reorganised, and it has nothing to do with the full-swing hold. Worth saying because its verdict leaked: 'Grip settled: conventional' sat in the FOCUS line of Swing Thoughts — Club by Club from Jul 26 until Sep 9, on a full-swing page, six weeks after the putting section it was written for had moved out to the Putting lab. Fixed in the same push that created this plan.\n\nSOURCES. The strong-grip description — knuckle count, V direction, fingers over palm, the pros and cons — came from you, and it is mainstream teaching rather than anything measured here; the links you sent are video and swing-tip pages and are not treated as evidence by this plan. The face-versus-path mechanism and the start-direction split are standard launch-monitor teaching, labelled STANDARD PRACTICE wherever they appear because they are somebody else's numbers. The miss counts are your Sterling Farms card, Aug 12 2026. The shaft history and the two-way miss are your own report, recorded Aug 31 and unmeasured.\n\nSTILL UNMEASURED, and this is the honest limit of the whole plan: your current grip (no photograph exists), your club path and face-to-path (no launch-monitor session has ever happened), and whether the June shaft change moved the path or only the curve. The grip you can settle this week with a phone. The other two need a sim, and that to-do has been open since Aug 20."
+          }
+        ]
+      }
     }
   ]
 }

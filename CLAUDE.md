@@ -1747,6 +1747,31 @@ measurement over self-report — and say which one you're using.
   `session-update` the day's entry and widen its `setup` to list every angle. If separate
   entries already exist for one day, fold them with `session-remove`.
 
+  **AND THE FILM HE SENDS YOU MAY ALREADY BE ON FILE — CHECK THE FILM ROOM BEFORE WRITING A
+  SESSION** (Sep 9 2026). Jack re-sent the Lakeside driver clip after being asked for it; it
+  was ingested as a new Aug 17 session and had to be folded back into `s14`, the Aug 20 entry
+  whose seven stills were pulled from that very video. His words: *"I sent it again even tho I
+  knew u had it."* Two things made the duplicate easy to miss and both generalise. **Stills
+  and the clip they were cut from do not look like the same capture** — one `setup` says "7
+  phone stills", the other "1 clip, 60 fps", and nothing about either says they are one batch.
+  And **a screenshot's Photos header is not the session date**: the frame he sent read Aug 17
+  against a session dated Aug 20, which is a discrepancy to raise, never to resolve by minting
+  a second row. So before a `session` entry: read the discipline's film room for the same
+  course, club and week, and where the answer is "this is the same footage seen again", the
+  push is a `session-update`, not a session. This is the app-side version of the provenance
+  rule below — the evolution grid is one column per BATCH OF FILM, not one per time somebody
+  looked at it.
+
+  **The same pass over-read the camera, which is the other half of the lesson.** Three
+  checkpoints (back at address, chest at the top, back at the finish) establish only that the
+  camera is BEHIND him. That is consistent with the rear-quarter reading `s14` already
+  carried, and it does NOT establish a square down-the-line one — the azimuth separates those
+  two and nothing in the frame measures it. "Behind" was written up as "the right camera
+  family at last", which contradicted a filmed description already on the record on evidence
+  that could not tell the two apart. **When a new read disagrees with an existing one, check
+  first whether it actually distinguishes the cases** — resolve on method, and where it
+  doesn't, the older description stands.
+
 - **Deleting film: preserve the numbers first** (standing instruction, Aug 14 2026). Jack
   cleared every putting session shot on a putter he no longer plays — the Phantom 7.5,
   Newport 2 and DF3i, eight sessions Jul 17–21, which also emptied Jul 18 entirely and
