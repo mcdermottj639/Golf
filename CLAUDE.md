@@ -500,7 +500,7 @@ already draws** — that is what makes them worth counting rather than generic:
 | Key | Range | Why that line |
 |---|---|---|
 | `t`   | ≤3 ft    | tap-in range, and now the **target** for a lag: a lag that finishes here left a tap-in, and a conceded one counts with them |
-| `s`   | 4–6 ft   | the scoring zone and **his** zone: the 5-ft test sits in the middle of it, the left miss is the whole putter saga, and `Short Putts — The Pop Stroke` covers exactly this range |
+| `s`   | 4–6 ft   | the scoring zone and **his** zone: the 5-ft test sits in the middle of it, the left miss is the whole putter saga, and `Short Putts — Inside Six Feet` covers exactly this range |
 | `m`   | 7–12 ft  | the make-some window — birdie chances and par saves |
 | `l`   | 13–20 ft | two-putt territory; a make is a bonus. A lag finishing here is a pace miss |
 | `xl`  | 21–30 ft | lag proper — three-putt risk climbs steeply through here |
@@ -1606,6 +1606,13 @@ rule above is unchanged.
   question marks. **So when you push a `faults` entry, check its tag reaches a drill**, and
   if it doesn't, either tag the lessons that train it or write the lesson. The lab will
   otherwise say so on Jack's phone, which is the point.
+- **But never close a coverage gap by tagging a drill that doesn't train the fault** — the
+  gap is the honest reading, and a wrong join reads exactly like a right one, which is the
+  same failure `FOCUS_TAG` is written down to prevent. Worked example, Sep 9 2026: the two
+  new grip drills are tagged `off-tee` and NOT `over-the-top-slice`, which would have been
+  the tempting join. A grip is a FACE lever and `over-the-top-slice` is a PATH fault, so
+  filing the drill under it would have made the lab claim that fault was being trained when
+  nothing on the bench touches it.
 - **A fault also needs a row in `FAULT_EV`** (`app.js`, Aug 27 2026) to render an evidence
   tier and a tappable "what this was read off" panel. A fault object is only `{tag, why}`,
   so the tier has to be written down rather than inferred from the prose — a `why` saying
@@ -1633,10 +1640,19 @@ shell asset rather than feed data.
 
 Standing plans are sliced by **situation, not by topic** — that's what Jack asked for and
 what the putting lab now models: `Grip & Posture — The Setup` (before the putter moves) ·
-`Putting Routine — Locked` (the order you do it in) · `Short Putts — The Pop Stroke`
-(inside ~6 ft) · `Lag Putts — The Distance Grind` (past ~6 ft) · `Putting — The Workshop
-Log`. Swing has `Swing — The Workshop Log` alongside its doing-plans. A new plan should be
-answerable to "which situation is this for?"
+`Putting Routine — Locked` (the order you do it in) · `Short Putts — Inside Six Feet` ·
+`Lag Putts — The Distance Grind` (past ~6 ft) · `Putting — The Workshop Log`. Swing models
+it too: `The Grip — Before the Club Moves` (added Sep 9 2026 — the swing lab's answer to the
+putting lab's `Grip & Posture`) alongside the pre-shot routine, the positions reference, the
+fault fix, the club-by-club keys and `Swing — The Workshop Log`.
+A new plan should be answerable to "which situation is this for?"
+
+**A PLAN'S TITLE IS ITS PRIMARY KEY, AND THE KEY IGNORES THE LAB.** `applyFeed()` dedupes an
+undated briefing on `course` **alone** — there is no `discipline` in that comparison — so two
+labs cannot share a plan title: pushing a swing `Grip & Posture — The Setup` would silently
+delete the putting one, in a lab nobody was looking at. That is why the swing grip plan is
+named for the moment rather than the subject. Grep the live titles before naming a new plan,
+not just the ones in the lab you are working in.
 
 Two rules that fall out of it, both learned the hard way on Aug 13:
 
@@ -1680,6 +1696,18 @@ both matter going forward:
   thoughts (driver / 5-wood / irons / wedges). Renamed **Swing Thoughts — Club by Club**
   and tagged `full-swing`. **Check a plan's TITLE against its CONTENT**: once the Mental lab
   existed, "Golf Mind" read as a mental plan and pointed at the wrong lab.
+
+**WHEN A SECTION MOVES LABS, ITS VERDICTS HAVE TO MOVE WITH IT — and the `focus` line is the
+copy that gets left behind** (Sep 9 2026). *Swing Thoughts — Club by Club* carried
+"Grip settled: conventional" in its focus from Jul 26 to Sep 9. True, and about **putting** —
+conventional beat left-hand-low and the claw in the July grip experiment — written while that
+plan still held the putting keys. Those keys moved to the Putting lab on Aug 14; the verdict
+in the focus did not, so a full-swing page told Jack his grip was settled and closed for six
+weeks, on the strength of a putting experiment. A focus reads as being about the whole page,
+which is exactly why a claim parked there survives the section that justified it. So after
+moving a section out of a plan, **re-read that plan's `focus` for anything the departed
+section was the basis of** — and grep the phrase across the feed, since a plan is re-sent
+whole and the line rides along in every later version.
 
 **A drill that names retired gear is the same bug as a stale lesson body.** `e1`'s drill was
 still sending Jack to a demo with a putter returned Jul 20 — invisible while drills were
