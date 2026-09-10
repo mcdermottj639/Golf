@@ -154,6 +154,16 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
   is **unmeasured**. Full read in the *Putting — The Workshop Log* plan (Aug 13 section);
   the owed two-drop test rides along with the overhead five in *Grip & Posture*'s sibling,
   the *Putting Routine* FACE section.
+- Putting grip: **CLAW inside about six feet, CONVENTIONAL past it** — Jack's call, Sep 10 2026
+  (*"Claw grip from now on for short putts. Maybe 6ft and less."*). It is an intent, so it is
+  authoritative and it is not waiting on a scoreboard: **no claw rep has ever been filmed or
+  scored on any putter in this project.** Six is not a new line — it is where *Short Putts —
+  Inside Six Feet* and *Lag Putts* already split, and where `PUTT_DIST`'s `s` bucket ends — and
+  the tie-break for the edge is **unsure → it's a lag → conventional**, because the claw's cost
+  is a distance-feel trade and pace is the open fault. Two consequences that catch people out:
+  the trail-hand-senses-the-weight cue is a **conventional-grip, lag-only** cue and must never be
+  carried inside six feet, and **the short-putt numbers and the 30-ft ladder numbers are no
+  longer comparable** — they differ by a grip now as well as by a stroke length.
 - Signature miss: **left on short putts** — the through-line of the whole putter saga.
   **Aug 10, 2026: likely reclassified as an AIM error, not a delivery error.** Jack found
   that setting the face *barely open* at address is the sweet spot. A zero-torque head
@@ -1627,6 +1637,25 @@ rule above is unchanged.
   top*) was not tagged with it. Thirteen lessons were re-tagged; nothing else changed.
 - **`lesson-update` is an `Object.assign`, so `tags` REPLACES the array.** Always send the
   full list, existing tags included.
+- **PATCHES ACCUMULATE ACROSS ENTRIES, so rewriting a drill means overriding every field an
+  EARLIER patch set — `steps`, `score` and `viz` included** (learned Sep 10 2026). `h9` was
+  added with its whole drill in the `drill` paragraph; `lesson-h9-steps-20260821` later split
+  it into `steps` + `score` + a `viz` diagram. Rewriting `drill` and `body` for the claw
+  decision therefore shipped a lesson whose prose said *two blocks, both claw* over a picture
+  still captioned *"One dial at a time"* with three boxes reading conventional / claw /
+  conventional — the retired protocol, drawn, under the new instruction. **`grep` the feed for
+  every prior `lesson-update` on that `target` before writing a new one**, and set every field
+  they set. A diagram is the part a drill actually gets read off, so a stale one outranks the
+  words above it.
+- **And check `drillBody()`'s shape while you are there**: when a lesson has `steps`, `drill`
+  renders as a ONE-LINE lead (`.dlead`) and only `steps` render as the instruction — so a
+  paragraph left in `drill` becomes a wall of text where a single line belongs. A lesson
+  without `steps` renders `drill` as prose. The two shapes coexist; know which one you are in.
+- **This was found in a browser and could not have been found any other way.** `node --check`
+  passes, the JSON is valid, and the entry applies cleanly — the contradiction only exists on
+  the rendered card. Any `lesson-update` that changes what a drill TELLS HIM to do is worth one
+  pass over the drill bench (Coach → *Open the drill bench*, expand the `<details>`) to read the
+  card as he will.
 
 **`lessons.js` is a FROZEN BASELINE — same rule as `seed()`** (standing instruction, Aug 13
 2026). Do NOT edit a lesson in place: append a `lesson-update` / `lesson-add` /
