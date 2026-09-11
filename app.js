@@ -99,13 +99,23 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v95';
+const BUILD = 'v96';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v96', d:'2026-09-11', items:[
+    'TRACKMAN. The app can now hold launch-monitor numbers, so the sessions at the lounge have somewhere to land instead of sitting in a chat. Two places show it: the carry ladder, and a new "The bay" block in the Swing, Short Game and Putting labs.',
+    'EVERY LADDER ROW NOW SAYS WHERE ITS NUMBER CAME FROM \u2014 the date it was measured, how many shots it averages, the spread, and the ball it was hit with. Rows that have never been measured say "estimated" rather than sitting there looking identical to one that has. The captions only appear once something on the ladder is genuinely measured; until then the gold note covers it as before.',
+    'The spread is new \u2014 \u00b19 yards on a driver is a number this app has never had for any club, and it is the one that decides a par 3.',
+    'A measured carry NEVER quietly overwrites a number you typed. The row shows both \u2014 "yours 230 \u00b7 the bay says 241" \u2014 with a button to take it. Blank rows it simply fills, because there is nothing there to protect.',
+    'The mini-driver / 2-iron OVERLAP flag can finally answer itself. Today it is loft arithmetic and says so; once both rows are measured it states the gap in YARDS, which is the question a 43-inch mini and a 39-inch driving iron actually pose.',
+    'A bay session opens like a film breakdown: what it measured, club by club, in a table that scrolls in its own box. A column only appears where the session produced it.',
+    'Three facts lead every bay session, because none of them is visible in a number: the BALL, the bay\u2019s normalization setting, and whether spin was MEASURED or estimated. Indoors a radar needs about two ball revolutions to measure spin \u2014 on the lounge\u2019s plain white balls it estimates one instead, and since carry is computed from launch and spin, that makes the carry a model built on a modelled input. Better than a guess. Not the same as a measurement.',
+    'New evidence badge: MEASURED IN THE BAY. It ranks above film and below your own rounds \u2014 a radar beats a frame counted by hand off a phone, and a card you actually played beats any number taken off a perfect lie. Tapping it says what a mat cannot see: still air, no slope, nothing at stake.',
+    'Nothing indoors touches your handicap, your on-course stats or the live logger. That wall goes in with simulator rounds, which are not built yet.' ] },
   { b:'v95', d:'2026-09-09', items:[
     'Your Lakeside driver film is dated AUG 17, not Aug 20. You confirmed the clip\u2019s date, and it was on the record as Aug 20 \u2014 which was quietly claiming it came off your Aug 20 round at Lakeside. It did not: that round is a real, separate day three days later, and its scores, pars and 70.5/129 are untouched.',
     'The correction follows the film everywhere it is cited \u2014 the swing faults, the posture plan, the checkpoint page, the capture to-do, and the evidence chip under the posture fault, which used to read \u201cAug 20 film\u201d on a card whose text now says Aug 17.',
@@ -461,6 +471,11 @@ function seed(){
     stats: [],            // stat snapshots (GHIN etc), oldest first — see the `stats` feed type
     drillLog: [],         // {date, drill}
     tests: [],            // {date, putter, makes, note} — 10-ball demo tests
+    // Launch-monitor sessions — the numeric twin of `sessions`. Its OWN array rather than
+    // a flag on the film sessions, because the two sources have opposite blind spots: film
+    // sees the body and cannot measure the ball, radar measures the ball and never sees his
+    // posture. One array would have let a Trackman carry be quoted as filmed. See bayLog().
+    bays: [],             // {date, venue, unit, ball, norm, spin, discipline, setup, finding, detail, _fid}
     shortlist: [
       { name:'L.A.B. DF3', type:'Zero-torque · XL mallet', price:479, demoed:false },
       { name:'Odyssey Ai-One S2S Jailbird', type:'Zero-torque · high-MOI', price:399, demoed:false },
@@ -546,6 +561,7 @@ function migrate(s){
   if(!s.lessonHidden) s.lessonHidden = [];
   if(!s.kit) s.kit = seed().kit;
   if(!s.drillLog) s.drillLog = [];   // per-drill practice record — see drillRuns()
+  if(!s.bays) s.bays = [];           // launch-monitor sessions — see bayLog()
   if(s.live === undefined) s.live = null;   // a round being logged hole-by-hole
   if(!s.updates) s.updates = [];            // the What's new log — see recordUpdate()
   if(s.updatesInit === undefined) s.updatesInit = false;
@@ -1041,6 +1057,7 @@ const TITLES = {
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
+  bay:['Bay Session','Every number the launch monitor produced.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
   shelf:['Coach','One shelf of the library.'],
   lesson:['Coach','One lesson, and the drill that trains it.'],
@@ -1116,7 +1133,7 @@ function render(view, arg, keepScroll){
   if(bt){ bt.textContent = BUILD; bt.hidden = view !== 'home'; }
   // The four labs live behind one nav button, so they all light it — and so does every
   // view that hangs off Rounds: a round card, and a course plan you opened from one.
-  const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game',
+  const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
                    drills:'coach', shelf:'coach', lesson:'coach', landed:'home',
                    round:'rounds', rounds:'rounds' };
   const navView = NAV_OF[view] || view;
@@ -1126,7 +1143,7 @@ function render(view, arg, keepScroll){
   // side it is the same intention and live() already knows which one it is.
   const teeLab = $('#navTeeLab');
   if(teeLab) teeLab.textContent = S.live ? 'RESUME' : 'TEE';
-  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, briefing, round:roundView, live, landed }[view] || home;
+  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
@@ -1269,6 +1286,7 @@ const actionLi = a => `<li class="${a.done ? 'done' : ''}" data-action="toggle-a
 const UP_TYPE = {
   session:['FILM','u-m'], 'session-update':['FILM','u-m'], 'session-remove':['FILM','u-m'],
   evolution:['GRID','u-m'], faults:['FAULT','u-m'], test:['TEST','u-m'], layout:['CARD','u-m'],
+  bay:['BAY','u-m'], 'bay-update':['BAY','u-m'], 'bay-remove':['BAY','u-m'],
   round:['ROUND','u-l'], 'round-update':['ROUND','u-l'],
   'lesson-add':['LESSON','u-k'], 'lesson-update':['LESSON','u-k'], 'lesson-remove':['LESSON','u-k'],
   kit:['KIT','u-k'],
@@ -1906,6 +1924,18 @@ const ladderLoft = row => { const m = /(\d+(?:\.\d+)?)/.exec(row.loft || ''); re
 // Two clubs within a degree and a half of each other on the ladder are fighting for one
 // number — the classic gapping trap, and in this bag a live question rather than a general
 // one. It is arithmetic over the ladder's own lofts, so it says nothing the data doesn't.
+// Two measured rows can say the overlap in the unit that actually decides it. The loft
+// flag is arithmetic and says nothing about distance — which is exactly the mini-driver vs
+// 2-iron question, two clubs 1.5° apart and four inches of shaft different. Where both rows
+// carry a measured number the app can finally answer it instead of raising it.
+function ladderGapYds(a, b){
+  // The number the row SHOWS, not the one the bay offered — where he has kept his own figure
+  // over a measured one, the yards he plays are his. A row with no `meas` yields nothing:
+  // a gap between a measurement and an estimate is not a measured gap.
+  const v = r => (r && r.meas && r.carry != null ? r.carry : null);
+  const av = v(a), bv = v(b);
+  return av != null && bv != null ? Math.abs(av - bv) : null;
+}
 function ladderOverlap(row){
   const i = S.carries.indexOf(row), l = ladderLoft(row);
   if(i < 0 || l == null) return null;
@@ -1946,7 +1976,10 @@ function clubRow(c){
       ${c.note ? expandable(c.note) : ''}
       ${mismatch ? `<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>` : ''}
       ${ov ? `<p class="sm faint">Sits ${Math.abs(ladderLoft(ov) - ladderLoft(row)).toFixed(1)}° off the
-        ${esc(ov.club)} on the ladder.</p>` : ''}
+        ${esc(ov.club)} on the ladder.${(() => { const g = ladderGapYds(row, ov);
+          return g == null ? '' : g <= 8
+            ? ` Measured, they carry <b>${g} yards apart</b> — so this one is real, not just loft arithmetic.`
+            : ` Measured, they carry <b>${g} yards apart</b>, so the flag is loft and not distance.`; })()}</p>` : ''}
       ${c.cat === 'wedge' && c.status === 'gaming'
         ? `<div class="meter grn" title="groove life"><span style="width:${groovePct(c)}%"></span></div>
            <div class="sm faint">Groove life ${groovePct(c)}% · ${c.rounds || 0} rounds</div>` : ''}
@@ -2027,18 +2060,52 @@ function grindsCard(wedges){
 // `S.carriesCalibrated` is false — once he has calibrated, saying otherwise would be a lie
 // about his own numbers.
 const LADDER_MAX = 300;
+// ----- Where a ladder number came from (Sep 11 2026) -----
+// A row is `{club, loft, carry}` and says nothing about its own provenance, which was
+// honest while every figure on it was a guess and becomes a LIE the moment a measured
+// number lands beside an estimate: 241 off a radar and 205 off nothing look identical.
+// `meas` is the record of what produced it — and never the authority. His calibrated
+// number stays the one the app plays off; where the two differ the row shows both and he
+// takes the measured one with a tap. See `carry-update` in applyFeed().
+//
+// The caption only appears once SOMETHING is measured. Before that the whole-ladder gold
+// note already says every row is an estimate, and thirteen rows each repeating it would be
+// 13px of noise a page tall.
+function ladderBadge(row){
+  const m = row.meas;
+  if(!m) return row.carry == null ? '' : `<span class="lmeas">estimated</span>`;
+  const bits = [m.date ? 'MEASURED ' + fmtDate(m.date) : 'MEASURED',
+    m.n ? `n=${m.n}` : '', m.sd != null ? `±${m.sd}` : '',
+    m.ball || '', m.spin === 'estimated' ? 'spin est.' : ''].filter(Boolean);
+  return `<span class="lmeas on">${esc(bits.join(' · '))}</span>`;
+}
+// The one place the two numbers meet. A measured figure he has not accepted is an offer,
+// not a correction — so it renders beside his own with the arithmetic visible and a button,
+// rather than replacing it and hoping he notices.
+function ladderOffer(row, i){
+  const m = row.meas;
+  if(!m || m.carry == null || row.carry == null || m.carry === row.carry) return '';
+  return `<span class="lmeas offer">yours ${row.carry} · the bay says ${m.carry}
+    <button class="btn ghost tiny" data-action="use-bay-carry" data-i="${i}">use ${m.carry}</button></span>`;
+}
 function ladderCard(){
   const pf = playsFactor();
+  const anyMeas = S.carries.some(c => c.meas);
   return `
-  ${S.carriesCalibrated ? '' : `<div class="goldnote">
+  ${anyMeas || S.carriesCalibrated ? '' : `<div class="goldnote">
     <div class="gnl">Estimated · not calibrated</div>
     <p class="sm">No number here has been measured yet — they are starting points for your game.
       Edit any row as a real carry comes in from the range or the course.</p>
   </div>`}
+  ${anyMeas ? `<p class="sm faint" style="margin-top:6px">Every row now says where its number
+    came from. A measured one carries the date, how many shots it averages, the spread, and
+    the ball it was hit with — which is what decides whether it transfers to the course.</p>` : ''}
   <div class="ladr">${S.carries.map((c, i) => {
     const next = S.carries[i + 1];
     const gap = next && c.carry && next.carry ? c.carry - next.carry : null;
-    return `<div class="lrow">
+    const badge = anyMeas ? ladderBadge(c) : '';
+    const offer = ladderOffer(c, i);
+    return `<div class="lgrp"><div class="lrow">
       <span class="lc">${esc(clubAbbr(c.club))}</span>
       <span class="lb">${c.carry != null
         ? `<i style="width:${Math.min(100, Math.round(c.carry / LADDER_MAX * 100))}%"></i>`
@@ -2047,7 +2114,7 @@ function ladderCard(){
         pf && c.carry ? `<b>${Math.round(c.carry * pf)} today</b>` : ''}</span>
       <span class="lg ${gap !== null && (gap >= 15 || gap <= 5) ? 'wide' : ''}">${
         gap !== null ? `${gap}` : '·'}</span>
-    </div>`; }).join('')}</div>
+    </div>${badge}${offer}</div>`; }).join('')}</div>
   <div class="lfoot"><span>0</span><span>${LADDER_MAX} yd scale</span></div>
   <button class="btn ghost tiny" data-action="save-carries">Save carries</button>
   ${pf ? `<p class="sm faint" style="margin-top:8px">"Today" = carry adjusted for ${Math.round(S.weather.t)}°F air (${
@@ -2058,6 +2125,10 @@ function ladderCard(){
       it stays as long as the bag is — a club leaving or joining is a ladder change as much as a
       bag change. Gap column: <b>15 yd or more</b> is a hole in the bag, <b>5 or less</b> is two
       clubs fighting for one number.</p>
+    <p class="sm">A <b>measured</b> row was read off a launch monitor and carries its date, its
+      shot count and its spread. It is still an indoor number off a mat, and the carry is
+      computed from measured launch rather than watched to the ground — so your own cards stay
+      the check on it.</p>
   </div>`;
 }
 function bag(){
@@ -2243,6 +2314,140 @@ function sessionLog(list, empty){
     <div class="sesh"><b>${fmtDate(s.date)}</b><span class="sesm">${esc(sessionSize(s))}${s.detail ? ' ▸' : ''}</span></div>
     <div class="sesg">${esc(sessionGist(s))}</div>
   </div>`).join('')}`;
+}
+
+// ----- The bay: launch-monitor sessions (Sep 11 2026) -----
+// The numeric twin of the film room, and the first source in this project that measures the
+// ball and the club directly rather than inferring them from a frame or a scorecard.
+//
+// A bay session declares its own `discipline` — nothing is read out of the setup line the
+// way sessionDiscipline() has to guess, because the entry is written already knowing which
+// lab it is for.
+const BAY_DISC = b => (b && b.discipline) || 'swing';
+function baysFor(disc){
+  return (S.bays || []).map((b, i) => ({ b, i }))
+    .filter(o => BAY_DISC(o.b) === disc)
+    .sort((x, y) => (y.b.date || '').localeCompare(x.b.date || ''));
+}
+// Same rule as a film session's gist: an authored line wins, the finding's opening sentence
+// is the fallback, so a session pushed without one still reads in the log.
+function bayGist(b){
+  if(b && b.detail && b.detail.gist) return b.detail.gist;
+  const lead = splitLead((b && b.finding) || '')[0];
+  return lead.length > 150 ? lead.slice(0, 132).replace(/\s+\S*$/, '') + '…' : lead;
+}
+const baySize = b => {
+  const m = /(\d+)\s*(shots?|balls?|swings?|putts?|drives?|strokes?)/i.exec((b && b.setup) || '');
+  return m ? m[1] + ' ' + m[2].toLowerCase() : '';
+};
+// WHAT THE NUMBERS WERE TAKEN UNDER, on every screen they appear on. Three facts decide
+// whether two sessions are comparable and whether a carry transfers to the course, and not
+// one of them is visible in the number itself:
+//   · the BALL — an unmarked range ball is not his gamer, and indoors a radar needs roughly
+//     two ball revolutions inside the window it can see to MEASURE spin. On a plain ball it
+//     frequently cannot, and estimates one instead.
+//   · the NORMALIZATION the bay was set to. `playsFactor()` treats a stored carry as a 70°F
+//     number, so a session normalized to anything else is a systematic error in one
+//     direction with nothing on screen to show it.
+//   · whether SPIN was measured or estimated. Carry is computed from launch AND spin, so an
+//     estimated spin makes the carry a model built on a modelled input — still far better
+//     than a guess, and not the same claim as a measurement.
+function bayProv(b){
+  const chips = [];
+  if(b.venue) chips.push(['', b.venue]);
+  if(b.unit) chips.push(['', b.unit]);
+  if(b.ball) chips.push([/unmark|range|venue/i.test(b.ball) ? 'warn' : 'ok', 'ball · ' + b.ball]);
+  if(b.norm) chips.push([/\b70\s*°?F/i.test(b.norm) ? 'ok' : 'warn', 'norm · ' + b.norm]);
+  if(b.spin) chips.push([b.spin === 'measured' ? 'ok' : 'warn', 'spin · ' + b.spin]);
+  if(!chips.length) return '';
+  return `<div class="bayp">${chips.map(([c, t]) =>
+    `<span class="bpc ${c}">${esc(t)}</span>`).join('')}</div>`;
+}
+// One column per parameter, and a column renders only where some club row actually carries
+// it — the same rule the approach buckets follow, and the reason a carry-only session draws
+// four columns instead of thirteen empty ones. Thirteen will not fit a phone whatever the
+// padding does, so the table is a `.tscroll`: it scrolls inside its own box rather than
+// taking the page sideways with it.
+const baySgn = v => (v > 0 ? '+' : '') + v;
+const BAY_COLS = [
+  ['n',     'N',       v => v],
+  ['carry', 'CARRY',   v => Math.round(v)],
+  ['sd',    '±',       v => Math.round(v)],
+  ['total', 'TOTAL',   v => Math.round(v)],
+  ['cs',    'CLUB MPH', v => v],
+  ['bs',    'BALL MPH', v => v],
+  ['smash', 'SMASH',   v => v],
+  ['la',    'LAUNCH°', v => v],
+  ['spin',  'SPIN',    v => Math.round(v)],
+  ['aoa',   'ATTACK°', baySgn],
+  ['path',  'PATH°',   baySgn],
+  ['face',  'FACE°',   baySgn],
+  ['ftp',   'F–P°',    baySgn],
+];
+function bayClubTable(clubs){
+  if(!Array.isArray(clubs) || !clubs.length) return '';
+  const cols = BAY_COLS.filter(([k]) => clubs.some(c => c[k] != null));
+  if(!cols.length) return '';
+  return `<div class="tscroll"><table>
+    <thead><tr><th>CLUB</th>${cols.map(([, lab]) => `<th>${esc(lab)}</th>`).join('')}</tr></thead>
+    <tbody>${clubs.map(c => `<tr><td><b>${esc(c.club ? clubTag(c.club) : '—')}</b></td>
+      ${cols.map(([k, , f]) => `<td>${c[k] == null ? '·' : esc(String(f(c[k])))}</td>`).join('')}</tr>`).join('')}
+    </tbody></table></div>`;
+}
+// NEWEST FIRST, same row shape as the film log — the lab still reads as one record of what
+// has been captured, with the BAY chip saying which kind of capture a row was.
+function bayLog(list){
+  return `<p class="sm faint" style="margin-bottom:2px">Tap a session for every number it produced.</p>
+  ${list.map(({ b, i }) => `<div class="seslog" data-action="open-bay" data-i="${i}">
+    <div class="sesh"><b>${fmtDate(b.date)}</b><span class="sesm"><span class="bayc">BAY</span>${
+      esc(baySize(b))}${b.detail ? ' ▸' : ''}</span></div>
+    <div class="sesg">${esc(bayGist(b))}</div>
+  </div>`).join('')}`;
+}
+function bayBlock(disc, empty){
+  const list = baysFor(disc);
+  return `<h2>The bay · measured numbers</h2>
+  <div class="card">
+    ${list.length ? bayLog(list) : `<p class="sm">${empty}</p>`}
+  </div>`;
+}
+function bayView(i){
+  const b = (S.bays || [])[+i];
+  if(!b) return game();
+  const d = b.detail || {};
+  const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
+  const LAB = { swing:['swing','Swing Lab'], 'short-game':['shortgame','Short Game'],
+                putting:['putting','Putting Lab'], mental:['mental','Mental Game'] };
+  const [view, label] = LAB[BAY_DISC(b)] || LAB.swing;
+  return `
+  <button class="backlink" data-action="go" data-view="${view}">← ${esc(label)}</button>
+  <div class="card">
+    <h2>${fmtDate(b.date)} · bay session</h2>
+    <h3>${esc(b.setup || '')}</h3>
+    ${bayProv(b)}
+    ${d.metrics && d.metrics.length ? `<div class="rowgrid g3" style="margin:12px 0 4px">
+      ${d.metrics.map(m => `<div class="stat" style="border-top-color:${sc[m.s] || 'var(--green)'}">
+        <div class="v" style="font-size:13px;color:${sc[m.s] || 'var(--green)'}">${esc(m.v)}</div>
+        <div class="l">${esc(m.k)}</div>
+        <div class="n" style="font-size:9px;color:var(--faint);font-family:var(--sans);margin-top:2px">${esc(m.n || '')}</div>
+      </div>`).join('')}
+    </div>` : ''}
+    ${b.finding ? `<p class="sm" style="margin-top:10px">${esc(b.finding)}</p>` : ''}
+  </div>
+  ${d.clubs && d.clubs.length ? `<h2>Club by club</h2>
+  <div class="card">
+    ${bayClubTable(d.clubs)}
+    <p class="sm faint" style="margin-top:8px">A column only appears where the session
+      actually produced it. Carry is computed from measured launch — it is a modelled flight,
+      not a ball anyone watched land.</p>
+  </div>` : ''}
+  ${d.story ? `<h2>What the numbers said</h2><div class="card">${prose(d.story)}
+    ${d.limits ? `<details class="sect"><summary><b>What the bay couldn't see</b><span class="gist">${
+      esc(splitLead(d.limits)[0])}</span></summary>${prose(d.limits)}</details>` : ''}
+  </div>` : ''}
+  <div class="card flat">${evDrawer('bay-ev-' + (+i), 'These numbers', 'bay',
+    [b.venue, baySize(b), b.ball ? 'ball · ' + b.ball : ''].filter(Boolean).join(' · '),
+    b.spin === 'estimated' ? 'Spin was estimated rather than measured on this session, so every carry here is a model built partly on a modelled input.' : '')}</div>`;
 }
 
 // ----- Lab plan blocks -----
@@ -2558,6 +2763,8 @@ function swing(){
     ${sessionLog(sessions, 'No swing sessions logged yet. Send Claude swing clips — down-the-line and face-on — and the breakdowns land here.')}
   </div>
 
+  ${bayBlock('swing', 'No bay sessions yet. Log in at the bay with the Trackman app, hit the gapping order \u2014 driver, mini, 2-iron, 5-wood first \u2014 and send the club summary. Club path, face-to-path and attack angle are measured on any ball; spin needs a marked one.')}
+
   <h2>Filming guide</h2>
   <div class="card flat">
     <p class="sm"><b>1 · Down-the-line</b> — behind the ball, camera at hand/hip height on the target line: plane, path, shaft position at the top.<br>
@@ -2784,6 +2991,8 @@ function putting(){
       <div style="margin-top:10px"><button class="btn" data-action="add-session">Save session</button></div>
     </details>
   </div>
+
+  ${bayBlock('putting', 'No bay putting data yet. Trackman\u2019s putting analysis measures face angle at impact, path and launch direction \u2014 and needs no marked ball. Face at impact has been measured once in this project, on Jul 30. Twenty putts settles whether \u201cbarely open\u201d is delivering square.')}
 
   <h2>Stroke evolution · on the LINK.2.1</h2>
   ${evolutionCard()}
@@ -3861,6 +4070,8 @@ function shortgame(){
     ${sessionLog(sessions, 'No short-game film yet. Send chipping, pitching or bunker clips — name the shot in the message and they file themselves here.')}
   </div>
 
+  ${bayBlock('short-game', 'No bay short-game data yet. A launch monitor measures the wedge matrix in one sitting \u2014 50, 56 and 60 at half, three-quarter and full. Six of those nine numbers have never been measured.')}
+
   <h2>Train it</h2>
   <div class="card flat">
     <div class="linkrow" data-action="open-shelf" data-shelf="Wedges &amp; Short Game"><span><b>Wedges &amp; Short Game</b><br><span class="sm">Clock system, bounce, chip vs pitch, landing spots</span></span><span class="arr">→</span></div>
@@ -3987,6 +4198,7 @@ let gameLab = LABS[0].disc;
 function game(){
   const cur = LABS.find(l => l.disc === gameLab) || LABS[0];
   const clips = S.sessions.filter(s => sessionDiscipline(s) === cur.disc).length;
+  const bayN = baysFor(cur.disc).length;
   const plans = plansFor(cur.disc).length;
   const open = faultsFor(cur.disc).filter(f => faultState(f) === 'open').length;
   return `
@@ -4013,7 +4225,8 @@ function game(){
   <div class="twoup">
     <div class="card tu"><div class="rdl">Film room</div>
       <b>${clips || '—'}</b>
-      <span>${clips ? `session${clips === 1 ? '' : 's'} on file` : 'no film on file'}</span></div>
+      <span>${clips ? `session${clips === 1 ? '' : 's'} on file` : 'no film on file'}${
+        bayN ? ` · ${bayN} in the bay` : ''}</span></div>
     <div class="card tu"><div class="rdl">Standing plans</div>
       <b>${plans || '—'}</b>
       <span>${plans ? 'sliced by situation' : 'none written yet'}</span></div>
@@ -4622,9 +4835,13 @@ function evOf(liveHoles, allHoles){
 // remove further away: typed up afterwards from memory, or fed in from a summary. So as
 // soon as his live cards carry a question, they are what the app answers it from, and the
 // weaker sources stand down rather than being averaged in beside them.
-const EV_RANK = { live:0, round:1, measured:2, snapshot:3, self:4 };
-const EV_LAB = { live:'you logged this live', round:'from your rounds', measured:'measured',
-  snapshot:'GHIN summary', self:'your own read' };
+// `bay` sits between them (Sep 11 2026): a radar reading beats a frame counted by hand off
+// a phone, and a card he actually played beats any number taken off a perfect lie. Both
+// `bay` and `measured` are observations, which is why both wear a solid chip — what
+// separates them is what they can see, and that is what EV_BLIND is for.
+const EV_RANK = { live:0, round:1, bay:2, measured:3, snapshot:4, self:5 };
+const EV_LAB = { live:'you logged this live', round:'from your rounds', bay:'measured in the bay',
+  measured:'measured', snapshot:'GHIN summary', self:'your own read' };
 const evTag = ev => ev ? ` <span class="ev ${ev}">${EV_LAB[ev]}</span>` : '';
 
 // ----- The evidence disclosure (Aug 27 2026) -----
@@ -4645,12 +4862,14 @@ const evTag = ev => ev ? ` <span class="ev ${ev}">${EV_LAB[ev]}</span>` : '';
 const EV_SOURCE = {
   live:'Cards you logged hole by hole in the live logger — recorded on the hole, between shots, with the bag you are playing today.',
   round:'Your own scorecards, typed up after the round rather than tapped in on the hole.',
+  bay:'A launch monitor in a simulator bay — radar-measured club delivery and ball launch, indoors, off a mat.',
   measured:'A measurement — film of the stroke, or a scored test.',
   snapshot:'A season summary somebody else computed, pasted in.',
   self:'Your own account of a round, written afterwards.' };
 const EV_BLIND = {
   live:'A card records WHAT happened, never why. Nothing on it measures the stroke that produced it, and nothing reads the notes you wrote on it.',
   round:'One remove from the shot — written up after the round, so a hole detail is only as good as the memory of it. And a scorecard still cannot see a stroke.',
+  bay:'A perfect lie, still air, no slope and nothing at stake — and the carry is a flight MODEL computed from measured launch, not a ball anyone watched land. It cannot tell you what this swing does off grass, in wind, with a score going.',
   measured:'Measured in one place on one day. Whether it holds up on the course is a different question, and this is not it.',
   snapshot:'It cannot be broken back down to a hole, and it may predate the bag you are playing. It is an average, not an event.',
   self:'Not a measurement. Nothing on a card confirms or contradicts it — it is the only witness for what a scorecard cannot see, and it is still a feel.' };
@@ -7133,6 +7352,17 @@ const ACTIONS = {
     el.textContent = opening ? 'Collapse all' : 'Expand all';
   },
   'open-session': el => render('session', el.dataset.i),
+  'open-bay': el => render('bay', el.dataset.i),
+  // Taking the bay's number is HIS decision, made once, with both figures on screen — which
+  // is the whole reason a measured push does not just overwrite the row. It does not set
+  // carriesCalibrated: accepting a measurement is not the same act as calibrating by feel.
+  'use-bay-carry': el => {
+    const row = S.carries[+el.dataset.i];
+    if(!row || !row.meas || row.meas.carry == null) return;
+    row.carry = row.meas.carry;
+    syncWedgeCarries('ladder');
+    save(); rerender(); toast('Carry updated from the bay');
+  },
   'open-briefing': el => render('briefing', el.dataset.id),
   'open-shelf': el => render('shelf', el.dataset.shelf),
   // Kit and place are filters on a list, so they redraw in place — jumping to the top of
@@ -7401,6 +7631,16 @@ function sessionLabView(e){
 }
 // Text here is RAW — whatsNew() escapes when it renders, so nothing in the feed can
 // inject markup and nothing gets double-escaped on the way through localStorage.
+// A carry row's changelog line. A measured push and a coaching estimate are different
+// claims and used to print identically — "205 yds" either way.
+function carryUpdateLine(club){
+  if(club.carry == null && !club.meas) return 'carry unmeasured';
+  const m = club.meas;
+  if(!m) return club.carry != null ? `${club.carry} yds · estimated` : 'carry unmeasured';
+  const v = club.carry != null ? club.carry : m.carry;
+  const bits = [m.n ? `n=${m.n}` : '', m.sd != null ? `±${m.sd}` : '', m.ball || ''].filter(Boolean);
+  return `${v != null ? v + ' yds · measured' : 'measured'}${bits.length ? ' · ' + bits.join(' · ') : ''}`;
+}
 function updateLine(e){
   const go = v => ({ a:'go', v });
   const nm = o => (o && o.name) || '';
@@ -7419,11 +7659,16 @@ function updateLine(e){
     case 'history-edit':  return { h:'Bag history corrected', s:clip(e.text, 96), act:go('bag') };
     case 'carry-update':  return { h:`Carry ladder · ${e.target || ''}`,
       s: e.remove ? 'dropped from the ladder — and from the tee chips in the live logger'
-        : clip((e.club && e.club.carry != null) ? `${e.club.carry} yds` : 'carry unmeasured', 72), act:go('bag') };
+        : clip(carryUpdateLine(e.club || {}), 96), act:go('bag') };
     case 'carries':       return { h:'Carry ladder rebuilt', s:'', act:go('bag') };
     case 'session':       return { h:`Film · ${clip(e.setup, 72)}`, s:clip(e.finding, 104), act:go(sessionLabView(e)) };
     case 'session-update':return { h:'Film session updated', s:clip(e.finding || e.setup, 104), act:go(sessionLabView(e)) };
     case 'session-remove':return { h:'Film session removed', s:clip(e.setupMatch, 96), act:go(sessionLabView(e)) };
+    case 'bay':           return { h:`Bay session · ${clip((e.bay || {}).setup, 72)}`,
+      s:clip(bayGist(e.bay || {}), 104), act:go(LAB_VIEW[BAY_DISC(e.bay)] || 'swing') };
+    case 'bay-update':    return { h:'Bay session updated', s:clip(bayGist(e.bay || {}), 104),
+      act:go(LAB_VIEW[BAY_DISC(e.bay)] || 'swing') };
+    case 'bay-remove':    return { h:'Bay session removed', s:'', act:go('game') };
     case 'evolution':     return { h:'Stroke evolution grid rebuilt', s:'', act:go('putting') };
     case 'faults':        return { h:`Diagnosis updated · ${e.discipline || 'putting'}`,
       s:`${(e.faults || []).length} fault${(e.faults || []).length === 1 ? '' : 's'} on the board`,
@@ -7547,6 +7792,16 @@ function applyFeed(feed){
         return true;
       });
     }
+    // A launch-monitor session. Same trio as film, including the `date` patch — a capture's
+    // date is a fact like any other and needs a route in (the Sep 9 lesson). The entry id
+    // becomes `_fid` so a later update can find it after the array has been reordered.
+    else if(e.type === 'bay' && e.bay) S.bays.push({ ...e.bay, _fid:e.id });
+    else if(e.type === 'bay-update'){
+      const b = S.bays.find(x => x._fid === e.target) ||
+                S.bays.find(x => e.setupMatch && (x.setup || '').startsWith(e.setupMatch));
+      if(b && e.bay) Object.assign(b, e.bay);
+    }
+    else if(e.type === 'bay-remove') S.bays = S.bays.filter(x => !(e.target && x._fid === e.target));
     else if(e.type === 'evolution' && e.evolution) S.evolution = e.evolution;
     else if(e.type === 'club-add' && e.club) S.clubs.push({ id:e.id, rounds:0, ...e.club });
     else if(e.type === 'club-update'){
@@ -7568,7 +7823,20 @@ function applyFeed(feed){
       const i = S.carries.findIndex(c => c.club === e.target);
       if(e.remove){ if(i >= 0) S.carries.splice(i, 1); }
       else if(e.club){
-        if(i >= 0) Object.assign(S.carries[i], e.club);
+        if(i >= 0){
+          const row = S.carries[i], patch = { ...e.club };
+          // A MEASURED carry never silently overwrites one HE calibrated. The number he
+          // typed is the stronger claim about his own bag — a bay figure is a range ball on
+          // a mat, and the carry is modelled from launch — so once `carriesCalibrated` is
+          // set, a patch carrying `meas` FILLS A BLANK and otherwise leaves his figure
+          // alone, keeping its own in `meas.carry` so the row can show both and he can take
+          // it with one tap. Before he has calibrated, every number on the ladder is a
+          // coaching estimate and a measurement should simply win. `"force": true` overrides.
+          if(patch.meas && patch.carry != null) patch.meas = { ...patch.meas, carry:patch.carry };
+          if(patch.meas && !e.force && S.carriesCalibrated && row.carry != null
+             && patch.meas.carry != null && patch.meas.carry !== row.carry) delete patch.carry;
+          Object.assign(row, patch);
+        }
         else {
           const at = e.after ? S.carries.findIndex(c => c.club === e.after) : -1;
           S.carries.splice(at >= 0 ? at + 1 : S.carries.length, 0,

@@ -27,7 +27,7 @@
      SOLID fills mean the tier was earned by observation (live, measured), OUTLINES mean
      it was not (round is a weaker card; snapshot and self are claims). Every rail, chip
      and tint in the app reads these five and nothing else — see EV_RANK in app.js. */
-  --t-live:#14512E; --t-round:#2E7D51; --t-measured:#6E2230;
+  --t-live:#14512E; --t-round:#2E7D51; --t-bay:#4E1722; --t-measured:#6E2230;
   --t-snapshot:#B08A2E; --t-snapshot-ink:#8A6A1C;
   --t-self:rgba(35,32,26,.35); --t-self-ink:rgba(35,32,26,.5);
   --serif:Georgia,'Times New Roman',serif;
@@ -253,6 +253,7 @@ body.night .uprow{border-bottom-color:#2a3138}
   margin-left:6px;vertical-align:1px;border:1px solid transparent}
 .ev.live{background:var(--t-live);color:var(--green-ink);border-color:var(--t-live)}
 .ev.round{background:transparent;color:var(--t-round);border-color:var(--t-round)}
+.ev.bay{background:var(--t-bay);color:var(--burg-ink);border-color:var(--t-bay)}
 .ev.measured{background:var(--t-measured);color:var(--burg-ink);border-color:var(--t-measured)}
 .ev.snapshot{background:transparent;color:var(--t-snapshot-ink);border-color:var(--t-snapshot)}
 .ev.self{background:transparent;color:var(--t-self-ink);border-color:var(--t-self);
@@ -263,12 +264,14 @@ body.night .uprow{border-bottom-color:#2a3138}
 .ev[data-action]::after{content:' ?';opacity:.55}
 body.night .ev.live{background:#2f6b46;color:#eaf6ee;border-color:#3f8159}
 body.night .ev.round{color:#8fd0a8;border-color:#33503f}
+body.night .ev.bay{background:#7a2334;color:#f6efe6;border-color:#8d3244}
 body.night .ev.measured{background:var(--burg);color:var(--burg-ink);border-color:var(--burg)}
 body.night .ev.snapshot{color:#dfc76a;border-color:#5a5533}
 body.night .ev.self{color:var(--faint);border-color:rgba(255,255,255,.18)}
 
 /* The rail. Put it on any card carrying a finding: `class="card tierrail t-live"`. */
 .tierrail{border-left:4px solid var(--tier,var(--line))}
+.t-bay{--tier:var(--t-bay)}
 .t-live{--tier:var(--t-live)}
 .t-round{--tier:var(--t-round)}
 .t-measured{--tier:var(--t-measured)}
@@ -520,6 +523,19 @@ body.night .dscore{border-left-color:var(--gtext)}
 .sesm{font-family:var(--sans);font-size:9.5px;font-weight:700;letter-spacing:.05em;
   text-transform:uppercase;color:var(--faint);white-space:nowrap}
 .sesg{font-size:12.5px;line-height:1.45;color:var(--soft);margin-top:3px}
+/* The bay log shares the film log's row so a lab still reads as one record of what has been
+   captured. The chip is what says which KIND of capture a row was — the two sources have
+   opposite blind spots and must never be mistaken for each other. */
+.bayc{display:inline-block;background:var(--t-bay);color:var(--burg-ink);border-radius:3px;
+  padding:1px 4px;margin-right:5px;font-family:var(--mono);font-size:8px;letter-spacing:.08em}
+body.night .bayc{background:#7a2334;color:#f6efe6}
+/* What the numbers were taken under. Three facts decide whether a session is comparable to
+   the next one, and none of them is visible in a number, so they lead the page. */
+.bayp{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.bpc{font-family:var(--mono);font-size:9px;letter-spacing:.05em;padding:3px 7px;
+  border:1px solid var(--line);border-radius:999px;color:var(--soft);background:var(--card2)}
+.bpc.ok{color:var(--gtext);border-color:var(--green-accent)}
+.bpc.warn{color:var(--gold-ink);border-color:var(--gold)}
 .backlink{display:inline-block;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--gtext);
   margin:14px 0 0;cursor:pointer;background:none;border:none;padding:0}
 
@@ -736,7 +752,7 @@ body.night{
   --burg-deep:#5f1d27; --nav:#0a0f0c;
   --shadow:2px 2px 0 #0a0d0f;
   --gtext:#8fd0a8; --btext:#e0a63c;
-  --t-live:#2f6b46; --t-round:#8fd0a8; --t-measured:#a33344;
+  --t-live:#2f6b46; --t-round:#8fd0a8; --t-bay:#c2566a; --t-measured:#a33344;
   --t-snapshot:#5a5533; --t-snapshot-ink:#dfc76a;
   --t-self:rgba(255,255,255,.2); --t-self-ink:#8b8879;
 }
@@ -1381,6 +1397,17 @@ body.night .chip.ns.on, body.night .chip.ob.on{background:var(--burg);color:var(
    a coloured bar is unreadable in sun and untappable with a thumb. A null carry draws no
    bar at all, because a guessed length would read as a measured one. */
 .ladr{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+/* A ladder row and the line that says where its number came from. The caption is a sibling
+   of .lrow rather than a fifth column: the row is already four columns tight at 320px, and
+   provenance is a sentence, not a field. It renders only once something on the ladder has
+   actually been measured — see ladderBadge(). */
+.lgrp{display:flex;flex-direction:column;gap:2px}
+.lmeas{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;color:var(--faint);
+  padding-left:44px;line-height:1.45}
+.lmeas.on{color:var(--t-bay)}
+body.night .lmeas.on{color:var(--t-bay)}
+.lmeas.offer{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:var(--ink62)}
+.lmeas.offer .btn{padding:3px 8px;font-size:9px}
 .lrow{display:flex;align-items:center;gap:8px}
 .lrow .lc{width:36px;flex:none;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink)}
 .lrow .lb{flex:1;min-width:0;height:26px;background:var(--sunk);border-radius:5px;

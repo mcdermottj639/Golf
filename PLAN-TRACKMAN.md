@@ -1,6 +1,8 @@
-# Plan — Trackman at Golf Lounge 18 — **DRAFT 2026-09-11**
+# Plan — Trackman at Golf Lounge 18 — **PHASES 1–2 BUILT 2026-09-11 (v96)**
 
-*Research + design. Nothing built yet. Jack's words: "New golf lounge 18 is open near me
+*Research + design. **Phase 1 (the ladder) and phase 2 (bay sessions in the labs) shipped in
+v96**; phases 3–5 are still design. `CLAUDE.md`'s "The bay" section is the authority on what was
+built and why — this file keeps the research and the reasoning behind it. Jack's words: "New golf lounge 18 is open near me
 with trackman. I made a trackman acct and will start playing there and getting lots of
 data. Research this all and mock up a plan how we can integrate it into the app."*
 
@@ -619,25 +621,25 @@ stop there.
 
 **Phase 1 — the ladder (small, high value)**
 
-- [ ] `meas` on a carry row: `{src, n, sd, date, ball, norm, spin, how}`; `carry-update`
+- [x] `meas` on a carry row: `{src, n, sd, date, ball, norm, spin, how}`; `carry-update`
       passes it through (already an `Object.assign`, so nothing to change in `applyFeed()`).
-- [ ] A provisional row — venue ball, estimated spin — **fills a blank and never overwrites a
+- [x] A provisional row — venue ball, estimated spin — **fills a blank and never overwrites a
       typed carry**; it renders both numbers until he picks.
-- [ ] `ladderCard()`: per-row MEASURED / ESTIMATED / unmeasured badge; whole-ladder banner
+- [x] `ladderCard()`: per-row MEASURED / ESTIMATED / unmeasured badge; whole-ladder banner
       only while nothing is measured.
-- [ ] `ladderOverlap()` rendering: state the gap in **yards** where both rows are measured.
-- [ ] Bag → the ladder's gold note gains one sentence on where a measured number came from.
-- [ ] `updateLine()` case so a measured carry announces itself properly in What's landed.
+- [x] `ladderOverlap()` rendering: state the gap in **yards** where both rows are measured.
+- [x] Bag → the ladder's gold note gains one sentence on where a measured number came from.
+- [x] `updateLine()` case so a measured carry announces itself properly in What's landed.
 
 **Phase 2 — bay sessions**
 
-- [ ] `S.bays` + `migrate()`; `bay` / `bay-update` / `bay-remove` in `applyFeed()`, mirroring
+- [x] `S.bays` + `migrate()`; `bay` / `bay-update` / `bay-remove` in `applyFeed()`, mirroring
       the session trio including the `date` patch.
-- [ ] `bayLog()` — sibling of `sessionLog()`, own heading, `BAY` chip, newest first.
-- [ ] `bayView()` — reuses the `detail.metrics` renderer, adds the club table.
-- [ ] `EV_RANK`/`EV_LAB`/`EV_SOURCE`/`EV_BLIND` gain `bay`; `UP_TYPE` gains `bay`.
-- [ ] `SESSION_LAB`-equivalent routing so a bay session lands in the right lab.
-- [ ] `FAULT_EV` rows for any fault a bay session becomes the basis of.
+- [x] `bayLog()` — sibling of `sessionLog()`, own heading, `BAY` chip, newest first.
+- [x] `bayView()` — reuses the `detail.metrics` renderer, adds the club table.
+- [x] `EV_RANK`/`EV_LAB`/`EV_SOURCE`/`EV_BLIND` gain `bay`; `UP_TYPE` gains `bay`.
+- [x] Discipline routing — a bay session declares its own, so there is nothing to infer.
+- [ ] (open) `FAULT_EV` rows for any fault a bay session becomes the basis of.
 
 **Phase 3 — putting / the grid**
 

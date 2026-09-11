@@ -105,7 +105,8 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `action-done`    | Mark action `target` done |
 | `action-update`  | Rewrite action `target` text |
 | `carries`        | Replace the distance ladder (ignored once the user calibrates) |
-| `carry-update`   | Patch ONE ladder row by `target` name: `club` to add/patch (`after` names the row to insert behind), `remove:true` to drop it. **Not** gated on calibration — see below |
+| `carry-update`   | Patch ONE ladder row by `target` name: `club` to add/patch (`after` names the row to insert behind), `remove:true` to drop it. **Not** gated on calibration — see below. A row may carry **`meas`** — `{src, n, sd, date, ball, norm, spin, carry}`, where a number came from. It is provenance and never authority: once `carriesCalibrated` is set, a patch carrying `meas` **fills a blank and otherwise leaves his figure alone**, parking its own in `meas.carry` so the row shows both and he takes it with a tap. `"force": true` overrides. See *The bay* below |
+| `bay` / `bay-update` / `bay-remove` | A launch-monitor session — the numeric twin of `session`, in its own array. The entry `id` becomes `_fid`; `bay-update` matches on it or on a `setupMatch` prefix and `Object.assign`s (the `date` included). See *The bay* below |
 | `course-add` / `course-remove` | Add/remove a course. **`course-add` dedupes on an EXACT name match only**, so pushing a course Jack already typed under a different spelling gives him two rows for one course — see *Two rows, one course* below |
 | `round`          | Add a played round (see *Logging a round* below). Skipped if a round with the same `date` + `course` + `nine` is already there, whatever put it there |
 | `round-update`   | Patch a round matched by `date` + `course` (+ `nine`): `Object.assign` of the top level, per-hole merge by hole `n`. **The way to backfill `rating`/`slope` onto a live-logged card**, or fix a hole after the fact. **On a `live:true` card it only FILLS GAPS** — fields the card already carries are left alone, because he recorded them standing on the hole. To overwrite one deliberately, put `"force": true` on the entry. Per-hole merges are unaffected either way |
@@ -200,6 +201,9 @@ the 4-iron's 190 — the only figure that ever covered that yardage — went wit
 cannot put a number on a tee shot or a long approach any more, and three standing course plans had
 to be re-read off the 2-iron's 205 and the 5-iron's 180 because of it. `action-5wood-carry-20260812`
 is the standing to-do; it was widened rather than duplicated, per the reuse rule below.
+**Since v96 there is a route in** — a `carry-update` may carry `meas`, and the row then states n,
+spread, date and ball (see *The bay*). Every word above stays true until he actually hits the bay:
+nothing at the long end is measured yet, and a route in is not a number.
 
 ## How to make common updates
 
@@ -761,8 +765,9 @@ An extension of *film is king* to the numbers: a hole Jack recorded himself is *
 a pasted GHIN average is **summarized**, a feel is **feel**. This works two ways:
 
 1. **Ranking.** Every tip carries an `ev` provenance — `live` (cards he logged in the live
-   logger, on the hole) → `round` (any other hole-by-hole card) → `measured` (5-ft tests,
-   filmed faults) → `snapshot` (pasted GHIN summaries)
+   logger, on the hole) → `round` (any other hole-by-hole card) → `bay` (a launch monitor:
+   radar-measured club delivery and ball launch, indoors, off a mat — added Sep 11 2026)
+   → `measured` (5-ft tests, filmed faults) → `snapshot` (pasted GHIN summaries)
    → `self` (his own post-round debrief, the Mental tab's only witness for what a card
    can't see), ranked by `EV_RANK` and badged in the UI by `evTag()`. Coach sorts severity first, then
    evidence, so the warnings still lead but his own rounds speak before a season average
@@ -1896,6 +1901,84 @@ Three things that make it worth the words:
   stock setup gets labelled `STANDARD PRACTICE` however confident it is, so a page full of
   general advice can't read as a page built from his game — the failure the short-game
   plan's own *What your own cards say* section already guards against.
+
+### The bay — launch-monitor sessions (Sep 11 2026)
+
+Jack joined **Golf Lounge 18** (Trackman 4 bays) and will be playing and practising there.
+The full research and the phased design are in **`PLAN-TRACKMAN.md`**; this section is what
+is BUILT and the rules that keep it honest. Phase 1 (the ladder) and phase 2 (bay sessions
+in the labs) shipped in v96. Simulator rounds and the Combine are not built.
+
+**There is no API and there never will be one here.** A Trackman account holder cannot
+export CSV or PDF; mytrackman.com is a viewer, CSV is a TPS-owner feature, and the Cloud
+API is sold to facilities. Ingestion is **screenshots he sends, read here, pushed as feed
+entries** — the film-report pipeline again. The app never talks to Trackman. Stamp
+`"src": "tm:<date>-<venue>"` on every entry a session produces, the same ledger rule film
+reports follow, so `grep src coach-feed.json` answers "did we already ingest this?"
+
+**`S.bays` is its own array, NOT a `kind` flag on `S.sessions`.** Reusing `session` would
+have rendered for free, which is the tempting half; it would also make `sessionSize()` print
+"23 clips" over a radar table, let the labs count a bay session as film, and — the real
+cost — let a Trackman carry be quoted as *filmed*. The two sources have **opposite blind
+spots**: film sees the body and cannot measure the ball, radar measures the ball and never
+sees his posture. They sit in the same place on the page under their own heading and share
+the row shape (`bayLog()` beside `sessionLog()`), so a lab still reads as one record of what
+has been captured. A bay session declares its own `discipline` — nothing is guessed out of
+the setup line the way `sessionDiscipline()` has to.
+
+**`ev:'bay'` ranks above `measured` and below `round`**: a radar reading beats a frame
+counted by hand off a phone, and a card he actually played beats any number taken off a
+perfect lie. `EV_BLIND.bay` is the sentence that earns it the tier — a mat, still air, no
+slope, nothing at stake, and a carry that is a **flight model computed from measured launch
+rather than a ball anyone watched land**.
+
+**THREE FACTS LEAD EVERY BAY SESSION, BECAUSE NONE OF THEM IS VISIBLE IN A NUMBER** — the
+`bayProv()` chips, and the same three belong on a ladder row's `meas`:
+
+- **The ball.** The lounge hits plain unmarked white balls (Jack, Sep 11 2026). Indoors a
+  radar needs roughly **two ball revolutions inside the window it can see** to MEASURE spin;
+  on a plain ball it frequently cannot and **estimates** one instead. The remedy is a metal
+  sticker dot or a Titleist Pro V1 RCT. So `spin:'estimated'` is the normal case today, and
+  since **carry is computed from launch AND spin**, a venue-ball carry is a model built
+  partly on a modelled input — better than a guess, not the same claim as a measurement.
+  Everything read off the club and off the ball at separation (club speed, path, face,
+  face-to-path, attack angle, dynamic loft, ball speed, launch angle and direction) is
+  measured on any ball, and that half is the whole swing diagnosis and the whole of putting.
+- **The normalization.** `playsFactor()` is `1 + (t − 70) × 0.001`, so **every carry this app
+  stores is a 70°F number**. Trackman's default is 77°F at sea level. Standing instruction:
+  **set the bay to 70°F / sea level.** A 77°F carry stored as-is makes every "plays like"
+  figure on the phone ~0.7% long in the same direction every time with nothing on screen to
+  show it. If a bay cannot be changed, do NOT silently convert — record `norm` as given and
+  state both numbers in `meas.how`.
+- **Whether spin was measured or estimated**, per the ball above.
+
+**The ladder says where each number came from, and `meas` is never the authority.** The
+captions render only once SOMETHING on the ladder is measured — before that the gold note
+already says every row is an estimate, and thirteen rows each repeating it is a page of
+noise. After that, a measured row carries date · n · spread · ball · `spin est.` and an
+unmeasured-but-populated row says `estimated`, because 241 off a radar and 205 off nothing
+must not look identical. **A measured push never silently overwrites a carry he calibrated**
+(`applyFeed`'s `carry-update`): it fills a blank, and otherwise renders *"yours 230 · the bay
+says 241"* with a button (`use-bay-carry`). Accepting it does **not** set
+`carriesCalibrated` — taking a measurement is not the same act as calibrating by feel.
+
+**`ladderGapYds()` states an OVERLAP in yards where both rows are measured.** The `OVERLAP`
+pill is loft arithmetic and says so; the mini driver and the 2-iron sit 1.5° apart with four
+inches of shaft between them, and only a measured pair can answer whether that is a real
+overlap. It reads the number the row SHOWS, not the one the bay offered — where he has kept
+his own figure, the yards he plays are his — and yields nothing unless BOTH rows carry
+`meas`, because a gap between a measurement and an estimate is not a measured gap.
+
+**A club-table column renders only where some club row carries it** (`BAY_COLS`), the same
+rule the approach buckets follow, so a carry-only session draws four columns instead of
+thirteen empty ones. Thirteen will not fit a phone whatever the padding does, so the table
+is a **`.tscroll`** from the start — verified scrolling inside its own box at 320 and 390
+with `documentElement.scrollWidth` clean on every view.
+
+What the browser pass turned up, since it is the reason the check list exists: nothing at
+320px clipped and no page scrolled sideways, but `cs` was labelled **CLUB** in a table whose
+first column is also CLUB — two identical headers over different numbers, invisible in code
+and obvious the moment the table rendered. It is `CLUB MPH` / `BALL MPH` now.
 
 ### Film reports arrive through Drive (Aug 25 2026)
 
