@@ -16,12 +16,12 @@ been openly unable to produce:
 
 | The app says today | What a bay session produces |
 |---|---|
-| Driver **235, estimated**, on a shaft that changed in June and has never been measured | Club speed, ball speed, smash, spin, launch, carry — and whether the regular LZ 5.5 is right |
+| Driver **235, estimated**, on a shaft that changed in June and has never been measured | Club speed, ball speed, smash, launch, carry — and whether the regular LZ 5.5 is right (spin needs a marked ball; see §1) |
 | Mini driver 15.5° — **carry blank** | A carry, at the loft it actually plays |
 | 5-wood 19.5° — **carry blank, at either loft** | Same |
 | 2-iron **~17°, 205 estimated** | Same, plus whether it and the mini are genuinely the same number (the OVERLAP flag is loft arithmetic and says so) |
 | Wedge matrix: **6 of 9 clock numbers never measured** | All nine in half an hour |
-| Evolution grid: **Strike location — all `?`** | Impact location, every shot |
+| Evolution grid: **Strike location — all `?`** | Impact location every shot — *if the ball is marked; see §1* |
 | Evolution grid: **Face at impact — one red mark, Jul 30** | Face angle at impact, every stroke, to 0.1° |
 | Swing faults read off **seven phone stills** | Club path, face-to-path, attack angle, low point, dynamic loft |
 
@@ -32,8 +32,17 @@ landed.** This app's whole discipline is not letting two different kinds of evid
 one badge, so Trackman gets its own evidence tier, its own blind-spot text, and a hard wall
 between simulator rounds and the handicap.
 
-Recommended order: **the ladder first** (biggest gap, smallest build), then bay sessions in
-the labs, then putting, then sim rounds, then the Combine as a benchmark.
+Recommended order, revised 2026-09-11 once Jack answered §9: **the ladder first** (biggest
+gap, smallest build), **putting second and possibly first** — it needs no marked ball, his
+bay probably has it, and face angle at impact has been measured once in the project's
+history — then bay sessions in the labs, then sim rounds, then the Combine.
+
+Two answers from Jack that change the shape of it: **the lounge's balls are plain and
+unmarked**, which means spin is estimated rather than measured and a bay carry is a range
+ball's carry (§1 — the fix is a $15 sheet of metal dots or a sleeve of Pro V1 RCT); and
+**the bay settings are his to set**, which means normalization goes to **70°F / sea level**
+rather than Trackman's 77°F default, because 70 is the baseline `playsFactor()` already
+assumes and matching it makes the app's "plays like" numbers exact.
 
 ---
 
@@ -84,20 +93,58 @@ few percent on carry outdoors (a vendor-adjacent claim, not an independent one),
 enormously better than the estimates currently on the ladder. It is still a model, and the
 app has to say so.
 
-**Normalization.** Trackman reports either the actual trajectory or a **normalized** one —
-calm conditions at a chosen altitude and temperature, defaulting to **77°F and sea level**.
-This is good news for us: `playsFactor()` already adjusts a stored carry for today's air,
-so a normalized 77°F/sea-level carry is exactly the right *baseline* number to store — but
-only if we record which setting produced it. A normalized number and an actual one filed as
-the same thing is a two-club error hiding in plain sight.
+### The ball decides how much of this is actually measured
+
+**The lounge hits plain, unmarked white balls** (Jack, 2026-09-11). That is the single
+most consequential answer of the four, and it splits the parameter list in two:
+
+- **Unaffected — measured on any ball.** Everything the radar reads off the club and off
+  the ball at separation: club speed, attack angle, club path, face angle, face-to-path,
+  dynamic loft, low point, ball speed, smash factor, launch angle and launch direction.
+  **The swing diagnosis and the putting stroke are in this half**, which is most of what
+  this project actually wants.
+- **Compromised — spin, and probably impact location.** Indoors TrackMan needs the ball to
+  complete about **two revolutions inside the tracked window** to measure spin; on a plain
+  ball in a bay it frequently cannot, and **reports an estimate instead**. Trackman's own
+  remedy is a **Titleist Pro V1 RCT** ball (radar-reflective marker under the cover) or a
+  **metal sticker dot** on a normal ball. Reports also tie impact location indoors to a
+  marked ball — treat that as unconfirmed until he looks at the screen.
+
+**Carry is computed from launch AND spin**, so on a venue ball the ladder number is a model
+built partly on an estimated input — and it is a *range ball's* flight, not his gamer's.
+That is still better than "235, estimated, on a shaft that changed in June", and it is two
+removes rather than one, so it gets said out loud on the row.
+
+**The fix costs about $15 and one sentence at the desk:** bring his own balls, and put a
+metal sticker dot on them (or play a sleeve of Pro V1 RCT, which needs no sticker and no
+orienting). Then the carry is his ball, with measured spin, and it transfers to the course.
+Until then, phase 1 carries get logged with `ball: "venue, unmarked"` and are treated as
+**provisional** — good enough to fill a blank row, not good enough to overwrite a number he
+typed.
+
+**Normalization — set the bay to 70°F and sea level, not Trackman's 77°F default.** Jack
+says the settings are his to set, and this one is free precision. `playsFactor()` in
+`app.js` is `1 + (t − 70) × 0.001`: the app's stored carries are **70°F numbers**, and it
+adjusts them for today's air from there. Store a 77°F-normalized carry and every "plays
+like" figure on the phone runs about **0.7% long — a couple of yards on the driver, and
+wrong in the same direction every time**. Matching the bay to the app's own baseline makes
+that error zero by construction.
+
+If a bay ever can't be changed, do **not** silently convert: record `norm: "77°F · sea
+level"` as given, and let the ingest state both numbers in `meas.how` ("241 at 77°F = 239 at
+the app's 70°F baseline"). An adjusted number with no arithmetic on the page is
+indistinguishable from a measured one.
 
 ### Putting — the one that matters most here
 
 TM4 measures putting: **face angle at impact, putter path, launch direction, ball speed,
 skid distance, roll speed, roll %**. Face angle at impact is the single number the entire
 putter saga has been built on one measurement of (1.5–1.7° left, Jul 30 2026, the only red
-on the evolution grid) and has never re-measured since the LINK.2.1 arrived. If putting
-analysis is available in his bay, **one 20-putt session settles the open question of
+on the evolution grid) and has never re-measured since the LINK.2.1 arrived. Jack believes
+his bay has putting analysis and has not used it (2026-09-11) — so this is *probable, not
+established*, and it is the first thing to check on the next visit. **No marked ball is
+needed for it**, which is what makes it the cheapest measurement available to him: **one
+20-putt session settles the open question of
 whether "barely open" at address is delivering square** — and puts a number on "barely",
 which is a standing to-do.
 
@@ -264,22 +311,33 @@ Add three optional fields to a ladder row, all set through the existing `carry-u
 { "type": "carry-update", "id": "carry-driver-tm-20260920",
   "target": "Driver",
   "club": { "carry": 241, "meas": { "src": "tm:2026-09-20-gl18-fairfield",
-            "n": 14, "sd": 9, "date": "2026-09-20", "how": "TM4 · normalized 77°F / sea level" } } }
+            "n": 14, "sd": 9, "date": "2026-09-20",
+            "ball": "venue, unmarked", "norm": "70°F · sea level",
+            "spin": "estimated",
+            "how": "TM4 indoors · venue ball · spin estimated · carry modelled from launch" } } }
 ```
 
 - `meas.n` — how many shots it is the average of. **A carry with no n is not a measurement**,
   and 6 is the floor Trackman itself sets.
 - `meas.sd` — the spread. This is the number that decides club selection on a par 3 and the
   app has never had it for anything.
+- `meas.ball` — `"venue, unmarked"` / `"his own, dotted"` / `"Pro V1 RCT"`. **The field that
+  decides whether the number transfers to the course**, and the reason it is a field rather
+  than prose in `how`: it has to be comparable between sessions without anyone re-reading a
+  sentence.
+- `meas.norm` — the bay's normalization setting, so a 77°F row can never be silently
+  compared against a 70°F one.
+- `meas.spin` — `"measured"` / `"estimated"`, off the ball answer above. A carry built on an
+  estimated spin is a model on a model and the row says so.
 - `meas.how` — the one-line description that renders under the row.
 
 Render (`ladderCard()`), at phone width:
 
 ```
  DRIVER   ████████████████████░░░░░░░░   241   ·
-          MEASURED 20 SEP · n=14 · ±9
+          MEASURED 20 SEP · n=14 · ±9 · venue ball
  MINI     ███████████████░░░░░░░░░░░░░   228   13
-          MEASURED 20 SEP · n=11 · ±7
+          MEASURED 20 SEP · n=11 · ±7 · venue ball
  2-IRON   ██████████████░░░░░░░░░░░░░░   205   23
           ESTIMATED — never measured
  5-WOOD   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░    —    ·
@@ -488,31 +546,37 @@ question and failing the same way again.
 
 1. **Log in.** Scan the QR on the bay screen with the Trackman Golf app. No login, no data —
    this is the one unrecoverable mistake.
-2. **Photograph the settings screen**: normalization on/off, temperature, altitude. Also note
-   whether he is hitting the **venue's premium balls or his own** — a range rock and a ProV1
-   are 300–500 rpm and several yards apart, and the ladder cannot absorb that silently.
-3. **Warm up first, and know where the warm-up ends.** Trackman's own Map My Bag has a no-data
+2. **Set normalization to 70°F and sea level, and photograph the settings screen.** 70, not
+   Trackman's 77 default — that is the baseline `playsFactor()` already assumes, and matching
+   it makes every "plays like" number on the phone exact instead of a couple of yards long.
+3. **The ball.** The lounge's are plain and unmarked, which means spin is being *estimated*
+   rather than measured (§1). Two options, in order: bring his own gamer balls with a **metal
+   sticker dot** on each, or a sleeve of **Titleist Pro V1 RCT** (no sticker, no orienting).
+   Either way, **write down which ball every session used** — that one word decides whether
+   the session's carries are worth putting on the ladder or only worth comparing to each
+   other.
+4. **Warm up first, and know where the warm-up ends.** Trackman's own Map My Bag has a no-data
    warm-up mode. A cold 7-iron in a club average is a lie that is impossible to find later.
 
 **For a gapping session (phase 1 — do this one first)**
 
-4. **Six shots per club minimum, ten or more if there is time.** Trackman's floor is 6; its
+5. **Six shots per club minimum, ten or more if there is time.** Trackman's floor is 6; its
    rolling average is 30.
-5. **Do not delete the bad ones.** A ladder built on his best strikes is the classic gapping
+6. **Do not delete the bad ones.** A ladder built on his best strikes is the classic gapping
    error and it puts him a club short on every approach. Keep the whole set; the app stores the
    average *and* the spread, and the spread is the more useful number.
-6. **Order: driver → mini → 2-iron → 5-wood → 5i → 7i → 9i → PW → 50 → 56 → 60.** The four blank
+7. **Order: driver → mini → 2-iron → 5-wood → 5i → 7i → 9i → PW → 50 → 56 → 60.** The four blank
    or estimated rows come first while he is fresh, because those are the ones the app cannot do
    anything about today.
-7. **The wedge matrix in the same session if there is time**: 50/56/60 at half, three-quarter
+8. **The wedge matrix in the same session if there is time**: 50/56/60 at half, three-quarter
    and full. Six of those nine numbers have never been measured.
 
 **What to send afterwards**
 
-8. The **club summary table** — a screenshot per club or one of the whole session. Club, shots,
+9. The **club summary table** — a screenshot per club or one of the whole session. Club, shots,
    ball speed, launch, spin, carry, total, side.
-9. The **settings shot** from step 2.
-10. One line saying what he was working on and anything the numbers wouldn't know ("mat felt
+10. The **settings shot** from step 2, and which ball.
+11. One line saying what he was working on and anything the numbers wouldn't know ("mat felt
     fast", "first session with the new grip").
 
 That is enough for a complete push. Anything he doesn't send is simply absent — which is fine
@@ -521,20 +585,33 @@ missing one, because it reads as current.
 
 ---
 
-## 9. Open questions — the four only the bay can answer
+## 9. The four questions — answered 2026-09-11, and what is left
 
-1. **Does his venue run putting analysis?** If yes, phase 3 jumps the queue: it is the cheapest
-   measurement of the most expensive open question in the project.
-2. **What ball do they use, and can he bring his own?** Decides whether session-to-session
-   comparison is meaningful.
-3. **Will a pro there email a Shot Analysis report** (route B)? One question at the desk; if yes,
-   ingestion gets much cheaper and much more accurate.
-4. **Is normalization on by default in those bays, and at what temperature and altitude?** This
-   is the single setting that decides whether a carry number is comparable to anything.
+**1. Putting analysis — *probably yes, never used.*** Jack's read, not the venue's confirmation.
+It needs no marked ball, so if it is there it is the cheapest real measurement available to him
+and **phase 3 jumps the queue**: one 20-putt session re-measures face angle at impact, which has
+been measured exactly once (Jul 30) and is the number the whole putter saga rests on. Still to
+confirm: that the mode is actually on that bay's TPS. *One look at the practice menu.*
 
-And one for Jack rather than the venue: **how often is he actually going?** A membership-cadence
-answer (weekly through the winter) justifies phases 4 and 5; a once-a-month answer says do phase
-1 and 2 properly and stop.
+**2. The ball — *plain unmarked white venue balls.*** Answered, and it is the answer with
+consequences: spin is being estimated rather than measured, so a carry off it is a model built
+partly on a modelled input, on a range ball rather than his. **Fix: his own balls with a metal
+dot, or Pro V1 RCT.** Until then bay carries fill blank ladder rows and never overwrite a number
+he typed. Still to confirm: *that the lounge lets him hit his own ball* — normal in a bay, worth
+one question.
+
+**3. The emailed report — *unknown.*** He does not know what they send. Ask for it by name:
+**"a TPS Shot Analysis report, emailed to my Trackman account address."** If they will, ingestion
+stops depending on screenshots. If they won't, nothing in this plan changes — route A was always
+the design.
+
+**4. The settings — *his to set.*** Then the standing instruction is **normalization ON, 70°F,
+sea level**, every session, because that is the baseline `app.js` already assumes. Set it once,
+photograph it once, and every carry on the ladder is directly comparable to every other.
+
+And the one for Jack rather than the venue, still open: **how often is he actually going?**
+Weekly through the winter justifies phases 4 and 5; once a month says do phases 1–3 properly and
+stop there.
 
 ---
 
@@ -542,8 +619,10 @@ answer (weekly through the winter) justifies phases 4 and 5; a once-a-month answ
 
 **Phase 1 — the ladder (small, high value)**
 
-- [ ] `meas` on a carry row: `{src, n, sd, date, how}`; `carry-update` passes it through
-      (already an `Object.assign`, so nothing to change in `applyFeed()`).
+- [ ] `meas` on a carry row: `{src, n, sd, date, ball, norm, spin, how}`; `carry-update`
+      passes it through (already an `Object.assign`, so nothing to change in `applyFeed()`).
+- [ ] A provisional row — venue ball, estimated spin — **fills a blank and never overwrites a
+      typed carry**; it renders both numbers until he picks.
 - [ ] `ladderCard()`: per-row MEASURED / ESTIMATED / unmeasured badge; whole-ladder banner
       only while nothing is measured.
 - [ ] `ladderOverlap()` rendering: state the gap in **yards** where both rows are measured.
@@ -621,8 +700,18 @@ answer (weekly through the winter) justifies phases 4 and 5; a once-a-month answ
 - Indoors the radar captures only part of the trajectory; ~8–10 ft of ball flight is the working
   minimum — Trackman help centre, *TM4 | Understanding Trackman 4 Unit Data: Indoors vs Outdoors*,
   plus review coverage. **Carry indoors is therefore modelled from measured launch.**
-- TM4 putting: face angle, path, launch direction, ball speed, skid distance, roll speed, roll % —
-  Trackman help centre, *Practice | Putting Analysis*, and PARennial Golf's summary.
+- TM4 putting: face angle, path, launch direction, ball speed, skid distance, roll speed, roll %,
+  and club data for putting (~30 parameters) — Trackman help centre, *Practice | Putting Analysis*
+  and *Parameters | Face to Path (Putting)*; trackman.com, *Introducing Club Data for Putting*;
+  PARennial Golf's summary. **No ball marking is named as a requirement** in any of them.
+- Indoor spin needs roughly two ball revolutions inside the tracked window; where it cannot get
+  them TrackMan estimates the spin rate. Trackman's remedy is the **Titleist Pro V1 RCT** ball
+  (radar-reflective marker under the cover, no orientation needed) or a **metal sticker dot** on
+  a normal ball — Trackman help centre, *TM4 | Supported Golf Balls for TM4* and *TM4 | Titleist
+  RCT Ball*; Titleist/MyGolfSpy coverage of RCT; simulator-forum practitioner reports for the
+  indoor distances at which spin becomes measurable. *The claim that impact location indoors
+  also depends on a marked ball comes from a single secondary source and is flagged unconfirmed
+  in §1.*
 - Combine: 60 shots, three at a time to nine targets plus driver, twice; 0–100 score with
   percentile rankings per yardage — Trackman Combine brochure and coaching write-ups.
 - There is published work on TM4's within- and between-session reliability indoors (*Journal of
