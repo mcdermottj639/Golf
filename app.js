@@ -99,13 +99,21 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v96';
+const BUILD = 'v97';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v97', d:'2026-09-11', items:[
+    'The rest of the Trackman work, built now rather than waiting for data to justify it \u2014 the same reason the ladder and the bay sessions went in before your first session.',
+    'SIMULATOR ROUNDS have a home, and a wall around them. A sim card is stored, listed with a SIM badge and opens to a full hole-by-hole round card \u2014 and it is counted in NOTHING: not your handicap, not the Today tiles, not Coach\u2019s four areas, not your PR or your record at a course. The USGA does not accept a simulator score, and a Trackman round of Pebble knows the real rating and slope, so the block is absolute rather than something that depends on a missing number.',
+    'The one thing a sim card may still tell the app is what the HOLE is \u2014 its par and stroke index, which the simulator renders accurately. It can never tell it what YOU do on that hole: your record there and the club you hit are read off outdoor cards only, because indoors there is no penalty for a bad drive.',
+    'A simulator putt is struck on a flat mat with the break applied by software, so made distances are thrown away on the way in. The putt count stays \u2014 you took those strokes.',
+    'EVERY LAB CAN HAVE ITS OWN EVOLUTION GRID now, not just putting. A run of bay sessions is what fills a swing one: attack angle, club path, face-to-path, batch by batch, with the same \u2713 / \u2717 / ? marks and the same rule that a row of question marks is the most useful row on the page. A lab with no grid shows nothing at all rather than an empty table.',
+    'THE COMBINE is in. Trackman\u2019s own test \u2014 60 shots to nine yardages plus driver, scored out of 100 \u2014 is the only thing a bay produces that is directly comparable to your own last attempt, so it renders as a benchmark in the Swing lab: latest, best, how many taken, a per-target table, and a trend once there are three.',
+    'Each lab now reads the same way top to bottom: the film, the bay, the grid the batches add up to, then the benchmark. The swing grid and the Combine were above the bay block first, which had one page teaching a reading order the next page contradicted.' ] },
   { b:'v96', d:'2026-09-11', items:[
     'TRACKMAN. The app can now hold launch-monitor numbers, so the sessions at the lounge have somewhere to land instead of sitting in a chat. Two places show it: the carry ladder, and a new "The bay" block in the Swing, Short Game and Putting labs.',
     'EVERY LADDER ROW NOW SAYS WHERE ITS NUMBER CAME FROM \u2014 the date it was measured, how many shots it averages, the spread, and the ball it was hit with. Rows that have never been measured say "estimated" rather than sitting there looking identical to one that has. The captions only appear once something on the ladder is genuinely measured; until then the gold note covers it as before.',
@@ -476,6 +484,10 @@ function seed(){
     // sees the body and cannot measure the ball, radar measures the ball and never sees his
     // posture. One array would have let a Trackman carry be quoted as filmed. See bayLog().
     bays: [],             // {date, venue, unit, ball, norm, spin, discipline, setup, finding, detail, _fid}
+    // Trackman Combine results — a fixed protocol scored 0–100, so unlike everything else
+    // the bay produces it is directly comparable against ITSELF over time. Same job as
+    // `tests` on the putting side: a repeatable benchmark, not a session.
+    combines: [],         // {id, date, venue, score, targets:[{yds, score, avgDist}], note}
     shortlist: [
       { name:'L.A.B. DF3', type:'Zero-torque · XL mallet', price:479, demoed:false },
       { name:'Odyssey Ai-One S2S Jailbird', type:'Zero-torque · high-MOI', price:399, demoed:false },
@@ -562,14 +574,19 @@ function migrate(s){
   if(!s.kit) s.kit = seed().kit;
   if(!s.drillLog) s.drillLog = [];   // per-drill practice record — see drillRuns()
   if(!s.bays) s.bays = [];           // launch-monitor sessions — see bayLog()
+  if(!s.combines) s.combines = [];   // Trackman Combine scores — see combineCard()
   if(s.live === undefined) s.live = null;   // a round being logged hole-by-hole
   if(!s.updates) s.updates = [];            // the What's new log — see recordUpdate()
   if(s.updatesInit === undefined) s.updatesInit = false;
   if(s.settings.seenBuild === undefined) s.settings.seenBuild = null;
   if(!s.settings.seenUpdates) s.settings.seenUpdates = [];
-  if(!s.evolution || s.sessions.every(x => !x.detail)){
+  // ONE GRID PER DISCIPLINE (Sep 11 2026). There was a single `S.evolution` and it was
+  // putting's, which is why the migration MOVES it rather than leaving it beside the new
+  // store: two homes for one kind of record is how they drift, and the second one is always
+  // the one nobody updates. `evoFor()` is the only reader from here on.
+  if(!s.grids){ s.grids = { putting: s.evolution || seed().evolution }; delete s.evolution; }
+  if(s.sessions.every(x => !x.detail)){
     const fresh = seed();
-    if(!s.evolution) s.evolution = fresh.evolution;
     // graft seed details onto matching pre-detail session rows
     s.sessions.forEach(row => {
       if(row.detail) return;
@@ -760,7 +777,7 @@ function struggles(){
   // `troubles` is defaulted on every write path, but an imported backup or a hand-built
   // round can arrive without it — and this renders on Home, so an undefined here is a
   // white screen on app open.
-  S.rounds.slice(-3).forEach(r => (r.troubles || []).forEach(t =>
+  realRounds().slice(-3).forEach(r => (r.troubles || []).forEach(t =>
     tags.set(t, `logged at ${r.course || 'your round'} on ${fmtDate(r.date)}`)));
   const mc = missCounts();
   if (mc.L > mc.R) tags.set('short-putts', `${mc.L} left misses in your 5-ft logs`);
@@ -1287,6 +1304,7 @@ const UP_TYPE = {
   session:['FILM','u-m'], 'session-update':['FILM','u-m'], 'session-remove':['FILM','u-m'],
   evolution:['GRID','u-m'], faults:['FAULT','u-m'], test:['TEST','u-m'], layout:['CARD','u-m'],
   bay:['BAY','u-m'], 'bay-update':['BAY','u-m'], 'bay-remove':['BAY','u-m'],
+  combine:['COMBINE','u-m'], 'combine-remove':['COMBINE','u-m'],
   round:['ROUND','u-l'], 'round-update':['ROUND','u-l'],
   'lesson-add':['LESSON','u-k'], 'lesson-update':['LESSON','u-k'], 'lesson-remove':['LESSON','u-k'],
   kit:['KIT','u-k'],
@@ -1706,7 +1724,7 @@ function teeClubRows(st){
 function theNumbers(){
   const C = areaCards();
   const { areas: A, st, sg } = gameAreas(C.cards);
-  const scored = S.rounds.filter(r => r.score);
+  const scored = realRounds().filter(r => r.score);
   const last = scored.slice(-1)[0];
   const idx = estIndex();
   const miss = st.fw.n - st.fw.hit;
@@ -1740,7 +1758,7 @@ function theNumbers(){
     <div class="charttile opens" data-action="go" data-view="rounds" data-seg="cards">
       <div class="lab">Round scores</div>
       <div class="big">${last ? esc(last.score) : '<span class="faint">—</span>'}</div>
-      <div class="sub">${S.rounds.length} logged</div>
+      <div class="sub">${realRounds().length} logged</div>
       <div class="trend" style="color:var(--btext)">${spark(scored.map(r => r.score), 24)}</div></div>
     ${numTile(AREA_LAB.tee, 'rounds', A.tee, 'no tee shots logged yet', teeClubRows(st))}
     ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet', greenClubRows(st))}
@@ -2261,8 +2279,13 @@ function sessionDiscipline(s){
 // so a future rebuild is a feed push rather than an app change: the per-column blurbs
 // (`notes`, parallel to `sessions`) and the closing footnote (`foot`). A metric with
 // no `state` renders without one, so an older grid still reads.
-function evolutionCard(){
-  const e = S.evolution;
+// A grid per discipline. Putting's is the one that exists today; a swing grid is what a
+// run of bay sessions turns into, and the renderer needed nothing but an argument because
+// the rows were always data. A discipline with no grid renders NOTHING — an empty grid is a
+// heading over a promise, which is the failure the retired 5-ft tile is the worked example of.
+const evoFor = disc => (S.grids || {})[disc || 'putting'] || null;
+function evolutionCard(disc){
+  const e = evoFor(disc);
   if(!e || !e.metrics || !e.metrics.length) return '';
   const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
   const mc = mk => mk === '\u2713' ? 'var(--green)' : mk === '\u2717' ? 'var(--burg)' : 'var(--faint)';
@@ -2403,6 +2426,47 @@ function bayLog(list){
       esc(baySize(b))}${b.detail ? ' ▸' : ''}</span></div>
     <div class="sesg">${esc(bayGist(b))}</div>
   </div>`).join('')}`;
+}
+// ----- The Combine (Sep 11 2026) -----
+// Trackman's own test: three shots each to nine target yardages plus driver, twice over —
+// 60 shots — scored 0–100 against the distance carried and how far offline it finished.
+// The only thing a bay produces that is directly comparable against ITSELF, which is what
+// makes it a BENCHMARK rather than a session, and why it renders as a table of results
+// rather than into the labs.
+//
+// Two rules borrowed from the drill log, both about not drawing a conclusion out of two
+// numbers: the trend line needs THREE results, and a per-target row only renders where the
+// target was actually hit at (an absent yardage is absent, never a zero).
+function combineCard(){
+  const list = (S.combines || []).slice().sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  if(!list.length) return '';
+  const last = list[list.length - 1];
+  const scored = list.filter(c => c.score != null).map(c => c.score);
+  const yds = [...new Set(list.flatMap(c => (c.targets || []).map(t => t.yds)))].sort((a, b) => a - b);
+  return `<h2>The Combine</h2>
+  <div class="card">
+    <div class="rowgrid g3">
+      <div class="stat"><div class="v">${esc(last.score != null ? last.score : '—')}</div>
+        <div class="l">Latest</div></div>
+      <div class="stat"><div class="v">${esc(scored.length ? Math.max(...scored) : '—')}</div>
+        <div class="l">Best</div></div>
+      <div class="stat"><div class="v">${list.length}</div><div class="l">Taken</div></div>
+    </div>
+    ${scored.length >= 3 ? `<div class="trend" style="color:var(--t-bay);margin-top:10px">${spark(scored, 30, 'var(--t-bay)')}</div>`
+      : `<p class="sm faint" style="margin-top:8px">A trend needs three results — two points are a line through anything.</p>`}
+    ${yds.length ? `<div class="tscroll" style="margin-top:10px"><table>
+      <thead><tr><th>TARGET</th>${list.map(c => `<th>${esc(fmtDate(c.date).replace(/,.*$/, ''))}</th>`).join('')}</tr></thead>
+      <tbody>${yds.map(y => `<tr><td><b>${esc(y)}</b></td>${list.map(c => {
+        const t = (c.targets || []).find(x => x.yds === y);
+        return `<td>${t ? esc(t.score != null ? t.score : (t.avgDist != null ? t.avgDist + '′' : '·')) : '·'}</td>`;
+      }).join('')}</tr>`).join('')}</tbody></table></div>
+      <p class="sm faint" style="margin-top:8px">Score out of 100 per target — distance carried and how far
+        offline it finished. A blank is a yardage that test did not ask for.</p>` : ''}
+    ${last.note ? `<p class="sm" style="margin-top:8px">"${esc(last.note)}"</p>` : ''}
+    ${evDrawer('combine-ev', 'These scores', 'bay',
+      `${list.length} Combine${list.length === 1 ? '' : 's'}${last.venue ? ' · ' + last.venue : ''}`,
+      'A fixed protocol to fixed targets on a mat — which is what makes it comparable to your own earlier attempts, and what stops it saying anything about a shot off a slope in wind.')}
+  </div>`;
 }
 function bayBlock(disc, empty){
   const list = baysFor(disc);
@@ -2765,6 +2829,10 @@ function swing(){
 
   ${bayBlock('swing', 'No bay sessions yet. Log in at the bay with the Trackman app, hit the gapping order \u2014 driver, mini, 2-iron, 5-wood first \u2014 and send the club summary. Club path, face-to-path and attack angle are measured on any ball; spin needs a marked one.')}
 
+  ${evoFor('swing') ? `<h2>Swing evolution · batch by batch</h2>${evolutionCard('swing')}` : ''}
+
+  ${combineCard()}
+
   <h2>Filming guide</h2>
   <div class="card flat">
     <p class="sm"><b>1 · Down-the-line</b> — behind the ball, camera at hand/hip height on the target line: plane, path, shaft position at the top.<br>
@@ -2995,7 +3063,7 @@ function putting(){
   ${bayBlock('putting', 'No bay putting data yet. Trackman\u2019s putting analysis measures face angle at impact, path and launch direction \u2014 and needs no marked ball. Face at impact has been measured once in this project, on Jul 30. Twenty putts settles whether \u201cbarely open\u201d is delivering square.')}
 
   <h2>Stroke evolution · on the LINK.2.1</h2>
-  ${evolutionCard()}
+  ${evolutionCard('putting')}
 
   <h2>Filming guide</h2>
   <div class="card flat">
@@ -3221,7 +3289,7 @@ function matchLine(r){
     : `${r.result === 'W' ? 'won' : 'lost'} ${m ? `${m} ${r.result === 'W' ? 'up' : 'down'}` : ''}`.trim();
 }
 function matchStats(){
-  const ms = S.rounds.filter(r => r.result && Array.isArray(r.holes) && r.holes.length >= 6)
+  const ms = withHoles().filter(r => r.result && r.holes.length >= 6)
     .map(r => ({ r, vs: roundVsPar(r), margin: r.margin || 0 }))
     // `matchNo` wins where it's known: an event can play the back nine first, so date
     // order is not match order and numbering them 1..n by date renames Jack's own matches.
@@ -3254,7 +3322,7 @@ function mental(){
   const next = logs.find(d => d.next);
   const plans = plansFor('mental');
   const other = plans.filter(b => !isRoutine(b));
-  const rounds = S.rounds.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10);
+  const rounds = realRounds().slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10);
   const v = m.thirds.map(perHole);
   const worst = v.every(x => x != null) ? v.indexOf(Math.max(...v)) : -1;
   const THIRD = ['Opening third', 'Middle third', 'Closing third'];
@@ -3581,7 +3649,7 @@ function coachFocus(sig){
 // card from three weeks ago is a different thing from one built on Saturday's round.
 function coachSince(){
   const bits = [];
-  const rs = S.rounds.filter(r => r.date).slice().sort((a,b) => a.date.localeCompare(b.date));
+  const rs = realRounds().filter(r => r.date).slice().sort((a,b) => a.date.localeCompare(b.date));
   const lr = rs[rs.length - 1];
   if(lr) bits.push(`your last round${lr.course ? ` at ${lr.course}` : ''} on ${fmtDate(lr.date)}${lr.live ? ' (logged live)' : ''}`);
   const ss = S.sessions.filter(x => x.date).slice().sort((a,b) => a.date.localeCompare(b.date));
@@ -4072,6 +4140,8 @@ function shortgame(){
 
   ${bayBlock('short-game', 'No bay short-game data yet. A launch monitor measures the wedge matrix in one sitting \u2014 50, 56 and 60 at half, three-quarter and full. Six of those nine numbers have never been measured.')}
 
+  ${evoFor('short-game') ? `<h2>Short game evolution · batch by batch</h2>${evolutionCard('short-game')}` : ''}
+
   <h2>Train it</h2>
   <div class="card flat">
     <div class="linkrow" data-action="open-shelf" data-shelf="Wedges &amp; Short Game"><span><b>Wedges &amp; Short Game</b><br><span class="sm">Clock system, bounce, chip vs pitch, landing spots</span></span><span class="arr">→</span></div>
@@ -4475,7 +4545,18 @@ function decisions(){
 // Rounds arrive two ways: logged in-app (a total only) and pushed through the
 // coach feed with hole-by-hole detail. Every analytic below degrades to nothing
 // when `holes` is missing, so old score-only rounds never break the page.
-function withHoles(){ return S.rounds.filter(r => Array.isArray(r.holes) && r.holes.length); }
+// ----- A simulator round is a round, and it is not THIS record (Sep 11 2026) -----
+// A Trackman round is real golf and real shot data, played off a perfect mat in still air
+// with software greens. The USGA does not accept one for a Handicap Index, and a sim round
+// of Pebble knows the real course rating and slope — so the exclusion has to be
+// UNCONDITIONAL rather than something that falls out of a missing rating.
+//
+// `realRounds()` is the door. Everything that computes a claim about his golf reads it;
+// only the round LIST and `roundView()` read `S.rounds` directly, because a sim card is
+// still his card and still worth opening. Guarding here rather than at thirty call sites is
+// what stops the next reader being the one that forgot.
+function realRounds(){ return S.rounds.filter(r => !r.sim); }
+function withHoles(){ return realRounds().filter(r => Array.isArray(r.holes) && r.holes.length); }
 function roundPar(r){
   if(r.par != null) return r.par;
   if(Array.isArray(r.holes)) return r.holes.reduce((a,h) => a + (h.par || 0), 0);
@@ -4485,6 +4566,9 @@ function roundVsPar(r){ const p = roundPar(r); return (p != null && r.score != n
 // USGA score differential. On a 9-hole card the 9-hole rating/slope give a
 // 9-hole differential — doubling it is the 18-hole equivalent.
 function roundDiff(r){
+  // Indoors never reaches the index — see realRounds(). First line, before anything else,
+  // because a sim round at a rated course has everything a differential needs.
+  if(r.sim) return null;
   if(r.rating == null || !r.slope || r.score == null) return null;
   const d = (113 / r.slope) * (r.score - r.rating);
   return (r.holes && r.holes.length <= 9) ? d * 2 : d;
@@ -4666,7 +4750,7 @@ function statsTrend(){
 // Best 40% of score differentials, the way a handicap index is built. Needs a few
 // rounds behind it before it means anything, so it stays null until then.
 function estIndex(){
-  const d = S.rounds.map(roundDiff).filter(v => v != null).sort((a,b) => a - b);
+  const d = realRounds().map(roundDiff).filter(v => v != null).sort((a,b) => a - b);
   if(d.length < 3) return null;
   const n = Math.max(1, Math.round(d.length * 0.4));
   return d.slice(0, n).reduce((a,b) => a + b, 0) / n;
@@ -4678,7 +4762,7 @@ function estIndex(){
 // place that prints the estimate can also print what it was built on and what is missing —
 // an absent number that says why is worth more than one that just says nothing.
 function indexBasis(){
-  const scored = S.rounds.filter(r => r.score != null);
+  const scored = realRounds().filter(r => r.score != null);
   const rated = scored.filter(r => roundDiff(r) != null);
   return { n:rated.length, scored:scored.length, short:Math.max(0, 3 - rated.length),
     missing: scored.filter(r => roundDiff(r) == null && fullCard(r)).length };
@@ -4697,7 +4781,10 @@ function coursesWithCards(list){
   return (list || S.courses).filter(c => courseRounds(c.name).some(r => r.score != null)).length;
 }
 function courseRounds(name){
-  return S.rounds.filter(r => sameCourse(r.course, name));
+  // Sim cards are out: a virtual Pebble round is not a round at Pebble, and letting one set
+  // a PR or a course average would put a number he has never shot on a course he may never
+  // have played. See realRounds().
+  return realRounds().filter(r => sameCourse(r.course, name));
 }
 // A nine and an eighteen are not comparable scores, so they are kept apart rather than
 // pooled into one "best" that would flatter whichever format he happened to play short.
@@ -5176,8 +5263,13 @@ function logRoundCard(){
 }
 
 function scores(){
-  const all = S.rounds.slice().sort((a,b) => (a.date || '').localeCompare(b.date || ''));
-  if(!all.length) return `
+  // Two lists on purpose: `all` is what the page COUNTS (outdoor cards only — see
+  // realRounds()), `list` is what it SHOWS. A sim round is still his card and still opens;
+  // it just never moves an average, a best, or the trend line.
+  const all = realRounds().slice().sort((a,b) => (a.date || '').localeCompare(b.date || ''));
+  const list = S.rounds.slice().sort((a,b) => (a.date || '').localeCompare(b.date || ''));
+  const simN = list.length - all.length;
+  if(!list.length) return `
   <div class="card">
     <h2>No rounds yet</h2>
     <p class="sm">Log one below, or send Claude your GHIN round summaries and they'll land here with the hole-by-hole detail — which is what unlocks the analytics: scoring mix, par-3/4/5 splits, your worst holes, and tips built from your own numbers.</p>
@@ -5281,10 +5373,11 @@ function scores(){
   <h2>Every round</h2>
   <div class="card">
     <div class="tscroll"><table><tr><th>Date</th><th>Course</th><th>Tees</th><th>Score</th><th>vs par</th><th>Putts</th></tr>
-      ${all.slice().reverse().map(r => { const v = roundVsPar(r); return `<tr data-action="open-round" data-i="${S.rounds.indexOf(r)}" style="cursor:pointer">
+      ${list.slice().reverse().map(r => { const v = roundVsPar(r); return `<tr data-action="open-round" data-i="${S.rounds.indexOf(r)}" style="cursor:pointer">
         <td style="white-space:nowrap">${fmtDate(r.date)} <span class="faint rgo">▸</span></td>
         <td class="sm rtxt">${esc(r.course || '—')}${r.nine ? ` <span class="faint">${r.nine === 'F' ? 'front' : 'back'}</span>` : ''}${
-          r.live ? ' <span class="ev live">live</span>' : ''}</td>
+          r.live ? ' <span class="ev live">live</span>' : ''}${
+          r.sim ? ' <span class="ev bay">sim</span>' : ''}</td>
         <td class="sm rtxt">${esc(r.tees || '—')}</td>
         <td><b>${esc(r.score ?? '—')}</b></td>
         <td class="sm">${v == null ? '—' : `<b style="color:${v > 5 ? 'var(--burg)' : v <= 2 ? 'var(--green)' : 'var(--ink)'}">${v > 0 ? '+' : ''}${v}</b>`}</td>
@@ -5292,6 +5385,7 @@ function scores(){
     </table></div>
     <p class="sm faint" style="margin-top:8px">Tap any round for the hole-by-hole card and its own breakdown.${
       st.live.rounds ? ` <b>${st.live.rounds}</b> of these you logged live, hole by hole — ${st.live.holes} of the ${st.holes} holes analysed above. Those are the cards everything here speaks from first.` : ''}${
+      simN ? ` <b>${simN}</b> ${simN === 1 ? 'is a round' : 'are rounds'} played indoors on a simulator — listed here and counted in nothing above, because a mat is not turf and the greens were software.` : ''}${
       all.some(r => r.note) ? ` Latest note: "${esc(all.filter(r=>r.note).slice(-1)[0].note)}"` : ''}</p>
   </div>
 
@@ -5303,9 +5397,13 @@ function scores(){
     // belongs to, and the tee box he wrote it on — not by being scanned for keywords,
     // which would be inference wearing a measurement's badge.
     const notes = [];
-    S.rounds.forEach((r, i) => (Array.isArray(r.holes) ? r.holes : []).forEach(h => {
-      if(h && h.note) notes.push({ r, i, n:h.n, text:h.note });
-    }));
+    // Indexed against S.rounds because the row opens that card — but a sim round's notes
+    // are not "what you wrote on the course", so they are skipped rather than filtered out
+    // of the array, which would shift every index after them.
+    S.rounds.forEach((r, i) => { if(r.sim) return;
+      (Array.isArray(r.holes) ? r.holes : []).forEach(h => {
+        if(h && h.note) notes.push({ r, i, n:h.n, text:h.note });
+      }); });
     if(!notes.length) return '';
     notes.sort((a, b) => (b.r.date || '').localeCompare(a.r.date || '') || b.i - a.i);
     const show = notes.slice(0, 12);
@@ -5863,7 +5961,8 @@ function roundView(i){
         <h2>${esc(r.course || 'Round')}</h2>
         <div class="sm faint">${a.par != null ? `par ${a.par}` : ''}${
           r.rating != null && r.slope ? ` · ${r.rating}/${r.slope}` : ''}${
-          r.live ? ' · <span class="ev live">you logged this live</span>' : ''}</div>
+          r.live ? ' · <span class="ev live">you logged this live</span>' : ''}${
+          r.sim ? ' · <span class="ev bay">played indoors</span>' : ''}</div>
       </div>
       <div class="rdsc">${esc(a.score ?? '—')}<i>${a.vs == null ? '' : `${a.vs > 0 ? '+' : ''}${a.vs}`}</i></div>
     </div>
@@ -5871,6 +5970,14 @@ function roundView(i){
     <div class="rdstats">
       ${tiles.slice(0, 4).map(([l, v]) => `<div class="rds"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}
     </div>
+    ${r.sim ? `<div class="goldnote" style="margin-top:10px">
+      <div class="gnl">Played indoors${r.venue ? ` · ${esc(r.venue)}` : ''}</div>
+      <p class="sm">Every shot here is one you hit, and the card is yours. It is <b>not</b> eligible
+        for a handicap differential, and it is counted in nothing on Today or in Coach — a mat is
+        not turf, the lies were perfect and the greens were software. Putts are the count only:
+        a simulator putt is struck on a flat mat with the break applied by the software, so no
+        made distance is recorded from one.</p>
+    </div>` : ''}
     ${r.note ? `<p class="sm" style="margin-top:8px">"${esc(r.note)}"</p>` : ''}
     ${r.troubles && r.troubles.length ? `<div class="chips">${r.troubles.map(k => {
       const lab = (TROUBLES.find(t => t[0] === k) || [null, k])[1];
@@ -5880,7 +5987,9 @@ function roundView(i){
       // did nothing at all to his index, silently. Where the course's own card is on file
       // it is one tap to fix, here on the card rather than as a job for the next feed push.
       // Eighteen holes only: these are 18-hole ratings (see `tees` in course-cards.js).
-      if(!fullCard(r) || (r.rating != null && r.slope)) return '';
+      // A sim round is never offered them: it would produce a differential the USGA does
+      // not accept, and it would look exactly like one that counts.
+      if(r.sim || !fullCard(r) || (r.rating != null && r.slope)) return '';
       const t = a.holes.length >= 18 && pub && pub.tees && pub.tees.length ? pub.tees : null;
       const d = roundDiff(r);
       return `<div class="card flat" style="margin-top:10px">
@@ -6180,10 +6289,16 @@ function briefHole(b, n){
 const emph = s => esc(s).replace(/\*([^*]+)\*/g, '<b>$1</b>');
 // What his own card says about this hole — course knowledge he generated himself, and
 // the only kind available at a course nobody has written a briefing for.
+// THE LINE FOR A SIM CARD, and it is worth stating once: a round played indoors can tell
+// you what the HOLE is (its par, its stroke index — facts about the course, which the sim
+// renders accurately), and it can never tell you what HE does on it. So `priorLayout()` and
+// `coursesWithLayout()` still read every card, while his record on a hole and the club he
+// hit there read `realRounds()`: indoors there is no penalty for a bad drive, so the club
+// he reached for is not the club he reaches for standing on the real tee.
 function holeRecord(course, n){
   const key = (course || '').trim().toLowerCase();
   const plays = [];
-  S.rounds.forEach(r => {
+  realRounds().forEach(r => {
     if((r.course || '').trim().toLowerCase() !== key || !Array.isArray(r.holes)) return;
     const h = r.holes.find(x => x && x.n === n && x.s != null && x.par != null);
     if(h) plays.push({ d:h.s - h.par, s:h.s, tee:h.tee, note:h.note, date:r.date });
@@ -6212,7 +6327,7 @@ function holeRecord(course, n){
 // the question the table exists to answer.
 function priorTee(course, n){
   const key = (course || '').trim().toLowerCase();
-  const cards = S.rounds.filter(r => (r.course || '').trim().toLowerCase() === key && Array.isArray(r.holes))
+  const cards = realRounds().filter(r => (r.course || '').trim().toLowerCase() === key && Array.isArray(r.holes))
     .sort(newestLiveFirst);
   for(const r of cards){
     const h = r.holes.find(x => x && x.n === n && x.tee);
@@ -7316,7 +7431,7 @@ const ACTIONS = {
     const note = $('#mtNote').value.trim(), nx = $('#mtNext').value.trim();
     if(!f && !triggers.length && !note && !nx) return toast('Nothing to save yet');
     const ri = $('#mtRound').value;
-    const rounds = S.rounds.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10);
+    const rounds = realRounds().slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10);
     const r = ri === '' ? null : rounds[+ri];
     S.mental.push({ id:uid(), date: $('#mtDate').value || today(),
       round: r ? { course:r.course, date:r.date, nine:r.nine || null } : null,
@@ -7614,6 +7729,8 @@ function sameRound(list, r){
 // one described vaguely, so the fallback names the entry type rather than dropping it.
 const LAB_VIEW = { swing:'swing', 'short-game':'shortgame', putting:'putting', mental:'mental',
   'full-swing':'swing' };
+const LAB_NAME = { swing:'Swing', 'short-game':'Short game', putting:'Stroke', mental:'Mental',
+  'full-swing':'Swing' };
 // A film session's changelog row has to point at the lab the session actually landed in.
 // sessionDiscipline() reads the setup text, which `session` entries always carry and most
 // `session-remove` entries do; a `session-update` patching only the finding carries none,
@@ -7669,7 +7786,11 @@ function updateLine(e){
     case 'bay-update':    return { h:'Bay session updated', s:clip(bayGist(e.bay || {}), 104),
       act:go(LAB_VIEW[BAY_DISC(e.bay)] || 'swing') };
     case 'bay-remove':    return { h:'Bay session removed', s:'', act:go('game') };
-    case 'evolution':     return { h:'Stroke evolution grid rebuilt', s:'', act:go('putting') };
+    case 'combine':       return { h:`Combine · ${(e.combine || {}).score != null ? (e.combine || {}).score : 'logged'}`,
+      s:clip((e.combine || {}).note, 104), act:go('swing') };
+    case 'combine-remove':return { h:'Combine result removed', s:'', act:go('swing') };
+    case 'evolution':     return { h:`${LAB_NAME[e.discipline || 'putting'] || 'Stroke'} evolution grid rebuilt`,
+      s:'', act:go(LAB_VIEW[e.discipline || 'putting'] || 'putting') };
     case 'faults':        return { h:`Diagnosis updated · ${e.discipline || 'putting'}`,
       s:`${(e.faults || []).length} fault${(e.faults || []).length === 1 ? '' : 's'} on the board`,
       act:go(LAB_VIEW[e.discipline || 'putting'] || 'putting') };
@@ -7687,7 +7808,7 @@ function updateLine(e){
     case 'layout':        return { h:`Scorecard on file · ${(e.layout && e.layout.course) || ''}`,
       s:`Par${e.layout && e.layout.si ? ' and stroke index' : ''} prefills now when you log a live round there`,
       act:go('courses') };
-    case 'round':         return { h:`Round · ${rd.course || ''}`,
+    case 'round':         return { h:`${rd.sim ? 'Indoor round' : 'Round'} · ${rd.course || ''}`,
       s:[rd.date ? fmtDate(rd.date) : '', rd.score != null ? `${rd.score}` : ''].filter(Boolean).join(' · '), act:go('scores') };
     case 'round-update':  return { h:`Round updated · ${rd.course || ''}`,
       s:[rd.date ? fmtDate(rd.date) : '', rd.rating != null ? 'rating and slope backfilled' : ''].filter(Boolean).join(' · '), act:go('scores') };
@@ -7802,7 +7923,17 @@ function applyFeed(feed){
       if(b && e.bay) Object.assign(b, e.bay);
     }
     else if(e.type === 'bay-remove') S.bays = S.bays.filter(x => !(e.target && x._fid === e.target));
-    else if(e.type === 'evolution' && e.evolution) S.evolution = e.evolution;
+    else if(e.type === 'combine' && e.combine){
+      S.combines = (S.combines || []).filter(c => c.id !== e.id).concat([{ id:e.id, ...e.combine }]);
+      S.combines.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    }
+    else if(e.type === 'combine-remove') S.combines = (S.combines || []).filter(c => c.id !== e.target);
+    // Scoped like `faults` and for the same reason: pushing a swing grid must not wipe the
+    // putting one. No discipline means putting, which is what every entry before Sep 11 meant.
+    else if(e.type === 'evolution' && e.evolution){
+      if(!S.grids) S.grids = {};
+      S.grids[e.discipline || 'putting'] = e.evolution;
+    }
     else if(e.type === 'club-add' && e.club) S.clubs.push({ id:e.id, rounds:0, ...e.club });
     else if(e.type === 'club-update'){
       const c = S.clubs.find(x => x.id === e.target || x.name === e.target);
@@ -7878,8 +8009,17 @@ function applyFeed(feed){
       // entry re-applying, and a round Jack already logged live arriving again as a feed
       // entry. The second one silently double-counts every stat, so it matches on the
       // round itself rather than on the entry id.
-      if(!S.rounds.some(r => r.feedId === e.id) && !sameRound(S.rounds, e.round))
-        S.rounds.push({ feedId:e.id, troubles:[], putts:null, note:'', holes:[], ...e.round });
+      if(!S.rounds.some(r => r.feedId === e.id) && !sameRound(S.rounds, e.round)){
+        const rd = { feedId:e.id, troubles:[], putts:null, note:'', holes:[], ...e.round };
+        // A simulator putt is struck on a flat mat with the break applied by software, so a
+        // made distance off one is not a proximity measurement — it is the sim's geometry.
+        // Stripped on the way IN rather than filtered at every reader: a field that exists
+        // in the store is a field somebody counts eventually. The putt COUNT survives,
+        // because he did take those strokes.
+        if(rd.sim && Array.isArray(rd.holes))
+          rd.holes = rd.holes.map(h => { const { pm, pd, gimme, ...rest } = h || {}; return rest; });
+        S.rounds.push(rd);
+      }
     }
     else if(e.type === 'round-update' && e.round){
       // Backfills a live-logged card with what the phone couldn't know on the course —

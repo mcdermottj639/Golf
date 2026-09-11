@@ -1,7 +1,8 @@
-# Plan — Trackman at Golf Lounge 18 — **PHASES 1–2 BUILT 2026-09-11 (v96)**
+# Plan — Trackman at Golf Lounge 18 — **ALL PHASES BUILT 2026-09-11 (v96–v97)**
 
-*Research + design. **Phase 1 (the ladder) and phase 2 (bay sessions in the labs) shipped in
-v96**; phases 3–5 are still design. `CLAUDE.md`'s "The bay" section is the authority on what was
+*Research + design. **Phases 1–2 shipped in v96; phases 3–5 (the grid per discipline,
+simulator rounds, the Combine) shipped in v97 the same day** — built ahead of the data for
+the same reason as the first two: so the first session has somewhere to land. `CLAUDE.md`'s "The bay" section is the authority on what was
 built and why — this file keeps the research and the reasoning behind it. Jack's words: "New golf lounge 18 is open near me
 with trackman. I made a trackman acct and will start playing there and getting lots of
 data. Research this all and mock up a plan how we can integrate it into the app."*
@@ -491,9 +492,13 @@ everywhere they appear:
 - Fairways and greens **are** kept on the card, because he genuinely hit those shots, and
   they are visible on the card only.
 
-If phase 4 feels like a lot of rules for a novelty, the alternative is simpler and also
-fine: **don't ingest sim rounds at all in v1**, and let them live in the Trackman app where
-they already are. Recommended if the first month's bay time is mostly practice.
+**BUILT ANYWAY, and the reasoning is worth keeping** (Jack, Sep 11 2026: *"U still have more
+phases? Why are u waiting"*). The draft above recommended holding phase 4 unless he plays sim
+rounds often. That was the wrong test: the quarantine IS the feature, every guard is a no-op
+while there are no sim cards, and building it later would mean writing the rules under
+pressure from data already sitting in the app. The same argument retired the other reason for
+waiting — that a swing grid needs sessions first. Machinery ahead of data; nothing renders
+until there is something to render.
 
 ### 6.5 Phase 5 — the Combine as a benchmark
 
@@ -639,23 +644,23 @@ stop there.
 - [x] `bayView()` — reuses the `detail.metrics` renderer, adds the club table.
 - [x] `EV_RANK`/`EV_LAB`/`EV_SOURCE`/`EV_BLIND` gain `bay`; `UP_TYPE` gains `bay`.
 - [x] Discipline routing — a bay session declares its own, so there is nothing to infer.
-- [ ] (open) `FAULT_EV` rows for any fault a bay session becomes the basis of.
+- [ ] (open, needs a session) `FAULT_EV` rows for any fault a bay session becomes the basis of.
 
 **Phase 3 — putting / the grid**
 
-- [ ] `discipline` on `evolution` (default `putting`), `evolutionCard(disc)`.
-- [ ] A swing grid seeded from the first two bay sessions.
+- [x] `discipline` on `evolution` (default `putting`), `evolutionCard(disc)` — grids live in `S.grids`.
+- [ ] (open) A swing grid seeded from the first two bay sessions — needs sessions.
 
-**Phase 4 — sim rounds** (only if he plays them often)
+**Phase 4 — sim rounds**
 
-- [ ] `sim:true` + `venue` on a round; `SIM` badge in the rounds list.
-- [ ] Hard exclusions: `indexBasis()`, `roundDiff()`, `areaCards()`.
-- [ ] Putting fields stripped on ingest.
-- [ ] The standing caveat line on the round card.
+- [x] `sim:true` + `venue` on a round; `SIM` badge in the rounds list.
+- [x] Hard exclusions, through one door — `realRounds()`, read by `roundDiff()`, `withHoles()`, `indexBasis()`, `courseRounds()` and the rest.
+- [x] Putting fields stripped on ingest.
+- [x] The standing caveat line on the round card.
 
 **Phase 5 — Combine**
 
-- [ ] `combine` feed type + a table in the Swing lab; trend at three results.
+- [x] `combine` feed type + a table in the Swing lab; trend at three results.
 
 **Every phase**
 

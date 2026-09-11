@@ -99,7 +99,8 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `session`        | Add a filmed putting session (`date`, `setup`, `finding`, `detail`) |
 | `session-update` | Patch a session by `target` (its feed id) or `setupMatch` prefix. Patches `setup`, `finding`, `detail` and — since Sep 9 2026 — **`date`**, which had no route at all: correcting a film's day used to mean removing the session and re-adding it, which orphans every later update targeting its `_fid`. `detail` is set WHOLESALE, so send the existing metrics/story back with it |
 | `session-remove` | Drop a session by `target` (its feed id), **or** by a `setupMatch` prefix optionally narrowed by `date` — the second form is the only way to remove a `seed()` session, which has no feed id. Used to fold duplicates and to clear out retired-gear film |
-| `evolution`      | Replace the metric-evolution grid. Carries `sessions` (short column labels), `notes` + `foot` (the legend, now data not code), and per metric `name` / `marks` / `s` / `state` / `verdict` |
+| `evolution`      | Replace a metric-evolution grid. Carries `sessions` (short column labels), `notes` + `foot` (the legend, now data not code), and per metric `name` / `marks` / `s` / `state` / `verdict`. **`discipline` scopes it** (`putting` default, as every entry before Sep 11 2026 meant) — one grid per lab, stored in `S.grids`, so pushing a swing grid cannot wipe the putting one |
+| `combine` / `combine-remove` | A Trackman Combine result — `{date, venue, score, targets:[{yds, score, avgDist}], note}`. Re-sending the same `id` replaces it. See *The bay* |
 | `faults`         | Replace the faults list. **`discipline`** (`putting` default / `swing` / `short-game`) scopes the replace to that lab only, so pushing swing faults can't wipe the putting ones; omit it and it replaces everything. **Start a `why` with `CLOSED` or `DOWNGRADED`** to settle one — `faultState()` reads that first word, which is what drops it off the Putting tab's diagnosis card and out of Coach's open-fault to-dos. Anything else reads as open |
 | `action`         | Add an open action item |
 | `action-done`    | Mark action `target` done |
@@ -108,7 +109,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `carry-update`   | Patch ONE ladder row by `target` name: `club` to add/patch (`after` names the row to insert behind), `remove:true` to drop it. **Not** gated on calibration — see below. A row may carry **`meas`** — `{src, n, sd, date, ball, norm, spin, carry}`, where a number came from. It is provenance and never authority: once `carriesCalibrated` is set, a patch carrying `meas` **fills a blank and otherwise leaves his figure alone**, parking its own in `meas.carry` so the row shows both and he takes it with a tap. `"force": true` overrides. See *The bay* below |
 | `bay` / `bay-update` / `bay-remove` | A launch-monitor session — the numeric twin of `session`, in its own array. The entry `id` becomes `_fid`; `bay-update` matches on it or on a `setupMatch` prefix and `Object.assign`s (the `date` included). See *The bay* below |
 | `course-add` / `course-remove` | Add/remove a course. **`course-add` dedupes on an EXACT name match only**, so pushing a course Jack already typed under a different spelling gives him two rows for one course — see *Two rows, one course* below |
-| `round`          | Add a played round (see *Logging a round* below). Skipped if a round with the same `date` + `course` + `nine` is already there, whatever put it there |
+| `round`          | Add a played round (see *Logging a round* below). Skipped if a round with the same `date` + `course` + `nine` is already there, whatever put it there. **`sim:true`** (+ `venue`) marks a simulator round — it is quarantined out of every claim the app makes, and its per-hole putting distances are stripped on the way in. See *A simulator round is a round, and it is not this record* |
 | `round-update`   | Patch a round matched by `date` + `course` (+ `nine`): `Object.assign` of the top level, per-hole merge by hole `n`. **The way to backfill `rating`/`slope` onto a live-logged card**, or fix a hole after the fact. **On a `live:true` card it only FILLS GAPS** — fields the card already carries are left alone, because he recorded them standing on the hole. To overwrite one deliberately, put `"force": true` on the entry. Per-hole merges are unaffected either way |
 | `stats`          | Add/replace a cumulative stats snapshot (GHIN summaries); `replaces` swaps one out |
 | `test`           | Append a 10-ball putter test result |
@@ -1853,7 +1854,8 @@ measurement over self-report — and say which one you're using.
 
   **The grid is the interface, and the verdicts hide behind it** (Aug 24 2026). Seven verdicts
   running to paragraphs used to print in full under the table — the most useful block on the
-  page was the one you scrolled past. `evolutionCard()` now renders each metric as a
+  page was the one you scrolled past. `evolutionCard(disc)` (one grid per discipline since
+  Sep 11 2026 — see *The bay*) renders each metric as a
   `<details>` whose summary carries the marks and a **`state`**: two or three words —
   *Settled · Closed · Open · Quick of 2:1 · Never measured · The open fault* — coloured off
   the metric's `s`. That is what makes the grid readable without reading anything, so **give
@@ -1907,7 +1909,8 @@ Three things that make it worth the words:
 Jack joined **Golf Lounge 18** (Trackman 4 bays) and will be playing and practising there.
 The full research and the phased design are in **`PLAN-TRACKMAN.md`**; this section is what
 is BUILT and the rules that keep it honest. Phase 1 (the ladder) and phase 2 (bay sessions
-in the labs) shipped in v96. Simulator rounds and the Combine are not built.
+in the labs) shipped in v96; the grid per discipline, simulator rounds and the Combine
+followed in v97. All five phases are built.
 
 **There is no API and there never will be one here.** A Trackman account holder cannot
 export CSV or PDF; mytrackman.com is a viewer, CSV is a TPS-owner feature, and the Cloud
@@ -1969,6 +1972,15 @@ overlap. It reads the number the row SHOWS, not the one the bay offered — wher
 his own figure, the yards he plays are his — and yields nothing unless BOTH rows carry
 `meas`, because a gap between a measurement and an estimate is not a measured gap.
 
+**ONE EVOLUTION GRID PER DISCIPLINE, in `S.grids`** (v97). There was a single `S.evolution`
+and it was putting's, so the migration MOVES it into `grids.putting` and deletes it rather
+than leaving the two beside each other — two homes for one kind of record is how they drift,
+and the second one is always the one nobody updates. `evoFor(disc)` is the only reader.
+**A discipline with no grid renders nothing at all** — no heading, no empty table — because
+an empty grid is a heading over a promise, which is the failure the retired 5-ft tile is the
+worked example of. A swing grid is what a run of bay sessions turns into; it arrives by feed
+(`evolution` + `discipline`), not by code.
+
 **A club-table column renders only where some club row carries it** (`BAY_COLS`), the same
 rule the approach buckets follow, so a carry-only session draws four columns instead of
 thirteen empty ones. Thirteen will not fit a phone whatever the padding does, so the table
@@ -1979,6 +1991,60 @@ What the browser pass turned up, since it is the reason the check list exists: n
 320px clipped and no page scrolled sideways, but `cs` was labelled **CLUB** in a table whose
 first column is also CLUB — two identical headers over different numbers, invisible in code
 and obvious the moment the table rendered. It is `CLUB MPH` / `BALL MPH` now.
+
+### A simulator round is a round, and it is not this record (Sep 11 2026)
+
+A Trackman round is real golf played by him, and the shot data under it is measured. It is
+also played off a perfect mat, in still air, on software greens, with no consequence for a
+tee shot. Both halves are true, so a sim card is **stored, opened and read — and counted in
+nothing**.
+
+**`realRounds()` is the door**, and it exists so the guard is in one place rather than at
+thirty call sites: everything that computes a claim about his golf reads it, while the round
+LIST and `roundView()` read `S.rounds` directly, because a sim card is still his card. The
+USGA does not accept a simulator score for a Handicap Index, and a sim round of Pebble knows
+the real course rating and slope — so **`roundDiff()` returns null on `r.sim` as its first
+line**, before anything else, rather than letting the exclusion fall out of a missing rating.
+`withHoles()` filters it too, which is what keeps it out of Today's tiles, Coach's four
+areas, the miss maps, the worst-hole table and the Mental tab in one move.
+
+**The line for what a sim card MAY still be read for, because it is not "nothing":** a round
+played indoors can say what the HOLE is — its par and stroke index are facts about the
+course, and the sim renders them accurately — and it can never say what HE does on it. So
+`priorLayout()` and `coursesWithLayout()` still read every card, while `holeRecord()` and
+`priorTee()` read `realRounds()`: indoors there is no penalty for a bad drive, so the club he
+reached for there is not the club he reaches for on the real tee.
+
+**Putting distances are stripped on the way IN**, in `applyFeed()`, not filtered at every
+reader — a field that exists in the store is a field somebody counts eventually. A simulator
+putt is struck on a flat mat with the break applied by software, so `pm`/`gimme`/`pd` off one
+is the sim's geometry rather than a proximity measurement. The putt COUNT survives, because
+he did take those strokes.
+
+What it still does: renders in the rounds list with a `SIM` badge beside the `LIVE` one, and
+opens to a full round card carrying a standing gold note saying it is not eligible for a
+differential and is counted in nothing. The rating chips are never offered on one — they
+would produce a differential that looks exactly like a real one. The list's caption counts
+the indoor rounds out loud.
+
+### The Combine is the only self-comparable thing a bay produces (Sep 11 2026)
+
+Three shots each to nine target yardages plus driver, twice over — 60 shots — scored 0–100
+on carry and how far offline the ball finished. Because the protocol is fixed, one Combine
+is directly comparable to the last one, which nothing else in a bay session is. That makes
+it a **benchmark**, the same job `S.tests` does on the putting side, which is why it renders
+as its own card in the Swing lab rather than as a session in a lab's bay log.
+
+Two rules carried over rather than reinvented: **a trend line needs three results** (the
+`drillLog` rule — two points are a line through anything), and a per-target row only renders
+for a yardage that test actually asked for, never as a zero.
+
+**A lab reads: film · the bay · the grid · the benchmark.** The putting lab set that order
+(film room → stroke evolution → 5-footer scoreboard) and the swing lab now matches it, with
+the bay log sitting beside the film it is the numeric twin of. A grid SUMMARISES the batches
+under it, so it cannot sit above them in one lab and below them in another — that is how one
+page teaches a reading order the next page contradicts. The first cut had the swing grid and
+the Combine above the bay block and it was wrong for exactly that reason.
 
 ### Film reports arrive through Drive (Aug 25 2026)
 
