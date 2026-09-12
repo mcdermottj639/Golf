@@ -60,7 +60,13 @@ calling `render()`. What is worth asserting, because each of these has actually 
 the order of `#view h2`s, an element's `getBoundingClientRect()` against the viewport
 (is it above the fold?), `scrollWidth > clientWidth` on a chip (does the label clip?),
 `documentElement.scrollWidth > innerWidth` (does the page scroll sideways?), and a
-`pageerror` listener for the whole run. **Check 320px as well as 390px** — that is the
+`pageerror` listener for the whole run. **ASSERT AGAINST THE ELEMENT, NOT THE PAGE TEXT**
+(learned Sep 12 2026): a check that hole 7 rendered as a par 3 tested
+`innerText('#view').includes('PAR 3')` and passed while the run had never left the scorecard
+screen — which lists every hole's par, so the string was on the page four times over. A
+whole-page `includes()` is a search for *somewhere*, and almost every assertion worth making
+is about *somewhere specific*. Read the header node, or assert on a value the rest of the
+page cannot contain. **Check 320px as well as 390px** — that is the
 narrowest phone and the width the form-control rule below was set at. This proves layout,
 not correctness: a number can be confidently wrong in a page that renders perfectly.
 
@@ -373,7 +379,20 @@ course he's playing:
    so match every tip against the pars and shapes on Jack's own card (or the official
    scorecard) before attaching it to a hole — and DROP any tip that can't be pinned. A
    floating tip on the wrong hole is worse than no tip.
-4. **Every note traceable, and say when it's an inference.** A yardage or hazard means it
+4. **NEVER WRITE A `play` CALL FOR A HOLE WHOSE PAR YOU DO NOT KNOW** (learned Sep 12 2026).
+   The Fairchild Wheeler Black plan shipped telling Jack to take "position off the tee, the
+   club that finds short grass" on the 7th. The 7th is a **221-yard par 3** — the longest par
+   3 on either course and past his 2-iron. The note came from a source that said only
+   *"6, 7 and 8 are a very tough bunch"*, and **a sentence that groups holes says nothing
+   about their pars.** Nothing in the research was wrong; the plan inferred a par 4 from a
+   hole number and wrote a tee call on top of it, which reads exactly like the researched
+   ones beside it. A yardage, a par and a stroke index are the floor for a club call — with
+   no card, a hole gets its hazards and its record and no `play` line. Jack's own scorecard
+   fixed it the next day, which is the other half of the lesson: **ask him for the card.**
+   Fifteen minutes of his screen recording beat every blocked scorecard host on the web, and
+   it also settled a par dispute, resolved an ambiguous carry, and corroborated the research
+   on four holes.
+5. **Every note traceable, and say when it's an inference.** A yardage or hazard means it
    was researched; a score, miss or stroke index means it came off his card. **Never
    describe a hole you haven't got a source for** — holes with no source get only his own
    record, which needs no briefing. Where a line is REASONED from a sourced fact rather
@@ -381,13 +400,13 @@ course he's playing:
    the note has to admit it and name what's still unknown. A confident tee line built on
    nothing but a hole's shape reads exactly like a researched one, and that is the failure
    worth guarding against.
-5. **Centre of the green, always.** Never build a plan around a pin position — you can't
+6. **Centre of the green, always.** Never build a plan around a pin position — you can't
    know where the flag is on the day, and a plan written for one sends him at an edge on
    a course where his standing miss is already short. Every approach and par-3 note
    targets the **middle**, club chosen off the yardage to the middle. *Back pin*, *front
    pin*, *tucked* and *short-side* are smells. Hazard and green-complex facts are fine —
    where the trouble sits doesn't move; where the flag sits does.
-6. **Say where it came from.** Close the plan with a paper-trail section splitting
+7. **Say where it came from.** Close the plan with a paper-trail section splitting
    researched facts from card facts, source by source.
 Underneath that, `holeRecord()` shows what his own cards say about the hole (plays, average
 against par, best, the club he's used) — that one needs no briefing at all and flags a hole
