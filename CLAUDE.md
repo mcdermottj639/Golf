@@ -306,7 +306,8 @@ course nobody has written a plan for.
 
 **Round prep reaches the course, one hole at a time.** A briefing whose `course` matches
 the round (suffix-tolerant, so "Beekman Golf Course — Scramble" matches a round logged as
-"Beekman Golf Course") reaches the logger through its **per-hole notes only** — the
+"Beekman Golf Course" — but see *Two eighteens, one facility* below, because an EXACT name
+now wins over that tolerance) reaches the logger through its **per-hole notes only** — the
 whole-round `focus`/`rules` deliberately do NOT ride along on every hole, because they are
 a first-tee read and repeating them on all eighteen screens just pushes the hole note down.
 The full plan lives in Home → Round Prep, which keeps every course plan permanently.
@@ -1240,9 +1241,12 @@ prints the date of the fix), and that these are **straight-line miles, not drive
 an hour up the Merritt and an hour to the Cape are not the same hour. With no fix at all
 the list renders in its original order with a button, never silently re-sorted.
 
-**Every course on his list has a fix on file (Aug 21 2026)** — 49 of them, 12 on the club's
-own coordinate and the rest on the town centre standing in for it. Add a course and add its
-`geo` in the same push: a course with no location is not broken, but it can only ever sit at
+**Every course on his list has a fix on file (Aug 21 2026)** — measured Sep 12 2026 in a
+browser rather than counted from the feed: **50 courses, 50 fixes, none missing**, 15 of them
+on the club's own coordinate and 35 on the town centre standing in for it. Note a `geo` is not
+one-per-course: `courseMatches()` keys it on the name before the em dash, so the single
+Fairchild Wheeler fix covers **both** its eighteens. Add a course and add its `geo` in the same
+push: a course with no location is not broken, but it can only ever sit at
 the bottom of a distance sort, and the sort is the reason the coordinates exist.
 
 ### Never ask for a position on your own initiative (Sep 8 2026)
@@ -1375,6 +1379,41 @@ Dunes* beside it. So when you push courses in bulk:
   merges and never deletes: the rating, PR and notes on those rows are his, and picking
   between two of his rows is not a heuristic's job. Two courses at one facility are written
   `Facility — Course` and are never flagged against each other.
+
+### Two eighteens, one facility (Sep 12 2026)
+
+`Facility — Course` had never actually been exercised until Fairchild Wheeler, which is 36
+holes as **Black** and **Red**. Writing a standing plan for each exposed that
+`courseMatches()` strips an em-dash suffix on **BOTH** sides, so every plan at a facility
+matches every round at it. That tolerance is correct for an **event** suffix — "Beekman Golf
+Course — Scramble" is a plan for a round logged as plain "Beekman Golf Course" — and wrong
+for two different golf courses.
+
+**So wherever a match picks ONE THING TO SHOW HIM, an exact name wins outright and the
+tolerant set is only the fallback.** `preferExact(list, name, of)` in `app.js` is that rule
+in one place; it narrows and never widens, so with no exact hit every caller behaves exactly
+as it did before. Three callers, and each was really broken:
+
+- **`liveBriefing()`** — the serious one. With both plans matching, the winner was
+  `all.find(b => !b.date)`, i.e. **whichever applied first**. Driven in a browser on the
+  pre-fix build: a round started on the Red was served the **Black's** plan on all eighteen
+  hole screens. A wrong tee call that looks exactly like a researched one is the whole
+  failure this file's research rules exist to prevent, and here the app produced it by itself.
+- **`planHeld()`** — grades a card through `liveBriefing()`, so it would have marked a round
+  against the other course's plan.
+- **`courseShape()`** — a round on the Black fed the Red plan's own history block.
+
+**`priorLayout()`, `priorTee()` and `holeRecord()` were already safe**, because they key on
+the exact lowercased name rather than through `courseMatches()`. Worth knowing before
+"fixing" them.
+
+**The claim that did NOT survive checking, and it is the reason to drive these rather than
+reason about them:** the course picker looked like it should collapse the two into one row,
+and the first draft of the release note said so. Measured before and after, it lists both
+correctly on either build — `livePicks()` gets the second row from its every-other-course
+group. `planPlayName()` was hardened the same way regardless, because resolving a plan to
+another course's name is wrong whether or not a symptom is visible today. **State the
+symptom you reproduced, not the one the code reads like it should have.**
 
 ### Writing briefings (they render in layers — write for that)
 

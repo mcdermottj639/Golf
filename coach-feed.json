@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-09-10",
+  "updated": "2026-09-12",
   "entries": [
     {
       "id": "s4-session",
@@ -33946,6 +33946,355 @@
       "type": "action-update",
       "target": "claw-trial-action-20260810",
       "text": "PUTTING — THE CLAW IS THE GRIP NOW, so this stops being a trial and becomes two checks. Your call, Sep 10 2026: claw inside about six feet, conventional past it. The grip question is CLOSED and is not waiting on any number below. WHAT IS STILL OPEN. (1) THE SHAFT — a claw can introduce lean without you feeling it, because the trail hand sits differently and the handle creeps forward. Get BOTH grips into the same face-on set, 240 fps, white tape on the shaft, and compare shaft angle at ADDRESS against shaft angle at IMPACT. Vertical on both is the pass; forward at impact on the claw means it is adding lean, and on a 2° face that drives the ball into the turf — it skids, finishes short, and it will read as bad pace rather than as a grip problem. This is now the single most valuable clip on the list, because it is the only thing that catches the one way this decision can quietly cost you strokes. (2) THE BASELINE — the 20-ball five-footer, CLAW ON BOTH BLOCKS, one with your normal stroke length and one with the pop. Run the normal-length block first: it is doing double duty as one arm of the pop-stroke test and as the first claw number this project has ever had. Every short-putt figure on file was made conventional, including Jul 20's 8/10 from four feet on the DF3i, so there is nothing behind you to beat — you are establishing the mark, not chasing one. Log makes out of 20, the direction of every miss, and the green speed. WHAT THE SPLIT STILL PROTECTS: CONVENTIONAL FOR LAGS, and if you are unsure which side of six feet you are on, it is a lag. That keeps the 30-ft ladder clean, which matters because pace is the open fault and a grip change is exactly the kind of thing that would contaminate the curve you are still trying to build. NOTE the old Grip Experiment closed with 'claw shelved' — that verdict was reached on the DF3i, with the Press Pistol 2°, and with the left miss still live. All three have changed, so it never bound anything and it does not now."
+    },
+    {
+      "id": "add-fairchildwheeler-black-20260912",
+      "type": "course-add",
+      "course": {
+        "name": "Fairchild Wheeler Golf Course — Black",
+        "st": "CT"
+      }
+    },
+    {
+      "id": "add-fairchildwheeler-red-20260912",
+      "type": "course-add",
+      "course": {
+        "name": "Fairchild Wheeler Golf Course — Red",
+        "st": "CT"
+      }
+    },
+    {
+      "id": "loc-fairchildwheeler-20260912",
+      "type": "geo",
+      "geo": {
+        "course": "Fairchild Wheeler Golf Course",
+        "lat": 41.215,
+        "lon": -73.2416,
+        "prec": "exact",
+        "place": "Fairfield, CT",
+        "src": "COURSE COORDINATE: the golf course's own map feature at 41.21503, -73.24162 (Mapcarta), matching the confirmed address 2390 Easton Turnpike, Fairfield CT 06825. One fix serves both eighteens — the Black and the Red share the property, and courseMatches() keys a geo on the name before the em dash. Read Sep 12 2026."
+      }
+    },
+    {
+      "id": "briefing-fairchildwheeler-black-20260912",
+      "type": "briefing",
+      "briefing": {
+        "course": "Fairchild Wheeler Golf Course — Black",
+        "focus": "The Black is the harder of the two eighteens — 72.0/128, hilly, tight, blind in places. Two numbers decide your round: the par 3s average 175, which is your 5-iron, and short is 7 of the 12 green misses on your cards. Take enough club, cover the middle, and the tough stretch through 6-7-8 costs you bogeys instead of doubles.",
+        "rules": [
+          "Par 3s average 175 — that is your 5-iron",
+          "2: BLIND tee shot — wait for the bell",
+          "17: par 3 over the CATTAILS — carry it",
+          "16: elevated green — be LONG, never short",
+          "6 · 7 · 8: bogey is a good score",
+          "5: 330 dogleg left — 2-iron, not driver",
+          "Cover the middle, never the flag"
+        ],
+        "holes": [
+          {
+            "n": 1,
+            "play": "*Fairway first* — favour left-centre",
+            "avoid": "*Right*. The hole bends that way, so a ball that leaks right runs through it",
+            "why": [
+              "A *slight dogleg right* — the only thing sourced on this hole (GOLFCT review, 2014)",
+              "REASONED, not sourced: your open swing fault is the *over-the-top slice*, which starts left and moves right. On a hole bending right, that finish runs out of fairway before the corner does",
+              "Opening hole on the harder eighteen. A fairway is the whole ask"
+            ],
+            "avoidDir": "R",
+            "avoidOn": "tee"
+          },
+          {
+            "n": 2,
+            "play": "*Wait for the bell*, then hit the club you can find",
+            "avoid": "Hitting before the group ahead rings — you cannot see them from the tee",
+            "why": [
+              "*Blind tee shot.* The group in front rings a bell when the landing area is clear (GOLFCT)",
+              "*Unknown, and worth one question in the pro shop*: what the blind shot is hiding — the line, and whether there is trouble at the end of it",
+              "A blind hole is where a fairway finder pays twice: you cannot correct what you never saw land"
+            ]
+          },
+          {
+            "n": 3,
+            "play": "*Wedge or 9-iron* — off the yardage to the *middle*",
+            "leaves": "A putt from the middle of the green",
+            "avoid": "*Short*. It is your standing miss and there is no reason to bring it in on a short one",
+            "why": [
+              "A *very short par 3* (GOLFCT). The yardage is not on file, so read the tee marker and club off the middle",
+              "The bottom of your ladder: *60° 80 · 56° 95 · 50° 108 · PW 122 · 9-iron 134*",
+              "The par 3s here *average 175*, so this one is the outlier — do not let the walk to the tee pick the club for you"
+            ],
+            "avoidDir": "S",
+            "avoidOn": "green"
+          },
+          {
+            "n": 4,
+            "play": "*One more club* into the green than the number says",
+            "avoid": "*Short* — uphill adds yardage the yardage post does not",
+            "why": [
+              "An *uphill par 4* (GOLFCT)",
+              "An uphill approach plays longer, and short is already *7 of your 12 recorded green misses*",
+              "Take the extra club and let the *middle* be the target"
+            ],
+            "avoidDir": "S",
+            "avoidOn": "green"
+          },
+          {
+            "n": 5,
+            "yds": 330,
+            "play": "*2-iron or 5-wood* to the corner — not driver",
+            "leaves": "A *wedge* in — 80 to 110 off your ladder",
+            "avoid": "The *fairway bunker right*, and the *trees* down the left",
+            "why": [
+              "330 yards, *dogleg left*, trees left, a *fairway bunker right* and a *well-protected green* — the club pro's own favourite hole here (Stephen Roach, Stamford Advocate)",
+              "He calls it *risk/reward*: it can be driven over the trees on the corner. That is a right-to-left shot over the inside of a dogleg LEFT — the opposite of your shape — and your driver reads *235 estimated*, on a shaft you changed in June and have never measured",
+              "So take the corner off the tee and the wedge in. A wedge from this fairway is the best scoring look on the front nine"
+            ],
+            "club": [
+              "2-iron",
+              "5-wood"
+            ],
+            "avoidDir": "R",
+            "avoidOn": "tee"
+          },
+          {
+            "n": 6,
+            "play": "*Fairway, then the middle.* Par is a bonus",
+            "avoid": "Chasing a hero shot back out of trouble",
+            "why": [
+              "*6, 7 and 8 are 'a very tough bunch'* (GOLFCT) — the hardest stretch out here",
+              "*Unknown*: what specifically makes this one hard. Nothing pins the trouble to a side, so play it conservatively until you have seen it",
+              "Across this stretch bogey is a good score. Take it and walk on"
+            ]
+          },
+          {
+            "n": 7,
+            "play": "*Position off the tee.* Take the club that finds short grass",
+            "avoid": "The *double*. This is the hole to protect against one",
+            "why": [
+              "Singled out as *difficult* in more than one source, and it sits in the middle of the tough 6-7-8 stretch",
+              "*Unknown*: the hazard, the shape and the yardage are all unsourced. This note is a posture, not a line",
+              "*Doubles are 50% of everything you lose.* A bogey here is a win"
+            ]
+          },
+          {
+            "n": 8,
+            "play": "*Enough club, middle of the green*",
+            "avoid": "*Short*",
+            "why": [
+              "The last of the tough three (GOLFCT)",
+              "Nothing else on this hole is sourced, so the only instruction worth writing is the one true everywhere on this card: *cover the middle*"
+            ],
+            "avoidDir": "S",
+            "avoidOn": "green"
+          },
+          {
+            "n": 11,
+            "play": "The *middle*, with the club that carries whatever guards it",
+            "avoid": "*Short*. It is 'well protected' and short is your miss",
+            "why": [
+              "A *short, well-protected par 3* (GOLFCT)",
+              "*Well protected* is not specific — look at what is actually guarding it from the tee and club to CARRY that, not to reach the front edge",
+              "Two putts from the middle is a par here"
+            ],
+            "avoidDir": "S",
+            "avoidOn": "green"
+          },
+          {
+            "n": 12,
+            "play": "*Aim down the right side* and let the hole bring it back — do not try to draw it",
+            "avoid": "*Left*. The corner is where a pulled tee shot dies",
+            "why": [
+              "*Dogleg left*, and the source's advice is 'play a draw, or aim left' (GOLFCT)",
+              "REASONED, not sourced: a draw is *not your shape* — your open fault is an over-the-top slice. Manufacturing one off the tee is how a dogleg left becomes a double",
+              "Take the longer route and hit the shot you own. Aim further left only if it is going straight today"
+            ],
+            "avoidDir": "L",
+            "avoidOn": "tee"
+          },
+          {
+            "n": 13,
+            "play": "*Only take on the 230 once you have seen it.* Otherwise play short of it",
+            "playAs": "Play",
+            "avoid": "Assuming your *235* is real. It is an estimate",
+            "why": [
+              "*Elevated tee box*, and the source says *a carry of around 230 yards* leaves a beautiful approach (GOLFCT)",
+              "*AMBIGUOUS, and the tee box settles it*: the source does not say whether 230 is a FORCED carry over something or simply the distance that leaves the best angle. Those are opposite decisions — look before you choose",
+              "Your driver reads *235 and it is an estimate*, on a shaft changed in June. The long end of your ladder has *no measured number in it at all*. 230 is not a carry this app can tell you that you have"
+            ]
+          },
+          {
+            "n": 14,
+            "play": "*Less club, more fairway* — 2-iron or 5-wood",
+            "leaves": "A short one in",
+            "why": [
+              "A *short hole*; the source plays it with a *draw hybrid* (GOLFCT) — meaning it does not need driver",
+              "REASONED: take the 'less than driver' half of that and leave the draw, same as the 12th",
+              "The 5-wood has been *19.5° since Sep 8* and is unmeasured — pick it for the flight, not off a number"
+            ],
+            "club": [
+              "2-iron",
+              "5-wood"
+            ]
+          },
+          {
+            "n": 15,
+            "play": "*Driver.* This is the hole asking for it",
+            "why": [
+              "A *nice flat wide-open par 4* (GOLFCT) — the least punishing tee shot on the card",
+              "If driver goes anywhere today it goes here: flat, wide, and nothing sourced to hit"
+            ],
+            "club": [
+              "driver"
+            ]
+          },
+          {
+            "n": 16,
+            "play": "*Club up twice.* Long is the safe miss here",
+            "avoid": "*Short*. This is the one green where the source explicitly says be long",
+            "why": [
+              "*Elevated green* — 'you want to be long' (GOLFCT)",
+              "This hole answers your standing miss head on: *7 of your 12 recorded green misses are short*, and here short is the one place you must not be",
+              "An elevated green also hides its surface from the fairway. Club for the *middle* and accept the back half"
+            ],
+            "avoidDir": "S",
+            "avoidOn": "green"
+          },
+          {
+            "n": 17,
+            "play": "*Enough club to carry the cattails*, at the middle",
+            "avoid": "*Short* — the cattails are wetland. Short is a penalty, not a chip",
+            "why": [
+              "A *par 3 over tall cattails*, called the prettiest hole on either course (GOLFCT)",
+              "Cattails mean *water/wetland*, so this is a forced carry: pick the club off the front edge, then take one more for the middle",
+              "The par 3s here average *175*. Your 5-iron is 180 and the 6-iron 170 — on a carry, take the 5"
+            ],
+            "club": [
+              "5-iron"
+            ],
+            "avoidDir": "S",
+            "avoidOn": "green"
+          },
+          {
+            "n": 18,
+            "play": "*Your shape fits this one.* Commit to the tee shot",
+            "avoid": "Leaving the approach *short* on an uphill finisher",
+            "why": [
+              "Plays *uphill*, and 'unless you can hit a fade you will have a tough chance to make par' (GOLFCT)",
+              "REASONED, and for once it favours you: your standing miss is a *left-to-right* ball, which is the shape the hole is asking for. This is the one tee shot out here where the slice is an asset",
+              "Uphill into the green means the 4th's rule again — *one more club, middle*"
+            ],
+            "avoidDir": "S",
+            "avoidOn": "green"
+          }
+        ],
+        "sections": [
+          {
+            "t": "What the Black asks of your game",
+            "k": "Enough club into the middle turns this course's doubles into bogeys — that is the whole plan.",
+            "b": "WHAT THE COURSE IS: 6,559 yards, 72.0 rating and 128 slope from the tips — the harder of the two eighteens by both numbers. Robert White, opened 1931. It is hilly, tighter than the Red, and it has recently renovated fairway and greenside bunkers.\n\nWHAT YOUR OWN CARDS SAY: short is 7 of the 12 green misses recorded on your hole-by-hole cards. Your tee misses skew left, 5 of 8. Up-and-down sits at 0 of 12, with 75% of those still coming in at bogey.\n\nPUT THOSE TOGETHER and the Black is a club-selection course for you rather than a driving one. Three of its holes — the 4th, the 16th and the 18th — are explicitly uphill or elevated, and every one of them punishes the miss you already have. On this card the extra club is not a preference, it is the plan.\n\nThe par 3s average 175 yards. That is a 5-iron for you, and there are at least three of them (3, 11, 17). Bogeying all of them is not a bad day; short-siding yourself trying to birdie one is."
+          },
+          {
+            "t": "The holes nobody has written down",
+            "k": "9 and 10 have no source at all — play them off the tee marker, not off this plan.",
+            "b": "THIS PLAN COVERS 16 OF 18 HOLES. Holes 9 and 10 have no researched source of any kind, so there is nothing here for them — a confident line invented for a hole nobody described reads exactly like a researched one, which is the failure worth avoiding.\n\nWHAT IS ALSO MISSING, and worth filling in as you play:\n\nYARDAGES. Only the 5th (330) has a sourced number. Every other yardage on this card comes off the marker on the day.\n\nPAR AND STROKE INDEX. Not on file for either course, so the logger will ask you to set par on each hole the first time round. After this round it prefills.\n\nTHE PAR IS ITSELF DISPUTED: sources give the Black as par 70 and as par 71. Your card tomorrow settles it.\n\nWATER. One listing claims the Black has water in play on 14 holes. That is marketing copy from a tee-time site and no per-hole source supports it, so it is NOT written into the hole notes — but the 17th's cattails are real, so treat water as live and note where you find it."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "Where each fact came from, and which lines are reasoning rather than research.",
+            "b": "RESEARCHED — COURSE FACTS: 6,559 yards, par 70 (some sources 71), rating 72.0, slope 128, Robert White, opened 1931, city of Bridgeport municipal, par 3s averaging 175 yards, renovated fairway and greenside bunkers.\n\nRESEARCHED — PER HOLE: the hole-by-hole shape of 1, 2, 3, 4, 6, 7, 8 and 11 through 18 comes from a single 2014 GOLFCT review of the facility, read through search summaries. The 5th (330, dogleg left, trees left, bunker right, well-protected green, risk/reward, drivable over the corner) comes from head professional Stephen Roach in a Stamford Advocate feature on the region's favourite holes.\n\nATTRIBUTION CHECKED: the back-nine descriptions were returned once under a Red-course query and twice under Black-course ones, including a direct confirmation that the cattails par 3 is the Black's 17th. They are filed under the Black on that basis. If you get out there and the 17th is not a par 3 over water, the whole back nine of this plan is on the wrong course — tell me and it moves.\n\nREASONED, NOT RESEARCHED, and each says so in its own note: the tee-shot shape advice on 1, 12, 14 and 18. Those come from combining a sourced hole SHAPE with your own open over-the-top-slice fault. The source's own advice on 12 and 14 is to draw the ball; this plan deliberately declines it.\n\nFROM YOUR OWN CARDS: the short-miss count (7 of 12), the tee-miss split (5 left of 8), up-and-down 0 of 12, doubles as 50% of strokes lost, and every ladder number quoted.\n\nNOT SOURCED, DELIBERATELY LEFT OUT: an unpinned review line describing a hole with a pond around the 280-yard mark, a raised tee with foliage both sides and four bunkers around an undulating green. No source pins it to a hole number, so it is not attached to one.\n\nCOULD NOT BE READ: the official scorecard. fairchildwheelergolf.com, bluegolf, golflink, golfpass and every other scorecard host were blocked by this session's network egress, so par and stroke index could not be pulled. That is why no scorecard has been put on file for either course."
+          }
+        ]
+      }
+    },
+    {
+      "id": "briefing-fairchildwheeler-red-20260912",
+      "type": "briefing",
+      "briefing": {
+        "course": "Fairchild Wheeler Golf Course — Red",
+        "focus": "The Red is the more open eighteen and the softer card — 71.3/124 against the Black's 72.0/128 — but the difficulty is not spread evenly. Both nines begin and end with steep elevation, so 1, 9, 10 and 18 are the four hard holes and the fourteen between them are flat and genuinely scoreable. Wind and the greens are the only defence in the middle. Take your par on the four and go and score on the rest.",
+        "rules": [
+          "1 · 9 · 10 · 18 are the steep ones — par is a bonus",
+          "2–8 and 11–17 are flat: score there",
+          "Wind is the defence out on the plain",
+          "Greens break more than the ground suggests",
+          "3: 484 par 5 — lay up to a ladder number",
+          "Fairways are wide — take the tee shot on",
+          "Cover the middle, never the flag"
+        ],
+        "holes": [
+          {
+            "n": 1,
+            "play": "*Fairway club.* Get it in play and take your medicine",
+            "avoid": "Opening the round with a *double*",
+            "why": [
+              "One of the four holes carrying a *steep elevation change* — both nines here begin and end with one (Fairfield County Golf)",
+              "GOLFCT is blunter: it calls 1, 9, 10 and 18 the *awful* holes on the Red",
+              "*Unknown*: whether this one plays up or down. Read it on the tee — an elevation change you guess at is a club you guess at"
+            ]
+          },
+          {
+            "n": 3,
+            "yds": 484,
+            "play": "*Lay up to a number off your ladder*",
+            "playAs": "Play",
+            "leaves": "*108 · 95 · 80* — pick one and hit it",
+            "avoid": "Going at it in two just because 484 says you can",
+            "why": [
+              "A *484-yard par 5* — the club professional's favourite hole on the Red (Stephen Roach, Stamford Advocate)",
+              "Reachable on paper, and your second would come off an *unmeasured* club: the 5-wood at 19.5° and the mini driver at 15.5° both carry *no number at all* on your ladder",
+              "Your up-and-down record is *0 of 12*. A missed green from 240 costs more than a wedge from 100 gains"
+            ]
+          },
+          {
+            "n": 9,
+            "play": "*Club off the elevation*, not off the flat number",
+            "avoid": "The *double* to close the nine",
+            "why": [
+              "The second of the four steep holes, closing the front (Fairfield County Golf)",
+              "*Unknown*: up or down, and by how much. Nothing is sourced beyond 'steep'",
+              "You are coming off seven flat holes — the eye recalibrates slowly. Trust the marker over the look"
+            ]
+          },
+          {
+            "n": 10,
+            "play": "*Same as the 1st* — fairway club, get it in play",
+            "avoid": "Treating the turn as a restart and reaching for driver",
+            "why": [
+              "Opens the back with the third of the four steep holes (Fairfield County Golf)",
+              "The scoring holes are 11 through 17. This one only has to not cost you anything"
+            ]
+          },
+          {
+            "n": 18,
+            "play": "*One more club* if it plays uphill. Finish with a par",
+            "avoid": "*Short*, which is your standing green miss anyway",
+            "why": [
+              "The last of the four steep holes (Fairfield County Golf)",
+              "*7 of your 12 recorded green misses are short.* On an elevation change that is the miss that gets worse, not better",
+              "Your closing three average *+0.67 a hole* against +0.89 for everything before them — you finish rounds better than you think. Play this one like the card says you can"
+            ],
+            "avoidDir": "S",
+            "avoidOn": "green"
+          }
+        ],
+        "sections": [
+          {
+            "t": "The shape of the round",
+            "k": "Four hard holes bookend the nines; the fourteen in between are where your score comes from.",
+            "b": "THE STRUCTURE IS THE WHOLE PLAN HERE. Both sets of nine begin and end with steep elevation changes — holes 1, 9, 10 and 18 — while the holes in between are relatively flat and offer real birdie chances. That is the course's own description via Fairfield County Golf, and a separate GOLFCT review agrees from the other direction, calling exactly those four the weakest holes on the Red.\n\nSO PLAY IT AS FOUR AND FOURTEEN. On 1, 9, 10 and 18 the job is to walk off with a par or a bogey and no argument. On 2 through 8 and 11 through 17 the fairways are wide, the ground is flat and the tee shot is available to you.\n\nWIND IS THE VARIABLE. The middle of this course sits on an open, flat plain, so wind is the main defence rather than trees or contour. That cuts both ways for you: it is the one condition that will make an under-clubbed approach look far worse, and short is already your miss.\n\nWHAT THIS COURSE DOES NOT ASK is the thing the Black does — it does not demand you place the ball off the tee. The Red is described as more open and forgiving to a sprayed drive. Given the long end of your ladder is entirely unmeasured, this is the better of the two courses on which to find out what the driver actually does."
+          },
+          {
+            "t": "The greens are the real defence",
+            "k": "Read every putt twice — the Red's greens break more than the flat ground suggests.",
+            "b": "STANDARD PRACTICE, AND THE SOURCE AGREES: the Red's greens are repeatedly described as its teeth — 'tough greens that will make most golfers double and triple check the breaks'. An open, flat, forgiving golf course that defends itself at the hole is a common design, and it is exactly the profile that flatters your ball-striking and then takes it back on the green.\n\nWHAT THAT MEANS FOR YOUR ROUND: distance control is the live putting priority in this app, and this is a course where the first putt matters more than usual. A flat-looking green that breaks is the one that leaves a nasty four-footer.\n\nYOUR GRIP CALL APPLIES HERE UNCHANGED, and it is worth saying because it is new: claw inside about six feet, conventional past it, and when you are unsure, treat it as a lag and putt it conventional. Nothing about this course changes that line.\n\nONE HONESTY NOTE: 'tough greens' is a general review claim, not a measurement, and nobody has told us which way any specific green breaks. Nothing here says a green breaks one way — only that they break more than they look, so read them twice."
+          },
+          {
+            "t": "Notes — the paper trail",
+            "k": "Where each fact came from, and what could not be read.",
+            "b": "RESEARCHED — COURSE FACTS: 6,568 yards, par 72, Robert White, opened 1931. Rating and slope are given as 71.3/124 by GolfLink and 71.0/124 by Fairfield County Golf — the slope agrees, the rating differs by three tenths, and neither has been verified against the card itself.\n\nRESEARCHED — STRUCTURE: 'Both sets of nine on The Red begin and end with steep elevation changes; the holes in between are relatively flat and offer great opportunities to card some birdies. Wind is the main variable as you are atop the flat plain.' (Fairfield County Golf.) A 2014 GOLFCT review independently names 1, 9, 10 and 18 as the course's poor holes, which is the same four.\n\nRESEARCHED — PER HOLE: only the 3rd, a 484-yard par 5, named by head professional Stephen Roach as his favourite on the Red in a Stamford Advocate feature.\n\nTHIS PLAN COVERS 5 OF 18 HOLES ON PURPOSE. No source describes any individual hole on the Red beyond the 3rd and the four elevation holes. Writing notes for the other thirteen would mean inventing them, and a confident tee line built on nothing reads exactly like a researched one. The flat middle is covered by the rules chips and the section above, which is what the evidence actually supports.\n\nFROM YOUR OWN CARDS: short as 7 of 12 recorded green misses, up-and-down 0 of 12, and the closing-three figures (+0.67 a hole against +0.89 before them) from the Mental tab's own read of your hole arrays.\n\nCOULD NOT BE READ: the official scorecard. fairchildwheelergolf.com, bluegolf, golflink, golfpass, mscorecard and every other scorecard host were blocked by this session's network egress, so par and stroke index are not on file. The logger will ask for par on each hole the first time and prefill it thereafter."
+          }
+        ]
+      }
     }
   ]
 }

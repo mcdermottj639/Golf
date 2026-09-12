@@ -99,13 +99,20 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v97';
+const BUILD = 'v98';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v98', d:'2026-09-12', items:[
+    'FAIRCHILD WHEELER is prepped — both eighteens, because you did not know yet which one you were playing. The Black and the Red are two separate standing plans in Round Prep, and both are on your course list with the facility on the map so they sort with everything else by distance.',
+    'THE BLACK is the harder card (72.0/128) and the one with real hole-by-hole research behind it: 16 of 18 holes, including the blind tee shot on the 2nd where you wait for the bell, the pro’s own favourite at the 330-yard 5th, the elevated green on 16 where long is the safe miss, and the par 3 over the cattails at 17. Its par 3s average 175 — your 5-iron.',
+    'THE RED covers 5 holes and says so. Nothing published describes the other thirteen, so rather than invent tee lines the plan gives you the structure that IS sourced: 1, 9, 10 and 18 are steep and the fourteen between them are flat and scoreable. Wind and the greens are the defence.',
+    'Where a plan’s advice fought your own swing it says which is which. Two holes on the Black want a draw; your open fault is an over-the-top slice, so those notes decline the source’s advice and tell you they are doing it. The 18th wants a fade, which is the one hole out there where your miss is an asset.',
+    'FIXED, AND IT WOULD HAVE BITTEN YOU TOMORROW: with two courses at one facility the app matched a plan on the name BEFORE the dash, so both plans matched either round and whichever one landed first won. Driven in a browser before and after: on the old build a round started on the RED was served the Black’s plan on every hole. An exact name now wins outright, and the round card grades a card against the right plan for the same reason. Event suffixes like “Beekman — Scramble” still match a round logged under the plain name, exactly as before.',
+    'No scorecard is on file for either course: every scorecard host was unreachable from here, so par and stroke index could not be sourced. The logger will ask you to set par as you go the first time round and prefill it after that. Sources given for both courses even say the Black is par 70 and par 71 — your card settles it.' ] },
   { b:'v97', d:'2026-09-11', items:[
     'The rest of the Trackman work, built now rather than waiting for data to justify it \u2014 the same reason the ladder and the bay sessions went in before your first session.',
     'SIMULATOR ROUNDS have a home, and a wall around them. A sim card is stored, listed with a SIM badge and opens to a full hole-by-hole round card \u2014 and it is counted in NOTHING: not your handicap, not the Today tiles, not Coach\u2019s four areas, not your PR or your record at a course. The USGA does not accept a simulator score, and a Trackman round of Pebble knows the real rating and slope, so the block is absolute rather than something that depends on a missing number.',
@@ -2720,7 +2727,9 @@ function courseShape(b){
   if(dirs && dirs[1] >= 3) plays.push(`*${dirs[0]}* is the warning on ${dirs[1]} holes — the miss this course punishes`);
   // HIS OWN CARDS. Par mix comes off a card rather than the plan, since a briefing's
   // holes carry yardages but never pars.
-  const rds = S.rounds.filter(r => courseMatches(r.course, b.course) && (r.holes || []).length);
+  const rds = preferExact(
+    S.rounds.filter(r => courseMatches(r.course, b.course) && (r.holes || []).length),
+    b.course, r => r.course);
   const full = rds.find(r => r.holes.length >= 18) || rds[0];
   if(full){
     const hs = full.holes.filter(h => h && h.par != null);
@@ -6238,6 +6247,20 @@ function courseMatches(a, b){
   const base = s => (s || '').trim().toLowerCase().replace(/\s+[—–]\s+.*$/, '');
   return (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase() || base(a) === base(b);
 }
+// TWO COURSES AT ONE FACILITY, AND WHY TOLERANCE IS NOT ENOUGH (Sep 12 2026).
+// courseMatches() strips an em-dash suffix on BOTH sides, which is exactly right for an
+// EVENT suffix — "Beekman Golf Course — Scramble" is a plan for a round logged as plain
+// "Beekman Golf Course" — and exactly wrong at Fairchild Wheeler, where "— Black" and
+// "— Red" are two different eighteens that happen to share a facility name. Left alone it
+// hands the logger whichever plan applied first, so he can stand on the Black reading the
+// Red's tee calls, and the course picker collapses the two into one row under the wrong
+// name. So wherever a match PICKS ONE THING TO SHOW HIM, an exact name wins outright and
+// the tolerant set is only the fallback. Narrowing, never widening: with no exact hit
+// every one of these behaves exactly as it did before.
+function preferExact(list, name, of){
+  const exact = list.filter(x => sameCourse(of ? of(x) : x, name));
+  return exact.length ? exact : list;
+}
 // ----- How far away a course is -----
 // Course locations arrive by feed (`geo` entries), same as scorecards do, and for the same
 // reason: a coordinate is a researched fact about the world, so it carries where it came
@@ -6275,8 +6298,11 @@ function courseMilesLab(name){
 function liveBriefing(L){
   const all = S.briefings.filter(b => b.course && courseMatches(b.course, L.course));
   if(!all.length) return null;
-  const dated = all.filter(b => b.date).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-  return dated.find(b => b.date === L.date) || dated[0] || all.find(b => !b.date) || null;
+  // The Black's plan for a round on the Black. planHeld() grades a card through here too,
+  // so the exact-name rule keeps a round from being marked against the other course's plan.
+  const pool = preferExact(all, L.course, b => b.course);
+  const dated = pool.filter(b => b.date).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  return dated.find(b => b.date === L.date) || dated[0] || pool.find(b => !b.date) || null;
 }
 // A hole note is a DECISION plus its reasons: `play` is the one line to act on, `why[]`
 // the bullets under it. Prose `note` still renders, so older plans don't break.
@@ -6541,9 +6567,12 @@ function liveCard(L){
 // already on record wherever there is one, and to the plain name otherwise.
 function planPlayName(b){
   const raw = (b.course || '').trim();
-  const known = [...S.courses.map(c => c.name), ...S.rounds.map(r => r.course)]
-    .find(n => n && courseMatches(raw, n));
-  return known || raw.replace(/\s+[—–]\s+.*$/, '');
+  const known = [...S.courses.map(c => c.name), ...S.rounds.map(r => r.course)].filter(Boolean);
+  // Its own spelling first, so the Black plan fills the box with the Black. Only then the
+  // tolerant hit, which is what carries an event suffix back to the plain course name.
+  return known.find(n => sameCourse(n, raw))
+      || known.find(n => courseMatches(raw, n))
+      || raw.replace(/\s+[—–]\s+.*$/, '');
 }
 // Two groups, in the order a tee box asks for them: what has a plan, then every other
 // course on his list. The second group is what stops the list dead-ending — a course with
