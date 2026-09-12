@@ -1126,6 +1126,43 @@ body.lvfocus .hero .tag{display:none}
 body.lvfocus .hero::after{content:'';display:block;clear:both}
 body.lvfocus .themebtn{width:32px;height:32px;font-size:15px;margin-top:0}
 
+/* ---- The finish screen's save bar (Sep 12 2026) ----
+   Finishing a round and SAVING one are two acts, and the review screen made them look like
+   one: the Save button was the last thing in the form, under the tee chips, the rating
+   fields, the differential line, the trouble chips and the notes box — about a screen and
+   a half down a 390px phone. So a round tapped in over four hours sat unsaved in the draft
+   while every number in the app still read two rounds, and the only clue was the tab bar
+   saying RESUME. Now it is pinned above the nav for the whole of the review.
+
+   STICKY, NEVER FIXED. Sticky keeps the bar in the flow, so it settles above the explainer
+   card at the end of the page instead of hovering over it, and nothing needs a matching
+   scroll padding to stay reachable. The offset is the nav's own clearance — the same
+   `84px + inset` body already reserves for it — and night mode's nav floats 10px off the
+   bottom edge with half the inset, so it gets its own figure. Measured at 320/375/390 in
+   both themes with the notch insets simulated. */
+.lvsave{position:sticky;bottom:calc(84px + env(safe-area-inset-bottom));z-index:20;
+  margin:12px -16px 0;padding:9px 16px 11px;background:var(--paper);
+  border-top:1px solid var(--line)}
+.lvsave p{margin:0 0 7px;font-family:var(--sans);font-size:11px;line-height:1.35;color:var(--faint)}
+.lvsave p b{color:var(--ink)}
+/* Full width and 46px tall: this is the one action on the screen, and every chip it sits
+   under already clears the 44px tap floor. */
+.lvsave .btn{display:block;width:100%;min-height:46px;font-size:13px}
+/* A pinned bar covers what scrolls under it, and what it can reach is the tail of the form
+   — the notes box sits 26px behind it at the scroll position where the card ends. Nothing
+   is unreachable: the explainer card below keeps scrolling, and at the end of the page the
+   bar settles into the flow with the notes box 36px clear of it (measured at 320/375/390).
+   scroll-margin-bottom on those fields was tried and does NOT help — the browser only
+   honours it when focus actually triggers a scroll, and a partly-visible field triggers
+   none. The keyboard case is not this case either: on iOS a sticky bottom offset is
+   measured against the layout viewport, which the keyboard does not shrink, so the bar
+   goes behind the keyboard rather than over the field being typed into. */
+/* Night's nav floats 10px off the bottom edge and takes HALF the inset, so it needs its
+   own figure rather than the light one plus a guess. */
+body.night .lvsave{bottom:calc(94px + env(safe-area-inset-bottom)/2);
+  background:rgba(9,14,11,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-top-color:rgba(255,255,255,.09)}
+
 /* ---- The card check (Aug 20 2026): eighteen pars and a total, before the first tee.
    The total is the error detector — a course that should be 71 reading 72 is one glance,
    and nothing downstream can catch a wrong par once the round is logged against it. ---- */

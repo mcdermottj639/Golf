@@ -700,12 +700,53 @@ screen Jack was on. Verified at 320/375/390 across the 13 mini, 13/14 and 15 Pro
 **Full card mode does NOT fit and is not meant to**: it is a full-height form, ~690px past
 the fold, and no padding trim reaches that. If Next ever has to be reachable there too, that
 is a sticky footer and a different decision — do not try to win it back in padding.
+(The FINISH screen took that decision on Sep 12 2026 and the offsets it measured are
+in *Finishing is not saving* below — but that screen is a form you scroll, not a
+screen that has to fit, so it settles nothing about this one.)
 
 **The pre-existing bug this turned up**: `.lvgrid` used plain `1fr` tracks, which floor at
 the chip's min-content width, so a wide club abbreviation in a 5- or 6-up row pushed the last
 chip past the viewport and scrolled the whole page sideways at 320px. Now `minmax(0,1fr)`.
 It was on `main` before any of this — found only because `documentElement.scrollWidth >
 innerWidth` is on the standing check list, which is exactly why that check is on the list.
+
+### Finishing is not saving (Sep 12 2026)
+
+The review screen is reached by `Finish`, and it looks like the end of the round — so it
+reads as one. It isn't: the round stays in `S.live` until `live-save` pushes it onto
+`S.rounds`, and that button used to be the LAST thing in the form card, under the tee
+chips, the rating fields, the differential line, the trouble chips and the notes box. About
+a screen and a half down a 390px phone. Jack finished eighteen, reviewed them, and left the
+card unsaved while Coach still read *2 live rounds* — which is how the bug was reported,
+because nothing on any other page says a draft is open.
+
+**The save is a sticky bar now (`.lvsave`), pinned above the nav for the whole review.**
+Three things about it worth keeping:
+
+- **Sticky, never fixed.** It stays in the flow, so at the end of the page it settles above
+  the explainer card instead of floating over it, and no view needs a matching scroll
+  padding to keep its last card reachable. The bottom offset is the nav's own clearance —
+  `84px + inset`, the same figure `body` already reserves — and **night mode needs its own**,
+  because that nav floats 10px off the bottom edge and spends only HALF the inset
+  (`94px + inset/2`). 8px clear of the tab bar in both themes at 320 · 375 · 390.
+- **The caption is the fix, not the pinning.** *"18 holes logged — not saved until you tap
+  this"* is the sentence that was missing; a button he can see but reads as optional would
+  have failed the same way.
+- **A pinned bar covers the tail of the form, and that is the cost.** The notes box sits
+  26px behind it at one scroll position, clear by 36px at the end of the page — nothing is
+  unreachable. `scroll-margin-bottom` on those fields does NOT fix the 26px and was taken
+  back out: a browser only honours it when focus actually triggers a scroll, and a
+  partly-visible field triggers none. **A rule that cannot fire is worse than no rule** —
+  it reads to the next person as a solved problem. The iOS keyboard is not this case
+  either: a sticky bottom offset is measured against the layout viewport, which the
+  keyboard does not shrink, so the bar goes behind the keyboard rather than over the field.
+
+**And the diagnosis is worth more than the fix, because this will be reported again as "the
+app lost my round".** It never has. Two things say so without touching the phone: the middle
+nav tab reads **RESUME** rather than TEE, which `render()` only does while `S.live` exists,
+and `coachSince()` names his last round off EVERY card in `S.rounds`, hole array or not — so
+a saved round always appears there. Read those two before touching any counting code; the
+count was right both times.
 
 ### A note on any hole (Aug 19 2026)
 

@@ -99,13 +99,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v98';
+const BUILD = 'v99';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v99', d:'2026-09-12', items:[
+    'FINISHING A ROUND AND SAVING ONE ARE TWO TAPS, AND THE SECOND ONE was hiding. On the review screen the Save button was the last thing in the form — under the tee chips, the rating fields, the differential line, the trouble chips and the notes box, about a screen and a half down. So a round could be tapped in over four hours, reviewed, and left sitting unsaved in the draft while every number in the app still read two rounds. That happened today.',
+    'The save is now pinned above the tab bar for the whole of the review screen, with the hole count and a line saying nothing reaches your record until you tap it. It settles back into the page at the bottom rather than floating over the last card. Measured in both themes at 320, 375 and 390 with the notch simulated: 8px clear of the tab bar every time, and the button is 46px tall.',
+    'The tell, if it ever happens again: the middle tab reads RESUME instead of TEE. That only ever means a round is still open in the draft — nothing is lost, tap it and finish saving. Your round is still there.' ] },
   { b:'v98', d:'2026-09-12', items:[
     'FAIRCHILD WHEELER is prepped — both eighteens, because you did not know yet which one you were playing. The Black and the Red are two separate standing plans in Round Prep, and both are on your course list with the facility on the map so they sort with everything else by distance.',
     'THE BLACK is the harder card (72.0/128) and the one with real hole-by-hole research behind it: 16 of 18 holes, including the blind tee shot on the 2nd where you wait for the bell, the pro’s own favourite at the 330-yard 5th, the elevated green on 16 where long is the safe miss, and the par 3 over the cattails at 17. Its par 3s average 175 — your 5-iron.',
@@ -7051,7 +7055,16 @@ function liveFinish(L){
     </div>
     <label>Anything else</label>
     <textarea id="lvNote" rows="2" placeholder='"Wind got me on the back nine…"'>${esc(L.note || '')}</textarea>
-    <div style="margin-top:12px"><button class="btn" data-action="live-save">Save round → see the breakdown</button></div>
+  </div>
+
+  <!-- The save, pinned. It used to be the last thing in the form card above, under the tee
+       chips, the rating fields, the differential line, the trouble chips and the notes box
+       — about a screen and a half down a 390px phone, which is how a round can be
+       finished and never saved. Sticky, not fixed: it stays in the flow, so at the bottom
+       of the page it settles above the explainer rather than covering it. -->
+  <div class="lvsave">
+    <p><b>${r.holes.length} hole${r.holes.length === 1 ? '' : 's'} logged</b> — not saved until you tap this.</p>
+    <button class="btn" data-action="live-save">Save round → see the breakdown</button>
   </div>
 
   <div class="card flat">
