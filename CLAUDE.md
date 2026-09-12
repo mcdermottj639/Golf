@@ -878,6 +878,45 @@ Consequence for writing plans: a hole note with no `club` and no `avoidDir` is u
 forever. Fill them in wherever the call genuinely names one — and leave them off where it
 doesn't, because a padded field is a false record, not a fuller one.
 
+### His own club call on a plan's hole (Sep 12 2026)
+
+Jack: *"allow me to go in and alter a round prep plan within the app if I like different
+clubs for different spots."* The picker is the easy half. **The hard half is that a plan is
+FED, and the feed re-sends a plan WHOLE under a new id every time a word of it changes** —
+so an edit written into the briefing object would be wiped by the next push of that plan,
+silently, which is the one outcome that makes the feature not worth having.
+
+- **`S.planCalls` is keyed by the plan's `course`**, not by its feed id. That key is chosen
+  rather than convenient: `applyFeed()` dedupes an undated briefing on `course` ALONE, so it
+  is already a plan's primary key — an override filed under it survives every re-send and
+  lands on whichever version is live. **Verified by simulating the next push** (same plan,
+  new id, new focus) and confirming the call held; do that check again if this store ever
+  moves, because nothing else in the app would report the loss.
+- **`briefHole()` is the ONE merge point**, which is what stops the tee and the plan page
+  from disagreeing: the live logger, the plan's own hole table and `planHeld()` all read a
+  hole through it. `holeRows()` is the matching rule for rendering, so neither screen can
+  drift from the other on how a call is labelled.
+- **It overrides the CLUB and never the plan's words.** `play` still renders, relabelled
+  `Plan` and dropped to the quiet `.was` row under his call — the carry ladder's rule
+  (*"yours 230 · the bay says 241"*), because a plan whose reasoning has been deleted is one
+  he cannot re-argue on the next trip round.
+- **The collapsed prep card has to lead with HIS call.** Shut is not empty (see *The hole's
+  prep collapses*), and the line it keeps is the one to act on — so once he has overruled a
+  hole, the default state on arrival must say his club, not the one he rejected.
+- **A call reaches the tee on a hole the plan never described.** Those are the holes he is
+  most likely to have his own view about, so an override with no plan hole behind it
+  synthesises a note rather than falling through `briefHole()`'s "did the plan say anything"
+  guard.
+- **`planHeld()` then grades against HIS call, which is right and has to be said out loud.**
+  That is the call he carried to the tee, so the took-the-call rate should measure it — but
+  the moment the page still calls it the plan's, the number is laundering his own pick into
+  the plan's record. The bullet names how many of the counted holes were his.
+- **Selecting a club is a GREEN chip, not burgundy.** The first cut used `.chip.on`, which is
+  burgundy — the app's colour for a thing that costs strokes (see the live logger's rule: the
+  colour is a property of the ANSWER). Picking a club costs nothing.
+- `planPick` is a module variable like `drillTag`, cleared by navigating off the plan: an
+  open picker is a question asked once and nothing about it belongs in the record.
+
 ### Hole data outranks a stats snapshot
 
 An extension of *film is king* to the numbers: a hole Jack recorded himself is **measured**,

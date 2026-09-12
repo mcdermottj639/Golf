@@ -99,13 +99,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v101';
+const BUILD = 'v102';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v102', d:'2026-09-12', items:[
+    'YOU CAN SET YOUR OWN CLUB ON ANY HOLE OF A PLAN. Open a course plan in Round Prep, tap \u201c＋ Your club\u201d on a hole, pick one or two off your ladder. It shows as YOUR CALL above the plan\u2019s line \u2014 which stays on the page, because a call you cannot see the reasoning for is one you cannot argue with next time round.',
+    'It reaches the tee. On that hole in the live logger the collapsed prep card leads with your club rather than the plan\u2019s, and the round card afterwards marks the holes where the call it graded was yours rather than researched. \u201cUse the plan\u201d puts it back.',
+    'THE PART THAT MATTERS: your pick survives the next update to that plan. Plans get re-sent whole every time a word of one changes, so an edit stored inside the plan would be wiped silently \u2014 yours is filed against the course instead. Tested by re-pushing the Fairchild Red plan under a new version after setting a club: the call held.',
+    'You can also set a club on a hole the plan says nothing about \u2014 those are the holes you are most likely to have your own view on, and it still reaches you on the tee.' ] },
   { b:'v101', d:'2026-09-12', items:[
     'HOW THE PLAN HELD UP IS READABLE NOW. You said the finished column was not easy to scan, and it wasn\u2019t \u2014 it was two lines of prose squeezed into a narrow column, so \u201cno play at it\u201d and \u201c\u2190 warned\u201d wrapped to three and four lines and you had to read every cell to find the bad holes.',
     'ONE LINE PER SHOT, because the club and what that club did are one fact: TEE with the club you hit and where the ball finished, GRN with the club in and whether you found the green. A green rail down the left where the shot cost nothing, burgundy where it did \u2014 so you can see a hole\u2019s story without reading a word.',
@@ -596,6 +601,7 @@ function migrate(s){
   if(!s.bays) s.bays = [];           // launch-monitor sessions — see bayLog()
   if(!s.combines) s.combines = [];   // Trackman Combine scores — see combineCard()
   if(s.live === undefined) s.live = null;   // a round being logged hole-by-hole
+  if(!s.planCalls) s.planCalls = {};         // his own club call on a plan's hole — see planCall()
   if(!s.updates) s.updates = [];            // the What's new log — see recordUpdate()
   if(s.updatesInit === undefined) s.updatesInit = false;
   if(s.settings.seenBuild === undefined) s.settings.seenBuild = null;
@@ -1139,9 +1145,14 @@ function rounds(seg){
 // still quietly on next week would make the bench lie about what is due. It survives a
 // rerender (a chip tap) and is cleared by navigating anywhere else.
 let drillTag = null;
+// Which hole's club picker is open on a plan. Same rule as drillTag and for the same
+// reason: it is a question asked once, so it survives a chip tap (a rerender) and dies the
+// moment he navigates anywhere else. Nothing about an open picker belongs in the record.
+let planPick = null;
 function render(view, arg, keepScroll){
   closeCheat();  // the cheat sheet overlay lives on <body>, so navigation must clear it
   if(view !== 'drills') drillTag = null;
+  if(view !== 'briefing') planPick = null;
   // Scores / Round Prep / Courses are segments of Rounds now. Resolving the old names
   // here rather than at every call site is the whole reason nothing dead-ended when the
   // nav changed shape: a link written a month ago still lands where it always meant to.
@@ -4062,22 +4073,48 @@ function briefing(id){
     <h2>The routine</h2>
     <ol class="steps">${b.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
   </div>` : ''}
-  ${(b.holes || []).length ? `<div class="card">
+  ${(() => {
+    // HOLE BY HOLE, AND EDITABLE (Sep 12 2026). Every row reads through briefHole(), which
+    // is where his own club call is merged in — so this table and the tee are the same
+    // sentence by construction rather than by two renderers agreeing.
+    const HN = planHoleNums(b);
+    const listed = HN.all.filter(n => briefHole(b, n) || (b.holes || []).some(h => h && h.n === n && (h.play || h.note || (h.why || []).length)));
+    if(!(b.holes || []).length && !HN.mine.length) return '';
+    const spare = HN.all.filter(n => !listed.includes(n));
+    const row = n => {
+      const hn = briefHole(b, n) || (b.holes || []).find(h => h && h.n === n) || { n };
+      const rows = holeRows(hn), mine = myCall(hn), open = planPick === n;
+      return `<tr><td><b>${n}</b>${hn.yds ? `<br><span class="sm faint">${hn.yds}y</span>` : ''}</td>
+        <td class="sm">
+        ${rows.length ? `<dl class="hi-grid">${rows.map(([k, v, cls]) =>
+          `<dt>${esc(k)}</dt><dd class="${cls}">${v}</dd>`).join('')}</dl>` : ''}
+        ${hn.note ? emph(hn.note) : ''}
+        ${(hn.why || []).length ? `<ul class="hi-why">${hn.why.map(w => `<li>${emph(w)}</li>`).join('')}</ul>` : ''}
+        <div class="callbar">
+          <button class="minibtn${mine ? ' on' : ''}" data-action="plan-pick" data-n="${n}">${
+            mine ? 'Your club ▾' : '＋ Your club'}</button>
+          ${mine ? `<button class="minibtn" data-action="plan-call-clear" data-n="${n}">Use the plan</button>` : ''}
+        </div>
+        ${open ? `<div class="chips callpick">${bagClubs().map(c =>
+            `<span class="chip${(hn.club || []).includes(c.key) && hn.yours ? ' grn' : ''}"
+               data-action="plan-call" data-n="${n}" data-k="${esc(c.key)}">${esc(c.name)}</span>`).join('')}
+          </div>
+          <p class="sm faint" style="margin-top:4px">Tap one or two — a call can name a choice. It reaches you on this hole while you log the round, and the plan's own line stays underneath it.</p>` : ''}
+        </td></tr>`;
+    };
+    return `<div class="card">
     <h2>Hole by hole</h2>
     <table><tr><th>Hole</th><th>The play</th></tr>
-      ${b.holes.filter(h => h && h.n && (h.play || h.note || (h.why || []).length)).map(h =>
-        `<tr><td><b>${h.n}</b>${h.yds ? `<br><span class="sm faint">${h.yds}y</span>` : ''}</td>
-        <td class="sm">${(() => {
-          const rows = [[h.playAs || 'Tee', h.play], ['Leaves', h.leaves],
-                        ['Green', h.green], ['Avoid', h.avoid]].filter(r => r[1]);
-          return rows.length ? `<dl class="hi-grid">${rows.map(([k, v], i) =>
-            `<dt>${esc(k)}</dt><dd class="${k === 'Avoid' ? 'hot' : i === 0 && h.play ? 'lead' : ''}">${emph(v)}</dd>`).join('')}</dl>` : '';
-        })()}
-        ${h.note ? emph(h.note) : ''}
-        ${(h.why || []).length ? `<ul class="hi-why">${h.why.map(w => `<li>${emph(w)}</li>`).join('')}</ul>` : ''}</td></tr>`).join('')}
+      ${listed.map(row).join('')}
+      ${planPick && !listed.includes(planPick) ? row(planPick) : ''}
     </table>
-    <p class="sm faint" style="margin-top:8px">Each of these surfaces on its own hole while you're logging a live round — that's the point of writing them.</p>
-  </div>` : ''}
+    ${spare.length ? `<div class="chips" style="margin-top:8px">
+      <span class="sm faint" style="align-self:center;margin-right:4px">Your club on another hole:</span>
+      ${spare.filter(n => n !== planPick).map(n =>
+        `<span class="chip" data-action="plan-pick" data-n="${n}">${n}</span>`).join('')}</div>` : ''}
+    <p class="sm faint" style="margin-top:8px">Each of these surfaces on its own hole while you're logging a live round — that's the point of writing them. <b>Your club overrules the plan's</b> on the tee and on the round card afterwards; the plan's own call stays on the page underneath it, and a later update to this plan will not wipe your pick.</p>
+  </div>`;
+  })()}
   ${(b.sections || []).length ? `<div class="card">
     <div class="secthead">
       <h2>The detail</h2>
@@ -5484,7 +5521,12 @@ function planHeld(r){
   if(!rows.length) return null;
   const took = rows.filter(x => x.onPlan !== null), warn = rows.filter(x => x.warned);
   const onN = took.filter(x => x.onPlan).length;
-  const sum = { n:rows.length, took:took.length, onN,
+  // WHOSE CALL THE RATE IS ABOUT. Once he has overruled a hole, `briefHole()` hands back
+  // HIS club, so the took-the-call rate is measured against his own pick — which is right,
+  // because that is the call he carried to the tee. It stops being right the moment the
+  // page still calls it the plan's, so the number says how many were his.
+  const sum = { mine: took.filter(x => x.hn.yours).length,
+    n:rows.length, took:took.length, onN,
     onOver: took.filter(x => x.onPlan).reduce((a, x) => a + x.d, 0),
     offOver: took.filter(x => !x.onPlan).reduce((a, x) => a + x.d, 0),
     warn:warn.length, warnHit: warn.filter(x => x.hit).length,
@@ -6083,15 +6125,17 @@ function roundView(i){
         : `The <b>${esc(P.plan.course || 'course')}</b> plan was written on ${fmtDate(P.written)}, <b>after this round</b> — so this card is among what it was built ON, not a test of it. It becomes a test the next time you play here.`
       : `The <b>${esc(P.plan.course || 'course')}</b> plan${P.written ? ` (written ${fmtDate(P.written)})` : ''} covered <b>${P.sum.n}</b> of these holes${P.sum.n ? `, and they played ${P.sum.over > 0 ? '+' : ''}${P.sum.over}` : ''}.`}</p>
     ${P.sum.took || P.sum.warn ? `<ul class="hi-why" style="margin-top:6px">
-      ${P.sum.took ? `<li><b>You took the call on ${P.sum.onN} of ${P.sum.took}</b> holes where the plan named a club${
-        P.sum.onN && P.sum.took - P.sum.onN ? ` — those played ${P.sum.onOver > 0 ? '+' : ''}${(P.sum.onOver / P.sum.onN).toFixed(2)} a hole against ${P.sum.offOver > 0 ? '+' : ''}${(P.sum.offOver / (P.sum.took - P.sum.onN)).toFixed(2)} on the ones you didn't` : ''}.</li>` : ''}
+      ${P.sum.took ? `<li><b>You took the call on ${P.sum.onN} of ${P.sum.took}</b> holes where a club was named${
+        P.sum.mine ? ` — <b>${P.sum.mine}</b> of them your own club, set on the plan rather than researched into it` : ''}${
+        P.sum.onN && P.sum.took - P.sum.onN ? `. Those played ${P.sum.onOver > 0 ? '+' : ''}${(P.sum.onOver / P.sum.onN).toFixed(2)} a hole against ${P.sum.offOver > 0 ? '+' : ''}${(P.sum.offOver / (P.sum.took - P.sum.onN)).toFixed(2)} on the ones you didn't` : ''}.</li>` : ''}
       ${P.sum.warn ? `<li><b>The warned miss happened on ${P.sum.warnHit} of ${P.sum.warn}</b> holes where the plan named a direction to avoid.</li>` : ''}
     </ul>` : ''}
     <table class="scard" style="margin-top:8px">
       <tr><th>Hole</th><th>The plan, then what happened</th><th>Score</th></tr>
       ${P.rows.map(x => `<tr>
         <td><b>${x.h.n}</b></td>
-        <td class="sm pv-said">${emph(x.call)}${x.hn.avoid ? `<br><span class="faint">Avoid: ${emph(x.hn.avoid)}</span>` : ''}
+        <td class="sm pv-said">${myCall(x.hn) ? `<b class="pv-mine">Your call: ${esc(myCall(x.hn))}</b><br>` : ''}${
+          emph(x.call)}${x.hn.avoid ? `<br><span class="faint">Avoid: ${emph(x.hn.avoid)}</span>` : ''}
         ${(() => {
           // ONE ROW PER SHOT (Sep 12 2026 — Jack: the finished column was not scannable).
           // The club and where that club's ball finished are one fact and now sit on one
@@ -6354,11 +6398,95 @@ function liveBriefing(L){
   const dated = pool.filter(b => b.date).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   return dated.find(b => b.date === L.date) || dated[0] || pool.find(b => !b.date) || null;
 }
+// ---- HIS OWN CLUB CALL ON A HOLE (Sep 12 2026) ----
+// Jack: "allow me to go in and alter a round prep plan within the app if I like different
+// clubs for different spots." The picker is the easy half. The hard half is that a plan is
+// FED, and the feed re-sends a plan WHOLE under a new id every time a word of it changes —
+// so an edit written into the briefing object would be wiped by the next push of that same
+// plan, silently, which is the one outcome that would make the feature not worth having.
+//
+// So an override lives in `S.planCalls`, keyed by the plan's `course`. That key is chosen
+// rather than convenient: `applyFeed()` dedupes an undated briefing on `course` ALONE, so
+// it is already a plan's primary key — an override filed under it survives every re-send
+// and lands on whatever version of the plan is live.
+//
+// IT OVERRIDES THE CLUB AND NEVER THE PLAN'S WORDS. `play` still renders, marked as the
+// plan's, underneath his call — the carry ladder's rule ("yours 230 · the bay says 241"),
+// because a plan whose reasoning has been deleted cannot be argued with next time.
+const planKey = b => String((b && b.course) || '').trim().toLowerCase();
+function planCall(b, n){
+  const m = S.planCalls && S.planCalls[planKey(b)];
+  const c = m && m[n];
+  return c && Array.isArray(c.club) && c.club.length ? c : null;
+}
+// Toggling the last club off clears the hole, and an empty course drops out entirely, so
+// "I changed my mind back" leaves no trace to confuse the next reader.
+function setPlanCall(b, n, key){
+  const k = planKey(b); if(!k || !key) return;
+  S.planCalls = S.planCalls || {};
+  const m = S.planCalls[k] = S.planCalls[k] || {};
+  const cur = (m[n] && m[n].club) || [];
+  const club = cur.includes(key) ? cur.filter(x => x !== key) : cur.concat([key]);
+  if(club.length) m[n] = { club, ts: isoDay(new Date()) };
+  else delete m[n];
+  if(!Object.keys(m).length) delete S.planCalls[k];
+  save();
+}
+function clearPlanCall(b, n){
+  const k = planKey(b), m = S.planCalls && S.planCalls[k];
+  if(!m) return;
+  delete m[n];
+  if(!Object.keys(m).length) delete S.planCalls[k];
+  save();
+}
 // A hole note is a DECISION plus its reasons: `play` is the one line to act on, `why[]`
 // the bullets under it. Prose `note` still renders, so older plans don't break.
+//
+// This is the ONE place his call is merged in, which is what stops the tee and the plan
+// page from ever disagreeing: the live logger, the plan's own hole table and planHeld()
+// all read the hole through here.
 function briefHole(b, n){
   const h = b && Array.isArray(b.holes) ? b.holes.find(x => x && x.n === n) : null;
+  const mine = planCall(b, n);
+  // HIS CALL REACHES THE TEE EVEN WHERE THE PLAN SAID NOTHING. A hole the research could
+  // not describe is exactly the one he is most likely to have his own view about, so an
+  // override with no plan hole behind it still produces a note rather than falling through
+  // the "did the plan say anything" guard below.
+  if(mine) return { ...(h || { n }), club: mine.club, yours: true, since: mine.ts,
+    planClub: h ? h.club : null };
   return h && (h.play || h.note || (h.why || []).length) ? h : null;
+}
+// The one phrasing of his call, so the plan page and the tee read identically.
+const myCall = hn => hn && hn.yours && (hn.club || []).length
+  ? hn.club.map(k => clubName(k)).join(' or ') : null;
+// The labelled rows of a hole, built ONCE for both screens. Values come back as HTML
+// because the two sources are not the same kind of text: the plan's prose goes through
+// emph(), whose asterisks are markup its author wrote, and his club goes through esc(),
+// because a club name is data and must never be able to carry markup.
+//
+// When he has overruled the call, the plan's line does not disappear — it drops to a quiet
+// row labelled `Plan`. A call whose reasoning has been deleted is one he cannot re-argue
+// on the next trip round, which is the whole value of having written the plan down.
+function holeRows(hn){
+  if(!hn) return [];
+  const rows = [], mine = myCall(hn);
+  if(mine) rows.push(['Your call', esc(mine), 'mine']);
+  if(hn.play) rows.push([mine ? 'Plan' : (hn.playAs || 'Tee'), emph(hn.play), mine ? 'was' : 'lead']);
+  if(hn.leaves) rows.push(['Leaves', emph(hn.leaves), '']);
+  if(hn.green) rows.push(['Green', emph(hn.green), '']);
+  if(hn.avoid) rows.push(['Avoid', emph(hn.avoid), 'hot']);
+  return rows;
+}
+// Every hole the plan's own table should list: the ones it describes, plus any he has put
+// a call on. The count comes off the course's card where one is on file, so a nine-hole
+// plan is not offered eighteen holes to edit.
+function planHoleNums(b){
+  const pub = publishedCard(b.course, null);
+  const described = (b.holes || []).filter(h => h && h.n).map(h => h.n);
+  const mine = Object.keys((S.planCalls || {})[planKey(b)] || {}).map(Number);
+  const max = Math.max(18, ...described, ...mine, 0);
+  const n = pub && Array.isArray(pub.par) && pub.par.length ? pub.par.length : max;
+  return { all: Array.from({ length: n }, (_, i) => i + 1), described, mine };
 }
 // Emphasis inside a note: *like this*. Applied AFTER escaping, so nothing in the source
 // can inject markup — only the asterisk pairs the author actually wrote become tags.
@@ -6931,7 +7059,12 @@ function livePlay(L){
     // Per hole, and deliberately not sticky — the next hole has its own plan.
     // `intelOpen` is UI state on S.live and never reaches the saved card.
     const shut = !h.intelOpen;
-    const gist = hn && hn.play ? emph(hn.play) : (hn && hn.note ? emph(hn.note) : line);
+    // Shut is not empty: the header keeps the one line to act on — and once he has set his
+    // own club, THAT is the line to act on, not the plan's. Getting this wrong would leave
+    // the collapsed card (the default state on arrival at a hole) still telling him to hit
+    // the club he overruled.
+    const gist = myCall(hn) ? `<b>${esc(myCall(hn))}</b> <span class="faint">· your call</span>`
+      : hn && hn.play ? emph(hn.play) : (hn && hn.note ? emph(hn.note) : line);
     return `<div class="card flat holeintel${shut ? ' shut' : ''}">
       <div class="lvlab hi-head" data-action="live-intel">${head.join(' · ')}
         <b class="hi-tog">${shut ? '▸' : '▾'}</b></div>
@@ -6943,12 +7076,10 @@ function livePlay(L){
         // which is exactly what a four-slot template gets right and a paragraph doesn't.
         // The decision is the first row rather than a headline: same grid, read first.
         if(!hn) return '';
-        const rows = [[hn.playAs || 'Tee', hn.play], ['Leaves', hn.leaves],
-                      ['Green', hn.green], ['Avoid', hn.avoid]].filter(r => r[1]);
+        const rows = holeRows(hn);
         if(!rows.length && !rec) return '';
         return `<dl class="hi-grid">
-          ${rows.map(([k, v], i) => `<dt>${esc(k)}</dt><dd class="${
-            k === 'Avoid' ? 'hot' : i === 0 && hn.play ? 'lead' : ''}">${emph(v)}</dd>`).join('')}
+          ${rows.map(([k, v, cls]) => `<dt>${esc(k)}</dt><dd class="${cls}">${v}</dd>`).join('')}
           ${rec ? `${rows.length ? '<div class="hi-sep"></div>' : ''}
             <dt class="was">Last</dt><dd class="was">${line}${
             eating ? ' — <b class="hot">play it as a bogey hole</b>' : ''}</dd>
@@ -7547,6 +7678,31 @@ const ACTIONS = {
     bumpGearCounters();
     save(); rerender(); toast('Round saved — Coach updated');
   },
+  // ---- His own club on a plan's hole ----
+  // The plan being edited is the one on screen: `current.arg` is the briefing id, so there
+  // is no way for a stale id to write onto the wrong plan. Every one of these is a
+  // rerender() rather than a render() — he has not gone anywhere, and the scroll position
+  // on a long plan is the difference between editing a hole and losing your place.
+  'plan-pick': el => {
+    const n = +el.dataset.n;
+    planPick = planPick === n ? null : n;
+    rerender();
+  },
+  'plan-call': el => {
+    const b = S.briefings.find(x => x.id === current.arg);
+    if(!b) return;
+    setPlanCall(b, +el.dataset.n, el.dataset.k);
+    rerender();
+  },
+  'plan-call-clear': el => {
+    const b = S.briefings.find(x => x.id === current.arg);
+    if(!b) return;
+    clearPlanCall(b, +el.dataset.n);
+    planPick = null;
+    rerender();
+    toast('Back to the plan\u2019s call');
+  },
+
   'toggle-sections': el => {
     const box = el.closest('.card');
     const secs = [...box.querySelectorAll('details.sect')];

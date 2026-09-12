@@ -1111,6 +1111,14 @@ body.night .hi-gist{color:#9ed4b2}
 /* Full-width rule: a border on the two cells would break across the column gap. */
 .hi-sep{grid-column:1/-1;border-top:1px dotted var(--dot);margin:3px 0 0}
 .hi-grid dd.was{color:var(--faint);font-size:12.5px}
+/* His own club call on a hole (Sep 12 2026). It reads like the decision row it replaces —
+   same weight, same place — and the plan's line drops to `.was` underneath rather than
+   being deleted, so the reasoning he is overruling is still there to argue with. */
+.hi-grid dd.mine{font-size:14px;color:var(--gtext);font-weight:700}
+.callbar{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.callpick{margin-top:6px}
+.minibtn.on{background:var(--green);color:var(--green-ink);border-color:var(--green)}
+.pv-mine{color:var(--gtext)}
 .hi-grid dd.was b{color:var(--ink)}
 .hi-grid dd.was b.hot{color:var(--btext)}
 .hi-why + .hi-grid, .hi-grid + .hi-why{margin-top:9px}
