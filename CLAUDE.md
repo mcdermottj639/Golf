@@ -853,6 +853,26 @@ where both shots finished, what it scored. Three rules hold it honest:
 - **No Coach tip fires off it.** One round is not a sample, and "the plan held" is exactly
   the sort of claim that would harden into folklore. It stays descriptive on the card until
   there are repeat rounds at a planned course to compute over.
+- **ONE LINE PER SHOT, and the result sits UNDER the plan rather than beside it** (Sep 12
+  2026 — Jack: the finished column was "not easy to scan and read"). Three columns now:
+  hole · the plan then what happened · score. Inside the middle cell the plan's words sit
+  above a dotted hairline and the shots below it, one line each — `TEE` with the tee club
+  and where that ball finished, `GRN` with the approach club and the green result, each
+  behind a **rail coloured by the ANSWER** (green cost nothing, burgundy did), which is the
+  live logger's own rule. A **`!`** marks the finish the plan warned about, because that is
+  the most informative cell in the table and must not rely on a reader noticing a shade. A
+  par 3 gets ONE line, since the tee shot IS the approach — an empty fairway slot printed a
+  dash, and a dash reads as data the card is missing rather than a question the hole never
+  asked. `Dead` is a tee shot that left no play, the word the off-the-tee club table already
+  uses.
+  **THE FIRST CUT GAVE THE SHOTS THEIR OWN COLUMN AND IT WAS WRONG — measure the TABLE's
+  HEIGHT, not just whether anything wraps.** A nowrap block needs about 135px, and on a
+  phone the only place that width can come from is the prose column beside it, so the plan's
+  words wrapped harder and every row grew: the table went from 2528px to **3365px at 320**
+  and 1691 to 1855 at 390. Zero wrapped lines and a worse page. Stacked it is 1835 at 320
+  and 1600 at 390 — **shorter than what it replaced at all five widths** (320 · 360 · 375 ·
+  390 · 430). A column that cannot wrap does not save space; it moves the cost somewhere the
+  wrap check cannot see.
 
 Consequence for writing plans: a hole note with no `club` and no `avoidDir` is unmarkable
 forever. Fill them in wherever the call genuinely names one — and leave them off where it

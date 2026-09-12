@@ -99,13 +99,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v100';
+const BUILD = 'v101';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v101', d:'2026-09-12', items:[
+    'HOW THE PLAN HELD UP IS READABLE NOW. You said the finished column was not easy to scan, and it wasn\u2019t \u2014 it was two lines of prose squeezed into a narrow column, so \u201cno play at it\u201d and \u201c\u2190 warned\u201d wrapped to three and four lines and you had to read every cell to find the bad holes.',
+    'ONE LINE PER SHOT, because the club and what that club did are one fact: TEE with the club you hit and where the ball finished, GRN with the club in and whether you found the green. A green rail down the left where the shot cost nothing, burgundy where it did \u2014 so you can see a hole\u2019s story without reading a word.',
+    'The plan\u2019s words sit above a hairline and the result below it, in the same cell, which is what gave the prose its width back. Measured against the old build: the table is SHORTER at every phone width \u2014 693px shorter at 320, 91px at 390 \u2014 and nothing wraps.',
+    'A red ! marks the finish the plan told you to avoid. On a par 3 there is one line, not two, because the tee shot IS the approach. And a tee shot that left no play at the green reads DEAD, the same word the off-the-tee club table uses.' ] },
   { b:'v100', d:'2026-09-12', items:[
     'YOUR FAIRCHILD WHEELER ROUND got the RED plan on its card, not the Black\u2019s \u2014 which is the fix from earlier today working on a real round rather than on a test one. That was the first round ever played at a 36-hole facility in this app.',
     'FIXED, on the same card: \u201cHow the plan held up\u201d told you the Red plan was written \u201cfrom this round among others\u201d. It was not \u2014 it was written that morning off research and your old scorecard. A plan is dated by its feed id, which carries a DAY and not a time, so the app genuinely cannot tell a plan written before you teed off from one written up that evening. It still does not grade a same-day plan (under-claiming is the safe way to be wrong), but it now says that is why, instead of asserting where the plan came from. It becomes a real test the next time you play there.',
@@ -6083,31 +6088,57 @@ function roundView(i){
       ${P.sum.warn ? `<li><b>The warned miss happened on ${P.sum.warnHit} of ${P.sum.warn}</b> holes where the plan named a direction to avoid.</li>` : ''}
     </ul>` : ''}
     <table class="scard" style="margin-top:8px">
-      <tr><th>Hole</th><th>The plan said</th><th>You hit</th><th>Finished</th><th>Score</th></tr>
+      <tr><th>Hole</th><th>The plan, then what happened</th><th>Score</th></tr>
       ${P.rows.map(x => `<tr>
         <td><b>${x.h.n}</b></td>
-        <td class="sm pv-said">${emph(x.call)}${x.hn.avoid ? `<br><span class="faint">Avoid: ${emph(x.hn.avoid)}</span>` : ''}</td>
-        <td class="sm">${x.h.tee ? `${esc(clubTag(x.h.tee))}${x.onPlan === true ? ' <b class="pv-ok">✓</b>' : x.onPlan === false ? ' <b class="pv-no">✗</b>' : ''}` : '<span class="faint">—</span>'}</td>
+        <td class="sm pv-said">${emph(x.call)}${x.hn.avoid ? `<br><span class="faint">Avoid: ${emph(x.hn.avoid)}</span>` : ''}
         ${(() => {
-          // BOTH finishes, because a warning is about one shot or the other: a tree down
+          // ONE ROW PER SHOT (Sep 12 2026 — Jack: the finished column was not scannable).
+          // The club and where that club's ball finished are one fact and now sit on one
+          // line, which is what collapsed two columns into one and took the wrapping out.
+          // BOTH shots get a line, because a warning is about one or the other: a tree down
           // the right of the fairway is answered by the tee line, a bunker short of the
           // green by the approach line. Marking only the green lost the tee warnings —
-          // including the three holes the drive left him no play on, which are exactly the
-          // ones the plan was loudest about.
-          const flag = on => x.hit && (x.hn.avoidOn === on
-            || (!x.hn.avoidOn && (on === 'tee' ? x.h.fmiss : x.h.gmiss) === x.warned))
-            ? ' <b class="pv-no">← warned</b>' : '';
-          const t = x.h.fw === true ? 'fairway' : x.h.fw === false ? (MISS_LAB[x.h.fmiss] || 'missed') : null;
-          const g = x.h.noshot ? '<b class="pv-no">no play at it</b>'
-            : x.h.gir === true ? 'hit' : x.h.gir === false ? (MISS_LAB[x.h.gmiss] || 'missed') : null;
-          const lines = [t ? `<span class="faint">tee</span> ${esc(t)}${flag('tee')}` : '',
-                         g ? `<span class="faint">green</span> ${g}${flag('green')}` : '']
-            .filter(Boolean);
-          return `<td class="sm">${lines.length ? lines.join('<br>') : '<span class="faint">—</span>'}</td>`;
-        })()}
+          // including the holes the drive left him no play on, which are exactly the ones
+          // the plan was loudest about.
+          const warnedOn = on => x.hit && (x.hn.avoidOn === on
+            || (!x.hn.avoidOn && (on === 'tee' ? x.h.fmiss : x.h.gmiss) === x.warned));
+          const cap = t => t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
+          // A rail per line, coloured by the ANSWER and not by the row — the live logger's
+          // rule. Green is the outcome that cost nothing; burgundy is every finish that did.
+          const shot = (lab, club, mark, fin, tone, warn) => `<div class="pvs ${tone}">
+            <i>${lab}</i>${club ? `<b class="pvc">${esc(club)}${mark}</b>` : '<b class="pvc"></b>'}
+            <span class="pvf">${fin || '<span class="faint">—</span>'}</span>${
+            warn ? '<em class="pvw" title="the miss the plan warned about">!</em>' : ''}</div>`;
+          const rows = [];
+          const mark = x.onPlan === true ? ' <span class="pv-ok">✓</span>'
+            : x.onPlan === false ? ' <span class="pv-no">✗</span>' : '';
+          // "Dead" is the word the off-the-tee club table already uses for a tee shot that
+          // left no play at the green, so the two pages name the same thing the same way.
+          // "Hit" rather than "Green", because the line is already labelled GRN and a word
+          // that repeats its own label carries nothing.
+          const gFin = x.h.noshot ? 'Dead' : x.h.gir === true ? 'Hit'
+            : x.h.gir === false ? cap(MISS_LAB[x.h.gmiss] || 'missed') : null;
+          const gTone = x.h.gir === true ? 'ok' : (gFin ? 'bad' : '');
+          if(x.h.par === 3){
+            // ONE LINE ON A PAR 3, because there is one shot: the tee shot IS the approach,
+            // which is what TEE_OWNS says everywhere else. Rendering an empty fairway slot
+            // here printed a dash, and a dash reads as data the card is missing rather than
+            // as a question the hole never asked.
+            rows.push(shot('TEE', x.h.tee ? clubTag(x.h.tee) : '', mark, gFin, gTone,
+              warnedOn('tee') || warnedOn('green')));
+          } else {
+            const tFin = x.h.fw === true ? 'Fairway' : x.h.fw === false ? cap(MISS_LAB[x.h.fmiss] || 'missed') : null;
+            if(x.h.tee || tFin) rows.push(shot('TEE', x.h.tee ? clubTag(x.h.tee) : '', mark,
+              tFin, x.h.fw === true ? 'ok' : x.h.fw === false ? 'bad' : '', warnedOn('tee')));
+            if(x.h.app || gFin) rows.push(shot('GRN', x.h.app ? clubTag(x.h.app) : '', '',
+              gFin, gTone, warnedOn('green')));
+          }
+          return rows.length ? `<div class="pvshots">${rows.join('')}</div>` : '';
+        })()}</td>
         <td class="sm"><b>${x.h.s}</b> <span class="faint">${x.d > 0 ? '+' + x.d : x.d === 0 ? 'par' : x.d}</span></td></tr>`).join('')}
     </table>
-    <p class="sm faint" style="margin-top:8px">The plan's words are quoted, never scored — only the holes where it named a <b>club</b> or a <b>direction</b> are counted, because those are the parts it stated plainly enough to be wrong about. Everything else here is your card.</p>
+    <p class="sm faint" style="margin-top:8px">One line per shot: the club, then where that ball finished — <b>TEE</b> off the tee, <b>GRN</b> going at the green, with a green rail where it cost nothing and a burgundy one where it did. <b>✓</b> and <b>✗</b> say whether the club was the one the plan named. <b>!</b> marks the finish the plan told you to avoid. <b>Dead</b> is a tee shot that left no play at the green, the same word the off-the-tee club table uses. The plan's words are quoted, never scored — only the holes where it named a <b>club</b> or a <b>direction</b> are counted, because those are the parts it stated plainly enough to be wrong about. Everything else here is your card.</p>
   </div>`)(planHeld(r))}
 
   <h2>Scoring mix</h2>

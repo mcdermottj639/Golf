@@ -1254,7 +1254,48 @@ body.night .chip.ns.on, body.night .chip.ob.on{background:var(--burg);color:var(
 .pv-no{color:var(--burg)}
 /* The plan's own words read as prose, so they are left-aligned inside the otherwise
    centred scorecard grid, and given the room — this is the widest column on the table. */
-.scard td.pv-said{text-align:left;width:44%}
+.scard td.pv-said{text-align:left;width:auto}
+/* ---- "What happened": one line per shot (Sep 12 2026) ----
+   Jack, on the round card: the finished column was "not easy to scan and read". It was two
+   prose lines per hole in a column squeezed by the plan's own words, so "no play at it" and
+   "← warned" wrapped to three and four lines and the eye had to READ every cell to find the
+   bad ones. Three things fixed it, and the first is the one that mattered:
+
+   THE CLUB AND WHAT IT DID ARE ONE FACT, so they are one line. That collapsed "You hit" and
+   "Finished" into a single column, which is where the width came from — the table went from
+   five columns to four and nothing had to shrink.
+
+   A RAIL CARRIES THE VERDICT, so the column is scannable without being read: green where the
+   shot cost nothing, burgundy where it did, neutral where the card does not say. Same rule as
+   the live logger's chips — the colour is a property of the ANSWER, not of the row.
+
+   AND THE LABELS ARE A FIXED COLUMN. TEE and GRN are mono at a set width, so every line in
+   the table starts at the same x and the rails stack into a readable strip down the page.
+   Keep `white-space:nowrap` on the cell: the whole point is that a finish never wraps, and
+   the words are short enough (Fairway · Green · Short · Left · Right · Long · OB · Dead)
+   that it does not have to. Add a longer one and this breaks. */
+/* The result sits UNDER the plan in the same cell, behind a hairline: what was called
+   above it, what the ball did below it. That is the shape the measurements forced. The
+   first cut put the shots in their own COLUMN, which reads well and is wrong on a phone —
+   a nowrap block needs ~135px, and the only place that width can come from is the plan's
+   prose, so every row grew taller than it started: +164px at 390 and +837px at 320,
+   measured against the build it replaced. Stacked, the prose gets the whole cell back. */
+.pvshots{margin-top:6px;padding-top:5px;border-top:1px dotted var(--dot);white-space:nowrap}
+.pvs{display:flex;align-items:center;gap:6px;padding:2px 0;line-height:1.25}
+.pvs::before{content:'';flex:0 0 auto;width:3px;height:13px;border-radius:2px;background:var(--line2)}
+.pvs.ok::before{background:var(--green)}
+.pvs.bad::before{background:var(--burg)}
+.pvs i{flex:0 0 auto;width:21px;font-style:normal;font-family:var(--mono);font-size:8.5px;
+  font-weight:600;letter-spacing:.06em;color:var(--faint)}
+.pvs .pvc{flex:0 0 auto;min-width:30px;font-family:var(--sans);font-size:10.5px;font-weight:700;color:var(--ink)}
+.pvs .pvf{font-size:12px;color:var(--faint)}
+.pvs.ok .pvf{color:var(--gtext);font-weight:600}
+.pvs.bad .pvf{color:var(--btext);font-weight:600}
+/* The one mark that is not a colour: the finish the plan told him to avoid, which is the most
+   informative cell in the table and must not rely on a reader noticing a shade. */
+.pvs .pvw{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  width:14px;height:14px;border-radius:4px;background:var(--burg);color:var(--burg-ink);
+  font-family:var(--mono);font-size:9.5px;font-weight:700;font-style:normal}
 
 /* Two rows, one course? — a flagged pair reads as one block, not two loose rows. */
 .dupe{border-left:2px solid var(--burg);padding-left:10px;margin:10px 0}
