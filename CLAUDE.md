@@ -130,7 +130,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `geo`            | Put a course's location on file (`geo:{course, lat, lon, prec, place, src}`). Round Prep sorts the standing plans and Courses sorts the rankings **nearest first** off it — see *Nearest first* below. Replaces any earlier fix for that course, matching on the name **before the em dash**, so one fix serves every course at a facility |
 | `deadline`       | Set the return-window deadline (clears "estimated") |
 | `profile`        | Patch the player profile (`profile:{handicap, stroke, miss, …}`); `Object.assign` onto `S.profile`. **The handicap on Today had no feed route at all until Sep 8 2026** — which is how the app came to say 8.5 while his GHIN index read 11.1 and the only remedy on offer was a to-do telling him to type it himself. A number the front page quotes must be pushable like every other number the front page quotes. It is still HIS number: relay what he reports, never an estimate |
-| `layout`         | Put a scorecard on file (`layout:{course, par[], si[], tot, ver, src, tees[]}`). It **replaces** the card, which is the point — an entry correcting a wrong stroke index must be able to ship without one rather than let the wrong one creep back. **`tees` is the one exception, and only downward**: an entry silent about tee ratings does not assert the course has none, so `course-cards.js`'s sourced ratings still stand behind it. See *A round has to reach the handicap* |
+| `layout`         | Put a scorecard on file (`layout:{course, par[], si[], tot, ver, src, tees[]}`). It **replaces** the card, which is the point — an entry correcting a wrong stroke index must be able to ship without one rather than let the wrong one creep back. **`tees` is the one exception, and only downward**: an entry silent about tee ratings does not assert the course has none, so `course-cards.js`'s sourced ratings still stand behind it. See *A round has to reach the handicap*. **`as` is the date the card was READ, which is not the date its data is FROM** — nothing in `app.js` reads the field, so it is a note to the next human, and on a card lifted off an old round a read-date silently claims the course looked like that then. Fairchild Wheeler's two cards came off rounds played around 2024 and were read Sep 12 2026; the age is stated in `src` because `as` cannot carry it. Same shape as the film-date lesson under *Film is king*: **the day somebody looked and the day the thing happened are two facts, and the first will stand in for the second unless you say so** |
 
 Unknown types are left unapplied on purpose (forward-compat), so a typo'd `type` silently
 does nothing — double-check against `applyFeed()`.
@@ -1358,6 +1358,13 @@ not know standing in the car park. So a round he logged himself scored, counted 
 - **`indexBasis()`** is why the estimate can no longer just sit there: Today's tile shows
   `N of 3 rated` where there is no estimate yet, and Rounds says how many cards carry a
   rating and how many full ones are missing one. An absent number that says why beats a dash.
+- **`indexBasis()` HAS NO RECENCY WINDOW — every rated round counts, forever** (checked
+  Sep 12 2026). That is fine while every card is recent and it is a trap the moment one is
+  not: backfilling an old round WITH a rating puts years-ago golf into the estimate beside
+  this month's, and the tile gives no hint that it happened. So **an old card gets logged
+  without `rating`/`slope` on purpose** — it still gives `holeRecord()` his history on the
+  hole, the worst-hole table and the miss maps, and it cannot reach the index. Only attach
+  ratings to a card whose score you would want the handicap to reflect.
 
 **The bug this turned up is the transferable part.** Lakeside's tee ratings had been in the
 file since August and were invisible from the day the feed corrected its stroke index —
