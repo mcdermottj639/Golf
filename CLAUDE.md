@@ -162,16 +162,39 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
   is **unmeasured**. Full read in the *Putting — The Workshop Log* plan (Aug 13 section);
   the owed two-drop test rides along with the overhead five in *Grip & Posture*'s sibling,
   the *Putting Routine* FACE section.
-- Putting grip: **CLAW inside about six feet, CONVENTIONAL past it** — Jack's call, Sep 10 2026
-  (*"Claw grip from now on for short putts. Maybe 6ft and less."*). It is an intent, so it is
-  authoritative and it is not waiting on a scoreboard: **no claw rep has ever been filmed or
-  scored on any putter in this project.** Six is not a new line — it is where *Short Putts —
-  Inside Six Feet* and *Lag Putts* already split, and where `PUTT_DIST`'s `s` bucket ends — and
-  the tie-break for the edge is **unsure → it's a lag → conventional**, because the claw's cost
-  is a distance-feel trade and pace is the open fault. Two consequences that catch people out:
-  the trail-hand-senses-the-weight cue is a **conventional-grip, lag-only** cue and must never be
-  carried inside six feet, and **the short-putt numbers and the 30-ft ladder numbers are no
-  longer comparable** — they differ by a grip now as well as by a stroke length.
+- Putting grip: **CONVENTIONAL on every length, CHOKED DOWN a little inside about six feet** —
+  Jack's call, Sep 12 2026 (*"Always the claw is out hated it. Just kinda choking up a little on
+  the short ones."*), reversing the Sep 10 claw decision after **two days**. Both calls are
+  intent, so both are authoritative and neither waited on a scoreboard. **The claw was adopted
+  by decision and reversed by decision without ever producing a number** — no claw rep was
+  filmed or scored on any putter in this project — so nothing in the record was built on it and
+  nothing had to be unwound. That is the cheap version of this mistake; write a grip change so
+  it stays cheap.
+  Four things survive the reversal and are what actually catch people out:
+  **Six is still the line**, now a CHOKE line rather than a grip line — it is where *Short Putts
+  — Inside Six Feet* and *Lag Putts* already split and where `PUTT_DIST`'s `s` bucket ends — and
+  the tie-break is unchanged: **unsure → it's a lag → full length on the handle**.
+  **What the claw was FOR is gone.** With the trail hand off the handle, quiet hands was a
+  geometry; a choke shortens the lever and removes no hand, so it is a **discipline** again and
+  the wrist-flick tell (the head passing the hands) is something to watch rather than something
+  the grip prevents.
+  **The choke has no number on it and it lands on the open fault.** A shorter lever sends the
+  same stroke length less far, and distance is stroke length at a fixed tempo — so the
+  17-inches-past target, learned at full length, has to be re-learned choked, and short putts
+  finishing short will otherwise read as the quitting through-stroke the plan already warns
+  about. Standing instruction: **mark the handle**. An unnumbered feel drifts (*"barely open"*
+  has had no number since Aug 10), and an unmarked choke silently turns the 20-ball five-footer
+  from a one-variable test into a two-variable one.
+  **The trail-hand-senses-the-weight cue is still lag-only** — but for its ORIGINAL reason,
+  that there is no distance to feel inside six feet, not the Sep 10 one that a claw has no feel
+  hand. When a rule outlives the second reason it was given, check the first one still holds.
+  And on comparability: the short-putt and 30-ft ladder numbers are made with the **same hold**
+  again, so a difference between them can no longer be a grip — they still differ by a stroke
+  length and by a choke, so read them side by side rather than as one series.
+  Jack reported **32 putts** on the day he made the call and read it as good. It is one round,
+  it cannot separate the choke from the greens he hit, and a putt count falls on its own when
+  greens are missed and chips finish close — it is not why the claw is out, and the app already
+  counts the card properly (see *The numbers on Today*).
 - Signature miss: **left on short putts** — the through-line of the whole putter saga.
   **Aug 10, 2026: likely reclassified as an AIM error, not a delivery error.** Jack found
   that setting the face *barely open* at address is the sweet spot. A zero-torque head
@@ -1759,6 +1782,15 @@ rule above is unchanged.
   every prior `lesson-update` on that `target` before writing a new one**, and set every field
   they set. A diagram is the part a drill actually gets read off, so a stale one outranks the
   words above it.
+  **THE SAME LESSON SHIPPED THE SAME BUG TWO DAYS LATER, SO THE GREP IS NOT THE HARD PART**
+  (Sep 12 2026). Rewriting `h9` for the claw REVERSAL, the prior patches were grepped and the
+  replacement `viz` was written — and then never added to the lesson object, because it was
+  built in a local variable the entry did not reference. Every other field went out correct, so
+  the JSON was valid, the entry applied, and the card rendered new prose about choking down over
+  a diagram captioned *"The grip is settled"* with two boxes reading CLAW. Identical symptom,
+  different cause: on Sep 10 a field was forgotten, on Sep 12 it was written and dropped. So the
+  check that catches both is not "did I remember the list" but **reading the rendered card**,
+  which is the pass below and which took one run to find it.
 - **And check `drillBody()`'s shape while you are there**: when a lesson has `steps`, `drill`
   renders as a ONE-LINE lead (`.dlead`) and only `steps` render as the instruction — so a
   paragraph left in `drill` becomes a wall of text where a single line belongs. A lesson
