@@ -191,10 +191,14 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
   And on comparability: the short-putt and 30-ft ladder numbers are made with the **same hold**
   again, so a difference between them can no longer be a grip — they still differ by a stroke
   length and by a choke, so read them side by side rather than as one series.
-  Jack reported **32 putts** on the day he made the call and read it as good. It is one round,
-  it cannot separate the choke from the greens he hit, and a putt count falls on its own when
-  greens are missed and chips finish close — it is not why the claw is out, and the app already
-  counts the card properly (see *The numbers on Today*).
+  Jack reported **32 putts** on the day he made the call and read it as good. The card landed
+  the same evening and it settles the caveat rather than leaving it general: that round hit
+  **2 greens in regulation out of 18**, so sixteen holes were played from off the green and the
+  putter mostly saw what a chip left it. A putt count falls on its own in exactly that
+  situation, which is why 32 is not a putting verdict — and the number that round actually
+  convicts is 1 up-and-down from 16. So it is not why the claw is out (he is), and it is not
+  evidence the choke-down worked. **When he reports a round stat as good, pull the card before
+  agreeing: the denominator is usually the story.**
 - Signature miss: **left on short putts** — the through-line of the whole putter saga.
   **Aug 10, 2026: likely reclassified as an AIM error, not a delivery error.** Jack found
   that setting the face *barely open* at address is the sweet spot. A zero-torque head
@@ -836,6 +840,16 @@ where both shots finished, what it scored. Three rules hold it honest:
   Sterling Farms standing plan was written Aug 12 largely from the Aug 12 card, so that
   card renders as *what it was built on*, not as a test of it. Grading a plan against the
   round it was derived from is marking your own homework, and the block says which it is.
+  **A FEED ID CARRIES A DAY, NOT A TIME, so SAME-DAY is a third case and it has to say so**
+  (Sep 12 2026). A plan written that morning off research and one written up that evening
+  off the card are identical to `planWritten()`, and the first Fairchild Wheeler round
+  proved it: the Red plan was written before Jack teed off, and his card told him it was
+  built *"from this round among others"*. Not grading it is still right — under-claiming is
+  the safe way to be wrong — but the SENTENCE was asserting a provenance nothing knows.
+  `planHeld()` now returns `sameDay` and `undated` beside `retro`, and the card states the
+  limit instead of inventing a source. **The behaviour was never the bug; the copy was** —
+  when a guard fires on a heuristic, check that what it PRINTS is only what the heuristic
+  actually established.
 - **No Coach tip fires off it.** One round is not a sample, and "the plan held" is exactly
   the sort of claim that would harden into folklore. It stays descriptive on the card until
   there are repeat rounds at a planned course to compute over.

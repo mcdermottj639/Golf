@@ -99,13 +99,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v99';
+const BUILD = 'v100';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v100', d:'2026-09-12', items:[
+    'YOUR FAIRCHILD WHEELER ROUND got the RED plan on its card, not the Black\u2019s \u2014 which is the fix from earlier today working on a real round rather than on a test one. That was the first round ever played at a 36-hole facility in this app.',
+    'FIXED, on the same card: \u201cHow the plan held up\u201d told you the Red plan was written \u201cfrom this round among others\u201d. It was not \u2014 it was written that morning off research and your old scorecard. A plan is dated by its feed id, which carries a DAY and not a time, so the app genuinely cannot tell a plan written before you teed off from one written up that evening. It still does not grade a same-day plan (under-claiming is the safe way to be wrong), but it now says that is why, instead of asserting where the plan came from. It becomes a real test the next time you play there.',
+    'No course rating on that card is deliberate, not an oversight: the published rating and slope for Fairchild Wheeler do not resolve cleanly \u2014 several variants, and one figure comes back under both courses. Tell Claude the rating and slope off your GHIN post or the scorecard and it can be backfilled onto the card with a tap.' ] },
   { b:'v99', d:'2026-09-12', items:[
     'FINISHING A ROUND AND SAVING ONE ARE TWO TAPS, AND THE SECOND ONE was hiding. On the review screen the Save button was the last thing in the form — under the tee chips, the rating fields, the differential line, the trouble chips and the notes box, about a screen and a half down. So a round could be tapped in over four hours, reviewed, and left sitting unsaved in the draft while every number in the app still read two rounds. That happened today.',
     'The save is now pinned above the tab bar for the whole of the review screen, with the hole count and a line saying nothing reaches your record until you tap it. It settles back into the page at the bottom rather than floating over the last card. Measured in both themes at 320, 375 and 390 with the notch simulated: 8px clear of the tab bar every time, and the button is 46px tall.',
@@ -5483,8 +5487,15 @@ function planHeld(r){
   // A plan only TESTS a round it predates. The Sterling Farms plan was written the same
   // day off this very card — it describes the round, it did not predict it, and calling
   // that "the plan held up" would be marking my own homework. The block says which it is.
+  //
+  // A feed id carries a DAY and not a time, so a plan written the morning of a round and
+  // one written up from its card that evening are indistinguishable here. Not grading
+  // either is right — under-claiming is the safe failure — but the COPY must not assert
+  // the round was among the plan's sources when nothing knows that. `sameDay` and
+  // `undated` exist so the card can say which of the three cases it is in.
   const w = planWritten(plan);
-  return { plan, rows, sum, retro: !w || !r.date || w >= r.date, written:w };
+  return { plan, rows, sum, retro: !w || !r.date || w >= r.date, written:w,
+    sameDay: !!(w && r.date && w === r.date), undated: !w || !r.date };
 }
 
 // ----- Single round deep dive -----
@@ -6060,7 +6071,11 @@ function roundView(i){
   ${(P => !P ? '' : `<h2>How the plan held up</h2>
   <div class="card">
     <p class="sm">${P.retro
-      ? `The <b>${esc(P.plan.course || 'course')}</b> plan was written ${P.written ? `on ${fmtDate(P.written)}, ` : ''}from this round among others — so this is what it was built ON, not a test of it. It becomes a test the next time you play here.`
+      ? P.undated
+        ? `The <b>${esc(P.plan.course || 'course')}</b> plan and this round cannot be placed either side of each other — one of them carries no date — so it is not counted as a test of the plan.`
+      : P.sameDay
+        ? `The <b>${esc(P.plan.course || 'course')}</b> plan was written on ${fmtDate(P.written)} — <b>the same day you played this</b>. A plan is dated by its feed id, which carries a day and not a time, so nothing here can tell whether it was written before you teed off or after you finished: it is <b>not counted as a test either way</b>. It becomes one the next time you play here.`
+        : `The <b>${esc(P.plan.course || 'course')}</b> plan was written on ${fmtDate(P.written)}, <b>after this round</b> — so this card is among what it was built ON, not a test of it. It becomes a test the next time you play here.`
       : `The <b>${esc(P.plan.course || 'course')}</b> plan${P.written ? ` (written ${fmtDate(P.written)})` : ''} covered <b>${P.sum.n}</b> of these holes${P.sum.n ? `, and they played ${P.sum.over > 0 ? '+' : ''}${P.sum.over}` : ''}.`}</p>
     ${P.sum.took || P.sum.warn ? `<ul class="hi-why" style="margin-top:6px">
       ${P.sum.took ? `<li><b>You took the call on ${P.sum.onN} of ${P.sum.took}</b> holes where the plan named a club${
