@@ -173,6 +173,29 @@ entries. This is exactly the pipeline film reports already use, and it works fro
 with no permission from anyone. Cost: one message after a session. **Everything in this
 plan is designed to work off Route A alone.**
 
+**Route A′ — a screen RECORDING of the shot table, and it is strictly better than stills
+(proven Sep 14 2026).** The Golf app's per-shot table is about twenty columns wide and a
+phone shows five at a time, so a screenshot is one fifth of a session and a reader cannot
+tell which fifth. Jack sent a **9-second recording of himself scrolling that table sideways**
+for a 5-shot 5-wood set, and it read out complete: all twenty columns for all five shots,
+plus the dispersion plot at the end. Nothing was ambiguous and nothing had to be asked for.
+So the ask is a recording, not a photo:
+
+- **One club at a time**, with the club filter set — the header chip (`5w`) and the target
+  (`202 yds`) are in frame on every single scroll position, which is what makes the set
+  self-identifying with no caption.
+- **Scroll slowly, and pause about a second at each column group.** Fifty frames a second
+  means a held group is unmissable; a fast swipe motion-blurs the digits.
+- **Include the dispersion plot** at the start or the end. It carries the shot pattern and
+  the Tour / HCP comparison rings, which no column does.
+
+The columns that came off it, in the app's own order: Target Hit Carry · Target Hit Total ·
+Carry F. · Total · Club Speed · B.Speed · Smash Factor · Spin Rate · Spin Axis · Curve ·
+Attack Angle · Face To Path · Club Path · Face Angle · L.Ang · L.Dir · Height · Carry S. ·
+Tot. S. · Dynamic Loft · Imp. Height · Spin Loft · Imp. Offset · Landing Ang. — with the
+app's own AVG and +/- rows underneath, so `meas.n` and `meas.sd` come straight off the
+screen rather than being computed here.
+
 **Route B — a TPS emailed report.** TPS can send a Shot Analysis report (PDF, and CSV for
 the operator) to a player's email, and can auto-share reports into the player's portal.
 This needs the venue's TPS and a staff member — most naturally **during a lesson**, which
@@ -580,8 +603,10 @@ question and failing the same way again.
 
 **What to send afterwards**
 
-9. The **club summary table** — a screenshot per club or one of the whole session. Club, shots,
-   ball speed, launch, spin, carry, total, side.
+9. **One screen recording per club, scrolling the shot table sideways** — the Route A′ recipe
+   in §2. Slowly, pausing at each column group, with the dispersion plot at one end. A
+   screenshot is one fifth of the table and does not say which fifth, so a recording is the
+   ask even when it feels like more work; it is one swipe.
 10. The **settings shot** from step 2, and which ball.
 11. One line saying what he was working on and anything the numbers wouldn't know ("mat felt
     fast", "first session with the new grip").
@@ -589,6 +614,21 @@ question and failing the same way again.
 That is enough for a complete push. Anything he doesn't send is simply absent — which is fine
 and is the app's normal failure mode — but a number sent without its settings is worse than a
 missing one, because it reads as current.
+
+**The two facts a recording cannot carry are the two that decide what the numbers mean, so
+they go in the message text: the NORMALIZATION and the BALL.** Neither is on the shot table.
+A 77°F session and a 70°F session render identical tables and differ by about a yard and a
+half at 190 — in the same direction every time, with nothing on screen to show it — and a
+venue-ball carry is a model built partly on an estimated spin, which is the difference
+between a row that may fill a blank ladder slot and one that may only be compared to itself.
+Send them once per visit, not once per club.
+
+**A mishit is data and it is also a decision, so it is raised rather than dropped.** Do not
+average a set silently: a five-shot set carrying one 124-yard toe strike averages twelve
+yards under its own four good shots, and BOTH numbers are defensible (the ladder is what he
+carries it on a good day; the spread is what he actually plays). §6's rule stands — do not
+delete the bad ones — but say which number a `meas.carry` was taken over, in `meas.how`, and
+ask him which one he wants on the row before pushing it.
 
 ---
 

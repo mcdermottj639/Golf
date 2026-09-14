@@ -2125,10 +2125,19 @@ followed in v97. All five phases are built.
 
 **There is no API and there never will be one here.** A Trackman account holder cannot
 export CSV or PDF; mytrackman.com is a viewer, CSV is a TPS-owner feature, and the Cloud
-API is sold to facilities. Ingestion is **screenshots he sends, read here, pushed as feed
+API is sold to facilities. Ingestion is **what he sends, read here, pushed as feed
 entries** — the film-report pipeline again. The app never talks to Trackman. Stamp
 `"src": "tm:<date>-<venue>"` on every entry a session produces, the same ledger rule film
 reports follow, so `grep src coach-feed.json` answers "did we already ingest this?"
+
+**And what he sends is a SCREEN RECORDING of the shot table, not a screenshot of it (Sep 14
+2026).** The table is ~20 columns wide and a phone shows five, so a still is one fifth of a
+session and nothing in the frame says which fifth. A 9-second sideways scroll of a 5-shot
+5-wood set read out complete — every column, every shot, plus the app's own AVG and +/- rows,
+which is where `meas.n` and `meas.sd` come from rather than being recomputed here. The recipe
+and the column list are in `PLAN-TRACKMAN.md` §2, Route A′. **The two facts no recording can
+carry go in the message text: the normalization temperature and the ball.** Neither appears on
+the shot table, and both decide what the carries mean — see the three provenance facts above.
 
 **`S.bays` is its own array, NOT a `kind` flag on `S.sessions`.** Reusing `session` would
 have rendered for free, which is the tempting half; it would also make `sessionSize()` print
