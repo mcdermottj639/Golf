@@ -56,6 +56,7 @@
     const bayIndex=(ctx.bays||[]).findIndex(b=>b._fid===q.bayId);
     return `<section class="rr" aria-label="Simulator Round Review">
       <h2>Round Review · what to do next</h2>
+      ${ctx.bayVisuals||''}
       <div class="card"><div class="rowgrid g3"><div class="stat"><div class="v">${fmtPair(tm.fairways)}</div><div class="l">Fairways · TrackMan</div></div><div class="stat"><div class="v">${fmtPair(tm.gir)}</div><div class="l">Greens · TrackMan</div></div><div class="stat"><div class="v">${metric(tm.averageDrive)}</div><div class="l">Average drive · yd</div></div></div>
       <p class="sm">${shots.length} verified shot observations across ${new Set(shots.map(s=>s.hole)).size} holes; the scorecard covers all 18. This is a partial shot ledger—not a complete shot count. Collapsed, missing and questionable readings are not filled in.</p>
       <p class="sm"><b>Actual bag this round:</b> Driver, Mini Driver, 5-wood, 6-iron, 9-iron, 56°. You reported that selected club labels were sometimes left unchanged. Each shot retains its displayed label; actual club remains unconfirmed unless independently identified.</p>

@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v108';
+const BUILD = 'v109';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v109', d:'2026-09-15', items:[
+    'THE TRACKMAN VISUALS ARE NOW FRONT AND CENTER IN THE BALLYBUNION ROUND REVIEW: carry shape, consistency and path-versus-face appear before the written takeaways, with one tap to the full Bay session.',
+    'A new apply-once repair restores the full 13-club Map My Bag record on phones where the first delivery update replaced that data. The Round Review now opens with the visual evidence instead of making you hunt for it.' ] },
   { b:'v108', d:'2026-09-15', items:[
     'THE BAY NOW SHOWS THE SHAPE OF THE BAG, NOT JUST A SPREADSHEET: scaled carry bars keep every exact TrackMan number visible while flags call out overlaps, inverted gaps and unusually large stretches between adjacent clubs.',
     'PATH AND FACE ARE NOW VISUAL TOO: every recorded shot is a dot, the outlined rings are the club averages, and each row prints path, face angle and face-to-path together. TrackMan Consistency has its own separate visual and is not mislabeled as standard deviation.' ] },
@@ -2534,6 +2537,26 @@ function bayDeliveryVisual(delivery){
     <p class="bvcap">Every small dot is one measured shot; the outlined rings are club averages. Negative is left of the target line. Face-to-path (F–P) is face angle minus club path: positive means the face was open to the path. Scale: ±16°.</p>
   </div>`;
 }
+function bayVisualMarkup(d){
+  if(!d || !Array.isArray(d.clubs) || !d.clubs.length) return '';
+  const delivery = Array.isArray(d.delivery) ? d.delivery : [];
+  return `${bayCarryVisual(d.clubs)}
+    ${bayConsistencyVisual(d.clubs)}
+    ${bayDeliveryVisual(delivery.length ? delivery : d.clubs)}`;
+}
+function roundBayVisuals(r){
+  const i = (S.bays || []).findIndex(b => b._fid === r.review?.bayId);
+  if(i < 0) return '';
+  const b = S.bays[i], visuals = bayVisualMarkup(b.detail || {});
+  if(!visuals) return '';
+  return `<div class="card bayvisuals rr-frontviz">
+    <div class="rr-vizlead"><span>TRACKMAN · ${esc(fmtDate(b.date))}</span>
+      <h3>Your measured swing patterns</h3>
+      <p class="sm">Carry gaps, TrackMan consistency, and every recorded path and face reading from the companion Bay session.</p></div>
+    ${visuals}
+    <button class="btn" data-action="open-bay" data-i="${i}">Open full Bay session & exact club data</button>
+  </div>`;
+}
 // NEWEST FIRST, same row shape as the film log — the lab still reads as one record of what
 // has been captured, with the BAY chip saying which kind of capture a row was.
 function bayLog(list){
@@ -2623,9 +2646,7 @@ function bayView(i){
   </div>
   ${d.clubs && d.clubs.length ? `<h2>Visual read</h2>
   <div class="card bayvisuals">
-    ${bayCarryVisual(d.clubs)}
-    ${bayConsistencyVisual(d.clubs)}
-    ${bayDeliveryVisual(delivery.length ? delivery : d.clubs)}
+    ${bayVisualMarkup(d)}
   </div>
   <h2>Exact club data</h2>
   <div class="card">
@@ -6177,7 +6198,7 @@ function roundView(i){
       <span class="arr">→</span></div>`)(courseRecord(r.course)) : ''}
   </div>
 
-  ${window.CaddieReview ? window.CaddieReview.render(r, { bays:S.bays, rounds:S.rounds, tests:S.reviewTests, identities:S.reviewClubOverrides }) : ''}
+  ${window.CaddieReview ? window.CaddieReview.render(r, { bays:S.bays, rounds:S.rounds, tests:S.reviewTests, identities:S.reviewClubOverrides, bayVisuals:roundBayVisuals(r) }) : ''}
   ${a.holes.length ? `
   <div class="card">
     ${fold(`rd-card-${i}`, 'Full scorecard',

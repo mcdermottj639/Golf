@@ -14,6 +14,8 @@ const assert=require('node:assert/strict');
  await page.waitForSelector('.rr');
  assert.ok((await page.locator('.rr').innerText()).includes('59 verified shot observations'));
  assert.equal(await page.locator('.rr [data-action="open-bay"]').count(),1);
+ assert.equal(await page.locator('.rr-frontviz').count(),1);
+ assert.equal(await page.locator('.rr-frontviz .bvdelivery').count(),1);
  for(const width of [320,390,768]){
   await page.setViewportSize({width,height:844});
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow ${width}`);

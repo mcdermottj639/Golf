@@ -2514,7 +2514,7 @@ different ways on two screens.
 After any feed change: `python3 -c "import json; json.load(open('coach-feed.json'))"`,
 `node --check app.js`, bump `"updated"`, commit, push.
 
-### Bay session visuals (Sep 15 2026 — build v108)
+### Bay session visuals (Sep 15 2026 — builds v108–v109)
 
 The Bay detail leads with a visual read, then keeps the exact club table immediately below
 it. `bayCarryVisual()` scales every carry against the longest club in that session and
@@ -2533,6 +2533,19 @@ exclude null fields before numeric coercion so missing readings never become zer
 average markers. Keep the
 exact table, the provenance chips and the limitation copy. At 320px the
 visual rows must stay inside the card with no page-level horizontal overflow.
+
+The Ballybunion Round Review receives the same three visuals through
+`roundBayVisuals()` and places them before its written takeaways. This is deliberate: a
+round review should lead with the evidence Jack can scan, while the Bay detail remains the
+source for the exact club table and full session story. Keep the full-session button inside
+that first visual card; do not bury the only route below the 59-shot ledger again.
+
+The first delivery entry (`bay-delivery-20260914-v1`) could reach a phone while it still
+ran the old shallow `bay-update` merger. That replaced the entire `detail` object with
+delivery alone, permanently hid the 13 `clubs` rows behind an already-applied feed id, and
+left every v108 visual with nothing to render. `bay-map-repair-20260915-v2` deliberately
+re-sends the COMPLETE detail object under a new id. Never edit or remove that repair: it is
+the recovery path for existing installs, while the deep merger protects later updates.
 
 **Always merge to `main` when the work is done** (standing instruction, Aug 1 2026): Jack
 doesn't review PRs on this repo — GitHub Pages serves from `main`, so work that stops on a

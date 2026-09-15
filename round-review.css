@@ -8,3 +8,8 @@
 .rr-form input,.rr-form select{font-size:16px;min-width:0;width:100%;box-sizing:border-box}
 .rr table td,.rr table th{white-space:nowrap}
 .rr .card,.rr .tscroll{min-width:0;max-width:100%;box-sizing:border-box}
+.rr-frontviz{border-top:4px solid var(--t-bay);box-shadow:0 8px 24px rgba(22,57,43,.09)}
+.rr-vizlead{margin:-2px 0 14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.rr-vizlead span{font-family:var(--sans);font-size:9px;font-weight:800;letter-spacing:.13em;color:var(--gtext)}
+.rr-vizlead h3{font-size:19px;margin:5px 0 0}.rr-vizlead p{margin:6px 0 0}
+.rr-frontviz>.btn{width:100%;margin-top:16px}
