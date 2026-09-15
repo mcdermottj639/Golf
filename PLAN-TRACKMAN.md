@@ -189,6 +189,14 @@ So the ask is a recording, not a photo:
 - **Include the dispersion plot** at the start or the end. It carries the shot pattern and
   the Tour / HCP comparison rings, which no column does.
 
+**The same visit also proved the Map My Bag summary route.** A second recording scrolled the
+13 expanded club cards vertically and kept the session header in frame: Sep 14 2026 · 13 clubs ·
+78 shots, with Normalize visibly on. That one pass carries each club's official average carry,
+TrackMan **Consistency**, directional distribution and the gapping chart. Use both recordings
+when available: the vertical summary supplies the authoritative club averages; the sideways
+table supplies the delivery that explains them. `Consistency` is stored as `cons`, never `sd`,
+because TrackMan did not label it standard deviation.
+
 The columns that came off it, in the app's own order: Target Hit Carry · Target Hit Total ·
 Carry F. · Total · Club Speed · B.Speed · Smash Factor · Spin Rate · Spin Axis · Curve ·
 Attack Angle · Face To Path · Club Path · Face Angle · L.Ang · L.Dir · Height · Carry S. ·
@@ -666,8 +674,10 @@ stop there.
 
 **Phase 1 — the ladder (small, high value)**
 
-- [x] `meas` on a carry row: `{src, n, sd, date, ball, norm, spin, how}`; `carry-update`
+- [x] `meas` on a carry row: `{src, n, sd, cons, date, ball, norm, spin, how}`; `carry-update`
       passes it through (already an `Object.assign`, so nothing to change in `applyFeed()`).
+- [x] Map My Bag `cons` stays a separate provenance field from `sd`; the bay table preserves
+      its one-decimal value and labels it CONSIST.
 - [x] A provisional row — venue ball, estimated spin — **fills a blank and never overwrites a
       typed carry**; it renders both numbers until he picks.
 - [x] `ladderCard()`: per-row MEASURED / ESTIMATED / unmeasured badge; whole-ladder banner
@@ -685,6 +695,9 @@ stop there.
 - [x] `EV_RANK`/`EV_LAB`/`EV_SOURCE`/`EV_BLIND` gain `bay`; `UP_TYPE` gains `bay`.
 - [x] Discipline routing — a bay session declares its own, so there is nothing to infer.
 - [ ] (open, needs a session) `FAULT_EV` rows for any fault a bay session becomes the basis of.
+- [x] First session landed: Sep 14 · Golf Lounge 18 · Map My Bag · 78 shots · 13 clubs.
+      Venue balls were unmarked; Normalize was on but its exact temperature/altitude was not
+      shown, so the carries are visible offers rather than silent 70°F ladder replacements.
 
 **Phase 3 — putting / the grid**
 

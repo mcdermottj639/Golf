@@ -112,7 +112,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 | `action-done`    | Mark action `target` done |
 | `action-update`  | Rewrite action `target` text |
 | `carries`        | Replace the distance ladder (ignored once the user calibrates) |
-| `carry-update`   | Patch ONE ladder row by `target` name: `club` to add/patch (`after` names the row to insert behind), `remove:true` to drop it. **Not** gated on calibration — see below. A row may carry **`meas`** — `{src, n, sd, date, ball, norm, spin, carry}`, where a number came from. It is provenance and never authority: once `carriesCalibrated` is set, a patch carrying `meas` **fills a blank and otherwise leaves his figure alone**, parking its own in `meas.carry` so the row shows both and he takes it with a tap. `"force": true` overrides. See *The bay* below |
+| `carry-update`   | Patch ONE ladder row by `target` name: `club` to add/patch (`after` names the row to insert behind), `remove:true` to drop it. **Not** gated on calibration — see below. A row may carry **`meas`** — `{src, n, sd, cons, date, ball, norm, spin, carry}`, where a number came from. `sd` is an actual standard-deviation row; `cons` is TrackMan Map My Bag's own **Consistency** field and must not be relabelled as ±. It is provenance and never authority: a patch can park its figure in `meas.carry` without changing the live carry, so the row shows both and he takes it with a tap. `"force": true` overrides. See *The bay* below |
 | `bay` / `bay-update` / `bay-remove` | A launch-monitor session — the numeric twin of `session`, in its own array. The entry `id` becomes `_fid`; `bay-update` matches on it or on a `setupMatch` prefix and `Object.assign`s (the `date` included). See *The bay* below |
 | `course-add` / `course-remove` | Add/remove a course. **`course-add` dedupes on an EXACT name match only**, so pushing a course Jack already typed under a different spelling gives him two rows for one course — see *Two rows, one course* below |
 | `round`          | Add a played round (see *Logging a round* below). Skipped if a round with the same `date` + `course` + `nine` is already there, whatever put it there. **`sim:true`** (+ `venue`) marks a simulator round — it is quarantined out of every claim the app makes, and its per-hole putting distances are stripped on the way in. See *A simulator round is a round, and it is not this record* |
@@ -228,16 +228,21 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
 
 Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 · 60° 80.
 
-**THE LONG END OF THE LADDER HAS NO MEASURED NUMBER IN IT (Sep 8 2026).** After the switch the
-top four rows read driver 235 *(estimated, and on a shaft that changed in June)* · mini 15.5°
-*(blank)* · 2-iron 205 *(estimated)* · 5-wood 19.5° *(blank)*. Two blanks where there was one, and
-the 4-iron's 190 — the only figure that ever covered that yardage — went with the club. So a plan
-cannot put a number on a tee shot or a long approach any more, and three standing course plans had
+**THE FIRST FULL BAG MAP LANDED SEP 14 2026.** Map My Bag recorded 78 shots, six each across
+13 clubs: driver 195.8 · TrackMan `3w` 182.4 · 5-wood 177.6 · 2-iron 152.3, with
+TrackMan Consistency 18.4 · 9.2 · 7.3 · 18.3 yards respectively. The 3w-to-5w gap is
+only 4.8 yards and the 5w-to-2i gap is 25.3. The session does NOT silently rewrite the live
+ladder: venue balls were unmarked and the Normalize toggle was on, but its temperature and
+altitude were not shown, so each figure is parked as a visible bay offer. The TrackMan `3w`
+label is not mapped to the Mini Driver until Jack confirms that is the club he hit. Before this,
+the top four rows read driver 235 *(estimated)* · mini *(blank)* · 2-iron 205 *(estimated)* ·
+5-wood *(blank)*, and three standing course plans had
 to be re-read off the 2-iron's 205 and the 5-iron's 180 because of it. `action-5wood-carry-20260812`
 is the standing to-do; it was widened rather than duplicated, per the reuse rule below.
 **Since v96 there is a route in** — a `carry-update` may carry `meas`, and the row then states n,
-spread, date and ball (see *The bay*). Every word above stays true until he actually hits the bay:
-nothing at the long end is measured yet, and a route in is not a number.
+consistency/spread, date and ball (see *The bay*). Sep 14 is the first use of that route. Because
+the exact normalization setting is missing, its values sit in `meas.carry` as offers rather than
+being promoted into the live 70°F ladder; the blank 5-wood row now renders that offer too.
 
 ## How to make common updates
 
@@ -2175,10 +2180,19 @@ rather than a ball anyone watched land**.
   state both numbers in `meas.how`.
 - **Whether spin was measured or estimated**, per the ball above.
 
+**FIRST LIVE SESSION, SEP 14 2026.** The Map My Bag recordings covered the summary and the
+sideways per-shot tables: 13 clubs, 78 shots, six per club. `coach-feed.json` stores the exact
+one-decimal carry and TrackMan **Consistency** fields as `carry` and `cons`. Do not turn `cons`
+into `sd`: TrackMan named the field, and the recording did not claim a standard deviation. The
+Normalize toggle is visibly on, but temperature and altitude never appear; `norm` therefore says
+exactly that rather than guessing 70°F or the 77°F default. The session is still strong enough to
+confirm out-to-in delivery: all six driver paths were leftward (mean −6.6°), as were all six 6i
+(−8.2°) and 8i (−7.6°) paths. That advances the DELIVERY evidence, not the body-mechanics cause.
+
 **The ladder says where each number came from, and `meas` is never the authority.** The
 captions render only once SOMETHING on the ladder is measured — before that the gold note
 already says every row is an estimate, and thirteen rows each repeating it is a page of
-noise. After that, a measured row carries date · n · spread · ball · `spin est.` and an
+noise. After that, a measured row carries date · n · consistency/spread · ball · `spin est.` and an
 unmeasured-but-populated row says `estimated`, because 241 off a radar and 205 off nothing
 must not look identical. **A measured push never silently overwrites a carry he calibrated**
 (`applyFeed`'s `carry-update`): it fills a blank, and otherwise renders *"yours 230 · the bay

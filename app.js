@@ -99,13 +99,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v102';
+const BUILD = 'v103';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v103', d:'2026-09-15', items:[
+    'YOUR FIRST FULL TRACKMAN BAG MAP IS IN. The Sep 14 session holds 78 shots across 13 clubs, six per club, with the exact one-decimal carry and Trackman consistency figures from the screen recordings.',
+    'THE LONG END IS MEASURED ENOUGH TO ASK THE RIGHT QUESTION: driver 195.8, the Trackman 3w label 182.4, 5-wood 177.6 and 2-iron 152.3. The 3w-to-5w gap is only 4.8 yards, while 5-wood to 2-iron is 25.3.',
+    'THE IRON LADDER IS NOT A LADDER YET. The 7-iron carried 135.9, 6-iron 134.5 and 5-iron 128.3; PW carried 113.2 against 9-iron 110.2. Those are session findings, not new course yardages, because the venue balls were unmarked and the normalization temperature was not shown.',
+    'Carry offers keep the decimal Trackman actually reported and now show even beside a blank ladder row. The bay table labels Trackman CONSISTENCY as consistency rather than silently calling it standard deviation.' ] },
   { b:'v102', d:'2026-09-12', items:[
     'YOU CAN SET YOUR OWN CLUB ON ANY HOLE OF A PLAN. Open a course plan in Round Prep, tap \u201c＋ Your club\u201d on a hole, pick one or two off your ladder. It shows as YOUR CALL above the plan\u2019s line \u2014 which stays on the page, because a call you cannot see the reasoning for is one you cannot argue with next time round.',
     'It reaches the tee. On that hole in the live logger the collapsed prep card leads with your club rather than the plan\u2019s, and the round card afterwards marks the holes where the call it graded was yours rather than researched. \u201cUse the plan\u201d puts it back.',
@@ -2124,8 +2129,10 @@ function ladderBadge(row){
   const m = row.meas;
   if(!m) return row.carry == null ? '' : `<span class="lmeas">estimated</span>`;
   const bits = [m.date ? 'MEASURED ' + fmtDate(m.date) : 'MEASURED',
-    m.n ? `n=${m.n}` : '', m.sd != null ? `±${m.sd}` : '',
-    m.ball || '', m.spin === 'estimated' ? 'spin est.' : ''].filter(Boolean);
+    m.n ? `n=${m.n}` : '', m.cons != null ? `cons ${m.cons}` : '',
+    m.sd != null ? `±${m.sd}` : '',
+    m.ball || '', m.spin === 'estimated' ? 'spin est.' : '',
+    m.norm && !/\b70\s*°?F/i.test(m.norm) ? 'norm unconfirmed' : ''].filter(Boolean);
   return `<span class="lmeas on">${esc(bits.join(' · '))}</span>`;
 }
 // The one place the two numbers meet. A measured figure he has not accepted is an offer,
@@ -2133,8 +2140,10 @@ function ladderBadge(row){
 // rather than replacing it and hoping he notices.
 function ladderOffer(row, i){
   const m = row.meas;
-  if(!m || m.carry == null || row.carry == null || m.carry === row.carry) return '';
-  return `<span class="lmeas offer">yours ${row.carry} · the bay says ${m.carry}
+  if(!m || m.carry == null || m.carry === row.carry) return '';
+  const lead = row.carry == null ? `the bay says ${m.carry}`
+    : `${S.carriesCalibrated ? 'yours' : 'ladder'} ${row.carry} · the bay says ${m.carry}`;
+  return `<span class="lmeas offer">${lead}
     <button class="btn ghost tiny" data-action="use-bay-carry" data-i="${i}">use ${m.carry}</button></span>`;
 }
 function ladderCard(){
@@ -2425,7 +2434,8 @@ function bayProv(b){
 const baySgn = v => (v > 0 ? '+' : '') + v;
 const BAY_COLS = [
   ['n',     'N',       v => v],
-  ['carry', 'CARRY',   v => Math.round(v)],
+  ['carry', 'CARRY',   v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
+  ['cons',  'CONSIST.',v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
   ['sd',    '±',       v => Math.round(v)],
   ['total', 'TOTAL',   v => Math.round(v)],
   ['cs',    'CLUB MPH', v => v],
@@ -7999,7 +8009,9 @@ function carryUpdateLine(club){
   const m = club.meas;
   if(!m) return club.carry != null ? `${club.carry} yds · estimated` : 'carry unmeasured';
   const v = club.carry != null ? club.carry : m.carry;
-  const bits = [m.n ? `n=${m.n}` : '', m.sd != null ? `±${m.sd}` : '', m.ball || ''].filter(Boolean);
+  const bits = [m.n ? `n=${m.n}` : '', m.cons != null ? `cons ${m.cons}` : '',
+    m.sd != null ? `±${m.sd}` : '', m.ball || '',
+    m.norm && !/\b70\s*°?F/i.test(m.norm) ? 'norm unconfirmed' : ''].filter(Boolean);
   return `${v != null ? v + ' yds · measured' : 'measured'}${bits.length ? ' · ' + bits.join(' · ') : ''}`;
 }
 function updateLine(e){
