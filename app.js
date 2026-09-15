@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v106';
+const BUILD = 'v107';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v107', d:'2026-09-15', items:[
+    'THE BALLYBUNION LEDGER NOW CONTAINS ALL 59 COUNTED NON-PUTTING SHOTS: 88 total strokes minus 29 TrackMan-assigned putts. Three canceled mulligan shots were removed and 24 collapsed timeline shots were added.',
+    'Expanded shots keep their readable delivery metrics. Shots whose data panel was never opened still keep the selected club, corrected actual club, displayed distance and finishing lie. Nothing missing is filled with zero.' ] },
   { b:'v106', d:'2026-09-15', items:[
     'ROUND CLUB IDENTITIES ARE NOW CONFIRMED: every TrackMan 3w label in Ballybunion was the Mini Driver, every 60° label was the 56°, and every 2-iron label was the 6-iron — the closest selected club when the label was not changed.',
     'Obvious full swings and partial 56° shots now populate the round club profiles. The 102-yard 6-iron and 61-yard 9-iron remain unclassified because swing length is not clear from the recording.' ] },

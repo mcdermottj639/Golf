@@ -2231,9 +2231,11 @@ and obvious the moment the table rendered. It is `CLUB MPH` / `BALL MPH` now.
 `round-review.js` and `round-review.css` extend the existing round card, not navigation.
 Rounds → Ballybunion opens the review; Bag, Swing Lab and Bay session link to it.
 The round is a new apply-once `round` feed entry. Its extraction source is
-`data/ballybunion-2026-09-15.json`; future corrections MUST use new `round-update` entries,
-not edits to an applied feed id. All 18 scores and 38 selected stable shot observations
-are captured; this is not a claim to have transcribed every shot in the recordings.
+`data/ballybunion-2026-09-15.json`; future corrections MUST use a new
+`round-review-update`, not edits to an applied feed id. All 18 scores and all 59 counted
+non-putting strokes are captured: 88 total minus 29 TrackMan-assigned putts. Three canceled
+mulligan shots are excluded. Expanded shots carry readable delivery metrics; a collapsed
+shot carries its club label, displayed distance, finishing lie and source frame.
 
 Jack carried only Driver, Mini Driver, 5-wood, 6-iron, 9-iron and 56°. He sometimes left
 the selected TrackMan club unchanged. `shots[].club` is only the displayed label;

@@ -12,7 +12,7 @@ const assert=require('node:assert/strict');
  await page.click('#nav [data-view="bag"]');
  await page.click(`[data-action="open-round"][data-i="${idx}"]`);
  await page.waitForSelector('.rr');
- assert.ok((await page.locator('.rr').innerText()).includes('38 verified shot observations'));
+ assert.ok((await page.locator('.rr').innerText()).includes('59 verified shot observations'));
  assert.equal(await page.locator('.rr [data-action="open-bay"]').count(),1);
  for(const width of [320,390,768]){
   await page.setViewportSize({width,height:844});
