@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v103';
+const BUILD = 'v104';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v104', d:'2026-09-15', items:[
+    'THE BAY FEED NOW BYPASSES GITHUB PAGES\' TEN-MINUTE EDGE CACHE. v103 could arrive before the Trackman data file at a phone\'s nearest cache, leaving Swing Lab correctly upgraded but still saying “No bay sessions yet.” The feed request now carries the running build in its URL, so code and data land together without resetting anything.' ] },
   { b:'v103', d:'2026-09-15', items:[
     'YOUR FIRST FULL TRACKMAN BAG MAP IS IN. The Sep 14 session holds 78 shots across 13 clubs, six per club, with the exact one-decimal carry and Trackman consistency figures from the screen recordings.',
     'THE LONG END IS MEASURED ENOUGH TO ASK THE RIGHT QUESTION: driver 195.8, the Trackman 3w label 182.4, 5-wood 177.6 and 2-iron 152.3. The 3w-to-5w gap is only 4.8 yards, while 5-wood to 2-iron is 25.3.',
@@ -8386,7 +8388,11 @@ function applyFeed(feed){
   if(changed){ save(); rerender(); toast('Coach update from Claude ⛳'); }
 }
 function fetchFeed(){
-  fetch('./coach-feed.json', { cache:'no-store' })
+  // GitHub Pages can keep the PREVIOUS coach-feed.json at an edge for ten minutes even
+  // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
+  // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
+  // every app release gets a fresh edge key and cannot render new code against old data.
+  fetch(`./coach-feed.json?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' })
     .then(r => r.ok ? r.json() : null)
     .then(f => { if(f) applyFeed(f); })
     .catch(()=>{}); // offline — try again next open
