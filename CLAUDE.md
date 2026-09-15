@@ -2243,6 +2243,13 @@ club, full intent and no flagged reading. User confirmations live in
 `S.reviewClubOverrides`, keyed by round feedId plus shot id, and survive feed updates.
 Raw labels stay intact. Partial shots and unknown identities never change carries.
 
+Jack resolved the mapping on Sep 15: every displayed 3w was Mini Driver, every 60° was
+56°, and every 2i was 6i — he selected the closest label when the exact club was absent.
+This arrives through `round-review-update`, which deep-patches review metadata without
+replacing the round or its shot ledger. Obvious driver/wood/iron swings aimed at the green
+are marked full and short 56° shots partial. H2's 102-yard 6i and H13's 61-yard 9i remain
+unknown because the recording does not establish swing length. User corrections still win.
+
 Round distance is displayed shot distance, not verified carry. Bay and round distance
 columns stay separate; no carry-gap arithmetic. Face-to-path is derived as face minus path
 only when both are numeric. Path findings describe a mixed-shot subset, not a full-swing

@@ -9,7 +9,10 @@
   const bayKey = k => ({'Driver':'driver','5 wood':'5-wood','56° wedge':'56-wedge'}[k] || k);
   function observations(r){ return Array.isArray(r?.review?.shots) ? r.review.shots : []; }
   function profiles(r,bays){
-    const shots=observations(r);
+    const clubMap=r.review?.clubMap||{}, intentByShot=r.review?.intentByShot||{};
+    const shots=observations(r).map(s=>({...s,
+      actualClub:s.actualClub||clubMap[s.club]||null,
+      intent:s.intent||intentByShot[s.id]||'unknown'}));
     return (r.review?.availableClubs || [...new Set(shots.map(s=>s.actualClub).filter(Boolean))]).map(club=>{
       const ss=shots.filter(s=>s.actualClub===club), full=ss.filter(s=>s.intent==='full' && !s.flag);
       const path=full.map(s=>s.path).filter(finite);
@@ -37,7 +40,13 @@
   }
   function render(r,ctx){
     if(!r.sim||!r.review)return '';
-    r={...r,review:{...r.review,shots:observations(r).map(s=>({...s,...(ctx.identities||{})[`${r.feedId}:${s.id}`]}))}};
+    const clubMap=r.review.clubMap||{}, intentByShot=r.review.intentByShot||{};
+    r={...r,review:{...r.review,shots:observations(r).map(s=>({
+      ...s,
+      actualClub:s.actualClub||clubMap[s.club]||null,
+      intent:s.intent||intentByShot[s.id]||'unknown',
+      ...(ctx.identities||{})[`${r.feedId}:${s.id}`]
+    }))}};
     const q=r.review, shots=observations(r), ps=profiles(r,ctx.bays), tm=q.trackman||{};
     const metric=(v,unit='')=>finite(v)?esc(v)+unit:'—';
     const f=findings(r);

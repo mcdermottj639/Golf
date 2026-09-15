@@ -36926,6 +36926,35 @@
     "body": "The Ballybunion simulator card recorded 3 greens in 18 holes. That is a reason to test approach repeatability, not proof of a particular swing fault. Club labels in the round were sometimes stale. Use the actual club for each target and record it explicitly. Open the Ballybunion Round Review to log results; this test does not alter outdoor statistics.",
     "drill": "Hit 10 balls to 125 yards and 10 to 150 yards. Count each ball finishing within 15 yards of the target. Keep club per target, ball, lie and normalization unchanged for repeats. Record every attempt and the settings. Log the two counts in Round Review. The first run establishes a baseline, not a pass/fail standard."
   }
+},
+{
+  "id": "round-review-club-map-20260915-v1",
+  "type": "round-review-update",
+  "src": "jack:2026-09-15-club-confirmation",
+  "round": { "date": "2026-09-15", "course": "Ballybunion", "sim": true },
+  "review": {
+    "clubMap": {
+      "driver": "driver",
+      "3-wood": "mini-driver",
+      "5-wood": "5-wood",
+      "2-iron": "6-iron",
+      "6-iron": "6-iron",
+      "9-iron": "9-iron",
+      "56-wedge": "56-wedge",
+      "60-wedge": "56-wedge"
+    },
+    "intentByShot": {
+      "h1-a":"full", "h1-b":"full", "h1-c":"partial", "h1-d":"partial",
+      "h2-a":"full", "h2-c":"partial", "h2-d":"partial", "h3-a":"partial",
+      "h4-a":"full", "h4-b":"full", "h4-c":"full", "h4-d":"partial",
+      "h5-a":"full", "h5-b":"partial", "h6-a":"full", "h7-a":"full",
+      "h7-b":"partial", "h8-a":"partial", "h9-a":"full", "h9-b":"full",
+      "h10-a":"full", "h10-b":"full", "h10-c":"partial", "h11-a":"full",
+      "h11-b":"partial", "h12-a":"full", "h14-a":"full", "h15-a":"partial",
+      "h16-a":"full", "h16-b":"full", "h16-c":"full", "h17-a":"partial",
+      "h17-b":"full", "h18-a":"full", "h18-b":"full", "h18-c":"partial"
+    }
+  }
 }
   ]
 }

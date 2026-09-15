@@ -14,7 +14,7 @@ window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayVie
 })();`;
 vm.runInContext(src,ctx);
 const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'coach-feed.json'),'utf8'));
-const old={...feed,entries:feed.entries.filter(e=>e.id!=='round-tm-ballybunion-20260915-review-v1'&&e.id!=='lesson-sim-approach-repeatability-20260915')};
+const old={...feed,entries:feed.entries.filter(e=>!['round-tm-ballybunion-20260915-review-v1','lesson-sim-approach-repeatability-20260915','round-review-club-map-20260915-v1'].includes(e.id))};
 T.applyFeed(old);const outdoor=JSON.stringify(T.realRounds()),carries=JSON.stringify(T.get().carries);
 T.applyFeed(feed);T.applyFeed(feed);
 const r=T.get().rounds.find(r=>r.review);
@@ -26,6 +26,9 @@ const html=T.roundView(T.get().rounds.indexOf(r));
 assert.ok(html.includes('Round Review · what to do next'));
 assert.ok(html.includes('38 verified shot observations'));
 assert.ok(html.includes('data-action="open-bay"'));
+assert.equal(r.review.clubMap['3-wood'],'mini-driver');
+assert.equal(r.review.clubMap['60-wedge'],'56-wedge');
+assert.equal(r.review.clubMap['2-iron'],'6-iron');
 assert.ok(T.bag().includes('Simulator Round Review'));
 assert.ok(T.bayView(0).includes('Simulator Round Review'));
 T.get().reviewTests=[{testId:'sim-approach-20',date:'2026-09-15',a:0,b:10,conditions:'test'}];

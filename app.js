@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v105';
+const BUILD = 'v106';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v106', d:'2026-09-15', items:[
+    'ROUND CLUB IDENTITIES ARE NOW CONFIRMED: every TrackMan 3w label in Ballybunion was the Mini Driver, every 60° label was the 56°, and every 2-iron label was the 6-iron — the closest selected club when the label was not changed.',
+    'Obvious full swings and partial 56° shots now populate the round club profiles. The 102-yard 6-iron and 61-yard 9-iron remain unclassified because swing length is not clear from the recording.' ] },
   { b:'v105', d:'2026-09-15', items:[
     'SIMULATOR ROUND REVIEW connects the Ballybunion scorecard to verified shot observations, the Bay session, club profiles, three evidence-backed takeaways and a logged next-session test.',
     'THE CLUB YOU SELECTED IS NOT ALWAYS THE CLUB YOU HIT. Jack used only Driver, Mini Driver, 5-wood, 6-iron, 9-iron and 56°. Recorded labels stay visible, but uncertain shot identities do not enter club averages or change playing carries.',
@@ -8338,6 +8341,11 @@ function applyFeed(feed){
             r.par = r.holes.reduce((a, h) => a + h.par, 0);
         }
       }
+    }
+    else if(e.type === 'round-review-update' && e.round && e.review){
+      const r = sameRound(S.rounds, e.round);
+      if(!r || !r.sim || !r.review) return;
+      Object.assign(r.review, e.review);
     }
     else if(e.type === 'test' && e.test) S.tests.push({ date:e.test.date || null, putter:e.test.putter, makes:e.test.makes, note:e.test.note || '' });
     else if(e.type === 'briefing' && e.briefing){
