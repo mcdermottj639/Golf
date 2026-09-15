@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v107';
+const BUILD = 'v108';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v108', d:'2026-09-15', items:[
+    'THE BAY NOW SHOWS THE SHAPE OF THE BAG, NOT JUST A SPREADSHEET: scaled carry bars keep every exact TrackMan number visible while flags call out overlaps, inverted gaps and unusually large stretches between adjacent clubs.',
+    'PATH AND FACE ARE NOW VISUAL TOO: every recorded shot is a dot, the outlined rings are the club averages, and each row prints path, face angle and face-to-path together. TrackMan Consistency has its own separate visual and is not mislabeled as standard deviation.' ] },
   { b:'v107', d:'2026-09-15', items:[
     'THE BALLYBUNION LEDGER NOW CONTAINS ALL 59 COUNTED NON-PUTTING SHOTS: 88 total strokes minus 29 TrackMan-assigned putts. Three canceled mulligan shots were removed and 24 collapsed timeline shots were added.',
     'Expanded shots keep their readable delivery metrics. Shots whose data panel was never opened still keep the selected club, corrected actual club, displayed distance and finishing lie. Nothing missing is filled with zero.' ] },
@@ -2471,6 +2474,66 @@ function bayClubTable(clubs){
       ${cols.map(([k, , f]) => `<td>${c[k] == null ? '·' : esc(String(f(c[k])))}</td>`).join('')}</tr>`).join('')}
     </tbody></table></div>`;
 }
+// A session should be readable before it becomes a spreadsheet. Bar lengths share one
+// scale within THIS session; the printed number remains the evidence. Gaps are simply the
+// difference between adjacent displayed carries, so an overlap or inversion is a prompt
+// to test the clubs again — not permission to rewrite the outdoor ladder.
+function bayGapKind(g){
+  if(g <= 0) return ['inverted', 'INVERTED'];
+  if(g < 6) return ['overlap', 'OVERLAP'];
+  if(g > 20) return ['stretch', 'STRETCH'];
+  return ['', 'GAP'];
+}
+function bayCarryVisual(clubs){
+  const rows = (clubs || []).filter(c => c.carry != null && Number.isFinite(+c.carry));
+  if(rows.length < 2) return '';
+  const max = Math.max(...rows.map(c => +c.carry), 1);
+  return `<div class="bayviz" aria-label="Carry ladder visual">
+    <div class="bvtitle"><b>Carry shape</b><span>longest bar = longest carry here</span></div>
+    ${rows.map((c, i) => {
+      const carry = +c.carry;
+      const next = rows[i + 1];
+      const gap = next ? carry - (+next.carry) : null;
+      const [kind, label] = gap == null ? ['', ''] : bayGapKind(gap);
+      return `<div class="bvitem">
+        <div class="bvrow"><span class="bvname">${esc(c.club ? clubTag(c.club) : '—')}</span>
+          <span class="bvtrack"><i class="bvbar" style="width:${Math.max(3, carry / max * 100).toFixed(1)}%"></i></span>
+          <b class="bvnum">${carry.toFixed(1)}</b></div>
+        ${gap == null ? '' : `<div class="bvgap ${kind}"><span>${esc(label)}</span><b>${gap > 0 ? '+' : ''}${gap.toFixed(1)} yd</b></div>`}
+      </div>`;
+    }).join('')}
+    <p class="bvcap">TrackMan carry, in yards. These are the session's normalized/modelled numbers—not automatic replacements for playing yardages.</p>
+  </div>`;
+}
+function bayConsistencyVisual(clubs){
+  const rows = (clubs || []).filter(c => c.cons != null && Number.isFinite(+c.cons));
+  if(rows.length < 2) return '';
+  const max = Math.max(...rows.map(c => +c.cons), 1);
+  return `<div class="bayviz bvcons" aria-label="TrackMan consistency visual">
+    <div class="bvtitle"><b>Consistency shape</b><span>shorter reported value = shorter bar</span></div>
+    ${rows.map(c => `<div class="bvrow"><span class="bvname">${esc(c.club ? clubTag(c.club) : '—')}</span>
+      <span class="bvtrack"><i class="bvbar" style="width:${Math.max(3, (+c.cons) / max * 100).toFixed(1)}%"></i></span>
+      <b class="bvnum">${(+c.cons).toFixed(1)}</b></div>`).join('')}
+    <p class="bvcap">TrackMan's displayed “Consistency” value. Its formula and unit were not shown, so this compares the screen values without relabelling them as standard deviation.</p>
+  </div>`;
+}
+function bayDeliveryVisual(delivery){
+  const rows = (delivery || []).filter(c => (c.path != null && Number.isFinite(+c.path)) || (c.face != null && Number.isFinite(+c.face)));
+  if(rows.length < 2) return '';
+  const pos = v => Math.max(0, Math.min(100, 50 + (+v / 16 * 50))).toFixed(1);
+  const points = (vals, kind) => (vals || []).filter(Number.isFinite).map(v =>
+    `<i class="bvdshot ${kind}" style="left:${pos(v)}%"></i>`).join('');
+  return `<div class="bayviz bvdelivery" aria-label="Club delivery direction visual">
+    <div class="bvtitle"><b>Path + face</b><span>left ← 0° → right</span></div>
+    <div class="bvdlegend"><span class="path">● club path</span><span class="face">● face angle</span><span>ring = average</span></div>
+    ${rows.map(c => `<div class="bvditem"><div class="bvdrow"><span class="bvname">${esc(c.club ? clubTag(c.club) : '—')}</span>
+      <span class="bvdaxis">${points(c.paths, 'path')}${points(c.faces, 'face')}
+      ${c.path != null && Number.isFinite(+c.path) ? `<i class="bvdot path" style="left:${pos(c.path)}%" title="Average path ${baySgn(c.path)}°"></i>` : ''}
+      ${c.face != null && Number.isFinite(+c.face) ? `<i class="bvdot face" style="left:${pos(c.face)}%" title="Average face ${baySgn(c.face)}°"></i>` : ''}</span></div>
+      <div class="bvdnums"><span>PATH <b>${baySgn(c.path)}°</b></span><span>FACE <b>${baySgn(c.face)}°</b></span><span>F–P <b>${baySgn(c.ftp)}°</b></span></div></div>`).join('')}
+    <p class="bvcap">Every small dot is one measured shot; the outlined rings are club averages. Negative is left of the target line. Face-to-path (F–P) is face angle minus club path: positive means the face was open to the path. Scale: ±16°.</p>
+  </div>`;
+}
 // NEWEST FIRST, same row shape as the film log — the lab still reads as one record of what
 // has been captured, with the BAY chip saying which kind of capture a row was.
 function bayLog(list){
@@ -2533,6 +2596,11 @@ function bayView(i){
   const b = (S.bays || [])[+i];
   if(!b) return game();
   const d = b.detail || {};
+  const delivery = d.delivery || [];
+  const clubRows = (d.clubs || []).map(c => {
+    const x = delivery.find(v => v.club === c.club);
+    return x ? { ...c, path:x.path, face:x.face, ftp:x.ftp } : c;
+  });
   const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
   const LAB = { swing:['swing','Swing Lab'], 'short-game':['shortgame','Short Game'],
                 putting:['putting','Putting Lab'], mental:['mental','Mental Game'] };
@@ -2553,9 +2621,15 @@ function bayView(i){
     </div>` : ''}
     ${b.finding ? `<p class="sm" style="margin-top:10px">${esc(b.finding)}</p>` : ''}
   </div>
-  ${d.clubs && d.clubs.length ? `<h2>Club by club</h2>
+  ${d.clubs && d.clubs.length ? `<h2>Visual read</h2>
+  <div class="card bayvisuals">
+    ${bayCarryVisual(d.clubs)}
+    ${bayConsistencyVisual(d.clubs)}
+    ${bayDeliveryVisual(delivery.length ? delivery : d.clubs)}
+  </div>
+  <h2>Exact club data</h2>
   <div class="card">
-    ${bayClubTable(d.clubs)}
+    ${bayClubTable(clubRows)}
     <p class="sm faint" style="margin-top:8px">A column only appears where the session
       actually produced it. Carry is computed from measured launch — it is a modelled flight,
       not a ball anyone watched land.</p>
@@ -8207,7 +8281,11 @@ function applyFeed(feed){
     else if(e.type === 'bay-update'){
       const b = S.bays.find(x => x._fid === e.target) ||
                 S.bays.find(x => e.setupMatch && (x.setup || '').startsWith(e.setupMatch));
-      if(b && e.bay) Object.assign(b, e.bay);
+      if(b && e.bay){
+        const detail = e.bay.detail ? { ...(b.detail || {}), ...e.bay.detail } : b.detail;
+        Object.assign(b, e.bay);
+        if(e.bay.detail) b.detail = detail;
+      }
     }
     else if(e.type === 'bay-remove') S.bays = S.bays.filter(x => !(e.target && x._fid === e.target));
     else if(e.type === 'combine' && e.combine){

@@ -2514,6 +2514,26 @@ different ways on two screens.
 After any feed change: `python3 -c "import json; json.load(open('coach-feed.json'))"`,
 `node --check app.js`, bump `"updated"`, commit, push.
 
+### Bay session visuals (Sep 15 2026 — build v108)
+
+The Bay detail leads with a visual read, then keeps the exact club table immediately below
+it. `bayCarryVisual()` scales every carry against the longest club in that session and
+prints the decimal beside the bar. The connector between adjacent clubs is literal carry
+subtraction: under 6 yards is **OVERLAP**, zero or less is **INVERTED**, and over 20 is
+**STRETCH**. These labels are test prompts, never automatic changes to the outdoor ladder.
+
+`bayConsistencyVisual()` repeats TrackMan's displayed Consistency values without calling
+them standard deviation: the recording did not show TrackMan's formula or unit. A shorter
+bar only means a smaller displayed number in that session. `bayDeliveryVisual()` plots every
+recorded path and face-angle shot as a small dot and the club average as an outlined ring.
+Face angle is derived shot-by-shot as path + face-to-path, the identity TrackMan uses; never
+average the two inputs separately when one row is missing. The chart renders only when at
+least two club rows contain real delivery numbers; absence must remain absence. Explicitly
+exclude null fields before numeric coercion so missing readings never become zero bars or
+average markers. Keep the
+exact table, the provenance chips and the limitation copy. At 320px the
+visual rows must stay inside the card with no page-level horizontal overflow.
+
 **Always merge to `main` when the work is done** (standing instruction, Aug 1 2026): Jack
 doesn't review PRs on this repo — GitHub Pages serves from `main`, so work that stops on a
 feature branch never reaches his phone. Develop on the assigned branch, then fast-forward
