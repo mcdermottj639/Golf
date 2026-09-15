@@ -14,8 +14,8 @@ const assert=require('node:assert/strict');
  await page.waitForSelector('.rr');
  assert.ok((await page.locator('.rr').innerText()).includes('59 verified shot observations'));
  assert.equal(await page.locator('.rr [data-action="open-bay"]').count(),1);
- assert.equal(await page.locator('.rr-frontviz').count(),1);
- assert.equal(await page.locator('.rr-frontviz .bvdelivery').count(),1);
+ assert.equal(await page.locator('.rr .bvdelivery').count(),0);
+ assert.equal(await page.locator('#round-range-reference').count(),1);
  for(const width of [320,390,768]){
   await page.setViewportSize({width,height:844});
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`overflow ${width}`);
@@ -37,6 +37,7 @@ const assert=require('node:assert/strict');
  assert.equal(state.reviewTests.length,1);assert.equal(state.rounds.filter(r=>!r.sim).length,beforeOutdoor);
  assert.ok(Object.values(state.reviewClubOverrides).some(x=>x.actualClub==='5-wood'));
  await page.click('#nav [data-view="bag"]');await page.click(`[data-action="open-round"][data-i="${idx}"]`);
+ await page.locator('#round-range-reference summary').click();
  await page.click('.rr [data-action="open-bay"]');
  assert.equal(await page.getByRole('heading',{name:'Exact club data',exact:true}).count(),1);
  assert.equal(await page.locator('.bvdelivery').count(),1);
@@ -46,6 +47,8 @@ const assert=require('node:assert/strict');
  }
  await page.setViewportSize({width:390,height:844});
  await page.locator('.bayvisuals').screenshot({path:'/tmp/caddie-bay-v108.png'});
+ await page.click('#nav [data-view="home"]');
+ await page.click('[data-kind="sim"]');
  await page.click(`[data-action="open-round"][data-i="${idx}"]`);
  await page.click('[data-action="open-lesson"][data-id="sim-approach-repeatability"]');
  assert.ok((await page.locator('#view').innerText()).includes('20-ball baseline'));

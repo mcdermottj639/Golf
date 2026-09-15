@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v109';
+const BUILD = 'v110';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v110', d:'2026-09-15', items:[
+    'SESSIONS NOW HAS ITS OWN HOME: open Range sessions or Simulator rounds directly from Today, Game or Bag. Dated cards separate practice, played rounds and swing videos.',
+    'Range charts live inside their own session. Ballybunion keeps its own shot evidence and an optional link to the older bag map. The Sep 15 range recording is listed separately as awaiting full analysis.' ] },
   { b:'v109', d:'2026-09-15', items:[
     'THE TRACKMAN VISUALS ARE NOW FRONT AND CENTER IN THE BALLYBUNION ROUND REVIEW: carry shape, consistency and path-versus-face appear before the written takeaways, with one tap to the full Bay session.',
     'A new apply-once repair restores the full 13-club Map My Bag record on phones where the first delivery update replaced that data. The Round Review now opens with the visual evidence instead of making you hunt for it.' ] },
@@ -1124,6 +1127,7 @@ const TITLES = {
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
   bay:['Bay Session','Every number the launch monitor produced.'],
+  sessions:['Sessions','Range practice, played rounds and swing videos — sorted by date.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
   shelf:['Coach','One shelf of the library.'],
   lesson:['Coach','One lesson, and the drill that trains it.'],
@@ -1204,7 +1208,7 @@ function render(view, arg, keepScroll){
   if(bt){ bt.textContent = BUILD; bt.hidden = view !== 'home'; }
   // The four labs live behind one nav button, so they all light it — and so does every
   // view that hangs off Rounds: a round card, and a course plan you opened from one.
-  const NAV_OF = { swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
+  const NAV_OF = { sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
                    drills:'coach', shelf:'coach', lesson:'coach', landed:'home',
                    round:'rounds', rounds:'rounds' };
   const navView = NAV_OF[view] || view;
@@ -1214,7 +1218,7 @@ function render(view, arg, keepScroll){
   // side it is the same intention and live() already knows which one it is.
   const teeLab = $('#navTeeLab');
   if(teeLab) teeLab.textContent = S.live ? 'RESUME' : 'TEE';
-  const R = { home, bag, game, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed }[view] || home;
+  const R = { home, bag, game, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
@@ -1856,6 +1860,13 @@ function home(){
   const pending = pendingReturn();
   const picks = pickedLessons().slice(0,1);
   return `
+  ${sessionShortcuts()}
+  <div class="home-quicklinks" role="group" aria-label="Quick navigation">
+    <button class="btn ghost" data-action="go" data-view="bag">My Bag</button>
+    <button class="btn ghost" data-action="go" data-view="drills">Practice Drills</button>
+    <button class="btn ghost" data-action="go" data-view="rounds" data-seg="prep">Round Prep</button>
+    <button class="btn" data-action="go" data-view="live">${S.live?'Resume Round':'Start Round'}</button>
+  </div>
   ${wxCard()}
   ${theNumbers()}
   ${startRound()}
@@ -2220,7 +2231,7 @@ function bag(){
   const groups = GROUPS.map(([lab, cats]) => [lab, lineup.filter(c => cats.includes(c.cat))])
     .filter(([, cs]) => cs.length);
   return `
-  ${window.CaddieReview ? window.CaddieReview.hub(S.rounds) : ''}
+  ${sessionShortcuts()}
   <div class="card">
     ${fold('bag-roster', 'In the bag', `${lineup.length} CLUB${lineup.length === 1 ? '' : 'S'}`,
       groups.length ? groups.map(([lab, cs]) => `<div class="cgrp">${lab}</div>
@@ -2549,13 +2560,29 @@ function roundBayVisuals(r){
   if(i < 0) return '';
   const b = S.bays[i], visuals = bayVisualMarkup(b.detail || {});
   if(!visuals) return '';
-  return `<div class="card bayvisuals rr-frontviz">
-    <div class="rr-vizlead"><span>TRACKMAN · ${esc(fmtDate(b.date))}</span>
-      <h3>Your measured swing patterns</h3>
-      <p class="sm">Carry gaps, TrackMan consistency, and every recorded path and face reading from the companion Bay session.</p></div>
-    ${visuals}
-    <button class="btn" data-action="open-bay" data-i="${i}">Open full Bay session & exact club data</button>
-  </div>`;
+  return `<details class="card" id="round-range-reference"><summary>Optional comparison · ${esc(fmtDate(b.date))} range session</summary>
+    <p class="sm">Separate practice session: ${esc(b.setup || '')}. Its range shots are not part of this round.</p>
+    <button class="btn" data-action="open-bay" data-i="${i}">Open range charts & exact data</button></details>`;
+}
+
+const SESSION_TYPES = [['range','Range sessions'],['sim','Simulator rounds'],['outdoor','Outdoor rounds'],['film','Swing videos']];
+function sessionShortcuts(){
+  return `<section class="card session-shortcuts" aria-label="Find your sessions"><h2>Sessions</h2>
+    <p class="sm">Choose what you want to review.</p><div class="session-grid">${SESSION_TYPES.map(([k,label])=>
+      `<button class="session-tile" data-action="session-category" data-kind="${k}"><b>${label}</b><span>${{range:'TrackMan charts & club data',sim:'Scorecards & shot evidence',outdoor:'Course rounds & statistics',film:'Filmed swings & coaching'}[k]} →</span></button>`).join('')}</div></section>`;
+}
+function sessionLibrary(kind='range'){
+  if(!SESSION_TYPES.some(([k])=>k===kind)) kind='range';
+  const rows = kind==='range' ? (S.bays||[]).map((b,i)=>({date:b.date,title:b.mode||'Launch-monitor practice',sub:[b.venue,b.setup].filter(Boolean).join(' · '),action:'open-bay',i}))
+    : kind==='film' ? (S.sessions||[]).map((s,i)=>({date:s.date,title:s.setup||'Swing video',sub:sessionDiscipline(s)+' · Film breakdown',action:'open-session',i}))
+    : (S.rounds||[]).map((r,i)=>({r,i})).filter(({r})=>kind==='sim'?r.sim:!r.sim).map(({r,i})=>({date:r.date,title:r.course||'Round',sub:[r.score!=null?'Score '+r.score:'Score not recorded',r.nine?r.nine+' nine':'',r.review?'Shot evidence & practice plan':'Scorecard & analysis'].filter(Boolean).join(' · '),action:'open-round',i}));
+  rows.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const pending=kind==='range'?`<article class="card session-pending"><span class="session-status">AWAITING FULL ANALYSIS</span><h3>Sep 15 recording · Range practice</h3>
+    <p class="sm">The 2:11 recording you sent at 18:29 is a separate session from the Sep 14 Map My Bag. Its full shot analysis and charts have not been added yet.</p>
+    <details><summary>Recording reference</summary><p class="sm">ScreenRecording_09-15-2026 18-29-32_1.mp4 · also supplied as F2F22B5A-6D32-44AD-8BE2-3A3062267A4D.mov. The recording date identifies the upload; the practice date is not yet verified.</p></details></article>`:'';
+  return `<div class="session-filters" role="group" aria-label="Session type">${SESSION_TYPES.map(([k,label])=>`<button class="btn ${k===kind?'':'ghost'}" data-action="session-category" data-kind="${k}" aria-pressed="${k===kind}">${label}</button>`).join('')}</div>
+    <h2>${SESSION_TYPES.find(([k])=>k===kind)[1]}</h2><p class="sm faint">Newest first · ${rows.length} available${kind==='range'?' · 1 awaiting analysis':''}</p>
+    ${pending}${rows.map(x=>`<button class="card session-row" data-action="${x.action}" data-i="${x.i}"><span class="session-date">${esc(x.date?fmtDate(x.date):'Date unknown')}</span><b>${esc(x.title)}</b><span>${esc(x.sub)}</span><span class="session-open">${kind==='range'?'Open charts & analysis':'Open details'} →</span></button>`).join('')||'<div class="card"><p>No sessions in this category yet.</p></div>'}`;
 }
 // NEWEST FIRST, same row shape as the film log — the lab still reads as one record of what
 // has been captured, with the BAY chip saying which kind of capture a row was.
@@ -2610,7 +2637,7 @@ function combineCard(){
 }
 function bayBlock(disc, empty){
   const list = baysFor(disc);
-  return `${disc === 'swing' && window.CaddieReview ? window.CaddieReview.hub(S.rounds) : ''}<h2>The bay · measured numbers</h2>
+  return `${disc === 'swing' ? sessionShortcuts() : ''}<h2>The bay · measured numbers</h2>
   <div class="card">
     ${list.length ? bayLog(list) : `<p class="sm">${empty}</p>`}
   </div>`;
@@ -2629,8 +2656,10 @@ function bayView(i){
                 putting:['putting','Putting Lab'], mental:['mental','Mental Game'] };
   const [view, label] = LAB[BAY_DISC(b)] || LAB.swing;
   return `
-  <button class="backlink" data-action="go" data-view="${view}">← ${esc(label)}</button>
-  ${window.CaddieReview ? window.CaddieReview.hub(S.rounds) : ''}
+  <button class="backlink" data-action="session-category" data-kind="range">← Range sessions</button>
+  <h2>${esc(fmtDate(b.date))} · ${esc(b.mode || 'Range practice')}</h2>
+  <p class="sm">${esc(b.venue || '')} · ${esc(b.setup || '')}</p>
+  ${d.clubs && d.clubs.length ? `<div class="card bayvisuals">${bayVisualMarkup(d)}</div>` : ''}
   <div class="card">
     <h2>${fmtDate(b.date)} · bay session</h2>
     <h3>${esc(b.setup || '')}</h3>
@@ -2644,11 +2673,7 @@ function bayView(i){
     </div>` : ''}
     ${b.finding ? `<p class="sm" style="margin-top:10px">${esc(b.finding)}</p>` : ''}
   </div>
-  ${d.clubs && d.clubs.length ? `<h2>Visual read</h2>
-  <div class="card bayvisuals">
-    ${bayVisualMarkup(d)}
-  </div>
-  <h2>Exact club data</h2>
+  ${d.clubs && d.clubs.length ? `<h2>Exact club data</h2>
   <div class="card">
     ${bayClubTable(clubRows)}
     <p class="sm faint" style="margin-top:8px">A column only appears where the session
@@ -4450,6 +4475,7 @@ function game(){
   const plans = plansFor(cur.disc).length;
   const open = faultsFor(cur.disc).filter(f => faultState(f) === 'open').length;
   return `
+  ${sessionShortcuts()}
   <div class="labgrid">${LABS.map(l => {
     const on = l.disc === cur.disc;
     const n = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;
@@ -7411,6 +7437,7 @@ function bumpGearCounters(){
 
 // ---------- Actions ----------
 const ACTIONS = {
+  'session-category': el => render('sessions', el.dataset.kind || 'range'),
   // `data-seg` is how a link asks for one FACE of a multi-segment view (Rounds). Every
   // other view ignores it, so one action still covers every link in the app.
   'go': el => { editingCourse = null; render(el.dataset.view, el.dataset.seg); },

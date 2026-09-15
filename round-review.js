@@ -61,7 +61,7 @@
       <p class="sm">${shots.length} verified shot observations across ${new Set(shots.map(s=>s.hole)).size} holes; the scorecard covers all 18. This is a partial shot ledger—not a complete shot count. Collapsed, missing and questionable readings are not filled in.</p>
       <p class="sm"><b>Actual bag this round:</b> Driver, Mini Driver, 5-wood, 6-iron, 9-iron, 56°. You reported that selected club labels were sometimes left unchanged. Each shot retains its displayed label; actual club remains unconfirmed unless independently identified.</p>
       <p class="sm faint">Auto-putting reported; approximately 12-foot gimme setting unconfirmed. Putting skill is not evaluated. Ball, normalization, tees and simulator conditions for this round are unconfirmed.</p>
-      ${bayIndex>=0?`<button class="btn" data-action="open-bay" data-i="${bayIndex}">Compare with Sep 14 Bay session</button>`:''}
+      ${bayIndex>=0&&!ctx.bayVisuals?`<button class="btn" data-action="open-bay" data-i="${bayIndex}">Compare with Sep 14 Bay session</button>`:''}
       <button class="btn" data-action="go" data-view="bag">Open Bag & playing carries</button></div>
       <h2>Three takeaways · evidence first</h2>${f.map(x=>`<div class="card"><h3>${esc(x.title)}</h3><p class="sm">${esc(x.body)}</p></div>`).join('')}
       <h2>Club profiles · range versus round</h2><div class="card"><p class="sm">Range carry and round shot distance are different fields. No carry-gap arithmetic or playing-yardage updates are made from this comparison. Only explicitly identified full shots enter the round summary; unknown-intent and short shots stay in the ledger.</p>

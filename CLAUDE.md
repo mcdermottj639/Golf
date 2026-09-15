@@ -26,7 +26,8 @@ design-options/       Pre-approval design candidates (historical snapshots — d
 mockup/               Original pre-approval mockup (historical snapshot — don't edit)
 ```
 
-There is **no test suite and no bundler.** "Build" = the files as-is. Validate before
+There is **no bundler.** "Build" = the files as-is. The simulator tests live in `tests/`.
+Run `node tests/round-review.cjs` and `node tests/round-review-import.cjs`. Validate before
 committing:
 
 ```
@@ -2534,11 +2535,28 @@ average markers. Keep the
 exact table, the provenance chips and the limitation copy. At 320px the
 visual rows must stay inside the card with no page-level horizontal overflow.
 
-The Ballybunion Round Review receives the same three visuals through
-`roundBayVisuals()` and places them before its written takeaways. This is deliberate: a
-round review should lead with the evidence Jack can scan, while the Bay detail remains the
-source for the exact club table and full session story. Keep the full-session button inside
-that first visual card; do not bury the only route below the 59-shot ledger again.
+### Session organization and Home quick navigation (v110)
+
+Jack wants separate, immediately findable homes for practice and rounds. `sessionShortcuts()`
+is first on Today, Game and Bag. It opens `sessionLibrary()` filtered to Range sessions,
+Simulator rounds, Outdoor rounds or Swing videos. Each list is newest-first with an explicit
+date, session identity and direct detail link. Home also has My Bag, Practice Drills,
+Round Prep and Start/Resume Round links before the weather and statistics.
+
+Range charts lead their own Bay detail. Do not embed a practice session's charts inside a
+played round: v109 did that and confused the source. `roundBayVisuals()` now returns only a
+collapsed optional comparison link labeled with the older range date. Ballybunion retains
+its own scorecard, shots and practice plan. Original array indices remain the navigation
+keys after sorting; never navigate using the sorted display index.
+
+CORRECTION TO PRIOR CHAT CLAIMS: the 131.1-second 18:29 range recording (also attached as
+F2F22B5A-6D32-44AD-8BE2-3A3062267A4D.mov) is NOT the Sep 14 78-shot/13-club bag map.
+Its visible 3w group has 10 shots and its 5w group has 9. Matching sampled frames proved
+the two uploaded filenames refer to the same recording, not that it was analyzed or imported.
+There is no completed import of that newer range session in v110. The Range list explicitly
+tracks it as awaiting full analysis, with Sep 15 labeled as recording/upload date, not a
+verified practice date. Remove that pending notice only when its own source-verified session
+is actually added; never claim the older map's charts came from this newer recording.
 
 The first delivery entry (`bay-delivery-20260914-v1`) could reach a phone while it still
 ran the old shallow `bay-update` merger. That replaced the entire `detail` object with
