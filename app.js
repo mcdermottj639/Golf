@@ -99,13 +99,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v104';
+const BUILD = 'v105';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v105', d:'2026-09-15', items:[
+    'SIMULATOR ROUND REVIEW connects the Ballybunion scorecard to verified shot observations, the Bay session, club profiles, three evidence-backed takeaways and a logged next-session test.',
+    'THE CLUB YOU SELECTED IS NOT ALWAYS THE CLUB YOU HIT. Jack used only Driver, Mini Driver, 5-wood, 6-iron, 9-iron and 56°. Recorded labels stay visible, but uncertain shot identities do not enter club averages or change playing carries.',
+    'The v103/v104 empty Bay was caused by a truncated, invalid published JSON feed—not proven to be a cache problem. The complete feed was repaired and verified byte-for-byte. Simulator results remain separate from outdoor records and putting skill.' ] },
   { b:'v104', d:'2026-09-15', items:[
     'THE BAY FEED NOW BYPASSES GITHUB PAGES\' TEN-MINUTE EDGE CACHE. v103 could arrive before the Trackman data file at a phone\'s nearest cache, leaving Swing Lab correctly upgraded but still saying “No bay sessions yet.” The feed request now carries the running build in its URL, so code and data land together without resetting anything.' ] },
   { b:'v103', d:'2026-09-15', items:[
@@ -2204,6 +2208,7 @@ function bag(){
   const groups = GROUPS.map(([lab, cats]) => [lab, lineup.filter(c => cats.includes(c.cat))])
     .filter(([, cs]) => cs.length);
   return `
+  ${window.CaddieReview ? window.CaddieReview.hub(S.rounds) : ''}
   <div class="card">
     ${fold('bag-roster', 'In the bag', `${lineup.length} CLUB${lineup.length === 1 ? '' : 'S'}`,
       groups.length ? groups.map(([lab, cs]) => `<div class="cgrp">${lab}</div>
@@ -2513,7 +2518,7 @@ function combineCard(){
 }
 function bayBlock(disc, empty){
   const list = baysFor(disc);
-  return `<h2>The bay · measured numbers</h2>
+  return `${disc === 'swing' && window.CaddieReview ? window.CaddieReview.hub(S.rounds) : ''}<h2>The bay · measured numbers</h2>
   <div class="card">
     ${list.length ? bayLog(list) : `<p class="sm">${empty}</p>`}
   </div>`;
@@ -2528,6 +2533,7 @@ function bayView(i){
   const [view, label] = LAB[BAY_DISC(b)] || LAB.swing;
   return `
   <button class="backlink" data-action="go" data-view="${view}">← ${esc(label)}</button>
+  ${window.CaddieReview ? window.CaddieReview.hub(S.rounds) : ''}
   <div class="card">
     <h2>${fmtDate(b.date)} · bay session</h2>
     <h3>${esc(b.setup || '')}</h3>
@@ -6056,10 +6062,9 @@ function roundView(i){
     ${r.sim ? `<div class="goldnote" style="margin-top:10px">
       <div class="gnl">Played indoors${r.venue ? ` · ${esc(r.venue)}` : ''}</div>
       <p class="sm">Every shot here is one you hit, and the card is yours. It is <b>not</b> eligible
-        for a handicap differential, and it is counted in nothing on Today or in Coach — a mat is
-        not turf, the lies were perfect and the greens were software. Putts are the count only:
-        a simulator putt is struck on a flat mat with the break applied by the software, so no
-        made distance is recorded from one.</p>
+        for a handicap differential and does not change outdoor statistics. It can inform this
+        separate Simulator Round Review. Auto-putts are assigned by software when enabled;
+        the putt count is not a measurement of your putting skill.</p>
     </div>` : ''}
     ${r.note ? `<p class="sm" style="margin-top:8px">"${esc(r.note)}"</p>` : ''}
     ${r.troubles && r.troubles.length ? `<div class="chips">${r.troubles.map(k => {
@@ -6092,6 +6097,7 @@ function roundView(i){
       <span class="arr">→</span></div>`)(courseRecord(r.course)) : ''}
   </div>
 
+  ${window.CaddieReview ? window.CaddieReview.render(r, { bays:S.bays, rounds:S.rounds, tests:S.reviewTests, identities:S.reviewClubOverrides }) : ''}
   ${a.holes.length ? `
   <div class="card">
     ${fold(`rd-card-${i}`, 'Full scorecard',
@@ -7316,6 +7322,23 @@ const ACTIONS = {
   // which is a navigation and goes through `go`.
   'game-lab': el => { gameLab = el.dataset.disc; rerender(); },
   'open-round': el => render('round', +el.dataset.i),
+  'save-review-identity': el => {
+    const shot = document.getElementById('rrshot').value;
+    const actualClub = document.getElementById('rrclub').value || null;
+    const intent = document.getElementById('rrintent').value;
+    (S.reviewClubOverrides ||= {})[`${el.dataset.round}:${shot}`] = { actualClub, intent };
+    save(); rerender(); toast('Shot identity saved');
+  },
+  'save-review-test': el => {
+    const a = document.getElementById('rr125'), b = document.getElementById('rr150');
+    const conditions = document.getElementById('rrconditions').value.trim();
+    const vals = [a,b].map(x => x.value.trim() === '' ? NaN : Number(x.value));
+    if(vals.some(x => !Number.isInteger(x) || x < 0 || x > 10) || !conditions){
+      document.getElementById('rr-error').textContent = 'Enter whole-number results from 0–10 and the clubs / conditions.'; return;
+    }
+    (S.reviewTests ||= []).push({ testId:el.dataset.test, date:today(), a:vals[0], b:vals[1], conditions });
+    save(); rerender(); toast('Simulator test saved');
+  },
 
   // ----- Live round -----
   'live-new': () => render('live'),

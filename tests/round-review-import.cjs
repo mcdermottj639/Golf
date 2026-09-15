@@ -1,0 +1,38 @@
+// Execute the real importer/render functions without browser layout; browser suite is separate.
+const vm=require('node:vm'),fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const root=path.join(__dirname,'..');
+const dummy={addEventListener(){},querySelectorAll(){return []},classList:{add(){},remove(){},toggle(){}},style:{},dataset:{}};
+const storage={};
+const ctx={console,setTimeout(){},clearTimeout(){},setInterval(){},document:{addEventListener(){},querySelector(){return dummy},querySelectorAll(){return []},getElementById(){return dummy},body:dummy},navigator:{},localStorage:{getItem:k=>storage[k]||null,setItem:(k,v)=>storage[k]=v},window:{addEventListener(){},matchMedia:()=>({matches:false,addEventListener(){}})}};
+ctx.window.CaddieReview=require('../round-review.js');
+vm.createContext(ctx);
+for(const f of ['lessons.js','courses-db.js','course-cards.js'])vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),ctx);
+let src=fs.readFileSync(path.join(root,'app.js'),'utf8');
+src=src.slice(0,src.indexOf('// ---------- Boot ----------'))+`
+rerender=()=>{};toast=()=>{};load();
+window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView};
+})();`;
+vm.runInContext(src,ctx);
+const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'coach-feed.json'),'utf8'));
+const old={...feed,entries:feed.entries.filter(e=>e.id!=='round-tm-ballybunion-20260915-review-v1'&&e.id!=='lesson-sim-approach-repeatability-20260915')};
+T.applyFeed(old);const outdoor=JSON.stringify(T.realRounds()),carries=JSON.stringify(T.get().carries);
+T.applyFeed(feed);T.applyFeed(feed);
+const r=T.get().rounds.find(r=>r.review);
+assert.equal(T.get().rounds.filter(r=>r.review).length,1);
+assert.equal(T.roundDiff(r),null);
+assert.equal(JSON.stringify(T.realRounds()),outdoor);
+assert.equal(JSON.stringify(T.get().carries),carries);
+const html=T.roundView(T.get().rounds.indexOf(r));
+assert.ok(html.includes('Round Review · what to do next'));
+assert.ok(html.includes('38 verified shot observations'));
+assert.ok(html.includes('data-action="open-bay"'));
+assert.ok(T.bag().includes('Simulator Round Review'));
+assert.ok(T.bayView(0).includes('Simulator Round Review'));
+T.get().reviewTests=[{testId:'sim-approach-20',date:'2026-09-15',a:0,b:10,conditions:'test'}];
+T.get().reviewClubOverrides={[r.feedId+':h1-a']:{actualClub:'5-wood',intent:'full'}};
+T.applyFeed(feed);
+assert.equal(T.get().reviewTests[0].a,0);
+assert.equal(T.get().reviewClubOverrides[r.feedId+':h1-a'].actualClub,'5-wood');
+T.get().rounds.push({date:'2026-09-01',course:'Score only',score:90});
+assert.doesNotThrow(()=>T.roundView(T.get().rounds.length-1));
+console.log('PASS actual app importer/render: fresh + existing feed, idempotence, outdoor exclusion, unchanged carries, review/Bag/Bay markup, preserved test/correction, score-only legacy card.');

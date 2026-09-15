@@ -2226,12 +2226,51 @@ What the browser pass turned up, since it is the reason the check list exists: n
 first column is also CLUB — two identical headers over different numbers, invisible in code
 and obvious the moment the table rendered. It is `CLUB MPH` / `BALL MPH` now.
 
-### A simulator round is a round, and it is not this record (Sep 11 2026)
+### Simulator Round Review (v105 · Sep 15 2026)
+
+`round-review.js` and `round-review.css` extend the existing round card, not navigation.
+Rounds → Ballybunion opens the review; Bag, Swing Lab and Bay session link to it.
+The round is a new apply-once `round` feed entry. Its extraction source is
+`data/ballybunion-2026-09-15.json`; future corrections MUST use new `round-update` entries,
+not edits to an applied feed id. All 18 scores and 38 selected stable shot observations
+are captured; this is not a claim to have transcribed every shot in the recordings.
+
+Jack carried only Driver, Mini Driver, 5-wood, 6-iron, 9-iron and 56°. He sometimes left
+the selected TrackMan club unchanged. `shots[].club` is only the displayed label;
+`actualClub` and `intent` are unknown until confirmed. Never map all 3w labels to Mini
+Driver or 60° labels to 56°, or infer clubs from speed. Profiles require confirmed actual
+club, full intent and no flagged reading. User confirmations live in
+`S.reviewClubOverrides`, keyed by round feedId plus shot id, and survive feed updates.
+Raw labels stay intact. Partial shots and unknown identities never change carries.
+
+Round distance is displayed shot distance, not verified carry. Bay and round distance
+columns stay separate; no carry-gap arithmetic. Face-to-path is derived as face minus path
+only when both are numeric. Path findings describe a mixed-shot subset, not a full-swing
+or body-mechanics diagnosis. Conflicting TrackMan and companion statistics remain separate.
+The fixed 20-ball approach test is a feed-added Coach lesson; its two integer counts
+(0–10) and required conditions are stored in `S.reviewTests`. Reading the lesson is not
+completing it. Simulator history does not imply a trend or comparable conditions.
+Auto-putting is assigned scoring, not putting skill; approximately 12-ft gimme is unconfirmed.
+
+The earlier v104 cache explanation was incorrect: the published feed contained a literal
+omitted-bytes marker and was invalid JSON. The complete file was repaired and verified
+byte-for-byte. Always upload complete bytes and verify SHA/JSON; never publish truncated
+command output. Retain the build-keyed feed request for versioning.
+
+Verification: `node tests/round-review.cjs` checks extraction totals, source/feed identity,
+club eligibility and escaping; `node tests/round-review-import.cjs` executes the actual
+importer and render functions against fresh/existing state, imports twice, and verifies
+unchanged outdoor records/carries and preserved user corrections. These are NOT browser
+layout tests. `tests/round-review-browser.cjs` exercises 320/390/768 widths, navigation,
+forms and persistence against a server on port 8765. v105 is not cleared for publication
+until that real-browser pass succeeds. The current environment had no browser binary and
+the Playwright Chromium download timed out; no visual verification has been claimed.
+
+### A simulator round is a round, and it is not the outdoor record (Sep 11 2026)
 
 A Trackman round is real golf played by him, and the shot data under it is measured. It is
-also played off a perfect mat, in still air, on software greens, with no consequence for a
-tee shot. Both halves are true, so a sim card is **stored, opened and read — and counted in
-nothing**.
+also played on a simulator with software conditions rather than outdoor turf. A sim card
+is stored, opened and analysed in its own review, but excluded from outdoor statistics.
 
 **`realRounds()` is the door**, and it exists so the guard is in one place rather than at
 thirty call sites: everything that computes a claim about his golf reads it, while the round
@@ -2252,8 +2291,8 @@ reached for there is not the club he reaches for on the real tee.
 **Putting distances are stripped on the way IN**, in `applyFeed()`, not filtered at every
 reader — a field that exists in the store is a field somebody counts eventually. A simulator
 putt is struck on a flat mat with the break applied by software, so `pm`/`gimme`/`pd` off one
-is the sim's geometry rather than a proximity measurement. The putt COUNT survives, because
-he did take those strokes.
+is the sim's geometry rather than a proximity measurement. The putt COUNT survives as the
+displayed score component; auto-putting strokes are assigned rather than physically struck.
 
 What it still does: renders in the rounds list with a `SIM` badge beside the `LIVE` one, and
 opens to a full round card carrying a standing gold note saying it is not eligible for a

@@ -36297,6 +36297,635 @@
       "type": "carry-update",
       "target": "60° wedge",
       "club": { "meas": { "src": "tm:2026-09-14-gl18-map-my-bag", "n": 6, "cons": 4.1, "date": "2026-09-14", "ball": "venue, unmarked", "norm": "Normalize on · exact setting not shown", "spin": "estimated", "carry": 66.3, "how": "TM4 indoors · venue ball · spin estimated · normalization on, exact setting not shown" } }
+    },
+{
+  "id": "round-tm-ballybunion-20260915-review-v1",
+  "type": "round",
+  "src": "tm:2026-09-15-ballybunion",
+  "round": {
+    "date": "2026-09-15",
+    "course": "Ballybunion",
+    "sim": true,
+    "par": 71,
+    "score": 88,
+    "putts": 29,
+    "note": "TrackMan simulator round. Auto-putting reported, approximately 12-foot gimme setting unconfirmed. Shot club labels were sometimes not changed; actual bag: Driver, Mini Driver, 5-wood, 6-iron, 9-iron, 56°. Recorded labels are not confirmed actual clubs.",
+    "holes": [
+      {
+        "n": 1,
+        "par": 4,
+        "s": 6,
+        "si": 11
+      },
+      {
+        "n": 2,
+        "par": 4,
+        "s": 6,
+        "si": 1
+      },
+      {
+        "n": 3,
+        "par": 3,
+        "s": 4,
+        "si": 9
+      },
+      {
+        "n": 4,
+        "par": 5,
+        "s": 7,
+        "si": 17
+      },
+      {
+        "n": 5,
+        "par": 5,
+        "s": 5,
+        "si": 13
+      },
+      {
+        "n": 6,
+        "par": 4,
+        "s": 5,
+        "si": 7
+      },
+      {
+        "n": 7,
+        "par": 4,
+        "s": 4,
+        "si": 5
+      },
+      {
+        "n": 8,
+        "par": 3,
+        "s": 4,
+        "si": 15
+      },
+      {
+        "n": 9,
+        "par": 4,
+        "s": 5,
+        "si": 3
+      },
+      {
+        "n": 10,
+        "par": 4,
+        "s": 5,
+        "si": 12
+      },
+      {
+        "n": 11,
+        "par": 4,
+        "s": 6,
+        "si": 2
+      },
+      {
+        "n": 12,
+        "par": 3,
+        "s": 3,
+        "si": 8
+      },
+      {
+        "n": 13,
+        "par": 5,
+        "s": 6,
+        "si": 18
+      },
+      {
+        "n": 14,
+        "par": 3,
+        "s": 2,
+        "si": 14
+      },
+      {
+        "n": 15,
+        "par": 3,
+        "s": 5,
+        "si": 4
+      },
+      {
+        "n": 16,
+        "par": 5,
+        "s": 5,
+        "si": 16
+      },
+      {
+        "n": 17,
+        "par": 4,
+        "s": 5,
+        "si": 6
+      },
+      {
+        "n": 18,
+        "par": 4,
+        "s": 5,
+        "si": 10
+      }
+    ],
+    "review": {
+      "bayId": "bay-20260914-gl18-map-my-bag",
+      "testId": "sim-approach-20",
+      "availableClubs": [
+        "driver",
+        "mini-driver",
+        "5-wood",
+        "6-iron",
+        "9-iron",
+        "56-wedge"
+      ],
+      "trackman": {
+        "fairways": [
+          6,
+          13
+        ],
+        "gir": [
+          3,
+          18
+        ],
+        "averageDrive": 217,
+        "longestDrive": 245,
+        "scrambling": 13,
+        "putts": 29
+      },
+      "companion": {
+        "drivingDistance": 224.34,
+        "drivingUnit": null,
+        "scrambling": 66.67,
+        "scramblingCount": [
+          10,
+          15
+        ],
+        "strokesGained": -29.76,
+        "benchmark": null
+      },
+      "coverage": "Scorecard and summary read from IMG_4114–4116. Selected stable observations read from four shot-detail recordings: 15-00-56 (holes 1–6), 15-02-35 (7–12), 15-04-01 (13–18). Companion statistics from 14-57-13. This ledger is a verified subset, not every shot or every available frame; missing measurements are null/absent, never zero. Distance means the shot distance displayed by the app; carry versus total is unconfirmed. Per-shot actual club and swing intent remain unconfirmed. Some displayed sequences/distances and repeated metrics need verification. Do not infer lie-adjusted carries or reconstruct counted shot order from this subset.",
+      "shots": [
+        {
+          "id": "h1-a",
+          "hole": 1,
+          "club": "5-wood",
+          "distance": 123,
+          "lie": "deep rough",
+          "cs": 83,
+          "aoa": 1.2,
+          "path": -1.8,
+          "face": 5.3,
+          "loft": 41,
+          "spinLoft": 40.3,
+          "source": "15-00-56 · 0s"
+        },
+        {
+          "id": "h1-b",
+          "hole": 1,
+          "club": "driver",
+          "distance": 207,
+          "lie": "fairway",
+          "cs": 82.4,
+          "aoa": -1.8,
+          "path": -1.5,
+          "face": 1.7,
+          "loft": 11.6,
+          "spinLoft": 13.8,
+          "source": "15-00-56 · 4s"
+        },
+        {
+          "id": "h1-c",
+          "hole": 1,
+          "club": "60-wedge",
+          "distance": 65,
+          "lie": "rough",
+          "cs": 40.8,
+          "path": -3.2,
+          "face": -4.7,
+          "loft": 20,
+          "source": "15-00-56 · 8s"
+        },
+        {
+          "id": "h1-d",
+          "hole": 1,
+          "club": "60-wedge",
+          "distance": 35,
+          "lie": "green",
+          "proximity": "3 ft 8 in",
+          "cs": 82.4,
+          "aoa": -1.8,
+          "path": -1.5,
+          "face": 1.7,
+          "loft": 11.6,
+          "spinLoft": 13.8,
+          "flag": "Delivery values repeat the earlier driver-labelled shot exactly; retained as displayed, excluded from summaries.",
+          "source": "15-00-56 · 12s"
+        },
+        {
+          "id": "h2-a",
+          "hole": 2,
+          "club": "driver",
+          "distance": 205,
+          "lie": "deep rough",
+          "source": "15-00-56 · 16s"
+        },
+        {
+          "id": "h2-b",
+          "hole": 2,
+          "club": "2-iron",
+          "distance": 102,
+          "lie": "deep rough",
+          "source": "15-00-56 · 16s"
+        },
+        {
+          "id": "h2-c",
+          "hole": 2,
+          "club": "56-wedge",
+          "distance": 48,
+          "lie": "deep rough",
+          "cs": 61.4,
+          "path": -1,
+          "face": -4.2,
+          "loft": 38,
+          "source": "15-00-56 · 20s"
+        },
+        {
+          "id": "h2-d",
+          "hole": 2,
+          "club": "60-wedge",
+          "distance": 49,
+          "lie": "green",
+          "proximity": "28 ft 2 in",
+          "cs": 89.2,
+          "aoa": 0.2,
+          "path": -3.2,
+          "face": -1.8,
+          "loft": 18,
+          "spinLoft": 17.9,
+          "flag": "Selected label is not an actual club carried; high speed for the displayed short shot needs verification.",
+          "source": "15-00-56 · 24s"
+        },
+        {
+          "id": "h3-a",
+          "hole": 3,
+          "club": "56-wedge",
+          "distance": 48,
+          "lie": "green",
+          "proximity": "33 ft 11 in",
+          "source": "15-00-56 · 28s"
+        },
+        {
+          "id": "h4-a",
+          "hole": 4,
+          "club": "driver",
+          "distance": 245,
+          "lie": "fairway",
+          "cs": 95.3,
+          "aoa": 0.6,
+          "path": -3.5,
+          "face": -0.7,
+          "loft": 14,
+          "spinLoft": 13.6,
+          "source": "15-00-56 · 32s"
+        },
+        {
+          "id": "h4-b",
+          "hole": 4,
+          "club": "3-wood",
+          "distance": 188,
+          "lie": "sand",
+          "source": "15-00-56 · 32s"
+        },
+        {
+          "id": "h4-c",
+          "hole": 4,
+          "club": "56-wedge",
+          "distance": 87,
+          "lie": "rough",
+          "cs": 73.1,
+          "aoa": -7.2,
+          "path": -4.3,
+          "face": -8.4,
+          "loft": 38.8,
+          "spinLoft": 46.2,
+          "source": "15-00-56 · 36s"
+        },
+        {
+          "id": "h4-d",
+          "hole": 4,
+          "club": "60-wedge",
+          "distance": 18,
+          "lie": "green",
+          "proximity": "29 ft",
+          "cs": 17.6,
+          "path": -5,
+          "face": -4.1,
+          "loft": 38.7,
+          "source": "15-00-56 · 40s"
+        },
+        {
+          "id": "h5-a",
+          "hole": 5,
+          "club": "3-wood",
+          "distance": 49,
+          "lie": "fairway",
+          "cs": 84.7,
+          "aoa": -0.8,
+          "path": -3.3,
+          "face": -5.4,
+          "loft": 3.2,
+          "spinLoft": 4.4,
+          "source": "15-00-56 · 44s"
+        },
+        {
+          "id": "h5-b",
+          "hole": 5,
+          "club": "60-wedge",
+          "distance": 28,
+          "lie": "green",
+          "proximity": "5 ft 2 in",
+          "cs": 17.8,
+          "aoa": -6.4,
+          "path": 5.2,
+          "face": -3.1,
+          "loft": 29.5,
+          "spinLoft": 36.8,
+          "source": "15-00-56 · 48s"
+        },
+        {
+          "id": "h6-a",
+          "hole": 6,
+          "club": "2-iron",
+          "distance": 184,
+          "lie": "rough",
+          "cs": 85.1,
+          "aoa": -1.8,
+          "path": -1.3,
+          "face": 1.2,
+          "loft": 19.1,
+          "spinLoft": 21.1,
+          "source": "15-00-56 · 52s"
+        },
+        {
+          "id": "h7-a",
+          "hole": 7,
+          "club": "driver",
+          "distance": 203,
+          "lie": "rough",
+          "source": "15-02-35 · 0s"
+        },
+        {
+          "id": "h7-b",
+          "hole": 7,
+          "club": "56-wedge",
+          "distance": 64,
+          "lie": "green",
+          "proximity": "20 ft 11 in",
+          "cs": 64.7,
+          "path": -3.9,
+          "face": 0.8,
+          "loft": 42.7,
+          "source": "15-02-35 · 5s"
+        },
+        {
+          "id": "h8-a",
+          "hole": 8,
+          "club": "56-wedge",
+          "distance": 44,
+          "lie": "fairway",
+          "path": -3.7,
+          "loft": 29,
+          "source": "15-02-35 · 15s"
+        },
+        {
+          "id": "h9-a",
+          "hole": 9,
+          "club": "driver",
+          "distance": 209,
+          "lie": "deep rough",
+          "cs": 89.8,
+          "aoa": 1.7,
+          "path": -3.8,
+          "face": -1.2,
+          "loft": 18,
+          "spinLoft": 16.5,
+          "source": "15-02-35 · 20s"
+        },
+        {
+          "id": "h9-b",
+          "hole": 9,
+          "club": "56-wedge",
+          "distance": 88,
+          "lie": "green",
+          "proximity": "5 ft 1 in",
+          "cs": 72.8,
+          "path": -0.2,
+          "face": -2.1,
+          "loft": 40.1,
+          "source": "15-02-35 · 25s"
+        },
+        {
+          "id": "h10-a",
+          "hole": 10,
+          "club": "3-wood",
+          "distance": 190,
+          "lie": "deep rough",
+          "source": "15-02-35 · 30s"
+        },
+        {
+          "id": "h10-b",
+          "hole": 10,
+          "club": "5-wood",
+          "distance": 129,
+          "lie": "deep rough",
+          "source": "15-02-35 · 30s"
+        },
+        {
+          "id": "h10-c",
+          "hole": 10,
+          "club": "56-wedge",
+          "distance": 21,
+          "lie": "green",
+          "proximity": "8 ft 8 in",
+          "source": "15-02-35 · 30s"
+        },
+        {
+          "id": "h11-a",
+          "hole": 11,
+          "club": "3-wood",
+          "distance": 202,
+          "lie": "rough",
+          "source": "15-02-35 · 35s"
+        },
+        {
+          "id": "h11-b",
+          "hole": 11,
+          "club": "56-wedge",
+          "distance": 18,
+          "lie": "fairway",
+          "cs": 43.9,
+          "path": -8.8,
+          "face": -5.1,
+          "loft": 16.5,
+          "source": "15-02-35 · 40s"
+        },
+        {
+          "id": "h12-a",
+          "hole": 12,
+          "club": "3-wood",
+          "distance": 212,
+          "lie": "green",
+          "proximity": "8 ft 6 in",
+          "cs": 90,
+          "aoa": 2.2,
+          "path": -4.8,
+          "face": -2.9,
+          "loft": 18.2,
+          "spinLoft": 16.1,
+          "source": "15-02-35 · 45s"
+        },
+        {
+          "id": "h13-a",
+          "hole": 13,
+          "club": "9-iron",
+          "distance": 61,
+          "lie": "deep rough",
+          "cs": 58.4,
+          "aoa": -6.6,
+          "path": -5.1,
+          "face": 0.2,
+          "loft": 27.3,
+          "spinLoft": 34.2,
+          "source": "15-04-01 · 0s"
+        },
+        {
+          "id": "h14-a",
+          "hole": 14,
+          "club": "9-iron",
+          "distance": 126,
+          "lie": "green",
+          "proximity": "9 ft 3 in",
+          "cs": 70.2,
+          "aoa": -7.1,
+          "path": -5.8,
+          "face": -2.8,
+          "loft": 21.6,
+          "spinLoft": 28.8,
+          "source": "15-04-01 · 5s"
+        },
+        {
+          "id": "h15-a",
+          "hole": 15,
+          "club": "60-wedge",
+          "distance": 33,
+          "lie": "fairway",
+          "cs": 54.2,
+          "path": -15.8,
+          "face": -13.4,
+          "loft": 49.6,
+          "source": "15-04-01 · 10s"
+        },
+        {
+          "id": "h16-a",
+          "hole": 16,
+          "club": "driver",
+          "distance": 239,
+          "lie": "deep rough",
+          "source": "15-04-01 · 15s"
+        },
+        {
+          "id": "h16-b",
+          "hole": 16,
+          "club": "5-wood",
+          "distance": 130,
+          "lie": "fairway",
+          "cs": 84,
+          "aoa": -1.3,
+          "path": 7.4,
+          "face": 6.7,
+          "loft": 17.9,
+          "spinLoft": 19.2,
+          "source": "15-04-01 · 15s"
+        },
+        {
+          "id": "h16-c",
+          "hole": 16,
+          "club": "56-wedge",
+          "distance": 91,
+          "lie": "green",
+          "proximity": "55 ft 3 in",
+          "cs": 70.6,
+          "aoa": -7.1,
+          "path": 0,
+          "face": 0.3,
+          "loft": 42.5,
+          "spinLoft": 49.6,
+          "source": "15-04-01 · 21s"
+        },
+        {
+          "id": "h17-b",
+          "hole": 17,
+          "club": "3-wood",
+          "distance": 235,
+          "lie": "fairway",
+          "cs": 88.2,
+          "aoa": -0.8,
+          "path": -1.5,
+          "face": -4.8,
+          "loft": 11.6,
+          "spinLoft": 12.8,
+          "source": "15-04-01 · 23s"
+        },
+        {
+          "id": "h17-a",
+          "hole": 17,
+          "club": "56-wedge",
+          "distance": 31,
+          "lie": "fairway",
+          "source": "15-04-01 · 25s"
+        },
+        {
+          "id": "h18-a",
+          "hole": 18,
+          "club": "driver",
+          "distance": 215,
+          "lie": "fairway",
+          "source": "15-04-01 · 30s"
+        },
+        {
+          "id": "h18-b",
+          "hole": 18,
+          "club": "6-iron",
+          "distance": 119,
+          "lie": "fairway",
+          "source": "15-04-01 · 30s"
+        },
+        {
+          "id": "h18-c",
+          "hole": 18,
+          "club": "56-wedge",
+          "distance": 33,
+          "lie": "green",
+          "proximity": "33 ft 3 in",
+          "cs": 28.2,
+          "path": 1.9,
+          "face": 3.8,
+          "loft": 34.7,
+          "source": "15-04-01 · 30s"
+        }
+      ]
     }
+  }
+},
+{
+  "id": "lesson-sim-approach-repeatability-20260915",
+  "type": "lesson-add",
+  "src": "tm:2026-09-15-ballybunion",
+  "lesson": {
+    "id": "sim-approach-repeatability",
+    "shelf": "Swing",
+    "title": "Simulator approach repeatability · 20-ball baseline",
+    "min": 20,
+    "tags": [
+      "approach",
+      "wedge-distance"
+    ],
+    "body": "The Ballybunion simulator card recorded 3 greens in 18 holes. That is a reason to test approach repeatability, not proof of a particular swing fault. Club labels in the round were sometimes stale. Use the actual club for each target and record it explicitly. Open the Ballybunion Round Review to log results; this test does not alter outdoor statistics.",
+    "drill": "Hit 10 balls to 125 yards and 10 to 150 yards. Count each ball finishing within 15 yards of the target. Keep club per target, ball, lie and normalization unchanged for repeats. Record every attempt and the settings. Log the two counts in Round Review. The first run establishes a baseline, not a pass/fail standard."
+  }
+}
   ]
 }

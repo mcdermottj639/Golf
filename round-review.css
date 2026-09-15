@@ -1,0 +1,10 @@
+.rr-link{width:100%;text-align:left;background:none;color:inherit;font:inherit;border:0;cursor:pointer}
+.rr .btn{margin:6px 6px 0 0;white-space:normal}
+.rr-shot{padding:12px 0;border-bottom:1px solid var(--line,#ddd)}
+.rr-shot h3{font-size:15px}
+.rr p{margin:10px 0;overflow-wrap:anywhere}
+.rr-form{display:grid;gap:12px;margin-top:16px}
+.rr-form label{display:grid;gap:5px;font-size:13px}
+.rr-form input,.rr-form select{font-size:16px;min-width:0;width:100%;box-sizing:border-box}
+.rr table td,.rr table th{white-space:nowrap}
+.rr .card,.rr .tscroll{min-width:0;max-width:100%;box-sizing:border-box}
