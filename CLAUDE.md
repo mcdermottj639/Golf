@@ -2548,6 +2548,8 @@ played round: v109 did that and confused the source. `roundBayVisuals()` now ret
 collapsed optional comparison link labeled with the older range date. Ballybunion retains
 its own scorecard, shots and practice plan. Original array indices remain the navigation
 keys after sorting; never navigate using the sorted display index.
+The browser regression route from Bag now selects Simulator rounds before opening a card;
+there is intentionally no direct round-card button on the Bag equipment page.
 
 CORRECTION TO PRIOR CHAT CLAIMS: the 131.1-second 18:29 range recording (also attached as
 F2F22B5A-6D32-44AD-8BE2-3A3062267A4D.mov) is NOT the Sep 14 78-shot/13-club bag map.
