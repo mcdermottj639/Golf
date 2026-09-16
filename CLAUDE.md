@@ -2585,6 +2585,10 @@ No fabricated consistency values, lateral dispersion coordinates, normalization 
 The driver 8.0/15.4, 3w 15.5, 6i 36.3 and wedge 63.6-carry/107.3-total shots stay in the
 analysis. They support a contact-repeatability practice focus, not rewriting stock carries
 or diagnosing body mechanics from launch-monitor numbers. Outdoor data is unchanged.
+The exact club table preserves one-decimal total distances, matching the charts instead
+of rounding 149.5 to 150. Live v111 was checked through Home → Range sessions: two separate
+cards, Sep 15 first, no pending notice, 54 carry dots and six shot tables. Managed-browser
+desktop screenshot and overflow check passed; mobile viewport emulation was unavailable.
 
 Home → Range sessions → Sep 15 opens this newest card. The pending-analysis copy is gone;
 if an offline install has not imported the new feed id, the hub truthfully asks it to
