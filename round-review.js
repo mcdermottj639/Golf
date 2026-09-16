@@ -16,7 +16,10 @@
     return (r.review?.availableClubs || [...new Set(shots.map(s=>s.actualClub).filter(Boolean))]).map(club=>{
       const ss=shots.filter(s=>s.actualClub===club), full=ss.filter(s=>s.intent==='full' && !s.flag);
       const path=full.map(s=>s.path).filter(finite);
-      const latest=(bays||[]).filter(b=>b.date<=r.date && b.detail?.clubs?.some(c=>bayKey(c.club)===club)).sort((a,b)=>b.date.localeCompare(a.date))[0];
+      // A recorded comparison stays attached to its source; a newer range import must
+      // not silently change the round's baseline or mix two range dates in one table.
+      const latest=r.review?.bayId ? (bays||[]).find(b=>b._fid===r.review.bayId)
+        : (bays||[]).filter(b=>b.date<=r.date && b.detail?.clubs?.some(c=>bayKey(c.club)===club)).sort((a,b)=>b.date.localeCompare(a.date))[0];
       const bay=latest?.detail.clubs.find(c=>bayKey(c.club)===club);
       return {club,ss,full,n:full.length,path:mean(path),pathN:path.length,bay,bayDate:latest?.date,
         distance:mean(full.map(s=>s.distance).filter(finite))};

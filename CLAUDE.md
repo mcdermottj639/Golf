@@ -2555,10 +2555,48 @@ CORRECTION TO PRIOR CHAT CLAIMS: the 131.1-second 18:29 range recording (also at
 F2F22B5A-6D32-44AD-8BE2-3A3062267A4D.mov) is NOT the Sep 14 78-shot/13-club bag map.
 Its visible 3w group has 10 shots and its 5w group has 9. Matching sampled frames proved
 the two uploaded filenames refer to the same recording, not that it was analyzed or imported.
-There is no completed import of that newer range session in v110. The Range list explicitly
-tracks it as awaiting full analysis, with Sep 15 labeled as recording/upload date, not a
-verified practice date. Remove that pending notice only when its own source-verified session
-is actually added; never claim the older map's charts came from this newer recording.
+v110 did not contain this newer session; its pending notice was accurate then, but prior
+chat claims that it had already been reviewed/imported were not. v111 adds the verified
+Sep 15 session described below. Never claim the older map's charts came from this recording.
+
+### Sep 15 Range video analysis (v111)
+
+`data/range-2026-09-15.json` is the source transcript: the header visibly says 9/15/2026,
+6 clubs and 54 shots (around 20s and 117s). Groups are Driver 6, 3w 10, 5w 9, 6i 10,
+9i 10 and 56° 9. Both filenames above refer to this 131.1-second recording.
+`scripts/range-sep15-entry.cjs` deterministically builds append-only feed entry
+`bay-20260915-range-54`. It is a new Bay, never an update to Sep 14 or Ballybunion.
+
+All 54 carry/total rows and both target-hit columns are transcribed. Preserve displayed
+averages (125.2/145.5/162.3/123.5/99.2/75.5 carry) separately from rounded-row calculations.
+There are 7 carry-target hits and 20 total-target hits; carry mode and total mode are NOT
+interchangeable. Total means for 9i and 56° are calculated, and the UI says so. Additional
+club/ball speeds, spin and path/face/F–P appear only where individually verified. Missing
+values stay null. There are 46 complete delivery rows (5/6, 6/10, 8/9, 9/10, 9/10, 9/9).
+New-session face angle is directly transcribed, not derived; displayed rounding can differ
+by 0.1°. Chart averages use available rows and explicitly state their coverage. Do not infer
+the untranscribed first-row metrics from whole-group averages. Keep the 3w source label:
+the user-confirmed Mini mapping in the round is not automatically a range mapping.
+
+`rangeShotVisuals()` leads the detail with carry/total bars, target outcomes, and all-shot
+carry dots on one scale, then the delivery chart. `rangeShotTables()` exposes all 54 rows
+in six expandable, internally scrolling tables with video timestamps and coverage notes.
+No fabricated consistency values, lateral dispersion coordinates, normalization or venue.
+The driver 8.0/15.4, 3w 15.5, 6i 36.3 and wedge 63.6-carry/107.3-total shots stay in the
+analysis. They support a contact-repeatability practice focus, not rewriting stock carries
+or diagnosing body mechanics from launch-monitor numbers. Outdoor data is unchanged.
+
+Home → Range sessions → Sep 15 opens this newest card. The pending-analysis copy is gone;
+if an offline install has not imported the new feed id, the hub truthfully asks it to
+reconnect/refresh. Preserve Sep 14 Map My Bag and the simulator round as separate records.
+Run `node tests/range-sep15.cjs` alongside both round-review suites. Import tests cover
+existing installs, duplicate prevention, 54 plotted dots, and unchanged outdoor carries.
+Build v111 and service-worker cache v111 travel together.
+Round club comparisons now honor `review.bayId` rather than silently switching to the
+newest imported range session. Ballybunion's baseline remains Sep 14. Local browser QA
+is unavailable in this runtime (Chromium executable absent; managed preview cannot reach
+localhost); run importer/render tests here and verify the published mobile route in the
+managed browser. Do not claim local 320/390 layout verification unless actually run.
 
 The first delivery entry (`bay-delivery-20260914-v1`) could reach a phone while it still
 ran the old shallow `bay-update` merger. That replaced the entire `detail` object with

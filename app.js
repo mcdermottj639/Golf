@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v110';
+const BUILD = 'v111';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v111', d:'2026-09-16', items:[
+    'SEP 15 RANGE VIDEO ANALYZED: Home → Range sessions → Sep 15 now opens all 54 shots, carry-versus-total charts, shot spread, target results and readable delivery data. Separate from Sep 14 Map My Bag and Ballybunion.',
+    'Every short shot stays in the analysis. Carry and total target hits are counted separately; missing readings stay blank. Existing playing yardages are unchanged.' ] },
   { b:'v110', d:'2026-09-15', items:[
     'SESSIONS NOW HAS ITS OWN HOME: open Range sessions or Simulator rounds directly from Today, Game or Bag. Dated cards separate practice, played rounds and swing videos.',
     'Range charts live inside their own session. Ballybunion keeps its own shot evidence and an optional link to the older bag map. The Sep 15 range recording is listed separately as awaiting full analysis.' ] },
@@ -2516,7 +2519,7 @@ function bayCarryVisual(clubs){
         ${gap == null ? '' : `<div class="bvgap ${kind}"><span>${esc(label)}</span><b>${gap > 0 ? '+' : ''}${gap.toFixed(1)} yd</b></div>`}
       </div>`;
     }).join('')}
-    <p class="bvcap">TrackMan carry, in yards. These are the session's normalized/modelled numbers—not automatic replacements for playing yardages.</p>
+    <p class="bvcap">TrackMan carry, in yards—not automatic replacements for playing yardages. Normalization and measurement limitations are recorded with each session.</p>
   </div>`;
 }
 function bayConsistencyVisual(clubs){
@@ -2548,11 +2551,46 @@ function bayDeliveryVisual(delivery){
     <p class="bvcap">Every small dot is one measured shot; the outlined rings are club averages. Negative is left of the target line. Face-to-path (F–P) is face angle minus club path: positive means the face was open to the path. Scale: ±16°.</p>
   </div>`;
 }
+function rangeShotVisuals(d){
+  const groups=d.rangeShots;
+  if(!Array.isArray(groups)||!groups.length) return '';
+  const max=Math.max(1,...groups.flatMap(c=>[c.target,...c.shots.map(s=>s.total)]));
+  const x=v=>(10+v/max*280).toFixed(1);
+  return `<section class="range-analysis" aria-label="September 15 range analysis">
+    <h3>Carry vs total · all 54 shots</h3><p class="sm">Green = carry · gold = total. Averages include every shot, including the very short ones. Distances in yards.</p>
+    ${groups.map((c,i)=>{const avg=d.clubs[i];return `<div class="range-club">
+      <h4>${esc(c.club)} · ${c.shots.length} shots</h4>
+      <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${avg.carry.toFixed(1)}</b></div>
+      <div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${avg.total.toFixed(1)}</b></div>
+      <p class="sm">Target ${c.target} yd · carry hits <b>${c.carryHits.length}/${c.shots.length}</b> · total hits <b>${c.totalHits.length}/${c.shots.length}</b></p>
+    </div>`}).join('')}
+    <p class="bvcap">Carry means are TrackMan's displayed averages. Total means for 9i and 56° are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.</p>
+    <h3>Every carry · see the short misses</h3><p class="sm">Each dot is one shot. Vertical line = target distance. All clubs share the same scale.</p>
+    ${groups.map(c=>`<div class="range-club"><b>${esc(c.club)}</b>
+      <svg viewBox="0 0 300 84" role="img" aria-label="${esc(c.club)} carry spread: ${c.shots.map(s=>s.carry).join(', ')} yards. Target ${c.target} yards.">
+      <line x1="10" x2="290" y1="62" y2="62" stroke="currentColor" opacity=".35"/>
+      <line x1="${x(c.target)}" x2="${x(c.target)}" y1="8" y2="65" stroke="var(--burg)" stroke-dasharray="4 3"/>
+      ${c.shots.map((s,i)=>`<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="var(--green)"><title>Shot ${s.shot}: ${s.carry} yd carry, ${s.total} yd total</title></circle>`).join('')}
+      <text x="10" y="80" fill="currentColor" font-size="10">0 yd</text><text x="290" y="80" text-anchor="end" fill="currentColor" font-size="10">${Math.round(max)} yd</text></svg>
+      <p class="sm faint">Carry range ${Math.min(...c.shots.map(s=>s.carry)).toFixed(1)}–${Math.max(...c.shots.map(s=>s.carry)).toFixed(1)} yd</p></div>`).join('')}
+  </section>`;
+}
+function rangeShotTables(d){
+  if(!Array.isArray(d.rangeShots)) return '';
+  const cols=[['shot','#'],['carry','Carry yd'],['total','Total yd'],['carryHit','Carry hit'],['totalHit','Total hit'],['cs','Club mph'],['bs','Ball mph'],['spin','Spin rpm'],['path','Path°'],['face','Face°'],['ftp','F–P°']];
+  return `<h2>All 54 shots · exact data</h2><div class="card"><p class="sm">Open a club below; swipe its table sideways for speed, spin and delivery. A dash means unavailable or not transcribed—not zero.</p>
+    ${d.rangeShots.map(c=>`<details class="sect"><summary><b>${esc(c.club)} · ${c.shots.length} shots</b></summary>
+      <div class="tscroll" tabindex="0" role="region" aria-label="${esc(c.club)} shot data"><table><thead><tr>${cols.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>
+      ${c.shots.map(s=>`<tr>${cols.map(([k])=>`<td>${s[k]==null?'—':typeof s[k]==='boolean'?(s[k]?'Yes':'No'):esc(String(s[k]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+      <p class="sm faint">Video reference: distance rows around ${c.distanceSeconds.join(', ')} seconds; supplementary columns around ${c.metricSeconds.join(', ')} seconds.</p></details>`).join('')}
+    <details class="sect"><summary>Source & coverage</summary><p class="sm">${esc(d.rangeSource.source)} · ${esc(d.rangeSource.alias)}. ${esc(d.rangeSource.dateEvidence)} ${esc(d.rangeSource.coverage)}</p></details></div>`;
+}
 function bayVisualMarkup(d){
   if(!d || !Array.isArray(d.clubs) || !d.clubs.length) return '';
   const delivery = Array.isArray(d.delivery) ? d.delivery : [];
-  return `${bayCarryVisual(d.clubs)}
+  return `${d.rangeShots?rangeShotVisuals(d):bayCarryVisual(d.clubs)}
     ${bayConsistencyVisual(d.clubs)}
+    ${d.rangeShots?'<p class="sm">Delivery below uses only verified readings: Driver 5/6, 3w 6/10, 5w 8/9, 6i 9/10, 9i 9/10, 56° 9/9. Rings are averages of those rows.</p>':''}
     ${bayDeliveryVisual(delivery.length ? delivery : d.clubs)}`;
 }
 function roundBayVisuals(r){
@@ -2577,11 +2615,9 @@ function sessionLibrary(kind='range'){
     : kind==='film' ? (S.sessions||[]).map((s,i)=>({date:s.date,title:s.setup||'Swing video',sub:sessionDiscipline(s)+' · Film breakdown',action:'open-session',i}))
     : (S.rounds||[]).map((r,i)=>({r,i})).filter(({r})=>kind==='sim'?r.sim:!r.sim).map(({r,i})=>({date:r.date,title:r.course||'Round',sub:[r.score!=null?'Score '+r.score:'Score not recorded',r.nine?r.nine+' nine':'',r.review?'Shot evidence & practice plan':'Scorecard & analysis'].filter(Boolean).join(' · '),action:'open-round',i}));
   rows.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  const pending=kind==='range'?`<article class="card session-pending"><span class="session-status">AWAITING FULL ANALYSIS</span><h3>Sep 15 recording · Range practice</h3>
-    <p class="sm">The 2:11 recording you sent at 18:29 is a separate session from the Sep 14 Map My Bag. Its full shot analysis and charts have not been added yet.</p>
-    <details><summary>Recording reference</summary><p class="sm">ScreenRecording_09-15-2026 18-29-32_1.mp4 · also supplied as F2F22B5A-6D32-44AD-8BE2-3A3062267A4D.mov. The recording date identifies the upload; the practice date is not yet verified.</p></details></article>`:'';
+  const pending=kind==='range'&&!(S.bays||[]).some(b=>b._fid==='bay-20260915-range-54')?`<article class="card session-pending"><h3>Sep 15 · Range practice</h3><p class="sm">The 54-shot analysis is available in the latest coach feed. Reconnect and refresh to download this session.</p></article>`:'';
   return `<div class="session-filters" role="group" aria-label="Session type">${SESSION_TYPES.map(([k,label])=>`<button class="btn ${k===kind?'':'ghost'}" data-action="session-category" data-kind="${k}" aria-pressed="${k===kind}">${label}</button>`).join('')}</div>
-    <h2>${SESSION_TYPES.find(([k])=>k===kind)[1]}</h2><p class="sm faint">Newest first · ${rows.length} available${kind==='range'?' · 1 awaiting analysis':''}</p>
+    <h2>${SESSION_TYPES.find(([k])=>k===kind)[1]}</h2><p class="sm faint">Newest first · ${rows.length} available</p>
     ${pending}${rows.map(x=>`<button class="card session-row" data-action="${x.action}" data-i="${x.i}"><span class="session-date">${esc(x.date?fmtDate(x.date):'Date unknown')}</span><b>${esc(x.title)}</b><span>${esc(x.sub)}</span><span class="session-open">${kind==='range'?'Open charts & analysis':'Open details'} →</span></button>`).join('')||'<div class="card"><p>No sessions in this category yet.</p></div>'}`;
 }
 // NEWEST FIRST, same row shape as the film log — the lab still reads as one record of what
@@ -2680,6 +2716,7 @@ function bayView(i){
       actually produced it. Carry is computed from measured launch — it is a modelled flight,
       not a ball anyone watched land.</p>
   </div>` : ''}
+  ${rangeShotTables(d)}
   ${d.story ? `<h2>What the numbers said</h2><div class="card">${prose(d.story)}
     ${d.limits ? `<details class="sect"><summary><b>What the bay couldn't see</b><span class="gist">${
       esc(splitLead(d.limits)[0])}</span></summary>${prose(d.limits)}</details>` : ''}
