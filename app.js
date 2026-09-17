@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v113';
+const BUILD = 'v114';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v114', d:'2026-09-17', items:[
+    'THE SIX-NUMBER BASELINE NOW EXPLAINS ITSELF: Every number says what it controls, what your reading means, and which comparisons are valid. The immediate priority is face-to-path consistency with face control—not blindly chasing speed.',
+    'CORRECT BALL-FLIGHT READ: −1.6° face with +6.5° face-to-path is a left-starting ball that peels right (pull fade / bigger cut), not a draw or hook.' ] },
   { b:'v113', d:'2026-09-17', items:[
     'YOUR SIX TRACKING NUMBERS ARE NOW A DEDICATED BASELINE: Ball speed 128.5 mph, smash 1.42, face angle −1.6°, face-to-path +6.5°, spin 3,979 rpm and carry 193.7 yd. Open Home → Sessions → Range sessions → Six-metric baseline.',
     'This is the original one-shot TrackMan panel—not the separate virtual-round readings. It sets the fields to track; it does not replace a club carry or claim a personal average.' ] },
@@ -2684,6 +2687,21 @@ function bayBlock(disc, empty){
     ${list.length ? bayLog(list) : `<p class="sm">${empty}</p>`}
   </div>`;
 }
+function sixMetricGuide(b){
+  if(!b || b._fid !== 'bay-six-metric-baseline-20260916-v1') return '';
+  return `<h2>What these six numbers mean</h2><div class="card">
+    <p class="sm">This is one TrackMan shot—not a club average. Compare future readings only with the same confirmed club, intended shot and conditions.</p>
+    <div class="rowgrid g3" style="margin-top:10px">
+      <div class="stat"><div class="v">128.5</div><div class="l">Ball speed · mph</div><p class="sm">How fast the ball left the face. Higher at a similar swing speed usually means more distance.</p></div>
+      <div class="stat"><div class="v">1.42</div><div class="l">Smash factor</div><p class="sm">Strike efficiency: ball speed divided by club speed. Higher with the same club and speed means a more centered strike. Driver-only reference: 1.47–1.50 is excellent.</p></div>
+      <div class="stat"><div class="v">−1.6°</div><div class="l">Face angle</div><p class="sm">Start direction. Negative means the face pointed left, so this ball started left of the target line.</p></div>
+      <div class="stat"><div class="v">+6.5°</div><div class="l">Face-to-path</div><p class="sm">Curve control. Positive means the face was open to the path. With the −1.6° face, this is a left-starting ball that peels right—a pull fade / bigger-cut pattern. Bring it closer to zero before chasing speed.</p></div>
+      <div class="stat"><div class="v">3,979</div><div class="l">Spin rate · rpm</div><p class="sm">Controls flight, roll and how much the ball can curve. The club is unconfirmed, so this is a comparison number—not yet called high or low.</p></div>
+      <div class="stat"><div class="v">193.7</div><div class="l">Carry · yd</div><p class="sm">Air distance before roll—the number for clearing hazards and holding greens. It is not a new bag yardage until repeated.</p></div>
+    </div>
+    <p class="sm" style="margin-top:10px"><b>Your immediate priority:</b> improve face-to-path consistency while keeping the face near your intended start line. That makes the ball flight more predictable; speed and carry become easier to trust afterward.</p>
+  </div>`;
+}
 function bayView(i){
   const b = (S.bays || [])[+i];
   if(!b) return game();
@@ -2715,6 +2733,7 @@ function bayView(i){
     </div>` : ''}
     ${b.finding ? `<p class="sm" style="margin-top:10px">${esc(b.finding)}</p>` : ''}
   </div>
+  ${sixMetricGuide(b)}
   ${d.clubs && d.clubs.length ? `<h2>Exact club data</h2>
   <div class="card">
     ${bayClubTable(clubRows)}
