@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v111';
+const BUILD = 'v112';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v112', d:'2026-09-16', items:[
+    'TRACKMAN FRONT NINE ADDED: Simulator rounds now includes the Sep 16 virtual front nine — 47 on par 36 — with the recording’s verified hole scores. Hole 10 was shown incomplete, so no back-nine score or putting result was invented.',
+    'THE SIX NUMBERS THAT MATTER ARE IN THE SHOT LEDGER: Spin, carry, face-to-path, smash, face angle and ball speed appear together wherever the recording showed them. They are simulator evidence only and do not change outdoor scoring or playing carries.' ] },
   { b:'v111', d:'2026-09-16', items:[
     'SEP 15 RANGE VIDEO ANALYZED: Home → Range sessions → Sep 15 now opens all 54 shots, carry-versus-total charts, shot spread, target results and readable delivery data. Separate from Sep 14 Map My Bag and Ballybunion.',
     'Every short shot stays in the analysis. Carry and total target hits are counted separately; missing readings stay blank. Existing playing yardages are unchanged.' ] },
