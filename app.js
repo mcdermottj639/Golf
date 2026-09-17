@@ -8592,10 +8592,8 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  fetch(`./coach-feed.json?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' })
-    .then(r => r.ok ? r.json() : null)
-    .then(f => { if(f) applyFeed(f); })
-    .catch(()=>{}); // offline — try again next open
+  Promise.all(['coach-feed.json','front9-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+    .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 
 // ---------- Boot ----------
