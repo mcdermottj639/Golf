@@ -579,6 +579,45 @@ body.night .bayc{background:#7a2334;color:#f6efe6}
 .bvdnums{display:flex;justify-content:flex-end;gap:10px;margin:2px 0 0 71px;font-family:var(--mono);font-size:8px;color:var(--faint)}
 .bvdnums b{color:var(--ink);font-size:8.5px}
 @media(max-width:340px){.bvrow{grid-template-columns:55px minmax(0,1fr) 37px}.bvdrow{grid-template-columns:55px minmax(0,1fr)}.bvgap{margin-left:62px}}
+/* ---- The swing readout (Sep 17 2026) ------------------------------------------------
+   Charts that answer "what am I doing wrong". They reuse the bay visuals' row grid on
+   purpose — one vocabulary for a labelled bar, and a layout already proven at 320px —
+   and add only what a picture needs that a bar cannot give: a flight fan, a clubface,
+   and a gauge against a published benchmark. Every figure is an inline SVG with a
+   viewBox and no fixed width, so it scales to the card rather than setting its width. */
+.swread h3{font-family:var(--sans);font-size:11px;font-weight:800;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--soft);margin:18px 0 8px}
+.swread h3:first-of-type{margin-top:12px}
+.swhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 8px;margin-bottom:4px}
+.swhead .sm{flex:1 1 180px;min-width:0}
+.swfig{margin:0}
+.swfig svg{display:block;width:100%;height:auto}
+.swspread .bvrow{margin-bottom:3px}
+.swspread .sw-good .bvbar{background:var(--green-accent)}
+.swspread .sw-mid .bvbar{background:var(--gold)}
+.swspread .sw-warn .bvbar{background:var(--burg)}
+.swkey{display:flex;flex-wrap:wrap;gap:3px 11px;margin-top:9px;
+  font-family:var(--sans);font-size:8.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.swkey .sw-good{color:var(--green-accent)}.swkey .sw-mid{color:var(--gold-ink)}.swkey .sw-warn{color:var(--btext)}
+.swkey span:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:currentColor;margin-right:4px;vertical-align:baseline}
+.swgauge{position:relative;height:13px;border-radius:999px;background:var(--card2);overflow:hidden;margin:2px 0 5px}
+.swfill{display:block;height:100%;border-radius:inherit;background:var(--t-bay)}
+.swmark{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--green-accent);transform:translateX(-1px)}
+.swgnums{display:flex;justify-content:space-between;font-family:var(--sans);font-size:8.5px;
+  font-weight:800;letter-spacing:.06em;color:var(--faint)}
+.swgnums b{font-family:var(--mono);font-size:10px;color:var(--ink);font-weight:400;margin-left:4px}
+.swrrow{display:grid;grid-template-columns:52px minmax(0,1fr) minmax(0,1fr) 46px;align-items:center;
+  gap:5px;min-height:24px;border-bottom:1px dotted var(--dot)}
+.swrrow:last-of-type{border-bottom:0}
+.swrn{font-family:var(--mono);font-size:9px;color:var(--faint);font-variant-numeric:tabular-nums}
+.swrv{font-family:var(--sans);font-size:8.5px;font-weight:800;letter-spacing:.04em;
+  text-align:right;color:var(--green-accent);text-transform:uppercase}
+.swrrow.off .swrv{color:var(--btext)}
+.swrrow.off .swrn{color:var(--btext)}
+@media(max-width:340px){.swrrow{grid-template-columns:44px minmax(0,1fr) minmax(0,1fr) 42px;gap:4px}
+  .swrn{font-size:8.5px}}
+
 .backlink{display:inline-block;font-family:var(--sans);font-size:12px;font-weight:700;color:var(--gtext);
   margin:14px 0 0;cursor:pointer;background:none;border:none;padding:0}
 

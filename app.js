@@ -99,13 +99,20 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v114';
+const BUILD = 'v115';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v115', d:'2026-09-17', items:[
+    'THE SLICE IS MEASURED. Two swing reports off Drive added the ball-flight numbers nobody had pulled: every club you hit finishes RIGHT of where it started, from +1.8 yards on the 50\u00b0 to +24.5 on the driver. Put beside the out-to-in club path already on file, both halves of the over-the-top miss are now measurements rather than a theory about your own game.',
+    'A NEW PAGE THAT SHOWS IT: Game \u2192 Swing now opens What the numbers say \u2014 your ball flight drawn club by club, a clubface map of where you actually strike it, which clubs are repeatable and which are not, and what the driver is leaving on the table.',
+    'WHERE YOU HIT IT ON THE FACE, for the first time: the 56\u00b0 is struck 6.4 mm on the HEEL on five of five shots and every longer club on the TOE. Get a lie board on it before grooving anything \u2014 there is a to-do on the board saying why.',
+    'THE DRIVER IS A 230-YARD CLUB ALREADY. 94.4 mph of club speed, 129.9 mph of ball speed. At a tour-standard strike the same swing leaves 9.8 mph faster \u2014 about 22 yards \u2014 and a centre-strike drill is on the Coach bench for it.',
+    'The swing lab has its first evolution grid, five columns of what has been captured and ten rows of what it answered. The two rows that are all dashes \u2014 shaft lean and the body move behind the path \u2014 are the ones that say what to film next.',
+    'Two things the reports got wrong were corrected rather than copied: your driver smash is 1.38, not the 1.36 both documents printed, and your 60\u00b0 was never missing from the bag map \u2014 it is the tightest club you own.' ] },
   { b:'v114', d:'2026-09-17', items:[
     'THE SIX-NUMBER BASELINE NOW EXPLAINS ITSELF: Every number says what it controls, what your reading means, and which comparisons are valid. The immediate priority is face-to-path consistency with face control—not blindly chasing speed.',
     'CORRECT BALL-FLIGHT READ: −1.6° face with +6.5° face-to-path is a left-starting ball that peels right (pull fade / bigger cut), not a draw or hook.' ] },
@@ -2480,6 +2487,7 @@ const BAY_COLS = [
   ['cons',  'CONSIST.',v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
   ['sd',    '±',       v => Math.round(v)],
   ['total', 'TOTAL',   v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
+  ['curve', 'CURVE yd', baySgn],
   ['cs',    'CLUB MPH', v => v],
   ['bs',    'BALL MPH', v => v],
   ['smash', 'SMASH',   v => v],
@@ -3040,6 +3048,250 @@ function closeCheat(){
 }
 
 // ----- Swing Lab -----
+// ----- The swing readout (Sep 17 2026) -----
+// Jack's ask: "show me what I'm doing wrong." This is that page, and it is a READER over
+// the swing bay sessions — never a fifth tally. Every figure below is one a bay session
+// already carries, asked a different question, which is the same rule `gameAreas()` and
+// Today's numbers block follow. Push a new bay session with the same fields and every
+// chart here redraws itself; there is nothing to edit in code when the next map lands.
+//
+// Two honesty rules the charts are built around, both learned from data already on file:
+//   - TrackMan's "Consistency" is ITS OWN figure and its formula was never on screen, so
+//     the spread chart divides it by the carry and calls the result a SPREAD INDEX. It is
+//     not a coefficient of variation and must never be relabelled one (the `cons` rule).
+//   - A curve figure comes off a modelled spin axis on an unmarked ball; a path and a face
+//     come off the radar. Where the two disagree the chart says so instead of picking a
+//     winner — see `swingReconcile()`.
+const SPREAD_BANDS = [[7, 'good', 'tight'], [9, 'mid', 'marginal'], [Infinity, 'warn', 'loose']];
+const spreadBand = pct => SPREAD_BANDS.find(b => pct < b[0]);
+const hasCarry = b => ((b.detail || {}).clubs || []).filter(c => c.carry != null).length;
+// The fullest bag map wins, newest breaking a tie: a six-club range session is a practice
+// set, a thirteen-club map is the bag. A session with fewer than six carries is neither.
+function bagMapBay(){
+  return baysFor('swing').map(o => o.b).filter(b => hasCarry(b) >= 6)
+    .sort((a, b) => hasCarry(b) - hasCarry(a) || (b.date || '').localeCompare(a.date || ''))[0] || null;
+}
+function strikeBay(){
+  return baysFor('swing').map(o => o.b).find(b => Array.isArray((b.detail || {}).strike)) || null;
+}
+const yd = v => (v > 0 ? '+' : '') + Number(v).toFixed(1);
+
+// 1 · WHERE THE BALL FINISHES — the headline finding drawn rather than stated.
+// Top-down: down the page is downrange, across the page is yards right of where the ball
+// started. The two axes do NOT share a scale — a 24-yard curve on a 196-yard carry is 12%
+// and would be a wiggle at true scale — so the stretch factor is printed in the caption
+// and every endpoint carries its exact yardage. An exaggerated axis that says so is a
+// chart; one that doesn't is a lie.
+function swingFlightChart(rows){
+  const use = rows.filter(c => c.curve != null && c.carry != null).sort((a, b) => b.carry - a.carry);
+  if(use.length < 3) return '';
+  const W = 300, H = 212, X0 = 34, TOP = 18, BASE = 178;
+  const maxC = Math.max(...use.map(c => Math.abs(c.curve)), 1);
+  const maxY = Math.max(...use.map(c => c.carry), 1);
+  const kx = Math.min(6.2, (W - X0 - 66) / maxC), ky = (BASE - TOP) / maxY;
+  const stretch = Math.round(kx / ky);
+  // Endpoint labels collide wherever two carries sit within a few yards — declutter by
+  // walking down the sorted list and pushing each label clear of the one above it.
+  let last = -99;
+  const pts = use.map(c => {
+    const dx = c.curve * kx, h = c.carry * ky;
+    const ey = BASE - h, ex = X0 + dx;
+    const ly = Math.max(ey, last + 11); last = ly;
+    return { c, ex, ey, ly };
+  });
+  return `<figure class="swfig"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Ball flight: ${
+    use.map(c => `${c.club} carries ${c.carry} yards and finishes ${Math.abs(c.curve).toFixed(1)} yards ${c.curve < 0 ? 'left' : 'right'}`).join('; ')}.">
+    ${[100, 200].filter(v => v <= maxY).map(v => `<line x1="${X0}" y1="${(BASE - v * ky).toFixed(1)}" x2="${
+      W - 8}" y2="${(BASE - v * ky).toFixed(1)}" stroke="var(--line2)"/><text x="${X0 - 3}" y="${
+      (BASE - v * ky - 3).toFixed(1)}" text-anchor="end" style="fill:var(--faint);font:9px var(--mono)">${v}</text>`).join('')}
+    <text x="${X0 - 3}" y="${BASE - 4}" text-anchor="end" style="fill:var(--faint);font:9px var(--mono)">0</text>
+    <line x1="${X0}" y1="${TOP - 4}" x2="${X0}" y2="${BASE}" stroke="var(--line)" stroke-dasharray="3 4"/>
+    <text x="${X0 - 3}" y="${TOP + 2}" text-anchor="end" style="fill:var(--faint);font:800 8px var(--sans)">START</text>
+    <text x="${X0 - 3}" y="${TOP + 12}" text-anchor="end" style="fill:var(--faint);font:800 8px var(--sans)">LINE</text>
+    ${[0, 10, 20, 30].filter(v => v <= maxC + 6).map(v => `<line x1="${(X0 + v * kx).toFixed(1)}" y1="${BASE}" x2="${
+      (X0 + v * kx).toFixed(1)}" y2="${BASE + 5}" stroke="var(--line)"/><text x="${(X0 + v * kx).toFixed(1)}" y="${
+      BASE + 16}" text-anchor="middle" style="fill:var(--faint);font:9px var(--mono)">${v}</text>`).join('')}
+    <line x1="${X0}" y1="${BASE}" x2="${W - 8}" y2="${BASE}" stroke="var(--line)"/>
+    <text x="${W - 8}" y="${BASE + 16}" text-anchor="end" style="fill:var(--faint);font:italic 9px var(--sans)">yards right →</text>
+    ${pts.map(({ c, ex, ey, ly }) => {
+      const dx = ex - X0, h = BASE - ey;
+      return `<path d="M ${X0} ${BASE} C ${X0} ${(BASE - h * .55).toFixed(1)} ${(X0 + dx * .16).toFixed(1)} ${
+        (BASE - h * .82).toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke="var(--burg)"
+        stroke-width="2" opacity="${(.34 + .1 * Math.abs(c.curve) / maxC * 6).toFixed(2)}" stroke-linecap="round"/>
+      <circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="3.4" fill="var(--burg)"/>
+      ${Math.abs(ly - ey) > 1.5 ? `<line x1="${(ex + 3.4).toFixed(1)}" y1="${ey.toFixed(1)}" x2="${
+        (ex + 7).toFixed(1)}" y2="${ly.toFixed(1)}" stroke="var(--burg)" stroke-width="1" opacity=".45"/>` : ''}
+      <text x="${(ex + 9).toFixed(1)}" y="${(ly + 3).toFixed(1)}" style="fill:var(--ink);font:800 9px var(--sans);paint-order:stroke;stroke:var(--card);stroke-width:3.5px;stroke-linejoin:round">${
+        esc(clubTag(c.club))} <tspan style="fill:var(--btext);font-family:var(--mono);font-weight:400">${
+        yd(c.curve)}</tspan></text>`;
+    }).join('')}
+  </svg>
+  <figcaption class="bvcap">Every club finishes RIGHT of where it started, and the miss grows with the
+    club. Sideways is stretched about ${stretch}× against downrange so the shape is readable — the yard
+    figures beside each club are exact, and the numbers down the left are carry in yards. Curve is
+    TrackMan's own figure: how far the ball finished from the line it launched on.</figcaption></figure>`;
+}
+
+// 2 · WHERE ON THE FACE — the one thing here that is optically measured rather than
+// modelled, which is why it survives the curve caveat intact. One slot per club so five
+// dots inside 30mm of face never stack on each other.
+function swingFaceMap(strike){
+  const use = (strike || []).filter(s => s.offset != null);
+  if(use.length < 2) return '';
+  const W = 300, FX = 42, FW = 216, FY = 36, FH = 96, CX = FX + FW / 2;
+  const span = Math.max(9, ...use.map(s => Math.abs(s.offset))) + 4;
+  const kx = (FW / 2 - 24) / span;
+  return `<figure class="swfig"><svg viewBox="0 0 ${W} 164" role="img" aria-label="Impact location: ${
+    use.map(s => `${s.club} ${Math.abs(s.offset)} millimetres ${s.offset < 0 ? 'heel' : 'toe'}`).join('; ')}.">
+    <text x="${FX}" y="${FY - 8}" style="fill:var(--faint);font:800 9px var(--sans)">◀ HEEL</text>
+    <text x="${CX}" y="${FY - 8}" text-anchor="middle" style="fill:var(--faint);font:800 9px var(--sans)">CENTRE</text>
+    <text x="${FX + FW}" y="${FY - 8}" text-anchor="end" style="fill:var(--faint);font:800 9px var(--sans)">TOE ▶</text>
+    <rect x="${FX}" y="${FY}" width="${FW}" height="${FH}" rx="9" fill="var(--card2)" stroke="var(--line)"/>
+    <line x1="${CX}" y1="${FY + 4}" x2="${CX}" y2="${FY + FH - 4}" stroke="var(--soft)" stroke-dasharray="3 3"/>
+    ${use.map((s, i) => {
+      const y = FY + FH * (i + .5) / use.length, x = CX + s.offset * kx, heel = s.offset < 0;
+      return `<line x1="${CX}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"
+        stroke="var(--burg)" stroke-width="1.2" opacity=".4"/>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.6" fill="${heel ? 'var(--gold)' : 'var(--burg)'}"/>
+      <text x="${FX + 7}" y="${(y + 3.2).toFixed(1)}" style="fill:var(--ink);font:800 9px var(--sans)">${esc(clubTag(s.club))}</text>
+      <text x="${FX + FW - 7}" y="${(y + 3.2).toFixed(1)}" text-anchor="end" style="fill:var(--soft);font:9px var(--mono)">${
+        Math.abs(s.offset).toFixed(1)}mm ${heel ? 'heel' : 'toe'}</text>`;
+    }).join('')}
+  </svg>
+  <figcaption class="bvcap">Read it as the clubface looking back at you. The wedge is struck on the HEEL
+    and everything longer on the TOE — a consistent bias, not scatter. That split is the classic
+    lie-angle signature (wedges too upright, long clubs too flat), but a posture that changes between a
+    wedge and a wood makes exactly the same picture. One lie-board session separates them; until then it
+    is a question, not a verdict.</figcaption></figure>`;
+}
+
+// 3 · WHICH CLUBS YOU CAN TRUST. The bar is TrackMan's Consistency as a share of the carry
+// — a SPREAD INDEX, deliberately not called a CV, because the formula behind Consistency
+// was never on screen. Sorted loosest first: the page should open on the problem.
+function swingSpread(rows){
+  const use = rows.filter(c => c.carry && c.cons != null)
+    .map(c => ({ ...c, pct: c.cons / c.carry * 100 })).sort((a, b) => b.pct - a.pct);
+  if(use.length < 4) return '';
+  const max = Math.max(...use.map(c => c.pct));
+  return `<div class="bayviz swspread">
+    ${use.map(c => { const [, cls, word] = spreadBand(c.pct);
+      return `<div class="bvrow sw-${cls}"><span class="bvname">${esc(clubTag(c.club))}</span>
+        <span class="bvtrack"><i class="bvbar" style="width:${Math.max(4, c.pct / max * 100).toFixed(1)}%"></i></span>
+        <b class="bvnum">${c.pct.toFixed(1)}%</b></div>`;
+    }).join('')}
+    <div class="swkey"><span class="sw-good">under 7% tight</span><span class="sw-mid">7–9% marginal</span><span class="sw-warn">over 9% loose</span></div>
+    <p class="bvcap">TrackMan's own “Consistency” figure divided by that club's carry, so the clubs can be
+      compared to each other. It is NOT a standard deviation — TrackMan never showed its formula, and
+      relabelling it would invent a precision the screen did not claim. Six shots a club: enough to rank
+      them, not enough to condemn one.</p></div>`;
+}
+
+// 4 · THE LADDER, in carry order rather than bag order — which is the whole point, because
+// an inversion is only visible when the clubs are sorted by what they actually do. Bands
+// are chained at under 6 yards apart, and the rule is printed rather than assumed.
+function swingLadder(rows){
+  const use = rows.filter(c => c.carry != null).sort((a, b) => b.carry - a.carry);
+  if(use.length < 4) return '';
+  const max = use[0].carry;
+  let bands = 1;
+  use.forEach((c, i) => { if(i && use[i - 1].carry - c.carry >= 6) bands++; });
+  return `<div class="bayviz swladder">
+    <div class="bvtitle"><b>${use.length} clubs · ${bands} distance bands</b><span>sorted by carry, not by bag order</span></div>
+    ${use.map((c, i) => { const next = use[i + 1];
+      const gap = next ? c.carry - next.carry : null;
+      const [kind, label] = gap == null ? ['', ''] : bayGapKind(gap);
+      return `<div class="bvitem"><div class="bvrow"><span class="bvname">${esc(clubTag(c.club))}</span>
+        <span class="bvtrack"><i class="bvbar" style="width:${Math.max(4, c.carry / max * 100).toFixed(1)}%"></i></span>
+        <b class="bvnum">${Number(c.carry).toFixed(1)}</b></div>
+        ${gap == null ? '' : `<div class="bvgap ${kind}"><span>${esc(label)}</span><b>${gap.toFixed(1)} yd</b></div>`}</div>`;
+    }).join('')}
+    <p class="bvcap">A band is a run of clubs inside 6 yards of each other — clubs that do one job between
+      them. Bag order and carry order disagree in this sample, which is what an inversion is. Six shots a
+      club exposes the question; it does not decide an equipment change on its own.</p></div>`;
+}
+
+// 5 · THE DRIVER'S UNSPENT SPEED. Ball speed against club speed, and what the same swing
+// would carry at a tour strike. The yardage is a DERIVATION and prints its own arithmetic.
+const SMASH_BENCH = 1.48, YD_PER_MPH = 2.2;
+function swingSmash(c){
+  if(!c || c.cs == null || c.bs == null) return '';
+  const now = c.bs / c.cs, could = c.cs * SMASH_BENCH, gain = could - c.bs;
+  if(gain <= 0) return '';
+  const p = v => Math.max(0, Math.min(100, (v - 1.15) / (1.55 - 1.15) * 100)).toFixed(1);
+  return `<div class="bayviz swsmash">
+    <div class="bvtitle"><b>Driver · strike, not speed</b><span>${c.n || 6} shots</span></div>
+    <div class="swgauge"><i class="swfill" style="width:${p(now)}%"></i>
+      <i class="swmark" style="left:${p(SMASH_BENCH)}%"></i></div>
+    <div class="swgnums"><span>YOURS <b>${now.toFixed(2)}</b></span><span>TOUR <b>${SMASH_BENCH.toFixed(2)}</b></span></div>
+    <p class="sm">Club speed <b>${c.cs}</b> mph is already a 230-yard club. Ball speed is
+      <b>${c.bs}</b> mph. At a tour-standard strike the same swing would leave at
+      <b>${could.toFixed(1)}</b> mph — <b>${gain.toFixed(1)} mph</b> more, which is roughly
+      <b>${Math.round(gain * YD_PER_MPH)} yards</b> at ${YD_PER_MPH} yards per mph.</p>
+    <p class="bvcap">A derivation, not a measurement: the tour smash benchmark and the yards-per-mph
+      conversion are both published averages, not your numbers. What is measured is the club speed and
+      the ball speed. The gap between them is a strike, and the face map above is where to look for it.</p></div>`;
+}
+
+// 6 · DO THE NUMBERS AGREE? The contradiction, stated rather than resolved.
+// A face-to-path comes off the radar at impact; a curve is computed from a spin axis that
+// an unmarked indoor ball frequently makes the unit ESTIMATE. So where they disagree, one
+// of the two is wrong and nothing in the capture says which — the honest rendering names
+// both candidates and the one session that settles it.
+function reconcile(ftp, curve){
+  if(Math.abs(curve) <= 6 && Math.abs(ftp) <= 3) return true;
+  if(Math.sign(curve) !== Math.sign(ftp)) return false;
+  return Math.abs(curve) <= Math.abs(ftp) * 5 + 6;
+}
+function swingReconcile(clubs, delivery){
+  const dmap = {};
+  (delivery || []).forEach(d => { if(d.ftp != null) dmap[d.club] = d.ftp; });
+  const use = clubs.filter(c => c.curve != null && dmap[c.club] != null)
+    .map(c => ({ ...c, ftp:dmap[c.club], ok:reconcile(dmap[c.club], c.curve) }));
+  if(use.length < 3) return '';
+  const bad = use.filter(c => !c.ok);
+  if(!bad.length) return '';
+  return `<div class="bayviz swrec">
+    ${use.map(c => `<div class="swrrow ${c.ok ? '' : 'off'}"><span class="bvname">${esc(clubTag(c.club))}</span>
+      <span class="swrn">F–P ${baySgn(c.ftp)}°</span><span class="swrn">curve ${yd(c.curve)} yd</span>
+      <span class="swrv">${c.ok ? 'agrees' : 'clash'}</span></div>`).join('')}
+    <p class="bvcap"><b>${bad.length} of ${use.length} disagree, and they are the ${
+      bad.every(c => /wood|driver|3w/i.test(c.club)) ? 'woods' : 'longest clubs'}.</b>
+      A face ${bad.some(c => c.ftp < 0) ? 'square or closed' : 'square'} to the path cannot bend a ball
+      ${Math.round(Math.min(...bad.map(c => Math.abs(c.curve))))}+ yards, so one of the two readings is
+      wrong on these clubs: either the face number, or a curve computed from a spin axis the unit had to
+      estimate off an unmarked ball. Nothing in this capture tells them apart. On the irons and wedges
+      the face-to-path is large enough that the curve agrees almost by construction — those clubs do not
+      test it. <b>It changes nothing about the diagnosis:</b> the path is measured out-to-in on every
+      club in every session, and the ball is measured finishing right in every session. Only the exact
+      face figure on the woods is in doubt, and one session on a marked ball settles it.</p></div>`;
+}
+
+// A section exists only once it can be answered — the live logger's rule. An empty fold is
+// a heading over a promise, which is the failure the retired 5-ft tile is the example of.
+const foldIf = (id, label, meta, body, open) => body ? fold(id, label, meta, body, open) : '';
+function swingReadout(){
+  const map = bagMapBay();
+  if(!map) return '';
+  const d = map.detail || {}, clubs = (d.clubs || []).filter(c => c.carry != null);
+  const st = strikeBay(), strike = (st && (st.detail || {}).strike) || [];
+  const driver = clubs.find(c => /driver/i.test(c.club) && !/mini/i.test(c.club));
+  const flight = swingFlightChart(clubs), face = swingFaceMap(strike);
+  if(!flight && !face && !clubs.length) return '';
+  const src = [`${fmtDate(map.date)} · ${map.mode || 'bag map'}`]
+    .concat(st && st !== map ? [`${fmtDate(st.date)} · strike read`] : []);
+  return `<h2>What the numbers say</h2>
+  <div class="card swread">
+    <div class="swhead">${evTag('bay')}<span class="sm">Read off ${esc(src.join(' + '))}. Radar, indoors,
+      off a mat — see each session for what that cannot see.</span></div>
+    ${flight ? `<h3>1 · Where the ball finishes</h3>${flight}` : ''}
+    ${face ? `<h3>2 · Where you strike it</h3>${face}` : ''}
+    ${foldIf('sw-spread', 'Which clubs you can trust', 'spread by club', swingSpread(clubs), true)}
+    ${foldIf('sw-ladder', 'What the bag actually covers', 'carry order', swingLadder(clubs), false)}
+    ${foldIf('sw-smash', 'The driver’s unspent speed', 'smash factor', swingSmash(driver), false)}
+    ${foldIf('sw-rec', 'Do the numbers agree?', 'the one contradiction', swingReconcile(clubs, d.delivery), false)}
+  </div>`;
+}
+
 function swing(){
   const sessions = S.sessions.map((s,i) => ({ s, i })).filter(o => sessionDiscipline(o.s) === 'swing').reverse();
   // Anything not explicitly claimed by another lab lands here — plansFor('swing') is the
@@ -3057,6 +3309,8 @@ function swing(){
   </div>` : ''}
 
   ${diagnosisCard('swing', 'No swing faults on the card yet — send film and they land here.')}
+
+  ${swingReadout()}
 
   <div class="card flat"><div class="linkrow" data-action="go" data-view="positions">
     <span><b>📐 Swing Positions · visual guide</b><br><span class="sm">Body checkpoints, address → finish, with a slide-vs-clear hip diagram</span></span><span class="arr">→</span></div></div>
@@ -4482,9 +4736,14 @@ const FAULT_EV = {
   'delivery-unverified':['measured', 'Aug 10 — 23 oblique clips and six on the target line, neither able to see lean'],
   'across-the-line-top':['measured', 'Jul 26 film, both clubs'],
   'posture-through-impact':['measured', 'Aug 17 film — the first that caught a finish'],
-  // Its own text says NOT MEASURED: seven stills neither confirm nor refute it. It is his
-  // lifelong read of his own miss, which is exactly what the `self` tier is for.
-  'over-the-top-slice':['self', 'Your own lifelong read — Aug 17 stills could neither confirm nor refute it'],
+  // Sep 17 2026: this moved off `self` and it is the biggest tier change the project has made.
+  // It sat at `self` for weeks because seven stills could neither confirm nor refute it and the
+  // only witness was Jack's own read of his own miss. Three bay sessions now measure BOTH halves
+  // — an out-to-in club path on every club, and a ball that finishes right on every club read for
+  // curve. A tier is a property of the SOURCE, so the moment a radar answers the question the
+  // fault was waiting on, the tier moves with it.
+  'over-the-top-slice':['bay', 'Sep 14 bag map (13 clubs · 78 shots) + Sep 15 range (54 shots) — out-to-in path on every club, ball right on every club'],
+  'strike-quality':['bay', 'Sep 14 bag map (78 shots) + a Sep 17 strike read of range footage (5 clubs, impact location optically measured)'],
 };
 const faultEv = f => FAULT_EV[f.tag] || null;
 // The diagnosis, one row per open fault, each carrying its own tier rail and a tappable

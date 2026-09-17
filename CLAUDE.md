@@ -244,6 +244,10 @@ is the standing to-do; it was widened rather than duplicated, per the reuse rule
 consistency/spread, date and ball (see *The bay*). Sep 14 is the first use of that route. Because
 the exact normalization setting is missing, its values sit in `meas.carry` as offers rather than
 being promoted into the live 70°F ladder; the blank 5-wood row now renders that offer too.
+**A second read of the same recordings on Sep 17 2026** added per-club ball-flight CURVE, and speed,
+smash, launch and spin for five clubs — see *Two Drive swing reports* below. It moved no carry: the
+normalization is still unknown, so the offers are still offers, and it corrected the driver's smash
+to 1.38 (both reports printed 1.36, which is the first shot's value rather than the set's mean).
 
 ## How to make common updates
 
@@ -1626,7 +1630,11 @@ came for goes above what it was derived from.**
 2. **A lab page reads: which lab · the cheat sheet · the routine · the plans · the
    diagnosis · the film · the rest.** The plans used to sit UNDER the diagnosis, so reaching
    a workshop log meant scrolling past every open fault and everything each was read off.
-   Mental already read this way and was left alone.
+   Mental already read this way and was left alone. **The swing lab gained one slot on Sep 17
+   2026** — `swingReadout()` sits directly AFTER the diagnosis and before everything else,
+   because it is the pictures the faults were read off: the fault states the claim, the charts
+   under it are the evidence, and separating those two by a film log would make the reader
+   scroll to find out why. Any lab that grows a readout goes in the same place.
 
 3. **Every lab page carries a `labBar()` across the top** — a `.segbar.labs` of all four, so
    Putting → Short Game is one tap instead of a trip back through the hub. It has the same
@@ -2214,7 +2222,13 @@ and the second one is always the one nobody updates. `evoFor(disc)` is the only 
 **A discipline with no grid renders nothing at all** — no heading, no empty table — because
 an empty grid is a heading over a promise, which is the failure the retired 5-ft tile is the
 worked example of. A swing grid is what a run of bay sessions turns into; it arrives by feed
-(`evolution` + `discipline`), not by code.
+(`evolution` + `discipline`), not by code. **The swing grid landed Sep 17 2026** —
+`evolution-swing-20260917`, five columns (Jul 26 film · Aug 17 film · Sep 14 map · Sep 15 range
+· the Sep 17 second read) and ten rows. Worth copying when the next lab gets one: the film
+columns and the radar columns answer almost entirely DIFFERENT rows, so most cells are dashes
+by nature rather than by neglect, and the two rows that are all dashes and question marks —
+shaft lean / low point, and the body move behind the path — are the most useful rows on it,
+because they are the only ones that say what to capture next.
 
 **A club-table column renders only where some club row carries it** (`BAY_COLS`), the same
 rule the approach buckets follow, so a carry-only session draws four columns instead of
@@ -2328,7 +2342,9 @@ Two rules carried over rather than reinvented: **a trend line needs three result
 `drillLog` rule — two points are a line through anything), and a per-target row only renders
 for a yardage that test actually asked for, never as a zero.
 
-**A lab reads: film · the bay · the grid · the benchmark.** The putting lab set that order
+**A lab reads: film · the bay · the grid · the benchmark.** (Since Sep 17 2026 the swing lab
+opens `swingReadout()` above all four, right under the diagnosis — see *The swing readout* below. The
+order of the four is unchanged.) The putting lab set that order
 (film room → stroke evolution → 5-footer scoreboard) and the swing lab now matches it, with
 the bay log sitting beside the film it is the numeric twin of. A grid SUMMARISES the batches
 under it, so it cannot sit above them in one lab and below them in another — that is how one
@@ -2520,6 +2536,99 @@ different ways on two screens.
 
 After any feed change: `python3 -c "import json; json.load(open('coach-feed.json'))"`,
 `node --check app.js`, bump `"updated"`, commit, push.
+
+### The swing readout — what the numbers say (v115 · Sep 17 2026)
+
+Jack's ask was *"a lot of good visuals to bring them to life to show me what I'm doing wrong."*
+`swingReadout()` is that page, in the swing lab directly under the diagnosis. Six visuals, two
+always on and four folded: ball flight club by club, a clubface impact map, a spread-by-club
+bar chart, the carry ladder in carry order, a driver smash gauge, and the one contradiction in
+the data.
+
+**IT IS A READER OVER `S.bays`, NOT A SEVENTH TALLY.** Every figure is one a bay session already
+carries, asked a different question — the same rule `gameAreas()` and Today's numbers block
+follow, and the reason the visuals are worth building rather than the numbers being retyped into
+a new feed type. `bagMapBay()` picks the swing bay with the most club rows carrying a carry
+(newest breaks a tie, six-club floor so a practice set never outranks a bag map) and
+`strikeBay()` finds the first carrying a `detail.strike` array. **Push a new map and every chart
+redraws with nothing to edit in code.** Two fields were added to the data to make that true:
+per-club `curve` on the Sep 14 map (plus a `CURVE yd` column in `BAY_COLS`), and a `strike`
+array — `{club, offset, aoa, dynLoft, spinLoft, land, carry, spread}`, offset **negative = heel,
+positive = toe** — on the Sep 15 session.
+
+**THE SCALE ON A CHART HAS TO DECLARE ITSELF.** A 24-yard curve on a 196-yard carry is 12%, which
+is a wiggle at true scale, so the flight chart stretches sideways about 8× against downrange —
+and prints the factor in its own caption, labels the lateral ruler in yards, and puts the exact
+figure beside every club. An exaggerated axis that says so is a chart; one that doesn't is a lie.
+Endpoint labels declutter by walking the sorted list and pushing each clear of the one above
+(driver, 3w and 5w sit inside 18 yards and would otherwise stack), and they carry a
+`paint-order:stroke` card-coloured halo so a label crossing a flight line stays legible.
+
+**NEVER CALL TRACKMAN'S CONSISTENCY A STANDARD DEVIATION.** The spread chart divides `cons` by the
+carry and calls the result a **spread index**, banded tight / marginal / loose, because the
+formula behind Consistency was never on screen. The same rule as the `cons` field itself; a
+percentage looks exactly as authoritative either way.
+
+**THE CONTRADICTION IS RENDERED, NOT RESOLVED.** `swingReconcile()` asks, per club, whether the
+measured face-to-path can account for the measured curve, and the rule is in code rather than in
+prose: same sign, and `|curve| <= |ftp| * 5 + 6`, with both-near-zero passing. Three of six
+clubs fail and they are exactly the three woods. The card names both candidate explanations —
+the face reading, or a curve computed from a spin axis an unmarked indoor ball makes the unit
+estimate — says which session settles it, and says out loud that **it changes nothing about the
+diagnosis**, because the path and the curve are each measured directly. It also admits that the
+irons pass almost by construction: at +8° of face-to-path a right curve is inevitable whatever
+the unit reports, so those clubs do not really test anything.
+
+### Two Drive swing reports, Sep 17 2026 — and what checking them first was worth
+
+Two reports landed in `Golf/Full Swing/Analysis Reports/` (a package and a longer master). Both
+are launch-monitor screen captures, not swing film, so the video-analysis geometry gates do not
+apply. **Roughly two thirds of both restated the app's own record** — their "Session B" is the
+Sep 14 Map My Bag ingested on Sep 15, to the decimal. The genuinely new material was ball-flight
+CURVE for six clubs, speed/smash/launch/spin for five, and impact location for five, and that
+last one is the most valuable thing in either document because it is the only measurement a
+radar cannot produce.
+
+Four things came out of reading the record first, and each is a standing lesson:
+
+- **THE SAME FOOTAGE CAME BACK, AGAIN, AND ITS DATE WAS WRONG AGAIN.** The reports date their
+  "Session A" to ≈Sep 13. Its 6-iron block is, shot for shot, the Sep 15 session's 6-iron block —
+  nine identical carries, totals, speeds, paths, faces and face-to-paths, in order — and two range
+  days cannot produce that. But its 5-wood, 9-iron and 56° groups match nothing on file and it
+  carries a 5-iron group the Sep 15 transcript has none of. **So it is partly footage already
+  ingested and partly footage of unknown session, and that is recorded as unresolved rather than
+  guessed.** The strike numbers went on as a `bay-update` to Sep 15, not as a new Sep 13 session:
+  a duplicate session is a column on the evolution grid for a day that never happened. Same call
+  as the Sep 9 `s14` fold, and the second time the analysis side's date has been the weak link —
+  **the day somebody looked and the day the thing happened are two facts.**
+- **CHECK THE ARITHMETIC, NOT JUST THE CONCLUSION.** Both reports print the driver's smash as
+  1.36. That is the FIRST shot's value; the six read 1.36 · 1.48 · 1.39 · 1.38 · 1.33 · 1.31, a
+  mean of 1.38, and 129.9 ÷ 94.4 agrees. Corrected on the record. Every other figure reproduced
+  exactly — all six curve means, every other club's smash, the 2-iron's cleaned 165.0 ±4.4 — so
+  re-deriving the headline numbers is cheap and it found the one that was wrong.
+- **THE RECORD WAS STRONGER IN ONE PLACE, SO NO ACTION WAS MINTED.** Both reports list the 60°
+  as "not captured" and ask for a re-shoot. It has been on file since Sep 15 — 66.3 yards,
+  consistency 4.1, the tightest club in the bag. A newer report is not automatically a better one,
+  and a capture action for something already captured is how a to-do list stops meaning anything.
+- **THE BIGGEST INSTRUCTION IN THE REPORTS WAS NOT FOLLOWED, AND THE REASONING IS THE POINT.**
+  Both conclude "the device measures ball data well and infers club data poorly" and direct that
+  any finding resting on this unit's club path or face-to-path be downgraded or retired. Run the
+  test across every club carrying both numbers and the failure is confined to the **woods**;
+  irons and wedges reconcile. More importantly the reports blame the half of the reading that is
+  **directly measured** — path and face come off the radar at impact — while a curve is computed
+  from a spin AXIS, and this app's own record of that venue already says the balls are unmarked
+  and spin is estimated. So the modelled number is the curve. Following the instruction would have
+  retired three measured path readings to protect a modelled one. **Resolve a contradiction on
+  method, and check which side of it is the measurement.**
+
+**WHAT IT CHANGED.** `over-the-top-slice` moved from `ev:'self'` to `ev:'bay'` — the biggest tier
+change the project has made, and it is a property of the SOURCE, so the tier moves the moment a
+radar answers the question the fault was waiting on. A new `strike-quality` fault holds the smash
+deficit, the consistency breakpoint at the 8-iron, and the heel-on-wedge / toe-on-everything-else
+split; `r11` on the Coach bench trains it, so the fault does not open a coverage gap.
+`across-the-line-top` and `posture-through-impact` each gained one line saying what radar did and
+did not advance — **a launch monitor never sees the top of a backswing, so those rows can only
+ever move on film.**
 
 ### Bay session visuals (Sep 15 2026 — builds v108–v109)
 
