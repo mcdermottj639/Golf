@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v112';
+const BUILD = 'v113';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v113', d:'2026-09-17', items:[
+    'YOUR SIX TRACKING NUMBERS ARE NOW A DEDICATED BASELINE: Ball speed 128.5 mph, smash 1.42, face angle −1.6°, face-to-path +6.5°, spin 3,979 rpm and carry 193.7 yd. Open Home → Sessions → Range sessions → Six-metric baseline.',
+    'This is the original one-shot TrackMan panel—not the separate virtual-round readings. It sets the fields to track; it does not replace a club carry or claim a personal average.' ] },
   { b:'v112', d:'2026-09-16', items:[
     'TRACKMAN FRONT NINE ADDED: Simulator rounds now includes the Sep 16 virtual front nine — 47 on par 36 — with the recording’s verified hole scores. Hole 10 was shown incomplete, so no back-nine score or putting result was invented.',
     'THE SIX NUMBERS THAT MATTER ARE IN THE SHOT LEDGER: Spin, carry, face-to-path, smash, face angle and ball speed appear together wherever the recording showed them. They are simulator evidence only and do not change outdoor scoring or playing carries.' ] },
