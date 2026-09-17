@@ -2229,6 +2229,8 @@ and obvious the moment the table rendered. It is `CLUB MPH` / `BALL MPH` now.
 
 ### Simulator Round Review (v105 · Sep 15 2026)
 
+**Sep 16 virtual front nine.** A supplied TrackMan screen recording shows holes 1–9 only: 47 on par 36. It visibly enters Hole 10 with "Hole incomplete," so the feed record carries `nine:9` and does not synthesize a back nine, a course name, conditions, putts or gimme settings. Seven panels expose the selected six improvement metrics — spin, flat carry, face-to-path, smash, face angle and ball speed — and `round-review.js` renders that six-value ledger when they are present. These fields are simulator observations; they do not update outdoor statistics, handicap, bag carries or a club profile without a confirmed club and swing intent.
+
 `round-review.js` and `round-review.css` extend the existing round card, not navigation.
 Rounds → Ballybunion opens the review; Bag, Swing Lab and Bay session link to it.
 The round is a new apply-once `round` feed entry. Its extraction source is
