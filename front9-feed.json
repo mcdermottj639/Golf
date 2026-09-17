@@ -172,6 +172,73 @@
           ]
         }
       }
+    },
+    {
+      "id": "bay-six-metric-baseline-20260916-v1",
+      "type": "bay",
+      "src": "tm:ScreenRecording_09-16-2026-20-18-40_1.mp4",
+      "bay": {
+        "date": "2026-09-16",
+        "discipline": "swing",
+        "mode": "Six-metric baseline",
+        "venue": "TrackMan",
+        "setup": "1 verified shot · six improvement metrics",
+        "finding": "Your dedicated improvement baseline. Future comparable TrackMan shots can be read against these same six numbers; this is not a bag-distance change or a club fitting verdict.",
+        "detail": {
+          "gist": "Baseline: 128.5 ball mph · 1.42 smash · −1.6° face · +6.5° face-to-path · 3,979 spin · 193.7 carry.",
+          "clubs": [
+            {
+              "club": "Unconfirmed club · single-shot baseline",
+              "n": 1,
+              "bs": 128.5,
+              "smash": 1.42,
+              "face": -1.6,
+              "ftp": 6.5,
+              "spin": 3979,
+              "carry": 193.7
+            }
+          ],
+          "metrics": [
+            {
+              "k": "Ball speed",
+              "v": "128.5 mph",
+              "s": "mid",
+              "n": "output"
+            },
+            {
+              "k": "Smash factor",
+              "v": "1.42",
+              "s": "mid",
+              "n": "strike efficiency"
+            },
+            {
+              "k": "Face angle",
+              "v": "−1.6°",
+              "s": "mid",
+              "n": "start direction"
+            },
+            {
+              "k": "Face-to-path",
+              "v": "+6.5°",
+              "s": "warn",
+              "n": "curve control"
+            },
+            {
+              "k": "Spin rate",
+              "v": "3,979 rpm",
+              "s": "mid",
+              "n": "flight control"
+            },
+            {
+              "k": "Carry",
+              "v": "193.7 yd",
+              "s": "good",
+              "n": "on-course distance"
+            }
+          ],
+          "limits": "One captured shot and an unconfirmed club. This establishes the six fields to track, not a personal average, club baseline, target, or diagnosis."
+        }
+      }
     }
   ]
 }
