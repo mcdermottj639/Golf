@@ -1,0 +1,177 @@
+{
+  "entries": [
+    {
+      "id": "round-tm-virtual-front9-20260916-v1",
+      "type": "round",
+      "src": "tm:ScreenRecording_09-16-2026-20-22-09_1.mp4",
+      "round": {
+        "date": "2026-09-16",
+        "course": "TrackMan Virtual · front nine",
+        "nine": 9,
+        "sim": true,
+        "par": 36,
+        "score": 47,
+        "note": "TrackMan virtual front nine captured in a screen recording. Hole 10 is explicitly incomplete; course name, settings and auto-putting/gimme configuration are not shown. Simulator record only — excluded from outdoor statistics, handicap, bag carries and putting evaluation.",
+        "holes": [
+          {
+            "n": 1,
+            "par": 4,
+            "s": 7,
+            "si": 13
+          },
+          {
+            "n": 2,
+            "par": 5,
+            "s": 6,
+            "si": 9
+          },
+          {
+            "n": 3,
+            "par": 3,
+            "s": 5,
+            "si": 11
+          },
+          {
+            "n": 4,
+            "par": 4,
+            "s": 5,
+            "si": 15
+          },
+          {
+            "n": 5,
+            "par": 4,
+            "s": 4,
+            "si": 3
+          },
+          {
+            "n": 6,
+            "par": 4,
+            "s": 5,
+            "si": 1
+          },
+          {
+            "n": 7,
+            "par": 5,
+            "s": 6,
+            "si": 5
+          },
+          {
+            "n": 8,
+            "par": 3,
+            "s": 2,
+            "si": 17
+          },
+          {
+            "n": 9,
+            "par": 4,
+            "s": 7,
+            "si": 7
+          }
+        ],
+        "review": {
+          "coverage": "Nine completed holes and seven readable full six-metric panels were captured from the supplied 67-second screen recording. Hole 10 visibly says incomplete; no missing shots, clubs, course name, conditions or putting data are inferred.",
+          "shots": [
+            {
+              "id": "h1-m3",
+              "hole": 1,
+              "club": "unconfirmed TrackMan label",
+              "distance": 178.2,
+              "lie": "rough",
+              "spin": 2367,
+              "carry": 178.2,
+              "ftp": 5.4,
+              "smash": 1.45,
+              "face": 3,
+              "bs": 118.1,
+              "source": "Sep 16 recording · Hole 1"
+            },
+            {
+              "id": "h2-m2",
+              "hole": 2,
+              "club": "unconfirmed TrackMan label",
+              "distance": 182.1,
+              "lie": "fairway",
+              "spin": 2383,
+              "carry": 182.1,
+              "ftp": 3.9,
+              "smash": 1.46,
+              "face": 1.1,
+              "bs": 125.3,
+              "source": "Sep 16 recording · Hole 2"
+            },
+            {
+              "id": "h4-m1",
+              "hole": 4,
+              "club": "unconfirmed TrackMan label",
+              "distance": 210.4,
+              "lie": "fairway",
+              "spin": 3486,
+              "carry": 210.4,
+              "ftp": 2.1,
+              "smash": 1.48,
+              "face": -5.3,
+              "bs": 135.3,
+              "source": "Sep 16 recording · Hole 4"
+            },
+            {
+              "id": "h5-m1",
+              "hole": 5,
+              "club": "unconfirmed TrackMan label",
+              "distance": 184.9,
+              "lie": "rough",
+              "spin": 3562,
+              "carry": 184.9,
+              "ftp": 3.6,
+              "smash": 1.4,
+              "face": -2.2,
+              "bs": 125.2,
+              "source": "Sep 16 recording · Hole 5"
+            },
+            {
+              "id": "h6-m1",
+              "hole": 6,
+              "club": "unconfirmed TrackMan label",
+              "distance": 171.7,
+              "lie": "rough",
+              "spin": 2060,
+              "carry": 171.7,
+              "ftp": 2.8,
+              "smash": 1.41,
+              "face": 4.6,
+              "bs": 123.1,
+              "source": "Sep 16 recording · Hole 6"
+            },
+            {
+              "id": "h7-m1",
+              "hole": 7,
+              "club": "unconfirmed TrackMan label",
+              "distance": 193.4,
+              "lie": "rough",
+              "spin": 4220,
+              "carry": 193.4,
+              "ftp": 2.1,
+              "smash": 1.48,
+              "face": -2.8,
+              "bs": 129.8,
+              "source": "Sep 16 recording · Hole 7"
+            },
+            {
+              "id": "h7-m2",
+              "hole": 7,
+              "club": "unconfirmed TrackMan label",
+              "distance": 165.6,
+              "lie": "fairway",
+              "spin": 2148,
+              "carry": 165.6,
+              "ftp": 3.7,
+              "smash": 1.42,
+              "face": 0.1,
+              "bs": 117.8,
+              "source": "Sep 16 recording · Hole 7"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
