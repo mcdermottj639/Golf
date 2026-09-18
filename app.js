@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v123';
+const BUILD = 'v124';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v124', d:'2026-09-18', items:[
+    '150 IS OFF THE 3-WOOD. That was TrackMan’s screen average with two tops in it, not a shot and not the club. The 3-wood number is 176.5 n=9 struck. The two tops stay on the day, marked held out.',
+    'BAG OFFER IS 176.5, not 150. Live carry still blank — do not type it onto the course ladder. Venue balls, Normalize on, temp not shown.' ] },
   { b:'v123', d:'2026-09-18', items:[
     'THE 7-IRON WAS IN THE RECORDING. Eleven shots: path, face-to-path, smash, speed, launch, spin. Per-shot carries were off-screen, so there is no cleaned 7-iron carry — the screen number stays 131.7. Delivery is complete and now sits on the day and in Cumulative.',
     '7-IRON FACE-TO-PATH +6.4° — the most open of the three clubs today. Path −6.9°, every shot left of the target. That is the same out-to-in as the woods, with more cut on it.',
@@ -3241,7 +3244,7 @@ function analysisClubs(detail){
       held: held.length,
       carry: carry != null ? +carry.toFixed(1) : null,
       total: total != null ? +total.toFixed(1) : null,
-      displayedCarry: base.carry,
+      displayedCarry: base.displayedCarry != null ? base.displayedCarry : base.carry,
       displayedN: base.n
     });
   });
@@ -3289,7 +3292,7 @@ function rangeShotVisuals(d){
   return `<section class="range-analysis" aria-label="Range shot analysis">
     <h3>Carry vs total · struck balls</h3><p class="sm">Green = carry · gold = total. Clear mishits are held out of these averages. Distances in yards.</p>
     ${groups.map(c=>{const avg=avgOf(c); if(avg.carry==null) return ''; return `<div class="range-club">
-      <h4>${esc(c.club)} · ${avg.n} struck${avg.held ? ` · ${avg.held} held out` : ''}${avg.displayedCarry != null && avg.held ? ` · screen ${(+avg.displayedCarry).toFixed(1)}` : ''}</h4>
+      <h4>${esc(c.club)} · ${avg.n} struck${avg.held ? ` · ${avg.held} held out` : ''}${avg.displayedCarry != null && avg.held && +avg.displayedCarry !== +avg.carry ? ` · screen ${(+avg.displayedCarry).toFixed(1)}` : ''}</h4>
       <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
       ${avg.total!=null?`<div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${(+avg.total).toFixed(1)}</b></div>`:''}
       ${c.target!=null?`<p class="sm">Target ${c.target} yd · carry hits <b>${(c.carryHits||[]).length}/${c.shots.length}</b> · total hits <b>${(c.totalHits||[]).length}/${c.shots.length}</b></p>`:''}
