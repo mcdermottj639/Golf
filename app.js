@@ -99,13 +99,18 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v115';
+const BUILD = 'v116';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v116', d:'2026-09-18', items:[
+    'FINDABILITY PASS: every number you can quote now wears a provenance chip — ON-COURSE, BAY, TRACKMAN, MEASURED, ESTIMATED, OFFER, FED, SELF — and an ⓘ that opens what it means, why it matters for you, and when not to trust it.',
+    'NUMBERS INDEX (Today → Numbers, also from Game): one searchable, filterable catalog of handicap, 5-ft makes, lag-inside-3, every ladder carry and parked bay offer, Combine score, groove counters and open return windows. Tap a row to the meaning sheet, then Open in app.',
+    'TODAY SEARCH finds a club, a course, a lesson and a metric from the same catalog. Evidence is a newest-first timeline of live rounds, bay/film and feed applies — stitched, not invented.',
+    'TODAY IS FIVE BLOCKS: the work, one scoreboard number, next-round prep, an open return window if there is one, and shortcuts (Search · Numbers · Evidence · Start/Resume). The long grids live in Numbers and Evidence now. Same data — easier to find and trust.' ] },
   { b:'v115', d:'2026-09-17', items:[
     'THE SLICE IS MEASURED. Two swing reports off Drive added the ball-flight numbers nobody had pulled: every club you hit finishes RIGHT of where it started, from +1.8 yards on the 50\u00b0 to +24.5 on the driver. Put beside the out-to-in club path already on file, both halves of the over-the-top miss are now measurements rather than a theory about your own game.',
     'A NEW PAGE THAT SHOWS IT: Game \u2192 Swing now opens What the numbers say \u2014 your ball flight drawn club by club, a clubface map of where you actually strike it, which clubs are repeatable and which are not, and what the driver is leaving on the table.',
@@ -1153,7 +1158,571 @@ const TITLES = {
   round:['Round Detail','One card, hole by hole, and what it cost you.'],
   live:['Live Round','Tap it in as you play — it scores itself.'],
   landed:['What’s landed','Every change to your app, newest first.'],
+  numbers:['Numbers','Every figure this app will quote, sourced and explained.'],
+  timeline:['Evidence','Rounds, bay, film and feed — newest first.'],
 };
+
+// ----- Findability (v116) -----
+// Numbers that cannot be found, sourced, or explained are just decoration. This pass
+// adds one vocabulary of provenance chips, a glossary keyed by metric id, a Numbers
+// Index built from a single catalog, Today search over that same catalog plus nav
+// targets, and an Evidence timeline that stitches rounds / bay / film / feed rather
+// than inventing events. Today itself is five decision blocks. See CLAUDE.md.
+const PROV = {
+  'on-course': { lab:'ON-COURSE', cls:'p-live', title:'Logged live round / GHIN-style course facts' },
+  bay:         { lab:'BAY',       cls:'p-bay',  title:'Launch-monitor / Map My Bag session — unmarked balls, indoor air' },
+  trackman:    { lab:'TRACKMAN',  cls:'p-tm',   title:'Combine or an explicit Trackman field. Consistency is not SD.' },
+  measured:    { lab:'MEASURED',  cls:'p-meas', title:'An explicit measurement — hosel stamp, film metric, scored test' },
+  estimated:   { lab:'ESTIMATED', cls:'p-est',  title:'A guess, a tilde loft, an unverified carry' },
+  offer:       { lab:'OFFER',     cls:'p-off',  title:'A meas.carry parked beside the live ladder, not yet accepted' },
+  fed:         { lab:'FED',       cls:'p-fed',  title:'Came from a coach-feed.json apply' },
+  self:        { lab:'SELF',      cls:'p-self', title:'Mental debrief / Jack-reported' },
+};
+function provBadge(kind){
+  const p = PROV[kind];
+  if(!p) return '';
+  return `<span class="prov ${p.cls}" title="${esc(p.title)}">${esc(p.lab)}</span>`;
+}
+function meaningBtn(metric){
+  if(!MEANING[metric]) return '';
+  return `<button type="button" class="meanbtn" data-action="meaning" data-metric="${esc(metric)}"
+    aria-label="What ${esc(MEANING[metric].title)} means" title="What this means">ⓘ</button>`;
+}
+function provOfCarry(row){
+  if(!row) return 'estimated';
+  const m = row.meas;
+  if(m && m.carry != null && row.carry != null && m.carry !== row.carry) return 'offer';
+  if(m){
+    const src = String(m.src || m.unit || '').toLowerCase();
+    if(/trackman|\btm\b|combine/.test(src)) return 'trackman';
+    return 'bay';
+  }
+  if(row.carry == null) return '';
+  return S.carriesCalibrated ? 'on-course' : 'estimated';
+}
+function provOfProfile(){
+  return 'on-course';
+}
+function openMeaning(metric, extra){
+  const m = MEANING[metric];
+  if(!m){ toast('No note on file for that number'); return; }
+  let v = document.getElementById('sheetveil');
+  if(!v){
+    v = document.createElement('div');
+    v.className = 'sheetveil'; v.id = 'sheetveil';
+    v.addEventListener('click', e => { if(e.target === v) closeCheat(); });
+    document.body.appendChild(v);
+  }
+  const deep = extra && extra.view === 'bay' && extra.i != null && extra.i !== ''
+    ? `<div class="linkrow" style="border-bottom:none;margin-top:10px" data-action="open-bay" data-i="${esc(String(extra.i))}">
+        <span><b>Open in app</b><br><span class="sm">The page that owns this number</span></span><span class="arr">→</span></div>`
+    : extra && extra.view
+    ? `<div class="linkrow" style="border-bottom:none;margin-top:10px" data-action="go" data-view="${esc(extra.view)}"${
+        extra.seg ? ` data-seg="${esc(extra.seg)}"` : ''}${
+        extra.id ? ` data-id="${esc(extra.id)}"` : ''}>
+        <span><b>Open in app</b><br><span class="sm">The page that owns this number</span></span><span class="arr">→</span></div>`
+    : '';
+  const chip = extra && extra.prov ? provBadge(extra.prov) : '';
+  v.innerHTML = `<div class="sheet card meansheet">
+    <div class="sheethead"><h2>${esc(m.title)}</h2>
+      <button class="btn ghost tiny" data-action="cheat-close">Close</button></div>
+    <div class="meanmeta">${chip}${extra && extra.value != null && extra.value !== ''
+      ? `<span class="meanval">${esc(String(extra.value))}${extra.unit ? ` ${esc(extra.unit)}` : ''}</span>` : ''}</div>
+    <p class="sm"><b>What it is.</b> ${esc(m.what)}</p>
+    <p class="sm"><b>Why it matters for you.</b> ${esc(m.why)}</p>
+    <p class="sm"><b>When not to trust it.</b> ${esc(m.caution)}</p>
+    ${deep}
+  </div>`;
+  const s = v.querySelector('.sheet');
+  if(s) s.scrollTop = 0;
+}
+
+const MEANING = {
+  handicap: {
+    title:'Handicap',
+    what:'The index you report — GHIN-style, pushed onto the profile like every other number Today quotes.',
+    why:'It is the number the front page used to get stuck on, and the one a round has to be able to move. The small estimate under it is this app’s own reading of your rated cards.',
+    caution:'It is HIS number, relayed. An estimate off three rated rounds is not a GHIN, and a sim card never reaches it.'
+  },
+  carry: {
+    title:'Playing carry',
+    what:'The yardage the live logger offers off the tee and into the green. The ladder IS the roster.',
+    why:'Club choice on a hole is this number, not a radar printout. A gap of 15+ is a hole in the bag; 5 or less is two clubs fighting.',
+    caution:'Until you calibrate, every row is a starting point. A measured bay figure sitting beside it is an offer, not a correction, until you tap Use.'
+  },
+  'meas.carry': {
+    title:'Bay carry (offer)',
+    what:'A launch-monitor carry parked on the row as meas.carry — shown beside your live number until you accept it.',
+    why:'So a radar session can arrive without silently rewriting the number you play off. You take it with a tap.',
+    caution:'Indoor, off a mat, often an unmarked ball, and the carry is a flight MODEL from measured launch — not a ball anyone watched land. Bay numbers are not handicap authority.'
+  },
+  cons: {
+    title:'Trackman Consistency',
+    what:'Trackman’s own Consistency field from Map My Bag. It is a named product figure, not a statistic we derived.',
+    why:'It is the only spread number the screen actually printed. The swing lab turns it into a spread index (cons / carry) so clubs can be compared.',
+    caution:'Consistency is NOT standard deviation and must never be labelled ± or SD. A separate sd field, when present, is the actual standard-deviation row.'
+  },
+  sd: {
+    title:'Standard deviation',
+    what:'The actual standard-deviation of a measured sample, in yards, when the session produced one.',
+    why:'It is the statistical spread of THAT sample — useful next to n= so you can see how many shots the figure rests on.',
+    caution:'Do not read it as Trackman Consistency. They are different fields. A one-session SD is not a season-long dispersion.'
+  },
+  fiveFootMake: {
+    title:'5-ft make rate',
+    what:'Makes out of 20 from five feet on the mat, with miss direction (L / R / short / long) on the ones that missed.',
+    why:'This is the short-putt number again. On-course make-rate-by-distance was retired because a card that only records the putt you HOLED can only climb toward 100%.',
+    caution:'A mat test is not a hole. One entry is a baseline, not a trend. The left-miss story lives in the all-time miss pattern, not in a single 20.'
+  },
+  lagInside3: {
+    title:'Lag inside 3 ft',
+    what:'Of lags whose finish is known, how many left a putt inside three feet — a concession after a lag counts, because nobody concedes a twenty-footer.',
+    why:'It is the distance-control number the scorecard can actually produce. Both halves come off the same population so it can never exceed 100%.',
+    caution:'A first version of this read 15/15 because most second putts were given. Read “the lag left a tap-in”, not a measured proximity. Holes logged before putts-made tracking do not belong in the denominator.'
+  },
+  gir: {
+    title:'Greens in regulation',
+    what:'Share of holes where the approach (any club AT a green) finished on the putting surface in regulation.',
+    why:'It is the “into the green” tile Coach and Today quote from the same cards, labelled by the shot not the club in hand.',
+    caution:'A wood into a par 5 and a wedge from 90 are both in it. It moves the moment 18 live holes exist, because then only live cards are counted — the provenance line says so.'
+  },
+  putts: {
+    title:'Putts',
+    what:'Putt counts per hole (1 / 2 / 3+) as a share of holes played, plus where the ones you holed were from.',
+    why:'A 2-putt from 40 feet is a good hole and a 2-putt from 5 is a dropped shot. The count alone cannot tell them apart; the made-distance row can.',
+    caution:'Chip-ins are none of the three rows, so the three need not sum to 100. A conceded first putt is not a make. Sim cards do not count.'
+  },
+  combineScore: {
+    title:'Combine score',
+    what:'Trackman’s own test: three shots each to fixed targets plus driver, twice over, scored 0–100 on carry and offline.',
+    why:'The only bay number that is directly comparable against itself, which is what makes it a benchmark rather than a session.',
+    caution:'A fixed protocol on a mat. It says nothing about a shot off a slope in wind. A trend needs three results; two points are a line through anything.'
+  },
+  faceAtImpact: {
+    title:'Face at impact',
+    what:'Face angle at impact, measured — on putting, once, on film (Jul 30); on full shots, from the bay when the session produced it.',
+    why:'Start direction lives here. Negative means the face pointed left of the target line.',
+    caution:'One session is a reading, not a grip. Compare only with the same club, intended shot and conditions. Unmarked-ball curve is a different claim.'
+  },
+  grooveRounds: {
+    title:'Groove life',
+    what:'Rounds on a gaming wedge against a ~N-round groove life. The meter is 100% new, 0% at the life limit.',
+    why:'Spin drops noticeably below ~50% life. The most-worn face in the bag is the one the Wear card names.',
+    caution:'The counter advances every time you log a round, however you logged it. It is usage, not a groove-gauge measurement of the face.'
+  },
+  returnWindow: {
+    title:'Return window',
+    what:'Days left on a club that is still sittable-in-a-return-window. The flag lives on the club, not on one hardcoded head.',
+    why:'The decision has a clock. A window you cannot see is a window you will miss.',
+    caution:'An estimated deadline is estimated. Confirm with the shop. This is not a golf statistic.'
+  },
+};
+
+function actAttrs(a){
+  if(!a) return '';
+  return ` data-action="${a.a}"${a.v ? ` data-view="${a.v}"` : ''}${
+    a.seg ? ` data-seg="${esc(a.seg)}"` : ''}${
+    a.id ? ` data-id="${esc(a.id)}"` : ''}${
+    a.i != null && a.i !== '' ? ` data-i="${a.i}"` : ''}`;
+}
+function numbersCatalog(state){
+  const rows = [];
+  const push = row => { if(row && row.value != null && row.value !== '' && row.value !== '—') rows.push(row); };
+  const C = areaCards();
+  const ga = gameAreas(C.cards);
+  const A = ga.areas, st = ga.st;
+  const pc = (n, d) => d ? Math.round(n / d * 100) + '%' : null;
+  const idx = estIndex();
+  push({ id:'handicap', label:'Handicap', value:String(state.profile.handicap),
+    prov:provOfProfile(), view:'home', metric:'handicap',
+    trend: idx != null ? `${idx.toFixed(1)} est.` : null });
+  if(idx != null) push({ id:'index', label:'Estimated index', value:idx.toFixed(1),
+    prov: C.ev === 'live' ? 'on-course' : 'on-course', view:'rounds', seg:'cards', metric:'handicap' });
+  const lastFt = latestFiveFt();
+  if(lastFt){
+    const s = fiveFtScore(lastFt);
+    if(s.total) push({ id:'fiveFootMake', label:'5-ft makes', value:`${s.makes}/20`,
+      prov:'measured', view:'putting', metric:'fiveFootMake',
+      trend: lastFt.date ? fmtDate(lastFt.date) : null });
+  }
+  const close = lagClose(st.putts || { dist:new Map(), lagIn:0, lagN:0 });
+  if(close.n) push({ id:'lagInside3', label:'Lag inside 3 ft', value:`${close.in}/${close.n}`,
+    unit: pc(close.in, close.n), prov:'on-course', view:'putting', metric:'lagInside3' });
+  if(st.putts && st.putts.holes){
+    push({ id:'putts', label:'Putts / hole',
+      value:(st.putts.total / st.putts.holes).toFixed(2),
+      prov:'on-course', view:'putting', metric:'putts' });
+    push({ id:'onePutt', label:'1-putt rate', value:pc(st.putts.one, st.putts.holes),
+      prov:'on-course', view:'rounds', seg:'cards', metric:'putts' });
+  }
+  if(A && A.app) push({ id:'gir', label:'Into the green', value:A.app.v,
+    prov:'on-course', view:'rounds', seg:'cards', metric:'gir' });
+  if(A && A.tee) push({ id:'fw', label:'Off the tee', value:A.tee.v,
+    prov:'on-course', view:'rounds', seg:'cards', metric:'gir' });
+  if(A && A.short) push({ id:'updown', label:'Up & down', value:A.short.v,
+    prov:'on-course', view:'rounds', seg:'cards', metric:'gir' });
+  const miss = st.fw ? st.fw.n - st.fw.hit : 0;
+  if(miss) push({ id:'scramble', label:'Scramble (missed FW)', value:pc(st.fw.saved, miss),
+    prov:'on-course', view:'rounds', seg:'cards', metric:'gir' });
+  (state.carries || []).forEach((c, i) => {
+    const kind = provOfCarry(c);
+    if(c.carry != null) push({ id:'carry-'+clubKey(c.club), label:`${c.club} carry`,
+      value:String(c.carry), unit:'yd', prov: kind === 'offer' ? (S.carriesCalibrated ? 'on-course' : 'estimated') : kind,
+      view:'bag', metric:'carry', i });
+    if(c.meas && c.meas.carry != null && c.meas.carry !== c.carry)
+      push({ id:'offer-'+clubKey(c.club), label:`${c.club} bay offer`,
+        value:String(c.meas.carry), unit:'yd', prov:'offer', view:'bag', metric:'meas.carry', i });
+    if(c.meas && c.meas.cons != null)
+      push({ id:'cons-'+clubKey(c.club), label:`${c.club} Consistency`,
+        value:String(c.meas.cons), prov:'trackman', view:'bag', metric:'cons', i });
+    if(c.meas && c.meas.sd != null)
+      push({ id:'sd-'+clubKey(c.club), label:`${c.club} SD`,
+        value:'±'+c.meas.sd, unit:'yd', prov:'measured', view:'bag', metric:'sd', i });
+  });
+  const combos = (state.combines || []).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  if(combos.length){
+    const last = combos[combos.length-1];
+    if(last.score != null) push({ id:'combineScore', label:'Combine score', value:String(last.score),
+      prov:'trackman', view:'swing', metric:'combineScore',
+      trend: last.date ? fmtDate(last.date) : null });
+  }
+  const wedges = (state.clubs || []).filter(c => c.cat === 'wedge' && c.status === 'gaming');
+  wedges.forEach(c => {
+    if(c.rounds) push({ id:'groove-'+c.id, label:`${c.name} grooves`,
+      value: groovePct(c)+'%', unit:`${c.rounds} rds`, prov:'on-course', view:'bag', metric:'grooveRounds' });
+  });
+  const pending = pendingReturn();
+  if(pending){
+    const dl = daysLeft(state.settings.returnDeadline);
+    push({ id:'returnWindow', label:`Return · ${pending.name}`,
+      value: dl==null ? 'unset' : dl+' days',
+      prov:'self', view:'decisions', metric:'returnWindow' });
+  }
+  const six = (state.bays || []).find(b => b._fid === 'bay-six-metric-baseline-20260916-v1');
+  if(six && six.detail && six.detail.metrics){
+    six.detail.metrics.forEach(m => {
+      const id = /face/i.test(m.k) ? 'faceAtImpact' : /carry/i.test(m.k) ? 'carry' : 'cons';
+      push({ id:'six-'+m.k, label:'Six-metric · '+m.k, value:String(m.v),
+        prov:'trackman', view:'bay', metric: id, i: (state.bays||[]).indexOf(six) });
+    });
+  }
+  const faceBay = (state.bays || []).find(b => /putt/i.test(b.discipline||'') && /face/i.test(JSON.stringify(b.detail||b.finding||'')));
+  if(faceBay){
+    const i = (state.bays||[]).indexOf(faceBay);
+    push({ id:'faceAtImpact', label:'Face at impact (putting)', value:'measured',
+      prov:'measured', view:'bay', metric:'faceAtImpact', i });
+  }
+  return rows;
+}
+
+function catalogFilter(row, filter){
+  if(!filter || filter === 'all') return true;
+  if(filter === 'on-course') return row.prov === 'on-course';
+  if(filter === 'bay') return row.prov === 'bay' || row.prov === 'trackman';
+  if(filter === 'estimated') return row.prov === 'estimated';
+  if(filter === 'offers') return row.prov === 'offer';
+  return true;
+}
+function catalogMatch(row, q){
+  if(!q) return true;
+  const hay = `${row.label} ${row.value} ${row.id} ${row.metric || ''} ${row.unit || ''} ${row.trend || ''}`.toLowerCase();
+  return q.split(/\s+/).filter(Boolean).every(w => hay.includes(w));
+}
+
+function numbersView(arg){
+  if(arg && typeof arg === 'object'){
+    if(arg.filter) numbersFilter = arg.filter;
+    if(arg.q != null) numbersQ = arg.q;
+  }
+  const q = (numbersQ || '').trim().toLowerCase();
+  const all = numbersCatalog(S);
+  const rows = all.filter(r => catalogFilter(r, numbersFilter) && catalogMatch(r, q));
+  const FILT = [['all','All'],['on-course','On-course'],['bay','Bay'],['estimated','Estimated'],['offers','Offers']];
+  return `
+  <button class="backlink" data-action="go" data-view="home">← Today</button>
+  <div class="card">
+    <h2>Numbers</h2>
+    <p class="sm faint">Every figure this app will quote, with where it came from. Tap a row for what it means.</p>
+    <input id="numSearch" type="search" placeholder="Filter numbers…" value="${esc(numbersQ || '')}"
+      autocomplete="off" enterkeyhint="search" aria-label="Filter numbers">
+    <div class="chips numfilt" role="tablist">${FILT.map(([k,lab]) =>
+      `<button type="button" class="chip ${numbersFilter===k?'on':''}" data-action="numbers-filter" data-k="${k}">${lab}</button>`).join('')}</div>
+  </div>
+  <div class="card" id="numList">
+    ${rows.length ? rows.map(numRow).join('') : `<p class="sm faint">Nothing matches. Try All, or a club name.</p>`}
+  </div>`;
+}
+function numRow(r){
+  return `<div class="linkrow numrow" data-action="open-number" data-metric="${esc(r.metric || '')}"
+      data-view="${esc(r.view || 'home')}"${r.seg ? ` data-seg="${esc(r.seg)}"` : ''}${
+      r.i != null ? ` data-i="${r.i}"` : ''} data-prov="${esc(r.prov || '')}" data-value="${esc(String(r.value))}"
+      ${r.unit ? ` data-unit="${esc(r.unit)}"` : ''}>
+    <span><b>${esc(r.label)}</b><br><span class="sm">${esc(String(r.value))}${r.unit ? ` ${esc(r.unit)}` : ''}${
+      r.trend ? ` · ${esc(r.trend)}` : ''}</span></span>
+    <span class="numend">${provBadge(r.prov)}${meaningBtn(r.metric)}<span class="arr">→</span></span>
+  </div>`;
+}
+
+function searchIndex(state){
+  const rows = [];
+  const add = (kind, label, haystack, act) => rows.push({ kind, label, haystack: (haystack||'').toLowerCase(), act });
+  numbersCatalog(state).forEach(n => add('Numbers', n.label,
+    `${n.label} ${n.value} ${n.id} ${n.metric||''} ${n.unit||''}`,
+    { a:'open-number', metric:n.metric, view:n.view, seg:n.seg, i:n.i, prov:n.prov, value:n.value, unit:n.unit }));
+  (state.clubs || []).forEach(c => add('Bag', c.name,
+    `${c.name} ${c.spec||''} ${c.note||''} ${c.cat||''} club`,
+    { a:'go', v:'bag' }));
+  (state.carries || []).forEach(c => add('Bag', c.club + ' (ladder)',
+    `${c.club} carry ladder 5-wood 5 wood`,
+    { a:'go', v:'bag' }));
+  (state.courses || []).forEach(c => add('Courses', c.name,
+    `${c.name} ${c.st||''} ${c.notes||''} course`,
+    { a:'go', v:'rounds', seg:'courses' }));
+  (state.rounds || []).forEach((r,i) => add('Courses', (r.course||'Round') + (r.sim ? ' (sim)' : ''),
+    `${r.course||''} ${r.date||''} round scorecard`,
+    { a:'open-round', i }));
+  (state.briefings || []).forEach(b => add('Plans', b.course || b.focus || 'Plan',
+    `${b.course||''} ${b.focus||''} briefing plan prep`,
+    { a:'open-briefing', id:b.id }));
+  lessons().forEach(l => add('Labs', l.title,
+    `${l.title} ${l.shelf||''} ${(l.body||'').slice(0,120)} lesson`,
+    { a:'open-lesson', id:l.id }));
+  drillList().forEach(d => add('Labs', d.l.title,
+    `${d.l.title} ${d.l.shelf||''} drill`,
+    { a:'go', v:'drills' }));
+  (state.bays || []).forEach((b,i) => add('Labs', b.setup || b.mode || 'Bay session',
+    `${b.setup||''} ${b.venue||''} ${b.mode||''} trackman bay range`,
+    { a:'open-bay', i }));
+  (state.sessions || []).forEach((s,i) => add('Labs', s.setup || 'Film',
+    `${s.setup||''} ${s.finding||''} film session`,
+    { a:'open-session', i }));
+  (state.combines || []).forEach(c => add('Numbers', 'Combine '+ (c.score != null ? c.score : ''),
+    `combine trackman ${c.note||''} ${c.venue||''}`,
+    { a:'go', v:'swing' }));
+  add('Numbers', 'The Combine', 'combine trackman benchmark score', { a:'go', v:'swing' });
+  add('Labs', 'Swing Lab', 'swing lab film bay', { a:'go', v:'swing' });
+  add('Labs', 'Putting Lab', 'putting lab 5-foot 5-ft 20-ball', { a:'go', v:'putting' });
+  add('Numbers', 'Numbers Index', 'numbers index catalog metrics', { a:'go', v:'numbers' });
+  add('Numbers', 'Evidence timeline', 'evidence timeline landed rounds bay film', { a:'go', v:'timeline' });
+  return rows;
+}
+function searchResultsHTML(q){
+  const query = (q || '').trim().toLowerCase();
+  if(!query) return `<p class="sm faint" id="hqEmpty">Try ‘5-wood’, ‘combine’, ‘handicap’…</p>`;
+  const words = query.split(/\s+/).filter(Boolean);
+  const hits = searchIndex(S).filter(r => words.every(w => r.haystack.includes(w) || r.label.toLowerCase().includes(w)));
+  if(!hits.length) return `<p class="sm faint">Nothing for “${esc(q.trim())}”. Try ‘5-wood’, ‘combine’, ‘handicap’…</p>`;
+  const groups = [];
+  hits.forEach(h => {
+    const last = groups[groups.length-1];
+    if(last && last.kind === h.kind) last.rows.push(h);
+    else groups.push({ kind:h.kind, rows:[h] });
+  });
+  return groups.map(g => `<div class="srchgrp"><div class="cgrp">${esc(g.kind)}</div>${
+    g.rows.slice(0,8).map(r => {
+      const a = r.act || {};
+      const attrs = [
+        a.a ? `data-action="${esc(a.a)}"` : '',
+        a.v ? `data-view="${esc(a.v)}"` : '',
+        a.seg ? `data-seg="${esc(a.seg)}"` : '',
+        a.id ? `data-id="${esc(a.id)}"` : '',
+        a.i != null ? `data-i="${a.i}"` : '',
+        a.metric ? `data-metric="${esc(a.metric)}"` : '',
+        a.prov ? `data-prov="${esc(a.prov)}"` : '',
+        a.value != null ? `data-value="${esc(String(a.value))}"` : '',
+        a.unit ? `data-unit="${esc(a.unit)}"` : '',
+      ].filter(Boolean).join(' ');
+      return `<div class="linkrow" ${attrs}><span><b>${esc(r.label)}</b></span><span class="arr">→</span></div>`;
+    }).join('')}</div>`).join('');
+}
+function todaySearch(){
+  return `<div class="card hqsearch">
+    <label for="hqSearch">Search</label>
+    <input id="hqSearch" type="search" placeholder="Club, course, lesson, number…"
+      value="${esc(searchQ || '')}" autocomplete="off" enterkeyhint="search">
+    <div id="hqResults">${searchResultsHTML(searchQ)}</div>
+  </div>`;
+}
+
+function evidenceEvents(){
+  const ev = [];
+  (S.rounds || []).forEach((r, i) => {
+    ev.push({ d:r.date || '', title:(r.sim ? 'Indoor round' : (r.live ? 'Live round' : 'Round')) + ' · ' + (r.course || ''),
+      gist:[r.score != null ? 'Score '+r.score : '', r.nine ? r.nine+' nine' : '', r.sim ? 'simulator — not a handicap round' : '']
+        .filter(Boolean).join(' · '),
+      prov: r.sim ? 'bay' : 'on-course',
+      act:{ a:'open-round', i } });
+  });
+  (S.bays || []).forEach((b, i) => {
+    ev.push({ d:b.date || '', title:b.setup || b.mode || 'Bay session',
+      gist:bayGist(b), prov:'bay', act:{ a:'open-bay', i } });
+  });
+  (S.combines || []).forEach(c => {
+    ev.push({ d:c.date || '', title:'Combine' + (c.score != null ? ' · '+c.score : ''),
+      gist:c.note || c.venue || 'Trackman Combine', prov:'trackman', act:{ a:'go', v:'swing' } });
+  });
+  (S.sessions || []).forEach((s, i) => {
+    ev.push({ d:s.date || '', title:s.setup || 'Filmed session',
+      gist:sessionGist(s), prov:'measured', act:{ a:'open-session', i } });
+  });
+  const SKIP = new Set(['round','round-update','bay','bay-update','session','session-update','combine','combine-remove']);
+  const KEEP = new Set(['carry-update','club-update','club-add','briefing','evolution','profile','layout','faults']);
+  (S.updates || []).forEach(u => {
+    if(SKIP.has(u.t) || !KEEP.has(u.t)) return;
+    ev.push({ d:u.d || '', title:u.h, gist:u.s || '', prov:'fed', act:u.act || null });
+  });
+  ev.sort((a, b) => (b.d || '').localeCompare(a.d || '') || (a.title||'').localeCompare(b.title||''));
+  return ev;
+}
+function timeline(){
+  const events = evidenceEvents();
+  return `
+  <button class="backlink" data-action="go" data-view="home">← Today</button>
+  <div class="card">
+    <h2>Evidence</h2>
+    <p class="sm faint">Rounds, bay sessions, film and feed applies — newest first. Nothing here is invented; it is stitched from what is already on file.</p>
+  </div>
+  <div class="card">
+    ${events.length ? events.map(e => {
+      const attrs = actAttrs(e.act);
+      return `<div class="linkrow tlrow${e.act ? ' opens' : ''}"${attrs}>
+        <span><b>${esc(e.title)}</b><br><span class="sm clip2">${esc(e.gist || '')}</span>
+          <span class="sm faint">${e.d ? esc(fmtDate(e.d)) : ''}</span></span>
+        <span class="numend">${provBadge(e.prov)}${e.act ? '<span class="arr">→</span>' : ''}</span>
+      </div>`;
+    }).join('') : `<p class="sm faint">No evidence on file yet.</p>`}
+    <div class="linkrow" data-action="go" data-view="landed" style="border-bottom:none">
+      <span class="sm"><b>What’s landed</b> — the changelog of pushes and builds</span><span class="arr">→</span></div>
+  </div>`;
+}
+
+function scoreboardCard(){
+  const C = areaCards();
+  const { st } = gameAreas(C.cards);
+  const lastFt = latestFiveFt();
+  const close = lagClose(st.putts || { dist:new Map(), lagIn:0, lagN:0 });
+  let metric = 'handicap', label = 'Handicap', value = String(S.profile.handicap),
+      prov = provOfProfile(), view = 'home', note = '';
+  if(lastFt){
+    const s = fiveFtScore(lastFt);
+    if(s.total){
+      metric = 'fiveFootMake'; label = '5-ft makes'; value = `${s.makes}/20`;
+      prov = 'measured'; view = 'putting';
+      note = lastFt.date ? `Last 20 · ${fmtDate(lastFt.date)}` : 'Mat test — the short-putt number';
+    }
+  }
+  if(metric === 'handicap' && close.n){
+    metric = 'lagInside3'; label = 'Lag inside 3 ft'; value = `${close.in}/${close.n}`;
+    prov = 'on-course'; view = 'putting';
+    note = pcSafe(close.in, close.n) + ' of lags whose finish is known';
+  }
+  if(metric === 'handicap'){
+    const idx = estIndex();
+    note = idx != null ? `${idx.toFixed(1)} estimated off your rated cards` : `${indexBasis().n} of 3 rated`;
+  }
+  return `<div class="card scoreboard" data-action="meaning" data-metric="${esc(metric)}" data-view="${esc(view)}" data-prov="${esc(prov)}" data-value="${esc(value)}">
+    <h2>The scoreboard</h2>
+    <div class="sbrow">
+      <div>
+        <div class="v">${esc(value)}${meaningBtn(metric)}</div>
+        <div class="l">${esc(label)}</div>
+      </div>
+      ${provBadge(prov)}
+    </div>
+    ${note ? `<p class="sm faint" style="margin-top:8px">${esc(note)}</p>` : ''}
+    ${C.cards.length && (metric === 'lagInside3' || metric === 'handicap') ? `<p class="sm faint">${areaProvLine(C)}</p>` : ''}
+  </div>`;
+}
+function pcSafe(n, d){ return d ? Math.round(n / d * 100) + '%' : '—'; }
+function areaProvLine(C){
+  if(!C.cards.length) return '';
+  return C.ev === 'live'
+    ? `Read off your ${C.liveCards.length} live round${C.liveCards.length===1?'':'s'} — ${C.liveHoles} holes you tapped in standing on them${C.setAside ? `, with ${C.setAside} older card${C.setAside===1?'':'s'} set aside` : ''}.`
+    : `Read off ${C.cards.length} card${C.cards.length===1?'':'s'} on record — ${C.allHoles} holes.`;
+}
+
+function workCard(){
+  const f = coachFocus(coachSignals());
+  const pick = pickedLessons()[0];
+  if(!f && !pick) return '';
+  const L = f && f.link;
+  return `<div class="card one${f ? rail(f.ev) : ''}">
+    <h2>The work</h2>
+    ${f ? `${evDrawer('ev-onething', 'The one thing', f.ev, f.src)}
+      <div class="oneh">${f.h}</div>
+      ${expandable(f.b)}
+      ${L ? `<div class="linkrow" data-action="${L.a}"${L.view ? ` data-view="${L.view}"` : ''}${
+        L.id ? ` data-id="${esc(L.id)}"` : ''}><span class="sm"><b>${esc(L.lab)}</b></span><span class="arr">→</span></div>` : ''}` : ''}
+    ${pick ? tipHTML(pick) : ''}
+    <button class="btn ghost tiny" data-action="go" data-view="coach">All lessons →</button>
+  </div>`;
+}
+function prepCardThin(){
+  const p = coursePlans();
+  const next = [...p.up, ...p.standing, ...p.past][0];
+  const rest = p.up.length + p.standing.length + p.past.length - (next ? 1 : 0);
+  const wx = S.weather;
+  const wxLine = wx ? `<p class="sm faint">${WX_ICON(wx.code)} ${Math.round(wx.t)}° · wind ${Math.round(wx.wind)} mph${
+    playsFactor() ? ` · 150 plays like ${Math.round(150 / playsFactor())}` : ''} · <span class="wxgo" data-action="get-weather">refresh</span></p>`
+    : `<p class="sm faint"><span class="wxgo" data-action="get-weather">Load conditions</span> — temperature only, for the carry effect.</p>`;
+  return `<div class="card">
+    <h2>Next round</h2>
+    ${wxLine}
+    ${next ? planRow(next)
+      : `<p class="sm">No plan on file. Tell Claude the course and day — a briefing built for <i>your</i> game lands here.</p>`}
+    ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="rounds" data-seg="prep">
+      <span class="sm"><b>All round prep</b> · ${rest} more plan${rest===1?'':'s'}</span><span class="arr">→</span></div>` : ''}
+  </div>`;
+}
+function returnWindowCard(){
+  const pending = pendingReturn();
+  if(!pending) return '';
+  const dl = daysLeft(S.settings.returnDeadline);
+  return `<div class="card">
+    <h2>Open window</h2>
+    <h3>${dl===null ? 'Deadline not set' : dl + ' days left on the ' + esc(pending.name)} ${meaningBtn('returnWindow')} ${provBadge('self')}</h3>
+    <p class="sm">${dl===null
+      ? `<span class="warn">Deadline unknown</span> — the ${esc(pending.name)} is still returnable and nothing here knows until when.`
+      : S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> — confirm the real one with the shop.' : 'Deadline confirmed.'}</p>
+    <div class="formrow" style="margin-top:8px">
+      <div><label>Deadline</label><input type="date" id="deadlineInput" value="${esc(S.settings.returnDeadline||'')}"></div>
+      <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
+    </div>
+    <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
+  </div>`;
+}
+function todayShortcuts(){
+  return `<div class="card hqshort" role="group" aria-label="Shortcuts">
+    <div class="home-quicklinks">
+      <button class="btn ghost" data-action="focus-search">Search</button>
+      <button class="btn ghost" data-action="go" data-view="numbers">Numbers</button>
+      <button class="btn ghost" data-action="go" data-view="timeline">Evidence</button>
+      <button class="btn" data-action="go" data-view="live">${S.live?'Resume round':'Start round'}</button>
+    </div>
+  </div>`;
+}
+function whatsNewOneLiner(){
+  const days = upDays();
+  if(!days.length) return '';
+  const seen = new Set(S.settings.seenUpdates || []);
+  const day = days[0];
+  const fresh = upFresh([day], seen);
+  upMarkSeen(days, [day]);
+  const first = day.rows[0];
+  return `<div class="card">
+    <p class="sm"><b>What’s new.</b> ${esc(first ? first.h : 'Nothing yet')}${
+      first && first.b ? ` · ${esc(first.b)}` : ''}${
+      fresh ? ` · <span class="warn">${fresh} new</span>` : ''}.</p>
+    <div class="linkrow" style="border-bottom:none" data-action="go" data-view="timeline">
+      <span class="sm"><b>See Evidence</b> — rounds, bay, film and feed, mixed by date</span><span class="arr">→</span></div>
+  </div>`;
+}
+
+let searchQ = '';
+let numbersQ = '';
+let numbersFilter = 'all';
+let searchT = 0;
+
 
 // ----- Rounds: one tab, three segments (Aug 27 2026, Jack's redesign) -----
 // Cards, the plans written for them, and the courses they were played on are three faces
@@ -1183,6 +1752,8 @@ function rounds(seg){
   const body = { cards:scores, prep:preps, courses }[cur.k];
   return `<div class="segbar">${ROUND_SEGS.map(s =>
     `<button class="seg ${s.k === cur.k ? 'on' : ''}" data-action="rounds-seg" data-k="${s.k}">${s.lab}</button>`).join('')}</div>
+  <div class="card flat"><div class="linkrow" data-action="go" data-view="timeline" style="border-bottom:none">
+    <span><b>Evidence →</b><span class="sm"> Rounds, bay and film mixed by date</span></span><span class="arr">→</span></div></div>
   ${body()}`;
 }
 
@@ -1228,7 +1799,7 @@ function render(view, arg, keepScroll){
   // The four labs live behind one nav button, so they all light it — and so does every
   // view that hangs off Rounds: a round card, and a course plan you opened from one.
   const NAV_OF = { sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
-                   drills:'coach', shelf:'coach', lesson:'coach', landed:'home',
+                   drills:'coach', shelf:'coach', lesson:'coach', landed:'home', numbers:'home', timeline:'home',
                    round:'rounds', rounds:'rounds' };
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
@@ -1237,7 +1808,7 @@ function render(view, arg, keepScroll){
   // side it is the same intention and live() already knows which one it is.
   const teeLab = $('#navTeeLab');
   if(teeLab) teeLab.textContent = S.live ? 'RESUME' : 'TEE';
-  const R = { home, bag, game, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed }[view] || home;
+  const R = { home, bag, game, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
@@ -1820,7 +2391,7 @@ function theNumbers(){
         // whole numbers block past the fold — the row is only as short as its tallest card.
         n ? `<div class="sv">${n} logged</div>` : ''}</div>`;
     })()}
-    <div class="stat"><div class="v">${esc(S.profile.handicap)}</div><div class="l">Handicap</div>${
+    <div class="stat"><div class="v">${esc(S.profile.handicap)}${meaningBtn('handicap')}</div><div class="l">Handicap ${provBadge(provOfProfile())}</div>${
       // The small number is the app's own estimate off his cards, and when there isn't one
       // the band says how far off it is rather than going blank — a tile that silently
       // drops a row is how "why has this never moved" becomes a question he has to ask.
@@ -1875,67 +2446,19 @@ function startRound(){
 
 // ----- Home -----
 function home(){
-  const dl = daysLeft(S.settings.returnDeadline);
-  const pending = pendingReturn();
-  const picks = pickedLessons().slice(0,1);
+  // Five decision blocks. The long grids, session library and changelog archive
+  // moved to Numbers / Evidence / the labs — same data, not a second copy.
   return `
-  ${sessionShortcuts()}
-  <div class="home-quicklinks" role="group" aria-label="Quick navigation">
-    <button class="btn ghost" data-action="go" data-view="bag">My Bag</button>
-    <button class="btn ghost" data-action="go" data-view="drills">Practice Drills</button>
-    <button class="btn ghost" data-action="go" data-view="rounds" data-seg="prep">Round Prep</button>
-    <button class="btn" data-action="go" data-view="live">${S.live?'Resume Round':'Start Round'}</button>
-  </div>
-  ${wxCard()}
-  ${theNumbers()}
-  ${startRound()}
-
-  ${(() => {
-    const p = coursePlans();
-    const next = [...p.up, ...p.standing, ...p.past][0];
-    const rest = p.up.length + p.standing.length + p.past.length - (next ? 1 : 0);
-    return `<div class="card">
-      <h2>Round prep</h2>
-      ${next ? planRow(next)
-      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Swing Positions, Swing Thoughts) live in the <b>Swing</b> lab, and the at-home training lives in <b>Coach</b>.</p>`}
-      ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="rounds" data-seg="prep">
-        <span class="sm"><b>All round prep</b> · ${rest} more plan${rest === 1 ? '' : 's'} on file</span><span class="arr">→</span></div>` : ''}
-      ${S.live ? '' : `<div class="linkrow" data-action="live-new">
-        <span><b>Play a live round</b><br><span class="sm">Tap each hole in as you go — clubs, fairways, greens, putts</span></span><span class="arr">→</span></div>`}
-      <div class="linkrow" style="border-bottom:none;padding-bottom:0"
-        data-action="cheat-open" data-disc="${next ? 'prep' : 'swing'}">
-        <span><b>⚡ Cheat sheet</b><br><span class="sm">The pre-round read — course, swing, short game, putting, mental</span></span><span class="arr">→</span></div>
-    </div>`;
-  })()}
-
-  ${oneThing()}
-
-  ${picks.length ? `<div class="card">
-    <h2>From your coach today</h2>
-    ${picks.map(p => tipHTML(p)).join('')}
-    <button class="btn ghost tiny" data-action="go" data-view="coach">All lessons →</button>
-  </div>` : ''}
-
-  ${whatsNew()}
-
-  ${!pending ? '' : `
-  <div class="card">
-    <h2>Putter return window</h2>
-    <h3>${dl===null ? 'Deadline not set' : dl + ' days left on the ' + esc(pending.name)}</h3>
-    <p class="sm">${dl===null
-      ? `<span class="warn">Deadline unknown</span> — the ${esc(pending.name)} is still returnable and nothing here knows until when. Find the receipt, confirm the window with the shop, and set it below.`
-      : S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> — confirm the real one with the shop and update it below.' : 'Deadline confirmed.'}</p>
-    <div class="formrow" style="margin-top:8px">
-      <div><label>Deadline</label><input type="date" id="deadlineInput" value="${esc(S.settings.returnDeadline||'')}"></div>
-      <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
-    </div>
-    <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
-  </div>`}
-
-  <div class="card flat">
-    <div class="linkrow" data-action="go" data-view="decisions"><b>Decisions</b><span class="arr">→</span></div>
-    <div class="linkrow" data-action="go" data-view="data"><b>Data & backup</b><span class="arr">→</span></div>
-  </div>`;
+  ${todaySearch()}
+  ${workCard()}
+  ${scoreboardCard()}
+  ${prepCardThin()}
+  ${returnWindowCard()}
+  ${todayShortcuts()}
+  ${whatsNewOneLiner()}
+  <p class="sm faint hqfoot"><button class="btn ghost tiny" data-action="go" data-view="data">Data & backup</button>
+    · <button class="btn ghost tiny" data-action="go" data-view="decisions">Decisions</button>
+    · <button class="btn ghost tiny" data-action="go" data-view="landed">What’s landed</button></p>`;
 }
 
 function tipHTML(p){
@@ -2175,13 +2698,19 @@ const LADDER_MAX = 300;
 // 13px of noise a page tall.
 function ladderBadge(row){
   const m = row.meas;
-  if(!m) return row.carry == null ? '' : `<span class="lmeas">estimated</span>`;
-  const bits = [m.date ? 'MEASURED ' + fmtDate(m.date) : 'MEASURED',
-    m.n ? `n=${m.n}` : '', m.cons != null ? `cons ${m.cons}` : '',
-    m.sd != null ? `±${m.sd}` : '',
-    m.ball || '', m.spin === 'estimated' ? 'spin est.' : '',
-    m.norm && !/\b70\s*°?F/i.test(m.norm) ? 'norm unconfirmed' : ''].filter(Boolean);
-  return `<span class="lmeas on">${esc(bits.join(' · '))}</span>`;
+  const kind = provOfCarry(row);
+  const liveKind = kind === 'offer' ? (S.carriesCalibrated ? 'on-course' : 'estimated') : kind;
+  if(!liveKind && !m) return '';
+  const meta = [];
+  if(m && m.n) meta.push('n=' + m.n);
+  if(m && m.date) meta.push(fmtDate(m.date));
+  if(m && m.cons != null) meta.push('Consistency ' + m.cons + ' · not SD');
+  if(m && m.sd != null) meta.push('SD ±' + m.sd);
+  if(m && m.ball) meta.push(m.ball);
+  if(m && m.spin === 'estimated') meta.push('spin est.');
+  if(m && m.norm && !/\b70\s*°?F/i.test(m.norm)) meta.push('norm unconfirmed');
+  return `<div class="lprov">${liveKind ? provBadge(liveKind) : ''}${meaningBtn('carry')}${
+    meta.length ? `<span class="lmeas">${esc(meta.join(' · '))}</span>` : ''}</div>`;
 }
 // The one place the two numbers meet. A measured figure he has not accepted is an offer,
 // not a correction — so it renders beside his own with the arithmetic visible and a button,
@@ -2191,7 +2720,7 @@ function ladderOffer(row, i){
   if(!m || m.carry == null || m.carry === row.carry) return '';
   const lead = row.carry == null ? `the bay says ${m.carry}`
     : `${S.carriesCalibrated ? 'yours' : 'ladder'} ${row.carry} · the bay says ${m.carry}`;
-  return `<span class="lmeas offer">${lead}
+  return `<span class="lmeas offer">${provBadge('offer')}${meaningBtn('meas.carry')}${lead}
     <button class="btn ghost tiny" data-action="use-bay-carry" data-i="${i}">use ${m.carry}</button></span>`;
 }
 function ladderCard(){
@@ -2209,7 +2738,7 @@ function ladderCard(){
   <div class="ladr">${S.carries.map((c, i) => {
     const next = S.carries[i + 1];
     const gap = next && c.carry && next.carry ? c.carry - next.carry : null;
-    const badge = anyMeas ? ladderBadge(c) : '';
+    const badge = ladderBadge(c);
     const offer = ladderOffer(c, i);
     return `<div class="lgrp"><div class="lrow">
       <span class="lc">${esc(clubAbbr(c.club))}</span>
@@ -2380,7 +2909,7 @@ function evolutionCard(disc){
   const mc = mk => mk === '\u2713' ? 'var(--green)' : mk === '\u2717' ? 'var(--burg)' : 'var(--faint)';
   const notes = e.notes || [];
   return `<div class="card">
-    <p class="sm faint" style="margin-bottom:6px">Tap a row for the reasoning behind it.</p>
+    <p class="sm faint" style="margin-bottom:6px">${provBadge('measured')} Tap a row for the reasoning behind it. ${meaningBtn('faceAtImpact')}</p>
     <div class="evo" style="--n:${e.sessions.length}">
       <div class="evohead"><span></span>${e.sessions.map(x => `<span>${esc(x)}</span>`).join('')}</div>
       ${e.metrics.map(m => `<details class="evorow" id="evo-${slug(m.name)}">
@@ -2666,8 +3195,8 @@ function combineCard(){
   return `<h2>The Combine</h2>
   <div class="card">
     <div class="rowgrid g3">
-      <div class="stat"><div class="v">${esc(last.score != null ? last.score : '—')}</div>
-        <div class="l">Latest</div></div>
+      <div class="stat"><div class="v">${esc(last.score != null ? last.score : '—')}${meaningBtn('combineScore')}</div>
+        <div class="l">Latest ${provBadge('trackman')}</div></div>
       <div class="stat"><div class="v">${esc(scored.length ? Math.max(...scored) : '—')}</div>
         <div class="l">Best</div></div>
       <div class="stat"><div class="v">${list.length}</div><div class="l">Taken</div></div>
@@ -2698,14 +3227,14 @@ function bayBlock(disc, empty){
 function sixMetricGuide(b){
   if(!b || b._fid !== 'bay-six-metric-baseline-20260916-v1') return '';
   return `<h2>What these six numbers mean</h2><div class="card">
-    <p class="sm">This is one TrackMan shot—not a club average. Compare future readings only with the same confirmed club, intended shot and conditions.</p>
+    <p class="sm">${provBadge('trackman')} This is one TrackMan shot—not a club average. Compare future readings only with the same confirmed club, intended shot and conditions. ${meaningBtn('faceAtImpact')}${meaningBtn('cons')}${meaningBtn('carry')}</p>
     <div class="rowgrid g3" style="margin-top:10px">
       <div class="stat"><div class="v">128.5</div><div class="l">Ball speed · mph</div><p class="sm">How fast the ball left the face. Higher at a similar swing speed usually means more distance.</p></div>
       <div class="stat"><div class="v">1.42</div><div class="l">Smash factor</div><p class="sm">Strike efficiency: ball speed divided by club speed. Higher with the same club and speed means a more centered strike. Driver-only reference: 1.47–1.50 is excellent.</p></div>
-      <div class="stat"><div class="v">−1.6°</div><div class="l">Face angle</div><p class="sm">Start direction. Negative means the face pointed left, so this ball started left of the target line.</p></div>
+      <div class="stat"><div class="v">−1.6° ${meaningBtn('faceAtImpact')}</div><div class="l">Face angle ${provBadge('trackman')}</div><p class="sm">Start direction. Negative means the face pointed left, so this ball started left of the target line.</p></div>
       <div class="stat"><div class="v">+6.5°</div><div class="l">Face-to-path</div><p class="sm">Curve control. Positive means the face was open to the path. With the −1.6° face, this is a left-starting ball that peels right—a pull fade / bigger-cut pattern. Bring it closer to zero before chasing speed.</p></div>
       <div class="stat"><div class="v">3,979</div><div class="l">Spin rate · rpm</div><p class="sm">Controls flight, roll and how much the ball can curve. The club is unconfirmed, so this is a comparison number—not yet called high or low.</p></div>
-      <div class="stat"><div class="v">193.7</div><div class="l">Carry · yd</div><p class="sm">Air distance before roll—the number for clearing hazards and holding greens. It is not a new bag yardage until repeated.</p></div>
+      <div class="stat"><div class="v">193.7 ${meaningBtn('carry')}</div><div class="l">Carry · yd ${provBadge('bay')}</div><p class="sm">Air distance before roll—the number for clearing hazards and holding greens. It is not a new bag yardage until repeated.</p></div>
     </div>
     <p class="sm" style="margin-top:10px"><b>Your immediate priority:</b> improve face-to-path consistency while keeping the face near your intended start line. That makes the ball flight more predictable; speed and carry become easier to trust afterward.</p>
   </div>`;
@@ -4807,9 +5336,13 @@ function game(){
       <span class="sb">${esc(l.sub)}</span></button>`; }).join('')}</div>
 
   <div class="card flat">
-    <div class="linkrow" data-action="go" data-view="${cur.view}" style="border-bottom:none">
+    <div class="linkrow" data-action="go" data-view="${cur.view}">
       <span><b>Open the ${esc(cur.name)} lab</b><br><span class="sm">The film room, the plans,
         and everything this diagnosis is built on</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="numbers">
+      <span><b>Numbers</b><br><span class="sm">Every figure, sourced and explained</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="timeline" style="border-bottom:none">
+      <span><b>Evidence</b><br><span class="sm">Rounds, bay, film and feed — newest first</span></span><span class="arr">→</span></div>
   </div>
 
   <div class="card">
@@ -7759,6 +8292,17 @@ function bumpGearCounters(){
 // ---------- Actions ----------
 const ACTIONS = {
   'session-category': el => render('sessions', el.dataset.kind || 'range'),
+  'meaning': el => openMeaning(el.dataset.metric, {
+    view: el.dataset.view, seg: el.dataset.seg, i: el.dataset.i,
+    prov: el.dataset.prov, value: el.dataset.value, unit: el.dataset.unit }),
+  'open-number': el => openMeaning(el.dataset.metric, {
+    view: el.dataset.view, seg: el.dataset.seg, i: el.dataset.i,
+    prov: el.dataset.prov, value: el.dataset.value, unit: el.dataset.unit }),
+  'numbers-filter': el => { numbersFilter = el.dataset.k; rerender(); },
+  'focus-search': () => {
+    const i = document.getElementById('hqSearch');
+    if(i){ i.focus(); i.scrollIntoView({ behavior:'smooth', block:'start' }); }
+  },
   // `data-seg` is how a link asks for one FACE of a multi-segment view (Rounds). Every
   // other view ignores it, so one action still covers every link in the app.
   'go': el => { editingCourse = null; render(el.dataset.view, el.dataset.seg); },
@@ -8397,6 +8941,26 @@ document.addEventListener('click', e => {
 // tap is: iOS kills a suspended PWA without warning, and a note that only existed in the
 // textarea would go with it. No re-render — that would take the keyboard away mid-word.
 document.addEventListener('input', e => {
+  if(e.target.id === 'hqSearch'){
+    searchQ = e.target.value;
+    clearTimeout(searchT);
+    searchT = setTimeout(() => {
+      const box = document.getElementById('hqResults');
+      if(box) box.innerHTML = searchResultsHTML(searchQ);
+    }, 120);
+    return;
+  }
+  if(e.target.id === 'numSearch'){
+    numbersQ = e.target.value;
+    const pos = e.target.selectionStart;
+    clearTimeout(searchT);
+    searchT = setTimeout(() => {
+      rerender();
+      const el = document.getElementById('numSearch');
+      if(el){ el.focus(); try{ el.setSelectionRange(pos, pos); }catch(err){} }
+    }, 120);
+    return;
+  }
   if(e.target.id !== 'lvHoleNote' || !S.live) return;
   const h = S.live.holes[S.live.cur];
   if(!h) return;
