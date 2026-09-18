@@ -10,7 +10,7 @@ for(const f of ['lessons.js','courses-db.js','course-cards.js'])vm.runInContext(
 let src=fs.readFileSync(path.join(root,'app.js'),'utf8');
 src=src.slice(0,src.indexOf('// ---------- Boot ----------'))+`
 rerender=()=>{};toast=()=>{};load();
-window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts};
+window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView};
 })();`;
 vm.runInContext(src,ctx);
 const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'coach-feed.json'),'utf8'));
@@ -63,9 +63,29 @@ const newer=T.get().bays.find(b=>b._fid==='bay-20260915-range-54');
 assert.equal(T.get().bays.filter(b=>b._fid===newer._fid).length,1);
 assert.equal(newer.detail.rangeShots.reduce((n,c)=>n+c.shots.length,0),54);
 const newHtml=T.bayView(T.get().bays.indexOf(newer));
-for(const phrase of ['Carry vs total · all 54 shots','Every carry','All 54 shots · exact data','Path + face','125.2','162.3']) assert.ok(newHtml.includes(phrase),phrase);
+for(const phrase of ['Carry vs total · struck balls','Every carry','All 54 shots · exact data','Path + face','125.2','162.3']) assert.ok(newHtml.includes(phrase),phrase);
+assert.ok(newHtml.includes('held out'));
+assert.ok(!newHtml.includes('including the very short ones'));
 assert.ok(!newHtml.includes('Consistency shape'));
 assert.equal((newHtml.match(/<circle /g)||[]).length,54);
+const tops=[{carry:196.7},{carry:152.3},{carry:26.4},{carry:172.4},{carry:195.3},{carry:161.4},{carry:165.9},{carry:34.9},{carry:201.2},{carry:189.2},{carry:154.5}];
+assert.equal(T.struckShots({shots:tops}).length,9);
+assert.equal(T.isClearMishit(tops[2],tops),true);
+assert.equal(T.isClearMishit(tops[0],tops),false);
+const fat9=[{carry:97.7},{carry:106},{carry:95.6},{carry:97.2},{carry:100.1},{carry:114.4},{carry:120.3},{carry:108.6},{carry:82.4},{carry:69.5}];
+assert.equal(T.isClearMishit(fat9[9],fat9),false);
+const sep18=T.get().bays.find(b=>b._fid==='bay-20260918-gl18-3w-5w-7i');
+if(sep18){
+  const clubs=T.analysisClubs(sep18.detail);
+  const w3=clubs.find(c=>/3/.test(c.club));
+  assert.equal(w3.n,9);
+  assert.equal(w3.held,2);
+  assert.equal(w3.carry,176.5);
+  const w5=clubs.find(c=>/5/.test(c.club));
+  assert.equal(w5.n,6);
+  assert.equal(w5.held,1);
+  assert.equal(w5.carry,179.1);
+}
 assert.ok(T.sessionLibrary('range').indexOf('Range practice · 54 shots')<T.sessionLibrary('range').indexOf('Map My Bag'));
 // Existing v110 install: new feed imports exactly one separate session without touching old data.
 T.get().bays=T.get().bays.filter(b=>b._fid!==newer._fid);

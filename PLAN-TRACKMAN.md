@@ -631,12 +631,13 @@ venue-ball carry is a model built partly on an estimated spin, which is the diff
 between a row that may fill a blank ladder slot and one that may only be compared to itself.
 Send them once per visit, not once per club.
 
-**A mishit is data and it is also a decision, so it is raised rather than dropped.** Do not
-average a set silently: a five-shot set carrying one 124-yard toe strike averages twelve
-yards under its own four good shots, and BOTH numbers are defensible (the ladder is what he
-carries it on a good day; the spread is what he actually plays). §6's rule stands — do not
-delete the bad ones — but say which number a `meas.carry` was taken over, in `meas.how`, and
-ask him which one he wants on the row before pushing it.
+**A mishit is data. It is not an analysis of the club.** The day keeps every shot — do not
+delete the bad ones from the table. Analysis (Cumulative, range bars, path/face rings)
+holds **clear mishits** out: carry under half the median of the rest of that club that
+day, or an explicit `mishit:true`. Print both numbers — the screen average and the
+struck-ball average — and never park the screen number on the live ladder. See
+CLAUDE.md *Review process*. The old "raise rather than drop" line was about not
+deleting the row; it was never permission to leave a 26-yard top inside a 3-wood average.
 
 ---
 
