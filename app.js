@@ -99,13 +99,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v121';
+const BUILD = 'v122';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v122', d:'2026-09-18', items:[
+    'MISHITS ARE OFF THE AVERAGE. Analysis is the struck balls. A top or skull — carry under half the rest of that club that day — is held out of the bars, the rings, and Cumulative. It stays on the day and in the table, marked not deleted.',
+    'THE 3-WOOD READ IS 176.5, NOT 150. Two tops (26.4, 34.9) out of eleven. The 5-wood is 179.1, not 157.6. Same rule on the Sep 15 range: the 8-yard and 15-yard drivers are off the average they were sitting in.',
+    'THE REVIEW PROCESS IS IN CLAUDE.md. Transcribe every shot. Clean the analysis. Print both ns. Check the arithmetic. Drive 320/390. Same commit as the code.' ] },
   { b:'v121', d:'2026-09-18', items:[
     'CUMULATIVE IS THE ANALYSIS NOW. Working vs needs work, the over-the-top picture, path and face from every bay day, the one thing to do, and the open items — on that page, not behind another door.',
     'PATH ACROSS DAYS is the visual: every club average as a dot, the ring is that day’s shape. Sep 14, Sep 15 and Sep 18 all sit left of zero. Face open to that path is the pull-fade. Fix the path first.',
@@ -3185,34 +3189,112 @@ function bayDeliveryVisual(delivery){
     <p class="bvcap">Every small dot is one measured shot; the outlined rings are club averages. Negative is left of the target line. Face-to-path (F–P) is face angle minus club path: positive means the face was open to the path. Scale: ±16°.</p>
   </div>`;
 }
+function rangeShotMedian(xs){
+  if(!xs.length) return null;
+  const a = xs.slice().sort((x,y)=>x-y);
+  const m = Math.floor(a.length / 2);
+  return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+}
+// The day keeps every shot. Analysis is the ones that got up.
+// Clear mishit: carry is less than half the median of the rest of that club
+// that day — a top or skull, not a slightly fat 9-iron. mishit:true also holds it out.
+// Two shots are not enough to call a median; those stay unless flagged.
+function isClearMishit(shot, group){
+  if(shot && shot.mishit === true) return true;
+  if(!shot || shot.carry == null || !Number.isFinite(+shot.carry)) return false;
+  const others = (group || []).filter(s => s !== shot && s.carry != null && Number.isFinite(+s.carry)).map(s => +s.carry);
+  if(others.length < 2) return false;
+  const med = rangeShotMedian(others);
+  return med > 0 && +shot.carry < med * 0.5;
+}
+function struckShots(group){
+  const shots = (group && group.shots) || [];
+  return shots.filter(s => !isClearMishit(s, shots));
+}
+function mishitShots(group){
+  const shots = (group && group.shots) || [];
+  return shots.filter(s => isClearMishit(s, shots));
+}
+function meanKeyed(shots, key){
+  const xs = (shots || []).map(s => s[key]).filter(v => v != null && Number.isFinite(+v)).map(Number);
+  return xs.length ? xs.reduce((a,b)=>a+b,0) / xs.length : null;
+}
+function analysisClubs(detail){
+  const groups = (detail || {}).rangeShots;
+  const clubs = (detail || {}).clubs || [];
+  if(!Array.isArray(groups) || !groups.length) return clubs;
+  return groups.map((g, i) => {
+    const struck = struckShots(g);
+    const held = mishitShots(g);
+    const base = clubs.find(c => c.club === g.club) || clubs[i] || {};
+    const carry = meanKeyed(struck, 'carry');
+    const total = meanKeyed(struck, 'total');
+    return Object.assign({}, base, {
+      club: g.club,
+      n: struck.length,
+      nAll: (g.shots || []).length,
+      held: held.length,
+      carry: carry != null ? +carry.toFixed(1) : base.carry,
+      total: total != null ? +total.toFixed(1) : base.total,
+      displayedCarry: base.carry,
+      displayedN: base.n
+    });
+  });
+}
+function analysisDelivery(detail){
+  const groups = (detail || {}).rangeShots;
+  if(!Array.isArray(groups) || !groups.length) return (detail || {}).delivery || [];
+  return groups.map(g => {
+    const struck = struckShots(g);
+    const paths = struck.map(s => s.path).filter(v => v != null && Number.isFinite(+v));
+    const faces = struck.map(s => s.face).filter(v => v != null && Number.isFinite(+v));
+    const ftps = struck.map(s => s.ftp).filter(v => v != null && Number.isFinite(+v));
+    return {
+      club: g.club,
+      path: meanKeyed(struck, 'path'),
+      face: meanKeyed(struck, 'face'),
+      ftp: meanKeyed(struck, 'ftp'),
+      paths, faces, ftps,
+      n: struck.length,
+      held: mishitShots(g).length
+    };
+  }).filter(d => d.path != null || d.face != null);
+}
 function rangeShotVisuals(d){
   const groups=d.rangeShots;
   if(!Array.isArray(groups)||!groups.length) return '';
-  const n=groups.reduce((s,c)=>s+c.shots.length,0);
+  const clubs=analysisClubs(d);
+  const heldN=groups.reduce((s,g)=>s+mishitShots(g).length,0);
+  const struckN=groups.reduce((s,g)=>s+struckShots(g).length,0);
+  const allN=groups.reduce((s,c)=>s+c.shots.length,0);
   const nums=groups.flatMap(c=>[c.target,...c.shots.map(s=>s.total),...c.shots.map(s=>s.carry)]).filter(Number.isFinite);
   const max=Math.max(1,...nums);
   const x=v=>(10+v/max*280).toFixed(1);
-  const avgOf=c=>(d.clubs||[]).find(x=>x.club===c.club) || (d.clubs||[])[groups.indexOf(c)] || {};
-  const caption=d.rangeCaption || (d.rangeSource
-    ? 'Carry means are TrackMan\'s displayed averages. Total means for 9i and 56° are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.'
-    : 'Averages are TrackMan\'s displayed figures, including the short ones. Distances in yards.');
+  const avgOf=c=>clubs.find(x=>x.club===c.club) || {};
+  const caption=heldN
+    ? `Analysis is the struck balls — ${struckN} of ${allN}. ${heldN} clear mishit${heldN===1?'':'s'} held out of the average (carry under half the rest of that club). They stay on the day and in the table.`
+    : (d.rangeCaption || (d.rangeSource
+      ? 'Carry means are TrackMan\'s displayed averages. Total means for 9i and 56° are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.'
+      : 'Averages are the struck balls. Distances in yards.'));
   return `<section class="range-analysis" aria-label="Range shot analysis">
-    <h3>Carry vs total · all ${n} shots</h3><p class="sm">Green = carry · gold = total. Averages include every shot, including the very short ones. Distances in yards.</p>
+    <h3>Carry vs total · struck balls</h3><p class="sm">Green = carry · gold = total. Clear mishits are held out of these averages. Distances in yards.</p>
     ${groups.map(c=>{const avg=avgOf(c); if(avg.carry==null) return ''; return `<div class="range-club">
-      <h4>${esc(c.club)} · ${c.shots.length} shots</h4>
+      <h4>${esc(c.club)} · ${avg.n} struck${avg.held ? ` · ${avg.held} held out` : ''}${avg.displayedCarry != null && avg.held ? ` · screen ${(+avg.displayedCarry).toFixed(1)}` : ''}</h4>
       <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
       ${avg.total!=null?`<div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${(+avg.total).toFixed(1)}</b></div>`:''}
       ${c.target!=null?`<p class="sm">Target ${c.target} yd · carry hits <b>${(c.carryHits||[]).length}/${c.shots.length}</b> · total hits <b>${(c.totalHits||[]).length}/${c.shots.length}</b></p>`:''}
     </div>`}).join('')}
     <p class="bvcap">${esc(caption)}</p>
-    <h3>Every carry · see the short misses</h3><p class="sm">Each dot is one shot.${groups.some(c=>c.target!=null)?' Vertical line = target distance.':''} All clubs share the same scale.</p>
-    ${groups.map(c=>{const carries=c.shots.map(s=>s.carry).filter(Number.isFinite); if(!carries.length) return ''; return `<div class="range-club"><b>${esc(c.club)}</b>
+    <h3>Every carry · mishits marked, not averaged</h3><p class="sm">Filled = struck. Open burgundy = held out of the average.${groups.some(c=>c.target!=null)?' Vertical line = target distance.':''} All clubs share the same scale.</p>
+    ${groups.map(c=>{const shots=c.shots||[]; const carries=shots.map(s=>s.carry).filter(Number.isFinite); if(!carries.length) return ''; const held=mishitShots(c); return `<div class="range-club"><b>${esc(c.club)}</b>
       <svg viewBox="0 0 300 84" role="img" aria-label="${esc(c.club)} carry spread: ${carries.join(', ')} yards.${c.target!=null?` Target ${c.target} yards.`:''}">
       <line x1="10" x2="290" y1="62" y2="62" stroke="currentColor" opacity=".35"/>
       ${c.target!=null?`<line x1="${x(c.target)}" x2="${x(c.target)}" y1="8" y2="65" stroke="var(--burg)" stroke-dasharray="4 3"/>`:''}
-      ${c.shots.map((s,i)=>s.carry==null?'':`<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="var(--green)"><title>Shot ${s.shot}: ${s.carry} yd carry${s.total!=null?`, ${s.total} yd total`:''}</title></circle>`).join('')}
+      ${shots.map((s,i)=>s.carry==null?'':isClearMishit(s,shots)
+        ? `<circle class="range-mishit" cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="none" stroke="var(--burg)" stroke-width="1.6"><title>Held out · shot ${s.shot}: ${s.carry} yd</title></circle>`
+        : `<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="var(--green)"><title>Shot ${s.shot}: ${s.carry} yd carry${s.total!=null?`, ${s.total} yd total`:''}</title></circle>`).join('')}
       <text x="10" y="80" fill="currentColor" font-size="10">0 yd</text><text x="290" y="80" text-anchor="end" fill="currentColor" font-size="10">${Math.round(max)} yd</text></svg>
-      <p class="sm faint">Carry range ${Math.min(...carries).toFixed(1)}–${Math.max(...carries).toFixed(1)} yd</p></div>`}).join('')}
+      <p class="sm faint">${held.length ? `${held.length} held out · struck range ${Math.min(...struckShots(c).map(s=>+s.carry)).toFixed(1)}–${Math.max(...struckShots(c).map(s=>+s.carry)).toFixed(1)} yd` : `Carry range ${Math.min(...carries).toFixed(1)}–${Math.max(...carries).toFixed(1)} yd`}</p></div>`}).join('')}
   </section>`;
 }
 function rangeShotTables(d){
@@ -3229,12 +3311,12 @@ function rangeShotTables(d){
 }
 function bayVisualMarkup(d){
   if(!d || !Array.isArray(d.clubs) || !d.clubs.length) return '';
-  const delivery = Array.isArray(d.delivery) ? d.delivery : [];
-  const deliveryNote = d.rangeDeliveryNote || (d.rangeSource
-    ? 'Delivery below uses only verified readings: Driver 5/6, 3w 6/10, 5w 8/9, 6i 9/10, 9i 9/10, 56° 9/9. Rings are averages of those rows.'
-    : '');
+  const delivery = analysisDelivery(d);
+  const deliveryNote = d.rangeShots
+    ? 'Path and face rings are struck-ball averages. Clear mishits are held out of the ring; they stay on the day.'
+    : (d.rangeDeliveryNote || '');
   return `${d.rangeShots?rangeShotVisuals(d):bayCarryVisual(d.clubs)}
-    ${bayConsistencyVisual(d.clubs)}
+    ${d.rangeShots?'':bayConsistencyVisual(d.clubs)}
     ${deliveryNote?`<p class="sm">${esc(deliveryNote)}</p>`:''}
     ${bayDeliveryVisual(delivery.length ? delivery : d.clubs)}`;
 }
@@ -3326,7 +3408,7 @@ function evoNow(disc){
 }
 function cumulativePathBays(){
   return baysFor('swing').filter(o =>
-    ((o.b.detail || {}).delivery || []).some(d => d.path != null && Number.isFinite(+d.path)));
+    analysisDelivery(o.b.detail || {}).some(d => d.path != null && Number.isFinite(+d.path)));
 }
 function cumulativeFlightRead(delivery){
   const rows = (delivery || []).filter(d => d.path != null && Number.isFinite(+d.path));
@@ -3357,7 +3439,7 @@ function cumulativePathHistory(){
   return `<div class="cump-hist" aria-label="Club path across bay days">
     <div class="bvtitle"><b>Path across days</b><span>left ← 0° → right</span></div>
     ${list.map(({ b }) => {
-      const rows = ((b.detail || {}).delivery || []).filter(d => d.path != null && Number.isFinite(+d.path));
+      const rows = analysisDelivery(b.detail || {}).filter(d => d.path != null && Number.isFinite(+d.path));
       const avg = rows.reduce((s,d)=>s+(+d.path),0)/rows.length;
       return `<div class="cump-row">
         <span class="cump-date">${esc(fmtDate(b.date))}</span>
@@ -3366,7 +3448,7 @@ function cumulativePathHistory(){
           <i class="bvdot path" style="left:${pos(avg)}%" title="Session mean ${baySgn(avg)}°"></i></span>
         <b>${esc(baySgn(avg))}°</b></div>`;
     }).join('')}
-    <p class="bvcap">Each small dot is one club's average path that day. The ring is the mean of those clubs — a shape, not a number to type. Different clubs on different days. Negative is out-to-in.</p>
+    <p class="bvcap">Each small dot is one club's struck-ball average path that day. The ring is the mean of those clubs — a shape, not a number to type. Clear mishits are held out. Negative is out-to-in.</p>
   </div>`;
 }
 function cumulativeView(){
@@ -3384,7 +3466,7 @@ function cumulativeView(){
   const since = coachSince();
   const pathBays = cumulativePathBays();
   const latest = pathBays[0] || null;
-  const delivery = latest ? ((latest.b.detail || {}).delivery || []) : [];
+  const delivery = latest ? analysisDelivery(latest.b.detail || {}) : [];
   const openFaults = (S.faults || []).filter(x => faultState(x) === 'open');
   const shutFaults = (S.faults || []).filter(x => faultState(x) !== 'open');
   const evoBits = ['swing','putting','short-game'].flatMap(d => {

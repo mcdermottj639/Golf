@@ -75,6 +75,37 @@ page cannot contain. **Check 320px as well as 390px** — that is the
 narrowest phone and the width the form-control rule below was set at. This proves layout,
 not correctness: a number can be confidently wrong in a page that renders perfectly.
 
+## Review process — every bay day, every analysis pass (v122)
+
+Jack's rule, standing: **the day keeps every shot. Analysis is the struck balls.**
+A displayed TrackMan average that still has the tops in it is not an analysis of the club.
+
+1. **Transcribe every shot.** Mishits stay on the day and in the exact table. Never
+   delete them, never fill a missing one with zero, never average a set silently and
+   park the result on the live ladder.
+2. **Hold clear mishits out of analysis.** `isClearMishit()`: a shot whose carry is
+   **less than half the median of the rest of that club that day** — a top or skull
+   that did not get up. Explicit `mishit: true` also holds it out. A fat 9-iron at
+   70% of the mean is not a mishit. Two shots are not a median; those stay unless
+   flagged. Without per-shot rows, a displayed average cannot be cleaned — say so,
+   do not guess.
+3. **Print both ns.** "TrackMan displayed 150.0 n=11 including two tops; analysis
+   176.5 n=9." The screen number is a fact about the screen. The analysis number is
+   a fact about the struck ball. They are not interchangeable.
+4. **Path and face rings use the same cut.** `analysisDelivery()` rebuilds the rings
+   from struck rows when `rangeShots` exist. Cumulative's path-across-days uses that,
+   not the polluted club average.
+5. **Check the arithmetic.** Re-mean the struck rows. Re-derive smash as ball ÷ club.
+   A printed 1.36 that is the first shot, not the mean, has already happened.
+6. **Do not park a cleaned indoor number on the live ladder.** Normalize, temperature,
+   venue balls — same rules as always. A cleaned 176.5 is a bay offer, not a 70°F
+   course carry.
+7. **Drive 320 and 390 before push.** Then CLAUDE.md audit in the same commit.
+
+`rangeShotVisuals()` plots every shot: filled green = struck, open burgundy = held
+out. The bars and rings are the filled ones. The Sep 15 note that used to keep the
+8-yard and 15-yard drivers *in* the average was wrong; v122 reverses it.
+
 ## Data model — READ THIS BEFORE CHANGING BAG / SESSION / COURSE DATA
 
 State comes from **two layers merged at runtime**, plus the user's own local edits:
@@ -2731,12 +2762,12 @@ lists**. v118 keeps the days and stops splitting them.
 
 `sessionShortcuts()` is now two tiles: **Days** and **Cumulative**. Days is one newest-first
 list of every capture (bay, outdoor, indoor, film, Combine) with filter chips if you want
-one kind — Range sessions is a filter, not a home. **Cumulative is the analysis page
-(v121):** working vs needs work (settled faults / open faults, evolution marks), the
-over-the-top path diagram, path+face from the latest bay day, path-across-days (each
-dot is one club average; the ring is that day's shape, not a number to type), the four
-on-course areas (same `areaCards()` / `gameAreas()` — do not invent a fifth), the latest
-bay finding, and the open to-dos. It is not a hub of doors onto Coach, Swing and Numbers.
+one kind — Range sessions is a filter, not a home. **Cumulative is the analysis page (v121–v122):** working vs needs work (settled faults /
+open faults, evolution marks), the over-the-top path diagram, path+face from the latest
+bay day, path-across-days (each dot is one club average; the ring is that day's shape,
+not a number to type). Path/face rings and range bars are **struck-ball averages** —
+clear mishits held out (v122). Then the four on-course areas (same `areaCards()` /
+`gameAreas()` — do not invent a fifth), the latest bay finding, and the open to-dos.
 Simulator rounds are days you can open and are **never** in those four — `realRounds()`
 stays the door. It moves when a day lands; the n is the accuracy.
 
@@ -2783,9 +2814,10 @@ the user-confirmed Mini mapping in the round is not automatically a range mappin
 carry dots on one scale, then the delivery chart. `rangeShotTables()` exposes all 54 rows
 in six expandable, internally scrolling tables with video timestamps and coverage notes.
 No fabricated consistency values, lateral dispersion coordinates, normalization or venue.
-The driver 8.0/15.4, 3w 15.5, 6i 36.3 and wedge 63.6-carry/107.3-total shots stay in the
-analysis. They support a contact-repeatability practice focus, not rewriting stock carries
-or diagnosing body mechanics from launch-monitor numbers. Outdoor data is unchanged.
+The driver 8.0/15.4, 3w 15.5 and 6i 36.3 shots stay **on the day** (exact table, marked
+dots). They are **held out of the analysis average** as of v122 — carry under half the
+rest of that club. The wedge 63.6 stays in the average; it is a short shot, not a top.
+They support a contact-repeatability read of the day, not rewriting stock carries.
 The exact club table preserves one-decimal total distances, matching the charts instead
 of rounding 149.5 to 150. Live v111 was checked through Home → Range sessions: two separate
 cards, Sep 15 first, no pending notice, 54 carry dots and six shot tables. Managed-browser
