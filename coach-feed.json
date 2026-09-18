@@ -39147,6 +39147,106 @@
           ]
         }
       }
+    },
+    {
+      "id": "bay-20260918-3w-off-150-v1",
+      "type": "bay-update",
+      "target": "bay-20260918-gl18-3w-5w-7i",
+      "src": "tm:2026-09-18-gl18-3w-5w-7i",
+      "bay": {
+        "finding": "Jack: felt amazing. The 3-wood is 176.5 yards, n=9 struck. Two tops (26.4, 34.9) are on the day and out of the average — TrackMan's screen 150.0 is not this club. 5-wood 179.1 n=6. 7-iron screen 131.7, carries off-screen, path −6.9°, face-to-path +6.4°. None of this is a 70°F course carry.",
+        "detail": {
+          "gist": "3-wood 176.5 n=9 struck. Two tops held out — 150 is not the club. Jack: felt amazing.",
+          "clubs": [
+            {
+              "club": "3 wood",
+              "n": 9,
+              "carry": 176.5,
+              "total": 211.0,
+              "cs": 88.0,
+              "bs": 123.9,
+              "smash": 1.42,
+              "la": 12.0,
+              "spin": 3005.0,
+              "aoa": -1.6
+            },
+            {
+              "club": "5 wood",
+              "n": 7,
+              "carry": 157.6,
+              "cons": 53.4,
+              "total": 188.1,
+              "cs": 86.0,
+              "bs": 118.5,
+              "smash": 1.38,
+              "la": 10.8,
+              "spin": 4350.0,
+              "aoa": -2.9
+            },
+            {
+              "club": "7-iron",
+              "n": 11,
+              "carry": 131.7,
+              "cons": 12.4,
+              "cs": 74.9,
+              "bs": 99.0,
+              "smash": 1.32,
+              "la": 16.8,
+              "spin": 5107.0,
+              "aoa": -4.9
+            }
+          ],
+          "metrics": [
+            {
+              "k": "3w struck",
+              "v": "176.5",
+              "s": "good",
+              "n": "n=9 · two tops held out · 150 is not this club"
+            },
+            {
+              "k": "5w struck",
+              "v": "179.1",
+              "s": "good",
+              "n": "n=6 · one 28.5 held out"
+            },
+            {
+              "k": "7i displayed",
+              "v": "131.7",
+              "s": "mid",
+              "n": "n=11 · cons 12.4 · carries off-screen"
+            },
+            {
+              "k": "3w path",
+              "v": "−6.1°",
+              "s": "warn",
+              "n": "n=9 struck · all left of target"
+            },
+            {
+              "k": "7i face-to-path",
+              "v": "+6.4°",
+              "s": "warn",
+              "n": "n=11 · most open of the three · path −6.9°"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "carry-3wood-struck-20260918",
+      "type": "carry-update",
+      "target": "3 wood",
+      "club": {
+        "meas": {
+          "src": "tm:2026-09-18-gl18-3w-5w-7i",
+          "n": 9,
+          "date": "2026-09-18",
+          "ball": "venue, unmarked",
+          "norm": "Normalize on · exact setting not shown",
+          "spin": "estimated",
+          "carry": 176.5,
+          "how": "Struck-ball mean n=9. Two tops (26.4, 34.9) held out — on the day, not in this number. TrackMan screen 150.0 n=11 is not the club. Venue ball, spin estimated, Normalize on. Not a 70°F course number."
+        }
+      }
     }
   ]
 }
