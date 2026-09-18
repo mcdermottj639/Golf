@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v125';
+const BUILD = 'v126';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v126', d:'2026-09-18', items:[
+    '7-IRON IS ON THE DAY CARD. Carry vs total was skipping any club with no per-shot carries, so eleven 7-iron shots lived only in the table below the fold. The 7-iron now shows on that card: screen 131.7, labelled screen because those carries were off-screen and cannot be cleaned, plus path −6.9° and face-to-path +6.4°.',
+    'SCREEN 157.6 no longer wraps onto its own line under 5-wood. Held-out screen numbers sit under the bar, not in the title.' ] },
   { b:'v125', d:'2026-09-18', items:[
     'AFTER SLOT, SAME DAY. Halfway through Jack started dropping the trail (right) hand to get more in-and-down. Those shots are their own block — not mixed into the first-block average.',
     'PATH MOVED. 3-wood −6.1° → −1.7° (n=8). 5-wood −4.7° → −2.1° (n=8). Face-to-path did not tighten. 5-wood struck carry 167.4 — not longer than the first block’s 179.1. 3-wood after: carries off-screen, screen 150.3 is not the club.' ] },
@@ -3276,33 +3279,75 @@ function analysisDelivery(detail){
   const seen = new Set(fromShots.map(d => d.club));
   return fromShots.concat(stored.filter(d => d && !seen.has(d.club)));
 }
+function rangeDelLine(d){
+  if(!d || (d.path == null && d.ftp == null)) return '';
+  const bits = [];
+  if(d.path != null) bits.push('path ' + baySgn(+Number(d.path).toFixed(1)) + '°');
+  if(d.ftp != null) bits.push('face-to-path ' + baySgn(+Number(d.ftp).toFixed(1)) + '°');
+  bits.push('n=' + d.n);
+  return bits.join(' · ');
+}
 function rangeShotVisuals(d){
   const groups=d.rangeShots;
   if(!Array.isArray(groups)||!groups.length) return '';
   const clubs=analysisClubs(d);
+  const delivery=analysisDelivery(d);
   const heldN=groups.reduce((s,g)=>s+mishitShots(g).length,0);
   const struckN=groups.reduce((s,g)=>s+struckShots(g).length,0);
   const allN=groups.reduce((s,c)=>s+c.shots.length,0);
-  const nums=groups.flatMap(c=>[c.target,...c.shots.map(s=>s.total),...c.shots.map(s=>s.carry)]).filter(Number.isFinite);
+  const nums=groups.flatMap(c=>{
+    const avg=clubs.find(x=>x.club===c.club) || {};
+    return [c.target, avg.carry, avg.total, avg.displayedCarry, ...(c.shots||[]).map(s=>s.total), ...(c.shots||[]).map(s=>s.carry)];
+  }).filter(Number.isFinite);
   const max=Math.max(1,...nums);
   const x=v=>(10+v/max*280).toFixed(1);
   const avgOf=c=>clubs.find(x=>x.club===c.club) || {};
+  const delOf=c=>delivery.find(x=>x.club===c.club);
   const caption=heldN
-    ? `Analysis is the struck balls — ${struckN} of ${allN}. ${heldN} clear mishit${heldN===1?'':'s'} held out of the average (carry under half the rest of that club). They stay on the day and in the table.`
+    ? `Analysis is the struck balls — ${struckN} of ${allN}. ${heldN} clear mishit${heldN===1?'':'s'} held out of the average (carry under half the rest of that club). They stay on the day and in the table. A club with no per-shot carries shows the screen number, labelled screen — it cannot be cleaned.`
     : (d.rangeCaption || (d.rangeSource
       ? 'Carry means are TrackMan\'s displayed averages. Total means for 9i and 56° are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.'
       : 'Averages are the struck balls. Distances in yards.'));
-  return `<section class="range-analysis" aria-label="Range shot analysis">
-    <h3>Carry vs total · struck balls</h3><p class="sm">Green = carry · gold = total. Clear mishits are held out of these averages. Distances in yards.</p>
-    ${groups.map(c=>{const avg=avgOf(c); if(avg.carry==null) return ''; return `<div class="range-club">
-      <h4>${esc(c.club)} · ${avg.n} struck${avg.held ? ` · ${avg.held} held out` : ''}${avg.displayedCarry != null && avg.held && +avg.displayedCarry !== +avg.carry ? ` · screen ${(+avg.displayedCarry).toFixed(1)}` : ''}</h4>
+  const barBlock=c=>{
+    const avg=avgOf(c);
+    const del=rangeDelLine(delOf(c));
+    const screen=avg.displayedCarry != null ? +avg.displayedCarry : null;
+    if(avg.carry != null){
+      const screenNote = screen != null && avg.held && screen !== +avg.carry
+        ? `<p class="sm faint">Screen ${screen.toFixed(1)} includes the held-out shots.</p>` : '';
+      return `<div class="range-club">
+      <h4>${esc(c.club)} · ${avg.n} struck${avg.held ? ` · ${avg.held} held out` : ''}</h4>
       <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
       ${avg.total!=null?`<div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${(+avg.total).toFixed(1)}</b></div>`:''}
       ${c.target!=null?`<p class="sm">Target ${c.target} yd · carry hits <b>${(c.carryHits||[]).length}/${c.shots.length}</b> · total hits <b>${(c.totalHits||[]).length}/${c.shots.length}</b></p>`:''}
-    </div>`}).join('')}
-    <p class="bvcap">${esc(caption)}</p>
-    <h3>Every carry · mishits marked, not averaged</h3><p class="sm">Filled = struck. Open burgundy = held out of the average.${groups.some(c=>c.target!=null)?' Vertical line = target distance.':''} All clubs share the same scale.</p>
-    ${groups.map(c=>{const shots=c.shots||[]; const carries=shots.map(s=>s.carry).filter(Number.isFinite); if(!carries.length) return ''; const held=mishitShots(c); return `<div class="range-club"><b>${esc(c.club)}</b>
+      ${screenNote}${del?`<p class="sm faint">${esc(del)}</p>`:''}
+    </div>`;
+    }
+    if(screen != null){
+      return `<div class="range-club">
+      <h4>${esc(c.club)} · screen · n=${avg.displayedN || (c.shots||[]).length}</h4>
+      <div class="range-bar-row"><span>Screen</span><span class="range-track"><i class="range-screen" style="width:${screen/max*100}%"></i></span><b>${screen.toFixed(1)}</b></div>
+      <p class="sm faint">Per-shot carries were off-screen, so this cannot be cleaned.${del ? ' '+esc(del)+'.' : ''}</p>
+    </div>`;
+    }
+    if(del){
+      return `<div class="range-club">
+      <h4>${esc(c.club)} · ${(c.shots||[]).length} shots · no carry</h4>
+      <p class="sm faint">${esc(del)}. Per-shot carries were off-screen.</p>
+    </div>`;
+    }
+    return '';
+  };
+  const spreadBlock=c=>{
+    const shots=c.shots||[];
+    const carries=shots.map(s=>s.carry).filter(Number.isFinite);
+    if(!carries.length){
+      const del=rangeDelLine(delOf(c));
+      return `<div class="range-club"><b>${esc(c.club)}</b>
+      <p class="sm faint">No per-shot carries — that column was off-screen.${del ? ' '+esc(del)+'.' : ''} ${shots.length} shots in the table below.</p></div>`;
+    }
+    const held=mishitShots(c);
+    return `<div class="range-club"><b>${esc(c.club)}</b>
       <svg viewBox="0 0 300 84" role="img" aria-label="${esc(c.club)} carry spread: ${carries.join(', ')} yards.${c.target!=null?` Target ${c.target} yards.`:''}">
       <line x1="10" x2="290" y1="62" y2="62" stroke="currentColor" opacity=".35"/>
       ${c.target!=null?`<line x1="${x(c.target)}" x2="${x(c.target)}" y1="8" y2="65" stroke="var(--burg)" stroke-dasharray="4 3"/>`:''}
@@ -3310,7 +3355,14 @@ function rangeShotVisuals(d){
         ? `<circle class="range-mishit" cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="none" stroke="var(--burg)" stroke-width="1.6"><title>Held out · shot ${s.shot}: ${s.carry} yd</title></circle>`
         : `<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="var(--green)"><title>Shot ${s.shot}: ${s.carry} yd carry${s.total!=null?`, ${s.total} yd total`:''}</title></circle>`).join('')}
       <text x="10" y="80" fill="currentColor" font-size="10">0 yd</text><text x="290" y="80" text-anchor="end" fill="currentColor" font-size="10">${Math.round(max)} yd</text></svg>
-      <p class="sm faint">${held.length ? `${held.length} held out · struck range ${Math.min(...struckShots(c).map(s=>+s.carry)).toFixed(1)}–${Math.max(...struckShots(c).map(s=>+s.carry)).toFixed(1)} yd` : `Carry range ${Math.min(...carries).toFixed(1)}–${Math.max(...carries).toFixed(1)} yd`}</p></div>`}).join('')}
+      <p class="sm faint">${held.length ? `${held.length} held out · struck range ${Math.min(...struckShots(c).map(s=>+s.carry)).toFixed(1)}–${Math.max(...struckShots(c).map(s=>+s.carry)).toFixed(1)} yd` : `Carry range ${Math.min(...carries).toFixed(1)}–${Math.max(...carries).toFixed(1)} yd`}</p></div>`;
+  };
+  return `<section class="range-analysis" aria-label="Range shot analysis">
+    <h3>Carry vs total · struck balls</h3><p class="sm">Green = carry · gold = total. Clear mishits are held out of these averages. Distances in yards. A faded bar is a screen number we cannot clean.</p>
+    ${groups.map(barBlock).join('')}
+    <p class="bvcap">${esc(caption)}</p>
+    <h3>Every carry · mishits marked, not averaged</h3><p class="sm">Filled = struck. Open burgundy = held out of the average.${groups.some(c=>c.target!=null)?' Vertical line = target distance.':''} All clubs share the same scale.</p>
+    ${groups.map(spreadBlock).join('')}
   </section>`;
 }
 function rangeShotTables(d){
