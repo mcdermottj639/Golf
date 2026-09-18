@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-09-17",
+  "updated": "2026-09-18",
   "entries": [
     {
       "id": "s4-session",
@@ -37723,6 +37723,178 @@
     {"id": "act-up-tmsetup-20260917", "src": "drive:1tXR1ohmYnXMC5qwopHL6XMrTLc0gL7by+1efpMCFtBPNBLS9GKV25JHhYCWo1NSrQH", "target": "trackman-setup-action-20260915", "text": "TRACKMAN — THREE THINGS TO DO AT THE BAY, one of which is now the highest-value capture left in the swing lab. (1) BRING A MARKED BALL — a metal sticker dot, or a Pro V1 RCT. Added Sep 17: on the lounge's plain balls the unit has to ESTIMATE spin, and a curve figure is computed from spin axis, which is why the driver and 3-wood read a face-to-path near zero while the ball curves 22–25 yards right. One set of six drivers on a marked ball tells you whether the face reading or the curve is the wrong one. Every iron already reconciles; it is only the woods in doubt. (2) PHOTOGRAPH THE SETTINGS PAGE showing 70°F and sea level — the app stores every carry as a 70°F number and the Sep 14 session's normalization was never on screen, which is why those thirteen carries sit as offers rather than as your ladder. (3) NAME THE CLUB TrackMan labels 3w. Until you confirm it, the app will not map it to the Mini Driver.", "type": "action-update"},
     {"id": "action-lie-loft-20260917", "src": "drive:1tXR1ohmYnXMC5qwopHL6XMrTLc0gL7by+1efpMCFtBPNBLS9GKV25JHhYCWo1NSrQH", "text": "EQUIPMENT — GET A LIE AND LOFT CHECK, and do it before you groove anything. It answers two measured questions in one cheap session. (1) THE HEEL/TOE SPLIT: the 56° is struck 6.4 mm on the HEEL on 5 of 5 shots and everything longer on the TOE — 6i 4.0, 9i 5.5, 5i 6.8, 5w 7.2 mm. That is the classic signature of wedges too upright and long clubs too flat, and it is equally the signature of a posture that changes between a wedge and a wood. A lie board separates them in ten minutes; nothing else you can do will. (2) THE PW/9-IRON INVERSION: the PW carried 113.2 and the 9-iron 110.2 on the bag map — the wrong way round by 3.0 yards, with the two tightest consistency figures in the set behind them, so it is unlikely to be strike. Check the lofts. WHY FIRST: drilling a fix around equipment that is off entrenches the compensation, which is a more expensive problem than the one you started with.", "type": "action"},
     {"id": "action-bag-refit-20260917", "src": "drive:1tXR1ohmYnXMC5qwopHL6XMrTLc0gL7by+1efpMCFtBPNBLS9GKV25JHhYCWo1NSrQH", "text": "EQUIPMENT — THE BAG COVERS NINE DISTANCES WITH THIRTEEN CLUBS. Off the Sep 14 map, and it needs no swing change to fix. The defects, in order of cost: a 25.3-yard HOLE between the 5-wood (177.6) and the 2-iron (152.3) with nothing in it; the 3-wood (182.4) and 5-wood (177.6) 4.8 yards apart, so one of them is a spare; 7i 135.9 · 6i 134.5 · 5i 128.3 · 8i 124.1 all inside 11.8 yards and out of order; PW and 9-iron inverted (the lie-and-loft to-do owns that one). The three loosest clubs in the bag by some distance are the 5i, 6i and 2i (13.9%, 13.5%, 12.0% of carry) — they are the clubs a re-fit would replace, and they are the ones not worth grinding on meanwhile. WHAT TO ASK A FITTER FOR: something at ~163 to fill the hole, one club instead of three around ~135, and a straight answer on whether a 5-hybrid beats the 2-iron for you. DO NOT BUY OFF THIS ALONE: six shots a club raises the question, it does not settle a purchase, and the lie-and-loft check comes first because it may move two of these numbers on its own.", "type": "action"},
-    {"id": "lesson-r11-centre-strike-20260917", "lesson": {"body": "This is the cheapest distance in your bag and you already have the engine for it. The bag map measured 94.4 mph of club speed with the driver — that is a 230-yard club — and 129.9 mph of ball speed coming off it, a smash factor of 1.38. A tour-standard 1.48 on the same swing speed sends the ball out at 139.7, which is 9.8 mph more and roughly 22 yards. No extra effort is involved: the difference between those two numbers is entirely where the ball meets the face.\n\nThe film says where to look. Measured impact location across five clubs: your 56° is struck 6.4 mm toward the HEEL on five of five shots, and every longer club toward the TOE — 6-iron 4.0, 9-iron 5.5, 5-iron 6.8, 5-wood 7.2 mm. That is a consistent bias, not random scatter, and it is the useful kind of fault: a bias has a direction, so you can aim at it.\n\nONE HONEST WARNING before you grind. That heel-on-the-wedge, toe-on-the-woods pattern is also exactly what a lie-angle mismatch looks like — wedges too upright, long clubs too flat. If that is what it is, no amount of practice fixes it and what you will actually groove is a compensation for a club that is wrong. There is a to-do on the board for a lie board. Get that done, then run this. If the lie angles come back fine, the pattern is yours and this drill is the answer to it.", "drill": "Spray the face, hit six, read the pattern before you change anything.", "id": "r11", "kit": ["powder"], "min": 4, "score": "Count the marks inside a centre-dime on each set of six. Log the number out of 6. Three sessions before you read a trend — two points are a line through anything.", "shelf": "At the Range", "steps": ["Foot spray or face tape on the clubface. A light, even coat — you want the mark, not a drift.", "Six shots with ONE club, normal swing, normal intent. Do not try to hit the middle yet; you are taking a baseline and a baseline you steered is worthless.", "Look at the six marks together, not one at a time. Count how many are heel-side, toe-side, high, low. One dot is noise; six is a pattern.", "Now re-spray and hit six more with one change only: stand a half-inch closer for a toe pattern, a half-inch further away for a heel pattern. Distance from the ball is the biggest single lever on impact location and the easiest to control.", "Repeat with a second club from the other end of the bag — a wedge and a wood — because your pattern reverses between them and a fix for one may be wrong for the other."], "tags": ["strike-quality", "off-tee", "approach"], "title": "Find the middle of the face — the 22 yards you already own", "where": "range"}, "src": "drive:1tXR1ohmYnXMC5qwopHL6XMrTLc0gL7by+1efpMCFtBPNBLS9GKV25JHhYCWo1NSrQH", "type": "lesson-add"}
+    {"id": "lesson-r11-centre-strike-20260917", "lesson": {"body": "This is the cheapest distance in your bag and you already have the engine for it. The bag map measured 94.4 mph of club speed with the driver — that is a 230-yard club — and 129.9 mph of ball speed coming off it, a smash factor of 1.38. A tour-standard 1.48 on the same swing speed sends the ball out at 139.7, which is 9.8 mph more and roughly 22 yards. No extra effort is involved: the difference between those two numbers is entirely where the ball meets the face.\n\nThe film says where to look. Measured impact location across five clubs: your 56° is struck 6.4 mm toward the HEEL on five of five shots, and every longer club toward the TOE — 6-iron 4.0, 9-iron 5.5, 5-iron 6.8, 5-wood 7.2 mm. That is a consistent bias, not random scatter, and it is the useful kind of fault: a bias has a direction, so you can aim at it.\n\nONE HONEST WARNING before you grind. That heel-on-the-wedge, toe-on-the-woods pattern is also exactly what a lie-angle mismatch looks like — wedges too upright, long clubs too flat. If that is what it is, no amount of practice fixes it and what you will actually groove is a compensation for a club that is wrong. There is a to-do on the board for a lie board. Get that done, then run this. If the lie angles come back fine, the pattern is yours and this drill is the answer to it.", "drill": "Spray the face, hit six, read the pattern before you change anything.", "id": "r11", "kit": ["powder"], "min": 4, "score": "Count the marks inside a centre-dime on each set of six. Log the number out of 6. Three sessions before you read a trend — two points are a line through anything.", "shelf": "At the Range", "steps": ["Foot spray or face tape on the clubface. A light, even coat — you want the mark, not a drift.", "Six shots with ONE club, normal swing, normal intent. Do not try to hit the middle yet; you are taking a baseline and a baseline you steered is worthless.", "Look at the six marks together, not one at a time. Count how many are heel-side, toe-side, high, low. One dot is noise; six is a pattern.", "Now re-spray and hit six more with one change only: stand a half-inch closer for a toe pattern, a half-inch further away for a heel pattern. Distance from the ball is the biggest single lever on impact location and the easiest to control.", "Repeat with a second club from the other end of the bag — a wedge and a wood — because your pattern reverses between them and a fix for one may be wrong for the other."], "tags": ["strike-quality", "off-tee", "approach"], "title": "Find the middle of the face — the 22 yards you already own", "where": "range"}, "src": "drive:1tXR1ohmYnXMC5qwopHL6XMrTLc0gL7by+1efpMCFtBPNBLS9GKV25JHhYCWo1NSrQH", "type": "lesson-add"},
+    {
+      "id": "add-dsadapt-3w-20260918",
+      "type": "club-add",
+      "club": {
+        "name": "Cobra DS-ADAPT X 3-wood",
+        "cat": "wood",
+        "loft": 15,
+        "spec": "15.0° stock (FutureFit33 ±2°) · Project X Denali Blue 60 · Regular · RH",
+        "status": "gaming",
+        "note": "IN Sep 18 2026. Golf Galaxy same-day, SKU 26808014, $199. Takes the fairway-finder slot the mini driver held. Mini out, 4-iron stays out. Bag at the long end is Driver · this · 19.5° 5-wood · 2-iron.\n\nSTOCK 15.0°, not the 16.5° 3-HL. FutureFit33 can move loft and lie independently ±2°, and nobody has read the sleeve, so treat 15 as the box spec rather than the hosel. Same open question as the driver’s adapter.\n\nSHAFT is the stock Project X Denali Blue 60 Regular (Cobra’s chart: 64g, mid launch). Playing length unmeasured (stock 43.25\").\n\nCARRY IS BLANK. Do not park the Sep 14 TrackMan 3w 182.4 on this head — that label was the mini driver. A number describing a different club is the worst of both."
+      }
+    },
+    {
+      "id": "club-minidriver-out-20260918",
+      "type": "club-update",
+      "target": "add-minidriver",
+      "club": {
+        "status": "backup",
+        "note": "OUT OF THE 14 Sep 18 2026 — replaced in the fairway-finder slot by the Cobra DS-ADAPT X 3-wood. Kept, not sold, same as Aug 12. Its tee-shot record stays in the Off-the-tee table as history: whatever it says about fairways found and holes left dead is still true, it just stops accumulating. The Sep 14 TrackMan 3w 182.4 and the Sep 15 3w groups belong to THIS club, not the new 3-wood."
+      }
+    },
+    {
+      "id": "club-darkspeed-slot-20260918",
+      "type": "club-update",
+      "target": "add-darkspeed-5w-20260812",
+      "club": {
+        "note": "STILL 19.5° Sep 18 2026, still the green-holding club in the slot the 4-iron left. The fairway-finder job has moved again — off the mini driver (now out) and onto the new DS-ADAPT X 3-wood. This head did not change. CARRY STILL BLANK at 19.5°. CONFIRM THE HOSEL STAMP: 16.5 → 19.5 was a three-degree move, the full sweep of a typical fairway sleeve, and nobody has read it since Aug 12."
+      }
+    },
+    {
+      "id": "club-kingtec-2i-note-20260918",
+      "type": "club-update",
+      "target": "add-kingtec-2i",
+      "club": {
+        "note": "Unchanged Sep 18 2026. Still ~17°, still the only long club carrying any figure (205, estimated). It no longer pairs with the mini driver; the new 3-wood is the fairway finder. Loft arithmetic against stock 15° is two degrees, which is outside the 1.5° OVERLAP flag — so the flag that used to fire on the mini will not fire here. That is loft, not yards. The 2-iron’s bay offer from Sep 14 (152.3) stays on THIS row."
+      }
+    },
+    {
+      "id": "carry-add-3wood-20260918",
+      "type": "carry-update",
+      "target": "3 wood",
+      "after": "Driver",
+      "club": {
+        "club": "3 wood",
+        "loft": "15°",
+        "carry": null
+      }
+    },
+    {
+      "id": "carry-remove-minidriver-20260918",
+      "type": "carry-update",
+      "target": "Mini Driver",
+      "remove": true
+    },
+    {
+      "id": "history-3wood-in-20260918",
+      "type": "history",
+      "date": "2026-09-18",
+      "text": "Cobra DS-ADAPT X 3-wood IN (stock 15°, Project X Denali Blue 60 Regular, Golf Galaxy SKU 26808014, $199). Carry blank — not the mini’s TrackMan 3w number."
+    },
+    {
+      "id": "history-mini-out-20260918",
+      "type": "history",
+      "date": "2026-09-18",
+      "text": "Mini driver OUT of the 14, kept. Fairway-finder job moves to the new 3-wood. Its Off-the-tee record stays as history."
+    },
+    {
+      "id": "history-4iron-stays-out-20260918",
+      "type": "history",
+      "date": "2026-09-18",
+      "text": "4-iron stays out of the 14 (out since Sep 8, kept with the set). Bag at the long end is Driver · 3-wood · 19.5° 5-wood · 2-iron."
+    },
+    {
+      "id": "history-bag-switch-20260918",
+      "type": "history",
+      "date": "2026-09-18",
+      "text": "BAG SWITCH — driver unchanged, mini out, DS-ADAPT X 3-wood in at stock 15°, 5-wood stays 19.5°, 2-iron unchanged, 4-iron stays out. Still 14 clubs. Both woods unmeasured."
+    },
+    {
+      "id": "upd-longend-carries-20260918",
+      "type": "action-update",
+      "target": "action-5wood-carry-20260812",
+      "text": "MEASURE THE LONG END — two blank rows, a new head. The bag changed on Sep 18: the mini driver is OUT, a Cobra DS-ADAPT X 3-wood is IN at stock 15°, the 5-wood stays 19.5° in the 4-iron’s slot, and the 4-iron stays out. Both woods sit on the ladder with NO carry. Do NOT type the Sep 14 TrackMan 3w 182.4 onto the new 3-wood — that label was the mini. THE THREE ANSWERS TO GET, in one range session with a rangefinder: (1) what this 3-wood carries at the sleeve setting it actually sits on, (2) what the 5-wood carries at 19.5°, (3) whether either of them is actually longer than the 2-iron’s 205 estimate. Five balls a club, rotating rather than blocked, average the middle three, type them into the carry ladder. Any gap under six yards is two clubs doing one job. Read the SLEEVE on the new 3-wood while you are at it — FutureFit33, stock 15°, ±2° — and send it."
+    },
+    {
+      "id": "upd-bag-refit-20260918",
+      "type": "action-update",
+      "target": "action-bag-refit-20260917",
+      "text": "EQUIPMENT — THE BAG STILL HAS A HOLE, and as of Sep 18 the club that sat next to it has changed. Off the Sep 14 map the 5-wood (177.6) to 2-iron (152.3) gap was 25.3 yards with nothing in it — both of those clubs are still in the bag, so that hole is still live. The 4.8-yard 3w-to-5w overlap on that map was the TrackMan 3w label, which was the MINI DRIVER; the mini is out as of Sep 18 and a Cobra DS-ADAPT X 3-wood is in with NO number. Do not treat 182.4 as this head. WHAT TO ASK A FITTER FOR is unchanged on the irons: something at ~163 to fill the 5-wood/2-iron hole, one club instead of three around ~135, and a straight answer on whether a 5-hybrid beats the 2-iron. DO NOT BUY OFF THE SEP 14 MAP ALONE, and do not buy a second 3-wood — you just did."
+    },
+    {
+      "id": "lesson-c1-bag-20260918",
+      "type": "lesson-update",
+      "target": "c1",
+      "lesson": {
+        "body": "The driver question isn't \"can I hit the fairway\" — it's \"where is the miss that ruins the hole.\" Before every tee shot, find the side where a miss is dead (water, OB, trees, bunkers you can't advance from) and aim so your normal shot pattern fits on the other side. An 8-handicap's dispersion is roughly 60 yards wide with driver; give that oval room. Sometimes that means the 3-wood or the 2-iron utility — as of Sep 18 the mini driver is out and a Cobra DS-ADAPT X 3-wood is the fairway finder, with the 5-wood still at 19.5 in the slot the 4-iron left. Par is a fine score from the fairway. One honest gap while you use this: NEITHER wood has a measured carry, so on a hole where the number matters, the 2-iron's 205 is the only long figure you actually have — and it is an estimate too. Do not play the new 3-wood at the mini's TrackMan number."
+      }
+    },
+    {
+      "id": "lesson-r2-bag-20260918",
+      "type": "lesson-update",
+      "target": "r2",
+      "lesson": {
+        "body": "Your loudest scoring pattern is that you miss greens SHORT — Sterling Farms missed twelve greens and seven of them were short, against two left, one right and one long, and the GHIN archive says the same thing across a season. There are exactly two causes and this drill separates them: either you are picking the wrong club, or your ladder numbers are wrong. Right now TWO clubs in the bag have no number at all. The bag changed on Sep 18: the mini driver came OUT and a Cobra DS-ADAPT X 3-wood came IN at stock 15 degrees; the 5-wood stays 19.5 in the slot the 4-iron left. Neither wood has a measured carry on the club that is actually in the bag. The 7-wood in the bullpen is in the same position. And a carry number is a CARRY off a good strike; a 60 percent strike from rough finishes eight to ten yards shorter, which is most of the short miss right there. Measure the number, then club off the number, then stop guessing.",
+        "drill": "Bring a rangefinder and pick a target with something behind it you can shoot. Five balls per club, alternating clubs rather than raking a bucket with one — ignore the best and the worst, average the middle three, and write that number down as the CARRY. Do the whole ladder over two sessions: driver, 3-wood, 2-iron, 5-wood, 5 through 9 iron on the first; PW, 50, 56, 60 and a second pass at both woods on the second. Enter them in the carry ladder in the app. Two things to record beside each number: how many of the five you actually struck, and how big the gap is to the club either side. Any gap under six yards is two clubs doing one job, and any gap over eighteen is a hole in the bag — and the hole to watch for is still where the 4-iron used to be, at about 190. Those answers settle the whole top of the bag: 3-wood versus 2-iron, and 5-wood versus 5-iron."
+      }
+    },
+    {
+      "id": "lesson-r7-bag-20260918",
+      "type": "lesson-update",
+      "target": "r7",
+      "lesson": {
+        "title": "Driver, 3-wood or 2-iron — settle it with a fairway-width target",
+        "body": "The bag carries three answers to the same tee-shot question, and as of Sep 18 they are not the three it carried last week. The mini driver is OUT and a Cobra DS-ADAPT X 3-wood is the fairway finder, with the 5-wood still at 19.5 in the 4-iron's place — so the comparison is now driver against 3-wood against the 2-iron utility, and neither wood has a measured carry. Meanwhile the app counts something better than a fairway percentage: the DEAD column on the off-the-tee table, which is how often a club left you no realistic play at the green. Most rough is playable and none of those are, and that is the real driver-versus-fairway-finder question. What the round data cannot do is give you a fair sample quickly — you hit maybe four drivers a round off holes that all differ. A range bay can put all three clubs on the same target on the same day, which is the only way the comparison is clean. Do not score the mini; it is not in the 14.",
+        "drill": "Pick two objects on the range roughly 30 yards apart at your tee-shot distance — that is a generous fairway, and generous is right, because the question is not accuracy, it is trouble. 10 balls with each of driver, 3-wood and 2-iron, rotating one ball at a time rather than a block per club, full routine on every one. Score three columns per club: IN the gap, outside it, and DEAD — a ball so far off it would have been behind trees or out of bounds. Carry the numbers over two sessions before reading them, then compare the dead rate against what the off-the-tee table in Scores says about the same clubs on the course."
+      }
+    },
+    {
+      "id": "plan-swing-thoughts-20260918-v8",
+      "type": "briefing",
+      "briefing": {
+        "course": "Swing Thoughts — Club by Club",
+        "focus": "Your own swing thoughts and setup keys, club by club, in your words — the go-to reference before a round or a range session. Where a line is standard technique rather than something you said, it is marked [STANDARD] inline, so the page can stay short and you can still tell which is which at a glance. The grip has its own plan as of Sep 9 2026 — nothing about the hold gets written here. Everything about putting lives in the Putting lab, so there is one source for it rather than two.\n\nThe long end of the bag changed on Sep 18 2026: the mini driver is OUT, the 4-iron stays out, and a Cobra DS-ADAPT X 3-wood is IN as the fairway finder. Driver as it was, then this 3-wood, then the 19.5° 5-wood, then the 2-iron. Carry on the new head is blank — do not park the Sep 14 TrackMan 3w 182.4 on it; that label was the mini.",
+        "sections": [
+          {
+            "t": "Driver — the big stick",
+            "b": "YOURS, and it is four months old before anyone wrote it down: the shaft is a Project X LZ 5.5 in REGULAR, in since June. On the old stiff shaft you hit a consistent cut that ran to a slice. On this one you are about 15 yards longer with much less curve — a straight ball that can miss BOTH ways. That is your read, not a measurement: no launch data exists on either shaft.\n\n[STANDARD] Why a shaft does that, because it decides what to do next. A shaft too stiff for your load will not let the tip deflect and close, so the face arrives open to the path — a cut, plus low dynamic loft, which is where the 15 yards were sitting. A softer tip lets the face square. The cost is that a face which CAN square can also over-square, and that is your two-way miss. The miss is the receipt for the distance.\n\nWHAT IT DID NOT DO is fix your path. Flex governs how the FACE arrives, not where the club TRAVELS — so the over-the-top, out-to-in path is still an open fault, untouched and still unmeasured. Read the straight ball as a path fault being CANCELLED by a face change, not as a path that got better. One useful thing follows: your path is already fade-shaped, so a fade is a shape you own rather than one you have to manufacture.\n\nTHE PLAY, unchanged: aim the CENTER of the fairway and swing LONGER, not tighter. [STANDARD] Aiming away from a known miss is textbook, not something you worked out. What HAS changed is the old rule that the bad one is the push-slice — with this shaft the bad one goes either way, so centre-aim is doing more work than it used to.\n\nIf you want the one-way miss back, the lever is the sliding weight on the sole and NOT the loft. The Aug 31 section of the Workshop Log has the reasoning; the short version is that toe weight bends the curve without moving your start line, and lowering the loft moves both.",
+            "k": "Regular shaft since June: ~15 yds longer, much less curve — but the miss now goes BOTH ways, and your path is unchanged."
+          },
+          {
+            "t": "The fairway finder — Cobra DS-ADAPT X 3-wood",
+            "b": "YOURS: Golf Galaxy same-day Sep 18 2026, SKU 26808014, $199. Cobra DS-ADAPT X 3-wood, right hand, Regular, Project X Denali Blue 60 graphite. It takes the fairway-finder job the mini driver held. The mini is out of the 14 (kept, not sold). The 4-iron stays out. The bag at the long end is Driver · this · 19.5° 5-wood · 2-iron.\n\nSTOCK LOFT IS 15.0°, not the 16.5° 3-HL. FutureFit33 can move loft and lie independently ±2°, and nobody has read the sleeve, so treat 15 as the box spec rather than the hosel. Same open question as the driver’s adapter.\n\nSHAFT is the stock Project X Denali Blue 60 Regular (Cobra’s chart: 64 g, mid launch / mid spin). Playing length unmeasured — stock is 43.25\".\n\nITS CARRY IS BLANK. Do not let the Sep 14 TrackMan 3w 182.4 creep onto this row. That label was the mini driver — Jack confirmed every displayed 3w on the Sep 15 sim round was the mini, and the Map My Bag 3w group is the same label. A number describing a different club is the worst of both. Hit this one and type the real figure.\n\n[STANDARD] What a 15° 3-wood is for off a tee: the club you put in play when the driver is the wrong risk. More spin and a higher launch than the driver, so it holds its line better into wind and runs less at the end. You lose a few yards to get it. That is the trade a fairway finder is supposed to make.",
+            "k": "In Sep 18 at stock 15°. Carry blank. Do not put the mini’s TrackMan 3w number on this head."
+          },
+          {
+            "t": "The 5-wood — 19.5°, and a different club now",
+            "b": "YOURS: on Sep 8 the 5-wood came DOWN three degrees, 16.5° to 19.5°, and moved down the bag with it. It is no longer the fairway finder — the new 3-wood has that job — it is the club sitting where the 4-iron used to, which came out of the bag the same day to keep you at 14.\n\nWHAT IT IS FOR NOW: the long par 3, the second into a par 5, and the 190-to-210 approach the 4-iron used to take. That is a shot that has to STOP, and this is the argument for the change being a good one — a 16.5° wood is a hard thing to hold a green with, and a 19.5° one launches high enough to land soft. The re-loft suits the new job better than the old setting suited the old one.\n\n[STANDARD] What you give up going the other way: three degrees costs you distance and, more to the point, it costs you the flat, running tee ball a strong 5-wood produces. That is the ball the 3-wood is in to hit.\n\nSTILL NO CARRY, and now for a second reason: it was unmeasured at 16.5°, and at 19.5° any number you had would describe the wrong club. It is one of two blank rows in the long end of the bag.\n\nAND THE ONE THING TO GO AND READ: what the hosel is actually indexed to. Three degrees is the full sweep of a typical fairway sleeve from one end to the other, so 19.5 only works out if the 16.5 the app has carried since August was itself the bottom of the range — and nobody has checked that either.",
+            "k": "Still 19.5° in the 4-iron’s slot — a green-holding club, not a tee club. Carry still blank."
+          },
+          {
+            "t": "Irons",
+            "b": "Ball position right of center, toward the trail (right) thigh. [STANDARD] — stock iron ball position, not your own feel; nothing has measured yours. The new KING TECs fly HIGHER and longer than the old set — trust the extra height. When you need to flight it down or take something off, CHOKE DOWN and hit the control shot rather than just swinging soft.\n\nWHICH iron is a different question from how to hit one, and it moved to its own plan on Aug 14: APPROACH PLAY — CLUB UP. Short version — club for the MIDDLE of the green, and lean to the longer club, because 7 of your 12 recorded green misses finished short.",
+            "k": "Ball back toward the trail thigh; the KING TECs fly higher than the old set, so trust the height."
+          },
+          {
+            "t": "Wedges",
+            "b": "(Open — fill in as you dial the Vokeys: your go-to feels for full vs. partial, and any open-face/flop keys. Ladder to stay honest: 60°→80 · 56°→95 · 50°→108 · PW→122.)",
+            "k": "Open — fill in your Vokey feels as you dial them. Ladder: 60°→80 · 56°→95 · 50°→108 · PW→122."
+          },
+          {
+            "t": "Putting — it lives in the Putting lab",
+            "b": "This section used to carry a putting key, and it went stale the moment the putter changed — it still said 'hands EVEN with the ball, press stays tiny', which was the DF3i's Press Pistol 2° geometry. The DF3i went back on Aug 10, and on the LINK's zero-lean grip that same cue is lean YOU are adding to a face with 2° to give.\n\nThat is the argument for not keeping it here at all. Two plans describing one stroke is exactly how a retired cue survives a putter change, and this one did for three days.\n\nSo: putting lives in the PUTTING LAB. The Routine plan is the whole stroke, the Setup plan is the low point and the weight, and the Distance Grind is the pace work. Nothing about putting gets written here again.",
+            "k": "Deliberately empty: two places describing one stroke is how a retired cue survives."
+          },
+          {
+            "t": "The grip — it has its own plan now",
+            "k": "Deliberately empty, and the 'grip settled' line this page carried was a PUTTING verdict that outlived the section it was written for.",
+            "b": "The full-swing hold lives in THE GRIP — BEFORE THE CLUB MOVES, in this lab, from Sep 9 2026. You asked for a stronger lead hand and that plan is the whole answer: how to build it, what it can and cannot do, and the gate that says whether it took.\n\nWHY IT IS NOT WRITTEN HERE. This page carried the line 'Grip settled: conventional' in its focus from Jul 26 until Sep 9. It was true, and it was about PUTTING — conventional beat left-hand-low and the claw in the grip experiment run on the DF3i in July — and it was written in the section of this plan that used to hold the putting keys. That section moved out to the Putting lab on Aug 14. The verdict did not move with it, so a full-swing page went on saying the grip was settled and closed for six weeks, about a decision that was never about the full swing at all.\n\nWhich is the same argument the putting section below makes, from the other direction: one subject, one page. The putter's hold lives in the Putting lab's Grip & Posture plan, the full-swing hold lives in the grip plan, and neither gets a second description here. They are opposite holds anyway — the putter runs up the lifeline so the wrists cannot hinge, a full-swing club sits in the fingers so they can."
+          }
+        ],
+        "rules": [
+          "Driver: aim centre, swing LONGER not tighter",
+          "Driver: the regular shaft killed the slice — the miss now goes BOTH ways",
+          "3-wood: in Sep 18, stock 15°, the fairway finder — carry blank",
+          "5-wood: still 19.5°, into the 4-iron’s slot — a green-holding club",
+          "Two blank carries up top: don’t hit either wood at a number",
+          "Mini driver and 4-iron are out of the 14",
+          "Irons: trust the extra height, choke down to flight it"
+        ],
+        "discipline": "full-swing"
+      }
+    }
   ]
 }
