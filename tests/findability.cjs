@@ -3,8 +3,9 @@
 const fs = require('fs');
 const src = fs.readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
 const must = [
-  "const BUILD = 'v120'",
+  "const BUILD = 'v121'",
   "function cumulativeView()",
+  "function cumulativePathHistory()",
   "function allDayRows()",
   "function provBadge(kind)",
   "function numbersCatalog(state)",

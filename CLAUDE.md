@@ -2731,13 +2731,14 @@ lists**. v118 keeps the days and stops splitting them.
 
 `sessionShortcuts()` is now two tiles: **Days** and **Cumulative**. Days is one newest-first
 list of every capture (bay, outdoor, indoor, film, Combine) with filter chips if you want
-one kind — Range sessions is a filter, not a home. Cumulative is the running picture:
-the same four on-course areas `areaCards()` / `gameAreas()` already compute for Today and
-Coach (do not invent a fifth number), with the n on the page (live holes, outdoor rounds,
-bay sessions, film days). Simulator rounds are days you can open and are **never** in
-those four — `realRounds()` stays the door. Bay and film sit in their own lanes
-(measured carries, Combine, current evolution-grid column). It moves when a day lands;
-the n is the accuracy.
+one kind — Range sessions is a filter, not a home. **Cumulative is the analysis page
+(v121):** working vs needs work (settled faults / open faults, evolution marks), the
+over-the-top path diagram, path+face from the latest bay day, path-across-days (each
+dot is one club average; the ring is that day's shape, not a number to type), the four
+on-course areas (same `areaCards()` / `gameAreas()` — do not invent a fifth), the latest
+bay finding, and the open to-dos. It is not a hub of doors onto Coach, Swing and Numbers.
+Simulator rounds are days you can open and are **never** in those four — `realRounds()`
+stays the door. It moves when a day lands; the n is the accuracy.
 
 Old `data-kind="range|sim|outdoor|film"` links still resolve as Day filters. Original
 array indices remain the navigation keys after sorting; never navigate using the sorted

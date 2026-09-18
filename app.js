@@ -99,13 +99,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v120';
+const BUILD = 'v121';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v121', d:'2026-09-18', items:[
+    'CUMULATIVE IS THE ANALYSIS NOW. Working vs needs work, the over-the-top picture, path and face from every bay day, the one thing to do, and the open items — on that page, not behind another door.',
+    'PATH ACROSS DAYS is the visual: every club average as a dot, the ring is that day’s shape. Sep 14, Sep 15 and Sep 18 all sit left of zero. Face open to that path is the pull-fade. Fix the path first.',
+    'Days still stay days. Today is untouched.' ] },
   { b:'v120', d:'2026-09-18', items:[
     'NEW 3-WOOD, FIRST LOOK. TrackMan displayed 150.0, n=11, consistency 58.6 — that average includes two tops (26.4 and 34.9). The other nine average 176.5, with four of them at 189–201. Jack: felt amazing. That is the struck ball, not the 150.',
     '5-WOOD displayed 157.6 because of one 28.5; cleaned 179.1, which sits on the Sep 14 map 177.6. 7-IRON 131.7 n=11 cons 12.4 (Sep 14 was 135.9 / 12.5). Per-shot 7-iron carries were off-screen.',
@@ -3277,10 +3281,10 @@ function allDayRows(){
 }
 function sessionShortcuts(){
   return `<section class="card session-shortcuts" aria-label="Days and cumulative"><h2>The record</h2>
-    <p class="sm">Days stay days. Cumulative is what they add up to, and it moves when a new one lands.</p>
+    <p class="sm">Days stay days. Cumulative is the analysis they add up to — path, face, what is working, what to do.</p>
     <div class="session-grid">
       <button class="session-tile" data-action="session-category" data-kind="days"><b>Days</b><span>Every capture, newest first →</span></button>
-      <button class="session-tile" data-action="session-category" data-kind="cumulative"><b>Cumulative</b><span>The running picture — more accurate as n grows →</span></button>
+      <button class="session-tile" data-action="session-category" data-kind="cumulative"><b>Cumulative</b><span>The analysis — working, needs work, what to do →</span></button>
     </div></section>`;
 }
 function sessionLibrary(kind='days'){
@@ -3320,46 +3324,94 @@ function evoNow(disc){
     }))
   };
 }
+function cumulativePathBays(){
+  return baysFor('swing').filter(o =>
+    ((o.b.detail || {}).delivery || []).some(d => d.path != null && Number.isFinite(+d.path)));
+}
+function cumulativeFlightRead(delivery){
+  const rows = (delivery || []).filter(d => d.path != null && Number.isFinite(+d.path));
+  if(!rows.length) return '';
+  const mean = xs => xs.reduce((a,b)=>a+b,0)/xs.length;
+  const paths = rows.map(d => +d.path);
+  const faces = rows.filter(d => d.face != null && Number.isFinite(+d.face)).map(d => +d.face);
+  const ftps = rows.filter(d => d.ftp != null && Number.isFinite(+d.ftp)).map(d => +d.ftp);
+  const allLeft = paths.every(p => p < 0);
+  const meanP = mean(paths);
+  const meanF = faces.length ? mean(faces) : null;
+  const meanFtp = ftps.length ? mean(ftps) : null;
+  let ball = 'Not enough face numbers on this session to name the curve.';
+  if(meanF != null && meanFtp != null){
+    if(meanF < 0 && meanFtp > 0) ball = 'Face left of the target and open to that path. The ball starts left and peels right — a pull-fade. Same pattern every bay day that has measured both halves.';
+    else if(meanF < 0 && meanFtp < 0) ball = 'Face left of the target and closed to the path. Start left, curve left.';
+    else if(meanF > 0 && meanFtp > 0) ball = 'Face right of the target and open to the path. Start right, curve right.';
+    else ball = 'Face right of the target and closed to the path. Start right, curve left.';
+  }
+  return `<p class="sm cum-flight"><b>${allLeft ? 'Every club path on this session is left of the target' : 'Club path is mixed'}</b>
+    · mean path ${esc(baySgn(meanP))}°${meanF != null ? ` · mean face ${esc(baySgn(meanF))}°` : ''}${meanFtp != null ? ` · mean face-to-path ${esc(baySgn(meanFtp))}°` : ''}.
+    ${esc(ball)} Fix the path first, then the face. ${meaningBtn('faceAtImpact')}</p>`;
+}
+function cumulativePathHistory(){
+  const list = cumulativePathBays();
+  if(!list.length) return '';
+  const pos = v => Math.max(0, Math.min(100, 50 + (+v / 16 * 50))).toFixed(1);
+  return `<div class="cump-hist" aria-label="Club path across bay days">
+    <div class="bvtitle"><b>Path across days</b><span>left ← 0° → right</span></div>
+    ${list.map(({ b }) => {
+      const rows = ((b.detail || {}).delivery || []).filter(d => d.path != null && Number.isFinite(+d.path));
+      const avg = rows.reduce((s,d)=>s+(+d.path),0)/rows.length;
+      return `<div class="cump-row">
+        <span class="cump-date">${esc(fmtDate(b.date))}</span>
+        <span class="bvdaxis">${rows.map(d =>
+          `<i class="bvdshot path" style="left:${pos(d.path)}%" title="${esc(clubTag(d.club))} ${baySgn(d.path)}°"></i>`).join('')}
+          <i class="bvdot path" style="left:${pos(avg)}%" title="Session mean ${baySgn(avg)}°"></i></span>
+        <b>${esc(baySgn(avg))}°</b></div>`;
+    }).join('')}
+    <p class="bvcap">Each small dot is one club's average path that day. The ring is the mean of those clubs — a shape, not a number to type. Different clubs on different days. Negative is out-to-in.</p>
+  </div>`;
+}
 function cumulativeView(){
   const C = areaCards();
-  const { areas:A, st } = gameAreas(C.cards);
+  const { areas:A } = gameAreas(C.cards);
   const outdoor = realRounds().length;
   const indoor = (S.rounds || []).filter(r => r.sim).length;
   const bays = (S.bays || []).length;
   const films = (S.sessions || []).length;
-  const measN = (S.carries || []).filter(r => r.meas).length;
-  const ladderN = (S.carries || []).length;
-  const lastCombine = (S.combines || []).slice().sort((a,b) => (a.date||'').localeCompare(b.date||'')).pop();
   const counted = AREAS.filter(k => A[k]);
   const thin = counted.length && Math.min(...counted.map(k => A[k].n)) < 36;
-  const idx = estIndex();
-  const f = coachFocus(coachSignals());
+  const sig = coachSignals();
+  const f = coachFocus(sig);
+  const ft = focusTag(f);
+  const since = coachSince();
+  const pathBays = cumulativePathBays();
+  const latest = pathBays[0] || null;
+  const delivery = latest ? ((latest.b.detail || {}).delivery || []) : [];
+  const openFaults = (S.faults || []).filter(x => faultState(x) === 'open');
+  const shutFaults = (S.faults || []).filter(x => faultState(x) !== 'open');
+  const evoBits = ['swing','putting','short-game'].flatMap(d => {
+    const now = evoNow(d);
+    return now ? now.rows.map(r => ({ disc:d, lab:now.lab, ...r })) : [];
+  });
+  const evoGood = evoBits.filter(r => r.mark === '\u2713' || r.mark === '~');
+  const evoBad = evoBits.filter(r => r.mark === '\u2717' || r.mark === '?');
+  const allPathsLeft = pathBays.length && pathBays.every(({ b }) =>
+    ((b.detail || {}).delivery || []).filter(d => d.path != null).every(d => +d.path < 0));
+  const recs = (S.actions || []).filter(a => !a.done);
+  const recShow = recs.filter(a => a.pri).concat(recs.filter(a => !a.pri)).slice(0, 4);
   const tile = k => {
     const a = A[k];
-    return `<div class="area">
-      <div class="l">${esc(AREA_LAB[k])}</div>
+    const on = f && areaOf(f) === k;
+    return `<div class="area${on ? ' focus' : ''}">
+      <div class="l">${esc(AREA_LAB[k])}${on ? ' · focus' : ''}</div>
       ${a ? `<div class="v">${esc(a.v)}</div><div class="u">${esc(a.u)}${a.raw ? ` · ${esc(a.raw)}` : ''} · n=${a.n}</div>
              <div class="rd">${a.read}</div>`
           : `<div class="v faint">—</div><div class="u">not logged yet</div>
              <div class="rd">Log a live round and this fills itself in.</div>`}
     </div>`;
   };
-  const evoBlock = disc => {
-    const now = evoNow(disc);
-    if(!now) return '';
-    const lab = disc === 'putting' ? 'Putting' : disc === 'swing' ? 'Swing' : 'Short game';
-    return `<div class="card cum-lane">
-      <h2>${esc(lab)} · current batch ${provBadge('measured')}</h2>
-      <p class="sm faint">Latest column of the evolution grid (${esc(now.lab)}) — not a new measurement, the current mark as more batches land.</p>
-      ${now.rows.map(r => `<div class="linkrow" data-action="go" data-view="${disc==='putting'?'putting':disc==='swing'?'swing':'shortgame'}">
-        <span><b>${esc(r.name)}</b><br><span class="sm">${esc(r.state || r.mark)}</span></span>
-        <span class="numend"><span class="evom">${esc(r.mark)}</span><span class="arr">→</span></span></div>`).join('')}
-    </div>`;
-  };
   return `
   <h2>Cumulative</h2>
   <div class="card">
-    <p class="sm">Days stay days. This is what they add up to. A number sitting on 54 holes is a different claim from one sitting on 9 — the n is the accuracy, and it moves when a day lands.</p>
+    <p class="sm">Days stay days. This is what they add up to — the analysis, the pictures, and what to do next. It moves when a day lands. The n is the accuracy.</p>
     <div class="cum-n">
       <span>${C.liveHoles} live holes</span>
       <span>${outdoor} outdoor round${outdoor===1?'':'s'}</span>
@@ -3367,41 +3419,76 @@ function cumulativeView(){
       <span>${films} film day${films===1?'':'s'}</span>
       ${indoor ? `<span>${indoor} indoor — listed, not in the four</span>` : ''}
     </div>
+    ${since.length ? `<p class="sm faint" style="margin-top:8px">Standing on ${esc(since.join(' · '))}.</p>` : ''}
   </div>
+
+  ${f ? `<div class="card">
+    <h2>The one thing</h2>
+    <div class="tipcard ${f.sev === 'good' ? 'green' : ''}${rail(f.ev)}">
+      <div class="src">Focus right now · ${esc(f.src)}${evTag(f.ev)}</div>
+      <h4>${f.h}</h4>${expandable(f.b)}
+      ${ft ? faultDrillRow(ft) : ''}
+    </div>
+  </div>` : ''}
+
+  <div class="card">
+    <h2>Working · needs work</h2>
+    <p class="sm faint">Closed faults and checkmarks on one side. Open faults and the measured miss on the other. Both move when a day lands.</p>
+    <div class="cum-split">
+      <div class="cum-col work">
+        <h3>Working</h3>
+        ${shutFaults.length ? `<ul>${shutFaults.map(x =>
+          `<li><b>${esc(faultLabel(x.tag))}</b> · ${faultState(x)==='downgraded'?'downgraded':'measured shut'}</li>`).join('')}</ul>`
+          : '<p class="sm faint">Nothing measured shut yet.</p>'}
+        ${evoGood.length ? `<p class="sm" style="margin-top:8px">${evoGood.map(r =>
+          `<span class="cum-mark good">${esc(r.mark)} ${esc(r.name)}</span>`).join('')}</p>` : ''}
+      </div>
+      <div class="cum-col need">
+        <h3>Needs work</h3>
+        ${allPathsLeft ? `<p class="sm"><b>Out-to-in path</b> — every measured club, every bay day. That is the swing job.</p>` : ''}
+        ${openFaults.length ? `<ul>${openFaults.map(x =>
+          `<li><b>${esc(faultLabel(x.tag))}</b> · ${esc(faultDisc(x).replace('-', ' '))}</li>`).join('')}</ul>`
+          : '<p class="sm faint">No open faults on the card.</p>'}
+        ${evoBad.length ? `<p class="sm" style="margin-top:8px">${evoBad.map(r =>
+          `<span class="cum-mark bad">${esc(r.mark)} ${esc(r.name)}</span>`).join('')}</p>` : ''}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Club path + face ${provBadge('bay')}</h2>
+    <p class="sm">Over the top throws the club out, then across. An open face turns that into start-left, curve-right. The pictures are the diagnosis; the dots below are the measurements.</p>
+    <div class="hipcompare">${pathDiagram()}</div>
+    ${latest ? `<p class="sm faint" style="margin-top:10px">Latest measured day · ${esc(fmtDate(latest.b.date))} · ${esc(latest.b.mode || latest.b.setup || 'bay')}. ${provBadge('trackman')}</p>
+      ${cumulativeFlightRead(delivery)}
+      ${bayDeliveryVisual(delivery)}` : '<p class="sm">No bay session has a path reading yet.</p>'}
+    ${cumulativePathHistory()}
+  </div>
+
   <div class="card">
     <h2>On course ${provBadge('on-course')}</h2>
     <p class="sm faint">${C.cards.length ? areaProvLine(C) : 'Nothing on-course on file yet.'}
-      ${indoor ? ' Indoor rounds are days you can open. They never enter these four — the USGA does not accept a simulator score, and a Trackman round of Pebble knows the real rating.' : ''}</p>
-    <div class="stat" style="margin:10px 0 12px">
-      <div class="v">${esc(String(S.profile.handicap))}${meaningBtn('handicap')}</div>
-      <div class="l">Handicap ${provBadge(provOfProfile())}</div>
-      ${idx != null ? `<div class="sv">${idx.toFixed(1)} est. off rated cards</div>` : `<div class="sv">${indexBasis().n} of 3 rated</div>`}
-    </div>
+      ${indoor ? ' Indoor rounds are days you can open. They never enter these four.' : ''}</p>
     <div class="areagrid">${AREAS.map(tile).join('')}</div>
-    ${thin ? `<p class="sm faint">Thin sample — some of these rest on fewer than 36 recorded holes, which is a flag rather than a rate. They redraw off every live round you log.</p>` : ''}
-    ${f ? `<p class="sm" style="margin-top:10px"><b>The one thing on this sample.</b> ${esc(f.h)}</p>` : ''}
-    <div class="linkrow" data-action="go" data-view="coach" style="margin-top:8px">
-      <span class="sm"><b>Coach</b> — the same four areas, with the work attached</span><span class="arr">→</span></div>
+    ${thin ? `<p class="sm faint">Thin sample — some of these rest on fewer than 36 recorded holes, which is a flag rather than a rate.</p>` : ''}
   </div>
-  <div class="card cum-lane">
-    <h2>From the bay ${provBadge('bay')}</h2>
-    <p class="sm faint">Indoor radar. It does not rewrite the on-course four. A measured carry parks beside yours until you take it.</p>
-    <div class="rowgrid g3" style="margin-top:10px">
-      <div class="stat"><div class="v">${measN}/${ladderN || '—'}</div><div class="l">Carries measured ${meaningBtn('carry')}</div></div>
-      <div class="stat"><div class="v">${lastCombine && lastCombine.score != null ? esc(String(lastCombine.score)) : '—'}${meaningBtn('combineScore')}</div>
-        <div class="l">Combine ${provBadge('trackman')}</div></div>
-      <div class="stat"><div class="v">${bays || '—'}</div><div class="l">Bay days</div></div>
-    </div>
-    <div class="linkrow" data-action="go" data-view="bag"><span class="sm"><b>Carry ladder</b> — live number and any parked bay offer</span><span class="arr">→</span></div>
-    <div class="linkrow" data-action="go" data-view="swing" style="border-bottom:none"><span class="sm"><b>Swing lab</b> — Combine, six-metric, strike map</span><span class="arr">→</span></div>
-  </div>
-  ${evoBlock('putting')}
-  ${evoBlock('swing')}
-  ${evoBlock('short-game')}
+
+  ${latest && latest.b.finding ? `<div class="card cum-lane">
+    <h2>Latest from the bay · ${esc(fmtDate(latest.b.date))} ${provBadge('bay')}</h2>
+    ${expandable(latest.b.finding)}
+    <div class="linkrow" data-action="open-bay" data-i="${latest.i}" style="margin-top:8px;border-bottom:none">
+      <span class="sm"><b>Open that day</b> — every shot, the charts, the table</span><span class="arr">→</span></div>
+  </div>` : ''}
+
+  ${recShow.length ? `<div class="card">
+    <h2>What to do</h2>
+    <p class="sm faint">Open items, priority first. The work lives here so it does not hide behind another door.</p>
+    ${recShow.map(a => `<div class="cum-rec">${expandable(a.text)}</div>`).join('')}
+  </div>` : ''}
+
   <div class="card flat">
-    <div class="linkrow" data-action="session-category" data-kind="days"><span><b>Days →</b><span class="sm"> the captures this picture is standing on</span></span><span class="arr">→</span></div>
-    <div class="linkrow" data-action="go" data-view="numbers"><span><b>Numbers →</b><span class="sm"> every figure, sourced</span></span><span class="arr">→</span></div>
-    <div class="linkrow" data-action="go" data-view="timeline" style="border-bottom:none"><span><b>Evidence →</b><span class="sm"> days plus feed applies</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="session-category" data-kind="days" style="border-bottom:none">
+      <span><b>Days →</b><span class="sm"> the captures this picture is standing on</span></span><span class="arr">→</span></div>
   </div>`;
 }
 // NEWEST FIRST, same row shape as the film log — the lab still reads as one record of what
@@ -5509,7 +5596,7 @@ const FAULT_EV = {
   // — an out-to-in club path on every club, and a ball that finishes right on every club read for
   // curve. A tier is a property of the SOURCE, so the moment a radar answers the question the
   // fault was waiting on, the tier moves with it.
-  'over-the-top-slice':['bay', 'Sep 14 bag map (13 clubs · 78 shots) + Sep 15 range (54 shots) — out-to-in path on every club, ball right on every club'],
+  'over-the-top-slice':['bay', 'Sep 14 bag map + Sep 15 range + Sep 18 3w/5w/7i — out-to-in path on every club, ball right on every club that was read for curve'],
   'strike-quality':['bay', 'Sep 14 bag map (78 shots) + a Sep 17 strike read of range footage (5 clubs, impact location optically measured)'],
 };
 const faultEv = f => FAULT_EV[f.tag] || null;
