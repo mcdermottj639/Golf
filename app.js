@@ -99,13 +99,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v118';
+const BUILD = 'v119';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v119', d:'2026-09-18', items:[
+    'BAG SWITCH: the mini driver is OUT of the 14 (kept). The 4-iron stays out. A Cobra DS-ADAPT X 3-wood is IN — stock 15°, Project X Denali Blue 60 Regular, Golf Galaxy SKU 26808014, $199 same-day. Long end is Driver · this 3-wood · 19.5° 5-wood · 2-iron.',
+    'THE NEW 3-WOOD HAS NO CARRY. Do not park the Sep 14 TrackMan 3w 182.4 on it — that label was the mini. Both woods sit blank until you hit them. Read the FutureFit33 sleeve (stock 15°, ±2°) when you have it in hand.',
+    'Days and Cumulative are on this build if v118 did not land: one list of every capture, and one running picture that moves when a day lands.' ] },
   { b:'v118', d:'2026-09-18', items:[
     'DAYS ARE ONE LIST AGAIN. Range / simulator / outdoor / film were four doors onto the same dated captures, so a week of work looked like four apps. Today and Game now open Days (every capture, newest first, filter chips if you want one kind) and Cumulative.',
     'CUMULATIVE IS THE RUNNING PICTURE. Same four on-course areas Coach and Today already compute — it does not invent a fifth number. The n is on the page (live holes, bay sessions, film days), and a simulator round is a day you can open, never a hole in these four. Bay and film sit in their own lanes. It moves when a day lands.' ] },
