@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v117';
+const BUILD = 'v118';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v118', d:'2026-09-18', items:[
+    'DAYS ARE ONE LIST AGAIN. Range / simulator / outdoor / film were four doors onto the same dated captures, so a week of work looked like four apps. Today and Game now open Days (every capture, newest first, filter chips if you want one kind) and Cumulative.',
+    'CUMULATIVE IS THE RUNNING PICTURE. Same four on-course areas Coach and Today already compute — it does not invent a fifth number. The n is on the page (live holes, bay sessions, film days), and a simulator round is a day you can open, never a hole in these four. Bay and film sit in their own lanes. It moves when a day lands.' ] },
   { b:'v117', d:'2026-09-18', items:[
     'THE THEME IS BACK. v116 replaced the Scorecard Heritage stylesheet with a 43-line chip file, so Today rendered as unstyled HTML — clipped search, no cards, no cream paper, no nav. The 1,671-line sheet is restored; findability CSS is appended, not substituted.',
     'TODAY IS THE PAGE JACK DESIGNED AGAIN: sessions, quick links, weather, the numbers tiles, start/resume round, round prep, the one thing, the coach tip, what’s landed. Search, Numbers and Evidence are added on top — they do not replace those blocks.',
@@ -1155,7 +1158,7 @@ const TITLES = {
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
   bay:['Bay Session','Every number the launch monitor produced.'],
-  sessions:['Sessions','Range practice, played rounds and swing videos — sorted by date.'],
+  sessions:['Days','Every capture, newest first — not split by type.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
   shelf:['Coach','One shelf of the library.'],
   lesson:['Coach','One lesson, and the drill that trains it.'],
@@ -1508,6 +1511,8 @@ function searchIndex(state){
   add('Labs', 'Putting Lab', 'putting lab 5-foot 5-ft 20-ball', { a:'go', v:'putting' });
   add('Numbers', 'Numbers Index', 'numbers index catalog metrics', { a:'go', v:'numbers' });
   add('Numbers', 'Evidence timeline', 'evidence timeline landed rounds bay film', { a:'go', v:'timeline' });
+  add('Labs', 'Days', 'sessions days range outdoor film simulator rounds', { a:'session-category', kind:'days' });
+  add('Labs', 'Cumulative', 'cumulative running picture evolving accuracy n holes', { a:'session-category', kind:'cumulative' });
   return rows;
 }
 function searchResultsHTML(q){
@@ -1535,6 +1540,7 @@ function searchResultsHTML(q){
         a.prov ? `data-prov="${esc(a.prov)}"` : '',
         a.value != null ? `data-value="${esc(String(a.value))}"` : '',
         a.unit ? `data-unit="${esc(a.unit)}"` : '',
+        a.kind ? `data-kind="${esc(a.kind)}"` : '',
       ].filter(Boolean).join(' ');
       return `<div class="linkrow" ${attrs}><span><b>${esc(r.label)}</b></span><span class="arr">→</span></div>`;
     }).join('')}</div>`).join('');
@@ -1789,6 +1795,15 @@ function render(view, arg, keepScroll){
   if(view === 'rounds'){
     const s = ROUND_SEGS.find(x => x.k === (arg || roundsSeg));
     if(s) tag = s.tag;
+  }
+  if(view === 'sessions'){
+    if(arg === 'cumulative'){
+      title = 'Cumulative';
+      tag = 'The running picture. It moves when a day lands.';
+    } else {
+      title = 'Days';
+      tag = 'Every capture, newest first — not split by type.';
+    }
   }
   $('#pageTitle').textContent = title;
   $('#pageTag').textContent = tag;
@@ -3210,22 +3225,165 @@ function roundBayVisuals(r){
     <button class="btn" data-action="open-bay" data-i="${i}">Open range charts & exact data</button></details>`;
 }
 
-const SESSION_TYPES = [['range','Range sessions'],['sim','Simulator rounds'],['outdoor','Outdoor rounds'],['film','Swing videos']];
-function sessionShortcuts(){
-  return `<section class="card session-shortcuts" aria-label="Find your sessions"><h2>Sessions</h2>
-    <p class="sm">Choose what you want to review.</p><div class="session-grid">${SESSION_TYPES.map(([k,label])=>
-      `<button class="session-tile" data-action="session-category" data-kind="${k}"><b>${label}</b><span>${{range:'TrackMan charts & club data',sim:'Scorecards & shot evidence',outdoor:'Course rounds & statistics',film:'Filmed swings & coaching'}[k]} →</span></button>`).join('')}</div></section>`;
+const SESSION_TYPES = [['days','Days'],['cumulative','Cumulative']];
+const DAY_FILTERS = [
+  ['days','All'],
+  ['outdoor','On-course'],
+  ['range','Bay'],
+  ['sim','Indoor'],
+  ['film','Film'],
+];
+// Captures, mixed. Four types used to be four homes; they are filters on one list now.
+function allDayRows(){
+  const rows = [];
+  (S.bays || []).forEach((b, i) => rows.push({
+    date:b.date, kind:'range', title:b.mode || b.setup || 'Bay session',
+    sub:[b.venue, b.setup].filter(Boolean).join(' · '),
+    action:'open-bay', i, prov:'bay'
+  }));
+  (S.sessions || []).forEach((s, i) => rows.push({
+    date:s.date, kind:'film', title:s.setup || 'Filmed session',
+    sub:[sessionDiscipline(s), sessionGist(s)].filter(Boolean).join(' · '),
+    action:'open-session', i, prov:'measured'
+  }));
+  (S.rounds || []).forEach((r, i) => rows.push({
+    date:r.date, kind:r.sim ? 'sim' : 'outdoor', title:r.course || 'Round',
+    sub:[r.score != null ? 'Score '+r.score : '', r.nine ? r.nine+' nine' : '',
+         r.sim ? 'simulator — not a handicap round' : (r.live ? 'logged live' : '')]
+      .filter(Boolean).join(' · '),
+    action:'open-round', i, prov:r.sim ? 'bay' : 'on-course'
+  }));
+  rows.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (a.title || '').localeCompare(b.title || ''));
+  return rows;
 }
-function sessionLibrary(kind='range'){
-  if(!SESSION_TYPES.some(([k])=>k===kind)) kind='range';
-  const rows = kind==='range' ? (S.bays||[]).map((b,i)=>({date:b.date,title:b.mode||'Launch-monitor practice',sub:[b.venue,b.setup].filter(Boolean).join(' · '),action:'open-bay',i}))
-    : kind==='film' ? (S.sessions||[]).map((s,i)=>({date:s.date,title:s.setup||'Swing video',sub:sessionDiscipline(s)+' · Film breakdown',action:'open-session',i}))
-    : (S.rounds||[]).map((r,i)=>({r,i})).filter(({r})=>kind==='sim'?r.sim:!r.sim).map(({r,i})=>({date:r.date,title:r.course||'Round',sub:[r.score!=null?'Score '+r.score:'Score not recorded',r.nine?r.nine+' nine':'',r.review?'Shot evidence & practice plan':'Scorecard & analysis'].filter(Boolean).join(' · '),action:'open-round',i}));
-  rows.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  const pending=kind==='range'&&!(S.bays||[]).some(b=>b._fid==='bay-20260915-range-54')?`<article class="card session-pending"><h3>Sep 15 · Range practice</h3><p class="sm">The 54-shot analysis is available in the latest coach feed. Reconnect and refresh to download this session.</p></article>`:'';
-  return `<div class="session-filters" role="group" aria-label="Session type">${SESSION_TYPES.map(([k,label])=>`<button class="btn ${k===kind?'':'ghost'}" data-action="session-category" data-kind="${k}" aria-pressed="${k===kind}">${label}</button>`).join('')}</div>
-    <h2>${SESSION_TYPES.find(([k])=>k===kind)[1]}</h2><p class="sm faint">Newest first · ${rows.length} available</p>
-    ${pending}${rows.map(x=>`<button class="card session-row" data-action="${x.action}" data-i="${x.i}"><span class="session-date">${esc(x.date?fmtDate(x.date):'Date unknown')}</span><b>${esc(x.title)}</b><span>${esc(x.sub)}</span><span class="session-open">${kind==='range'?'Open charts & analysis':'Open details'} →</span></button>`).join('')||'<div class="card"><p>No sessions in this category yet.</p></div>'}`;
+function sessionShortcuts(){
+  return `<section class="card session-shortcuts" aria-label="Days and cumulative"><h2>The record</h2>
+    <p class="sm">Days stay days. Cumulative is what they add up to, and it moves when a new one lands.</p>
+    <div class="session-grid">
+      <button class="session-tile" data-action="session-category" data-kind="days"><b>Days</b><span>Every capture, newest first →</span></button>
+      <button class="session-tile" data-action="session-category" data-kind="cumulative"><b>Cumulative</b><span>The running picture — more accurate as n grows →</span></button>
+    </div></section>`;
+}
+function sessionLibrary(kind='days'){
+  const kinds = new Set(['days','cumulative','range','sim','outdoor','film']);
+  if(!kinds.has(kind)) kind = 'days';
+  const segs = `<div class="segbar" role="tablist" aria-label="Record">
+    <button class="seg ${kind!=='cumulative'?'on':''}" data-action="session-category" data-kind="days">Days</button>
+    <button class="seg ${kind==='cumulative'?'on':''}" data-action="session-category" data-kind="cumulative">Cumulative</button>
+  </div>`;
+  if(kind === 'cumulative') return segs + cumulativeView();
+  const filter = (kind === 'days' || !kind) ? 'days' : kind;
+  const rows = allDayRows().filter(r => filter === 'days' || r.kind === filter);
+  const pending = (filter==='days' || filter==='range') && !(S.bays||[]).some(b => b._fid==='bay-20260915-range-54')
+    ? `<article class="card session-pending"><h3>Sep 15 · Range practice</h3><p class="sm">The 54-shot analysis is available in the latest coach feed. Reconnect and refresh to download this session.</p></article>` : '';
+  return `${segs}
+  <div class="session-filters" role="group" aria-label="Filter days">${DAY_FILTERS.map(([k,lab]) =>
+    `<button class="btn ${filter===k?'':'ghost'}" data-action="session-category" data-kind="${k}" aria-pressed="${filter===k}">${lab}</button>`).join('')}</div>
+  <h2>Days</h2>
+  <p class="sm faint">Newest first · ${rows.length} on file. A chip says what kind of day it was — it is not a second list.</p>
+  ${pending}${rows.length ? rows.map(x => `<button class="card session-row" data-action="${esc(x.action)}"${
+      x.i != null ? ` data-i="${x.i}"` : ''}${x.view ? ` data-view="${esc(x.view)}"` : ''}>
+      <span class="session-date">${esc(x.date ? fmtDate(x.date) : 'Date unknown')} ${provBadge(x.prov)}</span>
+      <b>${esc(x.title)}</b><span>${esc(x.sub || '')}</span>
+      <span class="session-open">Open →</span></button>`).join('')
+    : '<div class="card"><p>No days in this filter yet.</p></div>'}`;
+}
+function evoNow(disc){
+  const e = evoFor(disc);
+  if(!e || !e.metrics || !e.metrics.length) return null;
+  const col = Math.max(0, (e.sessions || []).length - 1);
+  return {
+    lab: (e.sessions || [])[col] || 'latest batch',
+    rows: e.metrics.map(m => ({
+      name:m.name, state:m.state || '',
+      mark:(m.marks && m.marks[col] != null) ? m.marks[col] : '—',
+      s:m.s
+    }))
+  };
+}
+function cumulativeView(){
+  const C = areaCards();
+  const { areas:A, st } = gameAreas(C.cards);
+  const outdoor = realRounds().length;
+  const indoor = (S.rounds || []).filter(r => r.sim).length;
+  const bays = (S.bays || []).length;
+  const films = (S.sessions || []).length;
+  const measN = (S.carries || []).filter(r => r.meas).length;
+  const ladderN = (S.carries || []).length;
+  const lastCombine = (S.combines || []).slice().sort((a,b) => (a.date||'').localeCompare(b.date||'')).pop();
+  const counted = AREAS.filter(k => A[k]);
+  const thin = counted.length && Math.min(...counted.map(k => A[k].n)) < 36;
+  const idx = estIndex();
+  const f = coachFocus(coachSignals());
+  const tile = k => {
+    const a = A[k];
+    return `<div class="area">
+      <div class="l">${esc(AREA_LAB[k])}</div>
+      ${a ? `<div class="v">${esc(a.v)}</div><div class="u">${esc(a.u)}${a.raw ? ` · ${esc(a.raw)}` : ''} · n=${a.n}</div>
+             <div class="rd">${a.read}</div>`
+          : `<div class="v faint">—</div><div class="u">not logged yet</div>
+             <div class="rd">Log a live round and this fills itself in.</div>`}
+    </div>`;
+  };
+  const evoBlock = disc => {
+    const now = evoNow(disc);
+    if(!now) return '';
+    const lab = disc === 'putting' ? 'Putting' : disc === 'swing' ? 'Swing' : 'Short game';
+    return `<div class="card cum-lane">
+      <h2>${esc(lab)} · current batch ${provBadge('measured')}</h2>
+      <p class="sm faint">Latest column of the evolution grid (${esc(now.lab)}) — not a new measurement, the current mark as more batches land.</p>
+      ${now.rows.map(r => `<div class="linkrow" data-action="go" data-view="${disc==='putting'?'putting':disc==='swing'?'swing':'shortgame'}">
+        <span><b>${esc(r.name)}</b><br><span class="sm">${esc(r.state || r.mark)}</span></span>
+        <span class="numend"><span class="evom">${esc(r.mark)}</span><span class="arr">→</span></span></div>`).join('')}
+    </div>`;
+  };
+  return `
+  <h2>Cumulative</h2>
+  <div class="card">
+    <p class="sm">Days stay days. This is what they add up to. A number sitting on 54 holes is a different claim from one sitting on 9 — the n is the accuracy, and it moves when a day lands.</p>
+    <div class="cum-n">
+      <span>${C.liveHoles} live holes</span>
+      <span>${outdoor} outdoor round${outdoor===1?'':'s'}</span>
+      <span>${bays} bay session${bays===1?'':'s'}</span>
+      <span>${films} film day${films===1?'':'s'}</span>
+      ${indoor ? `<span>${indoor} indoor — listed, not in the four</span>` : ''}
+    </div>
+  </div>
+  <div class="card">
+    <h2>On course ${provBadge('on-course')}</h2>
+    <p class="sm faint">${C.cards.length ? areaProvLine(C) : 'Nothing on-course on file yet.'}
+      ${indoor ? ' Indoor rounds are days you can open. They never enter these four — the USGA does not accept a simulator score, and a Trackman round of Pebble knows the real rating.' : ''}</p>
+    <div class="stat" style="margin:10px 0 12px">
+      <div class="v">${esc(String(S.profile.handicap))}${meaningBtn('handicap')}</div>
+      <div class="l">Handicap ${provBadge(provOfProfile())}</div>
+      ${idx != null ? `<div class="sv">${idx.toFixed(1)} est. off rated cards</div>` : `<div class="sv">${indexBasis().n} of 3 rated</div>`}
+    </div>
+    <div class="areagrid">${AREAS.map(tile).join('')}</div>
+    ${thin ? `<p class="sm faint">Thin sample — some of these rest on fewer than 36 recorded holes, which is a flag rather than a rate. They redraw off every live round you log.</p>` : ''}
+    ${f ? `<p class="sm" style="margin-top:10px"><b>The one thing on this sample.</b> ${esc(f.h)}</p>` : ''}
+    <div class="linkrow" data-action="go" data-view="coach" style="margin-top:8px">
+      <span class="sm"><b>Coach</b> — the same four areas, with the work attached</span><span class="arr">→</span></div>
+  </div>
+  <div class="card cum-lane">
+    <h2>From the bay ${provBadge('bay')}</h2>
+    <p class="sm faint">Indoor radar. It does not rewrite the on-course four. A measured carry parks beside yours until you take it.</p>
+    <div class="rowgrid g3" style="margin-top:10px">
+      <div class="stat"><div class="v">${measN}/${ladderN || '—'}</div><div class="l">Carries measured ${meaningBtn('carry')}</div></div>
+      <div class="stat"><div class="v">${lastCombine && lastCombine.score != null ? esc(String(lastCombine.score)) : '—'}${meaningBtn('combineScore')}</div>
+        <div class="l">Combine ${provBadge('trackman')}</div></div>
+      <div class="stat"><div class="v">${bays || '—'}</div><div class="l">Bay days</div></div>
+    </div>
+    <div class="linkrow" data-action="go" data-view="bag"><span class="sm"><b>Carry ladder</b> — live number and any parked bay offer</span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="swing" style="border-bottom:none"><span class="sm"><b>Swing lab</b> — Combine, six-metric, strike map</span><span class="arr">→</span></div>
+  </div>
+  ${evoBlock('putting')}
+  ${evoBlock('swing')}
+  ${evoBlock('short-game')}
+  <div class="card flat">
+    <div class="linkrow" data-action="session-category" data-kind="days"><span><b>Days →</b><span class="sm"> the captures this picture is standing on</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="numbers"><span><b>Numbers →</b><span class="sm"> every figure, sourced</span></span><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="timeline" style="border-bottom:none"><span><b>Evidence →</b><span class="sm"> days plus feed applies</span></span><span class="arr">→</span></div>
+  </div>`;
 }
 // NEWEST FIRST, same row shape as the film log — the lab still reads as one record of what
 // has been captured, with the BAY chip saying which kind of capture a row was.
@@ -3314,7 +3472,7 @@ function bayView(i){
                 putting:['putting','Putting Lab'], mental:['mental','Mental Game'] };
   const [view, label] = LAB[BAY_DISC(b)] || LAB.swing;
   return `
-  <button class="backlink" data-action="session-category" data-kind="range">← Range sessions</button>
+  <button class="backlink" data-action="session-category" data-kind="days">← Days</button>
   <h2>${esc(fmtDate(b.date))} · ${esc(b.mode || 'Range practice')}</h2>
   <p class="sm">${esc(b.venue || '')} · ${esc(b.setup || '')}</p>
   ${d.clubs && d.clubs.length ? `<div class="card bayvisuals">${bayVisualMarkup(d)}</div>` : ''}
@@ -8352,7 +8510,7 @@ function bumpGearCounters(){
 
 // ---------- Actions ----------
 const ACTIONS = {
-  'session-category': el => render('sessions', el.dataset.kind || 'range'),
+  'session-category': el => render('sessions', el.dataset.kind || 'days'),
   'meaning': el => openMeaning(el.dataset.metric, {
     view: el.dataset.view, seg: el.dataset.seg, i: el.dataset.i,
     prov: el.dataset.prov, value: el.dataset.value, unit: el.dataset.unit }),

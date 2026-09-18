@@ -1708,3 +1708,8 @@ body.night .readcard{color:var(--green-ink)}
 }
 body.night .prov.p-est{color:var(--gold);border-color:var(--gold)}
 body.night .meanbtn{color:var(--green-ink)}
+.cum-n{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 0}
+.cum-n span{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card2);color:var(--gtext);line-height:1.3}
+.cum-lane h2{margin-top:0}
+.session-row .session-date{display:flex;flex-wrap:wrap;align-items:center;gap:6px}

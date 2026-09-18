@@ -2539,7 +2539,7 @@ clipped search, concatenated "The one thingyou logged this live", no cards, no c
 paper, the tab bar sitting on the last line. Do not thin Today by deleting the theme
 or the Aug 30 blocks. Findability is additive.
 
-Current `home()`: `sessionShortcuts` · the four quick links · **search** (no empty-hint
+Current `home()`: `sessionShortcuts` (Days · Cumulative) · the four quick links · **search** (no empty-hint
 dump; placeholder is the hint) · `wxCard` · `theNumbers` · `startRound` · Round prep
 (cheat sheet included) · `oneThing` · the coach tip · `whatsNew` · the return window
 if any · Numbers / Evidence / Decisions / Data. Search, Numbers Index and Evidence
@@ -2722,19 +2722,32 @@ average markers. Keep the
 exact table, the provenance chips and the limitation copy. At 320px the
 visual rows must stay inside the card with no page-level horizontal overflow.
 
-### Session organization and Home quick navigation (v110)
+### Session organization and Home quick navigation (v110 → v118)
 
-Jack wants separate, immediately findable homes for practice and rounds. `sessionShortcuts()`
-is first on Today, Game and Bag. It opens `sessionLibrary()` filtered to Range sessions,
-Simulator rounds, Outdoor rounds or Swing videos. Each list is newest-first with an explicit
-date, session identity and direct detail link. Home also has My Bag, Practice Drills,
-Round Prep and Start/Resume Round links before the weather and statistics.
+Jack wanted separate, immediately findable homes for practice and rounds. v110 put
+`sessionShortcuts()` first on Today, Game and Bag as **four tiles** (Range / Simulator /
+Outdoor / Film). That made the days findable and also **split a week of work into four
+lists**. v118 keeps the days and stops splitting them.
+
+`sessionShortcuts()` is now two tiles: **Days** and **Cumulative**. Days is one newest-first
+list of every capture (bay, outdoor, indoor, film, Combine) with filter chips if you want
+one kind — Range sessions is a filter, not a home. Cumulative is the running picture:
+the same four on-course areas `areaCards()` / `gameAreas()` already compute for Today and
+Coach (do not invent a fifth number), with the n on the page (live holes, outdoor rounds,
+bay sessions, film days). Simulator rounds are days you can open and are **never** in
+those four — `realRounds()` stays the door. Bay and film sit in their own lanes
+(measured carries, Combine, current evolution-grid column). It moves when a day lands;
+the n is the accuracy.
+
+Old `data-kind="range|sim|outdoor|film"` links still resolve as Day filters. Original
+array indices remain the navigation keys after sorting; never navigate using the sorted
+display index. Home still has My Bag, Practice Drills, Round Prep and Start/Resume
+Round before the weather and statistics.
 
 Range charts lead their own Bay detail. Do not embed a practice session's charts inside a
 played round: v109 did that and confused the source. `roundBayVisuals()` now returns only a
 collapsed optional comparison link labeled with the older range date. Ballybunion retains
-its own scorecard, shots and practice plan. Original array indices remain the navigation
-keys after sorting; never navigate using the sorted display index.
+its own scorecard, shots and practice plan.
 The browser regression route from Bag now selects Simulator rounds before opening a card;
 there is intentionally no direct round-card button on the Bag equipment page.
 
@@ -2777,7 +2790,7 @@ of rounding 149.5 to 150. Live v111 was checked through Home → Range sessions:
 cards, Sep 15 first, no pending notice, 54 carry dots and six shot tables. Managed-browser
 desktop screenshot and overflow check passed; mobile viewport emulation was unavailable.
 
-Home → Range sessions → Sep 15 opens this newest card. The pending-analysis copy is gone;
+Home → Days (All or Bay filter) → Sep 15 opens this newest card. The pending-analysis copy is gone;
 if an offline install has not imported the new feed id, the hub truthfully asks it to
 reconnect/refresh. Preserve Sep 14 Map My Bag and the simulator round as separate records.
 Run `node tests/range-sep15.cjs` alongside both round-review suites. Import tests cover
