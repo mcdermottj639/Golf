@@ -99,13 +99,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v122';
+const BUILD = 'v123';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v123', d:'2026-09-18', items:[
+    'THE 7-IRON WAS IN THE RECORDING. Eleven shots: path, face-to-path, smash, speed, launch, spin. Per-shot carries were off-screen, so there is no cleaned 7-iron carry — the screen number stays 131.7. Delivery is complete and now sits on the day and in Cumulative.',
+    '7-IRON FACE-TO-PATH +6.4° — the most open of the three clubs today. Path −6.9°, every shot left of the target. That is the same out-to-in as the woods, with more cut on it.',
+    'A club with delivery and no per-shot carry is no longer dropped from the rings. Analysis still cannot clean a carry it cannot see.' ] },
   { b:'v122', d:'2026-09-18', items:[
     'MISHITS ARE OFF THE AVERAGE. Analysis is the struck balls. A top or skull — carry under half the rest of that club that day — is held out of the bars, the rings, and Cumulative. It stays on the day and in the table, marked not deleted.',
     'THE 3-WOOD READ IS 176.5, NOT 150. Two tops (26.4, 34.9) out of eleven. The 5-wood is 179.1, not 157.6. Same rule on the Sep 15 range: the 8-yard and 15-yard drivers are off the average they were sitting in.',
@@ -3223,28 +3227,32 @@ function analysisClubs(detail){
   const groups = (detail || {}).rangeShots;
   const clubs = (detail || {}).clubs || [];
   if(!Array.isArray(groups) || !groups.length) return clubs;
-  return groups.map((g, i) => {
+  const fromShots = groups.map((g, i) => {
     const struck = struckShots(g);
     const held = mishitShots(g);
     const base = clubs.find(c => c.club === g.club) || clubs[i] || {};
-    const carry = meanKeyed(struck, 'carry');
-    const total = meanKeyed(struck, 'total');
+    const hasCarry = struck.some(s => s.carry != null && Number.isFinite(+s.carry));
+    const carry = hasCarry ? meanKeyed(struck, 'carry') : null;
+    const total = hasCarry ? meanKeyed(struck, 'total') : null;
     return Object.assign({}, base, {
       club: g.club,
       n: struck.length,
       nAll: (g.shots || []).length,
       held: held.length,
-      carry: carry != null ? +carry.toFixed(1) : base.carry,
-      total: total != null ? +total.toFixed(1) : base.total,
+      carry: carry != null ? +carry.toFixed(1) : null,
+      total: total != null ? +total.toFixed(1) : null,
       displayedCarry: base.carry,
       displayedN: base.n
     });
   });
+  const seen = new Set(fromShots.map(c => c.club));
+  return fromShots.concat(clubs.filter(c => !seen.has(c.club)));
 }
 function analysisDelivery(detail){
   const groups = (detail || {}).rangeShots;
-  if(!Array.isArray(groups) || !groups.length) return (detail || {}).delivery || [];
-  return groups.map(g => {
+  const stored = (detail || {}).delivery || [];
+  if(!Array.isArray(groups) || !groups.length) return stored;
+  const fromShots = groups.map(g => {
     const struck = struckShots(g);
     const paths = struck.map(s => s.path).filter(v => v != null && Number.isFinite(+v));
     const faces = struck.map(s => s.face).filter(v => v != null && Number.isFinite(+v));
@@ -3259,6 +3267,8 @@ function analysisDelivery(detail){
       held: mishitShots(g).length
     };
   }).filter(d => d.path != null || d.face != null);
+  const seen = new Set(fromShots.map(d => d.club));
+  return fromShots.concat(stored.filter(d => d && !seen.has(d.club)));
 }
 function rangeShotVisuals(d){
   const groups=d.rangeShots;
@@ -3300,7 +3310,7 @@ function rangeShotVisuals(d){
 function rangeShotTables(d){
   if(!Array.isArray(d.rangeShots)) return '';
   const n=d.rangeShots.reduce((s,c)=>s+c.shots.length,0);
-  const all=[['shot','#'],['carry','Carry yd'],['total','Total yd'],['carryHit','Carry hit'],['totalHit','Total hit'],['cs','Club mph'],['bs','Ball mph'],['smash','Smash'],['la','Launch°'],['spin','Spin rpm'],['aoa','Attack°'],['path','Path°'],['face','Face°'],['ftp','F–P°']];
+  const all=[['shot','#'],['carry','Carry yd'],['total','Total yd'],['carryHit','Carry hit'],['totalHit','Total hit'],['side','Carry side'],['curve','Curve'],['height','Apex'],['cs','Club mph'],['bs','Ball mph'],['smash','Smash'],['la','Launch°'],['ld','Launch dir°'],['spin','Spin rpm'],['aoa','Attack°'],['path','Path°'],['face','Face°'],['ftp','F–P°']];
   const cols=all.filter(([k])=>k==='shot'||d.rangeShots.some(c=>c.shots.some(s=>s[k]!=null)));
   return `<h2>All ${n} shots · exact data</h2><div class="card"><p class="sm">Open a club below; swipe its table sideways for speed, spin and delivery. A dash means unavailable or not transcribed—not zero.</p>
     ${d.rangeShots.map(c=>`<details class="sect"><summary><b>${esc(c.club)} · ${c.shots.length} shots</b></summary>
