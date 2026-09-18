@@ -105,7 +105,9 @@ A displayed TrackMan average that still has the tops in it is not an analysis of
 7. **Drive 320 and 390 before push.** Then CLAUDE.md audit in the same commit.
 
 `rangeShotVisuals()` plots every shot: filled green = struck, open burgundy = held
-out. The bars and rings are the filled ones. The Sep 15 note that used to keep the
+out. The bars and rings are the filled ones. A club whose per-shot carries were
+off-screen still belongs on that card (v126): faded **screen** bar plus path /
+face-to-path, not omitted. The Sep 15 note that used to keep the
 8-yard and 15-yard drivers *in* the average was wrong; v122 reverses it.
 
 ## Data model — READ THIS BEFORE CHANGING BAG / SESSION / COURSE DATA
