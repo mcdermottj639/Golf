@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v124';
+const BUILD = 'v125';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v125', d:'2026-09-18', items:[
+    'AFTER SLOT, SAME DAY. Halfway through Jack started dropping the trail (right) hand to get more in-and-down. Those shots are their own block — not mixed into the first-block average.',
+    'PATH MOVED. 3-wood −6.1° → −1.7° (n=8). 5-wood −4.7° → −2.1° (n=8). Face-to-path did not tighten. 5-wood struck carry 167.4 — not longer than the first block’s 179.1. 3-wood after: carries off-screen, screen 150.3 is not the club.' ] },
   { b:'v124', d:'2026-09-18', items:[
     '150 IS OFF THE 3-WOOD. That was TrackMan’s screen average with two tops in it, not a shot and not the club. The 3-wood number is 176.5 n=9 struck. The two tops stay on the day, marked held out.',
     'BAG OFFER IS 176.5, not 150. Live carry still blank — do not type it onto the course ladder. Venue balls, Normalize on, temp not shown.' ] },
