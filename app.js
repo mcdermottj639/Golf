@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v126';
+const BUILD = 'v127';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v127', d:'2026-09-18', items:[
+    '3-WOOD AFTER SLOT HAS CARRIES NOW. Screen 150.3 n=9 included two tops (21.5, 12.6). Struck is 188.4 n=7 — longer than the first block’s 176.5. Path −2.0° (was −6.1°). 150.3 is not the club.',
+    'Same day, still its own block. Live ladder unchanged.' ] },
   { b:'v126', d:'2026-09-18', items:[
     '7-IRON IS ON THE DAY CARD. Carry vs total was skipping any club with no per-shot carries, so eleven 7-iron shots lived only in the table below the fold. The 7-iron now shows on that card: screen 131.7, labelled screen because those carries were off-screen and cannot be cleaned, plus path −6.9° and face-to-path +6.4°.',
     'SCREEN 157.6 no longer wraps onto its own line under 5-wood. Held-out screen numbers sit under the bar, not in the title.' ] },
