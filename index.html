@@ -58,7 +58,7 @@
 // again each time the app comes back to the foreground), and because sw.js calls
 // skipWaiting() + clients.claim(), a new build takes control the moment it installs and
 // fires 'controllerchange' — at which point we reload once to pick up the new code.
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && window.top === window) {
   // A first-ever visit also fires controllerchange (from clients.claim), and reloading
   // there would be a pointless flash — so only an app that was ALREADY controlled counts.
   var hadController = !!navigator.serviceWorker.controller, reloading = false;

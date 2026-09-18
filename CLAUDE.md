@@ -13,8 +13,10 @@ Hosted on GitHub Pages; installs to the phone home screen via the service worker
 index.html            App shell + nav + service-worker registration
 app.js                The whole app: seed data, state, all views, render logic
                       (incl. the live-round logger — see "Live rounds" below,
-                       the Mental tab, see "The Mental tab", and RELEASES, the
-                       app's own changelog — see "Home ends with What's new")
+                       the Mental tab, see "The Mental tab", RELEASES, the
+                       app's own changelog — see "Home ends with What's new",
+                       and Findability — Numbers Index, Today search, Evidence,
+                       provenance chips and meaning sheets)
 styles.css            "Scorecard Heritage" theme (cream paper, Masters green, burgundy)
 lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
@@ -1154,7 +1156,14 @@ cheap once the harness is up.
 
 ### The numbers on Today (Aug 30 2026)
 
-**Everything Today counts, under one heading**, in one block: a thin row of four stats —
+**v116 (Sep 18 2026): this block is no longer mounted on Today.** `theNumbers()` still
+builds the same reader — same `areaCards()` / `gameAreas()` / `AREA_LAB` contract —
+but Today leads with one scoreboard number (`scoreboardCard()`) and the rest of the
+figures live on the Numbers Index. The rules below still govern how those numbers
+are *computed and labelled*. Do not put the four-tile grid back on Today without
+undoing Findability; add a figure to `numbersCatalog(S)` instead.
+
+**Everything Today counted, under one heading**, in one block: a thin row of four stats —
 **courses · handicap · scramble · up & down** — over four tiles in the order a hole is
 played — **last score · off the tee · irons · putting** — and one paragraph under the lot.
 They were three separate blocks with the start-round button between them until Jack asked
@@ -1675,7 +1684,8 @@ Jack commissioned a redesign; this supersedes the six-tab bar described above. T
   update rows are why the aliases are permanent, not a migration step. A link may also carry
   `data-seg` to ask for a face directly (`data-view="rounds" data-seg="prep"`).
 - `NAV_OF` maps `round` (a round card) to the Rounds button as well as the four labs to Game,
-  and `landed` — the full What's-landed log, which hangs off Today — back to the Today button.
+  and `landed`, `numbers` and `timeline` — the changelog, the Numbers Index and Evidence,
+  all hanging off Today — back to the Today button.
 
 The tab glyphs are **CSS shapes** — a 19px bordered box, round or square, filled when active.
 No SVG, no icon font, no emoji: nothing to load, and legible at label size.
@@ -2517,6 +2527,76 @@ it belongs with. `oneThing()` itself is untouched and still renders `coachFocus(
 `coachSignals()`, so this was purely where a block sits — not a change to what Today claims
 or to the order in which it decides. The rule above still holds: whatever leads Coach is
 what that card shows, wherever on the page it happens to be.
+
+**Sep 18 2026 — Findability pass (v116). Today is five decision blocks.** The Aug 30
+order above is what the page *was*. It had become a dashboard: session library, four
+stat tiles, four chart tiles, start-round, prep, the one thing, the coach tip, the
+changelog, the return window and the data links. Numbers, search and Evidence now exist
+as their own views, so Today keeps only what you decide from in the morning:
+
+1. **The work** — `workCard()`: `coachFocus()` over `coachSignals()` (same pick Coach
+   leads with) plus the one coached lesson. Still the same decision, still the same
+   `evDrawer` rail.
+2. **One scoreboard number** — `scoreboardCard()`: 5-ft makes if a 20 exists, else
+   lag-inside-3 if the card can compute it, else handicap. Always a provenance chip and
+   an ⓘ. If the number quotes cards, `areaCards()` provenance line still sits under it.
+3. **Next round** — one plan (or “no plan”) plus a one-line weather read. Full prep
+   stays a Rounds segment.
+4. **Open window** — the return-window card, omitted when nothing is sittable.
+5. **Shortcuts** — Search · Numbers · Evidence · Start/Resume round.
+
+A one-liner “What’s new” plus **See Evidence →** replaced the folded latest-day
+changelog. `landed` is still the full push log; Evidence (`timeline`) is the mixed
+record (rounds + bay + film + notable feed applies), newest first, stitched from
+`S.rounds` / `S.bays` / `S.sessions` / `S.combines` / `S.updates` — **do not invent
+events**. `theNumbers()` still exists as a reader and is no longer mounted on Today;
+the Numbers Index is the findable surface for those figures. Search, session library
+and the long grids are one tap away, not gone.
+
+### Findability — provenance, meaning, Numbers, search, Evidence (Sep 18 2026)
+
+The job is to make a number **findable, sourced and understandable**. No new capture
+modules. Vocabulary is closed — do not invent a ninth truth kind:
+
+| Chip | Meaning |
+|---|---|
+| ON-COURSE | Logged live round / GHIN-style course facts |
+| BAY | Launch-monitor / Map My Bag session (range-ball caveats apply) |
+| TRACKMAN | Combine or an explicit TM field. **Consistency ≠ SD** and must never be labelled ± |
+| MEASURED | Explicit measurement (hosel stamp, film metric, scored test) |
+| ESTIMATED | Guess, tilde loft, unverified carry |
+| OFFER | `meas.carry` parked beside the live ladder, not yet accepted |
+| FED | Came from a `coach-feed.json` apply |
+| SELF | Mental debrief / Jack-reported |
+
+Helpers live in `app.js`: `provBadge(kind)`, `provOfCarry(row)`, `provOfProfile()`,
+`meaningBtn(metric)`, `openMeaning(metric, extra)` (reuses the cheat-sheet
+`sheetveil`). `MEANING` is the glossary keyed by metric id — at least `handicap`,
+`carry`, `meas.carry`, `cons`, `sd`, `fiveFootMake`, `lagInside3`, `gir`, `putts`,
+`combineScore`, `faceAtImpact`, `grooveRounds`, `returnWindow`. Wire is
+`data-action="meaning" data-metric="carry"`. Never show a bare carry / handicap /
+make-rate without a chip when provenance is knowable. Bay numbers keep the bay
+blind-spot (unmarked balls, normalize settings, not handicap authority).
+
+**Numbers Index** is `data-view="numbers"`, entered from Today and the Game hub.
+`numbersCatalog(S)` is the single builder — `{ id, label, value, unit?, prov, trend?,
+view, seg?, metric }`. Filter chips: All · On-course · Bay · Estimated · Offers.
+Tap a row → meaning sheet + “Open in app →” via existing `go` / `open-bay`. Trend
+only where a history array already exists; do not fake one.
+
+**Today search** (`#hqSearch`) queries `searchIndex(S)` — the catalog plus club
+names, courses, lesson titles, drills, briefings, bay setups. Results grouped
+Numbers · Bag · Courses · Labs · Plans. Empty state: *Try ‘5-wood’, ‘combine’,
+‘handicap’…*. Debounced; the results box updates in place so the keyboard stays.
+
+**Evidence** is `data-view="timeline"`. Entry: Today “Evidence →”, Game hub, and a
+linkrow on Rounds. Not a second changelog — `landed` still owns pushes and
+`RELEASES`. Evidence mixes the things that actually happened.
+
+The `evDrawer` tier chips (`live` / `round` / `bay` / `measured` / `snapshot` /
+`self`) are a different axis — strength of a finding — and stay. Provenance chips
+are what a *number* is. Do not collapse the two vocabularies.
+
 
 ### The evidence drawer (Aug 27 2026 — build a finding's provenance once)
 
