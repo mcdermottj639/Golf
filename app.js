@@ -99,13 +99,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v119';
+const BUILD = 'v120';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v120', d:'2026-09-18', items:[
+    'NEW 3-WOOD, FIRST LOOK. TrackMan displayed 150.0, n=11, consistency 58.6 — that average includes two tops (26.4 and 34.9). The other nine average 176.5, with four of them at 189–201. Jack: felt amazing. That is the struck ball, not the 150.',
+    '5-WOOD displayed 157.6 because of one 28.5; cleaned 179.1, which sits on the Sep 14 map 177.6. 7-IRON 131.7 n=11 cons 12.4 (Sep 14 was 135.9 / 12.5). Per-shot 7-iron carries were off-screen.',
+    'NONE OF THIS REPLACES THE LIVE LADDER. Normalize on, temp not shown, venue balls. The 3-wood row stays blank except for this offer. Do not type 150, and do not type the mini’s 182.4 onto this head.' ] },
   { b:'v119', d:'2026-09-18', items:[
     'BAG SWITCH: the mini driver is OUT of the 14 (kept). The 4-iron stays out. A Cobra DS-ADAPT X 3-wood is IN — stock 15°, Project X Denali Blue 60 Regular, Golf Galaxy SKU 26808014, $199 same-day. Long end is Driver · this 3-wood · 19.5° 5-wood · 2-iron.',
     'THE NEW 3-WOOD HAS NO CARRY. Do not park the Sep 14 TrackMan 3w 182.4 on it — that label was the mini. Both woods sit blank until you hit them. Read the FutureFit33 sleeve (stock 15°, ±2°) when you have it in hand.',
@@ -3180,43 +3184,54 @@ function bayDeliveryVisual(delivery){
 function rangeShotVisuals(d){
   const groups=d.rangeShots;
   if(!Array.isArray(groups)||!groups.length) return '';
-  const max=Math.max(1,...groups.flatMap(c=>[c.target,...c.shots.map(s=>s.total)]));
+  const n=groups.reduce((s,c)=>s+c.shots.length,0);
+  const nums=groups.flatMap(c=>[c.target,...c.shots.map(s=>s.total),...c.shots.map(s=>s.carry)]).filter(Number.isFinite);
+  const max=Math.max(1,...nums);
   const x=v=>(10+v/max*280).toFixed(1);
-  return `<section class="range-analysis" aria-label="September 15 range analysis">
-    <h3>Carry vs total · all 54 shots</h3><p class="sm">Green = carry · gold = total. Averages include every shot, including the very short ones. Distances in yards.</p>
-    ${groups.map((c,i)=>{const avg=d.clubs[i];return `<div class="range-club">
+  const avgOf=c=>(d.clubs||[]).find(x=>x.club===c.club) || (d.clubs||[])[groups.indexOf(c)] || {};
+  const caption=d.rangeCaption || (d.rangeSource
+    ? 'Carry means are TrackMan\'s displayed averages. Total means for 9i and 56° are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.'
+    : 'Averages are TrackMan\'s displayed figures, including the short ones. Distances in yards.');
+  return `<section class="range-analysis" aria-label="Range shot analysis">
+    <h3>Carry vs total · all ${n} shots</h3><p class="sm">Green = carry · gold = total. Averages include every shot, including the very short ones. Distances in yards.</p>
+    ${groups.map(c=>{const avg=avgOf(c); if(avg.carry==null) return ''; return `<div class="range-club">
       <h4>${esc(c.club)} · ${c.shots.length} shots</h4>
-      <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${avg.carry.toFixed(1)}</b></div>
-      <div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${avg.total.toFixed(1)}</b></div>
-      <p class="sm">Target ${c.target} yd · carry hits <b>${c.carryHits.length}/${c.shots.length}</b> · total hits <b>${c.totalHits.length}/${c.shots.length}</b></p>
+      <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
+      ${avg.total!=null?`<div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${(+avg.total).toFixed(1)}</b></div>`:''}
+      ${c.target!=null?`<p class="sm">Target ${c.target} yd · carry hits <b>${(c.carryHits||[]).length}/${c.shots.length}</b> · total hits <b>${(c.totalHits||[]).length}/${c.shots.length}</b></p>`:''}
     </div>`}).join('')}
-    <p class="bvcap">Carry means are TrackMan's displayed averages. Total means for 9i and 56° are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.</p>
-    <h3>Every carry · see the short misses</h3><p class="sm">Each dot is one shot. Vertical line = target distance. All clubs share the same scale.</p>
-    ${groups.map(c=>`<div class="range-club"><b>${esc(c.club)}</b>
-      <svg viewBox="0 0 300 84" role="img" aria-label="${esc(c.club)} carry spread: ${c.shots.map(s=>s.carry).join(', ')} yards. Target ${c.target} yards.">
+    <p class="bvcap">${esc(caption)}</p>
+    <h3>Every carry · see the short misses</h3><p class="sm">Each dot is one shot.${groups.some(c=>c.target!=null)?' Vertical line = target distance.':''} All clubs share the same scale.</p>
+    ${groups.map(c=>{const carries=c.shots.map(s=>s.carry).filter(Number.isFinite); if(!carries.length) return ''; return `<div class="range-club"><b>${esc(c.club)}</b>
+      <svg viewBox="0 0 300 84" role="img" aria-label="${esc(c.club)} carry spread: ${carries.join(', ')} yards.${c.target!=null?` Target ${c.target} yards.`:''}">
       <line x1="10" x2="290" y1="62" y2="62" stroke="currentColor" opacity=".35"/>
-      <line x1="${x(c.target)}" x2="${x(c.target)}" y1="8" y2="65" stroke="var(--burg)" stroke-dasharray="4 3"/>
-      ${c.shots.map((s,i)=>`<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="var(--green)"><title>Shot ${s.shot}: ${s.carry} yd carry, ${s.total} yd total</title></circle>`).join('')}
+      ${c.target!=null?`<line x1="${x(c.target)}" x2="${x(c.target)}" y1="8" y2="65" stroke="var(--burg)" stroke-dasharray="4 3"/>`:''}
+      ${c.shots.map((s,i)=>s.carry==null?'':`<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="var(--green)"><title>Shot ${s.shot}: ${s.carry} yd carry${s.total!=null?`, ${s.total} yd total`:''}</title></circle>`).join('')}
       <text x="10" y="80" fill="currentColor" font-size="10">0 yd</text><text x="290" y="80" text-anchor="end" fill="currentColor" font-size="10">${Math.round(max)} yd</text></svg>
-      <p class="sm faint">Carry range ${Math.min(...c.shots.map(s=>s.carry)).toFixed(1)}–${Math.max(...c.shots.map(s=>s.carry)).toFixed(1)} yd</p></div>`).join('')}
+      <p class="sm faint">Carry range ${Math.min(...carries).toFixed(1)}–${Math.max(...carries).toFixed(1)} yd</p></div>`}).join('')}
   </section>`;
 }
 function rangeShotTables(d){
   if(!Array.isArray(d.rangeShots)) return '';
-  const cols=[['shot','#'],['carry','Carry yd'],['total','Total yd'],['carryHit','Carry hit'],['totalHit','Total hit'],['cs','Club mph'],['bs','Ball mph'],['spin','Spin rpm'],['path','Path°'],['face','Face°'],['ftp','F–P°']];
-  return `<h2>All 54 shots · exact data</h2><div class="card"><p class="sm">Open a club below; swipe its table sideways for speed, spin and delivery. A dash means unavailable or not transcribed—not zero.</p>
+  const n=d.rangeShots.reduce((s,c)=>s+c.shots.length,0);
+  const all=[['shot','#'],['carry','Carry yd'],['total','Total yd'],['carryHit','Carry hit'],['totalHit','Total hit'],['cs','Club mph'],['bs','Ball mph'],['smash','Smash'],['la','Launch°'],['spin','Spin rpm'],['aoa','Attack°'],['path','Path°'],['face','Face°'],['ftp','F–P°']];
+  const cols=all.filter(([k])=>k==='shot'||d.rangeShots.some(c=>c.shots.some(s=>s[k]!=null)));
+  return `<h2>All ${n} shots · exact data</h2><div class="card"><p class="sm">Open a club below; swipe its table sideways for speed, spin and delivery. A dash means unavailable or not transcribed—not zero.</p>
     ${d.rangeShots.map(c=>`<details class="sect"><summary><b>${esc(c.club)} · ${c.shots.length} shots</b></summary>
       <div class="tscroll" tabindex="0" role="region" aria-label="${esc(c.club)} shot data"><table><thead><tr>${cols.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>
       ${c.shots.map(s=>`<tr>${cols.map(([k])=>`<td>${s[k]==null?'—':typeof s[k]==='boolean'?(s[k]?'Yes':'No'):esc(String(s[k]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
-      <p class="sm faint">Video reference: distance rows around ${c.distanceSeconds.join(', ')} seconds; supplementary columns around ${c.metricSeconds.join(', ')} seconds.</p></details>`).join('')}
-    <details class="sect"><summary>Source & coverage</summary><p class="sm">${esc(d.rangeSource.source)} · ${esc(d.rangeSource.alias)}. ${esc(d.rangeSource.dateEvidence)} ${esc(d.rangeSource.coverage)}</p></details></div>`;
+      ${c.distanceSeconds?`<p class="sm faint">Video reference: distance rows around ${c.distanceSeconds.join(', ')} seconds; supplementary columns around ${c.metricSeconds.join(', ')} seconds.</p>`:''}</details>`).join('')}
+    ${d.rangeSource?`<details class="sect"><summary>Source & coverage</summary><p class="sm">${esc(d.rangeSource.source)} · ${esc(d.rangeSource.alias)}. ${esc(d.rangeSource.dateEvidence)} ${esc(d.rangeSource.coverage)}</p></details>`:''}</div>`;
 }
 function bayVisualMarkup(d){
   if(!d || !Array.isArray(d.clubs) || !d.clubs.length) return '';
   const delivery = Array.isArray(d.delivery) ? d.delivery : [];
+  const deliveryNote = d.rangeDeliveryNote || (d.rangeSource
+    ? 'Delivery below uses only verified readings: Driver 5/6, 3w 6/10, 5w 8/9, 6i 9/10, 9i 9/10, 56° 9/9. Rings are averages of those rows.'
+    : '');
   return `${d.rangeShots?rangeShotVisuals(d):bayCarryVisual(d.clubs)}
     ${bayConsistencyVisual(d.clubs)}
-    ${d.rangeShots?'<p class="sm">Delivery below uses only verified readings: Driver 5/6, 3w 6/10, 5w 8/9, 6i 9/10, 9i 9/10, 56° 9/9. Rings are averages of those rows.</p>':''}
+    ${deliveryNote?`<p class="sm">${esc(deliveryNote)}</p>`:''}
     ${bayDeliveryVisual(delivery.length ? delivery : d.clubs)}`;
 }
 function roundBayVisuals(r){
