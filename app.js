@@ -99,13 +99,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v116';
+const BUILD = 'v117';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v117', d:'2026-09-18', items:[
+    'THE THEME IS BACK. v116 replaced the Scorecard Heritage stylesheet with a 43-line chip file, so Today rendered as unstyled HTML — clipped search, no cards, no cream paper, no nav. The 1,671-line sheet is restored; findability CSS is appended, not substituted.',
+    'TODAY IS THE PAGE JACK DESIGNED AGAIN: sessions, quick links, weather, the numbers tiles, start/resume round, round prep, the one thing, the coach tip, what’s landed. Search, Numbers and Evidence are added on top — they do not replace those blocks.',
+    'Search no longer dumps the empty hint onto the home page. Type to filter; try 5-wood, combine, handicap. Numbers and Evidence sit with Decisions at the bottom of Today.' ] },
   { b:'v116', d:'2026-09-18', items:[
     'FINDABILITY PASS: every number you can quote now wears a provenance chip — ON-COURSE, BAY, TRACKMAN, MEASURED, ESTIMATED, OFFER, FED, SELF — and an ⓘ that opens what it means, why it matters for you, and when not to trust it.',
     'NUMBERS INDEX (Today → Numbers, also from Game): one searchable, filterable catalog of handicap, 5-ft makes, lag-inside-3, every ladder carry and parked bay offer, Combine score, groove counters and open return windows. Tap a row to the meaning sheet, then Open in app.',
@@ -1536,11 +1540,15 @@ function searchResultsHTML(q){
     }).join('')}</div>`).join('');
 }
 function todaySearch(){
+  // Empty Today does not print the hint — the placeholder is the hint. Results
+  // appear only once there is a query, so the keyboard is not sitting over a list
+  // of instructions. searchResultsHTML still carries the 5-wood / combine / handicap
+  // empty copy for the no-hits case.
   return `<div class="card hqsearch">
     <label for="hqSearch">Search</label>
-    <input id="hqSearch" type="search" placeholder="Club, course, lesson, number…"
-      value="${esc(searchQ || '')}" autocomplete="off" enterkeyhint="search">
-    <div id="hqResults">${searchResultsHTML(searchQ)}</div>
+    <input id="hqSearch" type="search" placeholder="5-wood, combine…"
+      value="${esc(searchQ || '')}" autocomplete="off" enterkeyhint="search" aria-label="Search the book">
+    <div id="hqResults">${searchQ ? searchResultsHTML(searchQ) : ''}</div>
   </div>`;
 }
 
@@ -2446,19 +2454,72 @@ function startRound(){
 
 // ----- Home -----
 function home(){
-  // Five decision blocks. The long grids, session library and changelog archive
-  // moved to Numbers / Evidence / the labs — same data, not a second copy.
+  // Aug 30 running order (Jack's swap), restored in v117 after v116 replaced it.
+  // Findability is additive: search + Numbers/Evidence links. Do not gut this page.
+  const dl = daysLeft(S.settings.returnDeadline);
+  const pending = pendingReturn();
+  const picks = pickedLessons().slice(0,1);
   return `
+  ${sessionShortcuts()}
+  <div class="home-quicklinks" role="group" aria-label="Quick navigation">
+    <button class="btn ghost" data-action="go" data-view="bag">My Bag</button>
+    <button class="btn ghost" data-action="go" data-view="drills">Practice Drills</button>
+    <button class="btn ghost" data-action="go" data-view="rounds" data-seg="prep">Round Prep</button>
+    <button class="btn" data-action="go" data-view="live">${S.live?'Resume Round':'Start Round'}</button>
+  </div>
   ${todaySearch()}
-  ${workCard()}
-  ${scoreboardCard()}
-  ${prepCardThin()}
-  ${returnWindowCard()}
-  ${todayShortcuts()}
-  ${whatsNewOneLiner()}
-  <p class="sm faint hqfoot"><button class="btn ghost tiny" data-action="go" data-view="data">Data & backup</button>
-    · <button class="btn ghost tiny" data-action="go" data-view="decisions">Decisions</button>
-    · <button class="btn ghost tiny" data-action="go" data-view="landed">What’s landed</button></p>`;
+  ${wxCard()}
+  ${theNumbers()}
+  ${startRound()}
+
+  ${(() => {
+    const p = coursePlans();
+    const next = [...p.up, ...p.standing, ...p.past][0];
+    const rest = p.up.length + p.standing.length + p.past.length - (next ? 1 : 0);
+    return `<div class="card">
+      <h2>Round prep</h2>
+      ${next ? planRow(next)
+      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day — a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Swing Positions, Swing Thoughts) live in the <b>Swing</b> lab, and the at-home training lives in <b>Coach</b>.</p>`}
+      ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="rounds" data-seg="prep">
+        <span class="sm"><b>All round prep</b> · ${rest} more plan${rest === 1 ? '' : 's'} on file</span><span class="arr">→</span></div>` : ''}
+      ${S.live ? '' : `<div class="linkrow" data-action="live-new">
+        <span><b>Play a live round</b><br><span class="sm">Tap each hole in as you go — clubs, fairways, greens, putts</span></span><span class="arr">→</span></div>`}
+      <div class="linkrow" style="border-bottom:none;padding-bottom:0"
+        data-action="cheat-open" data-disc="${next ? 'prep' : 'swing'}">
+        <span><b>⚡ Cheat sheet</b><br><span class="sm">The pre-round read — course, swing, short game, putting, mental</span></span><span class="arr">→</span></div>
+    </div>`;
+  })()}
+
+  ${oneThing()}
+
+  ${picks.length ? `<div class="card">
+    <h2>From your coach today</h2>
+    ${picks.map(p => tipHTML(p)).join('')}
+    <button class="btn ghost tiny" data-action="go" data-view="coach">All lessons →</button>
+  </div>` : ''}
+
+  ${whatsNew()}
+
+  ${!pending ? '' : `
+  <div class="card">
+    <h2>Putter return window</h2>
+    <h3>${dl===null ? 'Deadline not set' : dl + ' days left on the ' + esc(pending.name)}</h3>
+    <p class="sm">${dl===null
+      ? `<span class="warn">Deadline unknown</span> — the ${esc(pending.name)} is still returnable and nothing here knows until when. Find the receipt, confirm the window with the shop, and set it below.`
+      : S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> — confirm the real one with the shop and update it below.' : 'Deadline confirmed.'}</p>
+    <div class="formrow" style="margin-top:8px">
+      <div><label>Deadline</label><input type="date" id="deadlineInput" value="${esc(S.settings.returnDeadline||'')}"></div>
+      <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
+    </div>
+    <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker →</button></p>
+  </div>`}
+
+  <div class="card flat">
+    <div class="linkrow" data-action="go" data-view="numbers"><b>Numbers</b><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="timeline"><b>Evidence</b><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="decisions"><b>Decisions</b><span class="arr">→</span></div>
+    <div class="linkrow" data-action="go" data-view="data"><b>Data & backup</b><span class="arr">→</span></div>
+  </div>`;
 }
 
 function tipHTML(p){

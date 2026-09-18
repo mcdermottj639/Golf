@@ -17,7 +17,9 @@ app.js                The whole app: seed data, state, all views, render logic
                        app's own changelog — see "Home ends with What's new",
                        and Findability — Numbers Index, Today search, Evidence,
                        provenance chips and meaning sheets)
-styles.css            "Scorecard Heritage" theme (cream paper, Masters green, burgundy)
+styles.css            "Scorecard Heritage" theme (cream paper, Masters green, burgundy).
+                      APPEND to this file. Never replace it. v116 shipped a 43-line
+                      chip sheet in its place and Today rendered as unstyled HTML.
 lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
 coach-feed.json       One-way "coach inbox" — see Data model below  ← updates land here
@@ -1156,12 +1158,13 @@ cheap once the harness is up.
 
 ### The numbers on Today (Aug 30 2026)
 
-**v116 (Sep 18 2026): this block is no longer mounted on Today.** `theNumbers()` still
-builds the same reader — same `areaCards()` / `gameAreas()` / `AREA_LAB` contract —
-but Today leads with one scoreboard number (`scoreboardCard()`) and the rest of the
-figures live on the Numbers Index. The rules below still govern how those numbers
-are *computed and labelled*. Do not put the four-tile grid back on Today without
-undoing Findability; add a figure to `numbersCatalog(S)` instead.
+**v117 (Sep 18 2026): `theNumbers()` is mounted on Today again.** v116 took it
+off and left a single scoreboard card; that was the thinning pass, and it
+shipped with the Scorecard Heritage stylesheet deleted, so the page Jack
+designed was gone twice over. Restored. The Numbers Index is still the
+searchable catalog — add a figure to `numbersCatalog(S)` as well as to this
+block, rather than replacing the tiles. The rules below still govern how
+those numbers are *computed and labelled*.
 
 **Everything Today counted, under one heading**, in one block: a thin row of four stats —
 **courses · handicap · scramble · up & down** — over four tiles in the order a hole is
@@ -2528,30 +2531,19 @@ it belongs with. `oneThing()` itself is untouched and still renders `coachFocus(
 or to the order in which it decides. The rule above still holds: whatever leads Coach is
 what that card shows, wherever on the page it happens to be.
 
-**Sep 18 2026 — Findability pass (v116). Today is five decision blocks.** The Aug 30
-order above is what the page *was*. It had become a dashboard: session library, four
-stat tiles, four chart tiles, start-round, prep, the one thing, the coach tip, the
-changelog, the return window and the data links. Numbers, search and Evidence now exist
-as their own views, so Today keeps only what you decide from in the morning:
+**v117 (Sep 18 2026) — this is still the running order.** v116 replaced `home()` with five
+new blocks (`workCard` / `scoreboardCard` / `prepCardThin` / shortcuts / a one-liner
+changelog) and, worse, **replaced `styles.css` wholesale** — 1,671 lines of Scorecard
+Heritage with 43 lines of chip rules. Today rendered as unstyled HTML on the phone:
+clipped search, concatenated "The one thingyou logged this live", no cards, no cream
+paper, the tab bar sitting on the last line. Do not thin Today by deleting the theme
+or the Aug 30 blocks. Findability is additive.
 
-1. **The work** — `workCard()`: `coachFocus()` over `coachSignals()` (same pick Coach
-   leads with) plus the one coached lesson. Still the same decision, still the same
-   `evDrawer` rail.
-2. **One scoreboard number** — `scoreboardCard()`: 5-ft makes if a 20 exists, else
-   lag-inside-3 if the card can compute it, else handicap. Always a provenance chip and
-   an ⓘ. If the number quotes cards, `areaCards()` provenance line still sits under it.
-3. **Next round** — one plan (or “no plan”) plus a one-line weather read. Full prep
-   stays a Rounds segment.
-4. **Open window** — the return-window card, omitted when nothing is sittable.
-5. **Shortcuts** — Search · Numbers · Evidence · Start/Resume round.
-
-A one-liner “What’s new” plus **See Evidence →** replaced the folded latest-day
-changelog. `landed` is still the full push log; Evidence (`timeline`) is the mixed
-record (rounds + bay + film + notable feed applies), newest first, stitched from
-`S.rounds` / `S.bays` / `S.sessions` / `S.combines` / `S.updates` — **do not invent
-events**. `theNumbers()` still exists as a reader and is no longer mounted on Today;
-the Numbers Index is the findable surface for those figures. Search, session library
-and the long grids are one tap away, not gone.
+Current `home()`: `sessionShortcuts` · the four quick links · **search** (no empty-hint
+dump; placeholder is the hint) · `wxCard` · `theNumbers` · `startRound` · Round prep
+(cheat sheet included) · `oneThing` · the coach tip · `whatsNew` · the return window
+if any · Numbers / Evidence / Decisions / Data. Search, Numbers Index and Evidence
+are extra doors, not replacements.
 
 ### Findability — provenance, meaning, Numbers, search, Evidence (Sep 18 2026)
 
