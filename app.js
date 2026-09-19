@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v131';
+const BUILD = 'v132';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v132', d:'2026-09-18', items:[
+    'CARRY vs TOTAL, labelled. “All” was carry and “Best 5” was painted gold like total — that was the mix-up. Green is carry. Gold is total. Best 5 is the longest 5 carries (green bar, burgundy number), not a total.' ] },
   { b:'v131', d:'2026-09-18', items:[
     'CLUB TABLE IS A TABLE AGAIN. Face and face-to-path were dumping 16-decimal floats, after-slot rows had no speed/spin even though the shots had them, and the club names scrolled off the screen. Angles to one decimal. Club column stays put. After-slot 3-wood and 5-wood now show smash, speed, launch, spin from the shots you already sent.',
     'Same Sep 18 numbers. 7-iron 131.7 / best 5 141.8. 112 still out.' ] },
@@ -3295,8 +3297,8 @@ function premierMeans(group){
 function premierLine(p){
   if(!p) return '';
   const bits = ['Best ' + p.n + ' of ' + p.of];
-  if(p.carry != null) bits.push('carry ' + p.carry);
-  if(p.total != null) bits.push('total ' + p.total);
+  if(p.carry != null) bits.push('carry ' + Number(p.carry).toFixed(1));
+  if(p.total != null) bits.push('total ' + Number(p.total).toFixed(1));
   if(p.path != null) bits.push('path ' + baySgn(+Number(p.path).toFixed(1)) + '°');
   if(p.ftp != null) bits.push('face-to-path ' + baySgn(+Number(p.ftp).toFixed(1)) + '°');
   if(p.smash != null) bits.push('smash ' + (+p.smash).toFixed(2));
@@ -3396,20 +3398,21 @@ function rangeShotVisuals(d){
   const delOf=c=>delivery.find(x=>x.club===c.club);
   const caption=d.rangeCaption || (d.rangeSource
       ? 'Carry means are TrackMan\'s displayed averages. Total means for 9i and 56° are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.'
-      : 'All remaining shots, then the best 5 of that batch (best 3 if the batch is short). Ranked by carry. Distances in yards.');
+      : 'Green is carry. Gold is total. Best 5 is the longest 5 carries of that batch.');
   const barBlock=c=>{
     const avg=avgOf(c);
     const del=rangeDelLine(delOf(c));
     const prem=premierMeans(c);
     const screen=avg.displayedCarry != null ? +avg.displayedCarry : null;
     const bestBar = prem && prem.carry != null
-      ? `<div class="range-bar-row best"><span>Best ${prem.n}</span><span class="range-track"><i style="width:${prem.carry/max*100}%"></i></span><b>${prem.carry.toFixed(1)}</b></div>`
+      ? `<div class="range-bar-row best"><span>Best ${prem.n}</span><span class="range-track"><i style="width:${prem.carry/max*100}%"></i></span><b>${prem.carry.toFixed(1)}</b></div>
+      ${prem.total!=null?`<div class="range-bar-row total best-tot"><span>Best tot</span><span class="range-track"><i style="width:${prem.total/max*100}%"></i></span><b>${Number(prem.total).toFixed(1)}</b></div>`:''}`
       : '';
     const bestLine = prem ? `<p class="sm faint">${esc(premierLine(prem))}</p>` : '';
     if(avg.carry != null){
       return `<div class="range-club">
-      <h4>${esc(c.club)} · ${avg.n}</h4>
-      <div class="range-bar-row"><span>All</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
+      <h4>${esc(c.club)} · ${avg.n} shots</h4>
+      <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
       ${avg.total!=null?`<div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${(+avg.total).toFixed(1)}</b></div>`:''}
       ${bestBar}
       ${c.target!=null?`<p class="sm">Target ${c.target} yd · carry hits <b>${(c.carryHits||[]).length}/${c.shots.length}</b> · total hits <b>${(c.totalHits||[]).length}/${c.shots.length}</b></p>`:''}
@@ -3453,10 +3456,10 @@ function rangeShotVisuals(d){
       <p class="sm faint">Carry range ${Math.min(...carries).toFixed(1)}–${Math.max(...carries).toFixed(1)} yd${top.size?` · gold = best ${top.size}`:''}</p></div>`;
   };
   return `<section class="range-analysis" aria-label="Range shot analysis">
-    <h3>All vs best 5</h3><p class="sm">Green = all remaining shots. Gold bar and gold dots = best 5 of that batch (best 3 if fewer than 5). Ranked by carry. Distances in yards.</p>
+    <h3>Carry vs total</h3><p class="sm">Green = carry. Gold = total. Best 5 is the longest 5 carries of that batch (best 3 if fewer than 5) — still carry, not total. Distances in yards.</p>
     ${groups.map(barBlock).join('')}
     <p class="bvcap">${esc(caption)}</p>
-    <h3>Every carry</h3><p class="sm">${groups.some(c=>c.target!=null)?'Vertical line = target distance. ':''}Gold dots = best 5. All clubs share the same scale.</p>
+    <h3>Every carry</h3><p class="sm">${groups.some(c=>c.target!=null)?'Vertical line = target distance. ':''}Green dots = remaining carries. Gold dots = the longest 5. All clubs share the same scale.</p>
     ${groups.map(spreadBlock).join('')}
   </section>`;
 }
