@@ -41393,6 +41393,52 @@
           "rangeCaption": "Two blocks, same day. First block is the session as logged. After slot is after Jack started dropping the trail hand. They are not one average. Analysis is the struck balls in each block. 3-wood after: 188.4 n=7; screen 150.3 is not the club."
         }
       }
+    },
+    {
+      "id": "bay-20260918-hide-mishits-v1",
+      "type": "bay-update",
+      "target": "bay-20260918-gl18-3w-5w-7i",
+      "src": "review:v128",
+      "bay": {
+        "finding": "Halfway through Jack started dropping the trail (right) hand to slot — more in-and-down. Same day, not mixed into the first-block average. 3-wood after: 188.4 n=7, path −2.0° (was −6.1°). 5-wood after: 167.4 n=8, path −2.1° (was −4.7°). Face-to-path did not tighten. Path improved. 3-wood carry got longer when it got up; 5-wood did not. None of this is a 70°F course carry.",
+        "detail": {
+          "gist": "After slot: 3w 188.4 n=7, path −2.0° (was −6.1°). 5w 167.4 n=8, path −2.1°.",
+          "rangeCaption": "Two blocks, same day. First block is the session as logged. After slot is after Jack started dropping the trail hand. They are not one average.",
+          "story": "First block: new DS-ADAPT X 3-wood 176.5 n=9, path −6.1°. 5-wood 179.1 n=6, path −4.7°. 7-iron screen 131.7 n=11 — per-shot carries were off-screen; path −6.9°, face-to-path +6.4°. After slot (trail hand, same day, not mixed): 3-wood 188.4 n=7, path −2.0°. 5-wood 167.4 n=8, path −2.1°. Path improved. Face-to-path did not tighten. 3-wood carry got longer when it got up; 5-wood did not. Venue balls, Normalize on. None of this is a 70°F course carry.",
+          "metrics": [
+            {
+              "k": "3w after",
+              "v": "188.4",
+              "s": "good",
+              "n": "n=7"
+            },
+            {
+              "k": "3w path after",
+              "v": "−2.0°",
+              "s": "good",
+              "n": "n=7 · was −6.1° first block"
+            },
+            {
+              "k": "5w after",
+              "v": "167.4",
+              "s": "mid",
+              "n": "n=8"
+            },
+            {
+              "k": "5w path after",
+              "v": "−2.1°",
+              "s": "good",
+              "n": "n=8 · was −4.7° first block"
+            },
+            {
+              "k": "7i face-to-path",
+              "v": "+6.4°",
+              "s": "warn",
+              "n": "n=11 first block"
+            }
+          ]
+        }
+      }
     }
   ]
 }
