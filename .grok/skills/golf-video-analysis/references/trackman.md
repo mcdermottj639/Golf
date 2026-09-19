@@ -29,6 +29,11 @@ Same day, different swing thought = **two groups**. Label after-slot
 
 ## After the table
 
-Remaining average + best 5 carry. Gist and finding must not still quote the
-raw screen n or a 150 that had tops in it. Live ladder stays blank unless
-Jack says otherwise.
+Hand the shot list to `/golf-number-crunch`. Remaining average + best 5
+carry + the group the sequence made (window vs baseline). Gist and
+finding must not still quote the raw screen n or a 150 that had tops
+in it. Live ladder stays blank unless Jack says otherwise.
+
+A remembered split (“shot 3 or 4”) is a hypothesis. The crunch skill
+runs the scan. Sep 18 7-iron was a window. Sep 18 3-wood after-slot
+was a baseline. Do not copy one name onto the other.
