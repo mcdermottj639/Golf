@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v128';
+const BUILD = 'v129';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v129', d:'2026-09-18', items:[
+    'RANGE TOPS ARE OUT. A skull on the bay is gone from the record — not just hidden. On-course rounds keep every shot.',
+    'ALL vs BEST 5. Every batch now shows the remaining average and the best 5 of that batch (best 3 if it is short), ranked by carry, with those shots’ path, face-to-path and smash. 3-wood first block: 176.5 all / 191.0 best 5. After slot: 188.4 / 192.7.' ] },
   { b:'v128', d:'2026-09-18', items:[
     'MISHITS ARE OFF THE CARD. Tops and skulls stay in the feed so the average stays honest — you just do not have to look at 26 yards next to 196. Bars, dots, and the shot table are the struck balls only.',
     'Same numbers as before: 3-wood 176.5 / 188.4 after slot. 5-wood 179.1 / 167.4. Nothing mixed, nothing deleted.' ] },
@@ -3124,6 +3127,7 @@ const baySgn = v => (v > 0 ? '+' : '') + v;
 const BAY_COLS = [
   ['n',     'N',       v => v],
   ['carry', 'CARRY',   v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
+  ['best',  'BEST 5',  v => Number(v).toFixed(1)],
   ['cons',  'CONSIST.',v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
   ['sd',    '±',       v => Math.round(v)],
   ['total', 'TOTAL',   v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
@@ -3214,10 +3218,9 @@ function rangeShotMedian(xs){
   const m = Math.floor(a.length / 2);
   return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
 }
-// The day keeps every shot. Analysis is the ones that got up.
-// Clear mishit: carry is less than half the median of the rest of that club
-// that day — a top or skull, not a slightly fat 9-iron. mishit:true also holds it out.
-// Two shots are not enough to call a median; those stay unless flagged.
+// Range mishits (tops / skulls) are cut from the live bay record (v129).
+// On-course rounds keep every shot. Clear mishit: carry under half the median
+// of the rest of that club that day, or mishit:true. Two shots are not a median.
 function isClearMishit(shot, group){
   if(shot && shot.mishit === true) return true;
   if(!shot || shot.carry == null || !Number.isFinite(+shot.carry)) return false;
@@ -3234,6 +3237,54 @@ function mishitShots(group){
   const shots = (group && group.shots) || [];
   return shots.filter(s => isClearMishit(s, shots));
 }
+function premierN(n){
+  if(n >= 5) return 5;
+  if(n >= 3) return 3;
+  return 0;
+}
+function shotRank(s){
+  if(s && s.carry != null && Number.isFinite(+s.carry)) return +s.carry;
+  if(s && s.smash != null && Number.isFinite(+s.smash)) return +s.smash;
+  if(s && s.bs != null && Number.isFinite(+s.bs)) return +s.bs;
+  return -Infinity;
+}
+function premierShots(group){
+  const shots = struckShots(group).slice().sort((a,b) => shotRank(b) - shotRank(a));
+  const n = premierN(shots.length);
+  return n ? shots.slice(0, n) : [];
+}
+function premierMeans(group){
+  const shots = premierShots(group);
+  if(!shots.length) return null;
+  const n = k => meanKeyed(shots, k);
+  const carry = n('carry'), total = n('total');
+  return {
+    n: shots.length,
+    of: struckShots(group).length,
+    carry: carry != null ? +carry.toFixed(1) : null,
+    total: total != null ? +total.toFixed(1) : null,
+    path: n('path'),
+    face: n('face'),
+    ftp: n('ftp'),
+    smash: n('smash'),
+    la: n('la'),
+    bs: n('bs'),
+    cs: n('cs'),
+    spin: n('spin'),
+    aoa: n('aoa'),
+    shots
+  };
+}
+function premierLine(p){
+  if(!p) return '';
+  const bits = ['Best ' + p.n + ' of ' + p.of];
+  if(p.carry != null) bits.push('carry ' + p.carry);
+  if(p.total != null) bits.push('total ' + p.total);
+  if(p.path != null) bits.push('path ' + baySgn(+Number(p.path).toFixed(1)) + '°');
+  if(p.ftp != null) bits.push('face-to-path ' + baySgn(+Number(p.ftp).toFixed(1)) + '°');
+  if(p.smash != null) bits.push('smash ' + (+p.smash).toFixed(2));
+  return bits.join(' · ');
+}
 function meanKeyed(shots, key){
   const xs = (shots || []).map(s => s[key]).filter(v => v != null && Number.isFinite(+v)).map(Number);
   return xs.length ? xs.reduce((a,b)=>a+b,0) / xs.length : null;
@@ -3245,6 +3296,7 @@ function analysisClubs(detail){
   const fromShots = groups.map((g, i) => {
     const struck = struckShots(g);
     const held = mishitShots(g);
+    const prem = premierMeans(g);
     const base = clubs.find(c => c.club === g.club) || clubs[i] || {};
     const hasCarry = struck.some(s => s.carry != null && Number.isFinite(+s.carry));
     const carry = hasCarry ? meanKeyed(struck, 'carry') : null;
@@ -3252,10 +3304,12 @@ function analysisClubs(detail){
     return Object.assign({}, base, {
       club: g.club,
       n: struck.length,
-      nAll: (g.shots || []).length,
+      nAll: struck.length,
       held: held.length,
       carry: carry != null ? +carry.toFixed(1) : null,
       total: total != null ? +total.toFixed(1) : null,
+      best: prem && prem.carry != null ? prem.carry : null,
+      bestN: prem ? prem.n : null,
       displayedCarry: base.displayedCarry != null ? base.displayedCarry : base.carry,
       displayedN: base.n
     });
@@ -3301,7 +3355,8 @@ function rangeShotVisuals(d){
   const nums=groups.flatMap(c=>{
     const avg=clubs.find(x=>x.club===c.club) || {};
     const struck=struckShots(c);
-    return [c.target, avg.carry, avg.total, ...struck.map(s=>s.total), ...struck.map(s=>s.carry)];
+    const prem=premierMeans(c);
+    return [c.target, avg.carry, avg.total, prem && prem.carry, prem && prem.total, ...struck.map(s=>s.total), ...struck.map(s=>s.carry)];
   }).filter(Number.isFinite);
   const max=Math.max(1,...nums);
   const x=v=>(10+v/max*280).toFixed(1);
@@ -3309,18 +3364,25 @@ function rangeShotVisuals(d){
   const delOf=c=>delivery.find(x=>x.club===c.club);
   const caption=d.rangeCaption || (d.rangeSource
       ? 'Carry means are TrackMan\'s displayed averages. Total means for 9i and 56° are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.'
-      : 'Averages are the struck balls. Distances in yards.');
+      : 'All remaining shots, then the best 5 of that batch (best 3 if the batch is short). Ranked by carry. Distances in yards.');
   const barBlock=c=>{
     const avg=avgOf(c);
     const del=rangeDelLine(delOf(c));
+    const prem=premierMeans(c);
     const screen=avg.displayedCarry != null ? +avg.displayedCarry : null;
+    const bestBar = prem && prem.carry != null
+      ? `<div class="range-bar-row best"><span>Best ${prem.n}</span><span class="range-track"><i style="width:${prem.carry/max*100}%"></i></span><b>${prem.carry.toFixed(1)}</b></div>`
+      : '';
+    const bestLine = prem ? `<p class="sm faint">${esc(premierLine(prem))}</p>` : '';
     if(avg.carry != null){
       return `<div class="range-club">
       <h4>${esc(c.club)} · ${avg.n}</h4>
-      <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
+      <div class="range-bar-row"><span>All</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
       ${avg.total!=null?`<div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${(+avg.total).toFixed(1)}</b></div>`:''}
+      ${bestBar}
       ${c.target!=null?`<p class="sm">Target ${c.target} yd · carry hits <b>${(c.carryHits||[]).length}/${c.shots.length}</b> · total hits <b>${(c.totalHits||[]).length}/${c.shots.length}</b></p>`:''}
       ${del?`<p class="sm faint">${esc(del)}</p>`:''}
+      ${bestLine}
     </div>`;
     }
     if(screen != null){
@@ -3328,12 +3390,14 @@ function rangeShotVisuals(d){
       <h4>${esc(c.club)} · screen · n=${avg.displayedN || (c.shots||[]).length}</h4>
       <div class="range-bar-row"><span>Screen</span><span class="range-track"><i class="range-screen" style="width:${screen/max*100}%"></i></span><b>${screen.toFixed(1)}</b></div>
       <p class="sm faint">Per-shot carries were off-screen, so this cannot be cleaned.${del ? ' '+esc(del)+'.' : ''}</p>
+      ${bestLine}
     </div>`;
     }
-    if(del){
+    if(del || prem){
       return `<div class="range-club">
-      <h4>${esc(c.club)} · ${(c.shots||[]).length} shots · no carry</h4>
-      <p class="sm faint">${esc(del)}. Per-shot carries were off-screen.</p>
+      <h4>${esc(c.club)} · ${avg.n || (c.shots||[]).length} shots · no carry</h4>
+      ${del?`<p class="sm faint">${esc(del)}. Per-shot carries were off-screen.</p>`:''}
+      ${bestLine}
     </div>`;
     }
     return '';
@@ -3342,23 +3406,25 @@ function rangeShotVisuals(d){
     const struck=struckShots(c).filter(s=>s.carry!=null && Number.isFinite(+s.carry));
     if(!struck.length){
       const del=rangeDelLine(delOf(c));
+      const prem=premierMeans(c);
       return `<div class="range-club"><b>${esc(c.club)}</b>
-      <p class="sm faint">No per-shot carries — that column was off-screen.${del ? ' '+esc(del)+'.' : ''}</p></div>`;
+      <p class="sm faint">No per-shot carries — that column was off-screen.${del ? ' '+esc(del)+'.' : ''}${prem ? ' '+esc(premierLine(prem))+'.' : ''}</p></div>`;
     }
     const carries=struck.map(s=>+s.carry);
+    const top=new Set(premierShots(c));
     return `<div class="range-club"><b>${esc(c.club)}</b>
       <svg viewBox="0 0 300 84" role="img" aria-label="${esc(c.club)} carry spread: ${carries.join(', ')} yards.${c.target!=null?` Target ${c.target} yards.`:''}">
       <line x1="10" x2="290" y1="62" y2="62" stroke="currentColor" opacity=".35"/>
       ${c.target!=null?`<line x1="${x(c.target)}" x2="${x(c.target)}" y1="8" y2="65" stroke="var(--burg)" stroke-dasharray="4 3"/>`:''}
-      ${struck.map((s,i)=>`<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="var(--green)"><title>Shot ${s.shot}: ${s.carry} yd carry${s.total!=null?`, ${s.total} yd total`:''}</title></circle>`).join('')}
+      ${struck.map((s,i)=>`<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="${top.has(s)?'#aa842c':'var(--green)'}"><title>${top.has(s)?'Best · ':''}Shot ${s.shot}: ${s.carry} yd carry${s.total!=null?`, ${s.total} yd total`:''}</title></circle>`).join('')}
       <text x="10" y="80" fill="currentColor" font-size="10">0 yd</text><text x="290" y="80" text-anchor="end" fill="currentColor" font-size="10">${Math.round(max)} yd</text></svg>
-      <p class="sm faint">Carry range ${Math.min(...carries).toFixed(1)}–${Math.max(...carries).toFixed(1)} yd</p></div>`;
+      <p class="sm faint">Carry range ${Math.min(...carries).toFixed(1)}–${Math.max(...carries).toFixed(1)} yd${top.size?` · gold = best ${top.size}`:''}</p></div>`;
   };
   return `<section class="range-analysis" aria-label="Range shot analysis">
-    <h3>Carry vs total</h3><p class="sm">Green = carry · gold = total. Distances in yards. A faded bar is a screen number we cannot clean.</p>
+    <h3>All vs best 5</h3><p class="sm">Green = all remaining shots. Gold bar and gold dots = best 5 of that batch (best 3 if fewer than 5). Ranked by carry. Distances in yards.</p>
     ${groups.map(barBlock).join('')}
     <p class="bvcap">${esc(caption)}</p>
-    <h3>Every carry</h3><p class="sm">${groups.some(c=>c.target!=null)?'Vertical line = target distance. ':''}All clubs share the same scale.</p>
+    <h3>Every carry</h3><p class="sm">${groups.some(c=>c.target!=null)?'Vertical line = target distance. ':''}Gold dots = best 5. All clubs share the same scale.</p>
     ${groups.map(spreadBlock).join('')}
   </section>`;
 }

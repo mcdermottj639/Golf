@@ -11,7 +11,7 @@ for(const f of ['lessons.js','courses-db.js','course-cards.js'])vm.runInContext(
 let src=fs.readFileSync(path.join(root,'app.js'),'utf8');
 src=src.slice(0,src.indexOf('// ---------- Boot ----------'))+`
 rerender=()=>{};toast=()=>{};load();
-window.reviewTest={applyFeed,get:()=>S,bayView,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView};
+window.reviewTest={applyFeed,get:()=>S,bayView,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView,premierMeans};
 })();`;
 vm.runInContext(src,ctx);
 const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'coach-feed.json'),'utf8'));
@@ -38,8 +38,12 @@ assert.equal(w5.n,6);
 assert.equal(w5.held,1);
 assert.equal(w5.carry,179.1);
 const html=T.bayView(T.get().bays.indexOf(sep18));
+assert.equal(w3.best, 191.0);
+assert.equal(w3.bestN, 5);
 assert.ok(html.includes('176.5'));
+assert.ok(html.includes('191.0'));
 assert.ok(html.includes('179.1'));
+assert.ok(html.includes('Best 5'));
 assert.ok(!html.includes('held out'));
 assert.ok(html.includes('exact data'));
 assert.ok(!html.includes('26.4'));
