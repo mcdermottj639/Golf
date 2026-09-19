@@ -440,6 +440,12 @@ hole and "The long second" on another, and only one of those two words is a dire
 works this way now.** Jack approved the Sterling Farms plan as the model. When he names a
 course he's playing:
 
+**On file for Sep 19 2026: Van Cortlandt Park Golf Course** (Bronx — dated briefing +
+standing). Oldest public course in the US, 6,002-yard par 70 card already in
+`course-cards.js`. No prior round of his. Club calls are from that card against the
+current bag (3-wood is the fairway finder). Hazard notes on 2 / 10 / 12 cite a 1979
+review and say where the routing has changed. Ask him the tee set when he starts.
+
 1. **Research the course first.** Hunt the course's own hole-by-hole pro tips (most
    course sites carry a tour; search snippets work when the site itself is blocked), then
    reviews for doglegs, elevation, green complexes, and per-hole yardages.

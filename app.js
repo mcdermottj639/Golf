@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v138';
+const BUILD = 'v139';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v139', d:'2026-09-18', items:[
+    'VAN CORTLANDT TOMORROW. Oldest public course in the country, 6,002 yards, par 70. 3-wood is the fairway finder. 7 is 222, past every measured carry — middle, two putts. 2 and 12 are three-shot par 5s. Opens 7 AM.' ] },
   { b:'v138', d:'2026-09-18', items:[
     'GROK SKILL — NUMBER CRUNCH. /golf-number-crunch turns a raw table into remaining, best 5, and the group the sequence made. Window vs baseline. Mishits out. Carry in red. Video skill transcribes; this one decides. Not a page.' ] },
   { b:'v137', d:'2026-09-18', items:[
