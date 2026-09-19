@@ -53,6 +53,8 @@ const html=T.bayView(T.get().bays.indexOf(sep18));
 assert.equal(w3.best, 191.0);
 assert.equal(w3.bestN, 5);
 assert.ok(html.includes('176.5'));
+assert.ok(!html.includes('222222'));
+assert.ok(html.includes('1.44') || html.includes('1.43'));
 assert.ok(html.includes('191.0'));
 assert.ok(html.includes('179.1'));
 assert.ok(html.includes('Best 5'));

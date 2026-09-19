@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v130';
+const BUILD = 'v131';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v131', d:'2026-09-18', items:[
+    'CLUB TABLE IS A TABLE AGAIN. Face and face-to-path were dumping 16-decimal floats, after-slot rows had no speed/spin even though the shots had them, and the club names scrolled off the screen. Angles to one decimal. Club column stays put. After-slot 3-wood and 5-wood now show smash, speed, launch, spin from the shots you already sent.',
+    'Same Sep 18 numbers. 7-iron 131.7 / best 5 141.8. 112 still out.' ] },
   { b:'v130', d:'2026-09-18', items:[
     '7-IRON CARRIES ARE IN. 131.7 n=11 — that was the real average, no tops. Best 5 is 141.8. Consistency 12.4. Path −6.9°.',
     '112 IS OUT. The after-slot 5-wood at 112 yards / 8′ of apex was a mishit. Half-median kept it because other tops had dragged the median down. The cut is now two-thirds of the cluster that actually got up. 5-wood after: 175.3 n=7 / best 5 182.0.' ] },
@@ -3126,7 +3129,13 @@ function bayProv(b){
 // four columns instead of thirteen empty ones. Thirteen will not fit a phone whatever the
 // padding does, so the table is a `.tscroll`: it scrolls inside its own box rather than
 // taking the page sideways with it.
-const baySgn = v => (v > 0 ? '+' : '') + v;
+const baySgn = v => {
+  const n = +Number(v);
+  if(!Number.isFinite(n)) return String(v);
+  const r = +n.toFixed(1);
+  if(r === 0) return '0';
+  return (r > 0 ? '+' : '') + r;
+};
 const BAY_COLS = [
   ['n',     'N',       v => v],
   ['carry', 'CARRY',   v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
@@ -3135,11 +3144,11 @@ const BAY_COLS = [
   ['sd',    '±',       v => Math.round(v)],
   ['total', 'TOTAL',   v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
   ['curve', 'CURVE yd', baySgn],
-  ['cs',    'CLUB MPH', v => v],
-  ['bs',    'BALL MPH', v => v],
-  ['smash', 'SMASH',   v => v],
-  ['la',    'LAUNCH°', v => v],
-  ['spin',  'SPIN',    v => Math.round(v)],
+  ['cs',    'CLUB MPH', v => Number(v).toFixed(1).replace(/\.0$/, '')],
+  ['bs',    'BALL MPH', v => Number(v).toFixed(1).replace(/\.0$/, '')],
+  ['smash', 'SMASH',   v => Number(v).toFixed(2)],
+  ['la',    'LAUNCH°', v => Number(v).toFixed(1)],
+  ['spin',  'SPIN',    v => String(Math.round(v))],
   ['aoa',   'ATTACK°', baySgn],
   ['path',  'PATH°',   baySgn],
   ['face',  'FACE°',   baySgn],
@@ -3149,7 +3158,7 @@ function bayClubTable(clubs){
   if(!Array.isArray(clubs) || !clubs.length) return '';
   const cols = BAY_COLS.filter(([k]) => clubs.some(c => c[k] != null));
   if(!cols.length) return '';
-  return `<div class="tscroll"><table>
+  return `<div class="tscroll bay-clubs"><table>
     <thead><tr><th>CLUB</th>${cols.map(([, lab]) => `<th>${esc(lab)}</th>`).join('')}</tr></thead>
     <tbody>${clubs.map(c => `<tr><td><b>${esc(c.club ? clubTag(c.club) : '—')}</b></td>
       ${cols.map(([k, , f]) => `<td>${c[k] == null ? '·' : esc(String(f(c[k])))}</td>`).join('')}</tr>`).join('')}
@@ -3309,15 +3318,30 @@ function analysisClubs(detail){
     const hasCarry = struck.some(s => s.carry != null && Number.isFinite(+s.carry));
     const carry = hasCarry ? meanKeyed(struck, 'carry') : null;
     const total = hasCarry ? meanKeyed(struck, 'total') : null;
+    const rnd = (k, d) => {
+      const v = meanKeyed(struck, k);
+      if(v != null) return +Number(v).toFixed(d);
+      if(base[k] != null && Number.isFinite(+base[k])) return +Number(base[k]).toFixed(d);
+      return null;
+    };
     return Object.assign({}, base, {
       club: g.club,
       n: struck.length,
       nAll: struck.length,
       held: held.length,
-      carry: carry != null ? +carry.toFixed(1) : null,
+      carry: carry != null ? +carry.toFixed(1) : (base.carry != null ? +Number(base.carry).toFixed(1) : null),
       total: total != null ? +total.toFixed(1) : null,
       best: prem && prem.carry != null ? prem.carry : null,
       bestN: prem ? prem.n : null,
+      cs: rnd('cs', 1),
+      bs: rnd('bs', 1),
+      smash: rnd('smash', 2),
+      la: rnd('la', 1),
+      spin: rnd('spin', 0),
+      aoa: rnd('aoa', 1),
+      path: rnd('path', 1),
+      face: rnd('face', 1),
+      ftp: rnd('ftp', 1),
       displayedCarry: base.displayedCarry != null ? base.displayedCarry : base.carry,
       displayedN: base.n
     });
@@ -3795,7 +3819,10 @@ function bayView(i){
   const delivery = analysisDelivery(d);
   const clubRows = analyzed.map(c => {
     const x = delivery.find(v => v.club === c.club);
-    const row = x ? { ...c, path:x.path, face:x.face, ftp:x.ftp } : { ...c };
+    const row = { ...c };
+    if(row.path == null && x && x.path != null) row.path = +Number(x.path).toFixed(1);
+    if(row.face == null && x && x.face != null) row.face = +Number(x.face).toFixed(1);
+    if(row.ftp == null && x && x.ftp != null) row.ftp = +Number(x.ftp).toFixed(1);
     if(row.carry == null && row.displayedCarry != null) row.carry = row.displayedCarry;
     return row;
   });

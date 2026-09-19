@@ -325,6 +325,12 @@ td b{font-size:14px}
    with room to spare and there is no reason to make them denser to fix this one. */
 .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tscroll>table{margin-top:0}
+.bay-clubs table{border-collapse:separate;border-spacing:0}
+.bay-clubs th, .bay-clubs td{white-space:nowrap}
+.bay-clubs th:first-child, .bay-clubs td:first-child{
+  position:sticky;left:0;z-index:2;background:var(--card);
+  box-shadow:6px 0 8px -6px rgba(40,24,16,.18);padding-right:10px}
+.bay-clubs thead th:first-child{z-index:3}
 /* The columns holding text the PLAYER typed — his course names, his tee names — may break a
    word rather than set a floor under the table. Nothing breaks while there is slack; it bites
    only when the row genuinely cannot fit, which is what stops one long name (a "Championship"
