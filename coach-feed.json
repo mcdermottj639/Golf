@@ -47131,6 +47131,652 @@
     "type": "history",
     "date": "2026-09",
     "text": "Jack, Sep 18 night: the 2-iron is the fairway finder right now. 3-wood or 5-wood if it needs to be high or draw. The DS-ADAPT X 3-wood stays in the 14 — default tee on the par 4s is the 2-iron; the woods are the high/draw option, and the 3-wood covers the 222-yard 7th. v139 had written 3-wood into every Van Cortlandt tee call because the mini came out the same day. That was the bag story, not his call."
+  },
+  {
+    "id": "briefing-vancortlandt-20260919-360",
+    "type": "briefing",
+    "src": "prep:2026-09-19-360",
+    "briefing": {
+      "course": "Van Cortlandt Park Golf Course",
+      "focus": "First time on the card. Oldest public course in the country — 6,002 yards, par 70, five par 3s. Working rule, still figuring it out: 2-iron is ~215. *Inside 360, 2-iron. Past 360, 3-wood or 5-wood.* Wood if it needs to be high or draw either way. 7 is 222 — 3-wood at the middle, 2-iron is close.",
+      "rules": [
+        "2-iron is ~215. Past 360: 3-wood or 5-wood — still figuring it out",
+        "Inside 360: 2-iron finds the fairway. Wood if high or draw",
+        "2 and 12 are three-shot par 5s (SI 1 and 2)",
+        "7 is 222 — 3-wood at the middle; 2-iron is close",
+        "Short 4s: 6, 8, 15, 16 — not driver",
+        "Cover the middle, never the flag",
+        "Opens 7 AM Saturday"
+      ],
+      "holes": [
+        {
+          "n": 1,
+          "yds": 370,
+          "play": "*3-wood or 5-wood* — 370, past 360",
+          "leaves": "A *5-wood or mid-iron* in",
+          "why": [
+            "370-yard par 4, stroke index 11 — past 360",
+            "Jack, Sep 19: 2-iron is ~215. Past 360, 3-wood or 5-wood. Still figuring it out",
+            "No hole-shape source on file — club call is from the yardage against the bag"
+          ],
+          "club": [
+            "3-wood",
+            "5-wood",
+            "2-iron"
+          ]
+        },
+        {
+          "n": 2,
+          "yds": 619,
+          "play": "Three shots. *2-iron* off the tee. Wood if *high or draw*",
+          "playAs": "Play",
+          "leaves": "A number off the wedge ladder — *122 · 108 · 95 · 80*",
+          "avoid": "Chasing this green in two. It *drops off at the back*",
+          "why": [
+            "*619 yards, stroke index 1* — the hardest hole on the card",
+            "1979 Riverdale Press: drive onto a *plateau*, second shot *blind*, green drops off behind. Trees and rough both sides. Yards have grown 590 → 619; the shape is the same idea",
+            "Three-shot hole. 2-iron (~215) off the tee, then a wood. The 360 line is a par-4 rule — you do not need to cover 360 here. Lay up to a wedge number"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ],
+          "avoidOn": "green"
+        },
+        {
+          "n": 3,
+          "yds": 172,
+          "play": "Club to the *middle* of the green",
+          "leaves": "A two-putt from the middle",
+          "why": [
+            "172-yard par 3, stroke index 17 — the easiest hole on the card",
+            "Sep 18 7-iron remaining is ~131; this is a 5-iron / 6-iron number to the middle, not a pin",
+            "No green-complex source — middle is the standing rule"
+          ]
+        },
+        {
+          "n": 4,
+          "yds": 364,
+          "play": "*3-wood or 5-wood* — 364, just past 360",
+          "leaves": "A *short iron* in",
+          "why": [
+            "364-yard par 4, stroke index 5 — fifth-hardest, *just* past 360",
+            "Working rule: past 360 is a wood. 4 yards is inside 'or so'. Still figuring it out — 2-iron is on the table if the tee looks tight"
+          ],
+          "club": [
+            "3-wood",
+            "5-wood",
+            "2-iron"
+          ]
+        },
+        {
+          "n": 5,
+          "yds": 345,
+          "play": "*2-iron*. Wood if *high or draw*",
+          "leaves": "A *wedge*",
+          "why": [
+            "345-yard par 4, stroke index 9 — inside 360",
+            "2-iron (~215) leaves a wedge or 9-iron. Wood if it needs to be high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 6,
+          "yds": 295,
+          "play": "*2-iron* — not driver. Wood if *high or draw*",
+          "leaves": "A *full wedge*",
+          "why": [
+            "295-yard par 4, stroke index 13 — shortest par 4 on the front",
+            "Driver is how a short hole becomes a no-play. 2-iron still leaves a wedge you own. 5-wood if it has to be high"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 7,
+          "yds": 222,
+          "play": "*3-wood* at the *middle*. 2-iron is ~215 — close",
+          "leaves": "Two putts. Bogey is fine",
+          "avoid": "Chasing the back edge. That is how a 4 becomes a 6",
+          "why": [
+            "*222 yards, stroke index 3* — longest par 3 on the card",
+            "Jack: 2-iron is ~215. 222 is 7 yards past that. Close, still figuring it out. The covering club is still *3-wood* at the middle",
+            "Bay measured 2-iron is 152.3 — that is a sim number, not the one he is playing. 5-wood if it needs to be high, knowing it will be short. Bogey is a good score"
+          ],
+          "club": [
+            "3-wood",
+            "5-wood",
+            "2-iron"
+          ]
+        },
+        {
+          "n": 8,
+          "yds": 318,
+          "play": "*2-iron* — not driver. Wood if *high or draw*",
+          "leaves": "A *wedge*",
+          "why": [
+            "318-yard par 4, stroke index 15 — inside 360",
+            "Short hole, tight trees — 2-iron, then a wedge. Wood if high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 9,
+          "yds": 391,
+          "play": "*3-wood or 5-wood* — 391, past 360",
+          "leaves": "A *mid-iron* to the middle",
+          "why": [
+            "391-yard par 4, stroke index 7 — longest par 4 on the front, past 360",
+            "The *original* 1895 ninth spanned two stone walls and two brooks. That is history, not a pin on today's 9th — do not play a hazard that is not in front of you",
+            "3-wood or 5-wood. 2-iron (~215) leaves ~176 — a long second on a tree-lined hole"
+          ],
+          "club": [
+            "3-wood",
+            "5-wood",
+            "2-iron"
+          ]
+        },
+        {
+          "n": 10,
+          "yds": 475,
+          "play": "Three shots. *2-iron* off the tee. Wood if *high or draw*",
+          "playAs": "Play",
+          "leaves": "A wedge after a second wood",
+          "avoid": "The *left* side of this corridor if the marsh is still there — look before you send it",
+          "why": [
+            "475-yard par 5, stroke index 6. Three shots. 2-iron (~215) then a wood still leaves a third",
+            "1979 Riverdale Press (when this hole was a *par 4*): fences both sides, *swamp left*, rail right. Par is now 5. The corridor may still be that tight — unconfirmed. Look",
+            "Two greens in this park sit on filled marsh from the Deegan work. Do not assume the left is playable. Wood off the tee if it needs to be high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ],
+          "avoidDir": "L",
+          "avoidOn": "tee"
+        },
+        {
+          "n": 11,
+          "yds": 174,
+          "play": "Club to the *middle* of the green",
+          "leaves": "A two-putt",
+          "why": [
+            "174-yard par 3, stroke index 18 — the easiest hole on the course",
+            "Same club as 3. Middle. Do not make this interesting"
+          ]
+        },
+        {
+          "n": 12,
+          "yds": 572,
+          "play": "Three shots. *2-iron* off the tee. Wood if *high or draw*. Second *short of the stream*",
+          "playAs": "Play",
+          "leaves": "A wedge to a *small* green",
+          "avoid": "The *stream* on the second shot",
+          "why": [
+            "*572 yards, stroke index 2* — second-hardest hole, runs parallel to 2",
+            "1979 Riverdale Press: a stream cuts the fairway and can catch the second; the green is one of the smallest on the course, ~60 feet front to back. Tibbetts Brook still runs through this park",
+            "Three-shot hole. 2-iron off the tee. Second shot short of the water — 5-wood if that second has to be high. Wedge onto a small green, stay on it"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 13,
+          "yds": 172,
+          "play": "Club to the *middle* of the green",
+          "leaves": "A two-putt",
+          "why": [
+            "172-yard par 3, stroke index 12 — third of five par 3s, same number as 3",
+            "Middle. The par-3 set is 172 · 222 · 174 · 172 · 190 — four of them are iron greens if you cover the middle"
+          ]
+        },
+        {
+          "n": 14,
+          "yds": 391,
+          "play": "*3-wood or 5-wood* — 391, past 360",
+          "leaves": "A *mid-iron* to the middle",
+          "why": [
+            "391-yard par 4, stroke index 4 — fourth-hardest, past 360",
+            "No hole-shape source. 3-wood or 5-wood. Bogey is fine"
+          ],
+          "club": [
+            "3-wood",
+            "5-wood",
+            "2-iron"
+          ]
+        },
+        {
+          "n": 15,
+          "yds": 302,
+          "play": "*2-iron* — not driver. Wood if *high or draw*",
+          "leaves": "A *full wedge*",
+          "why": [
+            "302-yard par 4, stroke index 14 — inside 360",
+            "Short hole. Driver is how this becomes a six. 2-iron, wedge, two putts. Wood if high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 16,
+          "yds": 292,
+          "play": "*2-iron* — not driver. Wood if *high or draw*",
+          "leaves": "A *wedge*",
+          "why": [
+            "292-yard par 4, stroke index 16 — shortest par 4 on the card",
+            "Giveaway hole if you take the fairway. Nothing here is worth attacking. Wood if high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 17,
+          "yds": 190,
+          "play": "Club to the *middle*. Cover the number",
+          "leaves": "A two-putt from the middle",
+          "avoid": "*Short* — that is the standing miss on approaches",
+          "why": [
+            "190-yard par 3, stroke index 8",
+            "Longer than 3 / 11 / 13. Take the club that carries the middle, not the one that carried 172",
+            "No bunker/water source on this green — middle is the rule, short is the miss to refuse"
+          ],
+          "avoidDir": "S",
+          "avoidOn": "green"
+        },
+        {
+          "n": 18,
+          "yds": 338,
+          "play": "*2-iron* — finish in the fairway. Wood if *high or draw*",
+          "leaves": "A *wedge or short iron*",
+          "why": [
+            "338-yard par 4, stroke index 10 — inside 360",
+            "Walk-off hole. 2-iron (~215), middle, two putts. Driver is optional and not the percentage. Wood if high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "t": "The par 3s",
+          "k": "Five of them, average 186. Four are iron greens if you cover the middle. 7 is the wood — 2-iron is close.",
+          "b": "The set is 172 · 222 · 174 · 172 · 190. Average 186 yards — shorter than Sterling Farms' 203, with one exception that is the same problem.\n\nHole 7 is 222 yards, stroke index 3. Jack: 2-iron is ~215. Seven yards past that. Close, still figuring it out. The covering club is still *3-wood* at the middle. *5-wood* if it needs to be high, knowing it will be short. *2-iron* is on the table if it looks downwind. Bogey is a good score.\n\nThe bay measured 2-iron is 152.3. That is a sim number on a mat. The number he is playing tomorrow is ~215, his, unmeasured.\n\n3, 11 and 13 are the same 172–174 number. 17 is 190 — take the extra club. Middle of the green on all five. You will not know the flag until you are there, and it should not change the club."
+        },
+        {
+          "t": "Driver is optional here",
+          "k": "Working rule: 2-iron ~215. Inside 360, 2-iron. Past 360, 3-wood or 5-wood. Still figuring it out.",
+          "b": "Jack, Sep 19 morning: the 2-iron is like 215. If the hole is further than 360, probably 3-wood or 5-wood. Still figuring it out.\n\nOn this card that puts woods on 1 (370), 4 (364), 9 (391) and 14 (391). 4 is four yards past the line — 2-iron is on the table if the tee looks tight.\n\nInside 360: 5 (345), 6 (295), 8 (318), 15 (302), 16 (292), 18 (338). 2-iron. 3-wood or 5-wood if it needs to be high or draw. A running 3-wood is through the short four.\n\nThe 360 line is a *par-4* rule. 2, 10 and 12 are three-shot par 5s — 2-iron off the tee still, wood if high or draw. You do not need 360 of tee ball to play them.\n\nGolfPass reviews (read Sep 18 2026) flag elevation, narrow fairways and thick rough as the challenge. That is the whole argument against driver: a miss in this rough is the noshot chip, and that chip is two shots before you have a green to play."
+        },
+        {
+          "t": "2 and 12 — the two hard par 5s",
+          "k": "Stroke index 1 and 2. Both are three-shot holes. 12 has a stream on the second.",
+          "b": "Hole 2 is 619 yards, SI 1. 1979 Riverdale Press: drive onto a plateau, second shot blind, green drops off at the back, trees both sides. Yards have grown; the shape is the same idea. 2-iron (~215) off the tee, wood second, lay up to a wedge number. Do not chase it in two. Wood off the tee if it needs to be high or draw.\n\nHole 12 is 572 yards, SI 2, parallel to 2. Same review: a stream cuts the fairway and can catch the second; the green is ~60 feet front to back, one of the smallest on the course. Tibbetts Brook still runs through Van Cortlandt Park. 2-iron off the tee. Second shot short of the water — 5-wood if that second has to be high. Wedge onto a small green, stay on it.\n\nHole 10 is the other par 5, 475 yards, SI 6. Still three shots. 1979 put swamp left and rail right on this corridor when it was a par 4 — look left before you send it; unconfirmed on today's routing."
+        },
+        {
+          "t": "Notes — the paper trail",
+          "k": "Where the course facts come from. You have no card here yet.",
+          "b": "RESEARCHED — the card already on file (course-cards.js, GolfNYC/GolfLink): par 70, OUT 3,096 / IN 2,906 / 6,002, stroke indexes a clean 1–18. Black tees 68.5 / 119. Hole yards used here are that 6,002-yard card. If you play Blue (5,558), the par 3s shrink ~15–20 yards — club off the tee plate, not this sheet. Pars and SI match 18Birdies and GolfTraxx measured back-tee yards.\n\nRESEARCHED — holes 2, 10, 12 hazards: Riverdale Press, 1979. Tight fences, 14 traps and one water hole on that era's routing. Hole 2 plateau / blind second / back-to-front drop. Hole 12 stream and a 60-foot green. Hole 10 swamp left / rail right when it was a par 4. Yards and the 10th's par have changed; the notes admit that. Tibbetts Brook / Van Cortlandt Lake still exist (NYC Parks / Wikipedia).\n\nRESEARCHED — character: oldest public course in the US, opened 1895, Bendelow to 18 in 1899, Stephen Kay renovation (GolfNYC). Tree-lined, elevation, thick rough (GolfPass, read Sep 18 2026). Opens 7 AM Saturday (Jack's Maps screenshot, Sep 18 2026).\n\nNOT SOURCED — doglegs, bunker sides, and pin-adjacent hazards on holes that only have a yardage. Those holes get a club call from the number against the bag, and no avoid line. A confident tee line built on a hole's imagined shape is the failure this plan is written not to make.\n\nNo round of yours is on file here. Everything about score, miss, or 'last time' is absent on purpose. Tell me the tees when you start and the card can take rating / slope.\n\nJack, Sep 19 2026 morning: 2-iron is like 215. Past 360, 3-wood or 5-wood. Still figuring it out. The 360 line is a working rule, not a measurement. Bay 2-iron remains 152.3 (sim). Ladder estimate moves 205 → 215 because that is now his number."
+        }
+      ],
+      "date": "2026-09-19"
+    },
+    "replaces": "briefing-vancortlandt-20260919-2i"
+  },
+  {
+    "id": "briefing-vancortlandt-standing-20260918-360",
+    "type": "briefing",
+    "src": "prep:2026-09-19-360",
+    "briefing": {
+      "course": "Van Cortlandt Park Golf Course",
+      "focus": "First time on the card. Oldest public course in the country — 6,002 yards, par 70, five par 3s. Working rule, still figuring it out: 2-iron is ~215. *Inside 360, 2-iron. Past 360, 3-wood or 5-wood.* Wood if it needs to be high or draw either way. 7 is 222 — 3-wood at the middle, 2-iron is close.",
+      "rules": [
+        "2-iron is ~215. Past 360: 3-wood or 5-wood — still figuring it out",
+        "Inside 360: 2-iron finds the fairway. Wood if high or draw",
+        "2 and 12 are three-shot par 5s (SI 1 and 2)",
+        "7 is 222 — 3-wood at the middle; 2-iron is close",
+        "Short 4s: 6, 8, 15, 16 — not driver",
+        "Cover the middle, never the flag",
+        "Opens 7 AM Saturday"
+      ],
+      "holes": [
+        {
+          "n": 1,
+          "yds": 370,
+          "play": "*3-wood or 5-wood* — 370, past 360",
+          "leaves": "A *5-wood or mid-iron* in",
+          "why": [
+            "370-yard par 4, stroke index 11 — past 360",
+            "Jack, Sep 19: 2-iron is ~215. Past 360, 3-wood or 5-wood. Still figuring it out",
+            "No hole-shape source on file — club call is from the yardage against the bag"
+          ],
+          "club": [
+            "3-wood",
+            "5-wood",
+            "2-iron"
+          ]
+        },
+        {
+          "n": 2,
+          "yds": 619,
+          "play": "Three shots. *2-iron* off the tee. Wood if *high or draw*",
+          "playAs": "Play",
+          "leaves": "A number off the wedge ladder — *122 · 108 · 95 · 80*",
+          "avoid": "Chasing this green in two. It *drops off at the back*",
+          "why": [
+            "*619 yards, stroke index 1* — the hardest hole on the card",
+            "1979 Riverdale Press: drive onto a *plateau*, second shot *blind*, green drops off behind. Trees and rough both sides. Yards have grown 590 → 619; the shape is the same idea",
+            "Three-shot hole. 2-iron (~215) off the tee, then a wood. The 360 line is a par-4 rule — you do not need to cover 360 here. Lay up to a wedge number"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ],
+          "avoidOn": "green"
+        },
+        {
+          "n": 3,
+          "yds": 172,
+          "play": "Club to the *middle* of the green",
+          "leaves": "A two-putt from the middle",
+          "why": [
+            "172-yard par 3, stroke index 17 — the easiest hole on the card",
+            "Sep 18 7-iron remaining is ~131; this is a 5-iron / 6-iron number to the middle, not a pin",
+            "No green-complex source — middle is the standing rule"
+          ]
+        },
+        {
+          "n": 4,
+          "yds": 364,
+          "play": "*3-wood or 5-wood* — 364, just past 360",
+          "leaves": "A *short iron* in",
+          "why": [
+            "364-yard par 4, stroke index 5 — fifth-hardest, *just* past 360",
+            "Working rule: past 360 is a wood. 4 yards is inside 'or so'. Still figuring it out — 2-iron is on the table if the tee looks tight"
+          ],
+          "club": [
+            "3-wood",
+            "5-wood",
+            "2-iron"
+          ]
+        },
+        {
+          "n": 5,
+          "yds": 345,
+          "play": "*2-iron*. Wood if *high or draw*",
+          "leaves": "A *wedge*",
+          "why": [
+            "345-yard par 4, stroke index 9 — inside 360",
+            "2-iron (~215) leaves a wedge or 9-iron. Wood if it needs to be high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 6,
+          "yds": 295,
+          "play": "*2-iron* — not driver. Wood if *high or draw*",
+          "leaves": "A *full wedge*",
+          "why": [
+            "295-yard par 4, stroke index 13 — shortest par 4 on the front",
+            "Driver is how a short hole becomes a no-play. 2-iron still leaves a wedge you own. 5-wood if it has to be high"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 7,
+          "yds": 222,
+          "play": "*3-wood* at the *middle*. 2-iron is ~215 — close",
+          "leaves": "Two putts. Bogey is fine",
+          "avoid": "Chasing the back edge. That is how a 4 becomes a 6",
+          "why": [
+            "*222 yards, stroke index 3* — longest par 3 on the card",
+            "Jack: 2-iron is ~215. 222 is 7 yards past that. Close, still figuring it out. The covering club is still *3-wood* at the middle",
+            "Bay measured 2-iron is 152.3 — that is a sim number, not the one he is playing. 5-wood if it needs to be high, knowing it will be short. Bogey is a good score"
+          ],
+          "club": [
+            "3-wood",
+            "5-wood",
+            "2-iron"
+          ]
+        },
+        {
+          "n": 8,
+          "yds": 318,
+          "play": "*2-iron* — not driver. Wood if *high or draw*",
+          "leaves": "A *wedge*",
+          "why": [
+            "318-yard par 4, stroke index 15 — inside 360",
+            "Short hole, tight trees — 2-iron, then a wedge. Wood if high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 9,
+          "yds": 391,
+          "play": "*3-wood or 5-wood* — 391, past 360",
+          "leaves": "A *mid-iron* to the middle",
+          "why": [
+            "391-yard par 4, stroke index 7 — longest par 4 on the front, past 360",
+            "The *original* 1895 ninth spanned two stone walls and two brooks. That is history, not a pin on today's 9th — do not play a hazard that is not in front of you",
+            "3-wood or 5-wood. 2-iron (~215) leaves ~176 — a long second on a tree-lined hole"
+          ],
+          "club": [
+            "3-wood",
+            "5-wood",
+            "2-iron"
+          ]
+        },
+        {
+          "n": 10,
+          "yds": 475,
+          "play": "Three shots. *2-iron* off the tee. Wood if *high or draw*",
+          "playAs": "Play",
+          "leaves": "A wedge after a second wood",
+          "avoid": "The *left* side of this corridor if the marsh is still there — look before you send it",
+          "why": [
+            "475-yard par 5, stroke index 6. Three shots. 2-iron (~215) then a wood still leaves a third",
+            "1979 Riverdale Press (when this hole was a *par 4*): fences both sides, *swamp left*, rail right. Par is now 5. The corridor may still be that tight — unconfirmed. Look",
+            "Two greens in this park sit on filled marsh from the Deegan work. Do not assume the left is playable. Wood off the tee if it needs to be high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ],
+          "avoidDir": "L",
+          "avoidOn": "tee"
+        },
+        {
+          "n": 11,
+          "yds": 174,
+          "play": "Club to the *middle* of the green",
+          "leaves": "A two-putt",
+          "why": [
+            "174-yard par 3, stroke index 18 — the easiest hole on the course",
+            "Same club as 3. Middle. Do not make this interesting"
+          ]
+        },
+        {
+          "n": 12,
+          "yds": 572,
+          "play": "Three shots. *2-iron* off the tee. Wood if *high or draw*. Second *short of the stream*",
+          "playAs": "Play",
+          "leaves": "A wedge to a *small* green",
+          "avoid": "The *stream* on the second shot",
+          "why": [
+            "*572 yards, stroke index 2* — second-hardest hole, runs parallel to 2",
+            "1979 Riverdale Press: a stream cuts the fairway and can catch the second; the green is one of the smallest on the course, ~60 feet front to back. Tibbetts Brook still runs through this park",
+            "Three-shot hole. 2-iron off the tee. Second shot short of the water — 5-wood if that second has to be high. Wedge onto a small green, stay on it"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 13,
+          "yds": 172,
+          "play": "Club to the *middle* of the green",
+          "leaves": "A two-putt",
+          "why": [
+            "172-yard par 3, stroke index 12 — third of five par 3s, same number as 3",
+            "Middle. The par-3 set is 172 · 222 · 174 · 172 · 190 — four of them are iron greens if you cover the middle"
+          ]
+        },
+        {
+          "n": 14,
+          "yds": 391,
+          "play": "*3-wood or 5-wood* — 391, past 360",
+          "leaves": "A *mid-iron* to the middle",
+          "why": [
+            "391-yard par 4, stroke index 4 — fourth-hardest, past 360",
+            "No hole-shape source. 3-wood or 5-wood. Bogey is fine"
+          ],
+          "club": [
+            "3-wood",
+            "5-wood",
+            "2-iron"
+          ]
+        },
+        {
+          "n": 15,
+          "yds": 302,
+          "play": "*2-iron* — not driver. Wood if *high or draw*",
+          "leaves": "A *full wedge*",
+          "why": [
+            "302-yard par 4, stroke index 14 — inside 360",
+            "Short hole. Driver is how this becomes a six. 2-iron, wedge, two putts. Wood if high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 16,
+          "yds": 292,
+          "play": "*2-iron* — not driver. Wood if *high or draw*",
+          "leaves": "A *wedge*",
+          "why": [
+            "292-yard par 4, stroke index 16 — shortest par 4 on the card",
+            "Giveaway hole if you take the fairway. Nothing here is worth attacking. Wood if high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        },
+        {
+          "n": 17,
+          "yds": 190,
+          "play": "Club to the *middle*. Cover the number",
+          "leaves": "A two-putt from the middle",
+          "avoid": "*Short* — that is the standing miss on approaches",
+          "why": [
+            "190-yard par 3, stroke index 8",
+            "Longer than 3 / 11 / 13. Take the club that carries the middle, not the one that carried 172",
+            "No bunker/water source on this green — middle is the rule, short is the miss to refuse"
+          ],
+          "avoidDir": "S",
+          "avoidOn": "green"
+        },
+        {
+          "n": 18,
+          "yds": 338,
+          "play": "*2-iron* — finish in the fairway. Wood if *high or draw*",
+          "leaves": "A *wedge or short iron*",
+          "why": [
+            "338-yard par 4, stroke index 10 — inside 360",
+            "Walk-off hole. 2-iron (~215), middle, two putts. Driver is optional and not the percentage. Wood if high or draw"
+          ],
+          "club": [
+            "2-iron",
+            "3-wood",
+            "5-wood"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "t": "The par 3s",
+          "k": "Five of them, average 186. Four are iron greens if you cover the middle. 7 is the wood — 2-iron is close.",
+          "b": "The set is 172 · 222 · 174 · 172 · 190. Average 186 yards — shorter than Sterling Farms' 203, with one exception that is the same problem.\n\nHole 7 is 222 yards, stroke index 3. Jack: 2-iron is ~215. Seven yards past that. Close, still figuring it out. The covering club is still *3-wood* at the middle. *5-wood* if it needs to be high, knowing it will be short. *2-iron* is on the table if it looks downwind. Bogey is a good score.\n\nThe bay measured 2-iron is 152.3. That is a sim number on a mat. The number he is playing tomorrow is ~215, his, unmeasured.\n\n3, 11 and 13 are the same 172–174 number. 17 is 190 — take the extra club. Middle of the green on all five. You will not know the flag until you are there, and it should not change the club."
+        },
+        {
+          "t": "Driver is optional here",
+          "k": "Working rule: 2-iron ~215. Inside 360, 2-iron. Past 360, 3-wood or 5-wood. Still figuring it out.",
+          "b": "Jack, Sep 19 morning: the 2-iron is like 215. If the hole is further than 360, probably 3-wood or 5-wood. Still figuring it out.\n\nOn this card that puts woods on 1 (370), 4 (364), 9 (391) and 14 (391). 4 is four yards past the line — 2-iron is on the table if the tee looks tight.\n\nInside 360: 5 (345), 6 (295), 8 (318), 15 (302), 16 (292), 18 (338). 2-iron. 3-wood or 5-wood if it needs to be high or draw. A running 3-wood is through the short four.\n\nThe 360 line is a *par-4* rule. 2, 10 and 12 are three-shot par 5s — 2-iron off the tee still, wood if high or draw. You do not need 360 of tee ball to play them.\n\nGolfPass reviews (read Sep 18 2026) flag elevation, narrow fairways and thick rough as the challenge. That is the whole argument against driver: a miss in this rough is the noshot chip, and that chip is two shots before you have a green to play."
+        },
+        {
+          "t": "2 and 12 — the two hard par 5s",
+          "k": "Stroke index 1 and 2. Both are three-shot holes. 12 has a stream on the second.",
+          "b": "Hole 2 is 619 yards, SI 1. 1979 Riverdale Press: drive onto a plateau, second shot blind, green drops off at the back, trees both sides. Yards have grown; the shape is the same idea. 2-iron (~215) off the tee, wood second, lay up to a wedge number. Do not chase it in two. Wood off the tee if it needs to be high or draw.\n\nHole 12 is 572 yards, SI 2, parallel to 2. Same review: a stream cuts the fairway and can catch the second; the green is ~60 feet front to back, one of the smallest on the course. Tibbetts Brook still runs through Van Cortlandt Park. 2-iron off the tee. Second shot short of the water — 5-wood if that second has to be high. Wedge onto a small green, stay on it.\n\nHole 10 is the other par 5, 475 yards, SI 6. Still three shots. 1979 put swamp left and rail right on this corridor when it was a par 4 — look left before you send it; unconfirmed on today's routing."
+        },
+        {
+          "t": "Notes — the paper trail",
+          "k": "Where the course facts come from. You have no card here yet.",
+          "b": "RESEARCHED — the card already on file (course-cards.js, GolfNYC/GolfLink): par 70, OUT 3,096 / IN 2,906 / 6,002, stroke indexes a clean 1–18. Black tees 68.5 / 119. Hole yards used here are that 6,002-yard card. If you play Blue (5,558), the par 3s shrink ~15–20 yards — club off the tee plate, not this sheet. Pars and SI match 18Birdies and GolfTraxx measured back-tee yards.\n\nRESEARCHED — holes 2, 10, 12 hazards: Riverdale Press, 1979. Tight fences, 14 traps and one water hole on that era's routing. Hole 2 plateau / blind second / back-to-front drop. Hole 12 stream and a 60-foot green. Hole 10 swamp left / rail right when it was a par 4. Yards and the 10th's par have changed; the notes admit that. Tibbetts Brook / Van Cortlandt Lake still exist (NYC Parks / Wikipedia).\n\nRESEARCHED — character: oldest public course in the US, opened 1895, Bendelow to 18 in 1899, Stephen Kay renovation (GolfNYC). Tree-lined, elevation, thick rough (GolfPass, read Sep 18 2026). Opens 7 AM Saturday (Jack's Maps screenshot, Sep 18 2026).\n\nNOT SOURCED — doglegs, bunker sides, and pin-adjacent hazards on holes that only have a yardage. Those holes get a club call from the number against the bag, and no avoid line. A confident tee line built on a hole's imagined shape is the failure this plan is written not to make.\n\nNo round of yours is on file here. Everything about score, miss, or 'last time' is absent on purpose. Tell me the tees when you start and the card can take rating / slope.\n\nJack, Sep 19 2026 morning: 2-iron is like 215. Past 360, 3-wood or 5-wood. Still figuring it out. The 360 line is a working rule, not a measurement. Bay 2-iron remains 152.3 (sim). Ladder estimate moves 205 → 215 because that is now his number."
+        }
+      ]
+    },
+    "replaces": "briefing-vancortlandt-standing-20260918-2i"
+  },
+  {
+    "id": "carry-2iron-215-20260919",
+    "type": "carry-update",
+    "target": "2-iron (utility)",
+    "src": "jack:2026-09-19",
+    "club": {
+      "club": "2-iron (utility)",
+      "loft": "~17°",
+      "carry": 215
+    }
+  },
+  {
+    "id": "history-2i-215-360-20260919",
+    "type": "history",
+    "date": "2026-09",
+    "text": "Jack, Sep 19 morning: 2-iron is like 215. If the hole is further than 360, probably 3-wood or 5-wood. Still figuring it out. Working rule for Van Cortlandt: inside 360, 2-iron; past 360 (1 / 4 / 9 / 14), woods. The 360 line is a par-4 rule — 2, 10 and 12 stay three-shot with 2-iron off the tee. Ladder estimate 205 → 215 (his number, unmeasured). Bay 152.3 stays the sim figure."
   }
   ]
 }

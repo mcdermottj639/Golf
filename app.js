@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v140';
+const BUILD = 'v141';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v141', d:'2026-09-19', items:[
+    '2-IRON ~215. Working rule: inside 360, 2-iron; past 360, 3-wood or 5-wood. Still figuring it out. Van Cortlandt: woods on 1 / 4 / 9 / 14. 7 is 222 — 3-wood, 2-iron is close.' ] },
   { b:'v140', d:'2026-09-18', items:[
     'VAN CORTLANDT TOMORROW. 2-iron is the fairway finder. 3-wood or 5-wood if it needs to be high or draw. 7 is 222 — 3-wood at the middle. Opens 7 AM.' ] },
   { b:'v139', d:'2026-09-18', items:[
