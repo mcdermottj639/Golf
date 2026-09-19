@@ -77,21 +77,22 @@ not correctness: a number can be confidently wrong in a page that renders perfec
 
 ## Review process — every bay day, every analysis pass (v122)
 
-Jack's rule, standing: **the day keeps every shot. Analysis is the struck balls.**
-A displayed TrackMan average that still has the tops in it is not an analysis of the club.
+Jack's rule, standing as of v129: **range mishits are out of the live record.**
+On-course rounds keep every shot. A displayed TrackMan average that still has the
+tops in it is not an analysis of the club.
 
-1. **Transcribe every shot.** Mishits stay in the feed. Never delete them, never fill a
-   missing one with zero, never average a set silently and park the result on the live
-   ladder. **As of v128 they are not drawn on the day card, the dots, or the exact table**
-   — Jack asked not to look at them. The average still excludes them.
-2. **Hold clear mishits out of analysis.** `isClearMishit()`: a shot whose carry is
-   **less than half the median of the rest of that club that day** — a top or skull
-   that did not get up. Explicit `mishit: true` also holds it out. A fat 9-iron at
-   70% of the mean is not a mishit. Two shots are not a median; those stay unless
-   flagged. Without per-shot rows, a displayed average cannot be cleaned — say so,
-   do not guess.
-3. **Keep both ns in the feed.** "TrackMan displayed 150.0 n=11 including two tops;
-   analysis 176.5 n=9." Do not print the mishit carries on the card (v128).
+1. **Transcribe every shot, then cut the range tops.** `isClearMishit()`: carry
+   **less than half the median of the rest of that club that day**, or `mishit: true`.
+   Those rows are dropped from the live bay card, table, rings, and averages. They
+   stay in historical feed entries (append-only) but the app does not read them.
+   On-course round shots are never cut this way. Never fill a missing one with zero,
+   never park a bay average on the live ladder.
+2. **A fat 9-iron at 70% of the mean is not a mishit.** Two shots are not a median;
+   those stay unless flagged. Without per-shot rows, a displayed average cannot be
+   cleaned — say so, do not guess.
+3. **Two reads per batch (v129).** All remaining shots, and the **best 5** (best 3
+   if the batch is short), ranked by carry. Print both. Best-5 is the ceiling of
+   that batch, not a new bag number.
 4. **Path and face rings use the same cut.** `analysisDelivery()` rebuilds the rings
    from struck rows when `rangeShots` exist. Clubs that have delivery but no per-shot
    carry still belong in the rings — do not drop them because the carry column was

@@ -63,7 +63,7 @@ const newer=T.get().bays.find(b=>b._fid==='bay-20260915-range-54');
 assert.equal(T.get().bays.filter(b=>b._fid===newer._fid).length,1);
 assert.equal(newer.detail.rangeShots.reduce((n,c)=>n+c.shots.length,0),54);
 const newHtml=T.bayView(T.get().bays.indexOf(newer));
-for(const phrase of ['Carry vs total','Every carry','exact data','Path + face','125.2','162.3']) assert.ok(newHtml.includes(phrase),phrase);
+for(const phrase of ['All vs best 5','Every carry','exact data','Path + face','125.2','162.3']) assert.ok(newHtml.includes(phrase),phrase);
 assert.ok(!newHtml.includes('held out'));
 assert.ok(!newHtml.includes('including the very short ones'));
 assert.ok(!newHtml.includes('Consistency shape'));
