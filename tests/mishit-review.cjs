@@ -33,7 +33,6 @@ const w3=clubs.find(c=>c.club==='3 wood');
 assert.equal(w3.n,9);
 assert.equal(w3.held,2);
 assert.equal(w3.carry,176.5);
-assert.equal(w3.displayedCarry,150);
 const w5=clubs.find(c=>c.club==='5 wood');
 assert.equal(w5.n,6);
 assert.equal(w5.held,1);
@@ -41,12 +40,14 @@ assert.equal(w5.carry,179.1);
 const html=T.bayView(T.get().bays.indexOf(sep18));
 assert.ok(html.includes('176.5'));
 assert.ok(html.includes('179.1'));
-assert.ok(html.includes('held out'));
-assert.ok(html.includes('All 29 shots · exact data') || html.includes('exact data'));
-assert.ok(html.includes('26.4')); // still on the day
-assert.ok(!html.includes('including the very short ones'));
+assert.ok(!html.includes('held out'));
+assert.ok(html.includes('exact data'));
+assert.ok(!html.includes('26.4'));
+assert.ok(!html.includes('34.9'));
+assert.ok(!html.includes('21.5'));
+assert.ok(!html.includes('12.6'));
 const cum=T.cumulativeView();
-assert.ok(cum.includes('struck-ball') || cum.includes('held out') || cum.includes('Club path'));
+assert.ok(cum.includes('Club path') || cum.includes('Path across'));
 
 const sep15=T.get().bays.find(b=>b._fid==='bay-20260915-range-54');
 const s15=T.analysisClubs(sep15.detail);

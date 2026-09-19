@@ -80,18 +80,18 @@ not correctness: a number can be confidently wrong in a page that renders perfec
 Jack's rule, standing: **the day keeps every shot. Analysis is the struck balls.**
 A displayed TrackMan average that still has the tops in it is not an analysis of the club.
 
-1. **Transcribe every shot.** Mishits stay on the day and in the exact table. Never
-   delete them, never fill a missing one with zero, never average a set silently and
-   park the result on the live ladder.
+1. **Transcribe every shot.** Mishits stay in the feed. Never delete them, never fill a
+   missing one with zero, never average a set silently and park the result on the live
+   ladder. **As of v128 they are not drawn on the day card, the dots, or the exact table**
+   — Jack asked not to look at them. The average still excludes them.
 2. **Hold clear mishits out of analysis.** `isClearMishit()`: a shot whose carry is
    **less than half the median of the rest of that club that day** — a top or skull
    that did not get up. Explicit `mishit: true` also holds it out. A fat 9-iron at
    70% of the mean is not a mishit. Two shots are not a median; those stay unless
    flagged. Without per-shot rows, a displayed average cannot be cleaned — say so,
    do not guess.
-3. **Print both ns.** "TrackMan displayed 150.0 n=11 including two tops; analysis
-   176.5 n=9." The screen number is a fact about the screen. The analysis number is
-   a fact about the struck ball. They are not interchangeable.
+3. **Keep both ns in the feed.** "TrackMan displayed 150.0 n=11 including two tops;
+   analysis 176.5 n=9." Do not print the mishit carries on the card (v128).
 4. **Path and face rings use the same cut.** `analysisDelivery()` rebuilds the rings
    from struck rows when `rangeShots` exist. Clubs that have delivery but no per-shot
    carry still belong in the rings — do not drop them because the carry column was
@@ -2814,13 +2814,12 @@ by 0.1°. Chart averages use available rows and explicitly state their coverage.
 the untranscribed first-row metrics from whole-group averages. Keep the 3w source label:
 the user-confirmed Mini mapping in the round is not automatically a range mapping.
 
-`rangeShotVisuals()` leads the detail with carry/total bars, target outcomes, and all-shot
-carry dots on one scale, then the delivery chart. `rangeShotTables()` exposes all 54 rows
-in six expandable, internally scrolling tables with video timestamps and coverage notes.
-No fabricated consistency values, lateral dispersion coordinates, normalization or venue.
-The driver 8.0/15.4, 3w 15.5 and 6i 36.3 shots stay **on the day** (exact table, marked
-dots). They are **held out of the analysis average** as of v122 — carry under half the
-rest of that club. The wedge 63.6 stays in the average; it is a short shot, not a top.
+`rangeShotVisuals()` leads the day with carry/total bars and struck-ball carry dots.
+`rangeShotTables()` is the struck rows only as of v128 (Jack: do not show the mishit
+numbers on the card). Mishits stay in the feed. The driver 8.0/15.4, 3w 15.5 and 6i 36.3
+shots stay **in the record**. They are **held out of the analysis average** as of v122 —
+carry under half the rest of that club. The wedge 63.6 stays in the average; it is a
+short shot, not a top.
 They support a contact-repeatability read of the day, not rewriting stock carries.
 The exact club table preserves one-decimal total distances, matching the charts instead
 of rounding 149.5 to 150. Live v111 was checked through Home → Range sessions: two separate
