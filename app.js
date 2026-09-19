@@ -99,15 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v134';
+const BUILD = 'v135';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
-  { b:'v134', d:'2026-09-18', items:[
-    'VIDEO SKILL LIVES IN THE APP. Red is the decoder — carry column, shaft plane, trail-arm slot. Same protocol the agent uses on TrackMan screens and swing film, stored so it does not walk off with a chat. Swing Lab → Video skill.' ] },
+  { b:'v135', d:'2026-09-18', items:[
+    'GROK SKILL, NOT A PAGE. Video analysis is /golf-video-analysis — a real Grok skill in the repo, not a Swing Lab screen. Send a TrackMan scroll or a swing clip and it reads carry in red. The extra page from v134 is gone.' ] },
   { b:'v133', d:'2026-09-18', items:[
     'PROOFREAD THE DAY CARD. Path rings had two 3Ws and two 5Ws with no after-slot label. Header still said 49 shots after the tops were out. −2° lost its decimal next to −6.1°. After-slot rows now say 3W · slot. The count is remaining shots, not the raw pile.' ] },
   { b:'v132', d:'2026-09-18', items:[
@@ -1224,7 +1224,6 @@ const TITLES = {
   landed:['What’s landed','Every change to your app, newest first.'],
   numbers:['Numbers','Every figure this app will quote, sourced and explained.'],
   timeline:['Evidence','Rounds, bay, film and feed — newest first.'],
-  videoskill:['Video skill','Red is the decoder. TrackMan screens and swing film.'],
 };
 
 // ----- Findability (v116) -----
@@ -1570,7 +1569,6 @@ function searchIndex(state){
   add('Numbers', 'Numbers Index', 'numbers index catalog metrics', { a:'go', v:'numbers' });
   add('Numbers', 'Evidence timeline', 'evidence timeline landed rounds bay film', { a:'go', v:'timeline' });
   add('Labs', 'Days', 'sessions days range outdoor film simulator rounds', { a:'session-category', kind:'days' });
-  add('Labs', 'Video skill', 'video skill film trackman red carry slot trail hand analysis', { a:'go', v:'videoskill' });
   add('Labs', 'Cumulative', 'cumulative running picture evolving accuracy n holes', { a:'session-category', kind:'cumulative' });
   return rows;
 }
@@ -1880,7 +1878,7 @@ function render(view, arg, keepScroll){
   if(bt){ bt.textContent = BUILD; bt.hidden = view !== 'home'; }
   // The four labs live behind one nav button, so they all light it — and so does every
   // view that hangs off Rounds: a round card, and a course plan you opened from one.
-  const NAV_OF = { sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', videoskill:'game', game:'game', bay:'game',
+  const NAV_OF = { sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
                    drills:'coach', shelf:'coach', lesson:'coach', landed:'home', numbers:'home', timeline:'home',
                    round:'rounds', rounds:'rounds' };
   const navView = NAV_OF[view] || view;
@@ -1890,7 +1888,7 @@ function render(view, arg, keepScroll){
   // side it is the same intention and live() already knows which one it is.
   const teeLab = $('#navTeeLab');
   if(teeLab) teeLab.textContent = S.live ? 'RESUME' : 'TEE';
-  const R = { home, bag, game, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, videoskill:videoSkillView, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
+  const R = { home, bag, game, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
@@ -4468,92 +4466,10 @@ function swing(){
   ${combineCard()}
 
   <h2>Filming guide</h2>
-  <div class="card flat"><div class="linkrow" data-action="go" data-view="videoskill">
-    <span><b>Video skill · read in red</b><br><span class="sm">Carry vs total on a TrackMan screen. Shaft plane and the slot on swing film. Stored in the app.</span></span><span class="arr">→</span></div></div>
   <div class="card flat">
     <p class="sm"><b>1 · Down-the-line</b> — behind the ball, camera at hand/hip height on the target line: plane, path, shaft position at the top.<br>
     <b>2 · Face-on</b> — chest height, square to you: posture, weight shift, hip clearance, low point.<br>
     Film 3 swings per angle in slo-mo (240fps), and grab the sim's numbers — path, attack angle, face-to-path, spin, carry.</p>
-  </div>`;
-}
-
-// ----- Video skill (v134) -----
-// Stored in the app so the protocol does not walk off with a chat. Red is the
-// decoder ink: carry column, shaft plane, trail-arm slot. Agent copy:
-// skills/VIDEO-ANALYSIS.md — keep them in lockstep.
-const VIDEO_SKILL = {
-  line: 'Red is the decoder. If a mark is red, that is the thing to look at.',
-  kinds: [
-    { id:'trackman', title:'TrackMan screen',
-      red:['Carry column','Club + n','Apex under 15′ on a wood'],
-      steps:[
-        'Carry is the left number. Total is gold — do not mix them.',
-        'One club at a time. First block and after-slot stay split.',
-        'If carry is off-screen, leave it blank and reshoot that column.',
-        'Range tops are out. A 5-wood at 112 yards / 8′ of apex is a mishit.'
-      ]},
-    { id:'swing', title:'Swing film',
-      red:['Shaft plane','Trail elbow in-and-down','Target line'],
-      steps:[
-        'Down-the-line first, hand height, on the target line.',
-        'Face-on second, chest height.',
-        'Three swings per angle. One session per day.'
-      ]}
-  ]
-};
-function skillSvgTrackman(){
-  const R='var(--skill-red)';
-  return `<svg class="skill-svg" viewBox="0 0 300 168" role="img" aria-label="TrackMan table: carry column in red, total in gold">
-    <rect x="18" y="10" width="264" height="148" rx="14" fill="var(--card)" stroke="var(--ink18)"/>
-    <text x="36" y="32" fill="var(--ink)" font-family="var(--sans)" font-size="11" font-weight="800">3 WOOD  ·  9</text>
-    <text x="36" y="52" fill="${R}" font-family="var(--sans)" font-size="9" font-weight="800" letter-spacing=".12em">CARRY</text>
-    <text x="118" y="52" fill="var(--gold)" font-family="var(--sans)" font-size="9" font-weight="800" letter-spacing=".12em">TOTAL</text>
-    <text x="198" y="52" fill="var(--ink36)" font-family="var(--sans)" font-size="9" font-weight="800" letter-spacing=".12em">PATH</text>
-    <rect x="30" y="60" width="72" height="78" rx="6" fill="rgba(196,30,58,.08)" stroke="${R}" stroke-width="2"/>
-    <text x="42" y="86" fill="${R}" font-family="var(--serif)" font-size="20" font-weight="700">176.5</text>
-    <text x="42" y="108" fill="${R}" font-family="var(--serif)" font-size="13">191.0</text>
-    <text x="42" y="126" fill="var(--ink50)" font-family="var(--sans)" font-size="9">all / best 5</text>
-    <text x="126" y="86" fill="var(--gold)" font-family="var(--serif)" font-size="18" font-weight="700">211</text>
-    <text x="204" y="86" fill="var(--ink)" font-family="var(--serif)" font-size="16">−6.1°</text>
-    <text x="30" y="150" fill="${R}" font-family="var(--sans)" font-size="10" font-weight="800">RED = CARRY. Do not read total as the club.</text>
-  </svg>`;
-}
-function skillSvgSlot(){
-  const R='var(--skill-red)';
-  return `<svg class="skill-svg" viewBox="0 0 300 168" role="img" aria-label="Down-the-line: red trail arm dropping into the slot">
-    <line x1="150" y1="18" x2="150" y2="150" stroke="var(--ink18)" stroke-dasharray="4 5"/>
-    <text x="156" y="28" fill="${R}" font-family="var(--sans)" font-size="10" font-weight="800">TARGET</text>
-    <circle cx="150" cy="40" r="8" fill="none" stroke="var(--ink)" stroke-width="2"/>
-    <line x1="150" y1="48" x2="150" y2="88" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-    <line x1="150" y1="88" x2="134" y2="130" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-    <line x1="150" y1="88" x2="166" y2="130" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-    <line x1="150" y1="62" x2="118" y2="58" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M118 58 C108 78 112 108 128 118" fill="none" stroke="${R}" stroke-width="3.5" stroke-linecap="round"/>
-    <polygon points="128,118 118,112 126,108" fill="${R}"/>
-    <text x="36" y="78" fill="${R}" font-family="var(--sans)" font-size="12" font-weight="800">SLOT</text>
-    <text x="36" y="96" fill="${R}" font-family="var(--sans)" font-size="11">trail arm</text>
-    <text x="36" y="112" fill="${R}" font-family="var(--sans)" font-size="11">in + down</text>
-    <line x1="150" y1="62" x2="188" y2="108" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/>
-    <line x1="188" y1="108" x2="210" y2="42" stroke="var(--ink50)" stroke-width="2" stroke-linecap="round"/>
-    <text x="168" y="150" fill="${R}" font-family="var(--sans)" font-size="10" font-weight="800">RED = the drop. Shaft plane stays on the line.</text>
-  </svg>`;
-}
-function videoSkillView(){
-  const k = VIDEO_SKILL.kinds;
-  const block = (item, svg) => `<div class="card skill-card">
-    <p class="skill-mark">${esc(item.title)}</p>
-    ${svg}
-    <div class="skill-reds">${item.red.map(t=>`<span>${esc(t)}</span>`).join('')}</div>
-    ${item.steps.map(t=>`<p class="skill-step"><b class="skill-tick">▸</b> ${esc(t)}</p>`).join('')}
-  </div>`;
-  return `
-  <button class="backlink" data-action="go" data-view="swing">← Swing Lab</button>
-  <h2>Video skill</h2>
-  <p class="sm skill-lead">${esc(VIDEO_SKILL.line)} This page is stored in the app. The same rules transcribe a TrackMan scroll and a swing clip.</p>
-  ${block(k[0], skillSvgTrackman())}
-  ${block(k[1], skillSvgSlot())}
-  <div class="card flat">
-    <p class="sm">Agent copy lives at <b>skills/VIDEO-ANALYSIS.md</b>. Update that file and this page together. Never invent a carry. Never mix first block with after-slot. Never park a bay average on the live ladder.</p>
   </div>`;
 }
 
@@ -5720,9 +5636,7 @@ function sessionView(i){
     ${d.compare ? `<details class="sect"><summary><b>Versus prior sessions</b><span class="gist">${esc(splitLead(d.compare)[0])}</span></summary>${prose(d.compare)}</details>` : ''}
     ${d.limits ? `<details class="sect"><summary><b>What this angle couldn't see</b><span class="gist">${esc(splitLead(d.limits)[0])}</span></summary>${prose(d.limits)}</details>` : ''}
     `}
-  </div>
-  <div class="card flat"><div class="linkrow" data-action="go" data-view="videoskill">
-    <span class="sm"><b>Video skill · read in red</b> — carry vs total, shaft plane, the slot</span><span class="arr">→</span></div></div>`;
+  </div>`;
 }
 
 // ----- Round-prep briefing -----

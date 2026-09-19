@@ -18,7 +18,6 @@
   --soft:var(--ink62); --faint:var(--ink50);
   --green:#14512E; --green-ink:#F4EFE2; --green-accent:#2E7D51; --green-deep:#0E3A21;
   --burg:#6E2230; --burg-ink:#F6EFE6; --burg-deep:#4E1722;
-  --skill-red:#C41E3A;
   --gold:#B08A2E; --gold-ink:#8A6A1C;
   --shadow:0 1px 2px rgba(35,32,26,.05);
   --gtext:#14512E; --btext:#6E2230;
@@ -838,7 +837,6 @@ body.night{
   --ink:#e9e7dd; --soft:#b5b2a4; --faint:#8b8879;
   --ink62:#b5b2a4; --ink50:#8b8879; --ink36:rgba(255,255,255,.36); --ink18:rgba(255,255,255,.18);
   --green:#174a2f; --green-ink:#dfe8d8; --green-deep:#0d2c1c; --burg:#a33344; --burg-ink:#f3e3d9;
-  --skill-red:#FF5A6A;
   --burg-deep:#5f1d27; --nav:#0a0f0c;
   --shadow:2px 2px 0 #0a0d0f;
   --gtext:#8fd0a8; --btext:#e0a63c;
@@ -1747,14 +1745,3 @@ body.night .meanbtn{color:var(--green-ink)}
   .cum-split{grid-template-columns:1fr}
   .cump-row{grid-template-columns:46px minmax(0,1fr) 40px}
 }
-
-
-/* Video skill — red is the decoder, nowhere else in the app uses this ink. */
-.skill-lead{margin:0 0 14px}
-.skill-card{border:2px solid var(--skill-red);margin-bottom:14px}
-.skill-mark{margin:0 0 8px;color:var(--skill-red);font-family:var(--sans);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-.skill-svg{display:block;width:100%;height:auto;margin:4px 0 10px}
-.skill-reds{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
-.skill-reds span{font-family:var(--sans);font-size:11px;font-weight:800;color:var(--skill-red);border:1px solid var(--skill-red);border-radius:999px;padding:3px 9px}
-.skill-step{margin:6px 0;font-size:13.5px;line-height:1.45}
-.skill-tick{color:var(--skill-red);margin-right:4px}
