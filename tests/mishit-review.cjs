@@ -25,6 +25,10 @@ assert.equal(T.isClearMishit(tops[0],tops),false);
 
 const fat9=[{carry:97.7},{carry:106},{carry:95.6},{carry:97.2},{carry:100.1},{carry:114.4},{carry:120.3},{carry:108.6},{carry:82.4},{carry:69.5}];
 assert.equal(T.isClearMishit(fat9[9],fat9),false);
+const w5after=[{carry:180},{carry:180.9},{carry:177},{carry:179.5},{carry:80.4},{carry:47.3},{carry:192.8},{carry:156.1},{carry:112},{carry:3.6},{carry:161}];
+assert.equal(T.isClearMishit(w5after[8],w5after),true); // 112 / 8' apex
+assert.equal(T.isClearMishit(w5after[7],w5after),false); // 156.1 got up
+
 
 const sep18=T.get().bays.find(b=>b._fid==='bay-20260918-gl18-3w-5w-7i');
 assert.ok(sep18, 'sep 18 bay on file');
@@ -37,6 +41,14 @@ const w5=clubs.find(c=>c.club==='5 wood');
 assert.equal(w5.n,6);
 assert.equal(w5.held,1);
 assert.equal(w5.carry,179.1);
+const w5b=clubs.find(c=>c.club==='5 wood · after slot');
+assert.equal(w5b.n,7);
+assert.equal(w5b.carry,175.3);
+assert.ok(!T.bayView(T.get().bays.indexOf(sep18)).includes('>112<') && !T.bayView(T.get().bays.indexOf(sep18)).includes('112.0'));
+const i7=clubs.find(c=>c.club==='7-iron');
+assert.equal(i7.carry,131.7);
+assert.equal(i7.best,141.8);
+
 const html=T.bayView(T.get().bays.indexOf(sep18));
 assert.equal(w3.best, 191.0);
 assert.equal(w3.bestN, 5);
