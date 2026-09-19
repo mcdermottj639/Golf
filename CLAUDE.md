@@ -2042,6 +2042,19 @@ Not a page in the PWA. A **Grok skill** at
 DTL, carries. Red = look here (carry, slot, mishits). Keep the skill in this
 repo so it loads in every future Grok session on Caddie HQ.
 
+### Number crunch — Grok skill (standing, Sep 18 2026)
+
+Not a page in the PWA. A **Grok skill** at
+`.grok/skills/golf-number-crunch/SKILL.md`. Slash command:
+`/golf-number-crunch`. After a table is transcribed (or Jack pastes
+carries), this is what averages, cuts mishits, picks premier (best 5 /
+best 3), and names the group from the **sequence** — window vs
+baseline — not from a remembered shot number. Red = remaining carry,
+best 5 carry, the group. 3-wood after-slot held (path −6.1° → −2.0°).
+7-iron later block was a window (run 138.2 n=5, then rest 128.9 n=20).
+Same thought, different half of the delivery; never one average.
+Keep it in this repo so it loads with the video skill.
+
 ### Film is king (standing instruction, Aug 10 2026)
 
 Jack's words are **feel**; the film is **real**. In tabs, plans and session copy, weight

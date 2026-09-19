@@ -26,6 +26,10 @@ When Jack sends a video, follow this file. Depth: `references/trackman.md`,
 at impossible to miss. Carry, mishits, the slot — those go in **red**. Total
 distance, setup chatter, and path-without-carry do not.
 
+**After the table is transcribed, load `/golf-number-crunch`.** This skill
+reads. That skill decides remaining, premier, and whether the sequence is
+a window or a baseline. Do not average here.
+
 ---
 
 ## Which video is this?
@@ -55,8 +59,8 @@ Not red
 • Path −6.1° · face-to-path +1.9°
 ```
 
-Then one sentence of what it means. Then, if it belongs in the app, the feed
-entry (`bay-update` / `session-update`) — append-only, never park a bay
+Then one sentence of what it means. Then run `/golf-number-crunch` on the
+shot list before grouping or writing a `bay-update`. Never park a bay
 average on the live ladder.
 
 If a frame can be marked up, draw **only** the red items (carry column box,
