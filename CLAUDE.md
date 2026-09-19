@@ -2034,12 +2034,13 @@ trailing **`Notes — the paper trail`** section per plan; a changed instruction
 line there, not a main section explaining what it replaced. "REWRITTEN", "reverts",
 "the old rule was" are smells in a main section.
 
-### Video skill (standing, Sep 18 2026)
+### Video analysis — Grok skill (standing, Sep 18 2026)
 
-How to read Jack's videos lives **in the app**: Swing Lab → **Video skill** (`videoskill`).
-Red is the decoder — carry column, shaft plane, trail-arm slot. Agent copy:
-`skills/VIDEO-ANALYSIS.md`. Update that file and `VIDEO_SKILL` in `app.js` together
-and bump `BUILD`. Do not invent a second protocol in chat.
+Not a page in the PWA. A **Grok skill** at
+`.grok/skills/golf-video-analysis/SKILL.md`. Slash command:
+`/golf-video-analysis`. Triggers on TrackMan screen recordings, swing film,
+DTL, carries. Red = look here (carry, slot, mishits). Keep the skill in this
+repo so it loads in every future Grok session on Caddie HQ.
 
 ### Film is king (standing instruction, Aug 10 2026)
 
