@@ -576,7 +576,7 @@ body.night .bayc{background:#7a2334;color:#f6efe6}
 .bvdlegend{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:4px 12px;margin:-3px 0 7px;font-family:var(--sans);font-size:9px;color:var(--faint)}
 .bvdlegend .path{color:var(--t-bay)}.bvdlegend .face{color:var(--gold-ink)}
 .bvditem{padding:5px 0;border-bottom:1px dotted var(--dot)}.bvditem:last-of-type{border-bottom:0}
-.bvdrow{display:grid;grid-template-columns:64px minmax(0,1fr);align-items:center;gap:7px;min-height:22px}
+.bvdrow{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:center;gap:7px;min-height:22px}
 .bvdaxis{position:relative;display:block;height:19px;border-left:1px solid var(--line);border-right:1px solid var(--line);
   background:linear-gradient(90deg,transparent 49.6%,var(--faint) 49.6%,var(--faint) 50.4%,transparent 50.4%)}
 .bvdshot,.bvdot{position:absolute;width:5px;height:5px;border-radius:50%;transform:translateX(-50%);background:var(--t-bay);opacity:.38;top:2px}
@@ -584,7 +584,7 @@ body.night .bayc{background:#7a2334;color:#f6efe6}
 .bvdot.face{top:10px;background:var(--card);border-color:var(--gold)}
 .bvdnums{display:flex;justify-content:flex-end;gap:10px;margin:2px 0 0 71px;font-family:var(--mono);font-size:8px;color:var(--faint)}
 .bvdnums b{color:var(--ink);font-size:8.5px}
-@media(max-width:340px){.bvrow{grid-template-columns:55px minmax(0,1fr) 37px}.bvdrow{grid-template-columns:55px minmax(0,1fr)}.bvgap{margin-left:62px}}
+@media(max-width:340px){.bvrow{grid-template-columns:55px minmax(0,1fr) 37px}.bvdrow{grid-template-columns:64px minmax(0,1fr)}.bvgap{margin-left:62px}}
 /* ---- The swing readout (Sep 17 2026) ------------------------------------------------
    Charts that answer "what am I doing wrong". They reuse the bay visuals' row grid on
    purpose — one vocabulary for a labelled bar, and a layout already proven at 320px —
