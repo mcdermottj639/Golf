@@ -1669,13 +1669,14 @@ body.night .readcard{color:var(--green-ink)}
 .range-analysis { min-width:0; }
 .range-club { padding:12px 0; border-bottom:1px solid var(--line); }
 .range-club h4 { margin:0 0 8px; line-height:1.3; }
-.range-bar-row { display:grid;grid-template-columns:56px minmax(0,1fr) 44px;gap:8px;align-items:center;margin:6px 0;font-size:12px; }
+.range-bar-row { display:grid;grid-template-columns:64px minmax(0,1fr) 44px;gap:8px;align-items:center;margin:6px 0;font-size:12px; }
 .range-bar-row b { text-align:right; }
 .range-track { background:rgba(18,80,48,.08);border-radius:4px;overflow:hidden;height:12px; }
 .range-track i { display:block;height:100%;background:var(--green); }
 .range-bar-row.total .range-track i { background:#aa842c; }
-.range-bar-row.best .range-track i { background:#aa842c; }
+.range-bar-row.best .range-track i { background:var(--green); }
 .range-bar-row.best b { color:var(--burg); }
+.range-bar-row.best-tot b { color:inherit; }
 .range-track i.range-screen { opacity:.45; }
 .range-club svg { display:block;width:100%;height:auto;margin-top:6px; }
 
