@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v129';
+const BUILD = 'v130';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v130', d:'2026-09-18', items:[
+    '7-IRON CARRIES ARE IN. 131.7 n=11 — that was the real average, no tops. Best 5 is 141.8. Consistency 12.4. Path −6.9°.',
+    '112 IS OUT. The after-slot 5-wood at 112 yards / 8′ of apex was a mishit. Half-median kept it because other tops had dragged the median down. The cut is now two-thirds of the cluster that actually got up. 5-wood after: 175.3 n=7 / best 5 182.0.' ] },
   { b:'v129', d:'2026-09-18', items:[
     'RANGE TOPS ARE OUT. A skull on the bay is gone from the record — not just hidden. On-course rounds keep every shot.',
     'ALL vs BEST 5. Every batch now shows the remaining average and the best 5 of that batch (best 3 if it is short), ranked by carry, with those shots’ path, face-to-path and smash. 3-wood first block: 176.5 all / 191.0 best 5. After slot: 188.4 / 192.7.' ] },
@@ -3224,10 +3227,15 @@ function rangeShotMedian(xs){
 function isClearMishit(shot, group){
   if(shot && shot.mishit === true) return true;
   if(!shot || shot.carry == null || !Number.isFinite(+shot.carry)) return false;
-  const others = (group || []).filter(s => s !== shot && s.carry != null && Number.isFinite(+s.carry)).map(s => +s.carry);
-  if(others.length < 2) return false;
-  const med = rangeShotMedian(others);
-  return med > 0 && +shot.carry < med * 0.5;
+  const carries = (group || []).map(s => s.carry).filter(v => v != null && Number.isFinite(+v)).map(Number);
+  if(carries.length < 3) return false;
+  const medAll = rangeShotMedian(carries);
+  if(!(medAll > 0)) return false;
+  // Other tops must not drag the median down (the 112-yard 5-wood with 8' of
+  // apex survived 0.5× of a median that still had 3.6 / 47.3 / 80.4 in it).
+  const cluster = carries.filter(c => c >= medAll * 0.5);
+  const med = rangeShotMedian(cluster.length >= 2 ? cluster : carries);
+  return med > 0 && +shot.carry < med * (2/3);
 }
 function struckShots(group){
   const shots = (group && group.shots) || [];

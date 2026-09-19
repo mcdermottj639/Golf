@@ -426,7 +426,9 @@
           "path": -10.4,
           "spinIndex": 91,
           "smashIndex": 103,
-          "face": -2.8
+          "face": -2.8,
+          "carry": 140.1,
+          "total": 154.2
         },
         {
           "shot": 2,
@@ -444,7 +446,9 @@
           "path": -10.2,
           "spinIndex": null,
           "smashIndex": null,
-          "face": 9.0
+          "face": 9.0,
+          "carry": 100.3,
+          "total": 130.1
         },
         {
           "shot": 3,
@@ -462,7 +466,9 @@
           "path": -7.4,
           "spinIndex": 116,
           "smashIndex": 98,
-          "face": 2.5
+          "face": 2.5,
+          "carry": 125.4,
+          "total": 140.9
         },
         {
           "shot": 4,
@@ -480,7 +486,9 @@
           "path": -7.2,
           "spinIndex": 95,
           "smashIndex": 97,
-          "face": -6.0
+          "face": -6.0,
+          "carry": 144.5,
+          "total": 165.2
         },
         {
           "shot": 5,
@@ -498,7 +506,9 @@
           "path": -6.8,
           "spinIndex": 97,
           "smashIndex": 100,
-          "face": -4.1
+          "face": -4.1,
+          "carry": 152.3,
+          "total": 166.6
         },
         {
           "shot": 6,
@@ -516,7 +526,9 @@
           "path": -7.1,
           "spinIndex": 94,
           "smashIndex": 99,
-          "face": -2.3
+          "face": -2.3,
+          "carry": 136.2,
+          "total": 148.7
         },
         {
           "shot": 7,
@@ -534,7 +546,9 @@
           "path": -1.5,
           "spinIndex": null,
           "smashIndex": null,
-          "face": 0.6
+          "face": 0.6,
+          "carry": 136.1,
+          "total": 157.0
         },
         {
           "shot": 8,
@@ -552,7 +566,9 @@
           "path": -7.0,
           "spinIndex": 115,
           "smashIndex": 92,
-          "face": 2.9
+          "face": 2.9,
+          "carry": 123.4,
+          "total": 136.3
         },
         {
           "shot": 9,
@@ -570,7 +586,9 @@
           "path": -6.0,
           "spinIndex": 88,
           "smashIndex": 101,
-          "face": -1.4
+          "face": -1.4,
+          "carry": 132.5,
+          "total": 147.8
         },
         {
           "shot": 10,
@@ -588,7 +606,9 @@
           "path": -4.1,
           "spinIndex": null,
           "smashIndex": null,
-          "face": -1.6
+          "face": -1.6,
+          "carry": 125.5,
+          "total": 144.7
         },
         {
           "shot": 11,
@@ -606,7 +626,9 @@
           "path": -8.6,
           "spinIndex": 101,
           "smashIndex": 98,
-          "face": -2.7
+          "face": -2.7,
+          "carry": 132.5,
+          "total": 145.9
         }
       ],
       "carryOffscreen": true

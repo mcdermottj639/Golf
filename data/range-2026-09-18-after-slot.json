@@ -384,7 +384,8 @@
           "path": -1.8,
           "spinIndex": 197,
           "smashIndex": 98,
-          "face": -0.7
+          "face": -0.7,
+          "mishit": true
         },
         {
           "shot": 10,
