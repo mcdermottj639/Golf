@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v135';
+const BUILD = 'v136';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v136', d:'2026-09-18', items:[
+    '7-IRON SLOT IS ON SHOT 3. First 140 after two at 110 / 117. Before 113.5 n=2. After 130.7 n=25 / best 5 147.1. Path barely moved (−8.2° → −7.3°). Face-to-path did (8.9 → 5.8). Three worms out. Same thought as the 3-wood; the 3-wood changed path, the 7-iron changed strike.' ] },
   { b:'v135', d:'2026-09-18', items:[
     'GROK SKILL, NOT A PAGE. Video analysis is /golf-video-analysis — a real Grok skill in the repo, not a Swing Lab screen. Send a TrackMan scroll or a swing clip and it reads carry in red. The extra page from v134 is gone.' ] },
   { b:'v133', d:'2026-09-18', items:[
@@ -1180,11 +1182,14 @@ function clubFallback(key){
 function clubName(key){ const c = clubBy(key); return c ? c.name : clubFallback(key); }
 function clubTag(key){
   const raw = String(key || '');
-  const slot = /after slot/i.test(raw);
-  const base = raw.replace(/\s*·\s*after slot.*/i, '').trim() || raw;
+  const after = /after slot/i.test(raw);
+  const before = /before slot/i.test(raw);
+  const base = raw.replace(/\s*·\s*(after|before) slot.*/i, '').trim() || raw;
   const c = clubBy(base) || clubBy(raw);
   const abbr = c ? c.abbr : clubAbbr(clubFallback(base));
-  return slot ? abbr + ' · slot' : abbr;
+  if(after) return abbr + ' · slot';
+  if(before) return abbr + ' · pre';
+  return abbr;
 }
 
 function groovePct(club){ return Math.max(0, Math.round(100 - (club.rounds||0)/GROOVE_LIFE*100)); }
@@ -3125,11 +3130,15 @@ function bayLiveSetup(b){
   const clubs = analysisClubs(d);
   const n = clubs.reduce((s,c)=>s+(+c.n||0),0);
   if(!n) return (b && b.setup) || '';
-  const short = c => clubTag(c.club).replace(' · slot','');
-  const first = clubs.filter(c => !/after slot/i.test(c.club)).map(c => `${short(c)} ${c.n}`);
-  const after = clubs.filter(c => /after slot/i.test(c.club)).map(c => `${short(c)} ${c.n}`);
-  if(after.length) return `${n} remaining · first ${first.join(' · ')} · after slot ${after.join(' · ')}`;
-  return `${n} remaining · ${first.join(' · ')}`;
+  const strip = c => clubTag(c.club).replace(/ · (slot|pre)/,'');
+  const first = clubs.filter(c => !/slot/i.test(c.club)).map(c => `${strip(c)} ${c.n}`);
+  const before = clubs.filter(c => /before slot/i.test(c.club)).map(c => `${strip(c)} ${c.n}`);
+  const after = clubs.filter(c => /after slot/i.test(c.club)).map(c => `${strip(c)} ${c.n}`);
+  const bits = [`${n} remaining`];
+  if(first.length) bits.push('first ' + first.join(' · '));
+  if(before.length) bits.push('before slot ' + before.join(' · '));
+  if(after.length) bits.push('after slot ' + after.join(' · '));
+  return bits.join(' · ');
 }
 // WHAT THE NUMBERS WERE TAKEN UNDER, on every screen they appear on. Three facts decide
 // whether two sessions are comparable and whether a carry transfers to the course, and not
