@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v132';
+const BUILD = 'v133';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v133', d:'2026-09-18', items:[
+    'PROOFREAD THE DAY CARD. Path rings had two 3Ws and two 5Ws with no after-slot label. Header still said 49 shots after the tops were out. −2° lost its decimal next to −6.1°. After-slot rows now say 3W · slot. The count is remaining shots, not the raw pile.' ] },
   { b:'v132', d:'2026-09-18', items:[
     'CARRY vs TOTAL, labelled. “All” was carry and “Best 5” was painted gold like total — that was the mix-up. Green is carry. Gold is total. Best 5 is the longest 5 carries (green bar, burgundy number), not a total.' ] },
   { b:'v131', d:'2026-09-18', items:[
@@ -1174,7 +1176,14 @@ function clubFallback(key){
     .replace(/\b[a-z]/g, c => c.toUpperCase());
 }
 function clubName(key){ const c = clubBy(key); return c ? c.name : clubFallback(key); }
-function clubTag(key){ const c = clubBy(key); return c ? c.abbr : clubAbbr(clubFallback(key)); }
+function clubTag(key){
+  const raw = String(key || '');
+  const slot = /after slot/i.test(raw);
+  const base = raw.replace(/\s*·\s*after slot.*/i, '').trim() || raw;
+  const c = clubBy(base) || clubBy(raw);
+  const abbr = c ? c.abbr : clubAbbr(clubFallback(base));
+  return slot ? abbr + ' · slot' : abbr;
+}
 
 function groovePct(club){ return Math.max(0, Math.round(100 - (club.rounds||0)/GROOVE_LIFE*100)); }
 function weekStreak(){
@@ -3100,9 +3109,26 @@ function bayGist(b){
   return lead.length > 150 ? lead.slice(0, 132).replace(/\s+\S*$/, '') + '…' : lead;
 }
 const baySize = b => {
+  const d = (b && b.detail) || {};
+  if(Array.isArray(d.rangeShots) && d.rangeShots.length){
+    const n = analysisClubs(d).reduce((s,c)=>s+(+c.n||0),0);
+    if(n) return n + ' shots';
+  }
   const m = /(\d+)\s*(shots?|balls?|swings?|putts?|drives?|strokes?)/i.exec((b && b.setup) || '');
   return m ? m[1] + ' ' + m[2].toLowerCase() : '';
 };
+function bayLiveSetup(b){
+  const d = (b && b.detail) || {};
+  if(!Array.isArray(d.rangeShots) || !d.rangeShots.length) return (b && b.setup) || '';
+  const clubs = analysisClubs(d);
+  const n = clubs.reduce((s,c)=>s+(+c.n||0),0);
+  if(!n) return (b && b.setup) || '';
+  const short = c => clubTag(c.club).replace(' · slot','');
+  const first = clubs.filter(c => !/after slot/i.test(c.club)).map(c => `${short(c)} ${c.n}`);
+  const after = clubs.filter(c => /after slot/i.test(c.club)).map(c => `${short(c)} ${c.n}`);
+  if(after.length) return `${n} remaining · first ${first.join(' · ')} · after slot ${after.join(' · ')}`;
+  return `${n} remaining · ${first.join(' · ')}`;
+}
 // WHAT THE NUMBERS WERE TAKEN UNDER, on every screen they appear on. Three facts decide
 // whether two sessions are comparable and whether a carry transfers to the course, and not
 // one of them is visible in the number itself:
@@ -3135,8 +3161,9 @@ const baySgn = v => {
   const n = +Number(v);
   if(!Number.isFinite(n)) return String(v);
   const r = +n.toFixed(1);
-  if(r === 0) return '0';
-  return (r > 0 ? '+' : '') + r;
+  const mag = Math.abs(r).toFixed(1);
+  if(r === 0) return '0.0';
+  return (r > 0 ? '+' : '-') + mag;
 };
 const BAY_COLS = [
   ['n',     'N',       v => v],
@@ -3481,7 +3508,7 @@ function bayVisualMarkup(d){
   if(!d || !Array.isArray(d.clubs) || !d.clubs.length) return '';
   const delivery = analysisDelivery(d);
   const deliveryNote = d.rangeShots
-    ? 'Path and face rings are the struck-ball averages.'
+    ? 'Path and face rings are the club averages for each block.'
     : (d.rangeDeliveryNote || '');
   return `${d.rangeShots?rangeShotVisuals(d):bayCarryVisual(d.clubs)}
     ${d.rangeShots?'':bayConsistencyVisual(d.clubs)}
@@ -3511,7 +3538,7 @@ function allDayRows(){
   const rows = [];
   (S.bays || []).forEach((b, i) => rows.push({
     date:b.date, kind:'range', title:b.mode || b.setup || 'Bay session',
-    sub:[b.venue, b.setup].filter(Boolean).join(' · '),
+    sub:[b.venue, bayLiveSetup(b) || b.setup].filter(Boolean).join(' · '),
     action:'open-bay', i, prov:'bay'
   }));
   (S.sessions || []).forEach((s, i) => rows.push({
@@ -3836,11 +3863,11 @@ function bayView(i){
   return `
   <button class="backlink" data-action="session-category" data-kind="days">← Days</button>
   <h2>${esc(fmtDate(b.date))} · ${esc(b.mode || 'Range practice')}</h2>
-  <p class="sm">${esc(b.venue || '')} · ${esc(b.setup || '')}</p>
+  <p class="sm">${esc(b.venue || '')} · ${esc(bayLiveSetup(b) || b.setup || '')}</p>
   ${d.clubs && d.clubs.length ? `<div class="card bayvisuals">${bayVisualMarkup(d)}</div>` : ''}
   <div class="card">
     <h2>${fmtDate(b.date)} · bay session</h2>
-    <h3>${esc(b.setup || '')}</h3>
+    <h3>${esc(bayLiveSetup(b) || b.setup || '')}</h3>
     ${bayProv(b)}
     ${d.metrics && d.metrics.length ? `<div class="rowgrid g3" style="margin:12px 0 4px">
       ${d.metrics.map(m => `<div class="stat" style="border-top-color:${sc[m.s] || 'var(--green)'}">
