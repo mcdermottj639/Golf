@@ -2034,6 +2034,13 @@ trailing **`Notes — the paper trail`** section per plan; a changed instruction
 line there, not a main section explaining what it replaced. "REWRITTEN", "reverts",
 "the old rule was" are smells in a main section.
 
+### Video skill (standing, Sep 18 2026)
+
+How to read Jack's videos lives **in the app**: Swing Lab → **Video skill** (`videoskill`).
+Red is the decoder — carry column, shaft plane, trail-arm slot. Agent copy:
+`skills/VIDEO-ANALYSIS.md`. Update that file and `VIDEO_SKILL` in `app.js` together
+and bump `BUILD`. Do not invent a second protocol in chat.
+
 ### Film is king (standing instruction, Aug 10 2026)
 
 Jack's words are **feel**; the film is **real**. In tabs, plans and session copy, weight
