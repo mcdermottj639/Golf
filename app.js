@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v136';
+const BUILD = 'v137';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v137', d:'2026-09-18', items:[
+    '7-IRON IS A WINDOW. The sequence, not a remembered split. Open 113.5 n=2. Run 138.2 n=5 in an 11-yard band. Rest 128.9 n=20 / best 5 146.6. Face-to-path 8.9 → 3.1 → 6.5. Path never to −2°. The 3-wood after-slot held. This did not.' ] },
   { b:'v136', d:'2026-09-18', items:[
     '7-IRON SLOT IS ON SHOT 3. First 140 after two at 110 / 117. Before 113.5 n=2. After 130.7 n=25 / best 5 147.1. Path barely moved (−8.2° → −7.3°). Face-to-path did (8.9 → 5.8). Three worms out. Same thought as the 3-wood; the 3-wood changed path, the 7-iron changed strike.' ] },
   { b:'v135', d:'2026-09-18', items:[
@@ -1182,14 +1184,16 @@ function clubFallback(key){
 function clubName(key){ const c = clubBy(key); return c ? c.name : clubFallback(key); }
 function clubTag(key){
   const raw = String(key || '');
-  const after = /after slot/i.test(raw);
-  const before = /before slot/i.test(raw);
-  const base = raw.replace(/\s*·\s*(after|before) slot.*/i, '').trim() || raw;
+  const phase =
+    /after slot/i.test(raw) ? ' · slot' :
+    /before slot/i.test(raw) ? ' · pre' :
+    /· open/i.test(raw) ? ' · open' :
+    /· window/i.test(raw) ? ' · run' :
+    /· rest/i.test(raw) ? ' · rest' : '';
+  const base = raw.replace(/\s*·\s*.*/i, '').trim() || raw;
   const c = clubBy(base) || clubBy(raw);
   const abbr = c ? c.abbr : clubAbbr(clubFallback(base));
-  if(after) return abbr + ' · slot';
-  if(before) return abbr + ' · pre';
-  return abbr;
+  return abbr + phase;
 }
 
 function groovePct(club){ return Math.max(0, Math.round(100 - (club.rounds||0)/GROOVE_LIFE*100)); }
@@ -3130,13 +3134,13 @@ function bayLiveSetup(b){
   const clubs = analysisClubs(d);
   const n = clubs.reduce((s,c)=>s+(+c.n||0),0);
   if(!n) return (b && b.setup) || '';
-  const strip = c => clubTag(c.club).replace(/ · (slot|pre)/,'');
-  const first = clubs.filter(c => !/slot/i.test(c.club)).map(c => `${strip(c)} ${c.n}`);
-  const before = clubs.filter(c => /before slot/i.test(c.club)).map(c => `${strip(c)} ${c.n}`);
+  const strip = c => clubTag(c.club).replace(/ · (slot|pre|open|run|rest)/,'');
+  const first = clubs.filter(c => !/· /.test(c.club)).map(c => `${strip(c)} ${c.n}`);
+  const seq = clubs.filter(c => /· (open|window|rest)/i.test(c.club)).map(c => `${clubTag(c.club)} ${c.n}`);
   const after = clubs.filter(c => /after slot/i.test(c.club)).map(c => `${strip(c)} ${c.n}`);
   const bits = [`${n} remaining`];
   if(first.length) bits.push('first ' + first.join(' · '));
-  if(before.length) bits.push('before slot ' + before.join(' · '));
+  if(seq.length) bits.push(seq.join(' · '));
   if(after.length) bits.push('after slot ' + after.join(' · '));
   return bits.join(' · ');
 }
