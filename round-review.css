@@ -44,4 +44,9 @@
 .rt-source summary::before{content:'▸';margin-right:6px}.rt-source[open] summary::before{content:'▾'}
 .rt-source p{font-size:11px}
 [data-review-hole]{scroll-margin-top:18px}
+.bay-takeaways .bt-meaning{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.bt-meaning>b{font:800 10px var(--sans);letter-spacing:.07em;text-transform:uppercase;color:var(--gtext)}
+.bay-takeaways .rt-plotlabel{flex-wrap:wrap}
+.bay-takeaways .rt-source p{overflow-wrap:anywhere}
+.range-evidence-club[data-club]{scroll-margin-top:18px}
 .rt-links button:focus-visible,.rt-hole:focus-visible{outline:2px solid var(--green);outline-offset:2px}

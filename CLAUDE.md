@@ -23,6 +23,7 @@ styles.css            "Scorecard Heritage" theme (cream paper, Masters green, bu
 lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
 round-takeaways.js    Shared scoring and club-data insight selection + compact visual cards
+bay-takeaways.js      Full-day range insight selection, explanations, source links and practice tests
 coach-feed.json       One-way "coach inbox" — see Data model below  ← updates land here
 sw.js                 Service worker (offline cache of the shell)
 manifest.webmanifest  PWA manifest;  icon.svg — app icon
@@ -3042,6 +3043,50 @@ Validation: importer/arithmetic tests passed, including 80→68→63 count recon
 
 The complete session ships in `range-20260922-feed.json`, fetched alongside the existing feeds on open/resume and cached by the v161 service worker. It uses the same append-only/idempotent importer. The large historical coach feed remains byte-identical.
 
+## Full-day bay takeaways (v164)
+
+Jack asked to apply the round-takeaway treatment to the full bay day and explain
+what the numbers mean, not merely prescribe next steps. Every Swing bay review
+now starts with `bayDayTakeaways()`. It gathers all `S.bays` on that exact local
+recorded date, with explicit source indices and canonical club labels, and calls
+the pure `bay-takeaways.js` module. Opening any range record on that day yields
+the same day review, followed by combined full-day charts and tables.
+On-course rounds, other dates and other disciplines never enter the day review.
+
+The new takeaway cohort excludes a row entirely if both carry and total are
+missing, then applies the existing `isClearMishit` callback separately per club
+block. Archived missing-distance counts from the v161 transcript are included
+in the coverage summary without reintroducing those readings. Takeaways do not
+fall back to source AVG values. Same canonical club is combined across targets
+and blocks, as explicitly requested; Mini remains distinct from 3W.
+Summary-only day records are explicitly counted and linked as coverage,
+not silently invented into shot-level results. No stored data or playing carry
+is changed. Day charts use the same retained-only projection without filtering twice; sources
+list the retained shot IDs and exclusions so their precise cohort is inspectable.
+
+The engine combines retained individual shots by club, then selects up to six diverse cards
+from paired face/path, carry control, landing-versus-finish target hits, smash
+variation, launch window and spin variation. Averages and best-five values use
+individual shots, never averages of block means. Mixed targets suppress target-hit
+cards. Takeaways never imply chronology, improvement, a causal swing
+fault or comparable conditions. Record numbers are identifiers in the day view,
+not timestamps. Target labels and full source setup disambiguate repeated clubs.
+Editorial selection thresholds (3 readings minimum, .08 smash spread, 3° launch,
+1000 rpm spin) decide which facts get a card;
+they are not ideal ranges or statistical-significance tests. Paired delivery
+uses only complete path/face/F-P rows. F-P may be derived from measured face
+minus path; other absent fields are never inferred. Zero is valid.
+
+Each card has recorded evidence, a measured-shot plot, a separate **What it
+means** explanation, a measurable **Next session** task, and expandable retained
+shot IDs/conditions plus source buttons. `bay-takeaway-source` opens the actual
+bay record and focuses its exact `data-club` delivery chart. New code is cached
+by v164. `tests/bay-takeaways.cjs` exercises actual full feed imports, day scopes,
+paired counts, filter parity, missing/zero data and no mutation. The browser
+test checks 320/390 widths, above-the-fold placement, explanation/action cards,
+and actual source-link focus. Sep22 currently covers 93 usable shots over eight
+blocks in two records, with 12 missing-distance and eight clear-mishit exclusions;
+that count includes earlier Sep22 shots, not only the last 80-shot upload.
 
 ## Cumulative planning and visual overview (v163)
 Cumulative uses the existing cumulativeClubSeries/rollRemaining reviewed cohorts; it does

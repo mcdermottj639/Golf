@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v163';
+const BUILD = 'v164';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v164', d:'2026-09-22', items:['ONE FULL-DAY SET PER CLUB: bay takeaways, charts and tables combine retained shots across same-club blocks. Takeaways explain what the numbers mean and give measurable next steps. Distance-dash rows and clear mishits stay out; original block details remain expandable.'] },
   { b:'v163', d:'2026-09-22', items:['CUMULATIVE NOW FLOWS FROM PLAN TO EVIDENCE: visual carry ladder, expandable club histories, a measured next-session test, outdoor areas and simulator access. Full tables and coaching detail remain available. Sample counts describe coverage, not accuracy.'] },
   { b:'v162', d:'2026-09-22', items:[
     'APEX NOW APPEARS IN EXACT CLUB DATA when a bay session recorded shot height. It is the average height in feet across readable, non-mishit shots; n shows how many supplied it. The original feet-and-inches shot readings remain in the shot table. Sessions without height do not gain an invented value.' ] },
@@ -3310,6 +3311,7 @@ function bayLiveSetup(b){
   if(!Array.isArray(d.rangeShots) || !d.rangeShots.length) return (b && b.setup) || '';
   const clubs = analysisClubs(d);
   const n = clubs.reduce((s,c)=>s+(+c.n||0),0);
+  if(d.combinedDay) return `${n} usable shots · ${clubs.map(c=>`${c.club}: ${c.n}`).join(' · ')}`;
   if(!n) return (b && b.setup) || '';
   const strip = c => clubTag(c.club).replace(/ · (slot|pre|open|run|rest)/,'');
   const first = clubs.filter(c => !/· /.test(c.club)).map(c => `${strip(c)} ${c.n}`);
@@ -3475,10 +3477,12 @@ function isClearMishit(shot, group){
 }
 function struckShots(group){
   const shots = (group && group.shots) || [];
+  if(group?.retainedOnly===true)return shots;
   return shots.filter(s => !isClearMishit(s, shots));
 }
 function mishitShots(group){
   const shots = (group && group.shots) || [];
+  if(group?.retainedOnly===true)return [];
   return shots.filter(s => isClearMishit(s, shots));
 }
 function premierN(n){
@@ -3678,7 +3682,7 @@ function rangeShotVisuals(d){
     }).filter(Boolean);
     return rows.length?`<div class="range-evidence"><div class="range-evidence-title"><b>Measured-shot profile</b><span>remaining shots · dots show this day's range, not ideal bands · smash = ball ÷ club speed · spin rpm · launch degrees</span></div><div class="range-metric-grid">${rows.join('')}</div><p class="sm faint">Each metric uses only shots with that reading; n is its sample count. Strike efficiency (smash) describes speed transfer, not contact location.</p></div>`:'';
   };
-  const evidenceBlock=c=>`<div class="range-evidence-club"><h4>${esc(c.club)} · ${struckShots(c).length} remaining shots</h4>${deliveryBlock(c)}${metricSummary(c)}</div>`;
+  const evidenceBlock=c=>`<div class="range-evidence-club" data-club="${esc(c.club)}"><h4>${esc(c.club)} · ${struckShots(c).length} remaining shots</h4>${deliveryBlock(c)}${metricSummary(c)}</div>`;
   const caption=d.rangeCaption || (d.rangeSource
       ? 'Carry means are TrackMan\'s displayed averages. Total means for 9i and 56° are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.'
       : 'Green is carry. Gold is total. Best 5 is the longest 5 carries of that batch.');
@@ -4392,10 +4396,26 @@ function sixMetricGuide(b){
     <p class="sm" style="margin-top:10px"><b>Your immediate priority:</b> improve face-to-path consistency while keeping the face near your intended start line. That makes the ball flight more predictable; speed and carry become easier to trust afterward.</p>
   </div>`;
 }
+function bayDayData(b){
+  const api=window.CaddieBayTakeaways;
+  if(!api||!b.date||BAY_DISC(b)!=='swing')return null;
+  const bays=(S.bays||[]).map((x,index)=>({...x,index,detail:{...(x.detail||{}),
+    rangeShots:(x.detail?.rangeShots||[]).map(g=>({...g,canon:clubCanon(g.club)}))}}));
+  return api.prepare(b.date,bays,isClearMishit);
+}
+function bayDayTakeaways(b,day=bayDayData(b)){
+  const api=window.CaddieBayTakeaways;
+  if(!day)return '';
+  return api.render(day,api.build(day));
+}
 function bayView(i){
-  const b = (S.bays || [])[+i];
+  let b = (S.bays || [])[+i];
   if(!b) return game();
-  const d = b.detail || {};
+  const day=bayDayData(b);
+  const d = day?.usable ? {combinedDay:true,clubs:day.clubs.map(g=>({club:g.club,n:g.shots.length})),rangeShots:day.clubs,
+    rangeCaption:'One combined full-day set per club. Missing-distance rows and clear mishits excluded in their original source blocks.'} : b.detail || {};
+  if(day?.usable)b={...b,detail:d,venue:'Full-day range review',ball:'See source notes',norm:'See source notes',spin:'See source notes',
+    finding:`${day.usable} usable shots across ${day.clubs.length} clubs. All same-club blocks combined; averages are calculated from individual retained readings, not averages of block averages.`};
   const analyzed = analysisClubs(d);
   const delivery = analysisDelivery(d);
   const clubRows = analyzed.map(c => {
@@ -4415,6 +4435,7 @@ function bayView(i){
   <button class="backlink" data-action="session-category" data-kind="days">← Days</button>
   <h2>${esc(fmtDate(b.date))} · ${esc(b.mode || 'Range practice')}</h2>
   <p class="sm">${esc(b.venue || '')} · ${esc(bayLiveSetup(b) || b.setup || '')}</p>
+  ${bayDayTakeaways(b,day)}
   ${d.clubs && d.clubs.length ? `<div class="card bayvisuals">${bayVisualMarkup(d)}</div>` : ''}
   <div class="card">
     <h2>${fmtDate(b.date)} · bay session</h2>
@@ -9909,6 +9930,14 @@ const ACTIONS = {
   },
   'open-session': el => render('session', el.dataset.i),
   'open-bay': el => render('bay', el.dataset.i),
+  'bay-takeaway-source': el => {
+    const i=Number(el.dataset.i),club=el.dataset.club;
+    if(!Number.isInteger(i)||!S.bays?.[i])return;
+    render('bay',i);
+    const target=[...document.querySelectorAll('.range-evidence-club')].find(x=>x.dataset.club===club)
+      ||document.querySelector('.bayvisuals');
+    if(target){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});target.scrollIntoView({behavior:'smooth',block:'start'});}
+  },
   // Taking the bay's number is HIS decision, made once, with both figures on screen — which
   // is the whole reason a measured push does not just overwrite the row. It does not set
   // carriesCalibrated: accepting a measurement is not the same act as calibrating by feel.
