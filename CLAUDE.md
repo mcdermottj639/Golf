@@ -3041,6 +3041,35 @@ Target-hit numerator/denominator now use the same retained shot IDs as the chart
 
 Validation: importer/arithmetic tests passed, including 80→68→63 count reconciliation and target-hit cohorts; real browser checked at 320/390px with six blocks, correct wedge 6/6 total hits, no horizontal overflow or JS errors. Prior v160 round takeaways regression passed.
 
+## Coach sim practice generator (v166)
+
+Coach now has a front-facing Build my sim practice plan button, after its hero.
+This generated session is the explicit exception to keeping standing plans in labs.
+It uses the latest dated bay day with sufficient usable shot-level evidence, the
+shared bay exclusions and same-club pooling, and at most three distinct clubs.
+No LLM/network service or invented diagnosis: priorities reuse the bay evidence
+engine. Show the baseline date and exclusion counts; rebuilding replaces only
+`S.simPracticePlan`, never shots, carries, equipment settings or round data.
+The generated plan and completed-block checklist persist locally and survive navigation.
+Sparse/empty records receive a labelled baseline-collection session.
+
+Venue constraint: Golf Lounge 18 Stamford TrackMan indoor bay. Default to range /
+Shot Analysis and on-screen targets from the mat, using permitted balls. No physical
+gates, bunker/rough practice, putting green, impact camera or extra aids required.
+Target Practice has a plain range fallback; Performance Center is optional only
+if staff confirm availability. Missing tiles remain missing. Count all attempts
+in practice scores, even though historical analysis excludes clear mishits.
+Official capability references checked Sep22: https://golflounge18.com/about/,
+https://landing.golflounge18.com/stamfordgiveaway,
+https://www.trackman.com/blog/your-guide-to-trackman-performance-studio.
+No claim that Stamford enables every TrackMan module.
+
+Repair: remote v165 app.js contained invalid UTF-8 and failed node syntax checking.
+Restored the verified v164 app and reapplied FutureFit feed loading and Bag reference
+rendering; preserved all other remote files, A3 current vs B7 proposed, and chart asset.
+Validate importer FutureFit assertions, bay/planner tests and Coach browser flow at
+320/390px, including saved checklist, reload, regeneration and source navigation.
+
 ## DS-ADAPT X FutureFit33 reference (v165)
 
 The Bag row for the current 3-wood renders `futureFit` data delivered through an
