@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v164';
+const BUILD = 'v165';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v165', d:'2026-09-22', items:[
+    'THE 3-WOOD ADAPTER IS ON THE BAG CARD. The official right-handed FutureFit33 chart is saved offline beside the DS-ADAPT X. A3 is recorded as the currently reported setting: 14.0° effective loft and 1.0° flat. B7 is marked as the higher-launch test: 16.7° and 0.7° flat. This corrects the earlier reversed chart read.' ] },
   { b:'v164', d:'2026-09-22', items:['ONE FULL-DAY SET PER CLUB: bay takeaways, charts and tables combine retained shots across same-club blocks. Takeaways explain what the numbers mean and give measurable next steps. Distance-dash rows and clear mishits stay out; original block details remain expandable.'] },
   { b:'v163', d:'2026-09-22', items:['CUMULATIVE NOW FLOWS FROM PLAN TO EVIDENCE: visual carry ladder, expandable club histories, a measured next-session test, outdoor areas and simulator access. Full tables and coaching detail remain available. Sample counts describe coverage, not accuracy.'] },
   { b:'v162', d:'2026-09-22', items:[
@@ -2906,6 +2908,22 @@ function clubPill(c){
   if(row && ladderOverlap(row)) return ['OVERLAP', 'p-gold'];
   return ['IN PLAY', 'p-green'];
 }
+function futureFitCard(c){
+  const f = c && c.futureFit;
+  if(!f) return '';
+  const signed = v => `${v > 0 ? '+' : ''}${Number(v).toFixed(1).replace(/\.0$/, '')}°`;
+  const effective = +(Number(f.baseLoft || c.loft || 0) + Number(f.loft || 0)).toFixed(1);
+  const lie = f.lie === 0 ? 'standard lie' : `${Math.abs(f.lie)}° ${f.lie > 0 ? 'upright' : 'flat'}`;
+  const target = f.target || {};
+  const targetEffective = +(Number(f.baseLoft || c.loft || 0) + Number(target.loft || 0)).toFixed(1);
+  return `<details class="ff33-card">
+    <summary><span><b>FutureFit33 · ${esc(f.current)}</b><small>${effective}° effective · ${esc(lie)}</small></span><span>ADJUSTMENT CHART ›</span></summary>
+    <div class="ff33-current warn"><b>Currently reported: ${esc(f.current)}</b> · ${signed(f.loft)} loft · ${esc(lie)} · ${effective}° effective loft.</div>
+    ${target.code ? `<div class="ff33-target"><b>Higher-launch test: ${esc(target.code)}</b> · ${signed(target.loft)} loft · ${Math.abs(target.lie)}° ${target.lie > 0 ? 'upright' : 'flat'} · ${targetEffective}° effective loft.</div>` : ''}
+    <img src="futurefit33-rh.jpg" alt="Cobra FutureFit33 right-handed loft and lie adjustment chart">
+    <p class="sm faint">Read vertically for loft: highest at the top, lowest at the bottom. Read horizontally for lie: upright left, flat right. A1 is standard. Saved from Cobra's official right-handed chart.</p>
+  </details>`;
+}
 // The roster row: what it is, what it is, what it measures, and where it stands.
 function clubRow(c){
   const [pill, pcls] = clubPill(c);
@@ -2919,6 +2937,7 @@ function clubRow(c){
       <div class="cs">${esc(clubSpecLine(c))}${row && row.carry != null ? ` · carries ${row.carry}` : ''}${
         row && row.carry == null ? ' · carry unmeasured' : ''}</div>
       ${c.note ? expandable(c.note) : ''}
+      ${futureFitCard(c)}
       ${mismatch ? `<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>` : ''}
       ${ov ? `<p class="sm faint">Sits ${Math.abs(ladderLoft(ov) - ladderLoft(row)).toFixed(1)}° off the
         ${esc(ov.club)} on the ladder.${(() => { const g = ladderGapYds(row, ov);

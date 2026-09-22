@@ -1844,3 +1844,13 @@ body.night .meanbtn{color:var(--green-ink)}
 .cum-detail>summary.card{padding:16px}
 #cum-plan,#cum-bag,#cum-course,#cum-evidence{scroll-margin-top:80px}
 @media(max-width:500px){.cum-steps{grid-template-columns:1fr;gap:6px}.cum-steps>div{border-left:2px solid #c5cdbb;padding-left:12px}.cum-club summary{gap:8px;grid-template-columns:44px minmax(20px,1fr) 96px}}
+
+/* The physical 3-wood adapter reference, kept on the club itself and cached offline. */
+.ff33-card{margin-top:10px;border:1px solid var(--line,#d8d2c5);border-radius:10px;overflow:hidden;background:#f7f4ec}
+.ff33-card summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px;cursor:pointer;font-size:11px;letter-spacing:.04em}
+.ff33-card summary small{display:block;margin-top:2px;letter-spacing:0;text-transform:none;font-size:11px;font-weight:400}
+.ff33-card img{display:block;width:100%;height:auto;background:white;border-top:1px solid var(--line,#d8d2c5);border-bottom:1px solid var(--line,#d8d2c5)}
+.ff33-current,.ff33-target{padding:10px 11px;font-size:12px;line-height:1.45}
+.ff33-current{background:#fff0dc;color:#633c16}
+.ff33-target{background:#e7f0e7;color:#173f2d}
+.ff33-card p{padding:0 11px 11px;margin:10px 0 0}
