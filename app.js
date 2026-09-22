@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v144';
+const BUILD = 'v145';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v145', d:'2026-09-22', items:[
+    'EVERY CLUB NOW HAS THE NUMBERS THAT MEASURE. Smash, club speed, ball speed, launch, spin, attack, path, face, face-to-path, launch direction — and dynamic loft / spin loft when a capture includes them. Best 5 stays burgundy. These bay screenshots did not have dynamic loft, so that column is a dash until the next one does.',
+    'SMASH IS BALL ÷ CLUB when smash is missing. Nothing invented. Indoor unmarked balls: path, face, speeds, launch are measured; spin and carry are still a model.' ] },
   { b:'v144', d:'2026-09-22', items:[
     'NEXT ACTIONS ARE A TITLE NOW. The 33-item wall is a list: one line each, HIGH first, the rest grouped by lane and folded. Tap the line for the coaching. Tap the box to tick it — opening it no longer marks it done.',
     'NOTHING WAS DELETED. Every action is still there. The essay is one tap away, not the thing you have to read to find the job.' ] },
@@ -3320,6 +3323,9 @@ const BAY_COLS = [
   ['la',    'LAUNCH°', v => Number(v).toFixed(1)],
   ['spin',  'SPIN',    v => String(Math.round(v))],
   ['aoa',   'ATTACK°', baySgn],
+  ['ld',    'DIR°',    baySgn],
+  ['dynLoft','DYN LOFT°', v => Number(v).toFixed(1)],
+  ['spinLoft','SPIN LOFT°', v => Number(v).toFixed(1)],
   ['path',  'PATH°',   baySgn],
   ['face',  'FACE°',   baySgn],
   ['ftp',   'F–P°',    baySgn],
@@ -3459,6 +3465,9 @@ function premierMeans(group){
     cs: n('cs'),
     spin: n('spin'),
     aoa: n('aoa'),
+    ld: n('ld'),
+    dynLoft: n('dynLoft'),
+    spinLoft: n('spinLoft'),
     shots
   };
 }
@@ -3509,6 +3518,9 @@ function analysisClubs(detail){
       la: rnd('la', 1),
       spin: rnd('spin', 0),
       aoa: rnd('aoa', 1),
+      ld: rnd('ld', 1),
+      dynLoft: rnd('dynLoft', 1),
+      spinLoft: rnd('spinLoft', 1),
       path: rnd('path', 1),
       face: rnd('face', 1),
       ftp: rnd('ftp', 1),
@@ -3792,6 +3804,29 @@ function fillDelivery(c){
   if(path == null && face != null && ftp != null) path = +(face - ftp).toFixed(1);
   return { path, face, ftp };
 }
+function num1(v, d){
+  if(v == null || !Number.isFinite(+v)) return null;
+  return +(+v).toFixed(d);
+}
+function fillMetrics(c){
+  const d = fillDelivery(c);
+  const cs = num1(c && c.cs, 1), bs = num1(c && c.bs, 1);
+  let smash = num1(c && c.smash, 2);
+  if(smash == null && bs != null && cs) smash = +(bs / cs).toFixed(2);
+  let dynLoft = num1(c && c.dynLoft, 1);
+  let spinLoft = num1(c && c.spinLoft, 1);
+  const aoa = num1(c && c.aoa, 1);
+  if(spinLoft == null && dynLoft != null && aoa != null) spinLoft = +(dynLoft - aoa).toFixed(1);
+  if(dynLoft == null && spinLoft != null && aoa != null) dynLoft = +(spinLoft + aoa).toFixed(1);
+  return {
+    ...d,
+    smash, cs, bs, aoa, dynLoft, spinLoft,
+    la: num1(c && c.la, 1),
+    spin: c && c.spin != null && Number.isFinite(+c.spin) ? Math.round(+c.spin) : null,
+    ld: num1(c && c.ld, 1),
+    total: num1(c && c.total, 1)
+  };
+}
 const BAG_CANON = ['Dr','Mini','3W','5W','2i','5i','6i','7i','8i','9i','PW','50°','56°','60°'];
 function cumulativeClubSeries(){
   const by = new Map();
@@ -3799,12 +3834,14 @@ function cumulativeClubSeries(){
     primaryClubsForDay(analysisClubs(b.detail || {})).forEach(c => {
       const k = clubCanon(c.club);
       if(!k) return;
-      const d = fillDelivery(c);
+      const d = fillMetrics(c);
       if(d.path == null && d.face == null && c.carry == null && c.best == null) return;
       if(!by.has(k)) by.set(k, []);
       by.get(k).push({
         date: b.date, i, phase: clubPhaseOf(c.club),
-        n: c.n, carry: c.carry, best: c.best, bestN: c.bestN,
+        n: c.n, carry: c.carry, best: c.best, bestN: c.bestN, total: d.total,
+        smash: d.smash, cs: d.cs, bs: d.bs, la: d.la, spin: d.spin,
+        aoa: d.aoa, dynLoft: d.dynLoft, spinLoft: d.spinLoft, ld: d.ld,
         path: d.path, face: d.face, ftp: d.ftp
       });
     });
@@ -3817,9 +3854,14 @@ function cumulativeBagTable(){
   const keys = BAG_CANON.filter(k => by.has(k)).concat([...by.keys()].filter(k => !BAG_CANON.includes(k)));
   const yd = v => v == null || !Number.isFinite(+v) ? '·' : Number(v).toFixed(1);
   const deg = v => v == null || !Number.isFinite(+v) ? '·' : baySgn(v) + '°';
+  const smash = v => v == null || !Number.isFinite(+v) ? '·' : Number(v).toFixed(2);
+  const mph = v => v == null || !Number.isFinite(+v) ? '·' : Number(v).toFixed(1).replace(/\.0$/, '');
+  const spin = v => v == null || !Number.isFinite(+v) ? '·' : String(Math.round(v));
   return `<div class="tscroll bay-clubs cum-bag"><table>
     <thead><tr>
-      <th>CLUB</th><th>BEST 5</th><th>REMAINING</th><th>PATH°</th><th>FACE°</th><th>F–P°</th><th>N</th><th>DAY</th>
+      <th>CLUB</th><th>BEST 5</th><th>CARRY</th><th>SMASH</th><th>CLUB</th><th>BALL</th>
+      <th>LAUNCH°</th><th>SPIN</th><th>AoA°</th><th>DYN LOFT°</th>
+      <th>PATH°</th><th>FACE°</th><th>F–P°</th><th>DIR°</th><th>N</th><th>DAY</th>
     </tr></thead>
     <tbody>${keys.map(k => {
       const pts = by.get(k);
@@ -3833,22 +3875,30 @@ function cumulativeBagTable(){
         <td><b>${esc(clubCanonLabel(k))}</b>${phase ? `<span class="sm faint">${esc(phase)}</span>` : ''}</td>
         <td><b class="cum-best">${yd(last.best)}</b>${delta != null ? `<div class="sm faint">${delta > 0 ? '+' : ''}${delta}</div>` : ''}</td>
         <td>${yd(last.carry)}</td>
+        <td>${smash(last.smash)}</td>
+        <td>${mph(last.cs)}</td>
+        <td>${mph(last.bs)}</td>
+        <td>${yd(last.la)}</td>
+        <td>${spin(last.spin)}</td>
+        <td>${deg(last.aoa)}</td>
+        <td>${deg(last.dynLoft)}</td>
         <td>${deg(last.path)}</td>
         <td>${deg(last.face)}</td>
         <td>${deg(last.ftp)}</td>
+        <td>${deg(last.ld)}</td>
         <td>${last.n == null ? '·' : last.n}</td>
         <td>${esc(fmtDate(last.date))}</td>
       </tr>`;
     }).join('')}</tbody>
   </table></div>
-  <p class="sm faint" style="margin-top:8px">Latest remaining mean of every club on file. Best 5 is the longest remaining carries of that block — burgundy, not a bag number. Negative path is out-to-in. Indoor unmarked balls: path and face are measured; carry is a model.</p>`;
+  <p class="sm faint" style="margin-top:8px">Latest remaining mean of every club on file. Best 5 is burgundy. Smash is ball ÷ club when the speeds are there. Dynamic loft is a dash until a capture includes it. Indoor unmarked balls: path, face, speeds, launch are measured; spin and carry are a model.</p>`;
 }
 function cumulativeBagCard(fromHome){
   const table = cumulativeBagTable();
   if(!table) return '';
   return `<div class="card">
     <h2>Every club · remaining & best 5 ${provBadge('bay')}</h2>
-    <p class="sm">The bag, read off the bays. Come back after the next lounge day and watch the row move. Path, face, and face-to-path sit next to carry so the fade has a number.</p>
+    <p class="sm">The bag, read off the bays. Smash, speeds, launch, spin, attack, path, face — the numbers that measure. Come back after the next lounge day and watch the row move.</p>
     ${table}
     ${fromHome ? `<div class="linkrow" data-action="session-category" data-kind="cumulative" style="border-bottom:none;margin-top:8px">
       <span class="sm"><b>Full cumulative</b> — path across days, what to do</span><span class="arr">→</span></div>` : ''}
