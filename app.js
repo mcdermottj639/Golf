@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v156';
+const BUILD = 'v157';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v157', d:'2026-09-22', items:[
+    'CLEAR MISHITS OUT OF CLUB COMPARISONS. Simulator club profiles exclude confirmed mishits and extreme short full-shot carry outliers. Distance and path use the same remaining shots, with counts shown. Every shot stays in the history and the round score.' ] },
   { b:'v156', d:'2026-09-22', items:[
     'SPYGLASS CLUB COMPARISONS ARE CONNECTED. All six clubs now show their recorded bay carry and path with the source date and block. The current 3-wood uses its own September 18 range shots. September 22 irons and September 15 short clubs have their own links.' ] },
   { b:'v155', d:'2026-09-22', items:[

@@ -1,0 +1,37 @@
+const assert=require('node:assert/strict');
+const R=require('../round-review.js');
+const r=require('../data/spyglass-verified-2026-09-22.json').round;
+const original=JSON.stringify(r);
+const ps=R.profiles(r,[]), wood=ps.find(p=>p.club==='3-wood');
+assert.deepEqual(wood.excluded.map(s=>s.id),['h7-video-tee-3w-20260915','h10-video-tee-3w-20260915']);
+assert.equal(wood.n,14);assert.equal(wood.fullN,16);assert.equal(wood.pathN,14);
+assert.equal(wood.distance.toFixed(1),'186.0');assert.equal(wood.path.toFixed(1),'-1.2');
+assert.ok(wood.full.some(s=>s.id==='h13-a'),'ordinary 137.8-yard miss stays');
+assert.ok(ps.filter(p=>p.club!=='3-wood').every(p=>p.excluded.length===0));
+assert.equal(JSON.stringify(r),original,'source data, score, HCP and all observations unchanged');
+assert.equal(R.observations(r).length,57);
+const html=R.render(r,{bays:[],rounds:[r]});
+assert.ok(html.includes('14 / 16'));assert.ok(html.includes('2 excluded'));
+assert.equal((html.match(/Excluded from club comparison:/g)||[]).length,2);
+assert.equal((html.match(/class="rr-shot"/g)||[]).length,57);
+
+function profile(shots,sim=true){return R.profiles({sim,review:{availableClubs:['3-wood'],shots:shots.map((s,i)=>({id:String(i),actualClub:'3-wood',intent:'full',...s}))}},[])[0];}
+const normal=[180,180,180].map(c=>({carry:c,distance:c,path:-2}));
+const p=profile([...normal,{carry:75,distance:95,path:20},{carry:126,distance:140,path:0}]);
+assert.equal(p.n,4,'75-yard example removed; 70% miss retained');
+assert.equal(p.distance,170,'distance uses same retained shots as path');
+assert.equal(p.path,-1.5);
+assert.equal(profile([...normal,{carry:120}]).n,4,'exact two-thirds boundary stays');
+assert.equal(profile([{carry:180},{carry:75}]).n,2,'no inferred exclusions in tiny groups');
+assert.equal(profile([...normal,{carry:null,distance:10,planYds:10,path:5}]).n,4,'missing carry never substituted with distance/plan');
+assert.equal(profile([...normal,{carry:'5'},{carry:NaN}]).n,5,'non-numeric carry never implies mishit');
+assert.equal(profile([...normal,{carry:175,mishit:true}]).n,3,'confirmed mishit excluded independently');
+assert.equal(profile([...normal,{carry:75}],false).n,4,'outdoor review unchanged');
+const partial=profile([...normal,...Array.from({length:12},()=>({carry:5,intent:'partial'})),{carry:75}]);
+assert.equal(partial.n,3,'chips cannot move full-shot threshold');
+assert.equal(partial.fullN,4);
+const flagged=profile([...normal,{carry:5,flag:'unreadable'},{carry:75,actualClub:'5-wood'},{carry:75,intent:'unknown'}]);
+assert.equal(flagged.fullN,3,'flagged, unknown intent and other clubs cannot enter cohort');
+const missingPath=profile([...normal,{carry:180,distance:180,path:null},{carry:75,path:50}]);
+assert.equal(missingPath.n,4);assert.equal(missingPath.pathN,3);assert.equal(missingPath.path,-2);
+console.log('PASS comparison exclusions: exact Spyglass shots, common cohort, ordinary misses, missing metrics, small samples, intent, flags and unchanged records.');

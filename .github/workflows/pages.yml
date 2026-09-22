@@ -36,6 +36,7 @@ jobs:
           node tests/range-visuals.cjs
           node tests/source-rounds.cjs
           node tests/spyglass-bay-links.cjs
+          node tests/round-comparison-mishits.cjs
           node tests/round-identity.cjs
           node tests/round-review-import.cjs
       - name: Mirror main to gh-pages
