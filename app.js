@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v154';
+const BUILD = 'v155';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v155', d:'2026-09-22', items:[
+    'SPYGLASS IS SEPTEMBER 22. Jack confirmed the play date and that it was his first TrackMan HCP round. The TrackMan profile screenshot shows HCP 7.4 with one round. Spyglass 85 now sits beside Hazeltine 80 in Indoor with an HCP label; outdoor handicap stays separate. Previously imported phones receive the correction.' ] },
   { b:'v154', d:'2026-09-22', items:[
     'SEE EACH SHOT: range profiles show path, face, face-to-path, smash, speed, spin and launch with individual readings, averages and measured sample counts. Face/path reference the target; face-to-path references the club path.',
     'SOURCE REPAIRS ARE INCLUDED: corrected 7-iron / 5-iron range data, Hazeltine 80 and Spyglass 85 now reach existing installs. Earlier v151/v152 descriptions below are historical and superseded by the source audit.' ] },
@@ -1289,6 +1291,7 @@ const TITLES = {
 const PROV = {
   'on-course': { lab:'ON-COURSE', cls:'p-live', title:'Logged live round / GHIN-style course facts' },
   bay:         { lab:'BAY',       cls:'p-bay',  title:'Launch-monitor / Map My Bag session — unmarked balls, indoor air' },
+  sim:         { lab:'SIM',       cls:'p-bay',  title:'Simulator round — separate from outdoor scoring and handicap' },
   trackman:    { lab:'TRACKMAN',  cls:'p-tm',   title:'Combine or an explicit Trackman field. Consistency is not SD.' },
   measured:    { lab:'MEASURED',  cls:'p-meas', title:'An explicit measurement — hosel stamp, film metric, scored test' },
   estimated:   { lab:'ESTIMATED', cls:'p-est',  title:'A guess, a tilde loft, an unverified carry' },
@@ -1672,10 +1675,10 @@ function todaySearch(){
 function evidenceEvents(){
   const ev = [];
   (S.rounds || []).forEach((r, i) => {
-    ev.push({ d:r.date || '', title:(r.sim ? 'Indoor round' : (r.live ? 'Live round' : 'Round')) + ' · ' + (r.course || ''),
-      gist:[r.score != null ? 'Score '+r.score : '', r.nine ? r.nine+' nine' : '', r.sim ? 'simulator — not a handicap round' : '']
+    ev.push({ d:r.date || '', title:(r.sim ? (r.trackmanHandicapRound ? 'TrackMan HCP round' : 'Indoor round') : (r.live ? 'Live round' : 'Round')) + ' · ' + (r.course || ''),
+      gist:[r.score != null ? 'Score '+r.score : '', r.nine ? r.nine+' nine' : '', r.sim ? (r.trackmanHandicapRound ? 'TrackMan HCP · indoor' : 'simulator · indoor') : '']
         .filter(Boolean).join(' · '),
-      prov: r.sim ? 'bay' : 'on-course',
+      prov: r.sim ? 'sim' : 'on-course',
       act:{ a:'open-round', i } });
   });
   (S.bays || []).forEach((b, i) => {
@@ -3769,10 +3772,10 @@ function allDayRows(){
   }));
   (S.rounds || []).forEach((r, i) => rows.push({
     date:r.date, kind:r.sim ? 'sim' : 'outdoor', title:r.course || 'Round',
-    sub:[r.score != null ? 'Score '+r.score : '', r.nine ? r.nine+' nine' : '',
-         r.sim ? 'simulator — not a handicap round' : (r.live ? 'logged live' : '')]
+    sub:[r.score != null ? 'Score '+r.score : '', r.nine ? r.nine+' holes' : '',
+         r.sim ? (r.trackmanHandicapRound ? 'TrackMan HCP round · indoor' : 'simulator · indoor') : (r.live ? 'logged live' : '')]
       .filter(Boolean).join(' · '),
-    action:'open-round', i, prov:r.sim ? 'bay' : 'on-course'
+    action:'open-round', i, prov:r.sim ? 'sim' : 'on-course'
   }));
   rows.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (a.title || '').localeCompare(b.title || ''));
   return rows;
@@ -7488,7 +7491,7 @@ function scores(){
         <td style="white-space:nowrap">${fmtDate(r.date)} <span class="faint rgo">▸</span></td>
         <td class="sm rtxt">${esc(r.course || '—')}${r.nine ? ` <span class="faint">${r.nine === 'F' ? 'front' : 'back'}</span>` : ''}${
           r.live ? ' <span class="ev live">live</span>' : ''}${
-          r.sim ? ' <span class="ev bay">sim</span>' : ''}</td>
+          r.sim ? ` <span class="ev bay">${r.trackmanHandicapRound ? 'TM HCP' : 'sim'}</span>` : ''}</td>
         <td class="sm rtxt">${esc(r.tees || '—')}</td>
         <td><b>${esc(r.score ?? '—')}</b></td>
         <td class="sm">${v == null ? '—' : `<b style="color:${v > 5 ? 'var(--burg)' : v <= 2 ? 'var(--green)' : 'var(--ink)'}">${v > 0 ? '+' : ''}${v}</b>`}</td>
@@ -8085,7 +8088,7 @@ function roundView(i){
         <div class="sm faint">${a.par != null ? `par ${a.par}` : ''}${
           r.rating != null && r.slope ? ` · ${r.rating}/${r.slope}` : ''}${
           r.live ? ' · <span class="ev live">you logged this live</span>' : ''}${
-          r.sim ? ' · <span class="ev bay">played indoors</span>' : ''}</div>
+          r.sim ? ` · <span class="ev bay">${r.trackmanHandicapRound ? 'TrackMan HCP round' : 'played indoors'}</span>` : ''}</div>
       </div>
       <div class="rdsc">${esc(a.score ?? '—')}<i>${a.vs == null ? '' : `${a.vs > 0 ? '+' : ''}${a.vs}`}</i></div>
     </div>
@@ -8094,9 +8097,8 @@ function roundView(i){
       ${tiles.slice(0, 4).map(([l, v]) => `<div class="rds"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}
     </div>
     ${r.sim ? `<div class="goldnote" style="margin-top:10px">
-      <div class="gnl">Played indoors${r.venue ? ` · ${esc(r.venue)}` : ''}</div>
-      <p class="sm">Every shot here is one you hit, and the card is yours. It is <b>not</b> eligible
-        for a handicap differential and does not change outdoor statistics. It can inform this
+      <div class="gnl">${r.trackmanHandicapRound ? 'TrackMan HCP round' : 'Played indoors'}${r.venue ? ` · ${esc(r.venue)}` : ''}</div>
+      <p class="sm">${r.trackmanHandicapRound ? `TrackMan Golf showed <b>${esc(r.trackmanHcpSnapshot)} HCP</b> and one round in Jack’s profile screenshot. This is a dated snapshot, not a live sync. ` : ''}Every shot here is one you hit, and the card is yours. Indoor rounds do not change the outdoor handicap estimate or outdoor statistics. It can inform this
         separate Simulator Round Review. Auto-putts are assigned by software when enabled;
         the putt count is not a measurement of your putting skill.</p>
     </div>` : ''}

@@ -4,14 +4,14 @@
   "target": "round-tm-spyglass-20260915-review-v1",
   "src": "data/evidence/2026-09-22-spyglass-audit.json",
   "round": {
-    "date": "2026-09-15",
+    "date": "2026-09-22",
     "course": "Spyglass Hill",
     "sim": true,
     "venue": "TrackMan Golf",
     "par": 72,
     "score": 85,
     "putts": 28,
-    "note": "Spyglass85, front42/back43. Source correction from Sep22 13:47:19 recording: 57 counted non-putt shots plus28 auto-finish strokes. Legacy date label retained; date of play not independently confirmed by capture filename.",
+    "note": "Spyglass 85, front 42 / back 43. Jack confirmed this was his September 22, 2026 TrackMan HCP round, his first qualifying round in TrackMan Golf. Profile screenshot shows HCP 7.4 and one round. Source review recorded 57 counted non-putt shots and 28 auto-finish strokes.",
     "holes": [
       {
         "n": 1,
@@ -1485,6 +1485,9 @@
         }
       ],
       "verificationNote": "The Sep22 recording rechecks the existing Spyglass card: 85, front42 / back43. Two omitted 3-wood shots restored, one unsupported 9-iron row removed, H5 label corrected to5-iron. Readable metric panels corrected; two unreadable panels stay blank and excluded from profiles."
-    }
+    },
+    "trackmanHandicapRound": true,
+    "trackmanHcpSnapshot": 7.4,
+    "trackmanHcpEvidence": "TrackMan Golf profile screenshot · HCP 7.4 · last 1 round average 85"
   }
 }

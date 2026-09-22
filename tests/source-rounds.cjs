@@ -4,7 +4,7 @@ const dummy={addEventListener(){},querySelectorAll(){return []},classList:{add()
 const ctx={console,setTimeout(){},clearTimeout(){},setInterval(){},document:{addEventListener(){},querySelector(){return dummy},querySelectorAll(){return []},getElementById(){return dummy},body:dummy},navigator:{},localStorage:{getItem:()=>null,setItem(){}},window:{addEventListener(){},matchMedia:()=>({matches:false,addEventListener(){}})}};
 ctx.window.CaddieReview=require('../round-review.js');vm.createContext(ctx);
 for(const f of ['lessons.js','courses-db.js','course-cards.js'])vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),ctx);
-let src=fs.readFileSync(path.join(root,'app.js'),'utf8');src=src.slice(0,src.indexOf('// ---------- Boot ----------'))+`rerender=()=>{};toast=()=>{};load();window.T={applyFeed,get:()=>S,realRounds,roundView};})();`;vm.runInContext(src,ctx);const T=ctx.window.T;
+let src=fs.readFileSync(path.join(root,'app.js'),'utf8');src=src.slice(0,src.indexOf('// ---------- Boot ----------'))+`rerender=()=>{};toast=()=>{};load();window.T={applyFeed,get:()=>S,realRounds,roundView,sessionLibrary};})();`;vm.runInContext(src,ctx);const T=ctx.window.T;
 const read=f=>JSON.parse(fs.readFileSync(path.join(root,f),'utf8'));
 T.applyFeed(read('coach-feed.json'));
 const baseline=JSON.stringify(T.realRounds()),carries=JSON.stringify(T.get().carries);
@@ -26,6 +26,11 @@ console.log('PASS filmed round corrections: 18 Hazeltine scores, verified panels
 
 const spy=T.get().rounds.find(r=>r.feedId==='round-tm-spyglass-20260915-review-v1');
 assert.equal(spy.score,85);assert.equal(spy.putts,28);assert.equal(spy.review.shots.length,57);
+assert.equal(spy.date,'2026-09-22','Jack confirmed date of play; legacy feed ID stays stable');
+assert.equal(spy.trackmanHandicapRound,true);
+assert.equal(spy.trackmanHcpSnapshot,7.4,'TrackMan HCP screenshot snapshot, separate from outdoor handicap');
+assert.ok(T.sessionLibrary('sim').includes('TrackMan HCP round'));
+assert.ok(T.roundView(T.get().rounds.indexOf(spy)).includes('TrackMan Golf showed <b>7.4 HCP</b>'));
 assert.equal(spy.review.shots.length+spy.putts,spy.score);
 assert.equal(spy.holes.reduce((n,h)=>n+h.putts,0),28);
 assert.equal(spy.review.shots.find(s=>s.id==='h3-a').carry,129.6);
@@ -36,4 +41,13 @@ assert.equal(spy.review.shots.filter(s=>s.hole===10).length,4);
 assert.equal(spy.review.shots.filter(s=>s.flag).length,2);
 for(const s of spy.review.shots.filter(s=>s.flag)) assert.equal(s.carry,undefined,'unreadable carry is not invented');
 assert.ok(spy.review.shots.every(s=>s.source.includes('ScreenRecording_09-22-2026')));
+const dateFix=fixes.entries.find(e=>e.id==='round-spyglass-play-date-20260922-v1');
+assert.ok(dateFix);
+// A phone that already imported v154 must still receive this new feed entry.
+spy.date='2026-09-15';delete spy.trackmanHandicapRound;delete spy.trackmanHcpSnapshot;
+T.get().feedApplied=T.get().feedApplied.filter(id=>id!==dateFix.id);
+T.applyFeed({entries:[dateFix]});T.applyFeed({entries:[dateFix]});
+assert.equal(spy.date,'2026-09-22');assert.equal(spy.trackmanHandicapRound,true);
+assert.equal(T.get().rounds.filter(r=>r.feedId===spy.feedId).length,1);
+assert.equal(JSON.stringify(T.realRounds()),baseline,'indoor correction leaves outdoor scores untouched');
 console.log('PASS Spyglass source repair:57 counted shots +28 assigned putts, missing rows restored, unsupported row removed, uncertain metrics blank.');
