@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v148';
+const BUILD = 'v149';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v149', d:'2026-09-22', items:[
+    'TODAY OPENS ON THE NUMBERS. Weather, then the four tiles, then start round. Days, Cumulative, search and the rest sit under that — the morning view is the scoreboard again.',
+    'EVERY CLUB STAYS ON CUMULATIVE. The bag table did not come back onto Today.' ] },
   { b:'v148', d:'2026-09-22', items:[
     'EVERY CLUB IS CUMULATIVE, NOT TODAY. The remaining/best-5 table and the path + face lanes live on Cumulative. Today is the door — Days and Cumulative tiles, then the rest of the morning.',
     'DAYS STAY DAYS. Tap a capture for that day’s numbers. The bag you come back to is Cumulative.' ] },
@@ -2673,20 +2676,12 @@ function startRound(){
 // ----- Home -----
 function home(){
   // Aug 30 running order (Jack's swap), restored in v117 after v116 replaced it.
-  // Findability is additive: search + Numbers/Evidence links. Do not gut this page.
+  // v149: weather + The numbers lead. Shortcuts / search sit below, not above.
   // v148: every-club remaining/best-5 and path+face lanes are Cumulative, not Today.
   const dl = daysLeft(S.settings.returnDeadline);
   const pending = pendingReturn();
   const picks = pickedLessons().slice(0,1);
   return `
-  ${sessionShortcuts()}
-  <div class="home-quicklinks" role="group" aria-label="Quick navigation">
-    <button class="btn ghost" data-action="go" data-view="bag">My Bag</button>
-    <button class="btn ghost" data-action="go" data-view="drills">Practice Drills</button>
-    <button class="btn ghost" data-action="go" data-view="rounds" data-seg="prep">Round Prep</button>
-    <button class="btn" data-action="go" data-view="live">${S.live?'Resume Round':'Start Round'}</button>
-  </div>
-  ${todaySearch()}
   ${wxCard()}
   ${theNumbers()}
   ${startRound()}
@@ -2718,6 +2713,15 @@ function home(){
   </div>` : ''}
 
   ${whatsNew()}
+
+  ${sessionShortcuts()}
+  <div class="home-quicklinks" role="group" aria-label="Quick navigation">
+    <button class="btn ghost" data-action="go" data-view="bag">My Bag</button>
+    <button class="btn ghost" data-action="go" data-view="drills">Practice Drills</button>
+    <button class="btn ghost" data-action="go" data-view="rounds" data-seg="prep">Round Prep</button>
+    <button class="btn" data-action="go" data-view="live">${S.live?'Resume Round':'Start Round'}</button>
+  </div>
+  ${todaySearch()}
 
   ${!pending ? '' : `
   <div class="card">
