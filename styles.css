@@ -331,6 +331,9 @@ td b{font-size:14px}
   position:sticky;left:0;z-index:2;background:var(--card);
   box-shadow:6px 0 8px -6px rgba(40,24,16,.18);padding-right:10px}
 .bay-clubs thead th:first-child{z-index:3}
+.cum-best{color:var(--btext)}
+.cum-bag tbody tr[data-action]{cursor:pointer}
+.cum-bag tbody tr[data-action]:active{background:var(--card2)}
 /* The columns holding text the PLAYER typed — his course names, his tee names — may break a
    word rather than set a floor under the table. Nothing breaks while there is slack; it bites
    only when the row genuinely cannot fit, which is what stops one long name (a "Championship"

@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v142';
+const BUILD = 'v143';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v143', d:'2026-09-22', items:[
+    'EVERY CLUB IS ON HOME AND CUMULATIVE. Remaining carry, best 5, path, face, face-to-path — latest block of every club on file. Best 5 is burgundy. Negative path is out-to-in. 7-iron rest −7.6° / −1.0° / +6.5°. 3-wood after slot −2.0° / −0.6° / +1.4°.',
+    'THIS IS THE BAG YOU COME BACK TO. Days stay days. The table is what they add up to. Indoor unmarked balls: path and face are measured; carry is still a model.' ] },
   { b:'v142', d:'2026-09-22', items:[
     'IN TO OUT. Path is the job. Face is already near square — closing it would hook. Target 0° to +2°. 3-wood already proved it: −6.1° → −2.0° after the slot, and it held.',
     '7-IRON IS THE TRAINING CLUB. Path never to −2°. Woods hold what they won. Wedges already sit near zero — leave them. Next bay: remaining path is the scoreboard, not best 5.' ] },
@@ -2553,6 +2556,7 @@ function home(){
   const picks = pickedLessons().slice(0,1);
   return `
   ${sessionShortcuts()}
+  ${cumulativeBagCard(true)}
   <div class="home-quicklinks" role="group" aria-label="Quick navigation">
     <button class="btn ghost" data-action="go" data-view="bag">My Bag</button>
     <button class="btn ghost" data-action="go" data-view="drills">Practice Drills</button>
@@ -3587,7 +3591,7 @@ function sessionShortcuts(){
     <p class="sm">Days stay days. Cumulative is the analysis they add up to — path, face, what is working, what to do.</p>
     <div class="session-grid">
       <button class="session-tile" data-action="session-category" data-kind="days"><b>Days</b><span>Every capture, newest first →</span></button>
-      <button class="session-tile" data-action="session-category" data-kind="cumulative"><b>Cumulative</b><span>The analysis — working, needs work, what to do →</span></button>
+      <button class="session-tile" data-action="session-category" data-kind="cumulative"><b>Cumulative</b><span>Every club — remaining, best 5, path, face →</span></button>
     </div></section>`;
 }
 function sessionLibrary(kind='days'){
@@ -3627,6 +3631,119 @@ function evoNow(disc){
     }))
   };
 }
+
+function clubBaseName(name){
+  return String(name || '').replace(/\s*·\s*.*$/i, '').replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+}
+function clubPhaseOf(name){
+  const raw = String(name || '');
+  if(/after slot/i.test(raw)) return 'after slot';
+  if(/before slot/i.test(raw)) return 'before slot';
+  if(/·\s*open/i.test(raw)) return 'open';
+  if(/·\s*window/i.test(raw)) return 'window';
+  if(/·\s*rest/i.test(raw)) return 'rest';
+  return 'stock';
+}
+function clubCanon(name){
+  const raw = clubBaseName(name);
+  if(/mini/i.test(raw)) return 'Mini';
+  if(/driver/i.test(raw)) return 'Dr';
+  const iron = raw.match(/(\d+)\s*-?\s*iron/i);
+  if(iron) return iron[1] + 'i';
+  const wood = raw.match(/(\d+)\s*-?\s*w(?:ood)?\b/i);
+  if(wood) return wood[1] + 'W';
+  const wedge = raw.match(/(\d{2})\s*°/);
+  if(wedge) return wedge[1] + '°';
+  if(/^pw\b/i.test(raw)) return 'PW';
+  return clubAbbr(raw);
+}
+function clubCanonLabel(canon){
+  const fromBag = (S.carries || []).find(c => clubCanon(c.club) === canon);
+  if(fromBag) return fromBag.club;
+  const map = { Dr:'Driver', Mini:'Mini Driver', '3W':'3-wood', '5W':'5-wood',
+    '2i':'2-iron', '5i':'5-iron', '6i':'6-iron', '7i':'7-iron', '8i':'8-iron', '9i':'9-iron',
+    PW:'PW', '50°':'50°', '56°':'56°', '60°':'60°' };
+  return map[canon] || canon;
+}
+function primaryClubsForDay(clubs){
+  const list = clubs || [];
+  const named = list.filter(c => clubPhaseOf(c.club) !== 'stock');
+  const stock = list.filter(c => clubPhaseOf(c.club) === 'stock');
+  if(named.some(c => ['open','window','rest'].includes(clubPhaseOf(c.club)))) return named;
+  return stock.concat(named);
+}
+function fillDelivery(c){
+  let path = c && c.path != null && Number.isFinite(+c.path) ? +(+c.path).toFixed(1) : null;
+  let face = c && c.face != null && Number.isFinite(+c.face) ? +(+c.face).toFixed(1) : null;
+  let ftp  = c && c.ftp  != null && Number.isFinite(+c.ftp)  ? +(+c.ftp).toFixed(1)  : null;
+  if(ftp == null && face != null && path != null) ftp = +(face - path).toFixed(1);
+  if(face == null && path != null && ftp != null) face = +(path + ftp).toFixed(1);
+  if(path == null && face != null && ftp != null) path = +(face - ftp).toFixed(1);
+  return { path, face, ftp };
+}
+const BAG_CANON = ['Dr','Mini','3W','5W','2i','5i','6i','7i','8i','9i','PW','50°','56°','60°'];
+function cumulativeClubSeries(){
+  const by = new Map();
+  baysFor('swing').slice().sort((a,b) => (a.b.date || '').localeCompare(b.b.date || '')).forEach(({ b, i }) => {
+    primaryClubsForDay(analysisClubs(b.detail || {})).forEach(c => {
+      const k = clubCanon(c.club);
+      if(!k) return;
+      const d = fillDelivery(c);
+      if(d.path == null && d.face == null && c.carry == null && c.best == null) return;
+      if(!by.has(k)) by.set(k, []);
+      by.get(k).push({
+        date: b.date, i, phase: clubPhaseOf(c.club),
+        n: c.n, carry: c.carry, best: c.best, bestN: c.bestN,
+        path: d.path, face: d.face, ftp: d.ftp
+      });
+    });
+  });
+  return by;
+}
+function cumulativeBagTable(){
+  const by = cumulativeClubSeries();
+  if(!by.size) return '';
+  const keys = BAG_CANON.filter(k => by.has(k)).concat([...by.keys()].filter(k => !BAG_CANON.includes(k)));
+  const yd = v => v == null || !Number.isFinite(+v) ? '·' : Number(v).toFixed(1);
+  const deg = v => v == null || !Number.isFinite(+v) ? '·' : baySgn(v) + '°';
+  return `<div class="tscroll bay-clubs cum-bag"><table>
+    <thead><tr>
+      <th>CLUB</th><th>BEST 5</th><th>REMAINING</th><th>PATH°</th><th>FACE°</th><th>F–P°</th><th>N</th><th>DAY</th>
+    </tr></thead>
+    <tbody>${keys.map(k => {
+      const pts = by.get(k);
+      const last = pts[pts.length - 1];
+      const firstBest = pts.find(p => p.best != null);
+      const delta = firstBest && last.best != null && pts.length > 1
+        ? +(last.best - firstBest.best).toFixed(1) : null;
+      const phase = last.phase && last.phase !== 'stock'
+        ? ` · ${last.phase === 'after slot' ? 'slot' : last.phase}` : '';
+      return `<tr data-action="open-bay" data-i="${last.i}" style="cursor:pointer">
+        <td><b>${esc(clubCanonLabel(k))}</b>${phase ? `<span class="sm faint">${esc(phase)}</span>` : ''}</td>
+        <td><b class="cum-best">${yd(last.best)}</b>${delta != null ? `<div class="sm faint">${delta > 0 ? '+' : ''}${delta}</div>` : ''}</td>
+        <td>${yd(last.carry)}</td>
+        <td>${deg(last.path)}</td>
+        <td>${deg(last.face)}</td>
+        <td>${deg(last.ftp)}</td>
+        <td>${last.n == null ? '·' : last.n}</td>
+        <td>${esc(fmtDate(last.date))}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>
+  <p class="sm faint" style="margin-top:8px">Latest remaining mean of every club on file. Best 5 is the longest remaining carries of that block — burgundy, not a bag number. Negative path is out-to-in. Indoor unmarked balls: path and face are measured; carry is a model.</p>`;
+}
+function cumulativeBagCard(fromHome){
+  const table = cumulativeBagTable();
+  if(!table) return '';
+  return `<div class="card">
+    <h2>Every club · remaining & best 5 ${provBadge('bay')}</h2>
+    <p class="sm">The bag, read off the bays. Come back after the next lounge day and watch the row move. Path, face, and face-to-path sit next to carry so the fade has a number.</p>
+    ${table}
+    ${fromHome ? `<div class="linkrow" data-action="session-category" data-kind="cumulative" style="border-bottom:none;margin-top:8px">
+      <span class="sm"><b>Full cumulative</b> — path across days, what to do</span><span class="arr">→</span></div>` : ''}
+  </div>`;
+}
+
 function cumulativePathBays(){
   return baysFor('swing').filter(o =>
     analysisDelivery(o.b.detail || {}).some(d => d.path != null && Number.isFinite(+d.path)));
@@ -3724,6 +3841,8 @@ function cumulativeView(){
     </div>
     ${since.length ? `<p class="sm faint" style="margin-top:8px">Standing on ${esc(since.join(' · '))}.</p>` : ''}
   </div>
+
+  ${cumulativeBagCard(false)}
 
   ${f ? `<div class="card">
     <h2>The one thing</h2>
