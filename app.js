@@ -99,18 +99,21 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v146';
+const BUILD = 'v147';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v147', d:'2026-09-22', items:[
+    'DYNAMIC LOFT WAS ON THE SCREENS. PW 36.9°, 50° 35.8°, 8-iron remaining 23.5° (the 22.8° avg included the worm), 5-iron 19.4°. Stored on every shot plus impact height. Spin loft was a dash — not invented.',
+    'SEP 22 RANGE IS ON THE BAG. 8-iron remaining 102.3 n=3 after the worm. 5-iron remaining 123.2 n=9 of 10 visible. Rolling remaining, not the last day. Clubs without a loft column still dash.' ] },
   { b:'v146', d:'2026-09-22', items:[
     'EVERY CLUB HAS FACE-TO-PATH ON CUMULATIVE. Same axis as the day cards: small dots are remaining shots (path green, face gold), rings are the rolling remaining mean, numbers are PATH / FACE / F–P. One row per club — no slot, no window, no rest.',
     'THE TABLE IS ROLLING REMAINING, NOT THE LAST BLOCK. Weighted by remaining n across days. After-slot stays on the day it happened. The bag is what the days add up to.' ] },
   { b:'v145', d:'2026-09-22', items:[
-    'EVERY CLUB NOW HAS THE NUMBERS THAT MEASURE. Smash, club speed, ball speed, launch, spin, attack, path, face, face-to-path, launch direction — and dynamic loft / spin loft when a capture includes them. Best 5 stays burgundy. These bay screenshots did not have dynamic loft, so that column is a dash until the next one does.',
+    'EVERY CLUB NOW HAS THE NUMBERS THAT MEASURE. Smash, club speed, ball speed, launch, spin, attack, path, face, face-to-path, launch direction — and dynamic loft / spin loft when a capture includes them. Best 5 stays burgundy.',
     'SMASH IS BALL ÷ CLUB when smash is missing. Nothing invented. Indoor unmarked balls: path, face, speeds, launch are measured; spin and carry are still a model.' ] },
   { b:'v144', d:'2026-09-22', items:[
     'NEXT ACTIONS ARE A TITLE NOW. The 33-item wall is a list: one line each, HIGH first, the rest grouped by lane and folded. Tap the line for the coaching. Tap the box to tick it — opening it no longer marks it done.',
@@ -3962,7 +3965,7 @@ function cumulativeBagTable(){
       </tr>`;
     }).join('')}</tbody>
   </table></div>
-  <p class="sm faint" style="margin-top:8px">Rolling remaining mean of every club on file, weighted by remaining n across days. One row per club — slot and window stay on the day they happened. Best 5 is the latest batch ceiling, in burgundy. Smash is ball ÷ club when the speeds are there. Dynamic loft is a dash until a capture includes it. Indoor unmarked balls: path, face, speeds, launch are measured; spin and carry are a model.</p>`;
+  <p class="sm faint" style="margin-top:8px">Rolling remaining mean of every club on file, weighted by remaining n across days. One row per club — slot and window stay on the day they happened. Best 5 is the latest batch ceiling, in burgundy. Smash is ball ÷ club when the speeds are there. Dynamic loft is on PW, 50°, 8-iron and 5-iron from the screens; other clubs stay a dash until a capture includes it. Spin loft was a dash on those captures — not invented. Indoor unmarked balls: path, face, speeds, launch are measured; spin and carry are a model.</p>`;
 }
 function cumulativeBagCard(fromHome){
   const table = cumulativeBagTable();
