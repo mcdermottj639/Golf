@@ -1807,6 +1807,8 @@ Next actions → Score history.** Before this the bench was the sixth block and 
 last, under a to-do list and a link to Scores — the two pages Coach exists to reach were the
 two furthest from the top. Don't push anything above the focus card.
 
+**Next actions are a list, not a wall (v144).** Each open to-do shows a title — the shout, the clause before the colon, or the first sentence — with the lane as a chip. Tap the title to open the rest of the authored text. HIGH sits as a list at the top; everything else groups by lane and starts folded. The checkbox is the only `toggle-action` target: expanding a row used to tick it done because the whole `<li>` carried the handler. Do not rewrite action text in the feed to make this work — `actionShape()` is presentation over `a.text`.
+
 **The four areas (Aug 24 2026).** Jack's instruction: the top of Coach reads high level
 across **off the tee · irons · short game · putting**, off the live round data. `gameAreas()`
 is a READER over `scoreStats()` and `shortGameStats()` — both now take an optional card set —

@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v143';
+const BUILD = 'v144';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v144', d:'2026-09-22', items:[
+    'NEXT ACTIONS ARE A TITLE NOW. The 33-item wall is a list: one line each, HIGH first, the rest grouped by lane and folded. Tap the line for the coaching. Tap the box to tick it — opening it no longer marks it done.',
+    'NOTHING WAS DELETED. Every action is still there. The essay is one tap away, not the thing you have to read to find the job.' ] },
   { b:'v143', d:'2026-09-22', items:[
     'EVERY CLUB IS ON HOME AND CUMULATIVE. Remaining carry, best 5, path, face, face-to-path — latest block of every club on file. Best 5 is burgundy. Negative path is out-to-in. 7-iron rest −7.6° / −1.0° / +6.5°. 3-wood after slot −2.0° / −0.6° / +1.4°.',
     'THIS IS THE BAG YOU COME BACK TO. Days stay days. The table is what they add up to. Indoor unmarked balls: path and face are measured; carry is still a model.' ] },
@@ -2039,9 +2042,117 @@ function preps(){
 }
 
 // One row of the to-do list, used open and done alike — the done ones stay tappable so a
-// wrongly-ticked action can be brought back.
-const actionLi = a => `<li class="${a.done ? 'done' : ''}" data-action="toggle-action" data-id="${a.id}">
-  <span class="box"></span><span class="txt">${esc(a.text)}${a.pri && !a.done ? '<span class="pri">HIGH</span>' : ''}</span></li>`;
+// wrongly-ticked action can be brought back. The BOX is the only toggle: putting
+// `toggle-action` on the whole <li> meant expanding "the rest" also marked it done.
+const ACTION_LANES = {
+  PUTTING:'PUTTING', SWING:'SWING', 'SWING FILM':'SWING', EQUIPMENT:'EQUIPMENT',
+  DRIVER:'DRIVER', APPROACH:'APPROACH', MENTAL:'MENTAL', LASER:'LASER',
+  'SHORT GAME':'SHORT GAME', GRIP:'GRIP', TRACKMAN:'TRACKMAN', PATH:'PATH',
+  BAY:'BAY', FILM:'FILM', LOG:'LOG'
+};
+const ACTION_LANE_ORDER = ['SWING','DRIVER','APPROACH','SHORT GAME','PUTTING',
+  'EQUIPMENT','GRIP','TRACKMAN','LASER','MENTAL','PATH','BAY','FILM','LOG','OTHER'];
+
+function actionMostlyCaps(t){
+  const letters = String(t).replace(/[^A-Za-z]/g,'');
+  const caps = String(t).replace(/[^A-Z]/g,'');
+  return letters.length >= 6 && caps.length / letters.length >= 0.72;
+}
+
+// Title the row; the rest of a.text is one tap away. lead + rest reconstruct the body —
+// nothing is dropped. Presentation only: do not rewrite action text in the feed for this.
+function actionTitle(body){
+  const s = String(body || '').trim();
+  if(!s) return ['',''];
+  const hits = [];
+  const p = /\.(?:\s|$)/.exec(s); if(p) hits.push([p.index, p.index + p[0].length]);
+  const c = s.indexOf(':'); if(c >= 0) hits.push([c, c + 1]);
+  const d = /\s[—–]\s/.exec(s); if(d) hits.push([d.index, d.index + d[0].length]);
+  hits.sort((a,b) => a[0] - b[0]);
+  if(hits.length && hits[0][0] <= 56){
+    const [i, j] = hits[0];
+    const head = s.slice(0, i).trim();
+    const rest = s.slice(j).trim();
+    const ch = s[i];
+    if(actionMostlyCaps(head) && head.length >= 6 && head.length <= 56) return [head, rest];
+    if(ch === ':' && head.length >= 3) return [head, rest];
+    if(/[—–]/.test(s.slice(i, j)) && head.length >= 8 && head.length <= 48) return [head, rest];
+  }
+  const comma = s.match(/^(.{6,48}?),(\s+)([a-z])/);
+  if(comma && actionMostlyCaps(comma[1])) return [comma[1].trim(), s.slice(comma[1].length + 1).trim()];
+  const sent = s.match(/^(.{12,56}?[.!?])(\s|$)/);
+  if(sent) return [sent[1].replace(/[.!?]+$/,'').trim(), s.slice(sent[1].length).trim()];
+  if(s.length > 52){
+    const cut = s.slice(0, 52).replace(/\s+\S*$/, '');
+    return [cut + '…', s.slice(cut.length).trim()];
+  }
+  return [s, ''];
+}
+
+function actionShape(a){
+  const raw = String(a.text || '').trim();
+  let lane = '', body = raw;
+  const m = raw.match(/^([A-Z][A-Z0-9 /&]{1,22})\s*[—–]\s*([\s\S]+)$/);
+  if(m){
+    const key = m[1].replace(/\s+/g, ' ').trim();
+    if(ACTION_LANES[key]){ lane = ACTION_LANES[key]; body = m[2].trim(); }
+  }
+  let [title, rest] = actionTitle(body);
+  title = title.replace(/\s+/g, ' ').replace(/^[—–\s-]+|[—–\s-]+$/g, '');
+  if(title.length > 56){
+    rest = rest || body;
+    title = title.slice(0, 54).replace(/\s+\S*$/, '') + '…';
+  }
+  if(!title) title = body.slice(0, 52) || 'Action';
+  return { lane, title, rest, id:a.id, pri:!!a.pri, done:!!a.done };
+}
+
+const actionLi = a => {
+  const s = actionShape(a);
+  const chips = `${s.lane ? `<span class="actlane">${esc(s.lane)}</span>` : ''}${
+    a.pri && !a.done ? '<span class="pri">HIGH</span>' : ''}`;
+  const head = `<b class="actt">${esc(s.title)}</b>${chips}`;
+  const body = s.rest
+    ? `<details class="actd" id="act-rest-${esc(a.id)}"><summary>${head}</summary>${prose(s.rest, 'sm')}</details>`
+    : `<div class="acth">${head}</div>`;
+  return `<li class="${a.done ? 'done' : ''}">
+    <span class="box" data-action="toggle-action" data-id="${esc(a.id)}" role="checkbox" aria-checked="${a.done ? 'true' : 'false'}"></span>
+    <div class="actb">${body}</div>
+  </li>`;
+};
+
+function actionList(items){
+  return `<ul class="check">${items.map(actionLi).join('')}</ul>`;
+}
+
+function actionLaneRank(a){
+  const i = ACTION_LANE_ORDER.indexOf(actionShape(a).lane || 'OTHER');
+  return i < 0 ? 99 : i;
+}
+
+function actionBoard(open){
+  if(!open.length){
+    return '<p class="sm">Nothing open. Log a round or send Claude some film and the next things to do land here.</p>';
+  }
+  const high = open.filter(a => a.pri).slice().sort((a,b) => actionLaneRank(a) - actionLaneRank(b));
+  const rest = open.filter(a => !a.pri);
+  const by = {};
+  rest.forEach(a => {
+    const k = actionShape(a).lane || 'OTHER';
+    (by[k] || (by[k] = [])).push(a);
+  });
+  const parts = [];
+  if(high.length) parts.push(`<p class="actlab">High · ${high.length}</p>${actionList(high)}`);
+  ACTION_LANE_ORDER.forEach(l => {
+    if(!by[l]) return;
+    parts.push(fold('act-lane-' + l.toLowerCase().replace(/\s+/g, '-'), l, String(by[l].length), actionList(by[l]), false));
+  });
+  Object.keys(by).forEach(l => {
+    if(ACTION_LANE_ORDER.includes(l)) return;
+    parts.push(fold('act-lane-' + l.toLowerCase().replace(/\s+/g, '-'), l, String(by[l].length), actionList(by[l]), false));
+  });
+  return parts.join('');
+}
 
 // The type column: three-to-six mono characters saying what KIND of change a row is,
 // tinted by the strength of the evidence behind that kind — burgundy for a measurement or
@@ -5579,12 +5690,11 @@ function coach(){
   </div>` : ''}
 
   <h2>Next actions${open.length ? ` · ${open.length}` : ''}</h2>
-  <div class="card">
-    ${open.length ? `<ul class="check">${open.map(actionLi).join('')}</ul>`
-      : '<p class="sm">Nothing open. Log a round or send Claude some film and the next things to do land here.</p>'}
-    ${S.actions.some(a => a.done) ? `<details class="more">
+  <div class="card actcard">
+    ${actionBoard(open)}
+    ${S.actions.some(a => a.done) ? `<details class="more" id="act-done">
       <summary>${S.actions.filter(a => a.done).length} done</summary>
-      <ul class="check">${S.actions.filter(a => a.done).map(actionLi).join('')}</ul>
+      ${actionList(S.actions.filter(a => a.done))}
     </details>` : ''}
     <div class="formrow" style="margin-top:10px">
       <input id="newAction" placeholder="Add an action item…">
