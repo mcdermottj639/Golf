@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v158';
+const BUILD = 'v159';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v159', d:'2026-09-22', items:[
+    'HAZELTINE CLUB PROFILES NOW SHOW THE RECORDED NUMBERS. Each selected club has its own dated range reference, measured round carry, total and path with sample counts. TrackMan club selections are provisional, and mixed-intent shots are not presented as full-swing club distances. Other indoor cards keep their separate evidence rules.',
+    'TODAY SHOWS A SIM SCORE beside the outdoor round score: the most recently added complete simulator card and number of full indoor rounds. The nine-hole virtual round stays in Days but does not enter that score line or outdoor metrics.' ] },
   { b:'v158', d:'2026-09-22', items:[
     'CARRY AND TOTAL ARE SEPARATE. Spyglass Hole 1 3-wood carried 189.4 yd, went 248 yd in total to the rough, and left 300 yd to the hole. Spyglass shot-list distances now use their recorded total, Hazeltine keeps its separate measurements, and virtual front-nine carry-only tiles no longer claim to be total distance. Existing installs receive the corrections.' ] },
   { b:'v157', d:'2026-09-22', items:[
@@ -2626,6 +2629,8 @@ function theNumbers(){
   const { areas: A, st, sg } = gameAreas(C.cards);
   const scored = realRounds().filter(r => r.score);
   const last = scored.slice(-1)[0];
+  const simFull = S.rounds.filter(r => r.sim && r.holes?.length === 18 && Number.isFinite(r.score));
+  const latestSim = simFull.slice(-1)[0]; // most recently added full simulator card; play date may be unknown
   const idx = estIndex();
   const miss = st.fw.n - st.fw.hit;
   const pc = (n, d) => d ? Math.round(n / d * 100) + '%' : '—';
@@ -2657,8 +2662,9 @@ function theNumbers(){
   <div class="rowgrid g2">
     <div class="charttile opens" data-action="go" data-view="rounds" data-seg="cards">
       <div class="lab">Round scores</div>
-      <div class="big">${last ? esc(last.score) : '<span class="faint">—</span>'}</div>
-      <div class="sub">${realRounds().length} logged</div>
+      <div class="scorepair"><div class="big">${last ? esc(last.score) : '<span class="faint">—</span>'}</div>
+      <div class="simscore" title="Latest added full simulator score; ${simFull.length} full rounds" aria-label="Simulator: latest added full round ${latestSim ? esc(latestSim.score) : 'unavailable'}; ${simFull.length} full rounds">SIM <b>${latestSim ? esc(latestSim.score) : '—'}</b> · ${simFull.length}</div></div>
+      <div class="sub">On-course · ${realRounds().length} logged</div>
       <div class="trend" style="color:var(--btext)">${spark(scored.map(r => r.score), 24)}</div></div>
     ${numTile(AREA_LAB.tee, 'rounds', A.tee, 'no tee shots logged yet', teeClubRows(st))}
     ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet', greenClubRows(st))}

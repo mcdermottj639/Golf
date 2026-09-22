@@ -38,18 +38,21 @@
   }
   function profiles(r,bays){
     const clubMap=r.review?.clubMap||{}, intentByShot=r.review?.intentByShot||{};
+    const labelOnly=r.review?.profileMode==='selected-label';
     const shots=observations(r).map(s=>({...s,
       actualClub:s.actualClub||clubMap[s.club]||null,
       intent:s.intent||intentByShot[s.id]||'unknown'}));
     return (r.review?.availableClubs || [...new Set(shots.map(s=>s.actualClub).filter(Boolean))]).map(club=>{
-      const ss=shots.filter(s=>s.actualClub===club), candidates=ss.filter(s=>s.intent==='full' && !s.flag);
-      const excluded=r.sim?comparisonExclusions(candidates):[];
+      // Some older reviews only establish the on-screen club selection. Display those
+      // observations as such, without pretending their actual club or intent is known.
+      const ss=shots.filter(s=>labelOnly?s.club===club:s.actualClub===club);
+      const candidates=ss.filter(s=>!s.flag && (labelOnly || s.intent==='full'));
+      const excluded=r.sim&&!labelOnly?comparisonExclusions(candidates):[];
       const full=candidates.filter(s=>!excluded.includes(s));
       const path=full.map(s=>s.path).filter(finite);
       // A recorded comparison stays attached to its source; a newer range import must
       // not silently change the round's baseline or mix two range dates in one table.
-      // noBay: this card's clubs are not the same heads as the latest bay of the same name
-      // (Spyglass 3-wood vs a Mini labelled 3w, etc.) — leave the bay column blank.
+      // Explicit per-club links supersede the historical round-wide noBay guard.
       const links=r.review?.bayClubLinks;
       const link=links?.[club];
       const latest=link
@@ -60,7 +63,8 @@
       const bay=link
         ? latest?.detail?.clubs?.find(c=>c.club===link.club)
         : latest?.detail?.clubs?.find(c=>bayKey(c.club)===club);
-      return {club,ss,full,excluded,fullN:candidates.length,n:full.length,path:mean(path),pathN:path.length,bay,bayDate:latest?.date,bayLabel:link?.label,bayIndex:latest?(bays||[]).indexOf(latest):-1,
+      return {club,ss,full,excluded,labelOnly,fullN:candidates.length,n:full.length,path:mean(path),pathN:path.length,bay,bayDate:latest?.date,bayLabel:link?.label,bayIndex:latest?(bays||[]).indexOf(latest):-1,
+        carryN:full.filter(s=>finite(s.carry)).length,distanceN:full.filter(s=>finite(s.distance)).length,
         carry:mean(full.map(s=>s.carry).filter(finite)),
         distance:mean(full.map(s=>s.distance).filter(finite))};
     });
@@ -113,7 +117,9 @@
       : q.bagConfirmed
       ? 'Club names below are the shot-list labels. Distance follows each source record; the carry tile is shown separately where available. Missing tiles stay blank. A flag excludes a reading from club summaries.'
       : 'Club names below are selected TrackMan labels, NOT confirmed actual clubs. Distance is the displayed shot distance, not confirmed carry. Face-to-path is calculated as face minus path when both are present. Source times are approximate positions in supplied recordings. A flag excludes a reading from club summaries.';
-    const bayFoot = q.bayClubLinks
+    const bayFoot = q.profileMode==='selected-label'
+      ? 'Hazeltine groups shots by the club selected on the TrackMan screen. The actual heads and swing intent were not confirmed, so these are observed shot averages, not full-swing club benchmarks. Wedge rows can mix chips and full swings. Bay columns are separate dated range references, never used to fill missing round measurements. Same-day session order is unknown. A dash means no verified reading or matching source.'
+      : q.bayClubLinks
       ? 'Each bay row uses the dated range block shown under its club. Bay values use remaining range shots; round values use the remaining identified full shots after the comparison exclusions above. Same-day order is not recorded. Missing source data stays blank until that session downloads.'
       : q.noBay
       ? 'Bay comparison is off for this card so a Mini labelled 3w cannot land on a 3-wood row. Full-shot n is this round only.'
@@ -129,8 +135,8 @@
       ${bayIndex>=0&&!ctx.bayVisuals&&!q.noBay?`<button class="btn" data-action="open-bay" data-i="${bayIndex}">Compare with Sep 14 Bay session</button>`:''}
       <button class="btn" data-action="go" data-view="bag">Open Bag & playing carries</button></div>
       <h2>Three takeaways · evidence first</h2>${f.map(x=>`<div class="card"><h3>${esc(x.title)}</h3><p class="sm">${esc(x.body)}</p></div>`).join('')}
-      <h2>Club profiles · range versus round</h2><div class="card"><p class="sm">Carry measures the ball in the air. Total distance measures where it finished after rolling. Spyglass Hole 1: 189.4 yd carry, 248 yd total to rough, 300 yd remaining to the hole. Numbers with no independently captured total stay blank. No carry-gap arithmetic or playing-yardage updates are made from this comparison. Comparison averages exclude confirmed mishits and extreme short full shots: carry below two-thirds of the usual cluster for that club in this round, with at least three readings in the cluster. Ordinary misses remain. Partial and unknown-intent shots stay out. Every shot still counts toward the score and stays in the history.</p>
-      <div class="tscroll"><table><thead><tr><th>Club</th><th>Bay carry yd</th><th>Round carry yd</th><th>${q.distanceMeaning==='total'?'Round total yd':'Shot-list distance yd'}</th><th>Bay path °</th><th>Round path °</th><th>Full shots used</th></tr></thead><tbody>${ps.map(p=>`<tr><td>${esc(label(p.club))}${p.bayLabel ? `<div class="sm faint">${esc(p.bayLabel)}${p.bay ? ` · n=${p.bay.n}` : " · source pending"}</div>` : ""}</td><td>${num(p.bay?.carry)}</td><td>${num(p.carry)}</td><td>${num(p.distance)}</td><td>${num(p.bay?.path)}</td><td>${num(p.path)} <small>(n=${p.pathN})</small></td><td>${p.n} / ${p.fullN}${p.excluded.length?`<div class="sm faint">${p.excluded.length} excluded</div>`:''}</td></tr>`).join('')}</tbody></table></div>
+      <h2>Club profiles · range versus round</h2><div class="card"><p class="sm">Carry measures the ball in the air. Total distance measures where it finished after rolling. ${r.course==='Spyglass Hill'?'Spyglass Hole 1: 189.4 yd carry, 248 yd total to rough, 300 yd remaining to the hole. ':''}Numbers with no independently captured total stay blank. No carry-gap arithmetic or playing-yardage updates are made from this comparison. ${q.profileMode==='selected-label'?'Hazeltine includes all readable, unflagged shots grouped by the displayed club selection. Club identity and full-swing intent remain unconfirmed; do not treat these as stock distances.':'Comparison averages exclude confirmed mishits and extreme short full shots: carry below two-thirds of the usual cluster for that club in this round, with at least three readings in the cluster. Ordinary misses remain. Partial and unknown-intent shots stay out.'} Every shot still counts toward the score and stays in the history.</p>
+      <div class="tscroll"><table><thead><tr><th>Club${q.profileMode==='selected-label'?' selected':''}</th><th>Bay carry yd</th><th>Round carry yd</th><th>${q.distanceMeaning==='total'?'Round total yd':'Shot-list distance yd'}</th><th>Bay path °</th><th>Round path °</th><th>${q.profileMode==='selected-label'?'Observed shots':'Full shots used'}</th></tr></thead><tbody>${ps.map(p=>`<tr><td>${esc(label(p.club))}${p.bayLabel ? `<div class="sm faint">${esc(p.bayLabel)}${p.bay ? ` · n=${p.bay.n}` : " · source pending"}</div>` : ""}</td><td>${num(p.bay?.carry)}</td><td>${num(p.carry)} <small>(n=${p.carryN})</small></td><td>${num(p.distance)} <small>(n=${p.distanceN})</small></td><td>${num(p.bay?.path)}</td><td>${num(p.path)} <small>(n=${p.pathN})</small></td><td>${p.n} / ${p.fullN}${p.excluded.length?`<div class="sm faint">${p.excluded.length} excluded</div>`:''}</td></tr>`).join('')}</tbody></table></div>
       <p class="sm faint">${esc(bayFoot)}</p></div>
       ${q.bagConfirmed?'':`<details class="card"><summary>Optional · identify a shot's actual club</summary><p class="sm">Only correct shots you remember. Your correction is saved separately from the imported label and survives feed updates. Leave the rest unknown.</p><div class="rr-form"><label>Shot<select id="rrshot">${shots.map(s=>`<option value="${esc(s.id)}">H${s.hole} · ${esc(s.club)} label · ${finite(s.distance)?metric(s.distance)+' yd':'total unverified'} · actual ${esc(s.actualClub||'unknown')}</option>`).join('')}</select></label><label>Actual club<select id="rrclub"><option value="">Unknown / clear correction</option>${(q.availableClubs||[]).map(c=>`<option value="${esc(c)}">${esc(label(c))}</option>`).join('')}</select></label><label>Swing intent<select id="rrintent"><option value="unknown">Unknown</option><option value="full">Full swing</option><option value="partial">Partial / chip</option><option value="recovery">Recovery</option></select></label><button class="btn" data-action="save-review-identity" data-round="${esc(r.feedId)}">Save shot identity</button></div></details>`}
       <h2>Hole evidence · inspect the shots</h2><div class="card"><p class="sm faint">${esc(holeIntro)}</p>

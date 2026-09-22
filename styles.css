@@ -84,8 +84,9 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
    every h2 in the app would be a change to every page, checked on none of them. It exists
    because the block ran just past the fold on Jack's phone, where env(safe-area-inset-*) adds
    ~59px at the top and ~34px at the bottom that a desktop browser reports as zero. */
-.nums h2{margin:10px 0 5px}
-.nums .rowgrid{margin:5px 0}
+.nums h2{margin:5px 0 2px}
+.nums .rowgrid{margin:2px 0}
+.nums .charttile{padding-top:5px;padding-bottom:4px}
 .rowgrid.g3{grid-template-columns:1fr 1fr 1fr}
 .rowgrid.g2{grid-template-columns:1fr 1fr}
 /* THREE BANDS THAT LINE UP ACROSS THE WHOLE ROW, whether or not a tile has a second number.
@@ -916,6 +917,11 @@ body.night .buildtag{background:rgba(255,255,255,.06);border-color:rgba(255,255,
   font-family:var(--sans);font-weight:700}
 .charttile .big{font-size:20px;font-weight:700;color:var(--gtext);margin:1px 0 3px}
 .charttile .sub{font-size:10.5px;color:var(--faint);font-family:var(--sans)}
+.charttile .scorepair{display:flex;align-items:baseline;justify-content:space-between;gap:3px;min-width:0}
+.charttile .scorepair .big{flex:none}
+.charttile .simscore{font-family:var(--sans);font-size:10px;line-height:1.2;color:var(--faint);white-space:nowrap}
+.charttile .simscore b{color:var(--gtext)}
+@media (max-width:360px){.charttile .simscore{font-size:9px;letter-spacing:-.02em}}
 .charttile .trend{margin-top:auto;padding-top:6px}
 /* Which club found the fairway, inside the Off-the-tee tile. Three columns on one line each:
    name, rate, and the raw count that keeps a 100% off one tee shot honest. Mono so the

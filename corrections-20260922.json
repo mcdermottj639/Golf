@@ -3358,6 +3358,54 @@
       },
       "distanceMeaning": "total",
       "shotDistances": {}
+    },
+    {
+      "id": "round-hazeltine-club-profiles-20260922-v1",
+      "type": "round-review-update",
+      "target": "round-tm-hazeltine-imported-v1",
+      "src": "review:v159: selected-label observations and separately sourced range references; no invented club identity or full-swing intent",
+      "round": {
+        "sim": true,
+        "course": "Hazeltine National",
+        "date": "2026-09-22"
+      },
+      "review": {
+        "profileMode": "selected-label",
+        "bayClubLinks": {
+          "3-wood": {
+            "bayId": "bay-20260918-gl18-3w-5w-7i",
+            "club": "3 wood · after slot",
+            "label": "Sep 18 · later block"
+          },
+          "5-wood": {
+            "bayId": "bay-20260918-gl18-3w-5w-7i",
+            "club": "5 wood · after slot",
+            "label": "Sep 18 · later block"
+          },
+          "5-iron": {
+            "bayId": "bay-20260922-range-8i-5i",
+            "club": "5-iron",
+            "label": "Sep 22"
+          },
+          "7-iron": {
+            "bayId": "bay-20260922-range-8i-5i",
+            "club": "7-iron",
+            "label": "Sep 22"
+          },
+          "9-iron": {
+            "bayId": "bay-20260915-range-54",
+            "club": "9-iron",
+            "label": "Sep 15"
+          },
+          "56-wedge": {
+            "bayId": "bay-20260915-range-54",
+            "club": "56° wedge",
+            "label": "Sep 15"
+          }
+        },
+        "noBay": false,
+        "coverage": "51 visible non-canceled shot rows; partial shot ledger. All18 hole headers were read. Play date is not shown; Sep22 is the capture/import date. Do not infer putts or FIR/GIR from missing rows. Club profiles show selected TrackMan labels only; actual club and swing intent remain unconfirmed. They show the separate bay baseline and sample counts without borrowing missing round values."
+      }
     }
   ]
 }

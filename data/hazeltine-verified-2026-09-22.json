@@ -155,7 +155,7 @@
       "bagLine": "Club labels are read from this recording. Actual club identities and swing intent can be confirmed per shot.",
       "bagConfirmed": false,
       "clubMap": {},
-      "noBay": true,
+      "noBay": false,
       "trackman": {},
       "shots": [
         {
@@ -882,9 +882,42 @@
         }
       ],
       "verificationNote": "All 18 filmed hole scores verified: 80 (+8), front 41 / back 39. Three canceled mulligans are excluded. Expanded tiles are recorded only where readable; collapsed shots retain displayed distance. Older recap tiles were not verified by this recording.",
-      "coverage": "51 visible non-canceled shot rows; partial shot ledger. All18 hole headers were read. Play date is not shown; Sep22 is the capture/import date. Do not infer putts or FIR/GIR from missing rows.",
+      "coverage": "51 visible non-canceled shot rows; partial shot ledger. All18 hole headers were read. Play date is not shown; Sep22 is the capture/import date. Do not infer putts or FIR/GIR from missing rows. Club profiles show selected TrackMan labels only; actual club and swing intent remain unconfirmed. They show the separate bay baseline and sample counts without borrowing missing round values.",
       "sources": "ScreenRecording_09-22-2026 13-44-18_1.mp4 · original recording; course name confirmed by Jack. See data/evidence/2026-09-22-hazeltine-transcript.json.",
-      "puttingNote": "Simulator auto-finish appears in the recording. A complete assigned-putt count is not established here; putting skill is not inferred from it."
+      "puttingNote": "Simulator auto-finish appears in the recording. A complete assigned-putt count is not established here; putting skill is not inferred from it.",
+      "profileMode": "selected-label",
+      "bayClubLinks": {
+        "3-wood": {
+          "bayId": "bay-20260918-gl18-3w-5w-7i",
+          "club": "3 wood · after slot",
+          "label": "Sep 18 · later block"
+        },
+        "5-wood": {
+          "bayId": "bay-20260918-gl18-3w-5w-7i",
+          "club": "5 wood · after slot",
+          "label": "Sep 18 · later block"
+        },
+        "5-iron": {
+          "bayId": "bay-20260922-range-8i-5i",
+          "club": "5-iron",
+          "label": "Sep 22"
+        },
+        "7-iron": {
+          "bayId": "bay-20260922-range-8i-5i",
+          "club": "7-iron",
+          "label": "Sep 22"
+        },
+        "9-iron": {
+          "bayId": "bay-20260915-range-54",
+          "club": "9-iron",
+          "label": "Sep 15"
+        },
+        "56-wedge": {
+          "bayId": "bay-20260915-range-54",
+          "club": "56° wedge",
+          "label": "Sep 15"
+        }
+      }
     }
   },
   "src": "data/evidence/2026-09-22-hazeltine-transcript.json"

@@ -38,6 +38,7 @@ jobs:
           node tests/spyglass-bay-links.cjs
           node tests/round-comparison-mishits.cjs
           node tests/spyglass-shot-distance.cjs
+          node tests/all-indoor-profiles.cjs
           node tests/round-identity.cjs
           node tests/round-review-import.cjs
       - name: Mirror main to gh-pages
