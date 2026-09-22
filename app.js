@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v161';
+const BUILD = 'v162';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v162', d:'2026-09-22', items:[
+    'APEX NOW APPEARS IN EXACT CLUB DATA when a bay session recorded shot height. It is the average height in feet across readable, non-mishit shots; n shows how many supplied it. The original feet-and-inches shot readings remain in the shot table. Sessions without height do not gain an invented value.' ] },
   { b:'v161', d:'2026-09-22', items:['COMPLETE RANGE SESSION: All 80 source shots reviewed across both September 22 recordings. Twelve distance-dash rows excluded entirely and five clear mishits held out: 63 usable shots across 3W, 5W, two 5i blocks, 7i and 56°. Cleaned carry/total, path/face, strike, launch, best-five comparisons and specific practice takeaways.'] },
   { b:'v160', d:'2026-09-22', items:[
     'TAKEAWAYS NOW COME FROM EACH ROUND. Scoring opportunities and club-level face/path, carry, strike, speed, spin and launch readings compete for the strongest cards. Each shows evidence, a visual, a next-session action and links to its holes. Outdoor scorecards get the same scoring engine; sparse records show fewer cards.' ] },
@@ -3368,6 +3370,7 @@ const BAY_COLS = [
   ['bs',    'BALL MPH', v => Number(v).toFixed(1).replace(/\.0$/, '')],
   ['smash', 'SMASH',   v => Number(v).toFixed(2)],
   ['la',    'LAUNCH°', v => Number(v).toFixed(1)],
+  ['apex',  'APEX FT', v => Number(v).toFixed(1)],
   ['spin',  'SPIN',    v => String(Math.round(v))],
   ['aoa',   'ATTACK°', baySgn],
   ['ld',    'DIR°',    baySgn],
@@ -3384,7 +3387,7 @@ function bayClubTable(clubs){
   return `<div class="tscroll bay-clubs"><table>
     <thead><tr><th>CLUB</th>${cols.map(([, lab]) => `<th>${esc(lab)}</th>`).join('')}</tr></thead>
     <tbody>${clubs.map(c => `<tr><td><b>${esc(c.club ? clubTag(c.club) : '—')}</b></td>
-      ${cols.map(([k, , f]) => `<td>${c[k] == null ? '·' : esc(String(f(c[k])))}</td>`).join('')}</tr>`).join('')}
+      ${cols.map(([k, , f]) => `<td>${c[k] == null ? '·' : esc(String(f(c[k]))) + (k === 'apex' && c.metricCounts?.apex ? ` <small>n=${c.metricCounts.apex}</small>` : '')}</td>`).join('')}</tr>`).join('')}
     </tbody></table></div>`;
 }
 // A session should be readable before it becomes a spreadsheet. Bar lengths share one
@@ -3532,6 +3535,14 @@ function meanKeyed(shots, key){
   const xs = (shots || []).map(s => s[key]).filter(v => v != null && Number.isFinite(+v)).map(Number);
   return xs.length ? xs.reduce((a,b)=>a+b,0) / xs.length : null;
 }
+// TrackMan's shot-height readout is feet/inches; keep the original in the
+// shot table and convert only for an explicitly labelled club-level mean.
+function apexFeet(value){
+  if(typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if(typeof value !== 'string') return null;
+  const match = value.trim().match(/^(\d+)'(?:\s*(\d+(?:\.\d+)?)\s*"?)?$/);
+  return match && (+match[2] || 0) < 12 ? +match[1] + (+match[2] || 0)/12 : null;
+}
 function analysisClubs(detail){
   const groups = (detail || {}).rangeShots;
   const clubs = (detail || {}).clubs || [];
@@ -3559,6 +3570,11 @@ function analysisClubs(detail){
       return null;
     };
     const metrics = Object.fromEntries(metricKeys.map(k => [k, rnd(k, k === 'spin' ? 0 : (k === 'smash' ? 2 : 1))]));
+    const apexReadings = struck.map(s => apexFeet(s.height)).filter(v => v != null);
+    metricCounts.apex = apexReadings.length;
+    const apex = apexReadings.length
+      ? +(apexReadings.reduce((sum, v) => sum + v, 0)/apexReadings.length).toFixed(1)
+      : (base.apex != null && Number.isFinite(+base.apex) ? +base.apex : null);
     return Object.assign({}, base, {
       club: g.club,
       n: struck.length,
@@ -3569,7 +3585,7 @@ function analysisClubs(detail){
       total: metrics.total,
       best: prem && prem.carry != null ? prem.carry : null,
       bestN: prem ? prem.n : null,
-      cs: metrics.cs, bs: metrics.bs, smash: metrics.smash, la: metrics.la,
+      cs: metrics.cs, bs: metrics.bs, smash: metrics.smash, la: metrics.la, apex,
       spin: metrics.spin, aoa: metrics.aoa, ld: metrics.ld,
       dynLoft: metrics.dynLoft, spinLoft: metrics.spinLoft,
       path: metrics.path, face: metrics.face, ftp: metrics.ftp,
