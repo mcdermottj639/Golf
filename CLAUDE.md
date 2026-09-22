@@ -1662,7 +1662,8 @@ this"). Without `k` the app falls back to the section's opening sentence, which 
 briefings still read fine, but an authored `k` is much better. Bodies may use blank lines
 for paragraph breaks — `prose()` honours them (a single `\n` does nothing).
 
-Keep `h2`s few: the jump bar at the top of every view is built from them.
+Keep `h2`s few: the jump bar at the top of every view is built from them. One row,
+swipe sideways — do not wrap it onto two lines.
 
 - **Round-prep briefing**: append a `briefing` entry (dated = one round; undated =
   standing plan, singleton per course/title).

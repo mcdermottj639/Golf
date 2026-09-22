@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v149';
+const BUILD = 'v150';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v150', d:'2026-09-22', items:[
+    'THE JUMP BAR IS ONE ROW. Swipe sideways for Round prep, Coach, The record. It used to wrap onto a second line over the weather.' ] },
   { b:'v149', d:'2026-09-22', items:[
     'TODAY OPENS ON THE NUMBERS. Weather, then the four tiles, then start round. Days, Cumulative, search and the rest sit under that — the morning view is the scoreboard again.',
     'EVERY CLUB STAYS ON CUMULATIVE. The bag table did not come back onto Today.' ] },
@@ -1958,14 +1960,15 @@ function buildJumpBar(){
   if(hs.length < 2) return;
   const bar = document.createElement('div');
   bar.className = 'jumpbar';
+  bar.setAttribute('role', 'navigation');
+  bar.setAttribute('aria-label', 'On this page');
   hs.forEach((h, i) => {
     h.id = h.id || `sec${i}`;
     const b = document.createElement('button');
     b.className = 'jump';
     b.dataset.jump = h.id;
     // Headings read "Scoring mix · 45 holes" or "Shaft at the top (down-the-line)".
-    // Keep the half before the dot, drop a trailing parenthetical — a jump label
-    // only has to be recognisable, and short chips keep the bar to fewer rows.
+    // Keep the half before the dot, drop a trailing parenthetical.
     b.textContent = h.textContent.split('·')[0].replace(/\s*\([^)]*\)\s*$/, '').trim();
     bar.appendChild(b);
   });
