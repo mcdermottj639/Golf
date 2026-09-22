@@ -3003,3 +3003,41 @@ Scoring uses known scores and pars, plus recorded adjacent fairway-to-approach o
 Carry, smash, club speed, ball speed, launch and spin candidates require at least three readings. Display-selection spread thresholds are 10 yd, .08 smash, 5/8 mph club/ball speed, 3 degrees launch and 1000 rpm spin; these are editorial rules for choosing a notable card, never ideal swing ranges or grades. Dated exact range links can add a reference mean only for confirmed groups; never borrow a later session or mix carry with total. Missing values stay absent. Source/sample details are expandable; each card gives evidence, a plot, a concrete next-session test and buttons that open the actual hole evidence or outdoor scorecard row. `review-hole` opens ancestor details, scrolls and focuses the relevant element without modifying data. The old generic 20-ball test remains available below the new cards.
 
 `tests/round-takeaways.cjs` checks distinct results for all four indoor rounds, outdoor scoring, paired counts, missing/zero/partial data, exclusions, all six metric types, linked source safeguards and no record mutation. The module is loaded before round-review and cached with the PWA. Run that test in the publish workflow and verify the real hole buttons and 320/390 layouts in Chromium.
+
+
+## September 22 complete range session (v161)
+
+Two recordings `18-46-05` and `18-50-03` for Sep22 reconcile to 80 source
+shots: 56° n6, 7i n15, 5i target165 n14, 3W n7, 5W n12, 5i target170 n26.
+Audited transcripts: `data/range-2026-09-22-184605.json` and
+`data/range-2026-09-22-185003.json`. The stable NEW bay feed ID is
+`bay-20260922-range-184605-batch1`, now the complete session (both files
+arrived before publication). Do not duplicate this session on future uploads.
+Prior Sep22 8i/5i imports and explicit round-to-bay references are separate.
+
+**Jack's Sep22 rule: a row with no carry AND no total (both dashes) contributes
+nothing to live analysis, including face/path/strike.** Preserve raw source
+transcripts for audit only. The complete new feed excludes those twelve rows:
+7i #7; 5W #3,5,8,9; 5i target170 #1,2,6,10,17,20,26. Then the existing
+clear-mishit filter holds out 5W #10 and target170 5i #13,18,23,25. These
+five raw distance-bearing outliers remain available for exclusion markers;
+the live averages/tables/rings use 63 usable shots. Do not call missing
+readings mishits, fill dashes with zero, or use original screen AVG in live
+metrics after filtering. Both 5i target blocks stay separate.
+
+Cleaned carry / total / best-five carry (yd): 56° 83.6/92.1/85.5;
+7i 133.5/160.8/149.5; 5i165 149.1/179.1/165.4; 3W 177.7/223.2/182.8;
+5W 174.7/207.2/188.3; 5i170 153.9/187.4/168.2. Per-metric counts stay
+explicit: target165 5i #10 lacks club speed; retained target170 #11 has
+some delivery/strike columns off-screen. Never derive these from AVG.
+Source displayed means are retained separately for audit. No outdoor stock
+carry changes. FILM NONE. Ball marking and normalization not shown; numeric
+spin and impact readings transcribed without independently verifying status.
+Specific practice takeaways are stored in the bay finding/story.
+Regression: `node tests/range-sep22-batch1.cjs` (both recordings).
+
+Target-hit numerator/denominator now use the same retained shot IDs as the charts. Target-labelled blocks appear in the day header. The v160 round takeaways release is preserved.
+
+Validation: importer/arithmetic tests passed, including 80→68→63 count reconciliation and target-hit cohorts; real browser checked at 320/390px with six blocks, correct wedge 6/6 total hits, no horizontal overflow or JS errors. Prior v160 round takeaways regression passed.
+
+The complete session ships in `range-20260922-feed.json`, fetched alongside the existing feeds on open/resume and cached by the v161 service worker. It uses the same append-only/idempotent importer. The large historical coach feed remains byte-identical.

@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v160';
+const BUILD = 'v161';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v161', d:'2026-09-22', items:['COMPLETE RANGE SESSION: All 80 source shots reviewed across both September 22 recordings. Twelve distance-dash rows excluded entirely and five clear mishits held out: 63 usable shots across 3W, 5W, two 5i blocks, 7i and 56°. Cleaned carry/total, path/face, strike, launch, best-five comparisons and specific practice takeaways.'] },
   { b:'v160', d:'2026-09-22', items:[
     'TAKEAWAYS NOW COME FROM EACH ROUND. Scoring opportunities and club-level face/path, carry, strike, speed, spin and launch readings compete for the strongest cards. Each shows evidence, a visual, a next-session action and links to its holes. Outdoor scorecards get the same scoring engine; sparse records show fewer cards.' ] },
   { b:'v159', d:'2026-09-22', items:[
@@ -3311,9 +3312,11 @@ function bayLiveSetup(b){
   const first = clubs.filter(c => !/· /.test(c.club)).map(c => `${strip(c)} ${c.n}`);
   const seq = clubs.filter(c => /· (open|window|rest)/i.test(c.club)).map(c => `${clubTag(c.club)} ${c.n}`);
   const after = clubs.filter(c => /after slot/i.test(c.club)).map(c => `${strip(c)} ${c.n}`);
+  const targets = clubs.filter(c => /· target /i.test(c.club)).map(c => `${clubCanon(c.club)} target ${c.club.split('target ')[1]}: ${c.n}`);
   const bits = [`${n} remaining`];
   if(first.length) bits.push('first ' + first.join(' · '));
   if(seq.length) bits.push(seq.join(' · '));
+  if(targets.length) bits.push(targets.join(' · '));
   if(after.length) bits.push('after slot ' + after.join(' · '));
   return bits.join(' · ');
 }
@@ -3672,13 +3675,15 @@ function rangeShotVisuals(d){
       ${prem.total!=null?`<div class="range-bar-row total best-tot"><span>Best tot</span><span class="range-track"><i style="width:${prem.total/max*100}%"></i></span><b>${Number(prem.total).toFixed(1)}</b></div>`:''}`
       : '';
     const bestLine = prem ? `<p class="sm faint">${esc(premierLine(prem))}</p>` : '';
+    const retainedIds = new Set(struckShots(c).map(s => s.shot));
+    const targetHits = hits => (hits || []).filter(id => retainedIds.has(id)).length;
     if(avg.carry != null){
       return `<div class="range-club">
       <h4>${esc(c.club)} · ${avg.n} shots</h4>
       <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
       ${avg.total!=null?`<div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${(+avg.total).toFixed(1)}</b></div>`:''}
       ${bestBar}
-      ${c.target!=null?`<p class="sm">Target ${c.target} yd · carry hits <b>${(c.carryHits||[]).length}/${c.shots.length}</b> · total hits <b>${(c.totalHits||[]).length}/${c.shots.length}</b></p>`:''}
+      ${c.target!=null?`<p class="sm">Target ${c.target} yd · carry hits <b>${targetHits(c.carryHits)}/${retainedIds.size}</b> · total hits <b>${targetHits(c.totalHits)}/${retainedIds.size}</b></p>`:''}
       ${del?`<p class="sm faint">${esc(del)}</p>`:''}
       ${bestLine}
     </div>`;
@@ -10549,7 +10554,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 
