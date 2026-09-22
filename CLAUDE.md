@@ -2619,15 +2619,16 @@ clipped search, concatenated "The one thingyou logged this live", no cards, no c
 paper, the tab bar sitting on the last line. Do not thin Today by deleting the theme
 or the Aug 30 blocks. Findability is additive.
 
-Current `home()`: `sessionShortcuts` (Days · Cumulative) · the four quick links · **search** (no empty-hint
-dump; placeholder is the hint) · `wxCard` · `theNumbers` · `startRound` · Round prep
-(cheat sheet included) · `oneThing` · the coach tip · `whatsNew` · the return window
-if any · Numbers / Evidence / Decisions / Data. Search, Numbers Index and Evidence
-are extra doors, not replacements.
+Current `home()`: `wxCard` · `theNumbers` · `startRound` · Round prep · `oneThing` ·
+the coach tip · `whatsNew` · `sessionShortcuts` (Days · Cumulative) · the four quick
+links · **search** · the return window if any · Numbers / Evidence / Decisions / Data.
+
+**v149 — Today opens on The numbers.** Weather then the four tiles then start round.
+Shortcuts and search sit below, not above. That is the Aug 30 order Jack asked for
+again. Search, Numbers Index and Evidence stay extra doors, not replacements.
 
 **v148 — every club is Cumulative, not Today.** The remaining/best-5 table and the every-club
 path + face lanes were on Today after v143/v145. They belong on `cumulativeView()` only.
-Today is the morning door (Days / Cumulative tiles, weather, the numbers, round prep).
 Do not put the bag table back on `home()`. Days stay days.
 
 ### Findability — provenance, meaning, Numbers, search, Evidence (Sep 18 2026)
