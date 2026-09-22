@@ -2875,7 +2875,7 @@ not a number to type). Path/face rings and range bars are **struck-ball averages
 clear mishits held out (v122). Then the four on-course areas (same `areaCards()` /
 `gameAreas()` — do not invent a fifth), the latest bay finding, and the open to-dos.
 Simulator rounds are days you can open and are **never** in those four — `realRounds()`
-stays the door. It moves when a day lands; the n is the accuracy.
+stays the door. It updates with imported records; n describes sample coverage, not accuracy.
 
 Old `data-kind="range|sim|outdoor|film"` links still resolve as Day filters. Original
 array indices remain the navigation keys after sorting; never navigate using the sorted
@@ -3041,3 +3041,26 @@ Target-hit numerator/denominator now use the same retained shot IDs as the chart
 Validation: importer/arithmetic tests passed, including 80→68→63 count reconciliation and target-hit cohorts; real browser checked at 320/390px with six blocks, correct wedge 6/6 total hits, no horizontal overflow or JS errors. Prior v160 round takeaways regression passed.
 
 The complete session ships in `range-20260922-feed.json`, fetched alongside the existing feeds on open/resume and cached by the v161 service worker. It uses the same append-only/idempotent importer. The large historical coach feed remains byte-identical.
+
+
+## Cumulative planning and visual overview (v163)
+Cumulative uses the existing cumulativeClubSeries/rollRemaining reviewed cohorts; it does
+not create a second data store. It leads with section links, a next-session measurement
+plan, and a carry-bar bag overview. Expand each club for per-metric counts and up to six
+source-linked carry blocks. Same-day blocks and differing setups are labelled; changes
+are observations, not proven improvement. Full tables and delivery lanes remain expandable.
+The plan selects the largest nonnegative latest eligible block best-minus-retained carry
+gap (at least five retained shots), labels its source date, and suggests a repeatable
+measurement test, never a predicted distance gain. Outdoor areas still use realRounds;
+simulator and film navigation remains separate. Existing coaching assessments update only
+when reviewed findings are published, not simply when numeric data arrives.
+Path claims use analysisDelivery rather than raw averages. Sample counts never claim
+accuracy, and delivery measurements do not diagnose over-the-top body motion.
+
+v163 validation: cumulative populated/empty render and unchanged-state checks passed,
+along with September 22 range arithmetic/import, round takeaways, round review and
+round importer suites. The 320/390 browser suite is provided as
+tests/cumulative-browser.cjs, but could not run here: Chromium process_singleton socket
+creation was denied by the runtime. Do not claim visual QA. Jack explicitly requested merge to main after being informed
+of this limitation; publication proceeds under that instruction. The browser check
+remains outstanding.

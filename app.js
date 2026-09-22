@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v162';
+const BUILD = 'v163';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v163', d:'2026-09-22', items:['CUMULATIVE NOW FLOWS FROM PLAN TO EVIDENCE: visual carry ladder, expandable club histories, a measured next-session test, outdoor areas and simulator access. Full tables and coaching detail remain available. Sample counts describe coverage, not accuracy.'] },
   { b:'v162', d:'2026-09-22', items:[
     'APEX NOW APPEARS IN EXACT CLUB DATA when a bay session recorded shot height. It is the average height in feet across readable, non-mishit shots; n shows how many supplied it. The original feet-and-inches shot readings remain in the shot table. Sessions without height do not gain an invented value.' ] },
   { b:'v161', d:'2026-09-22', items:['COMPLETE RANGE SESSION: All 80 source shots reviewed across both September 22 recordings. Twelve distance-dash rows excluded entirely and five clear mishits held out: 63 usable shots across 3W, 5W, two 5i blocks, 7i and 56°. Cleaned carry/total, path/face, strike, launch, best-five comparisons and specific practice takeaways.'] },
@@ -4106,14 +4107,14 @@ function cumulativeFlightRead(delivery){
   const meanFtp = ftps.length ? mean(ftps) : null;
   let ball = 'Not enough face numbers on this session to name the curve.';
   if(meanF != null && meanFtp != null){
-    if(meanF < 0 && meanFtp > 0) ball = 'Face left of the target and open to that path. The ball starts left and peels right — a pull-fade. Same pattern every bay day that has measured both halves.';
+    if(meanF < 0 && meanFtp > 0) ball = 'Face left of the target and open to that path. For a centered strike, this tends toward a left start and rightward curve. This describes the session averages; individual shots may differ.';
     else if(meanF < 0 && meanFtp < 0) ball = 'Face left of the target and closed to the path. Start left, curve left.';
     else if(meanF > 0 && meanFtp > 0) ball = 'Face right of the target and open to the path. Start right, curve right.';
     else ball = 'Face right of the target and closed to the path. Start right, curve left.';
   }
   return `<p class="sm cum-flight"><b>${allLeft ? 'Every club path on this session is left of the target' : 'Club path is mixed'}</b>
     · mean path ${esc(baySgn(meanP))}°${meanF != null ? ` · mean face ${esc(baySgn(meanF))}°` : ''}${meanFtp != null ? ` · mean face-to-path ${esc(baySgn(meanFtp))}°` : ''}.
-    ${esc(ball)} Fix the path first, then the face. ${meaningBtn('faceAtImpact')}</p>`;
+    ${esc(ball)} Test path and face together rather than treating either average as a swing diagnosis. ${meaningBtn('faceAtImpact')}</p>`;
 }
 function cumulativePathHistory(){
   const list = cumulativePathBays();
@@ -4133,6 +4134,58 @@ function cumulativePathHistory(){
     }).join('')}
     <p class="bvcap">Each small dot is one club's average path that day. The ring is the mean of those clubs — a shape, not a number to type. Negative is out-to-in.</p>
   </div>`;
+}
+
+// Derived from the same reviewed cohorts as Days. Nothing here writes playing yardages.
+function cumulativeOverview(){
+  const by = cumulativeClubSeries();
+  const rows = cumulativeClubKeys(by).map(k => {
+    const pts = by.get(k), roll = rollRemaining(pts);
+    return {k, pts, roll, last:pts[pts.length-1]};
+  });
+  const num = (v,d=1) => v == null || !Number.isFinite(+v) ? '—' : (+v).toFixed(d);
+  const scale = Math.max(1,...rows.map(r=>r.roll.carry || 0));
+  const candidates = rows.map(r=>{
+    const p = [...r.pts].reverse().find(p=>p.carry != null && p.best != null && p.n >= 5);
+    return {...r,p,gap:p ? p.best-p.carry : -1};
+  }).filter(r=>r.p && r.gap >= 0).sort((a,b)=>b.gap-a.gap);
+  const focus = candidates[0];
+  return `<nav class="cum-jumps" aria-label="Cumulative sections">
+    <a href="#cum-plan">Plan</a><a href="#cum-bag">Bag & trends</a><a href="#cum-course">On course</a><a href="#cum-evidence">Evidence</a>
+  </nav>
+  <section class="card cum-plan" id="cum-plan">
+    <span class="eyebrow">Your next session</span><h2>Turn the record into a test</h2>
+    ${focus ? `<p><b>${esc(clubCanonLabel(focus.k))}: make the usual shot more like your better ones.</b>
+    In the ${esc(fmtDate(focus.p.date))} block, retained carry averaged ${num(focus.p.carry)} yd; best ${focus.p.bestN || 5} averaged ${num(focus.p.best)} yd.
+    That ${num(focus.gap)} yd gap is a consistency question, not promised distance.</p>
+    <div class="cum-steps"><div><b>01 · Establish</b><p>Warm up, then record 10 shots with this club and one target. Keep the same setup and ball conditions.</p></div>
+    <div><b>02 · Compare</b><p>Compare retained carry and its spread with this block. Track path and face-to-path alongside it; chasing the longest shot alone will miss the pattern.</p></div>
+    <div><b>03 · Decide</b><p>Look for a smaller gap to your best shots without a wider miss. Repeat on another day before changing a playing yardage.</p></div></div>
+    <button class="btn" data-action="open-bay" data-i="${focus.p.i}">Open the baseline session</button>`
+    : '<p>Build a baseline: record 10 shots with one club, one target and readable carry/total. Add path and face when available.</p>'}
+    <p class="sm faint">Suggested measurement plan. The club is selected by the largest available latest-block best-shot gap, not estimated strokes lost.</p>
+  </section>
+  <section class="card" id="cum-bag"><span class="eyebrow">Range evidence</span><h2>Your bag at a glance</h2>
+    <p class="sm">Bars show rolling indoor carry. Open a club for its session history and delivery. Total includes roll; carry is distance through the air.</p>
+    <div class="cum-club-list">${rows.map(({k,pts,roll,last})=>{
+      const measured = pts.filter(p=>p.carry != null);
+      const history = measured.slice(-6);
+      const max = Math.max(1,...history.map(p=>p.carry));
+      return `<details class="cum-club"><summary><span class="cum-club-name">${esc(clubCanonLabel(k))}</span>
+        <span class="cum-bar"><i style="width:${Math.max(0,(roll.carry || 0)/scale*100)}%"></i></span>
+        <span><b>${num(roll.carry)}</b><small>yd carry · n=${roll.metricCounts.carry || 0}</small></span></summary>
+        <div class="cum-club-body"><div class="cum-metrics">
+          <span><b>${num(roll.total)}</b>Total yd · n=${roll.metricCounts.total || 0}</span>
+          <span><b>${num(roll.smash,2)}</b>Smash · n=${roll.metricCounts.smash || 0}</span>
+          <span><b>${num(roll.path)}°</b>Path · n=${roll.metricCounts.path || 0}</span>
+          <span><b>${num(roll.ftp)}°</b>Face–path · n=${roll.metricCounts.ftp || 0}</span>
+        </div><p class="sm">Smash is ball speed ÷ club speed. Path is club travel relative to target; face–path is where the face points relative to that travel. Positive angles point right, negative left.</p>
+        <h3>Recent carry readings</h3>
+        ${history.map(p=>`<button class="cum-history" data-action="open-bay" data-i="${p.i}"><span>${esc(fmtDate(p.date))}<small>${esc(p.phase)} · n=${p.metricCounts?.carry ?? p.n ?? '—'}</small></span><span class="cum-bar"><i style="width:${Math.max(0,p.carry/max*100)}%"></i></span><b>${num(p.carry)}</b></button>`).join('') || '<p class="sm">No readable carry history yet.</p>'}
+        <p class="sm faint">Up to six recorded blocks; same-day blocks are not separate days. Setup, intent and conditions can differ, so movement alone does not prove improvement.</p>
+        <button class="btn" data-action="open-bay" data-i="${last.i}">Latest source · ${esc(fmtDate(last.date))}</button></div></details>`;
+    }).join('') || '<p>No reviewed range clubs yet. Open Days to check your sessions.</p>'}</div>
+  </section>`;
 }
 function cumulativeView(){
   const C = areaCards();
@@ -4158,8 +4211,10 @@ function cumulativeView(){
   });
   const evoGood = evoBits.filter(r => r.mark === '\u2713' || r.mark === '~');
   const evoBad = evoBits.filter(r => r.mark === '\u2717' || r.mark === '?');
-  const allPathsLeft = pathBays.length && pathBays.every(({ b }) =>
-    ((b.detail || {}).delivery || []).filter(d => d.path != null).every(d => +d.path < 0));
+  const allPathsLeft = pathBays.length && pathBays.every(({ b }) => {
+    const rows = analysisDelivery(b.detail || {}).filter(d => d.path != null && Number.isFinite(+d.path));
+    return rows.length && rows.every(d => +d.path < 0);
+  });
   const recs = (S.actions || []).filter(a => !a.done);
   const recShow = recs.filter(a => a.pri).concat(recs.filter(a => !a.pri)).slice(0, 4);
   const tile = k => {
@@ -4176,7 +4231,7 @@ function cumulativeView(){
   return `
   <h2>Cumulative</h2>
   <div class="card">
-    <p class="sm">Days stay days. This is what they add up to — the analysis, the pictures, and what to do next. It moves when a day lands. The n is the accuracy.</p>
+    <p class="sm">Days stay days. This is what they add up to — the analysis, the pictures, and what to do next. It updates when reviewed data is imported. Sample counts show coverage, not measurement accuracy.</p>
     <div class="cum-n">
       <span>${C.liveHoles} live holes</span>
       <span>${outdoor} outdoor round${outdoor===1?'':'s'}</span>
@@ -4187,8 +4242,10 @@ function cumulativeView(){
     ${since.length ? `<p class="sm faint" style="margin-top:8px">Standing on ${esc(since.join(' · '))}.</p>` : ''}
   </div>
 
-  ${cumulativeBagCard(false)}
-  ${cumulativeClubFaceCard()}
+  ${cumulativeOverview()}
+  <details class="card cum-detail"><summary>All club metrics · full table</summary>${cumulativeBagTable()}</details>
+  <details class="cum-detail"><summary class="card">Delivery patterns · path & face</summary>
+  ${cumulativeClubFaceCard()}</details>
 
   ${f ? `<div class="card">
     <h2>The one thing</h2>
@@ -4200,8 +4257,8 @@ function cumulativeView(){
   </div>` : ''}
 
   <div class="card">
-    <h2>Working · needs work</h2>
-    <p class="sm faint">Closed faults and checkmarks on one side. Open faults and the measured miss on the other. Both move when a day lands.</p>
+    <h2 id="cum-evidence">Working · needs work</h2>
+    <p class="sm faint">Closed faults and checkmarks on one side. Open faults and the measured miss on the other. These coaching assessments change when reviewed findings are published.</p>
     <div class="cum-split">
       <div class="cum-col work">
         <h3>Working</h3>
@@ -4225,7 +4282,7 @@ function cumulativeView(){
 
   <div class="card">
     <h2>Club path + face ${provBadge('bay')}</h2>
-    <p class="sm">Over the top throws the club out, then across. An open face turns that into start-left, curve-right. The pictures are the diagnosis; the dots below are the measurements.</p>
+    <p class="sm">Path describes club travel; face helps explain start direction and face-to-path helps explain curvature. Launch-monitor readings alone do not establish the body movement causing them.</p>
     <div class="hipcompare">${pathDiagram()}</div>
     ${latest ? `<p class="sm faint" style="margin-top:10px">Latest measured day · ${esc(fmtDate(latest.b.date))} · ${esc(latest.b.mode || latest.b.setup || 'bay')}. ${provBadge('trackman')}</p>
       ${cumulativeFlightRead(delivery)}` : '<p class="sm">No bay session has a path reading yet.</p>'}
@@ -4233,7 +4290,7 @@ function cumulativeView(){
   </div>
 
   <div class="card">
-    <h2>On course ${provBadge('on-course')}</h2>
+    <h2 id="cum-course">On course ${provBadge('on-course')}</h2>
     <p class="sm faint">${C.cards.length ? areaProvLine(C) : 'Nothing on-course on file yet.'}
       ${indoor ? ' Indoor rounds are days you can open. They never enter these four.' : ''}</p>
     <div class="areagrid">${AREAS.map(tile).join('')}</div>
@@ -4253,6 +4310,10 @@ function cumulativeView(){
     ${recShow.map(a => `<div class="cum-rec">${expandable(a.text)}</div>`).join('')}
   </div>` : ''}
 
+  <div class="card"><h2>Explore the whole record</h2>
+    <p class="sm">Simulator scores and shot profiles have their own context. Putting, short-game and swing assessments above retain their reviewed evidence.</p>
+    <div class="cum-jumps"><button class="btn" data-action="session-category" data-kind="sim">Simulator rounds (${indoor})</button><button class="btn" data-action="session-category" data-kind="film">Swing & putting film (${films})</button></div>
+  </div>
   <div class="card flat">
     <div class="linkrow" data-action="session-category" data-kind="days" style="border-bottom:none">
       <span><b>Days →</b><span class="sm"> the captures this picture is standing on</span></span><span class="arr">→</span></div>
