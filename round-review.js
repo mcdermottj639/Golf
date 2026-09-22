@@ -89,7 +89,7 @@
       ? `<p class="sm">${esc(q.sources)}</p>`
       : `<p class="sm">TrackMan: average drive 217 yd, longest 245 yd, scrambling 13%, assigned putts 29. Companion-app recording: driving distance 224.34 (unit not visible in captured panel), scrambling 66.67% (10/15), total strokes gained −29.76 with benchmark unconfirmed. These are source reports, not reconciled statistics; no combined strokes-gained diagnosis is made.</p>`;
     const holeIntro = q.bagConfirmed
-      ? 'Club names below are the shot-list labels. Distance is displayed carry, not a playing-yardage update. Missing tiles are blank, never zero. A flag excludes a reading from club summaries.'
+      ? 'Club names below are the shot-list labels. Distance follows each source record; the carry tile is shown separately where available. Missing tiles stay blank. A flag excludes a reading from club summaries.'
       : 'Club names below are selected TrackMan labels, NOT confirmed actual clubs. Distance is the displayed shot distance, not confirmed carry. Face-to-path is calculated as face minus path when both are present. Source times are approximate positions in supplied recordings. A flag excludes a reading from club summaries.';
     const bayFoot = q.noBay
       ? 'Bay comparison is off for this card so a Mini labelled 3w cannot land on a 3-wood row. Full-shot n is this round only.'
@@ -98,7 +98,8 @@
       <h2>Round Review · what to do next</h2>
       ${ctx.bayVisuals||''}
       <div class="card"><div class="rowgrid g3"><div class="stat"><div class="v">${fmtPair(tm.fairways)}</div><div class="l">Fairways · TrackMan</div></div><div class="stat"><div class="v">${fmtPair(tm.gir)}</div><div class="l">Greens · TrackMan</div></div><div class="stat"><div class="v">${metric(tm.averageDrive)}</div><div class="l">Average drive · yd</div></div></div>
-      <p class="sm">${shots.length} verified shot observations across ${new Set(shots.map(s=>s.hole)).size} holes; the scorecard covers all 18. This is a partial shot ledger—not a complete shot count. Collapsed, missing and questionable readings are not filled in.</p>
+      <p class="sm">${shots.length} shot observations across ${new Set(shots.map(s=>s.hole)).size} holes; ${(r.holes||[]).filter(h=>h.s!=null).length} holes have recorded scores. Coverage and unresolved readings are listed below.</p>
+      ${q.verificationNote ? `<p class="sm"><b>Source check:</b> ${esc(q.verificationNote)}</p>` : ''}
       ${bagP}
       ${puttP}
       ${bayIndex>=0&&!ctx.bayVisuals&&!q.noBay?`<button class="btn" data-action="open-bay" data-i="${bayIndex}">Compare with Sep 14 Bay session</button>`:''}

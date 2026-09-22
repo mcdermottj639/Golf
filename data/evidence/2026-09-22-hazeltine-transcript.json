@@ -1,0 +1,1142 @@
+{
+  "source_video": "ScreenRecording_09-22-2026 13-44-18_1.mp4",
+  "video_duration_seconds": 99.833,
+  "capture_date": "2026-09-22",
+  "play_date": null,
+  "course": "Hazeltine National",
+  "course_basis": "User-confirmed.",
+  "method": "Visual review of frames sampled every 2 seconds. The recording cycles back to Hole 1 at about 98 seconds. Header/score entries cover all 18 holes. Shot entries are only the visible timeline rows and expanded metric panels; do not infer hidden rows or shot order from a panel during a screen transition. Expanded metric panels were rechecked against the original full-size frames at their cited offsets; the 2-second contact sheet was not used for numeric transcription.",
+  "round_summary": {
+    "score_from_visible_hole_headers": 80,
+    "par_from_visible_hole_headers": 72,
+    "score_vs_par": 8,
+    "hole_scores_sum_check": 80,
+    "prior_import_score": 80,
+    "preserve_prior_score": true,
+    "note": "The video shows a complete 18-hole score vector summing to 80 (+8). Play date is not shown. This does not authenticate the prior imported round date; 2026-09-22 remains the import/capture date only."
+  },
+  "holes": [
+    {
+      "n": 1,
+      "t": 0,
+      "par": 4,
+      "yards": 390,
+      "hcp": 5,
+      "score": 5,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 244,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 144
+        },
+        {
+          "club": "7-iron",
+          "target_yards": 157,
+          "lie_or_destination": "semi rough",
+          "remaining_yards": 17
+        },
+        {
+          "club": "56°",
+          "target_yards": 20,
+          "lie_or_destination": "green",
+          "remaining": "9 ft 10 in to hole"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "3-wood",
+        "target_yards": 244,
+        "carry_yards": 205.3,
+        "path_deg": -3.6,
+        "spin_rpm": 2773,
+        "face_to_path_deg": 1.4,
+        "smash": 1.48,
+        "ball_speed_mph": 131.8,
+        "frame_t": 0
+      }
+    },
+    {
+      "n": 2,
+      "t": 6,
+      "par": 4,
+      "yards": 367,
+      "hcp": 9,
+      "score": 3,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 186,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 196
+        },
+        {
+          "club": "5-iron",
+          "target_yards": 181,
+          "lie_or_destination": "sand",
+          "remaining_yards": 10
+        },
+        {
+          "club": "56°",
+          "target_yards": 10,
+          "lie_or_destination": "hole",
+          "result": "birdie"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "56°",
+        "target_yards": 10,
+        "carry_yards": 11.7,
+        "path_deg": 2.4,
+        "spin_rpm": 2182,
+        "face_to_path_deg": -1.1,
+        "smash": 1.21,
+        "ball_speed_mph": 23.5,
+        "frame_t": 10
+      }
+    },
+    {
+      "n": 3,
+      "t": 12,
+      "par": 5,
+      "yards": 522,
+      "hcp": 11,
+      "score": 6,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 209,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 314
+        },
+        {
+          "club": "3-wood",
+          "target_yards": 137,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 176
+        },
+        {
+          "club": "5-iron",
+          "target_yards": 154,
+          "lie_or_destination": "rough",
+          "remaining_yards": 23
+        },
+        {
+          "club": "56°",
+          "target_yards": 26,
+          "lie_or_destination": "green",
+          "remaining": "14 ft 1 in to hole"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "56°",
+        "target_yards": 26,
+        "carry_yards": 15.9,
+        "path_deg": 0.1,
+        "spin_rpm": 2567,
+        "face_to_path_deg": 2.6,
+        "smash": 1.05,
+        "ball_speed_mph": 28.4,
+        "frame_t": 18
+      }
+    },
+    {
+      "n": 4,
+      "t": 20,
+      "par": 3,
+      "yards": 160,
+      "hcp": 15,
+      "score": 3,
+      "visible_shots": [
+        {
+          "club": "5-iron",
+          "target_yards": 167,
+          "lie_or_destination": "green",
+          "remaining": "43 ft to hole"
+        },
+        {
+          "event": "Auto finish (2 strokes)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "5-iron",
+        "target_yards": 167,
+        "carry_yards": 138.3,
+        "path_deg": -2.0,
+        "spin_rpm": 2654,
+        "face_to_path_deg": -0.7,
+        "smash": 1.36,
+        "ball_speed_mph": 104.9,
+        "frame_t": 20
+      }
+    },
+    {
+      "n": 5,
+      "t": 22,
+      "par": 4,
+      "yards": 365,
+      "hcp": 1,
+      "score": 5,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 212,
+          "lie_or_destination": "sand",
+          "remaining_yards": 141
+        },
+        {
+          "club": "9-iron",
+          "target_yards": 113,
+          "lie_or_destination": "sand",
+          "remaining_yards": 18
+        },
+        {
+          "club": "56°",
+          "target_yards": 9,
+          "lie_or_destination": "semi rough",
+          "remaining_yards": 8
+        },
+        {
+          "club": "56°",
+          "target_yards": 9,
+          "lie_or_destination": "green",
+          "remaining": "5 ft 8 in to hole"
+        },
+        {
+          "event": "Auto finish (1 stroke)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "3-wood",
+        "target_yards": 212,
+        "carry_yards": 186.7,
+        "path_deg": -1.9,
+        "spin_rpm": 3544,
+        "face_to_path_deg": 2.4,
+        "smash": 1.47,
+        "ball_speed_mph": 131.8,
+        "frame_t": 22
+      }
+    },
+    {
+      "n": 6,
+      "t": 30,
+      "par": 4,
+      "yards": 344,
+      "hcp": 3,
+      "score": 5,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 224,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 135
+        },
+        {
+          "club": "7-iron",
+          "target_yards": 144,
+          "lie_or_destination": "sand",
+          "remaining_yards": 13
+        },
+        {
+          "club": "56°",
+          "target_yards": 21,
+          "lie_or_destination": "green",
+          "remaining": "23 ft 4 in to hole"
+        },
+        {
+          "event": "Auto finish (2 strokes)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "3-wood",
+        "target_yards": 224,
+        "carry_yards": 191.6,
+        "path_deg": 6.2,
+        "spin_rpm": 1958,
+        "face_to_path_deg": -2.2,
+        "smash": 1.48,
+        "ball_speed_mph": 130.3,
+        "frame_t": 30
+      }
+    },
+    {
+      "n": 7,
+      "t": 34,
+      "par": 5,
+      "yards": 494,
+      "hcp": 13,
+      "score": 5,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 182,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 324
+        },
+        {
+          "club": "3-wood",
+          "target_yards": 237,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 65
+        },
+        {
+          "club": "56°",
+          "target_yards": 40,
+          "lie_or_destination": "semi rough",
+          "remaining_yards": 2,
+          "cancelled_by_mulligan": true
+        },
+        {
+          "event": "Mulligan; previous shot (56°, 40 yd semi-rough) does not count"
+        },
+        {
+          "club": "56°",
+          "target_yards": 54,
+          "lie_or_destination": "green",
+          "remaining": "21 ft 10 in to hole"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "56°",
+        "target_yards": 40,
+        "carry_yards": 32.8,
+        "path_deg": 2.1,
+        "spin_rpm": 3430,
+        "face_to_path_deg": -0.8,
+        "smash": 1.04,
+        "ball_speed_mph": 41.1,
+        "frame_t": 38
+      },
+      "additional_expanded_metrics": {
+        "club": "56°",
+        "target_yards": 54,
+        "carry_yards": 44.5,
+        "path_deg": 4.1,
+        "spin_rpm": 4618,
+        "face_to_path_deg": -6.6,
+        "smash": 1.16,
+        "ball_speed_mph": 49.8,
+        "frame_t": 48
+      }
+    },
+    {
+      "n": 8,
+      "t": 40,
+      "par": 3,
+      "yards": 124,
+      "hcp": 17,
+      "score": 4,
+      "visible_shots": [
+        {
+          "club": "7-iron",
+          "target_yards": 143,
+          "lie_or_destination": "rough",
+          "remaining_yards": 17
+        },
+        {
+          "club": "56°",
+          "target_yards": 28,
+          "lie_or_destination": "semi rough",
+          "remaining_yards": 9
+        },
+        {
+          "club": "56°",
+          "target_yards": 10,
+          "lie_or_destination": "green",
+          "remaining": "2 ft 6 in to hole"
+        },
+        {
+          "event": "Auto finish (1 stroke)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "7-iron",
+        "target_yards": 143,
+        "carry_yards": 129.8,
+        "path_deg": -3.7,
+        "spin_rpm": 6218,
+        "face_to_path_deg": 6.0,
+        "smash": 1.35,
+        "ball_speed_mph": 100.4,
+        "frame_t": 40
+      }
+    },
+    {
+      "n": 9,
+      "t": 50,
+      "par": 4,
+      "yards": 376,
+      "hcp": 7,
+      "score": 5,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 207,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 169
+        },
+        {
+          "club": "5-iron",
+          "target_yards": 186,
+          "lie_or_destination": "semi rough",
+          "remaining_yards": 27
+        },
+        {
+          "club": "56°",
+          "target_yards": 22,
+          "lie_or_destination": "green",
+          "remaining": "14 ft 4 in to hole"
+        },
+        {
+          "event": "Auto finish (2 strokes)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "3-wood",
+        "target_yards": 207,
+        "carry_yards": 180.8,
+        "path_deg": -2.2,
+        "spin_rpm": 1532,
+        "face_to_path_deg": 2.0,
+        "smash": 1.37,
+        "ball_speed_mph": 116.9,
+        "frame_t": 50
+      }
+    },
+    {
+      "n": 10,
+      "t": 54,
+      "par": 4,
+      "yards": 378,
+      "hcp": 8,
+      "score": 5,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 237,
+          "lie_or_destination": "rough",
+          "remaining_yards": 215
+        },
+        {
+          "club": "5-iron",
+          "target_yards": 116,
+          "lie_or_destination": "rough",
+          "remaining_yards": 122,
+          "cancelled_by_mulligan": true
+        },
+        {
+          "event": "Mulligan; previous shot (5-iron, 116 yd rough) does not count"
+        },
+        {
+          "club": "5-wood",
+          "target_yards": 160,
+          "lie_or_destination": "semi rough",
+          "remaining_yards": 38
+        },
+        {
+          "club": "56°",
+          "target_yards": 32,
+          "lie_or_destination": "green",
+          "remaining": "21 ft 2 in to hole"
+        },
+        {
+          "event": "Auto finish (2 strokes)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "5-iron",
+        "target_yards": 116,
+        "carry_yards": 131.7,
+        "path_deg": -5.1,
+        "spin_rpm": 4019,
+        "face_to_path_deg": 2.4,
+        "smash": 1.36,
+        "ball_speed_mph": 106.3,
+        "frame_t": 56
+      },
+      "additional_expanded_metrics": {
+        "club": "5-wood",
+        "target_yards": 160,
+        "carry_yards": 140.2,
+        "path_deg": 6.5,
+        "spin_rpm": 2895,
+        "face_to_path_deg": -7.5,
+        "smash": 1.46,
+        "ball_speed_mph": 125.5,
+        "frame_t": 60
+      }
+    },
+    {
+      "n": 11,
+      "t": 62,
+      "par": 5,
+      "yards": 515,
+      "hcp": 12,
+      "score": 5,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 220,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 321
+        },
+        {
+          "club": "3-wood",
+          "target_yards": 189,
+          "lie_or_destination": "sand",
+          "remaining_yards": 119
+        },
+        {
+          "club": "9-iron",
+          "target_yards": 116,
+          "lie_or_destination": "semi rough",
+          "remaining_yards": 7
+        },
+        {
+          "club": "56°",
+          "target_yards": 8,
+          "lie_or_destination": "green",
+          "remaining": "6 ft 4 in to hole"
+        },
+        {
+          "event": "Auto finish (1 stroke); Par"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "3-wood",
+        "target_yards": 220,
+        "carry_yards": 198.4,
+        "path_deg": -1.3,
+        "spin_rpm": 2223,
+        "face_to_path_deg": 3.7,
+        "smash": 1.44,
+        "ball_speed_mph": 128.3,
+        "frame_t": 62
+      }
+    },
+    {
+      "n": 12,
+      "t": 70,
+      "par": 4,
+      "yards": 374,
+      "hcp": 2,
+      "score": 4,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 234,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 151
+        },
+        {
+          "club": "7-iron",
+          "target_yards": 156,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 9
+        },
+        {
+          "club": "56°",
+          "target_yards": 9,
+          "lie_or_destination": "green",
+          "remaining": "5 ft 8 in to hole"
+        },
+        {
+          "event": "Auto finish (1 stroke)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "7-iron",
+        "target_yards": 156,
+        "carry_yards": 148.4,
+        "path_deg": -5.5,
+        "spin_rpm": 5737,
+        "face_to_path_deg": 1.8,
+        "smash": 1.4,
+        "ball_speed_mph": 108.2,
+        "frame_t": 70
+      }
+    },
+    {
+      "n": 13,
+      "t": 74,
+      "par": 3,
+      "yards": 166,
+      "hcp": 16,
+      "score": 4,
+      "visible_shots": [
+        {
+          "club": "5-iron",
+          "target_yards": 67,
+          "lie_or_destination": "rough",
+          "remaining_yards": 104,
+          "cancelled_by_mulligan": true
+        },
+        {
+          "event": "Mulligan; previous shot (5-iron, 67 yd rough) does not count"
+        },
+        {
+          "club": "2-iron",
+          "target_yards": 176,
+          "lie_or_destination": "rough",
+          "remaining_yards": 11
+        },
+        {
+          "club": "56°",
+          "target_yards": 16,
+          "lie_or_destination": "green",
+          "remaining": "11 ft 3 in to hole"
+        },
+        {
+          "event": "Auto finish (2 strokes)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "5-iron",
+        "target_yards": 67,
+        "carry_yards": 28.2,
+        "path_deg": 0.4,
+        "spin_rpm": 1505,
+        "face_to_path_deg": -1.2,
+        "smash": 1.33,
+        "ball_speed_mph": 102.4,
+        "frame_t": 74
+      },
+      "additional_expanded_metrics": {
+        "club": "56°",
+        "target_yards": 16,
+        "carry_yards": 5.1,
+        "path_deg": -5.3,
+        "spin_rpm": 1188,
+        "face_to_path_deg": 10.5,
+        "smash": 1.15,
+        "ball_speed_mph": 16.3,
+        "frame_t": 78
+      }
+    },
+    {
+      "n": 14,
+      "t": 80,
+      "par": 4,
+      "yards": 309,
+      "hcp": 18,
+      "score": 5,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 216,
+          "lie_or_destination": "rough",
+          "remaining_yards": 95
+        },
+        {
+          "club": "56°",
+          "target_yards": 82,
+          "lie_or_destination": "sand",
+          "remaining_yards": 13
+        },
+        {
+          "club": "56°",
+          "target_yards": 15,
+          "lie_or_destination": "green",
+          "remaining": "11 ft 10 in to hole"
+        },
+        {
+          "event": "Auto finish (2 strokes)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "3-wood",
+        "target_yards": 216,
+        "carry_yards": 206.0,
+        "path_deg": -2.0,
+        "spin_rpm": 3111,
+        "face_to_path_deg": 3.2,
+        "smash": 1.46,
+        "ball_speed_mph": 133.1,
+        "frame_t": 80
+      }
+    },
+    {
+      "n": 15,
+      "t": 84,
+      "par": 5,
+      "yards": 525,
+      "hcp": 6,
+      "score": 6,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 76,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 441
+        },
+        {
+          "club": "3-wood",
+          "target_yards": 235,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 185
+        },
+        {
+          "club": "5-iron",
+          "target_yards": 72,
+          "lie_or_destination": "rough",
+          "remaining_yards": 12
+        },
+        {
+          "club": "56°",
+          "target_yards": 16,
+          "lie_or_destination": "green",
+          "remaining": "17 ft 10 in to hole"
+        },
+        {
+          "event": "Auto finish (2 strokes)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "3-wood",
+        "target_yards": 76,
+        "carry_yards": 35.1,
+        "path_deg": 0.1,
+        "spin_rpm": 226,
+        "face_to_path_deg": -1.4,
+        "smash": 1.42,
+        "ball_speed_mph": 120.8,
+        "frame_t": 84
+      },
+      "additional_expanded_metrics": {
+        "club": "56°",
+        "target_yards": 16,
+        "carry_yards": 7.0,
+        "path_deg": 4.8,
+        "spin_rpm": 1588,
+        "face_to_path_deg": 8.3,
+        "smash": 1.04,
+        "ball_speed_mph": 18.4,
+        "frame_t": 90
+      }
+    },
+    {
+      "n": 16,
+      "t": 90,
+      "par": 4,
+      "yards": 312,
+      "hcp": 10,
+      "score": 4,
+      "visible_shots": [
+        {
+          "club": "5-wood",
+          "target_yards": 219,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 97
+        },
+        {
+          "club": "56°",
+          "target_yards": 106,
+          "lie_or_destination": "green",
+          "remaining": "35 ft 4 in to hole"
+        },
+        {
+          "event": "Auto finish (1 stroke)"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "5-wood",
+        "target_yards": 219,
+        "carry_yards": 185.7,
+        "path_deg": -3.0,
+        "spin_rpm": 3756,
+        "face_to_path_deg": 2.3,
+        "smash": 1.46,
+        "ball_speed_mph": 130.4,
+        "frame_t": 90
+      }
+    },
+    {
+      "n": 17,
+      "t": 94,
+      "par": 3,
+      "yards": 135,
+      "hcp": 14,
+      "score": 2,
+      "visible_shots": [
+        {
+          "club": "7-iron",
+          "target_yards": 148,
+          "lie_or_destination": "green",
+          "remaining": "7 ft 1 in to hole"
+        },
+        {
+          "event": "Auto finish (1 stroke); Birdie"
+        }
+      ],
+      "expanded_metrics": {
+        "club": "7-iron",
+        "target_yards": 148,
+        "carry_yards": 134.8,
+        "path_deg": -7.2,
+        "spin_rpm": 5370,
+        "face_to_path_deg": 4.2,
+        "smash": 1.3,
+        "ball_speed_mph": 100.8,
+        "frame_t": 94
+      }
+    },
+    {
+      "n": 18,
+      "t": 96,
+      "par": 4,
+      "yards": 362,
+      "hcp": 4,
+      "score": 4,
+      "visible_shots": [
+        {
+          "club": "3-wood",
+          "target_yards": 222,
+          "lie_or_destination": "fairway",
+          "remaining_yards": 148
+        },
+        {
+          "club": "7-iron",
+          "target_yards": 158,
+          "lie_or_destination": "green",
+          "remaining": "45 ft 6 in to hole"
+        },
+        {
+          "event": "Auto finish (2 strokes); Par"
+        }
+      ],
+      "expanded_metrics": null
+    }
+  ],
+  "comparisons": {
+    "prior_hazeltine_import_scorecard": {
+      "score": 80,
+      "par": 72,
+      "stored_in": 40,
+      "video_in": 39,
+      "holes_differing_in_back_nine": [
+        {
+          "hole": 12,
+          "video": 4,
+          "stored": 3
+        },
+        {
+          "hole": 15,
+          "video": 6,
+          "stored": 5
+        },
+        {
+          "hole": 16,
+          "video": 4,
+          "stored": 5
+        },
+        {
+          "hole": 17,
+          "video": 2,
+          "stored": 3
+        }
+      ]
+    },
+    "rewrite_hazeltine_course_signatures_conflict": "Video headers give pars/yards H1 4/390, H2 4/367, H3 5/522, H4 3/160, H5 4/365, H6 4/344, H7 5/494, H8 3/124, H9 4/376, H10 4/378, H11 5/515, H12 4/374, H13 3/166, H14 4/309, H15 5/525, H16 4/312, H17 3/135, H18 4/362; many differ from rewrite/hazeltine-2026-09-22.json. Preserve the video headers as source observations and flag the rewrite record for review.",
+    "rewrite_hazeltine_card": [
+      {
+        "hole": 1,
+        "video": {
+          "par": 4,
+          "yards": 390,
+          "score": 5
+        },
+        "rewrite": {
+          "par": 4,
+          "yards": 400,
+          "score": 5
+        },
+        "differs": true
+      },
+      {
+        "hole": 2,
+        "video": {
+          "par": 4,
+          "yards": 367,
+          "score": 3
+        },
+        "rewrite": {
+          "par": 4,
+          "yards": 388,
+          "score": 3
+        },
+        "differs": true
+      },
+      {
+        "hole": 3,
+        "video": {
+          "par": 5,
+          "yards": 522,
+          "score": 6
+        },
+        "rewrite": {
+          "par": 4,
+          "yards": 452,
+          "score": 3
+        },
+        "differs": true
+      },
+      {
+        "hole": 4,
+        "video": {
+          "par": 3,
+          "yards": 160,
+          "score": 3
+        },
+        "rewrite": {
+          "par": 4,
+          "yards": 419,
+          "score": 4
+        },
+        "differs": true
+      },
+      {
+        "hole": 5,
+        "video": {
+          "par": 4,
+          "yards": 365,
+          "score": 5
+        },
+        "rewrite": {
+          "par": 3,
+          "yards": 155,
+          "score": 5
+        },
+        "differs": true
+      },
+      {
+        "hole": 6,
+        "video": {
+          "par": 4,
+          "yards": 344,
+          "score": 5
+        },
+        "rewrite": {
+          "par": 5,
+          "yards": 572,
+          "score": 6
+        },
+        "differs": true
+      },
+      {
+        "hole": 7,
+        "video": {
+          "par": 5,
+          "yards": 494,
+          "score": 5
+        },
+        "rewrite": {
+          "par": 4,
+          "yards": 394,
+          "score": 5
+        },
+        "differs": true
+      },
+      {
+        "hole": 8,
+        "video": {
+          "par": 3,
+          "yards": 124,
+          "score": 4
+        },
+        "rewrite": {
+          "par": 3,
+          "yards": 176,
+          "score": 3
+        },
+        "differs": true
+      },
+      {
+        "hole": 9,
+        "video": {
+          "par": 4,
+          "yards": 376,
+          "score": 5
+        },
+        "rewrite": {
+          "par": 5,
+          "yards": 556,
+          "score": 6
+        },
+        "differs": true
+      },
+      {
+        "hole": 10,
+        "video": {
+          "par": 4,
+          "yards": 378,
+          "score": 5
+        },
+        "rewrite": {
+          "par": 4,
+          "yards": 410,
+          "score": 4
+        },
+        "differs": true
+      },
+      {
+        "hole": 11,
+        "video": {
+          "par": 5,
+          "yards": 515,
+          "score": 5
+        },
+        "rewrite": {
+          "par": 4,
+          "yards": 384,
+          "score": 5
+        },
+        "differs": true
+      },
+      {
+        "hole": 12,
+        "video": {
+          "par": 4,
+          "yards": 374,
+          "score": 4
+        },
+        "rewrite": {
+          "par": 3,
+          "yards": 168,
+          "score": 4
+        },
+        "differs": true
+      },
+      {
+        "hole": 13,
+        "video": {
+          "par": 3,
+          "yards": 166,
+          "score": 4
+        },
+        "rewrite": {
+          "par": 5,
+          "yards": 542,
+          "score": 6
+        },
+        "differs": true
+      },
+      {
+        "hole": 14,
+        "video": {
+          "par": 4,
+          "yards": 309,
+          "score": 5
+        },
+        "rewrite": {
+          "par": 4,
+          "yards": 452,
+          "score": 5
+        },
+        "differs": true
+      },
+      {
+        "hole": 15,
+        "video": {
+          "par": 5,
+          "yards": 525,
+          "score": 6
+        },
+        "rewrite": {
+          "par": 4,
+          "yards": 388,
+          "score": 3
+        },
+        "differs": true
+      },
+      {
+        "hole": 16,
+        "video": {
+          "par": 4,
+          "yards": 312,
+          "score": 4
+        },
+        "rewrite": {
+          "par": 4,
+          "yards": 419,
+          "score": 4
+        },
+        "differs": true
+      },
+      {
+        "hole": 17,
+        "video": {
+          "par": 3,
+          "yards": 135,
+          "score": 2
+        },
+        "rewrite": {
+          "par": 3,
+          "yards": null,
+          "score": 4
+        },
+        "differs": true
+      },
+      {
+        "hole": 18,
+        "video": {
+          "par": 4,
+          "yards": 362,
+          "score": 4
+        },
+        "rewrite": {
+          "par": 5,
+          "yards": 572,
+          "score": 5
+        },
+        "differs": true
+      }
+    ],
+    "rewrite_hazeltine_summary": {
+      "video_score": 80,
+      "rewrite_record_score": 80,
+      "video_front_nine": 41,
+      "rewrite_front_nine": 40,
+      "video_back_nine": 39,
+      "rewrite_back_nine": 40,
+      "holes_with_any_difference": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "holes_with_score_difference": [
+        3,
+        4,
+        6,
+        8,
+        9,
+        10,
+        13,
+        15,
+        17,
+        18
+      ]
+    }
+  },
+  "known_limits": [
+    "No play date appears in the recording.",
+    "Capture samples show all 18 hole headers and scores; a 80 (+8) total and par 72 are supported by these headers.",
+    "Some metric panels are visible during list scrolling/transitions. Values were recorded only where the expanded shot row was legible; missing metrics and incomplete row lists are left unfilled.",
+    "Auto-finish markers are transcribed when visible; no manual putt count is inferred.",
+    "The three visible Mulligan markers cancel the immediately preceding shot: H7 56° 40 yd, H10 5-iron 116 yd, and H13 5-iron 67 yd. The following shot rows and hole stroke totals confirm that context."
+  ]
+}

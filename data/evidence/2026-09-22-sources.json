@@ -1,0 +1,30 @@
+{
+  "reviewDate": "2026-09-22",
+  "note": "Original uploaded videos are preserved with the user attachments. Hashes identify the exact bytes reviewed. Capture date alone does not establish a round play date. See timestamped transcripts for verified observations. Earlier unverified Sep22 8-iron and 26-shot 5-iron records are superseded by the correction feed.",
+  "sources": [
+    {
+      "filename": "ScreenRecording_09-22-2026 13-41-32_1.mp4",
+      "sha256": "5e51620a519acafdfb52857f7be3fa41affa5683790b3738180b93e88c75457e",
+      "bytes": 10074087,
+      "captureDate": "2026-09-22"
+    },
+    {
+      "filename": "ScreenRecording_09-22-2026 13-42-45_1.mp4",
+      "sha256": "058b714533cd8e9fc38be5191be72ced2f60b2326193c3141c6873b9c42a91a0",
+      "bytes": 14398702,
+      "captureDate": "2026-09-22"
+    },
+    {
+      "filename": "ScreenRecording_09-22-2026 13-44-18_1.mp4",
+      "sha256": "07ff9286d19957813c1581fa77b885a038f035cfa8395efe1700edd805ef6c36",
+      "bytes": 36397033,
+      "captureDate": "2026-09-22"
+    },
+    {
+      "filename": "ScreenRecording_09-22-2026 13-47-19_1.mp4",
+      "sha256": "92781e98ddc270c6e9078b52c4d7771664d79fb8b05d09471c660266e3f70d38",
+      "bytes": 39695909,
+      "captureDate": "2026-09-22"
+    }
+  ]
+}

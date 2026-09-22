@@ -1,0 +1,2120 @@
+{
+  "sourceVideo": "ScreenRecording_09-22-2026 13-47-19_1.mp4",
+  "sourceDurationSeconds": 92.766667,
+  "sourceRound": "data/spyglass-2026-09-15.json · TrackMan screen review",
+  "method": "One-second source frames; accepted only metrics on an expanded shot row with its context visible. Timestamp is the extracted frame number (seconds from start, approximately).",
+  "metricOrder": [
+    "carry",
+    "path",
+    "spin",
+    "ftp",
+    "smash",
+    "loft"
+  ],
+  "verifiedPanelShots": [
+    {
+      "shotId": "h1-a",
+      "sourceTimestampSec": 11,
+      "videoMetrics": {
+        "carry": 189.4,
+        "path": 3.0,
+        "spin": 1870,
+        "ftp": 0.7,
+        "smash": 1.48,
+        "loft": 12.3
+      },
+      "changedFields": {
+        "smash": {
+          "stored": 1.47,
+          "video": 1.48
+        },
+        "loft": {
+          "stored": 9.4,
+          "video": 12.3
+        }
+      },
+      "shotContext": {
+        "hole": 1,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 248,
+        "distance": 189.4
+      },
+      "visiblePanelContext": {
+        "clubLabel": "3w",
+        "lie": "rough",
+        "yardsToHole": 300
+      }
+    },
+    {
+      "shotId": "h1-b",
+      "sourceTimestampSec": 13,
+      "videoMetrics": {
+        "carry": 177.4,
+        "path": 1.3,
+        "spin": 1788,
+        "ftp": 6.4,
+        "smash": 1.36,
+        "loft": 18.4
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 159.5,
+          "video": 177.4
+        },
+        "path": {
+          "stored": -2.7,
+          "video": 1.3
+        },
+        "spin": {
+          "stored": 3527,
+          "video": 1788
+        },
+        "ftp": {
+          "stored": 3.6,
+          "video": 6.4
+        },
+        "smash": {
+          "stored": 1.35,
+          "video": 1.36
+        },
+        "loft": {
+          "stored": 15.3,
+          "video": 18.4
+        }
+      },
+      "shotContext": {
+        "hole": 1,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 182,
+        "distance": 159.5
+      },
+      "visiblePanelContext": {
+        "clubLabel": "3w",
+        "lie": "rough",
+        "yardsToHole": 77
+      }
+    },
+    {
+      "shotId": "h1-c",
+      "sourceTimestampSec": 15,
+      "videoMetrics": {
+        "carry": 67.7,
+        "path": -2.2,
+        "spin": 4155,
+        "ftp": 0.1,
+        "smash": 1.04,
+        "loft": 41.4
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 1,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "full",
+        "lie": "green",
+        "planYds": 75,
+        "distance": 67.7,
+        "proximity": "57ft 7in to hole"
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "green",
+        "distanceToHole": "7 ft 7 in"
+      }
+    },
+    {
+      "shotId": "h2-a",
+      "sourceTimestampSec": 17,
+      "videoMetrics": {
+        "carry": 167.9,
+        "path": 0.6,
+        "spin": 3010,
+        "ftp": 6.6,
+        "smash": null,
+        "loft": null
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 167.3,
+          "video": 167.9
+        },
+        "path": {
+          "stored": -5.6,
+          "video": 0.6
+        },
+        "spin": {
+          "stored": 2967,
+          "video": 3010
+        },
+        "ftp": {
+          "stored": 5.2,
+          "video": 6.6
+        }
+      },
+      "shotContext": {
+        "hole": 2,
+        "actualClub": "5-wood",
+        "club": "5-wood",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 181,
+        "distance": 167.3
+      },
+      "visiblePanelContext": {
+        "clubLabel": "5w",
+        "lie": "rough",
+        "yardsToHole": 134
+      },
+      "captureNote": "Panel is cut off by the following expanded row; smash and loft unreadable."
+    },
+    {
+      "shotId": "h2-b",
+      "sourceTimestampSec": 18,
+      "videoMetrics": {
+        "carry": 109.6,
+        "path": -4.8,
+        "spin": 6517,
+        "ftp": 4.3,
+        "smash": 1.18,
+        "loft": 27.9
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 90.4,
+          "video": 109.6
+        },
+        "path": {
+          "stored": -2.2,
+          "video": -4.8
+        },
+        "spin": {
+          "stored": 5676,
+          "video": 6517
+        },
+        "ftp": {
+          "stored": -0.3,
+          "video": 4.3
+        },
+        "smash": {
+          "stored": 1.27,
+          "video": 1.18
+        },
+        "loft": {
+          "stored": 27.4,
+          "video": 27.9
+        }
+      },
+      "shotContext": {
+        "hole": 2,
+        "actualClub": "9-iron",
+        "club": "9-iron",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 95,
+        "distance": 90.4
+      },
+      "visiblePanelContext": {
+        "clubLabel": "9i",
+        "lie": "rough",
+        "yardsToHole": 34
+      }
+    },
+    {
+      "shotId": "h2-c",
+      "sourceTimestampSec": 19,
+      "videoMetrics": {
+        "carry": 25.0,
+        "path": -8.8,
+        "spin": 2381,
+        "ftp": 5.1,
+        "smash": 0.93,
+        "loft": 44.7
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 21.3,
+          "video": 25.0
+        },
+        "path": {
+          "stored": -2.4,
+          "video": -8.8
+        },
+        "spin": {
+          "stored": 1945,
+          "video": 2381
+        },
+        "ftp": {
+          "stored": 4.8,
+          "video": 5.1
+        },
+        "smash": {
+          "stored": 1.19,
+          "video": 0.93
+        },
+        "loft": {
+          "stored": 33.1,
+          "video": 44.7
+        }
+      },
+      "shotContext": {
+        "hole": 2,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 29,
+        "distance": 21.3,
+        "proximity": "6ft 1in to hole"
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "green",
+        "distanceToHole": "6 ft 1 in"
+      }
+    },
+    {
+      "shotId": "h3-a",
+      "sourceTimestampSec": 20,
+      "videoMetrics": {
+        "carry": 129.6,
+        "path": -1.9,
+        "spin": 6579,
+        "ftp": -1.3,
+        "smash": 1.34,
+        "loft": 24.9
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 147.5,
+          "video": 129.6
+        },
+        "path": {
+          "stored": -8.8,
+          "video": -1.9
+        },
+        "spin": {
+          "stored": 6536,
+          "video": 6579
+        },
+        "ftp": {
+          "stored": 5.1,
+          "video": -1.3
+        },
+        "smash": {
+          "stored": 1.31,
+          "video": 1.34
+        },
+        "loft": {
+          "stored": 24.7,
+          "video": 24.9
+        }
+      },
+      "shotContext": {
+        "hole": 3,
+        "actualClub": "9-iron",
+        "club": "9-iron",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 147,
+        "distance": 147.5
+      },
+      "visiblePanelContext": {
+        "clubLabel": "9i",
+        "lie": "rough",
+        "yardsToHole": 11
+      },
+      "captureNote": "Values transcribed from the stable 20s source frame."
+    },
+    {
+      "shotId": "h3-b",
+      "sourceTimestampSec": 23,
+      "videoMetrics": {
+        "carry": 5.5,
+        "path": 5.1,
+        "spin": 1720,
+        "ftp": -3.1,
+        "smash": 1.29,
+        "loft": 29.1
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 3,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 17,
+        "distance": 5.5,
+        "proximity": "20ft 5in to hole"
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "green",
+        "distanceToHole": "20 ft 5 in"
+      }
+    },
+    {
+      "shotId": "h4-a",
+      "sourceTimestampSec": 25,
+      "videoMetrics": {
+        "carry": 177.2,
+        "path": -4.3,
+        "spin": 3341,
+        "ftp": -4.0,
+        "smash": 1.44,
+        "loft": 10.6
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 4,
+        "actualClub": "5-wood",
+        "club": "5-wood",
+        "intent": "full",
+        "lie": "fairway",
+        "planYds": 215,
+        "distance": 177.2
+      },
+      "visiblePanelContext": {
+        "clubLabel": "5w",
+        "lie": "fairway",
+        "yardsToHole": 145
+      }
+    },
+    {
+      "shotId": "h4-b",
+      "sourceTimestampSec": 26,
+      "videoMetrics": {
+        "carry": 124.6,
+        "path": -0.8,
+        "spin": 6457,
+        "ftp": -0.4,
+        "smash": 1.28,
+        "loft": 24.1
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 137.7,
+          "video": 124.6
+        },
+        "path": {
+          "stored": -6.1,
+          "video": -0.8
+        },
+        "spin": {
+          "stored": 6285,
+          "video": 6457
+        },
+        "ftp": {
+          "stored": 3.4,
+          "video": -0.4
+        },
+        "smash": {
+          "stored": 1.31,
+          "video": 1.28
+        },
+        "loft": {
+          "stored": 25.4,
+          "video": 24.1
+        }
+      },
+      "shotContext": {
+        "hole": 4,
+        "actualClub": "9-iron",
+        "club": "9-iron",
+        "intent": "full",
+        "lie": "semi rough",
+        "planYds": 150,
+        "distance": 137.7
+      },
+      "visiblePanelContext": {
+        "clubLabel": "9i",
+        "lie": "semi rough",
+        "yardsToHole": 15
+      }
+    },
+    {
+      "shotId": "h4-c",
+      "sourceTimestampSec": 28,
+      "videoMetrics": {
+        "carry": 7.4,
+        "path": -3.5,
+        "spin": 1805,
+        "ftp": 3.0,
+        "smash": 1.25,
+        "loft": 36.4
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 4,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 18,
+        "distance": 7.4,
+        "proximity": "14ft 9in to hole"
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "green"
+      }
+    },
+    {
+      "shotId": "h5-a",
+      "sourceTimestampSec": 29,
+      "videoMetrics": {
+        "carry": 144.9,
+        "path": -7.6,
+        "spin": 3803,
+        "ftp": 8.2,
+        "smash": 1.33,
+        "loft": 15.8
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 154.3,
+          "video": 144.9
+        },
+        "path": {
+          "stored": -3.5,
+          "video": -7.6
+        },
+        "spin": {
+          "stored": 6396,
+          "video": 3803
+        },
+        "ftp": {
+          "stored": 3.4,
+          "video": 8.2
+        },
+        "smash": {
+          "stored": 1.34,
+          "video": 1.33
+        },
+        "loft": {
+          "stored": 21.7,
+          "video": 15.8
+        }
+      },
+      "shotContext": {
+        "hole": 5,
+        "clubLabel": "5i",
+        "lie": "sand",
+        "yardsToHole": 13
+      },
+      "visiblePanelContext": {
+        "clubLabel": "5i",
+        "lie": "sand",
+        "yardsToHole": 13,
+        "note": "Stored context says 7-iron/rough; visual row says 5i/sand. Review shot identity mapping."
+      },
+      "storedShotContext": {
+        "hole": 5,
+        "clubLabel": "5i",
+        "lie": "sand",
+        "yardsToHole": 13
+      }
+    },
+    {
+      "shotId": "h5-b",
+      "sourceTimestampSec": 31,
+      "videoMetrics": {
+        "carry": 14.8,
+        "path": null,
+        "spin": 1915,
+        "ftp": null,
+        "smash": null,
+        "loft": null
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 5,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 18,
+        "distance": 14.8,
+        "proximity": "16ft 8in to hole"
+      }
+    },
+    {
+      "shotId": "h6-a",
+      "sourceTimestampSec": 32,
+      "videoMetrics": {
+        "carry": 175.7,
+        "path": -4.3,
+        "spin": 1909,
+        "ftp": 4.5,
+        "smash": 1.36,
+        "loft": 17.3
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 6,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "fairway",
+        "planYds": 203,
+        "distance": 175.7
+      },
+      "visiblePanelContext": {
+        "clubLabel": "3w",
+        "lie": "fairway",
+        "yardsToHole": 211
+      }
+    },
+    {
+      "shotId": "h6-b",
+      "sourceTimestampSec": 34,
+      "videoMetrics": {
+        "carry": 195.5,
+        "path": -2.8,
+        "spin": 3774,
+        "ftp": 5.0,
+        "smash": 1.44,
+        "loft": 17.4
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 162.5,
+          "video": 195.5
+        },
+        "path": {
+          "stored": 2.8,
+          "video": -2.8
+        },
+        "spin": {
+          "stored": 4016,
+          "video": 3774
+        },
+        "ftp": {
+          "stored": 0.8,
+          "video": 5.0
+        },
+        "smash": {
+          "stored": 1.37,
+          "video": 1.44
+        },
+        "loft": {
+          "stored": 12.2,
+          "video": 17.4
+        }
+      },
+      "shotContext": {
+        "hole": 6,
+        "actualClub": "5-wood",
+        "club": "5-wood",
+        "intent": "full",
+        "lie": "sand",
+        "planYds": 185,
+        "distance": 162.5
+      },
+      "visiblePanelContext": {
+        "clubLabel": "5w",
+        "lie": "sand",
+        "yardsToHole": 22
+      }
+    },
+    {
+      "shotId": "h6-c",
+      "sourceTimestampSec": 35,
+      "videoMetrics": {
+        "carry": 26.9,
+        "path": -6.7,
+        "spin": 3032,
+        "ftp": 7.3,
+        "smash": 1.1,
+        "loft": 47.9
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 6,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 21,
+        "distance": 26.9,
+        "proximity": "8ft 10in to hole"
+      }
+    },
+    {
+      "shotId": "h7-a",
+      "sourceTimestampSec": 38,
+      "videoMetrics": {
+        "carry": 178.4,
+        "path": 1.4,
+        "spin": 3441,
+        "ftp": 1.1,
+        "smash": 1.45,
+        "loft": 8.0
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 7,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 166,
+        "distance": 178.4
+      },
+      "visiblePanelContext": {
+        "clubLabel": "3w",
+        "lie": "rough",
+        "yardsToHole": 268
+      },
+      "captureNote": "The 3w166-yard rough row; identity matched by club, displayed distance and destination, not sequence alone."
+    },
+    {
+      "shotId": "h7-b",
+      "sourceTimestampSec": 39,
+      "videoMetrics": {
+        "carry": 190.2,
+        "path": -2.7,
+        "spin": 1852,
+        "ftp": 4.7,
+        "smash": 1.41,
+        "loft": 14.3
+      },
+      "changedFields": {
+        "carry": {
+          "stored": null,
+          "video": 190.2
+        },
+        "path": {
+          "stored": null,
+          "video": -2.7
+        },
+        "spin": {
+          "stored": null,
+          "video": 1852
+        },
+        "ftp": {
+          "stored": null,
+          "video": 4.7
+        },
+        "smash": {
+          "stored": null,
+          "video": 1.41
+        },
+        "loft": {
+          "stored": null,
+          "video": 14.3
+        }
+      },
+      "shotContext": {
+        "hole": 7,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "semi rough",
+        "planYds": 187,
+        "distance": 175.3
+      },
+      "visiblePanelContext": {
+        "clubLabel": "3w",
+        "lie": "semi rough",
+        "yardsToHole": 83
+      },
+      "captureNote": "Video row context matches this existing h7-b identity."
+    },
+    {
+      "shotId": "h8-a",
+      "sourceTimestampSec": 40,
+      "videoMetrics": {
+        "carry": 206.2,
+        "path": -2.1,
+        "spin": 2911,
+        "ftp": 0.8,
+        "smash": 1.48,
+        "loft": 14.0
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 8,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "fairway",
+        "planYds": 219,
+        "distance": 206.2
+      },
+      "visiblePanelContext": {
+        "clubLabel": "3w",
+        "lie": "fairway",
+        "yardsToHole": 160
+      },
+      "captureNote": "Panel is visible though dimmed in the 1s extract; parent confirmed the 512px source frame."
+    },
+    {
+      "shotId": "h8-b",
+      "sourceTimestampSec": 42,
+      "videoMetrics": {
+        "carry": 21.0,
+        "path": -1.7,
+        "spin": 2156,
+        "ftp": 2.0,
+        "smash": 1.21,
+        "loft": 4.9
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 31.1,
+          "video": 21.0
+        },
+        "path": {
+          "stored": -6.5,
+          "video": -1.7
+        },
+        "spin": {
+          "stored": 3658,
+          "video": 2156
+        },
+        "ftp": {
+          "stored": 6.3,
+          "video": 2.0
+        },
+        "smash": {
+          "stored": 0.95,
+          "video": 1.21
+        },
+        "loft": {
+          "stored": 34.6,
+          "video": 4.9
+        }
+      },
+      "shotContext": {
+        "hole": 8,
+        "actualClub": "7-iron",
+        "club": "7-iron",
+        "intent": "partial",
+        "lie": "fairway",
+        "planYds": 33,
+        "distance": 31.1
+      },
+      "visiblePanelContext": {
+        "clubLabel": "7i",
+        "lie": "fairway",
+        "yardsToHole": 126
+      }
+    },
+    {
+      "shotId": "h8-c",
+      "sourceTimestampSec": 43,
+      "videoMetrics": {
+        "carry": 114.6,
+        "path": -2.3,
+        "spin": 5933,
+        "ftp": 0.7,
+        "smash": 1.32,
+        "loft": 24.2
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 8,
+        "actualClub": "9-iron",
+        "club": "9-iron",
+        "intent": "full",
+        "lie": "green",
+        "planYds": 117,
+        "distance": 114.6,
+        "proximity": "4ft 8in to hole"
+      }
+    },
+    {
+      "shotId": "h9-a",
+      "sourceTimestampSec": 45,
+      "videoMetrics": {
+        "carry": 187.7,
+        "path": -2.5,
+        "spin": 1936,
+        "ftp": 4.2,
+        "smash": 1.44,
+        "loft": 15.1
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 192,
+          "video": 187.7
+        },
+        "path": {
+          "stored": -3,
+          "video": -2.5
+        },
+        "spin": {
+          "stored": 2806,
+          "video": 1936
+        },
+        "ftp": {
+          "stored": 3.3,
+          "video": 4.2
+        },
+        "smash": {
+          "stored": 1.47,
+          "video": 1.44
+        },
+        "loft": {
+          "stored": 10.3,
+          "video": 15.1
+        }
+      },
+      "shotContext": {
+        "hole": 9,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "fairway",
+        "planYds": 204,
+        "distance": 192
+      }
+    },
+    {
+      "shotId": "h9-b",
+      "sourceTimestampSec": 46,
+      "videoMetrics": {
+        "carry": 198.8,
+        "path": 0.5,
+        "spin": 3611,
+        "ftp": -1.8,
+        "smash": 1.47,
+        "loft": 10.1
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 9,
+        "actualClub": "5-wood",
+        "club": "5-wood",
+        "intent": "full",
+        "lie": "semi rough",
+        "planYds": 218,
+        "distance": 198.8
+      }
+    },
+    {
+      "shotId": "h9-c",
+      "sourceTimestampSec": 48,
+      "videoMetrics": {
+        "carry": 4.0,
+        "path": 2.9,
+        "spin": 1838,
+        "ftp": 7.1,
+        "smash": 1.03,
+        "loft": 38.6
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 9,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 14,
+        "distance": 4,
+        "proximity": "12ft 7in to hole"
+      }
+    },
+    {
+      "shotId": "h10-a",
+      "sourceTimestampSec": 51,
+      "videoMetrics": {
+        "carry": 208.1,
+        "path": 3.5,
+        "spin": 2298,
+        "ftp": 2.8,
+        "smash": 1.43,
+        "loft": 16.7
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 10,
+        "actualClub": "5-wood",
+        "club": "5-wood",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 235,
+        "distance": 208.1
+      },
+      "visiblePanelContext": {
+        "clubLabel": "5w",
+        "lie": "rough",
+        "yardsToHole": 33
+      }
+    },
+    {
+      "shotId": "h10-b",
+      "sourceTimestampSec": 52,
+      "videoMetrics": {
+        "carry": 24.9,
+        "path": -0.5,
+        "spin": 2275,
+        "ftp": -1.5,
+        "smash": 1.07,
+        "loft": 39.3
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 18.4,
+          "video": 24.9
+        },
+        "path": {
+          "stored": 0.4,
+          "video": -0.5
+        },
+        "spin": {
+          "stored": 1374,
+          "video": 2275
+        },
+        "ftp": {
+          "stored": 4.8,
+          "video": -1.5
+        },
+        "smash": {
+          "stored": 1.29,
+          "video": 1.07
+        },
+        "loft": {
+          "stored": 26.1,
+          "video": 39.3
+        }
+      },
+      "shotContext": {
+        "hole": 10,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "sand",
+        "planYds": 21,
+        "distance": 18.4
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "sand",
+        "yardsToHole": 13
+      }
+    },
+    {
+      "shotId": "h10-c",
+      "sourceTimestampSec": 54,
+      "videoMetrics": {
+        "carry": 12.2,
+        "path": -8.0,
+        "spin": 1826,
+        "ftp": 9.0,
+        "smash": 0.86,
+        "loft": 47.1
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 10,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 14,
+        "distance": 12.2,
+        "proximity": "5ft 3in to hole"
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "green",
+        "distanceToHole": "5 ft 3 in"
+      }
+    },
+    {
+      "shotId": "h11-a",
+      "sourceTimestampSec": 55,
+      "videoMetrics": {
+        "carry": 197.6,
+        "path": -2.9,
+        "spin": 3215,
+        "ftp": 4.2,
+        "smash": 1.47,
+        "loft": 12.6
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 237.4,
+          "video": 197.6
+        },
+        "path": {
+          "stored": -2.6,
+          "video": -2.9
+        },
+        "spin": {
+          "stored": 2707,
+          "video": 3215
+        },
+        "ftp": {
+          "stored": 2.5,
+          "video": 4.2
+        },
+        "smash": {
+          "stored": 1.5,
+          "video": 1.47
+        },
+        "loft": {
+          "stored": 10.7,
+          "video": 12.6
+        }
+      },
+      "shotContext": {
+        "hole": 11,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "fairway",
+        "planYds": 251,
+        "distance": 237.4
+      },
+      "visiblePanelContext": {
+        "clubLabel": "3w",
+        "lie": "fairway",
+        "yardsToHole": 249
+      }
+    },
+    {
+      "shotId": "h11-b",
+      "sourceTimestampSec": 56,
+      "videoMetrics": {
+        "carry": 202.2,
+        "path": 1.4,
+        "spin": 3140,
+        "ftp": 1.6,
+        "smash": 1.47,
+        "loft": 14.8
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 11,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "sand",
+        "planYds": 211,
+        "distance": 202.2
+      },
+      "visiblePanelContext": {
+        "clubLabel": "3w",
+        "lie": "sand",
+        "yardsToHole": 38
+      }
+    },
+    {
+      "shotId": "h11-d",
+      "sourceTimestampSec": 59,
+      "videoMetrics": {
+        "carry": 7.9,
+        "path": 0.6,
+        "spin": 1995,
+        "ftp": 9.1,
+        "smash": 1.07,
+        "loft": 43.1
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 11,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 16,
+        "distance": 7.9,
+        "proximity": "4ft 9in to hole"
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "green",
+        "distanceToHole": "4 ft 9 in"
+      }
+    },
+    {
+      "shotId": "h12-a",
+      "sourceTimestampSec": 60,
+      "videoMetrics": {
+        "carry": 161.4,
+        "path": -8.7,
+        "spin": 5138,
+        "ftp": 8.4,
+        "smash": 1.39,
+        "loft": 18.1
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 139.2,
+          "video": 161.4
+        },
+        "path": {
+          "stored": -7.3,
+          "video": -8.7
+        },
+        "spin": {
+          "stored": 4499,
+          "video": 5138
+        },
+        "ftp": {
+          "stored": 6.8,
+          "video": 8.4
+        },
+        "smash": {
+          "stored": 1.35,
+          "video": 1.39
+        },
+        "loft": {
+          "stored": 19.3,
+          "video": 18.1
+        }
+      },
+      "shotContext": {
+        "hole": 12,
+        "actualClub": "5-iron",
+        "club": "5-iron",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 153,
+        "distance": 139.2
+      },
+      "visiblePanelContext": {
+        "clubLabel": "5i",
+        "lie": "rough",
+        "yardsToHole": 23
+      }
+    },
+    {
+      "shotId": "h12-b",
+      "sourceTimestampSec": 61,
+      "videoMetrics": {
+        "carry": 23.3,
+        "path": -8.3,
+        "spin": 2608,
+        "ftp": 10.5,
+        "smash": 0.86,
+        "loft": 52.2
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 12,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "semi rough",
+        "planYds": 34,
+        "distance": 23.3
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "semi rough",
+        "yardsToHole": 10
+      }
+    },
+    {
+      "shotId": "h12-c",
+      "sourceTimestampSec": 63,
+      "videoMetrics": {
+        "carry": 3.9,
+        "path": -1.5,
+        "spin": 1552,
+        "ftp": 1.3,
+        "smash": 1.29,
+        "loft": 37.7
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 7.6,
+          "video": 3.9
+        },
+        "path": {
+          "stored": 0.7,
+          "video": -1.5
+        },
+        "spin": {
+          "stored": 2163,
+          "video": 1552
+        },
+        "ftp": {
+          "stored": 0.7,
+          "video": 1.3
+        },
+        "smash": {
+          "stored": 1.22,
+          "video": 1.29
+        },
+        "loft": {
+          "stored": 33.2,
+          "video": 37.7
+        }
+      },
+      "shotContext": {
+        "hole": 12,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 11,
+        "distance": 7.6,
+        "proximity": "2ft 8in to hole"
+      }
+    },
+    {
+      "shotId": "h13-a",
+      "sourceTimestampSec": 64,
+      "videoMetrics": {
+        "carry": 137.8,
+        "path": 1.4,
+        "spin": 1847,
+        "ftp": 5.0,
+        "smash": 1.27,
+        "loft": 20.1
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 13,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "fairway",
+        "planYds": 165,
+        "distance": 137.8
+      }
+    },
+    {
+      "shotId": "h13-b",
+      "sourceTimestampSec": 66,
+      "videoMetrics": {
+        "carry": 197.9,
+        "path": -1.3,
+        "spin": 3223,
+        "ftp": -0.2,
+        "smash": 1.46,
+        "loft": 10.1
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 13,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "fairway",
+        "planYds": 217,
+        "distance": 197.9
+      }
+    },
+    {
+      "shotId": "h13-c",
+      "sourceTimestampSec": 68,
+      "videoMetrics": {
+        "carry": 16.2,
+        "path": 3.8,
+        "spin": 3193,
+        "ftp": 1.3,
+        "smash": 1.11,
+        "loft": 37.0
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 20.1,
+          "video": 16.2
+        },
+        "path": {
+          "stored": 3.3,
+          "video": 3.8
+        },
+        "spin": {
+          "stored": 1892,
+          "video": 3193
+        },
+        "smash": {
+          "stored": 1.24,
+          "video": 1.11
+        },
+        "loft": {
+          "stored": 31.3,
+          "video": 37.0
+        }
+      },
+      "shotContext": {
+        "hole": 13,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 28,
+        "distance": 20.1,
+        "proximity": "31ft 8in to hole"
+      }
+    },
+    {
+      "shotId": "h14-a",
+      "sourceTimestampSec": 69,
+      "videoMetrics": {
+        "carry": 186.9,
+        "path": -4.4,
+        "spin": null,
+        "ftp": null,
+        "smash": null,
+        "loft": null
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 14,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "deep rough",
+        "planYds": 214,
+        "distance": 186.9
+      }
+    },
+    {
+      "shotId": "h14-b",
+      "sourceTimestampSec": 70,
+      "videoMetrics": {
+        "carry": 160.8,
+        "path": -1.1,
+        "spin": null,
+        "ftp": null,
+        "smash": null,
+        "loft": null
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 147.2,
+          "video": 160.8
+        },
+        "path": {
+          "stored": 1.7,
+          "video": -1.1
+        }
+      },
+      "shotContext": {
+        "hole": 14,
+        "actualClub": "9-iron",
+        "club": "9-iron",
+        "intent": "full",
+        "lie": "fairway",
+        "planYds": 150,
+        "distance": 147.2
+      }
+    },
+    {
+      "shotId": "h14-c",
+      "sourceTimestampSec": 71,
+      "videoMetrics": {
+        "carry": 150.0,
+        "path": -7.6,
+        "spin": 6240,
+        "ftp": 5.9,
+        "smash": 1.34,
+        "loft": 21.5
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 14,
+        "actualClub": "7-iron",
+        "club": "7-iron",
+        "intent": "full",
+        "lie": "fairway",
+        "planYds": 157,
+        "distance": 150
+      },
+      "visiblePanelContext": {
+        "clubLabel": "7i",
+        "lie": "fairway",
+        "yardsToHole": 8
+      }
+    },
+    {
+      "shotId": "h14-d",
+      "sourceTimestampSec": 73,
+      "videoMetrics": {
+        "carry": 2.4,
+        "path": -0.7,
+        "spin": 1470,
+        "ftp": 0.2,
+        "smash": 1.34,
+        "loft": 35.4
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 8.1,
+          "video": 2.4
+        },
+        "path": {
+          "stored": 2.6,
+          "video": -0.7
+        },
+        "spin": {
+          "stored": 1923,
+          "video": 1470
+        },
+        "ftp": {
+          "stored": 0.7,
+          "video": 0.2
+        },
+        "smash": {
+          "stored": 1.28,
+          "video": 1.34
+        },
+        "loft": {
+          "stored": 31,
+          "video": 35.4
+        }
+      },
+      "shotContext": {
+        "hole": 14,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 7,
+        "distance": 8.1,
+        "proximity": "2ft 4in to hole"
+      }
+    },
+    {
+      "shotId": "h15-a",
+      "sourceTimestampSec": 74,
+      "videoMetrics": {
+        "carry": 98.4,
+        "path": -1.7,
+        "spin": null,
+        "ftp": null,
+        "smash": 1.24,
+        "loft": 27.2
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 15,
+        "actualClub": "9-iron",
+        "club": "9-iron",
+        "intent": "full",
+        "lie": "deep rough",
+        "planYds": 110,
+        "distance": 98.4
+      }
+    },
+    {
+      "shotId": "h15-b",
+      "sourceTimestampSec": 76,
+      "videoMetrics": {
+        "carry": 3.3,
+        "path": null,
+        "spin": null,
+        "ftp": null,
+        "smash": 1.24,
+        "loft": 40.3
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 15,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 6,
+        "distance": 3.3,
+        "proximity": "7ft 7in to hole"
+      }
+    },
+    {
+      "shotId": "h16-a",
+      "sourceTimestampSec": 77,
+      "videoMetrics": {
+        "carry": 199.2,
+        "path": -2.8,
+        "spin": 3446,
+        "ftp": 2.6,
+        "smash": 1.47,
+        "loft": 12.4
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 231.7,
+          "video": 199.2
+        },
+        "path": {
+          "stored": -1.9,
+          "video": -2.8
+        },
+        "spin": {
+          "stored": 2560,
+          "video": 3446
+        },
+        "ftp": {
+          "stored": 3.3,
+          "video": 2.6
+        },
+        "loft": {
+          "stored": 11.6,
+          "video": 12.4
+        }
+      },
+      "shotContext": {
+        "hole": 16,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 257,
+        "distance": 231.7
+      },
+      "visiblePanelContext": {
+        "clubLabel": "3w",
+        "lie": "rough",
+        "yardsToHole": 225
+      }
+    },
+    {
+      "shotId": "h16-b",
+      "sourceTimestampSec": 79,
+      "videoMetrics": {
+        "carry": 161.7,
+        "path": 3.5,
+        "spin": 1583,
+        "ftp": 2.5,
+        "smash": 1.31,
+        "loft": 20.2
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 16,
+        "actualClub": "5-wood",
+        "club": "5-wood",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 166,
+        "distance": 161.7
+      },
+      "visiblePanelContext": {
+        "clubLabel": "5w",
+        "lie": "rough",
+        "yardsToHole": 43
+      }
+    },
+    {
+      "shotId": "h16-c",
+      "sourceTimestampSec": 80,
+      "videoMetrics": {
+        "carry": 24.0,
+        "path": -0.6,
+        "spin": 3678,
+        "ftp": -0.1,
+        "smash": 1.03,
+        "loft": 34.4
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 21.7,
+          "video": 24.0
+        },
+        "path": {
+          "stored": -6,
+          "video": -0.6
+        },
+        "spin": {
+          "stored": 1867,
+          "video": 3678
+        },
+        "ftp": {
+          "stored": 7.7,
+          "video": -0.1
+        },
+        "smash": {
+          "stored": 1.21,
+          "video": 1.03
+        },
+        "loft": {
+          "stored": 35.7,
+          "video": 34.4
+        }
+      },
+      "shotContext": {
+        "hole": 16,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "rough",
+        "planYds": 24,
+        "distance": 21.7
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "rough",
+        "yardsToHole": 16
+      }
+    },
+    {
+      "shotId": "h16-d",
+      "sourceTimestampSec": 82,
+      "videoMetrics": {
+        "carry": 13.0,
+        "path": 0.7,
+        "spin": 2787,
+        "ftp": 2.0,
+        "smash": 1.25,
+        "loft": 37.0
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 16,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 26,
+        "distance": 13,
+        "proximity": "42ft 8in to hole"
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "green",
+        "distanceToHole": "4 ft 8 in"
+      }
+    },
+    {
+      "shotId": "h17-a",
+      "sourceTimestampSec": 83,
+      "videoMetrics": {
+        "carry": 204.4,
+        "path": -1.2,
+        "spin": 2971,
+        "ftp": 2.1,
+        "smash": 1.46,
+        "loft": 14.3
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 199.2,
+          "video": 204.4
+        },
+        "path": {
+          "stored": -2.5,
+          "video": -1.2
+        },
+        "spin": {
+          "stored": 2838,
+          "video": 2971
+        },
+        "ftp": {
+          "stored": 1.7,
+          "video": 2.1
+        },
+        "smash": {
+          "stored": 1.47,
+          "video": 1.46
+        },
+        "loft": {
+          "stored": 12.2,
+          "video": 14.3
+        }
+      },
+      "shotContext": {
+        "hole": 17,
+        "actualClub": "5-wood",
+        "club": "5-wood",
+        "intent": "full",
+        "lie": "semi rough",
+        "planYds": 225,
+        "distance": 199.2
+      },
+      "visiblePanelContext": {
+        "clubLabel": "5w",
+        "lie": "semi rough",
+        "yardsToHole": 104
+      }
+    },
+    {
+      "shotId": "h17-b",
+      "sourceTimestampSec": 85,
+      "videoMetrics": {
+        "carry": 92.4,
+        "path": -0.1,
+        "spin": 5661,
+        "ftp": -1.2,
+        "smash": 1.03,
+        "loft": 35.0
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 17,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 86,
+        "distance": 92.4
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "rough",
+        "yardsToHole": 11
+      }
+    },
+    {
+      "shotId": "h17-c",
+      "sourceTimestampSec": 87,
+      "videoMetrics": {
+        "carry": 4.2,
+        "path": 1.5,
+        "spin": 1736,
+        "ftp": 3.1,
+        "smash": 1.21,
+        "loft": 37.8
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 17,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 9,
+        "distance": 4.2,
+        "proximity": "3ft 3in to hole"
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "green",
+        "distanceToHole": "3 ft 3 in"
+      }
+    },
+    {
+      "shotId": "h18-a",
+      "sourceTimestampSec": 88,
+      "videoMetrics": {
+        "carry": 177.9,
+        "path": -2.0,
+        "spin": 3080,
+        "ftp": -0.8,
+        "smash": 1.46,
+        "loft": 6.8
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 207.7,
+          "video": 177.9
+        },
+        "path": {
+          "stored": -3.1,
+          "video": -2.0
+        },
+        "spin": {
+          "stored": 3145,
+          "video": 3080
+        },
+        "ftp": {
+          "stored": 3.8,
+          "video": -0.8
+        },
+        "loft": {
+          "stored": 11.7,
+          "video": 6.8
+        }
+      },
+      "shotContext": {
+        "hole": 18,
+        "actualClub": "3-wood",
+        "club": "3-wood",
+        "intent": "full",
+        "lie": "fairway",
+        "planYds": 218,
+        "distance": 207.7
+      },
+      "visiblePanelContext": {
+        "clubLabel": "3w",
+        "lie": "fairway",
+        "yardsToHole": 162
+      }
+    },
+    {
+      "shotId": "h18-b",
+      "sourceTimestampSec": 89,
+      "videoMetrics": {
+        "carry": 131.5,
+        "path": -4.1,
+        "spin": 7248,
+        "ftp": 7.6,
+        "smash": 1.33,
+        "loft": 22.2
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 18,
+        "actualClub": "7-iron",
+        "club": "7-iron",
+        "intent": "full",
+        "lie": "rough",
+        "planYds": 139,
+        "distance": 131.5
+      },
+      "visiblePanelContext": {
+        "clubLabel": "7i",
+        "lie": "rough",
+        "yardsToHole": 34
+      }
+    },
+    {
+      "shotId": "h18-c",
+      "sourceTimestampSec": 91,
+      "videoMetrics": {
+        "carry": 19.2,
+        "path": -4.7,
+        "spin": 1805,
+        "ftp": 4.9,
+        "smash": 1.27,
+        "loft": 41.1
+      },
+      "changedFields": {
+        "carry": {
+          "stored": 8.8,
+          "video": 19.2
+        },
+        "path": {
+          "stored": -4.3,
+          "video": -4.7
+        },
+        "spin": {
+          "stored": 2219,
+          "video": 1805
+        },
+        "ftp": {
+          "stored": 6.8,
+          "video": 4.9
+        },
+        "smash": {
+          "stored": 0.8,
+          "video": 1.27
+        },
+        "loft": {
+          "stored": 47,
+          "video": 41.1
+        }
+      },
+      "shotContext": {
+        "hole": 18,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "sand",
+        "planYds": 15,
+        "distance": 8.8
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "sand",
+        "yardsToHole": 18
+      }
+    },
+    {
+      "shotId": "h18-d",
+      "sourceTimestampSec": 92,
+      "videoMetrics": {
+        "carry": 18.4,
+        "path": -2.9,
+        "spin": 3020,
+        "ftp": 8.1,
+        "smash": 0.87,
+        "loft": 45.2
+      },
+      "changedFields": {},
+      "shotContext": {
+        "hole": 18,
+        "actualClub": "56-wedge",
+        "club": "56-wedge",
+        "intent": "partial",
+        "lie": "green",
+        "planYds": 15,
+        "distance": 18.4,
+        "proximity": "8ft 8in to hole"
+      },
+      "visiblePanelContext": {
+        "clubLabel": "56°",
+        "lie": "green",
+        "distanceToHole": "8 ft 8 in"
+      }
+    }
+  ],
+  "notVerified": [
+    {
+      "shotId": "h11-c",
+      "reason": "No unambiguous, stable expanded-row six-metric panel captured in this pass; do not fill from adjacent frames or infer from the stored shot."
+    },
+    {
+      "shotId": "h7-d",
+      "reason": "No unambiguous, stable expanded-row six-metric panel captured in this pass; do not fill from adjacent frames or infer from the stored shot."
+    },
+    {
+      "shotId": "h7-c",
+      "reason": "Stored row appears invented/mis-extracted (9i/80yds rough); source video shows a third 3w 187yds to semi rough. Remove this old row; do not apply its panel to it."
+    }
+  ],
+  "summary": {
+    "shotCount": 56,
+    "verifiedPanelShotCount": 53,
+    "notVerifiedCount": 3,
+    "changedShotCount": 24,
+    "expectedFeedShotCount": 56,
+    "note": "h7-c is a rejected stored source row; new h7-video-tee row is separate. H10 video tee row is also an unmatched additional row."
+  },
+  "unmappedVisibleRows": [
+    {
+      "sourceTimestampSec": 50,
+      "hole": 10,
+      "clubLabel": "3w",
+      "lie": "fairway",
+      "yardsToHole": 219,
+      "videoMetrics": {
+        "carry": 89.0,
+        "path": -0.5,
+        "spin": 2783,
+        "ftp": 4.4,
+        "smash": 1.46,
+        "loft": 1.7
+      },
+      "reason": "The source ledger has no separate h10 row for this displayed 3w shot; do not assign it to h10-a, whose visible 5w panel is at 51s.",
+      "suggestedNewId": "h10-video-tee-3w-20260915"
+    },
+    {
+      "sourceTimestampSec": 37,
+      "hole": 7,
+      "suggestedNewId": "h7-video-tee-3w-20260915",
+      "clubLabel": "3w",
+      "lie": "rough",
+      "yardsToHole": 437,
+      "videoMetrics": {
+        "carry": 43.8,
+        "path": -0.2,
+        "spin": 8806,
+        "ftp": -8.4,
+        "smash": 0.99,
+        "loft": 27.7
+      },
+      "reason": "Additional first H7 3w row; existing h7-a/h7-b align with the next two visible 3w rows. Create as a new shot, preserving original order."
+    }
+  ],
+  "holeScorecard": [
+    {
+      "hole": 1,
+      "par": 5,
+      "score": 5,
+      "autoFinishStrokes": 2
+    },
+    {
+      "hole": 2,
+      "par": 4,
+      "score": 4,
+      "autoFinishStrokes": 1
+    },
+    {
+      "hole": 3,
+      "par": 3,
+      "score": 4,
+      "autoFinishStrokes": 2
+    },
+    {
+      "hole": 4,
+      "par": 4,
+      "score": 5,
+      "autoFinishStrokes": 2
+    },
+    {
+      "hole": 5,
+      "par": 3,
+      "score": 4,
+      "autoFinishStrokes": 2
+    },
+    {
+      "hole": 6,
+      "par": 4,
+      "score": 5,
+      "autoFinishStrokes": 2
+    },
+    {
+      "hole": 7,
+      "par": 5,
+      "score": 6,
+      "autoFinishStrokes": 2
+    },
+    {
+      "hole": 8,
+      "par": 4,
+      "score": 4,
+      "autoFinishStrokes": 1
+    },
+    {
+      "hole": 9,
+      "par": 4,
+      "score": 5,
+      "autoFinishStrokes": 2
+    },
+    {
+      "hole": 10,
+      "par": 4,
+      "score": 5,
+      "autoFinishStrokes": 1
+    },
+    {
+      "hole": 11,
+      "par": 5,
+      "score": 5,
+      "autoFinishStrokes": 1
+    },
+    {
+      "hole": 12,
+      "par": 3,
+      "score": 4,
+      "autoFinishStrokes": 1
+    },
+    {
+      "hole": 13,
+      "par": 4,
+      "score": 5,
+      "autoFinishStrokes": 2
+    },
+    {
+      "hole": 14,
+      "par": 5,
+      "score": 5,
+      "autoFinishStrokes": 1
+    },
+    {
+      "hole": 15,
+      "par": 3,
+      "score": 3,
+      "autoFinishStrokes": 1
+    },
+    {
+      "hole": 16,
+      "par": 4,
+      "score": 6,
+      "autoFinishStrokes": 2
+    },
+    {
+      "hole": 17,
+      "par": 4,
+      "score": 4,
+      "autoFinishStrokes": 1
+    },
+    {
+      "hole": 18,
+      "par": 4,
+      "score": 6,
+      "autoFinishStrokes": 2
+    }
+  ],
+  "scoreTotals": {
+    "out": 42,
+    "in": 43,
+    "par": 72,
+    "total": 85,
+    "source": "Scorecard view; holes17/18 score from their Hole header Strokes values."
+  }
+}

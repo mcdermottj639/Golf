@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 'use strict';
 const fs = require('fs');
-const src = fs.readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
+const path = require('path');
+const root = path.join(__dirname, '..');
+const src = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
 const must = [
-  "const BUILD = 'v146'",
   "function isClearMishit(shot, group)",
   "function analysisDelivery(detail)",
   "function cumulativeClubDelivery()",
@@ -20,6 +22,12 @@ const must = [
   "Consistency is NOT standard deviation",
   "Try ‘5-wood’, ‘combine’, ‘handicap’",
 ];
+const appBuild = src.match(/const BUILD = '(v\d+)'/);
+const cacheBuild = sw.match(/const CACHE = 'caddiehq-(v\d+)'/);
+if (!appBuild || !cacheBuild || appBuild[1] !== cacheBuild[1]) {
+  console.error(`findability build/cache mismatch: app=${appBuild?.[1] || 'missing'}, service worker=${cacheBuild?.[1] || 'missing'}`);
+  process.exit(1);
+}
 const missing = must.filter(s => !src.includes(s));
 if (missing.length) {
   console.error('findability missing:\n' + missing.map(s => '  ' + s).join('\n'));

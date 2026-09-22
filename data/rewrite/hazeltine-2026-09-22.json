@@ -1,4 +1,6 @@
 {
+  "verificationStatus": "superseded: conflicting original video; retained only as a historical snapshot",
+  "authoritativeCorrection": "../hazeltine-verified-2026-09-22.json",
   "course": "Hazeltine National",
   "location": "Chaska, MN",
   "sim": true,

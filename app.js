@@ -99,13 +99,19 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v152';
+const BUILD = 'v154';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v154', d:'2026-09-22', items:[
+    'SEE EACH SHOT: range profiles show path, face, face-to-path, smash, speed, spin and launch with individual readings, averages and measured sample counts. Face/path reference the target; face-to-path references the club path.',
+    'SOURCE REPAIRS ARE INCLUDED: corrected 7-iron / 5-iron range data, Hazeltine 80 and Spyglass 85 now reach existing installs. Earlier v151/v152 descriptions below are historical and superseded by the source audit.' ] },
+  { b:'v153', d:'2026-09-22', items:[
+    'SOURCE CHECK: today’s supplied range videos show 7-iron and 5-iron. The previous 8-iron / combined 26-shot record used the wrong evidence. New source-linked corrections also reach phones that already imported the old record.',
+    'RELIABLE UPDATES: simulator and outdoor rounds keep separate identities. Release checks validate matching app/cache versions and run before the website is published.' ] },
   { b:'v152', d:'2026-09-22', items:[
     'SEP 22 RANGE IS ONE SESSION. About two hours, not a morning card and an afternoon card. 8-iron stays 102.3 n=3 after the worm. 5-iron is both tables from that visit — 26 shots, remaining 141.0, dyn loft 22.1°, path −3.2°.' ] },
   { b:'v151', d:'2026-09-22', items:[
@@ -3515,36 +3521,38 @@ function analysisClubs(detail){
     const held = mishitShots(g);
     const prem = premierMeans(g);
     const base = clubs.find(c => c.club === g.club) || clubs[i] || {};
-    const hasCarry = struck.some(s => s.carry != null && Number.isFinite(+s.carry));
-    const carry = hasCarry ? meanKeyed(struck, 'carry') : null;
-    const total = hasCarry ? meanKeyed(struck, 'total') : null;
+    const metricKeys = ['carry','total','cs','bs','smash','la','spin','aoa','ld','dynLoft','spinLoft','path','face','ftp'];
+    const metricCounts = {};
     const rnd = (k, d) => {
       const v = meanKeyed(struck, k);
-      if(v != null) return +Number(v).toFixed(d);
-      if(base[k] != null && Number.isFinite(+base[k])) return +Number(base[k]).toFixed(d);
+      if(v != null){
+        metricCounts[k] = struck.filter(s => s[k] != null && Number.isFinite(+s[k])).length;
+        return +Number(v).toFixed(d);
+      }
+      if(base[k] != null && Number.isFinite(+base[k])){
+        const prior = base.metricCounts && base.metricCounts[k];
+        metricCounts[k] = prior != null && Number.isFinite(+prior) ? +prior
+          : (base.n != null && Number.isFinite(+base.n) ? +base.n : 0);
+        return +Number(base[k]).toFixed(d);
+      }
+      metricCounts[k] = 0;
       return null;
     };
+    const metrics = Object.fromEntries(metricKeys.map(k => [k, rnd(k, k === 'spin' ? 0 : (k === 'smash' ? 2 : 1))]));
     return Object.assign({}, base, {
       club: g.club,
       n: struck.length,
       nAll: struck.length,
       held: held.length,
-      carry: carry != null ? +carry.toFixed(1) : (base.carry != null ? +Number(base.carry).toFixed(1) : null),
-      total: total != null ? +total.toFixed(1) : null,
+      metricCounts,
+      carry: metrics.carry,
+      total: metrics.total,
       best: prem && prem.carry != null ? prem.carry : null,
       bestN: prem ? prem.n : null,
-      cs: rnd('cs', 1),
-      bs: rnd('bs', 1),
-      smash: rnd('smash', 2),
-      la: rnd('la', 1),
-      spin: rnd('spin', 0),
-      aoa: rnd('aoa', 1),
-      ld: rnd('ld', 1),
-      dynLoft: rnd('dynLoft', 1),
-      spinLoft: rnd('spinLoft', 1),
-      path: rnd('path', 1),
-      face: rnd('face', 1),
-      ftp: rnd('ftp', 1),
+      cs: metrics.cs, bs: metrics.bs, smash: metrics.smash, la: metrics.la,
+      spin: metrics.spin, aoa: metrics.aoa, ld: metrics.ld,
+      dynLoft: metrics.dynLoft, spinLoft: metrics.spinLoft,
+      path: metrics.path, face: metrics.face, ftp: metrics.ftp,
       displayedCarry: base.displayedCarry != null ? base.displayedCarry : base.carry,
       displayedN: base.n
     });
@@ -3597,6 +3605,43 @@ function rangeShotVisuals(d){
   const x=v=>(10+v/max*280).toFixed(1);
   const avgOf=c=>clubs.find(x=>x.club===c.club) || {};
   const delOf=c=>delivery.find(x=>x.club===c.club);
+  const finiteValues=(shots,key)=>shots.map(s=>s[key]).filter(v=>v!=null&&Number.isFinite(+v)).map(Number);
+  const deliveryBlock=c=>{
+    const shots=struckShots(c);
+    const specs=[['path','PATH','°'],['face','FACE','°'],['ftp','F–P','°']];
+    const values=specs.map(([key])=>[key,finiteValues(shots,key)]).filter(([,xs])=>xs.length);
+    if(!values.length)return '';
+    const limit=Math.max(2,Math.ceil(Math.max(...values.flatMap(([,xs])=>xs.map(Math.abs)))/2)*2);
+    const pos=v=>(50+Number(v)/limit*50).toFixed(2);
+    return `<div class="range-delivery" aria-label="${esc(c.club)} delivery angles">
+      <b>Delivery direction</b><span class="range-evidence-n">${values.reduce((n,[,xs])=>n+xs.length,0)} measured values</span>
+      ${values.map(([key,xs])=>{const avg=meanKeyed(shots,key);const zero=key==='ftp'?'face square to path':'target line';const ends=key==='ftp'?['closed','open']:['left','right'];return `<div class="range-angle-group"><div class="range-angle-row">
+        <span>${key==='ftp'?'F–P':key.toUpperCase()}</span><div class="range-angle-track" aria-label="${key==='ftp'?'Face-to-path':key==='path'?'Club path':'Face angle'}: ${xs.length} shots, mean ${baySgn(avg)} degrees; zero is ${zero}">
+          ${xs.map(v=>`<i class="range-angle-dot" style="left:${pos(v)}%"></i>`).join('')}
+          <i class="range-angle-mean" style="left:${pos(avg)}%"></i>
+        </div><b>${baySgn(avg)}°</b><small>n=${xs.length}</small></div>
+        <div class="range-angle-scale-row"><span></span><div class="range-angle-scale"><span>−${limit}°</span><span>+${limit}°</span></div></div>
+        <p class="range-angle-reference">Center = ${zero}; negative ${ends[0]}, positive ${ends[1]}.</p></div>`;}).join('')}
+    </div>`;
+  };
+  const metricSummary=c=>{
+    const shots=struckShots(c);
+    const specs=[['smash','Smash factor','×',2],['cs','Club speed','mph',1],['bs','Ball speed','mph',1],['spin','Spin','rpm',0],['la','Launch','°',1]];
+    const rows=specs.map(([key,label,unit,dec])=>{
+      const xs=finiteValues(shots,key); if(!xs.length)return '';
+      const avg=xs.reduce((a,b)=>a+b,0)/xs.length,min=Math.min(...xs),max=Math.max(...xs);
+      const span=max-min || Math.max(Math.abs(avg)*.08,1);
+      const lo=min-span*.08,hi=max+span*.08;
+      const pos=v=>Math.max(0,Math.min(100,(v-lo)/(hi-lo)*100)).toFixed(2);
+      const fmt=v=>dec===0?String(Math.round(v)):v.toFixed(dec);
+      return `<div class="range-metric"><div class="range-metric-head"><span>${label}</span><b>${fmt(avg)} <small>${unit}</small></b><em>n=${xs.length}</em></div>
+        <div class="range-metric-track" role="img" aria-label="${label}: mean ${fmt(avg)} ${unit}, ${xs.length} measured shots, range ${fmt(min)} to ${fmt(max)}">
+          ${xs.map(v=>`<i style="left:${pos(v)}%"></i>`).join('')}<b style="left:${pos(avg)}%"></b></div>
+        <div class="range-metric-range"><span>${fmt(min)}</span><span>range</span><span>${fmt(max)}</span></div></div>`;
+    }).filter(Boolean);
+    return rows.length?`<div class="range-evidence"><div class="range-evidence-title"><b>Measured-shot profile</b><span>remaining shots · dots show this day's range, not ideal bands · smash = ball ÷ club speed · spin rpm · launch degrees</span></div><div class="range-metric-grid">${rows.join('')}</div><p class="sm faint">Each metric uses only shots with that reading; n is its sample count. Strike efficiency (smash) describes speed transfer, not contact location.</p></div>`:'';
+  };
+  const evidenceBlock=c=>`<div class="range-evidence-club"><h4>${esc(c.club)} · ${struckShots(c).length} remaining shots</h4>${deliveryBlock(c)}${metricSummary(c)}</div>`;
   const caption=d.rangeCaption || (d.rangeSource
       ? 'Carry means are TrackMan\'s displayed averages. Total means for 9i and 56° are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.'
       : 'Green is carry. Gold is total. Best 5 is the longest 5 carries of that batch.');
@@ -3662,6 +3707,8 @@ function rangeShotVisuals(d){
     <p class="bvcap">${esc(caption)}</p>
     <h3>Every carry</h3><p class="sm">${groups.some(c=>c.target!=null)?'Vertical line = target distance. ':''}Green dots = remaining carries. Gold dots = the longest 5. All clubs share the same scale.</p>
     ${groups.map(spreadBlock).join('')}
+    <h3>Delivery and shot quality</h3><p class="sm">Path and face use the target line as 0°. Face-to-path uses 0° for face square to path (negative = closed; positive = open). Outlined marker is the mean; small dots are individual remaining shots.</p>
+    ${groups.map(evidenceBlock).join('')}
   </section>`;
 }
 function rangeShotTables(d){
@@ -3859,20 +3906,25 @@ function shotAngles(del, key){
   return (del && del[key] ? del[key] : []).filter(v => v != null && Number.isFinite(+v)).map(Number);
 }
 function rollRemaining(pts){
+  const metricKeys = ['carry','best','total','smash','cs','bs','la','spin','aoa','dynLoft','spinLoft','ld','path','face','ftp'];
+  const metricCounts = {};
   const w = key => {
     let sum = 0, wt = 0;
     (pts || []).forEach(p => {
-      const v = p[key], n = p.n;
+      const v = p[key];
+      const explicit = p.metricCounts && Object.prototype.hasOwnProperty.call(p.metricCounts, key);
+      const n = explicit ? p.metricCounts[key] : p.n;
       if(v == null || !Number.isFinite(+v)) return;
       if(n == null || !Number.isFinite(+n) || !(+n > 0)) return;
       sum += +v * +n;
       wt += +n;
     });
+    metricCounts[key] = wt;
     return wt ? sum / wt : null;
   };
   const n = (pts || []).reduce((s, p) => s + (p.n != null && Number.isFinite(+p.n) ? +p.n : 0), 0);
   const raw = {
-    n: n || null,
+    n: n || null, metricCounts,
     carry: w('carry'), best: w('best'), total: w('total'),
     smash: w('smash'), cs: w('cs'), bs: w('bs'), la: w('la'), spin: w('spin'),
     aoa: w('aoa'), dynLoft: w('dynLoft'), spinLoft: w('spinLoft'), ld: w('ld'),
@@ -3898,7 +3950,7 @@ function cumulativeClubSeries(){
       const del = deliveryMatch(dels, c.club);
       if(!by.has(k)) by.set(k, []);
       by.get(k).push({
-        date: b.date, i, phase: clubPhaseOf(c.club),
+        date: b.date, i, phase: clubPhaseOf(c.club), metricCounts: c.metricCounts,
         n: c.n, carry: c.carry, best: c.best, bestN: c.bestN, total: d.total,
         smash: d.smash, cs: d.cs, bs: d.bs, la: d.la, spin: d.spin,
         aoa: d.aoa, dynLoft: d.dynLoft, spinLoft: d.spinLoft, ld: d.ld,
@@ -3979,7 +4031,7 @@ function cumulativeBagTable(){
       </tr>`;
     }).join('')}</tbody>
   </table></div>
-  <p class="sm faint" style="margin-top:8px">Rolling remaining mean of every club on file, weighted by remaining n across days. One row per club — slot and window stay on the day they happened. Best 5 is the latest batch ceiling, in burgundy. Smash is ball ÷ club when the speeds are there. Dynamic loft is on PW, 50°, 8-iron and 5-iron from the screens; other clubs stay a dash until a capture includes it. Spin loft was a dash on those captures — not invented. Indoor unmarked balls: path, face, speeds, launch are measured; spin and carry are a model.</p>`;
+  <p class="sm faint" style="margin-top:8px">Rolling remaining mean of every club on file, weighted by remaining n across days. One row per club — slot and window stay on the day they happened. Best 5 is the latest batch ceiling, in burgundy. Missing readings stay a dash. Open a day to see its captured shots and source. Indoor carry is a simulator result, not a calibrated outdoor playing yardage.</p>`;
 }
 function cumulativeBagCard(fromHome){
   const table = cumulativeBagTable();
@@ -10006,12 +10058,21 @@ function syncWedgeCarries(source){
 // Claude analyzes filmed sessions and pushes findings to coach-feed.json in the
 // repo; the app merges any entries it hasn't applied yet. Jack's own logs stay
 // local — this is a one-way inbox for coaching updates.
-// Same date, same course, same nine = the same round, however it got here.
+// Same date, course, nine, and (when supplied) simulator status = the same round.
 function sameRound(list, r){
   const key = (r.course || '').trim().toLowerCase();
+  const hasSim = Object.prototype.hasOwnProperty.call(r, 'sim');
   return list.find(x => x.date === r.date
     && (x.course || '').trim().toLowerCase() === key
-    && (x.nine || null) === (r.nine || null)) || null;
+    && (x.nine || null) === (r.nine || null)
+    && (!hasSim || !!x.sim === !!r.sim)) || null;
+}
+// A feed target is authoritative. In particular, never fall back to date/course matching
+// when a supplied id is stale: that could patch a local round with a coincidental identity.
+function targetedRound(list, e, r){
+  if(Object.prototype.hasOwnProperty.call(e, 'target'))
+    return list.find(x => x.feedId === e.target) || null;
+  return sameRound(list, r);
 }
 // ---------- What's new: the log of everything that has changed ----------
 // Every feed entry is a change somebody made to his app, and until now the only sign one
@@ -10215,6 +10276,7 @@ function applyFeed(feed){
     else if(e.type === 'bay-update'){
       const b = S.bays.find(x => x._fid === e.target) ||
                 S.bays.find(x => e.setupMatch && (x.setup || '').startsWith(e.setupMatch));
+      if(!b || !e.bay) return; // Retry after the base feed arrives; never consume a missing-target correction.
       if(b && e.bay){
         const detail = e.bay.detail ? { ...(b.detail || {}), ...e.bay.detail } : b.detail;
         Object.assign(b, e.bay);
@@ -10323,7 +10385,8 @@ function applyFeed(feed){
     else if(e.type === 'round-update' && e.round){
       // Backfills a live-logged card with what the phone couldn't know on the course —
       // course rating and slope, most of all, without which there's no differential.
-      const r = sameRound(S.rounds, e.round);
+      const r = targetedRound(S.rounds, e, e.round);
+      if(!r) return; // A temporarily missing base round must not consume its correction.
       if(r){
         const { holes, force, ...rest } = e.round;
         // Live cards take precedence over anything fed in afterwards: he recorded that
@@ -10358,7 +10421,7 @@ function applyFeed(feed){
       }
     }
     else if(e.type === 'round-review-update' && e.round && e.review){
-      const r = sameRound(S.rounds, e.round);
+      const r = targetedRound(S.rounds, e, e.round);
       if(!r || !r.sim || !r.review) return;
       Object.assign(r.review, e.review);
     }
@@ -10438,7 +10501,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 

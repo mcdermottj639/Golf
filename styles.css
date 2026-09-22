@@ -1715,6 +1715,38 @@ body.night .readcard{color:var(--green-ink)}
 .range-bar-row.best-tot b { color:inherit; }
 .range-track i.range-screen { opacity:.45; }
 .range-club svg { display:block;width:100%;height:auto;margin-top:6px; }
+.range-evidence-club{padding:12px 0;border-bottom:1px solid var(--line)}
+.range-evidence-club h4{margin:0 0 8px}
+.range-delivery,.range-evidence{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:12px;margin:8px 0;min-width:0}
+.range-delivery> b{font-size:12px}
+.range-evidence-n{float:right;font:10px var(--mono);color:rgba(35,32,26,.72)}
+.range-angle-row{display:grid;grid-template-columns:36px minmax(0,1fr) 52px 32px;gap:8px;align-items:center;margin:10px 0;font:11px var(--mono)}
+.range-angle-row>span{font-weight:800}
+.range-angle-row> b{text-align:right}
+.range-angle-row small{font-size:9px;color:rgba(35,32,26,.72)}
+.range-angle-track{height:20px;position:relative;border-radius:4px;background:linear-gradient(90deg,rgba(18,80,48,.06) 0 49.7%,rgba(18,80,48,.16) 49.7% 50.3%,rgba(18,80,48,.06) 50.3% 100%);border-bottom:1px solid var(--line)}
+.range-angle-track:after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1px dashed var(--burg);opacity:.75}
+.range-angle-dot,.range-angle-mean{position:absolute;top:50%;transform:translate(-50%,-50%);border-radius:50%;z-index:1}
+.range-angle-dot{width:5px;height:5px;background:var(--green);opacity:.48}
+.range-angle-mean{width:11px;height:11px;background:var(--card);border:2px solid var(--burg);z-index:2}
+.range-angle-scale-row{display:grid;grid-template-columns:36px minmax(0,1fr) 52px 32px;gap:8px;align-items:start}
+.range-angle-scale{display:flex;justify-content:space-between;gap:2px;font:9px var(--mono);color:rgba(35,32,26,.72);white-space:nowrap}
+.range-angle-reference{margin:2px 0 7px 44px;font-size:10px;color:rgba(35,32,26,.72)}
+.range-evidence-title{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:10px}
+.range-evidence-title b{font-size:12px}
+.range-evidence-title span{font-size:10px;color:rgba(35,32,26,.72);text-align:right}
+.range-metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.range-metric{min-width:0;border-radius:6px;background:rgba(18,80,48,.045);padding:9px}
+.range-metric-head{display:flex;align-items:baseline;gap:5px;min-width:0;font-size:10px}
+.range-metric-head>span{flex:1;min-width:0;font-weight:700}
+.range-metric-head>b{font:700 14px var(--mono);white-space:nowrap}
+.range-metric-head small{font:9px var(--sans);color:rgba(35,32,26,.72)}
+.range-metric-head em{font:9px var(--mono);font-style:normal;color:rgba(35,32,26,.72);white-space:nowrap}
+.range-metric-track{height:14px;position:relative;margin:7px 2px 3px;border-bottom:1px solid var(--line)}
+.range-metric-track i{position:absolute;bottom:2px;width:5px;height:5px;border-radius:50%;background:var(--green);opacity:.55;transform:translateX(-50%)}
+.range-metric-track b{position:absolute;bottom:0;width:9px;height:9px;border:2px solid var(--burg);background:var(--card);border-radius:50%;transform:translateX(-50%);z-index:1}
+.range-metric-range{display:flex;justify-content:space-between;font:9px var(--mono);color:rgba(35,32,26,.72)}
+@media(max-width:480px){.range-metric-grid{grid-template-columns:minmax(0,1fr)}.range-evidence-title{align-items:flex-start;flex-direction:column}.range-evidence-title span{text-align:left}}
 
 
 /* ---- Findability (v117): provenance chips, meaning sheet, Numbers, search, timeline.

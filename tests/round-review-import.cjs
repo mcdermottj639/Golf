@@ -33,7 +33,7 @@ assert.equal(JSON.stringify(T.realRounds()),outdoor);
 assert.equal(JSON.stringify(T.get().carries),carries);
 const html=T.roundView(T.get().rounds.indexOf(r));
 assert.ok(html.includes('Round Review · what to do next'));
-assert.ok(html.includes('59 verified shot observations'));
+assert.ok(html.includes('59 shot observations'));
 assert.ok(html.includes('data-action="open-bay"'));
 assert.ok(html.includes('Optional comparison'));
 assert.ok(!html.includes('Carry shape'));

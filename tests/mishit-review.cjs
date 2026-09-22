@@ -60,10 +60,8 @@ assert.ok(html.includes('179.1'));
 assert.ok(html.includes('Best 5'));
 assert.ok(!html.includes('held out'));
 assert.ok(html.includes('exact data'));
-assert.ok(!html.includes('26.4'));
-assert.ok(!html.includes('34.9'));
-assert.ok(!html.includes('21.5'));
-assert.ok(!html.includes('12.6'));
+for (const miss of ['26.4','34.9','21.5','12.6'])
+  assert.ok(!new RegExp(`Shot \\d+: ${miss.replace('.', '\\.')} yd carry`).test(html), `${miss} mishit is absent from the rendered shot evidence`);
 const cum=T.cumulativeView();
 assert.ok(cum.includes('Club path') || cum.includes('Path across'));
 

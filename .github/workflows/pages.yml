@@ -21,6 +21,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify data and existing-install updates
+        run: |
+          node --check app.js
+          node --check round-review.js
+          node -e "for (const f of ['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"
+          node tests/findability.cjs
+          node tests/sep22-migration.cjs
+          node tests/range-sep22-5i-vg3.cjs
+          node tests/metric-samples.cjs
+          node tests/range-visuals.cjs
+          node tests/source-rounds.cjs
+          node tests/round-identity.cjs
+          node tests/round-review-import.cjs
       - name: Mirror main to gh-pages
         run: |
           git config user.name "github-actions[bot]"

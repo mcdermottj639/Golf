@@ -13,7 +13,7 @@ const assert=require('node:assert/strict');
  await page.click('[data-kind="sim"]');
  await page.click(`[data-action="open-round"][data-i="${idx}"]`);
  await page.waitForSelector('.rr');
- assert.ok((await page.locator('.rr').innerText()).includes('59 verified shot observations'));
+ assert.ok((await page.locator('.rr').innerText()).includes('59 shot observations'));
  assert.equal(await page.locator('.rr [data-action="open-bay"]').count(),1);
  assert.equal(await page.locator('.rr .bvdelivery').count(),0);
  assert.equal(await page.locator('#round-range-reference').count(),1);

@@ -2280,22 +2280,28 @@ exactly that rather than guessing 70°F or the 77°F default. The session is sti
 confirm out-to-in delivery: all six driver paths were leftward (mean −6.6°), as were all six 6i
 (−8.2°) and 8i (−7.6°) paths. That advances the DELIVERY evidence, not the body-mechanics cause.
 
-**DYNAMIC LOFT WAS ON THE SCROLLED COLUMNS (v147).** v145 left the column as a dash and said
-the bay screenshots did not include it. They did, one swipe past launch direction: PW remaining
-36.9°, 50° 35.8°, Sep 22 8-iron remaining 23.5° (the 22.8° average still had the worm in it),
-5-iron 19.4°. Spin loft was a dash — do not invent it from missing attack. Impact height is
-signed millimetres on the shot (down negative). Store the shot, then the remaining mean of
-pure hits. A displayed average that still has the mishit in it is not the live number.
+**SEP 22 SOURCE CORRECTION (v153).** The four original recordings supplied by Jack
+were reviewed again. The range clips at 13:41:32 and 13:42:45 show **7-iron, 16
+shots, target 145**, and **5-iron, 17 shots, target 153**. The v147–v152 8-iron / 26-shot
+5-iron transcription does not match those sources and must not be used as today's
+numbers. `data/range-2026-09-22.json` is the corrected transcript. Original feed
+entries remain historical; a fresh `bay-update` corrects the stable primary `_fid`
+`bay-20260922-range-8i-5i` on existing phones, and a `bay-remove` retires the previously
+shipped standalone VG3 bay. The old primary ID is retained only for migration and
+must never be interpreted as the club roster.
 
-**SEP 22 RANGE is one bay** (`bay-20260922-range-8i-5i`, `data/range-2026-09-22.json`).
-One visit, about two hours — do not split it into morning and afternoon cards.
-8-iron 4 shots, target 131, shot 2 worm held out, remaining 102.3 n=3.
-5-iron is both tables from that visit (9 on the first, shot 10 off-screen and not invented,
-plus the 17-shot table). Live remaining is the mean of those 26: carry 141.0, dyn loft 22.1°,
-path −3.2°, smash 1.33. The 17-shot table's own screen AVG was 150 / dyn loft 23.4° / path −1.1°;
-that row is stored inside the same 5-iron, not a second day.
-The PW/50° clips on the same phone dump match the Sep 14 Map My Bag six-shot groups
-(113.2 / 99.1) — do not mint a second day for those.
+The correction entries live in `corrections-20260922.json`, loaded after the three
+base feeds and cached for offline use. A missing-target bay/round update remains
+unapplied so it retries when the base feed becomes available. `metricCounts` carries
+the finite sample count per metric through cumulative averages; missing readings
+never gain weight from another metric’s sample size. Legacy records fall back to n.
+
+Use the original source filenames, file hashes and timestamped transcripts in
+`data/evidence/` to check a claim. Shot counts and visible AVG rows provide independent
+transcription checks. Agreement between copied JSON files or a test pinned to the
+same values does not establish source accuracy. Do not rename a suspect club using
+carry distance; read the club badge and match shot numbers across every scroll.
+Missing readings stay null. Simulator values do not calibrate the outdoor ladder.
 
 **The ladder says where each number came from, and `meas` is never the authority.** The
 captions render only once SOMETHING on the ladder is measured — before that the gold note
@@ -2381,31 +2387,31 @@ The fixed 20-ball approach test is a feed-added Coach lesson; its two integer co
 completing it. Simulator history does not imply a trend or comparable conditions.
 Auto-putting is assigned scoring, not putting skill; approximately 12-ft gimme is unconfirmed.
 
-**Spyglass Hill 85 (v151 · Sep 22 2026 ingest of a 9/15 overlay).** Source:
-`data/spyglass-2026-09-15.json`, feed id `round-tm-spyglass-20260915-review-v1`.
-`sim:true`, venue TrackMan Golf — same calendar day as Ballybunion, so it is quarantined
-out of THE NUMBERS, handicap, miss maps and rolling bay remaining. 56 captured non-putt
-shots (carry, path, F–P, smash, spin, dynamic loft, remaining-to-hole). Hole-list putts
-sum to 29, which matches 85 − 56; the recap tile printed 28 and 1.6/hole — 29 is stored
-on the card, 28 stays on `review.trackman.putts`. Dest-fairway tee shots are 7/14;
-TrackMan counted 8 — both kept. GIR is hole 1 only (3 shots to the green on a par 5).
-Hole 5 56° dashes were left blank. Spin loft was a dash. Club speed / ball speed from
-a driving overlay are not attached to a hole. `review.noBay` is true so a Mini labelled
-3w cannot land on this card's 3-wood row. `review.bagLine` / `bagConfirmed` keep
-Ballybunion's unconfirmed-label copy off this card. Corrections: new
-`round-review-update`, never edit the applied feed id.
+**Spyglass Hill85 (v153 source correction).** The Sep22 13:47:19 recording
+verifies the85 score, out42/in43, and28 auto-finish strokes. The earlier v151 note
+claimed56 shots and29 putts; that was an extraction error. The source contains57
+non-putt rows: add the omitted H7 tee shot and H10 tee shot, remove the unsupported
+H7 9-iron row. H5 first shot is labeled5-iron into sand.55 expanded panels are
+readable; H7 final wedge and H11 third shot remain blank/flagged for their unreadable
+metrics. Do not fill those with the old values. `data/spyglass-verified-2026-09-22.json`
+contains the targeted correction; timestamps and differences are in `data/evidence/`.
+The original Sep15 play-date label is retained, with a note that the Sep22 capture
+filename does not verify the play date. Keep simulator results out of outdoor stats
+and range means. User shot-identity overrides remain separately stored.
 
-**Hazeltine National 80 (v151).** Source: `data/hazeltine-imported.json`. Recap tiles
-from the visible scorecard (FIR 11/14, GIR 5/18, scramble 3/13 23%, 1.6 putts/hole,
-driving 228/245) plus IN 40 hole scores 10–18. Front nine hole scores and a shot ledger
-were not on that card and are **not invented**. Play date was not on screen —
-`date: 2026-09-22` is the import day, stated in the note. No `review` object, so the
-simulator hole-evidence UI stays off rather than drawing an empty ledger.
+**Hazeltine National 80 (v153 source correction).** Jack identified the 13:44:18
+recording as Hazeltine. All 18 headers sum to 80 on par72, **out41 / in39**. The
+v151 imported back-nine-only card and the separate rewrite snapshot conflict with
+this video. `data/hazeltine-verified-2026-09-22.json` supplies an explicit targeted
+`round-update`; it replaces the recorded hole scores and adds the visible shot
+ledger, excluding the three canceled mulligans. Expanded metrics are only populated
+from readable panels. Do not invent metrics on collapsed rows or derive a full putt
+count from an incomplete shot list. The capture/import date is Sep22; play date was
+not shown. Historical recap tiles are not treated as verified by this clip.
 
-A rewrite-store snapshot of the same numbers (plus every bay session) lives in
-`data/rewrite/` so a sandbox wipe does not lose them. The PWA does not read that folder.
-The 17-shot 5-iron table is archived at `data/range-2026-09-22-5i-vg3.json` and
-`data/rewrite/vg3-5i-afternoon.json`. It is not its own bay.
+`data/rewrite/` contains historical snapshots, not another live database. See its
+README before using a snapshot. The superseded standalone 17-shot VG3 source and
+old 8-iron transcript must not be reimported as extra Sep22 sessions.
 
 
 
@@ -2656,6 +2662,15 @@ or the Aug 30 blocks. Findability is additive.
 Current `home()`: `wxCard` · `theNumbers` · `startRound` · Round prep · `oneThing` ·
 the coach tip · `whatsNew` · `sessionShortcuts` (Days · Cumulative) · the four quick
 links · **search** · the return window if any · Numbers / Evidence / Decisions / Data.
+
+**Release verification (v153).** `tests/findability.cjs` checks that BUILD and the
+service worker cache version match; it must not pin an old version number. The Pages
+workflow runs syntax, feed JSON, findability, existing-install bay migration, round
+identity, and importer tests before publishing. Corrections to existing feed IDs
+require new update/remove entries: never expect an edited historical entry to replay.
+Explicit round correction targets resolve by `feedId` only; an absent target must
+not fall back to an unrelated date/course match. Simulator and outdoor records with
+explicit `sim` values are distinct even on the same date/course.
 
 **v149 — Today opens on The numbers.** Weather then the four tiles then start round.
 Shortcuts and search sit below, not above. That is the Aug 30 order Jack asked for
@@ -2958,3 +2973,7 @@ feature branch never reaches his phone. Develop on the assigned branch, then fas
   global setting, so pass `"date": ""` to clear a stale one belonging to a different club —
   the card then renders "Deadline unknown" instead of a wrong countdown.
 - `design-options/` and `mockup/` are frozen pre-launch artifacts; leave them be.
+
+## Visual evidence release (v154)
+
+Range sessions now show individual measured-shot dots and means for path, face, face-to-path, smash, club/ball speed, spin and launch. Missing readings are omitted and each metric shows its own n. Path and face use the target reference; face-to-path uses the club path reference. Range mishit filtering stays consistent with carry calculations; simulator round data remains separate. Profile scales describe each metric’s observed range, not an ideal-performance grade. Browser checks cover corrected day, cumulative and simulator views at 320 and 390 pixels.
