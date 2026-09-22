@@ -14,6 +14,7 @@ window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayVie
 })();`;
 vm.runInContext(src,ctx);
 const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'coach-feed.json'),'utf8'));
+feed.entries.push(...JSON.parse(fs.readFileSync(path.join(root,'futurefit-feed.json'),'utf8')).entries);
 assert.equal(T.bayCarryVisual([{carry:null},{carry:100}]),'');
 assert.equal(T.bayConsistencyVisual([{cons:null},{cons:10}]),'');
 assert.equal(T.bayDeliveryVisual([{path:null,face:null},{path:0,face:0}]),'');

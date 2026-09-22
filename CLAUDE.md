@@ -3044,7 +3044,9 @@ Validation: importer/arithmetic tests passed, including 80→68→63 count recon
 ## DS-ADAPT X FutureFit33 reference (v165)
 
 The Bag row for the current 3-wood renders `futureFit` data delivered through an
-append-only `club-update`. The currently reported physical setting is A3: on Cobra's
+append-only `club-update` in `futurefit-feed.json`. It is separate from the multi-megabyte
+historical coach feed so a small equipment change never requires replacing that archive.
+The currently reported physical setting is A3: on Cobra's
 official right-handed chart that is −1.0° loft and 1.0° flat, producing 14.0° effective
 loft on the 15.0° head. It is not the higher-loft setting previously claimed in chat.
 The proposed higher-launch comparison is B7: +1.7° loft and 0.7° flat, 16.7° effective.

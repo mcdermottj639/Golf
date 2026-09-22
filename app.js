@@ -1,8195 +1,448 @@
-/* Caddie HQ ‚Äî Jack's golf command center. Vanilla JS, localStorage, no backend. */
-(function(){
-'use strict';
-
-const LS_KEY = 'caddiehq_v1';
-const TROUBLES = [
-  ['three-putts','3-putts'], ['short-putts','Short putts'], ['bunkers','Bunkers'],
-  ['off-tee','Off the tee'], ['approach','Approach'], ['chipping','Chipping'],
-  ['wedge-distance','Wedge distance'], ['mental','Mental'],
-];
-const MISS_CYCLE = ['', 'make', 'L', 'R', 'S', 'Lg']; // 5-ft tap states
-// How long a putt was. One tap on the green, and it is what turns a putt count into a
-// putting statistic: a 2-putt from 40 feet is a good hole and a 2-putt from 5 is a dropped
-// shot, and a putt count alone cannot tell them apart.
-//
-// The boundaries are not generic ‚Äî every one of them is a line this project already draws,
-// which is what makes the buckets worth counting:
-//   ‚â§3     tap-in range. Separating it stops gimmes inflating the make rate, and a miss
-//          from inside it is a real event rather than a rounding error.
-//   4‚Äì6    the scoring zone, and HIS zone: the 5-ft test sits in the middle of it and the
-//          left miss on short putts is the through-line of the whole putter saga. Where
-//          `Short Putts ‚Äî The Pop Stroke` applies.
-//   7‚Äì12   the make-some window ‚Äî birdie chances and par saves. Where strokes are won.
-//   13‚Äì20  two-putt territory where a make is a bonus. The first real pace test.
-//   21‚Äì30  lag proper: three-putt risk starts to climb steeply through here.
-//   30+    the ladder distance. The 30-ft grind is measured here, so the on-course number
-//          is directly comparable to the practice one for the first time.
-const PUTT_DIST = [
-  { k:'t',  lab:'‚â§3',    name:'inside 3 ft' },
-  { k:'s',  lab:'4‚Äì6',   name:'4‚Äì6 ft' },
-  { k:'m',  lab:'7‚Äì12',  name:'7‚Äì12 ft' },
-  { k:'l',  lab:'13‚Äì20', name:'13‚Äì20 ft' },
-  { k:'xl', lab:'21‚Äì30', name:'21‚Äì30 ft' },
-  { k:'xxl',lab:'30+',   name:'over 30 ft' },
-];
-const PD = Object.fromEntries(PUTT_DIST.map(d => [d.k, d]));
-// A conceded putt: the last one on the hole was given rather than holed. It still COUNTS
-// ‚Äî he scores it, everybody does ‚Äî but it was never struck, and the difference matters in
-// two opposite directions:
-//   ¬∑ given from the FIRST putt, it is a make he never hit. Counting it as one inflates
-//     exactly the number this whole project is about (the short ones), so it comes out of
-//     the make rate entirely rather than being credited: you cannot measure a putt that
-//     was not attempted. Film is king, applied to a scorecard.
-//   ¬∑ given after a LAG, it is the opposite ‚Äî evidence the first putt finished inside
-//     gimme range, which is the closest thing to a proximity measurement the card has and
-//     a straight win for the open distance-control fault.
-const conceded = h => !!h.gimme && h.putts === 1;      // a make he never hit
-const lagGiven = h => !!h.gimme && h.putts >= 2;       // a lag that finished inside the circle
-// A hole records ONE putt by distance (Sep 8 2026 ‚Äî Jack's call: total putts and the
-// length of the putt he holed, and nothing else to tap on the green):
-//   `pm` ‚Äî the putt that WENT IN. On a one-putt hole it is the only putt there was; on a
-//          longer one it is where the LAG left him, which is a proximity measurement and
-//          the only one a scorecard has ever been able to produce.
-//   `gimme` ‚Äî the last one was given instead of holed, so there is no made distance. After
-//          a lag that means it finished inside gimme range, which is the best proximity
-//          result on the ladder rather than a missing one.
-//   `pd` ‚Äî where the first putt started. RETIRED as an input: the live logger stopped
-//          asking on Sep 8 2026. Old cards still carry it and still render it, so the
-//          reader below stays ‚Äî but nothing computes a rate off it any more, because a
-//          field that stops being logged would otherwise drift a number quietly.
-// Both readers tolerate cards written before `pm` existed, where the single distance was
-// stored as `pd` whatever the putt count ‚Äî nothing has to be migrated to keep counting.
-const puttFirstK = h => ((h.putts >= 2 ? h.pd : (h.pm || h.pd)) || null);
-const puttMadeK  = h => (h.gimme ? null : ((h.putts === 1 ? (h.pm || h.pd) : h.pm) || null));
-// WHY THERE IS NO MAKE RATE BY DISTANCE ANY MORE. It took the first putt's distance to
-// record a putt he MISSED with a distance on it; without that field every putt the card
-// carries a distance for is one that went in, so a make rate computed over them can only
-// ever climb toward 100%. That is not a rate getting better, it is a denominator going
-// missing ‚Äî the same failure as the 171% lag rate, one step earlier. So the ladder below
-// counts holed putts and where the lag left him, and says so; the short-putt conversion
-// went back to the 5-ft mat test, which is where it lived before Aug 20.
-const pdName = k => (PD[k] || { name:k }).name;
-// The mental tab's vocabulary. A fixed set, in Jack's own words, so that "I got upset by
-// stupid stuff" becomes something countable across rounds instead of a feeling that reads
-// the same every time. Each one carries its IF-THEN ‚Äî the response is decided at home,
-// off the course, which is the whole point of deciding it in advance: on the 14th tee
-// there is no deciding, only doing whatever was already decided.
-const MENTAL_TRIGGERS = [
-  { k:'opener', lab:'Opening tee shot', blurb:'Threw the first one away and it rattled you.',
-    then:'The recovery needs no fixing ‚Äî your second hole plays at your season average and a bad opening does not predict the round. What the opening hole costs is the opening hole, which makes this a WARM-UP and first-swing problem, not a resilience one. Prime the feel before the tee rather than hunting for it on the 4th, and commit to the fuller swing on the 1st instead of the safe short one ‚Äî your own Golf Mind note says the straight driver ball needs the LONGER swing. If the miss is going somewhere your usual miss does not, that is a swing question and it needs film of a COLD swing, not a warmed-up one.' },
-  { k:'slow', lab:'Slow play', blurb:'Waiting on every shot; the group ahead never moves.',
-    then:'Do not stand over the ball early. Wait AWAY from it ‚Äî pick the club and the target while you wait, and start the routine only when it is actually your turn. Your routine has a fixed length; let the waiting happen outside it, never inside it.' },
-  { k:'partner', lab:'Random partners', blurb:'Chatter, gimmes, someone standing in your eyeline.',
-    then:'The only response available is where you stand. Move so they are out of your eyeline for the ten seconds the shot takes. You get one comment in your head, then it is a course condition ‚Äî you do not argue with wind either. Watch the FIRST THREE HOLES specifically: on the one card where you logged this, that is where the damage went.' },
-  { k:'closing', lab:'Did not close', blurb:'Up in the match, or a good score going, and it slipped.',
-    then:'Same routine, same target selection as the 2nd hole ‚Äî closing is not a different skill, it is the refusal to change anything. The one legitimate change: one more club, aimed at the middle. That is protecting a lead correctly; steering is not.' },
-  { k:'anger', lab:'Anger at a shot', blurb:'It was gone, and you carried it to the next one.',
-    then:'Ten yards of walking, then the club goes back in the bag and the hole is filed. The rule is not "do not be angry" ‚Äî it is that anger gets a container with an end you can see.' },
-  { k:'drift', lab:'Checked out', blurb:'Went through the motions ‚Äî no target, no routine.',
-    then:'Attention comes back through a target, not through effort. Next shot, name the smallest thing you can see ‚Äî a branch, a mower line, a bunker lip ‚Äî out loud. If you cannot name one, you are not in the round yet.' },
-  { k:'score', lab:'Score math', blurb:'Adding the round up while it was still going.',
-    then:'Convert it to the hole in front of you: what number makes THIS hole fine? Play that one. The arithmetic still works in the car.' },
-  { k:'rush', lab:'Rushed', blurb:'Played quicker than your own routine.',
-    then:'Count the beats ‚Äî read, one rehearsal, step in, go. Rushing shows up as the rehearsal disappearing first, every time, so that is the one to check.' },
-  { k:'body', lab:'Tired ¬∑ hungry ¬∑ hot', blurb:'A physical state wearing a mental costume.',
-    then:'Eat before you diagnose your head. Water at every tee from the 10th and food at the turn whether you want it or not ‚Äî the standing advice is that a lot of late-round collapses are blood sugar rather than character. That is general practice, not something measured about you.' },
-];
-const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closing stretch'], ['after','After a blow-up']];
-const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
-// Bump this WITH `CACHE` in sw.js ‚Äî they're the same build, and the Data tab shows this
-// one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v165';
-// The app's own changelog. coach-feed.json carries DATA updates and announces itself
-// through them; a change to the app ITSELF has no other route onto the phone and nowhere
-// else to say what it did, so it is written here and merged into Home's What's new block
-// alongside the feed updates. Newest first. Add a block whenever BUILD is bumped ‚Äî an
-// update he can't see landed is indistinguishable from one that didn't.
-const RELEASES = [
-  { b:'v165', d:'2026-09-22', items:[
-    'THE 3-WOOD ADAPTER IS ON THE BAG CARD. The official right-handed FutureFit33 chart is saved offline beside the DS-ADAPT X. A3 is recorded as the currently reported setting: 14.0¬∞ effective loft and 1.0¬∞ flat. B7 is marked as the higher-launch test: 16.7¬∞ and 0.7¬∞ flat. This corrects the earlier reversed chart read.' ] },
-  { b:'v164', d:'2026-09-22', items:['ONE FULL-DAY SET PER CLUB: bay takeaways, charts and tables combine retained shots across same-club blocks. Takeaways explain what the numbers mean and give measurable next steps. Distance-dash rows and clear mishits stay out; original block details remain expandable.'] },
-  { b:'v163', d:'2026-09-22', items:['CUMULATIVE NOW FLOWS FROM PLAN TO EVIDENCE: visual carry ladder, expandable club histories, a measured next-session test, outdoor areas and simulator access. Full tables and coaching detail remain available. Sample counts describe coverage, not accuracy.'] },
-  { b:'v162', d:'2026-09-22', items:[
-    'APEX NOW APPEARS IN EXACT CLUB DATA when a bay session recorded shot height. It is the average height in feet across readable, non-mishit shots; n shows how many supplied it. The original feet-and-inches shot readings remain in the shot table. Sessions without height do not gain an invented value.' ] },
-  { b:'v161', d:'2026-09-22', items:['COMPLETE RANGE SESSION: All 80 source shots reviewed across both September 22 recordings. Twelve distance-dash rows excluded entirely and five clear mishits held out: 63 usable shots across 3W, 5W, two 5i blocks, 7i and 56¬∞. Cleaned carry/total, path/face, strike, launch, best-five comparisons and specific practice takeaways.'] },
-  { b:'v160', d:'2026-09-22', items:[
-    'TAKEAWAYS NOW COME FROM EACH ROUND. Scoring opportunities and club-level face/path, carry, strike, speed, spin and launch readings compete for the strongest cards. Each shows evidence, a visual, a next-session action and links to its holes. Outdoor scorecards get the same scoring engine; sparse records show fewer cards.' ] },
-  { b:'v159', d:'2026-09-22', items:[
-    'HAZELTINE CLUB PROFILES NOW SHOW THE RECORDED NUMBERS. Each selected club has its own dated range reference, measured round carry, total and path with sample counts. TrackMan club selections are provisional, and mixed-intent shots are not presented as full-swing club distances. Other indoor cards keep their separate evidence rules.',
-    'TODAY SHOWS A SIM SCORE beside the outdoor round score: the most recently added complete simulator card and number of full indoor rounds. The nine-hole virtual round stays in Days but does not enter that score line or outdoor metrics.' ] },
-  { b:'v158', d:'2026-09-22', items:[
-    'CARRY AND TOTAL ARE SEPARATE. Spyglass Hole 1 3-wood carried 189.4 yd, went 248 yd in total to the rough, and left 300 yd to the hole. Spyglass shot-list distances now use their recorded total, Hazeltine keeps its separate measurements, and virtual front-nine carry-only tiles no longer claim to be total distance. Existing installs receive the corrections.' ] },
-  { b:'v157', d:'2026-09-22', items:[
-    'CLEAR MISHITS OUT OF CLUB COMPARISONS. Simulator club profiles exclude confirmed mishits and extreme short full-shot carry outliers. Distance and path use the same remaining shots, with counts shown. Every shot stays in the history and the round score.' ] },
-  { b:'v156', d:'2026-09-22', items:[
-    'SPYGLASS CLUB COMPARISONS ARE CONNECTED. All six clubs now show their recorded bay carry and path with the source date and block. The current 3-wood uses its own September 18 range shots. September 22 irons and September 15 short clubs have their own links.' ] },
-  { b:'v155', d:'2026-09-22', items:[
-    'SPYGLASS IS SEPTEMBER 22. Jack confirmed the play date and that it was his first TrackMan HCP round. The TrackMan profile screenshot shows HCP 7.4 with one round. Spyglass 85 now sits beside Hazeltine 80 in Indoor with an HCP label; outdoor handicap stays separate. Previously imported phones receive the correction.' ] },
-  { b:'v154', d:'2026-09-22', items:[
-    'SEE EACH SHOT: range profiles show path, face, face-to-path, smash, speed, spin and launch with individual readings, averages and measured sample counts. Face/path reference the target; face-to-path references the club path.',
-    'SOURCE REPAIRS ARE INCLUDED: corrected 7-iron / 5-iron range data, Hazeltine 80 and Spyglass 85 now reach existing installs. Earlier v151/v152 descriptions below are historical and superseded by the source audit.' ] },
-  { b:'v153', d:'2026-09-22', items:[
-    'SOURCE CHECK: today‚Äôs supplied range videos show 7-iron and 5-iron. The previous 8-iron / combined 26-shot record used the wrong evidence. New source-linked corrections also reach phones that already imported the old record.',
-    'RELIABLE UPDATES: simulator and outdoor rounds keep separate identities. Release checks validate matching app/cache versions and run before the website is published.' ] },
-  { b:'v152', d:'2026-09-22', items:[
-    'SEP 22 RANGE IS ONE SESSION. About two hours, not a morning card and an afternoon card. 8-iron stays 102.3 n=3 after the worm. 5-iron is both tables from that visit ‚Äî 26 shots, remaining 141.0, dyn loft 22.1¬∞, path ‚àí3.2¬∞.' ] },
-  { b:'v151', d:'2026-09-22', items:[
-    'SPYGLASS 85 IS ON THE CARD. TrackMan Golf, 9/15. 56 shots stored with carry, path, face-to-path, smash, spin, dynamic loft and remaining-to-hole. Simulator card ‚Äî it does not change THE NUMBERS or rolling bay averages.',
-    'HAZELTINE 80 IS PARKED TOO. Recap tiles from the scorecard (FIR 11/14, GIR 5/18, scramble 23%, 1.6 putts/hole, driving 228/245) plus the back nine scores. Front nine hole scores were not on that card and are not invented. Play date unknown ‚Äî import day is labelled as such.' ] },
-  { b:'v150', d:'2026-09-22', items:[
-    'THE JUMP BAR IS ONE ROW. Swipe sideways for Round prep, Coach, The record. It used to wrap onto a second line over the weather.' ] },
-  { b:'v149', d:'2026-09-22', items:[
-    'TODAY OPENS ON THE NUMBERS. Weather, then the four tiles, then start round. Days, Cumulative, search and the rest sit under that ‚Äî the morning view is the scoreboard again.',
-    'EVERY CLUB STAYS ON CUMULATIVE. The bag table did not come back onto Today.' ] },
-  { b:'v148', d:'2026-09-22', items:[
-    'EVERY CLUB IS CUMULATIVE, NOT TODAY. The remaining/best-5 table and the path + face lanes live on Cumulative. Today is the door ‚Äî Days and Cumulative tiles, then the rest of the morning.',
-    'DAYS STAY DAYS. Tap a capture for that day‚Äôs numbers. The bag you come back to is Cumulative.' ] },
-  { b:'v147', d:'2026-09-22', items:[
-    'DYNAMIC LOFT WAS ON THE SCREENS. PW 36.9¬∞, 50¬∞ 35.8¬∞, 8-iron remaining 23.5¬∞ (the 22.8¬∞ avg included the worm), 5-iron 19.4¬∞. Stored on every shot plus impact height. Spin loft was a dash ‚Äî not invented.',
-    'SEP 22 RANGE IS ON THE BAG. 8-iron remaining 102.3 n=3 after the worm. 5-iron remaining 123.2 n=9 of 10 visible. Rolling remaining, not the last day. Clubs without a loft column still dash.' ] },
-  { b:'v146', d:'2026-09-22', items:[
-    'EVERY CLUB HAS FACE-TO-PATH ON CUMULATIVE. Same axis as the day cards: small dots are remaining shots (path green, face gold), rings are the rolling remaining mean, numbers are PATH / FACE / F‚ÄìP. One row per club ‚Äî no slot, no window, no rest.',
-    'THE TABLE IS ROLLING REMAINING, NOT THE LAST BLOCK. Weighted by remaining n across days. After-slot stays on the day it happened. The bag is what the days add up to.' ] },
-  { b:'v145', d:'2026-09-22', items:[
-    'EVERY CLUB NOW HAS THE NUMBERS THAT MEASURE. Smash, club speed, ball speed, launch, spin, attack, path, face, face-to-path, launch direction ‚Äî and dynamic loft / spin loft when a capture includes them. Best 5 stays burgundy.',
-    'SMASH IS BALL √∑ CLUB when smash is missing. Nothing invented. Indoor unmarked balls: path, face, speeds, launch are measured; spin and carry are still a model.' ] },
-  { b:'v144', d:'2026-09-22', items:[
-    'NEXT ACTIONS ARE A TITLE NOW. The 33-item wall is a list: one line each, HIGH first, the rest grouped by lane and folded. Tap the line for the coaching. Tap the box to tick it ‚Äî opening it no longer marks it done.',
-    'NOTHING WAS DELETED. Every action is still there. The essay is one tap away, not the thing you have to read to find the job.' ] },
-  { b:'v143', d:'2026-09-22', items:[
-    'EVERY CLUB IS ON HOME AND CUMULATIVE. Remaining carry, best 5, path, face, face-to-path ‚Äî latest block of every club on file. Best 5 is burgundy. Negative path is out-to-in. 7-iron rest ‚àí7.6¬∞ / ‚àí1.0¬∞ / +6.5¬∞. 3-wood after slot ‚àí2.0¬∞ / ‚àí0.6¬∞ / +1.4¬∞.',
-    'THIS IS THE BAG YOU COME BACK TO. Days stay days. The table is what they add up to. Indoor unmarked balls: path and face are measured; carry is still a model.' ] },
-  { b:'v142', d:'2026-09-22', items:[
-    'IN TO OUT. Path is the job. Face is already near square ‚Äî closing it would hook. Target 0¬∞ to +2¬∞. 3-wood already proved it: ‚àí6.1¬∞ ‚Üí ‚àí2.0¬∞ after the slot, and it held.',
-    '7-IRON IS THE TRAINING CLUB. Path never to ‚àí2¬∞. Woods hold what they won. Wedges already sit near zero ‚Äî leave them. Next bay: remaining path is the scoreboard, not best 5.' ] },
-  { b:'v141', d:'2026-09-19', items:[
-    '2-IRON ~215. Working rule: inside 360, 2-iron; past 360, 3-wood or 5-wood. Still figuring it out. Van Cortlandt: woods on 1 / 4 / 9 / 14. 7 is 222 ‚Äî 3-wood, 2-iron is close.' ] },
-  { b:'v140', d:'2026-09-18', items:[
-    'VAN CORTLANDT TOMORROW. 2-iron is the fairway finder. 3-wood or 5-wood if it needs to be high or draw. 7 is 222 ‚Äî 3-wood at the middle. Opens 7 AM.' ] },
-  { b:'v139', d:'2026-09-18', items:[
-    'VAN CORTLANDT TOMORROW. Oldest public course in the country, 6,002 yards, par 70. 3-wood is the fairway finder. 7 is 222, past every measured carry ‚Äî middle, two putts. 2 and 12 are three-shot par 5s. Opens 7 AM.' ] },
-  { b:'v138', d:'2026-09-18', items:[
-    'GROK SKILL ‚Äî NUMBER CRUNCH. /golf-number-crunch turns a raw table into remaining, best 5, and the group the sequence made. Window vs baseline. Mishits out. Carry in red. Video skill transcribes; this one decides. Not a page.' ] },
-  { b:'v137', d:'2026-09-18', items:[
-    '7-IRON IS A WINDOW. The sequence, not a remembered split. Open 113.5 n=2. Run 138.2 n=5 in an 11-yard band. Rest 128.9 n=20 / best 5 146.6. Face-to-path 8.9 ‚Üí 3.1 ‚Üí 6.5. Path never to ‚àí2¬∞. The 3-wood after-slot held. This did not.' ] },
-  { b:'v136', d:'2026-09-18', items:[
-    '7-IRON SLOT IS ON SHOT 3. First 140 after two at 110 / 117. Before 113.5 n=2. After 130.7 n=25 / best 5 147.1. Path barely moved (‚àí8.2¬∞ ‚Üí ‚àí7.3¬∞). Face-to-path did (8.9 ‚Üí 5.8). Three worms out. Same thought as the 3-wood; the 3-wood changed path, the 7-iron changed strike.' ] },
-  { b:'v135', d:'2026-09-18', items:[
-    'GROK SKILL, NOT A PAGE. Video analysis is /golf-video-analysis ‚Äî a real Grok skill in the repo, not a Swing Lab screen. Send a TrackMan scroll or a swing clip and it reads carry in red. The extra page from v134 is gone.' ] },
-  { b:'v133', d:'2026-09-18', items:[
-    'PROOFREAD THE DAY CARD. Path rings had two 3Ws and two 5Ws with no after-slot label. Header still said 49 shots after the tops were out. ‚àí2¬∞ lost its decimal next to ‚àí6.1¬∞. After-slot rows now say 3W ¬∑ slot. The count is remaining shots, not the raw pile.' ] },
-  { b:'v132', d:'2026-09-18', items:[
-    'CARRY vs TOTAL, labelled. ‚ÄúAll‚Äù was carry and ‚ÄúBest 5‚Äù was painted gold like total ‚Äî that was the mix-up. Green is carry. Gold is total. Best 5 is the longest 5 carries (green bar, burgundy number), not a total.' ] },
-  { b:'v131', d:'2026-09-18', items:[
-    'CLUB TABLE IS A TABLE AGAIN. Face and face-to-path were dumping 16-decimal floats, after-slot rows had no speed/spin even though the shots had them, and the club names scrolled off the screen. Angles to one decimal. Club column stays put. After-slot 3-wood and 5-wood now show smash, speed, launch, spin from the shots you already sent.',
-    'Same Sep 18 numbers. 7-iron 131.7 / best 5 141.8. 112 still out.' ] },
-  { b:'v130', d:'2026-09-18', items:[
-    '7-IRON CARRIES ARE IN. 131.7 n=11 ‚Äî that was the real average, no tops. Best 5 is 141.8. Consistency 12.4. Path ‚àí6.9¬∞.',
-    '112 IS OUT. The after-slot 5-wood at 112 yards / 8‚Ä≤ of apex was a mishit. Half-median kept it because other tops had dragged the median down. The cut is now two-thirds of the cluster that actually got up. 5-wood after: 175.3 n=7 / best 5 182.0.' ] },
-  { b:'v129', d:'2026-09-18', items:[
-    'RANGE TOPS ARE OUT. A skull on the bay is gone from the record ‚Äî not just hidden. On-course rounds keep every shot.',
-    'ALL vs BEST 5. Every batch now shows the remaining average and the best 5 of that batch (best 3 if it is short), ranked by carry, with those shots‚Äô path, face-to-path and smash. 3-wood first block: 176.5 all / 191.0 best 5. After slot: 188.4 / 192.7.' ] },
-  { b:'v128', d:'2026-09-18', items:[
-    'MISHITS ARE OFF THE CARD. Tops and skulls stay in the feed so the average stays honest ‚Äî you just do not have to look at 26 yards next to 196. Bars, dots, and the shot table are the struck balls only.',
-    'Same numbers as before: 3-wood 176.5 / 188.4 after slot. 5-wood 179.1 / 167.4. Nothing mixed, nothing deleted.' ] },
-  { b:'v127', d:'2026-09-18', items:[
-    '3-WOOD AFTER SLOT HAS CARRIES NOW. Screen 150.3 n=9 included two tops (21.5, 12.6). Struck is 188.4 n=7 ‚Äî longer than the first block‚Äôs 176.5. Path ‚àí2.0¬∞ (was ‚àí6.1¬∞). 150.3 is not the club.',
-    'Same day, still its own block. Live ladder unchanged.' ] },
-  { b:'v126', d:'2026-09-18', items:[
-    '7-IRON IS ON THE DAY CARD. Carry vs total was skipping any club with no per-shot carries, so eleven 7-iron shots lived only in the table below the fold. The 7-iron now shows on that card: screen 131.7, labelled screen because those carries were off-screen and cannot be cleaned, plus path ‚àí6.9¬∞ and face-to-path +6.4¬∞.',
-    'SCREEN 157.6 no longer wraps onto its own line under 5-wood. Held-out screen numbers sit under the bar, not in the title.' ] },
-  { b:'v125', d:'2026-09-18', items:[
-    'AFTER SLOT, SAME DAY. Halfway through Jack started dropping the trail (right) hand to get more in-and-down. Those shots are their own block ‚Äî not mixed into the first-block average.',
-    'PATH MOVED. 3-wood ‚àí6.1¬∞ ‚Üí ‚àí1.7¬∞ (n=8). 5-wood ‚àí4.7¬∞ ‚Üí ‚àí2.1¬∞ (n=8). Face-to-path did not tighten. 5-wood struck carry 167.4 ‚Äî not longer than the first block‚Äôs 179.1. 3-wood after: carries off-screen, screen 150.3 is not the club.' ] },
-  { b:'v124', d:'2026-09-18', items:[
-    '150 IS OFF THE 3-WOOD. That was TrackMan‚Äôs screen average with two tops in it, not a shot and not the club. The 3-wood number is 176.5 n=9 struck. The two tops stay on the day, marked held out.',
-    'BAG OFFER IS 176.5, not 150. Live carry still blank ‚Äî do not type it onto the course ladder. Venue balls, Normalize on, temp not shown.' ] },
-  { b:'v123', d:'2026-09-18', items:[
-    'THE 7-IRON WAS IN THE RECORDING. Eleven shots: path, face-to-path, smash, speed, launch, spin. Per-shot carries were off-screen, so there is no cleaned 7-iron carry ‚Äî the screen number stays 131.7. Delivery is complete and now sits on the day and in Cumulative.',
-    '7-IRON FACE-TO-PATH +6.4¬∞ ‚Äî the most open of the three clubs today. Path ‚àí6.9¬∞, every shot left of the target. That is the same out-to-in as the woods, with more cut on it.',
-    'A club with delivery and no per-shot carry is no longer dropped from the rings. Analysis still cannot clean a carry it cannot see.' ] },
-  { b:'v122', d:'2026-09-18', items:[
-    'MISHITS ARE OFF THE AVERAGE. Analysis is the struck balls. A top or skull ‚Äî carry under half the rest of that club that day ‚Äî is held out of the bars, the rings, and Cumulative. It stays on the day and in the table, marked not deleted.',
-    'THE 3-WOOD READ IS 176.5, NOT 150. Two tops (26.4, 34.9) out of eleven. The 5-wood is 179.1, not 157.6. Same rule on the Sep 15 range: the 8-yard and 15-yard drivers are off the average they were sitting in.',
-    'THE REVIEW PROCESS IS IN CLAUDE.md. Transcribe every shot. Clean the analysis. Print both ns. Check the arithmetic. Drive 320/390. Same commit as the code.' ] },
-  { b:'v121', d:'2026-09-18', items:[
-    'CUMULATIVE IS THE ANALYSIS NOW. Working vs needs work, the over-the-top picture, path and face from every bay day, the one thing to do, and the open items ‚Äî on that page, not behind another door.',
-    'PATH ACROSS DAYS is the visual: every club average as a dot, the ring is that day‚Äôs shape. Sep 14, Sep 15 and Sep 18 all sit left of zero. Face open to that path is the pull-fade. Fix the path first.',
-    'Days still stay days. Today is untouched.' ] },
-  { b:'v120', d:'2026-09-18', items:[
-    'NEW 3-WOOD, FIRST LOOK. TrackMan displayed 150.0, n=11, consistency 58.6 ‚Äî that average includes two tops (26.4 and 34.9). The other nine average 176.5, with four of them at 189‚Äì201. Jack: felt amazing. That is the struck ball, not the 150.',
-    '5-WOOD displayed 157.6 because of one 28.5; cleaned 179.1, which sits on the Sep 14 map 177.6. 7-IRON 131.7 n=11 cons 12.4 (Sep 14 was 135.9 / 12.5). Per-shot 7-iron carries were off-screen.',
-    'NONE OF THIS REPLACES THE LIVE LADDER. Normalize on, temp not shown, venue balls. The 3-wood row stays blank except for this offer. Do not type 150, and do not type the mini‚Äôs 182.4 onto this head.' ] },
-  { b:'v119', d:'2026-09-18', items:[
-    'BAG SWITCH: the mini driver is OUT of the 14 (kept). The 4-iron stays out. A Cobra DS-ADAPT X 3-wood is IN ‚Äî stock 15¬∞, Project X Denali Blue 60 Regular, Golf Galaxy SKU 26808014, $199 same-day. Long end is Driver ¬∑ this 3-wood ¬∑ 19.5¬∞ 5-wood ¬∑ 2-iron.',
-    'THE NEW 3-WOOD HAS NO CARRY. Do not park the Sep 14 TrackMan 3w 182.4 on it ‚Äî that label was the mini. Both woods sit blank until you hit them. Read the FutureFit33 sleeve (stock 15¬∞, ¬±2¬∞) when you have it in hand.',
-    'Days and Cumulative are on this build if v118 did not land: one list of every capture, and one running picture that moves when a day lands.' ] },
-  { b:'v118', d:'2026-09-18', items:[
-    'DAYS ARE ONE LIST AGAIN. Range / simulator / outdoor / film were four doors onto the same dated captures, so a week of work looked like four apps. Today and Game now open Days (every capture, newest first, filter chips if you want one kind) and Cumulative.',
-    'CUMULATIVE IS THE RUNNING PICTURE. Same four on-course areas Coach and Today already compute ‚Äî it does not invent a fifth number. The n is on the page (live holes, bay sessions, film days), and a simulator round is a day you can open, never a hole in these four. Bay and film sit in their own lanes. It moves when a day lands.' ] },
-  { b:'v117', d:'2026-09-18', items:[
-    'THE THEME IS BACK. v116 replaced the Scorecard Heritage stylesheet with a 43-line chip file, so Today rendered as unstyled HTML ‚Äî clipped search, no cards, no cream paper, no nav. The 1,671-line sheet is restored; findability CSS is appended, not substituted.',
-    'TODAY IS THE PAGE JACK DESIGNED AGAIN: sessions, quick links, weather, the numbers tiles, start/resume round, round prep, the one thing, the coach tip, what‚Äôs landed. Search, Numbers and Evidence are added on top ‚Äî they do not replace those blocks.',
-    'Search no longer dumps the empty hint onto the home page. Type to filter; try 5-wood, combine, handicap. Numbers and Evidence sit with Decisions at the bottom of Today.' ] },
-  { b:'v116', d:'2026-09-18', items:[
-    'FINDABILITY PASS: every number you can quote now wears a provenance chip ‚Äî ON-COURSE, BAY, TRACKMAN, MEASURED, ESTIMATED, OFFER, FED, SELF ‚Äî and an ‚ìò that opens what it means, why it matters for you, and when not to trust it.',
-    'NUMBERS INDEX (Today ‚Üí Numbers, also from Game): one searchable, filterable catalog of handicap, 5-ft makes, lag-inside-3, every ladder carry and parked bay offer, Combine score, groove counters and open return windows. Tap a row to the meaning sheet, then Open in app.',
-    'TODAY SEARCH finds a club, a course, a lesson and a metric from the same catalog. Evidence is a newest-first timeline of live rounds, bay/film and feed applies ‚Äî stitched, not invented.',
-    'TODAY IS FIVE BLOCKS: the work, one scoreboard number, next-round prep, an open return window if there is one, and shortcuts (Search ¬∑ Numbers ¬∑ Evidence ¬∑ Start/Resume). The long grids live in Numbers and Evidence now. Same data ‚Äî easier to find and trust.' ] },
-  { b:'v115', d:'2026-09-17', items:[
-    'THE SLICE IS MEASURED. Two swing reports off Drive added the ball-flight numbers nobody had pulled: every club you hit finishes RIGHT of where it started, from +1.8 yards on the 50\u00b0 to +24.5 on the driver. Put beside the out-to-in club path already on file, both halves of the over-the-top miss are now measurements rather than a theory about your own game.',
-    'A NEW PAGE THAT SHOWS IT: Game \u2192 Swing now opens What the numbers say \u2014 your ball flight drawn club by club, a clubface map of where you actually strike it, which clubs are repeatable and which are not, and what the driver is leaving on the table.',
-    'WHERE YOU HIT IT ON THE FACE, for the first time: the 56\u00b0 is struck 6.4 mm on the HEEL on five of five shots and every longer club on the TOE. Get a lie board on it before grooving anything \u2014 there is a to-do on the board saying why.',
-    'THE DRIVER IS A 230-YARD CLUB ALREADY. 94.4 mph of club speed, 129.9 mph of ball speed. At a tour-standard strike the same swing leaves 9.8 mph faster \u2014 about 22 yards \u2014 and a centre-strike drill is on the Coach bench for it.',
-    'The swing lab has its first evolution grid, five columns of what has been captured and ten rows of what it answered. The two rows that are all dashes \u2014 shaft lean and the body move behind the path \u2014 are the ones that say what to film next.',
-    'Two things the reports got wrong were corrected rather than copied: your driver smash is 1.38, not the 1.36 both documents printed, and your 60\u00b0 was never missing from the bag map \u2014 it is the tightest club you own.' ] },
-  { b:'v114', d:'2026-09-17', items:[
-    'THE SIX-NUMBER BASELINE NOW EXPLAINS ITSELF: Every number says what it controls, what your reading means, and which comparisons are valid. The immediate priority is face-to-path consistency with face control‚Äînot blindly chasing speed.',
-    'CORRECT BALL-FLIGHT READ: ‚àí1.6¬∞ face with +6.5¬∞ face-to-path is a left-starting ball that peels right (pull fade / bigger cut), not a draw or hook.' ] },
-  { b:'v113', d:'2026-09-17', items:[
-    'YOUR SIX TRACKING NUMBERS ARE NOW A DEDICATED BASELINE: Ball speed 128.5 mph, smash 1.42, face angle ‚àí1.6¬∞, face-to-path +6.5¬∞, spin 3,979 rpm and carry 193.7 yd. Open Home ‚Üí Sessions ‚Üí Range sessions ‚Üí Six-metric baseline.',
-    'This is the original one-shot TrackMan panel‚Äînot the separate virtual-round readings. It sets the fields to track; it does not replace a club carry or claim a personal average.' ] },
-  { b:'v112', d:'2026-09-16', items:[
-    'TRACKMAN FRONT NINE ADDED: Simulator rounds now includes the Sep 16 virtual front nine ‚Äî 47 on par 36 ‚Äî with the recording‚Äôs verified hole scores. Hole 10 was shown incomplete, so no back-nine score or putting result was invented.',
-    'THE SIX NUMBERS THAT MATTER ARE IN THE SHOT LEDGER: Spin, carry, face-to-path, smash, face angle and ball speed appear together wherever the recording showed them. They are simulator evidence only and do not change outdoor scoring or playing carries.' ] },
-  { b:'v111', d:'2026-09-16', items:[
-    'SEP 15 RANGE VIDEO ANALYZED: Home ‚Üí Range sessions ‚Üí Sep 15 now opens all 54 shots, carry-versus-total charts, shot spread, target results and readable delivery data. Separate from Sep 14 Map My Bag and Ballybunion.',
-    'Every short shot stays in the analysis. Carry and total target hits are counted separately; missing readings stay blank. Existing playing yardages are unchanged.' ] },
-  { b:'v110', d:'2026-09-15', items:[
-    'SESSIONS NOW HAS ITS OWN HOME: open Range sessions or Simulator rounds directly from Today, Game or Bag. Dated cards separate practice, played rounds and swing videos.',
-    'Range charts live inside their own session. Ballybunion keeps its own shot evidence and an optional link to the older bag map. The Sep 15 range recording is listed separately as awaiting full analysis.' ] },
-  { b:'v109', d:'2026-09-15', items:[
-    'THE TRACKMAN VISUALS ARE NOW FRONT AND CENTER IN THE BALLYBUNION ROUND REVIEW: carry shape, consistency and path-versus-face appear before the written takeaways, with one tap to the full Bay session.',
-    'A new apply-once repair restores the full 13-club Map My Bag record on phones where the first delivery update replaced that data. The Round Review now opens with the visual evidence instead of making you hunt for it.' ] },
-  { b:'v108', d:'2026-09-15', items:[
-    'THE BAY NOW SHOWS THE SHAPE OF THE BAG, NOT JUST A SPREADSHEET: scaled carry bars keep every exact TrackMan number visible while flags call out overlaps, inverted gaps and unusually large stretches between adjacent clubs.',
-    'PATH AND FACE ARE NOW VISUAL TOO: every recorded shot is a dot, the outlined rings are the club averages, and each row prints path, face angle and face-to-path together. TrackMan Consistency has its own separate visual and is not mislabeled as standard deviation.' ] },
-  { b:'v107', d:'2026-09-15', items:[
-    'THE BALLYBUNION LEDGER NOW CONTAINS ALL 59 COUNTED NON-PUTTING SHOTS: 88 total strokes minus 29 TrackMan-assigned putts. Three canceled mulligan shots were removed and 24 collapsed timeline shots were added.',
-    'Expanded shots keep their readable delivery metrics. Shots whose data panel was never opened still keep the selected club, corrected actual club, displayed distance and finishing lie. Nothing missing is filled with zero.' ] },
-  { b:'v106', d:'2026-09-15', items:[
-    'ROUND CLUB IDENTITIES ARE NOW CONFIRMED: every TrackMan 3w label in Ballybunion was the Mini Driver, every 60¬∞ label was the 56¬∞, and every 2-iron label was the 6-iron ‚Äî the closest selected club when the label was not changed.',
-    'Obvious full swings and partial 56¬∞ shots now populate the round club profiles. The 102-yard 6-iron and 61-yard 9-iron remain unclassified because swing length is not clear from the recording.' ] },
-  { b:'v105', d:'2026-09-15', items:[
-    'SIMULATOR ROUND REVIEW connects the Ballybunion scorecard to verified shot observations, the Bay session, club profiles, three evidence-backed takeaways and a logged next-session test.',
-    'THE CLUB YOU SELECTED IS NOT ALWAYS THE CLUB YOU HIT. Jack used only Driver, Mini Driver, 5-wood, 6-iron, 9-iron and 56¬∞. Recorded labels stay visible, but uncertain shot identities do not enter club averages or change playing carries.',
-    'The v103/v104 empty Bay was caused by a truncated, invalid published JSON feed‚Äînot proven to be a cache problem. The complete feed was repaired and verified byte-for-byte. Simulator results remain separate from outdoor records and putting skill.' ] },
-  { b:'v104', d:'2026-09-15', items:[
-    'THE BAY FEED NOW BYPASSES GITHUB PAGES\' TEN-MINUTE EDGE CACHE. v103 could arrive before the Trackman data file at a phone\'s nearest cache, leaving Swing Lab correctly upgraded but still saying ‚ÄúNo bay sessions yet.‚Äù The feed request now carries the running build in its URL, so code and data land together without resetting anything.' ] },
-  { b:'v103', d:'2026-09-15', items:[
-    'YOUR FIRST FULL TRACKMAN BAG MAP IS IN. The Sep 14 session holds 78 shots across 13 clubs, six per club, with the exact one-decimal carry and Trackman consistency figures from the screen recordings.',
-    'THE LONG END IS MEASURED ENOUGH TO ASK THE RIGHT QUESTION: driver 195.8, the Trackman 3w label 182.4, 5-wood 177.6 and 2-iron 152.3. The 3w-to-5w gap is only 4.8 yards, while 5-wood to 2-iron is 25.3.',
-    'THE IRON LADDER IS NOT A LADDER YET. The 7-iron carried 135.9, 6-iron 134.5 and 5-iron 128.3; PW carried 113.2 against 9-iron 110.2. Those are session findings, not new course yardages, because the venue balls were unmarked and the normalization temperature was not shown.',
-    'Carry offers keep the decimal Trackman actually reported and now show even beside a blank ladder row. The bay table labels Trackman CONSISTENCY as consistency rather than silently calling it standard deviation.' ] },
-  { b:'v102', d:'2026-09-12', items:[
-    'YOU CAN SET YOUR OWN CLUB ON ANY HOLE OF A PLAN. Open a course plan in Round Prep, tap \u201cÔºã Your club\u201d on a hole, pick one or two off your ladder. It shows as YOUR CALL above the plan\u2019s line \u2014 which stays on the page, because a call you cannot see the reasoning for is one you cannot argue with next time round.',
-    'It reaches the tee. On that hole in the live logger the collapsed prep card leads with your club rather than the plan\u2019s, and the round card afterwards marks the holes where the call it graded was yours rather than researched. \u201cUse the plan\u201d puts it back.',
-    'THE PART THAT MATTERS: your pick survives the next update to that plan. Plans get re-sent whole every time a word of one changes, so an edit stored inside the plan would be wiped silently \u2014 yours is filed against the course instead. Tested by re-pushing the Fairchild Red plan under a new version after setting a club: the call held.',
-    'You can also set a club on a hole the plan says nothing about \u2014 those are the holes you are most likely to have your own view on, and it still reaches you on the tee.' ] },
-  { b:'v101', d:'2026-09-12', items:[
-    'HOW THE PLAN HELD UP IS READABLE NOW. You said the finished column was not easy to scan, and it wasn\u2019t \u2014 it was two lines of prose squeezed into a narrow column, so \u201cno play at it\u201d and \u201c\u2190 warned\u201d wrapped to three and four lines and you had to read every cell to find the bad holes.',
-    'ONE LINE PER SHOT, because the club and what that club did are one fact: TEE with the club you hit and where the ball finished, GRN with the club in and whether you found the green. A green rail down the left where the shot cost nothing, burgundy where it did \u2014 so you can see a hole\u2019s story without reading a word.',
-    'The plan\u2019s words sit above a hairline and the result below it, in the same cell, which is what gave the prose its width back. Measured against the old build: the table is SHORTER at every phone width \u2014 693px shorter at 320, 91px at 390 \u2014 and nothing wraps.',
-    'A red ! marks the finish the plan told you to avoid. On a par 3 there is one line, not two, because the tee shot IS the approach. And a tee shot that left no play at the green reads DEAD, the same word the off-the-tee club table uses.' ] },
-  { b:'v100', d:'2026-09-12', items:[
-    'YOUR FAIRCHILD WHEELER ROUND got the RED plan on its card, not the Black\u2019s \u2014 which is the fix from earlier today working on a real round rather than on a test one. That was the first round ever played at a 36-hole facility in this app.',
-    'FIXED, on the same card: \u201cHow the plan held up\u201d told you the Red plan was written \u201cfrom this round among others\u201d. It was not \u2014 it was written that morning off research and your old scorecard. A plan is dated by its feed id, which carries a DAY and not a time, so the app genuinely cannot tell a plan written before you teed off from one written up that evening. It still does not grade a same-day plan (under-claiming is the safe way to be wrong), but it now says that is why, instead of asserting where the plan came from. It becomes a real test the next time you play there.',
-    'No course rating on that card is deliberate, not an oversight: the published rating and slope for Fairchild Wheeler do not resolve cleanly \u2014 several variants, and one figure comes back under both courses. Tell Claude the rating and slope off your GHIN post or the scorecard and it can be backfilled onto the card with a tap.' ] },
-  { b:'v99', d:'2026-09-12', items:[
-    'FINISHING A ROUND AND SAVING ONE ARE TWO TAPS, AND THE SECOND ONE was hiding. On the review screen the Save button was the last thing in the form ‚Äî under the tee chips, the rating fields, the differential line, the trouble chips and the notes box, about a screen and a half down. So a round could be tapped in over four hours, reviewed, and left sitting unsaved in the draft while every number in the app still read two rounds. That happened today.',
-    'The save is now pinned above the tab bar for the whole of the review screen, with the hole count and a line saying nothing reaches your record until you tap it. It settles back into the page at the bottom rather than floating over the last card. Measured in both themes at 320, 375 and 390 with the notch simulated: 8px clear of the tab bar every time, and the button is 46px tall.',
-    'The tell, if it ever happens again: the middle tab reads RESUME instead of TEE. That only ever means a round is still open in the draft ‚Äî nothing is lost, tap it and finish saving. Your round is still there.' ] },
-  { b:'v98', d:'2026-09-12', items:[
-    'FAIRCHILD WHEELER is prepped ‚Äî both eighteens, because you did not know yet which one you were playing. The Black and the Red are two separate standing plans in Round Prep, and both are on your course list with the facility on the map so they sort with everything else by distance.',
-    'THE BLACK is the harder card (72.0/128) and the one with real hole-by-hole research behind it: 16 of 18 holes, including the blind tee shot on the 2nd where you wait for the bell, the pro‚Äôs own favourite at the 330-yard 5th, the elevated green on 16 where long is the safe miss, and the par 3 over the cattails at 17. Its par 3s average 175 ‚Äî your 5-iron.',
-    'THE RED covers 5 holes and says so. Nothing published describes the other thirteen, so rather than invent tee lines the plan gives you the structure that IS sourced: 1, 9, 10 and 18 are steep and the fourteen between them are flat and scoreable. Wind and the greens are the defence.',
-    'Where a plan‚Äôs advice fought your own swing it says which is which. Two holes on the Black want a draw; your open fault is an over-the-top slice, so those notes decline the source‚Äôs advice and tell you they are doing it. The 18th wants a fade, which is the one hole out there where your miss is an asset.',
-    'FIXED, AND IT WOULD HAVE BITTEN YOU TOMORROW: with two courses at one facility the app matched a plan on the name BEFORE the dash, so both plans matched either round and whichever one landed first won. Driven in a browser before and after: on the old build a round started on the RED was served the Black‚Äôs plan on every hole. An exact name now wins outright, and the round card grades a card against the right plan for the same reason. Event suffixes like ‚ÄúBeekman ‚Äî Scramble‚Äù still match a round logged under the plain name, exactly as before.',
-    'No scorecard is on file for either course: every scorecard host was unreachable from here, so par and stroke index could not be sourced. The logger will ask you to set par as you go the first time round and prefill it after that. Sources given for both courses even say the Black is par 70 and par 71 ‚Äî your card settles it.' ] },
-  { b:'v97', d:'2026-09-11', items:[
-    'The rest of the Trackman work, built now rather than waiting for data to justify it \u2014 the same reason the ladder and the bay sessions went in before your first session.',
-    'SIMULATOR ROUNDS have a home, and a wall around them. A sim card is stored, listed with a SIM badge and opens to a full hole-by-hole round card \u2014 and it is counted in NOTHING: not your handicap, not the Today tiles, not Coach\u2019s four areas, not your PR or your record at a course. The USGA does not accept a simulator score, and a Trackman round of Pebble knows the real rating and slope, so the block is absolute rather than something that depends on a missing number.',
-    'The one thing a sim card may still tell the app is what the HOLE is \u2014 its par and stroke index, which the simulator renders accurately. It can never tell it what YOU do on that hole: your record there and the club you hit are read off outdoor cards only, because indoors there is no penalty for a bad drive.',
-    'A simulator putt is struck on a flat mat with the break applied by software, so made distances are thrown away on the way in. The putt count stays \u2014 you took those strokes.',
-    'EVERY LAB CAN HAVE ITS OWN EVOLUTION GRID now, not just putting. A run of bay sessions is what fills a swing one: attack angle, club path, face-to-path, batch by batch, with the same \u2713 / \u2717 / ? marks and the same rule that a row of question marks is the most useful row on the page. A lab with no grid shows nothing at all rather than an empty table.',
-    'THE COMBINE is in. Trackman\u2019s own test \u2014 60 shots to nine yardages plus driver, scored out of 100 \u2014 is the only thing a bay produces that is directly comparable to your own last attempt, so it renders as a benchmark in the Swing lab: latest, best, how many taken, a per-target table, and a trend once there are three.',
-    'Each lab now reads the same way top to bottom: the film, the bay, the grid the batches add up to, then the benchmark. The swing grid and the Combine were above the bay block first, which had one page teaching a reading order the next page contradicted.' ] },
-  { b:'v96', d:'2026-09-11', items:[
-    'TRACKMAN. The app can now hold launch-monitor numbers, so the sessions at the lounge have somewhere to land instead of sitting in a chat. Two places show it: the carry ladder, and a new "The bay" block in the Swing, Short Game and Putting labs.',
-    'EVERY LADDER ROW NOW SAYS WHERE ITS NUMBER CAME FROM \u2014 the date it was measured, how many shots it averages, the spread, and the ball it was hit with. Rows that have never been measured say "estimated" rather than sitting there looking identical to one that has. The captions only appear once something on the ladder is genuinely measured; until then the gold note covers it as before.',
-    'The spread is new \u2014 \u00b19 yards on a driver is a number this app has never had for any club, and it is the one that decides a par 3.',
-    'A measured carry NEVER quietly overwrites a number you typed. The row shows both \u2014 "yours 230 \u00b7 the bay says 241" \u2014 with a button to take it. Blank rows it simply fills, because there is nothing there to protect.',
-    'The mini-driver / 2-iron OVERLAP flag can finally answer itself. Today it is loft arithmetic and says so; once both rows are measured it states the gap in YARDS, which is the question a 43-inch mini and a 39-inch driving iron actually pose.',
-    'A bay session opens like a film breakdown: what it measured, club by club, in a table that scrolls in its own box. A column only appears where the session produced it.',
-    'Three facts lead every bay session, because none of them is visible in a number: the BALL, the bay\u2019s normalization setting, and whether spin was MEASURED or estimated. Indoors a radar needs about two ball revolutions to measure spin \u2014 on the lounge\u2019s plain white balls it estimates one instead, and since carry is computed from launch and spin, that makes the carry a model built on a modelled input. Better than a guess. Not the same as a measurement.',
-    'New evidence badge: MEASURED IN THE BAY. It ranks above film and below your own rounds \u2014 a radar beats a frame counted by hand off a phone, and a card you actually played beats any number taken off a perfect lie. Tapping it says what a mat cannot see: still air, no slope, nothing at stake.',
-    'Nothing indoors touches your handicap, your on-course stats or the live logger. That wall goes in with simulator rounds, which are not built yet.' ] },
-  { b:'v95', d:'2026-09-09', items:[
-    'Your Lakeside driver film is dated AUG 17, not Aug 20. You confirmed the clip\u2019s date, and it was on the record as Aug 20 \u2014 which was quietly claiming it came off your Aug 20 round at Lakeside. It did not: that round is a real, separate day three days later, and its scores, pars and 70.5/129 are untouched.',
-    'The correction follows the film everywhere it is cited \u2014 the swing faults, the posture plan, the checkpoint page, the capture to-do, and the evidence chip under the posture fault, which used to read \u201cAug 20 film\u201d on a card whose text now says Aug 17.',
-    'Every OTHER Aug 20 is left alone on purpose: your round, the day you photographed the scorecard, and the dates plans were edited. Only the day the camera rolled moved.',
-    'Under the hood: a filmed session\u2019s DATE can now be corrected from the feed at all. It could not before \u2014 the only way to change one was to delete the session and re-add it, which throws away everything already attached to it.' ] },
-  { b:'v94', d:'2026-09-08', items:[
-    'PUTTING now shows where your makes came from. The distance ranges sit in the corner beside the number \u2014 one line per range you have actually holed from, and ranges you have nothing in do not appear \u2014 and GIVEN is the fourth row, reading like the three above it.',
-    'Given is counted off the chip you tapped, over the holes that actually recorded an ending: a made distance, or a concession. NOT over every hole you played. Your first live round did not track putts made, and this is what stops those eighteen holes being read as gimmes and inflating the number \u2014 they are simply not in it.',
-    'Coach\u2019s putting line now says how many holes recorded an ending, so a share taken over eighteen of your thirty-six can never read as though it came off all of them.',
-    'Longest made came out. It is the last line of the range list now, so keeping it said the same thing twice \u2014 and it was being cut off to "Longest mad\u2026" on the narrowest phone.',
-    'Nothing else moved. The 1-putt, 2-putt and 3+ rows still read over every hole you played, and the tile is the same height it was, so the block clears the tab bar by exactly what it did before.' ] },
-  { b:'v93', d:'2026-09-08', items:[
-    'The location prompt should stop turning up. The app was asking iOS for a fresh position every time you opened it \u2014 that is what put the Allow dialog on screen each morning. It now uses the fix it already had saved, so opening the app asks for nothing at all.',
-    'It asks in three places now and every one of them is a tap you made: the weather card the first time on a new phone, MOVED? on that card, and the distance sorts on Round prep and Courses. Ten opens in a row went from eleven prompts to one.',
-    'The honest trade: the temperature now follows your saved fix rather than you. While that fix is today\u2019s you would never know the difference. Once it is older, the card names the day it was taken and moved? sits right beside it \u2014 one tap and you are current again.',
-    'Worth knowing, because it is the half nobody can code around: whether Allow sticks is iOS\u2019s decision, not the app\u2019s, and for a web app on the home screen it often does not. Nothing on a page can make it stick. What a page can do is stop asking, which is what this is.' ] },
-  { b:'v92', d:'2026-09-08', items:[
-    'A round you type into Log a round on the Rounds tab no longer breaks the page. It was saving fine and then vanishing \u2014 the round list and Today\u2019s handicap tile both stopped drawing, because the handicap check read the hole-by-hole array off a card that has never had one. Typed rounds are score, putts and a note by design. Anything already saved is fine and shows up now.',
-    'Every round stopped scrolling the page sideways on a narrow phone. Six columns of minimum width did not fit a 320px card \u2014 or a 375px one \u2014 so the whole page slid. The table now tightens its own spacing on a phone and, if it ever still cannot fit, scrolls inside its own box instead of dragging the page with it.',
-    'Nothing was dropped to do it: all six columns are still there. The padding halves, the column headings give up their letter spacing, and the little \u203a on the date goes \u2014 the caption underneath already tells you the row is tappable. Type sizes are untouched.',
-    'A long course or tee name can no longer decide how wide that table has to be. It wraps instead, which matters because those are the two columns you type yourself.' ] },
-  { b:'v91', d:'2026-09-08', items:[
-    'Your bag switch is in. The MINI DRIVER is back at 15.5\u00b0 and is the fairway finder again; the 5-WOOD dropped to 19.5\u00b0 and moved down the bag into the slot the 4-IRON just left; the 4-iron is out. Still fourteen clubs, and the tee chips in the live logger now offer exactly that set.',
-    'Both woods sit on the carry ladder with NO number, and that is on purpose. The mini\u2019s old 220 was an estimate at 13.5\u00b0 and this is not that club, and the 5-wood has never been measured at any loft. A guess reads exactly like a measurement once it is on the ladder.',
-    'The bag flags the 2-iron as an OVERLAP now. That is loft arithmetic and nothing else \u2014 at 15.5\u00b0 the mini sits exactly 1.5\u00b0 off it, which is where the rule fires. A 43-inch mini driver and a 39-inch driving iron do not carry the same distance whatever their lofts say; the flag is the app saying the question is open, not answering it.',
-    'Every plan that told you to hit a 4-iron has been re-read. Wianno, Pound Ridge and Lakeside had eleven calls between them off a club you no longer carry \u2014 they now come off the 2-iron\u2019s 205 or the 5-iron\u2019s 180, with the leaves moved to match, and each plan\u2019s paper trail says what changed. Sterling Farms\u2019 5-wood calls still name a club you carry; the note there says it is three degrees weaker than the one that hit them.',
-    'Swing Thoughts has a section per wood again, and the range drills that were comparing driver against the 5-wood are comparing driver against the mini driver instead.',
-    'Small thing on What\u2019s landed: a bag change now says which club it was rather than the id it was filed under.' ] },
-  { b:'v90', d:'2026-09-08', items:[
-    'PUTTING now reads 1-putt, 2-putt and 3+ putts as percentages of the holes you played, with the raw counts beside them, and the longest putt you holed underneath. The headline is putts a hole.',
-    'It was showing 100%. That tile led with the share of your lags finishing inside three feet, and on your two live rounds that came out 15 of 15 ‚Äî because 12 of those second putts were GIVEN, and a conceded putt is inside gimme range by definition. The number was right and told you nothing: it was measuring how freely your partners give short ones. A rate that can only land near 100% is not a measurement.',
-    'Where that proximity number still appears ‚Äî the lag finding and Putting ¬∑ by distance ‚Äî it now says how many were conceded rather than holed, so you can see which half is yours.',
-    'The whole numbers block got a little tighter to make room, out of leading and padding only. It now clears the tab bar by 15px on the smallest phone and about 50px on yours ‚Äî it was running 8px PAST it once you had live putting data on the card, which nothing had measured before.' ] },
-  { b:'v89', d:'2026-09-08', items:[
-    'A round you finish now moves your HANDICAP. The finish screen offers the tees as chips where the course\u2019s scorecard is on file ‚Äî tap White and the rating and slope fill themselves in, and it tells you the differential and where your estimated index lands before you save.',
-    'Lakeside is the first course wired up: all five tee rows off the card you photographed (Blue 72.3/131 \u00b7 White 70.5/129 \u00b7 Green 68.4/123 \u00b7 Gold 65.8/113 \u00b7 Red 64.3/111). They had been sitting in the file since August and were unreachable ‚Äî the feed entry that corrected the stroke index was replacing the whole card, tee ratings included.',
-    'Any full card already saved without a rating can be fixed from the card itself: open the round and the tee chips are there.',
-    'The estimated index says what it rests on. Today\u2019s handicap tile carries it, and Rounds now says how many of your cards carry a rating and how many full ones are missing one ‚Äî so a number that has not moved tells you why instead of just sitting there.',
-    'Your PR keeps itself. A course\u2019s PR is now the lowest you have typed in OR the lowest full card you have logged, whichever is better, and the list sorts by that ‚Äî so a good round moves it on its own. Your typed number is never overwritten; where a card beat it, the course says so and leaves yours alone.',
-    'Every course you tap now opens with YOUR RECORD HERE above the fields ‚Äî rounds played, best 18 (and best 9), average against par, and when you last played it. The rankings show how many cards you have at each course, and Today counts how many of your courses have one.',
-    'Your handicap can be pushed by Claude now instead of you typing it. It was the one number on the front page with no route in ‚Äî which is how the app came to say 8.5 while your GHIN index said 11.1 and the only fix on offer was a to-do telling you to go and change it yourself.' ] },
-  { b:'v88', d:'2026-09-08', items:[
-    'FIRST PUTT is off the live logger. A green now asks two questions instead of three ‚Äî how many putts, and how long the one you holed was. Nothing else about logging a hole changed.',
-    'That length does more work than it looks like. On a hole that took two putts, the putt you holed IS where your lag finished ‚Äî so the app still measures distance control, and measures it as a proximity number rather than as a count of three-putts.',
-    'Putting ¬∑ by distance is rebuilt around it: how many you holed from each range, how many of those were one-putts, and where your lags left you ‚Äî with conceded lags counted as inside three feet, because nobody concedes a twenty-footer. Coach‚Äôs putting headline is now the share of lags that finish inside three feet.',
-    'What it costs, plainly: there is no longer a make rate by distance, and no 4‚Äì6 ft conversion off the course. Recording a putt you MISSED with a distance on it needed the first-putt field ‚Äî without it every putt the card knows the length of is one that went in, and a rate over those could only ever climb toward 100%. The 5-ft mat test is the short-putt number again, as it was before August.',
-    'Old rounds keep every distance you already tapped in, and the scorecard still shows where the first putt started on the cards that carry one.' ] },
-  { b:'v87', d:'2026-09-06', items:[
-    'Fixed the 171% on Putting \u00b7 by distance. The count of lags that finished inside gimme range covers every distance you started a putt from, but it was being divided by your first putts from past thirteen feet only \u2014 so a card with twelve of them against seven long first putts printed a percentage over 100.',
-    'It now reads as a share of the holes where you actually had a second putt to hit, which is the only set those twelve can be part of. On that card it is 12 of 15, so 80%. The count itself was right all along, and nothing else on the table moved \u2014 the three-putt rate and the make rates were never affected.' ] },
-  { b:'v86', d:'2026-08-31', items:[
-    'The NEXT HOLE button now sits above the tab bar on a hole you have finished \u2014 no scrolling to get off the hole. It was about 40px below the fold in Quick view, so every hole cost you a scroll you should never have had to make.',
-    'The header is smaller. Hole N was wrapping onto two lines on your phone, which cost 44px on its own; the hole number, par, stroke index, Card and Finish now sit on one line and the whole green block is 58px shorter. It is sticky, so that is 58px back on all eighteen holes.',
-    'The hole prep moved back ABOVE the scoring rows, where the CSS always said it belonged \u2014 it is a tee-box read, so it goes ahead of the taps. It still arrives collapsed with the one line to act on showing.',
-    'The paragraph explaining the chips moved to the very bottom. You know how it works by now; it was sitting between the card and the Next button.',
-    'Fixed a sideways scroll at the narrowest phone width: a wide club abbreviation in a five- or six-chip row was pushing the last chip past the edge and dragging the whole page with it.' ] },
-  { b:'v85', d:'2026-08-30', items:[
-    'All four tiles fit on one screen now. It was clipping the bottom two on your phone \u2014 and not on any desktop browser, because the notch and home-indicator insets that eat about 90px there report as zero everywhere else. Simulated your phone properly and it was 38px over.',
-    'Nothing shrank. The space came out of padding and gaps: a tighter masthead, a slightly shorter weather card, and The numbers closing up as one block instead of sitting like three unrelated ones. Type sizes are untouched \u2014 you already told me these read small.' ] },
-  { b:'v84', d:'2026-08-30', items:[
-    'IRONS is now INTO THE GREEN \u2014 on Coach as well as Today, so it is one name and not two. The tile was named for the club usually in your hand, but the area is every shot at a green: a wood into a par 5 and a wedge from 90 are both in it, which the Woods row made obvious.',
-    'Its breakdown splits four ways in club order: Woods, 2i\u20135i, 6i\u2013PW, 50\u201360\u00b0. Long and short irons were sharing one hit rate, and a 4-iron from 200 and a 9-iron from 140 are not the same shot \u2014 lumping them hid the comparison the row exists to make.',
-    'The Woods line only appears once you actually go at a green with one, so it stays out of the way until it has something to say.' ] },
-  { b:'v83', d:'2026-08-30', items:[
-    'PUTTING now breaks down the same way as the other two \u2014 your make rate by the distance you struck the putt from, in a ladder: inside 3, 4\u20136, 7\u201312 and so on, showing the four ranges you have played most.',
-    'It says something before that data exists, which is the point of adding it now: until two ranges carry a putt it tells you to tap the distance on the green, so the space is an instruction rather than a hole in the card.',
-    'That rate is per PUTT STRUCK, not per hole \u2014 a two-putt records one you missed and one you holed, both with distances, which is exactly why the logger asks for the made putt and the first putt separately.' ] },
-  { b:'v82', d:'2026-08-30', items:[
-    'OFF THE TEE now breaks down by club in the room it had spare \u2014 driver, 2-iron, whatever you hit, with the fairway rate and the raw count beside each. Par 3s are left out of it exactly as you said: a par 3 has no fairway, so a club used only there never appears.',
-    'IRONS splits the same way, by what was in your hands: 2i\u2013PW, 50\u201360\u00b0, and Woods when you go at a green with one. Par-3 tee shots ARE counted here \u2014 on a par 3 the tee shot is the approach, so that is where the green belongs.',
-    'The PW is counted with the irons \u2014 your call. It was genuinely ambiguous: it is part of the 4\u2013PW set and it also anchors your wedge ladder at 44\u00b0.',
-    'Both are read off the same club table that already lives on Rounds, so the tile and that table can never disagree. Tap either tile for the full version with the dead-drive and OB columns.' ] },
-  { b:'v81', d:'2026-08-30', items:[
-    'Fixed what v80 broke on OFF THE TEE. Lining the captions up had pushed that one to the bottom of its card, leaving a gap between the 36% and the word under it \u2014 which is what a broken card looks like. The caption sits under its number again, the trend line on ROUND SCORES moved to the bottom edge, and all three text lines still line up across the row.' ] },
-  { b:'v80', d:'2026-08-30', items:[
-    'The numbers lines up properly now. COURSES has no second number, so its label was sitting where the other three had theirs \u2014 the row read as four cards at three different heights. Value, label and the small figure are now three fixed bands across the whole row, and UP & DOWN fits on one line on a narrow phone instead of wrapping.',
-    'Same fix on the four tiles below: ROUND SCORES carries a trend line and OFF THE TEE does not, which had left their caption lines 34px apart. Both captions sit on the same baseline now.' ] },
-  { b:'v79', d:'2026-08-30', items:[
-    'The numbers now says which cards it was read off, at the top of the line under it. That is the answer to why they all moved: once you have 18 holes you logged yourself, the whole block switches to your live rounds ONLY and sets the older cards aside \u2014 so finishing one round you tapped in recomputes every number at once. Coach has always said so; this block was not, which is the bug.',
-    'Nothing about how any of them is calculated changed. Checked line by line.' ] },
-  { b:'v78', d:'2026-08-30', items:[
-    'UP & DOWN now carries its own small second number the way scramble does \u2014 the up-and-2 rate. Worth seeing together: you have saved 0 of 12 missed greens, but 75% of them still came in at bogey or better. The headline alone read like nothing was being saved; the tier under it says what actually happened.',
-    'COURSES moved to the left of the row and is now a link straight to your course list.' ] },
-  { b:'v77', d:'2026-08-30', items:[
-    'The two handicaps are one tile now. HANDICAP keeps the big number and the estimated index off your logged cards sits under it, small \u2014 they were two readings of one thing side by side as equals, which reads as a contradiction rather than as a figure and the app\u2019s estimate of it.',
-    'The freed tile is SCRAMBLE, your definition: par or better after a missed fairway. 1 of 8 so far, with the bogey-or-better rate under it in the same small type \u2014 63%.',
-    'Scramble and up & down are a pair and the line under the block says so, because the words do not: the same question asked about two different mistakes \u2014 did you save the hole from off the fairway, and did you save it from off the green. Worth flagging that your \u201cscramble\u201d is not the standard golf usage, which is up-and-down.' ] },
-  { b:'v75', d:'2026-08-30', items:[
-    'The numbers is now everything Today counts, under one heading: the handicap row you used to scroll past the round button to reach, and under it four live numbers in the order a hole is played \u2014 your last score, off the tee, irons, putting. Tap any tile for what is behind it.',
-    'UP & DOWN replaced 5-ft makes in that top row, so the row and the tiles together cover all four parts of your game.',
-    'Three tiles went. 5-FT MAKES had never shown a number \u2014 it needs two mat tests and there is one. CARRY LADDER was a fact about your bag, not a result, and it lives on Bag. CONDITIONS was the weather card directly above it, said again and smaller \u2014 you spotted that one, and it was only visible because the swap had just put the two side by side.',
-    'The three new numbers are read off the same cards and the same reader Coach uses, so the front page and the coach cannot quote you different percentages.',
-    'The clock no longer sits on top of the masthead. The app paints under the status bar by design, but nothing was reserving room for it at the top \u2014 only at the bottom.',
-    'Two changes aimed at the scrolling glitch where the page shows through past the tab bar: the rubber-band bounce is off, and the tab bar now gets its own layer so it stops lagging behind a fast flick. Tell me if you still see it, and whether it is the home-screen app or Safari \u2014 they would be different causes.' ] },
-  { b:'v74', d:'2026-08-30', items:[
-    'On Today, the numbers and the one thing swapped places. The four tiles \u2014 5-ft makes, round scores, carry ladder, conditions \u2014 now sit straight under the weather, and the one thing you are working on sits below round prep, next to the coaching that goes with it.' ] },
-  { b:'v73', d:'2026-08-30', items:[
-    'Your plans moved to the top of every lab, above the diagnosis. Reaching a workshop log meant scrolling past every open fault and everything it was read off \u2014 several screens on Putting and Swing. A lab now reads: which lab, the cheat sheet, the routine, the plans, then the diagnosis under them.' ] },
-  { b:'v72', d:'2026-08-30', items:[
-    'On the Labs hub, the way INTO the lab you picked now sits directly under the four tiles instead of at the very bottom of the page. Picking Putting and actually opening Putting were separated by the entire diagnosis \u2014 several screens on any lab with faults open. Picking a lab and going in is one motion.',
-    'Every lab page now carries all four labs across the top, so you can go straight from Putting to Short Game without going back to the hub. Fixed order, always \u2014 Swing, Short, Putting, Mental \u2014 and the one you are already in is the lit one.' ] },
-  { b:'v71', d:'2026-08-30', items:[
-    'The app now keeps YOUR calendar day, not the server\u2019s. It was reading the clock in UTC, so from 8pm Eastern onwards it believed it was already tomorrow \u2014 a round finished on a Sunday evening saved itself as Monday, a drill logged at nine went on the wrong day of the streak, and What\u2019s landed stopped saying "today" hours before your day was over.',
-    'Nothing already saved was changed. If a card or a drill is sitting on the wrong date from an evening before this, tell me which and I will move it.' ] },
-  { b:'v70', d:'2026-08-30', items:[
-    'What\u2019s landed on Today is now just that \u2014 what landed. It shows the latest day only, with a button to the full log. It had grown to a hundred-odd rows, so the block that answers "what is different since yesterday" had turned into an archive of changes you had already read.',
-    'The full history moved to its own page, unchanged and one tap away. The "N new" count is honest about the split: Today counts what it is showing you, and the button says how many more are waiting and how many of those you have not seen.' ] },
-  { b:'v69', d:'2026-08-30', items:[
-    'Every coaching page now says whether an instruction is YOURS or standard practice. You asked to always see what you are thinking and feeling separately from what best practice typically is, so you can tell when you are off track \u2014 the short-game plan is the worked example, and the whole app was audited against it.',
-    'The audit found four things that were wrong rather than just unlabelled. Your wedge bounce was listed as 10/10/8 in a Coach lesson; the build is 8/10/8. A lesson said "your proximity from 150 yards is 45+ feet" \u2014 nothing here has ever measured your proximity, that is a published amateur average. The Swing Positions page still named the hip slide as your miss, which the Aug 20 film retracted. And the Bag stated a shallow sweeping attack angle as fact one card above the card admitting nobody has filmed it.',
-    'On the Putting Routine, "barely open is square" now says out loud that it is your own read and still unconfirmed. It was stated flat on the collapsed card, which is the version you actually see \u2014 the instruction has not changed, only what it admits.' ] },
-  { b:'v68', d:'2026-08-27', items:[
-    'Your film history is easier to find. Every lab now calls it the same thing \u2014 FILM ROOM. Putting was still calling it "Stroke session log" while Swing and Short Game called it Film room, and the jump bar at the top of a lab is built from those headings, so the same block announced itself with a different word depending on which lab you were in.',
-    'In Putting it also moved UP, above the stroke evolution grid. The grid is a summary OF the film, so the film itself should not have been the thing you scroll past the summary to reach.',
-    'Nothing was ever lost: every session is still there, ten across the three labs, and tapping one still opens the full breakdown. It was findable-only-if-you-knew-where, which is the same as missing.' ] },
-  { b:'v67', d:'2026-08-27', items:[
-    'The whole app has been redrawn. The tab bar is five tabs with the TEE button in the middle of them ‚Äî one thumb, any screen, and it starts a round or picks the one you are in the middle of back up.',
-    'Courses moved under Rounds, and your round prep moved there too. Cards ¬∑ Round prep ¬∑ Courses are now three faces of one tab, so the plans sit next to the cards that judge them. The Game tab is the four labs and nothing else.',
-    'The live logger only asks what can exist. Putts appear once there is a score; the first-putt distance only when you actually had two putts; say nought putts and it stops asking about putting at all. The fairway question waits until you have named the club you hit, and on a par 3 it asks for the green off the tee rather than pretending there was a second shot.',
-    'Your round card now prints the FULL scorecard ‚Äî par, stroke index, score and putts across the nine, with circles on the birdies and squares on the bogeys, doubled for eagles and doubles. Tap the header to fold it away.',
-    'Under it: a miss map of where the greens went, the distances you actually holed from, putting by distance, and a by-club table for that round alone.',
-    'Every finding carries a coloured rail in the tier of its evidence, and tapping the badge now opens EVIDENCE USED ‚Äî what was counted, what it was read off, and what that source cannot tell you. Same panel on Today, on the labs and on a round card.',
-    'The bag leads with the clubs instead of the numbers: type, make, loft, what it measures and where it stands. Then a section on grinds and bounce ‚Äî what an F, an S and an M sole actually do differently, which of your three sits in which bounce band, and the four Vokey grinds you do not have and why each exists.',
-    'The carry ladder is bars against a 300-yard scale with the number in its own column, gaps flagged where they are wide, and the 5-wood showing UNMEASURED rather than a guess. It says out loud that the ladder IS the club list the logger offers you.',
-    'The labs hub is four cards; pick one and its diagnosis is right there, a row per open fault with its evidence rail and the drills that train it.',
-    'Every section on every tab folds away, and what you left open stays open when the page redraws.' ] },
-  { b:'v66', d:'2026-08-24', items:[
-    'The stroke evolution grid stopped printing seven paragraphs under the table. Every row now shows its marks AND a two-word state \u2014 Settled, Closed, Open, Never measured \u2014 so you can read where the stroke stands without reading anything.',
-    'Tap any row for the full reasoning behind it. Nothing was cut; it just stopped being printed on the page you use to find things.',
-    'What each column was is now behind one collapsed line instead of a paragraph of legend.',
-    'Under the hood: the column blurbs moved out of the app and into the data, so rebuilding the grid is a feed push rather than a code change. That was a documented trap \u2014 the old legend was hardcoded and had to be edited by hand every time a column was added.' ] },
-  { b:'v65', d:'2026-08-24', items:[
-    'The film room log on every lab \u2014 Putting, Swing, Short Game \u2014 is now a scannable list instead of a three-column table. A row is the date, how big the batch was, and ONE line saying what it concluded.',
-    'The full breakdown is unchanged and one tap away, same as before. Nothing was thrown out; it just stopped being printed on the page you use to find things.',
-    'The reason it needed doing: the findings have grown to paragraphs, and three columns at phone width meant you had to READ the log to navigate it.',
-    'Putting now lists newest first, like the other two labs already did.' ] },
-  { b:'v64', d:'2026-08-24', items:[
-    'The three ball-height stroke clips got read properly, and they were written off too early \u2014 the head fills 224 to 365 pixels in them, which is the closest look at the club anywhere in this project.',
-    'PATH goes to a tick on the Aug 24 column: SBST confirmed from a second camera, by a test that needs no scale at all. The head travels a straight line back and through and essentially retraces it. Two unrelated methods agreeing is the strongest evidence on that page.',
-    'TEMPO is running quick. Six strokes now, across two sessions and two mats \u2014 mean about 1.79 against a 2:1 target, five of six under 2.0. Read the direction as real and the number as not yet, because the way backswing start is detected shortens the ratio.',
-    'EARLY LIFT was challenged by those clips and the challenge did not survive \u2014 so it stays closed. Two ways of finding the head\u2019s edge give OPPOSITE answers on the same footage, because the head is more motion-blurred coming down than going back. Its grid mark is now a question mark: the angle was tried and could not settle it.',
-    'First thing in the record that points at STRIKE LOCATION rather than inferring it: at address the ball sits toward the toe side of the head. Eyeball read, so it proves nothing \u2014 but that camera plus impact tape closes the fault in one session.' ] },
-  { b:'v63', d:'2026-08-24', items:[
-    'Four more putts on the AirBreak landed, same mat and same tilt as the first three \u2014 so the stroke evolution grid\u2019s Aug 24 column now reads off SEVEN putts, and two of its rows moved off a dash.',
-    'START LINE is measurable on this mat after all, and the rule it was written under this morning was half wrong. Break only bends the ball about 0.02 in over the first 8 in of roll, so the line a putt LEAVES on reads to roughly a third of a degree. What the mat cannot tell you is whether you aimed it there \u2014 a 2.9\u00b0 right start is either a perfect allowance or a shove, and no camera can separate those.',
-    'The one that matters: the mat wants about 2.5\u00b0 of right start line, and THE ONLY MISS IN THAT BATCH IS THE ONE THAT STARTED AT THE TARGET. The three that allowed 1.6\u20132.9\u00b0 right all went in. Every miss across both batches went left, and on a mat falling left that is an under-read break, not the old aim fault.',
-    'TEMPO got its first re-measurement since Jul 30 \u2014 1.64 to 2.13 across four putts, mean about 1.86. Consistent with the settled 2.0 and too soft to move it, so the row reads as holding. The firmer number underneath it is the down-stroke duration, which varied 32% across four strokes.',
-    'A new to-do: shoot the OVERHEAD set. It is the only angle that separates stroke path from head rise and the only route to face angle at impact \u2014 two open faults for one clip.' ] },
-  { b:'v62', d:'2026-08-24', items:[
-    'The stroke evolution grid has a fourth column \u2014 Aug 24 AirBreak \u2014 for the three putts filmed on the new mat at the PuttOut trainer.',
-    'One row moved: PACE. Nothing ran long ‚Äî both misses finished five to six inches past on a six-foot putt, a dying pace rather than a firm one, and the holed one stayed in the cup. Same answer the Aug 10 outdoor session gave, and the first time an indoor batch has given it.',
-    'Start line got a DASH, and the reason is the useful part: on a mat that makes the ball curve, aim and break are the same number and there is no way to pull them apart. The AirBreak is the wrong mat for the aim question and the right one for pace. Flat mat with a line for start line; this one for speed.',
-    'Strike location took a fourth column of question marks. Six clips on the day and not one shows the face.' ] },
-  { b:'v61', d:'2026-08-24', items:[
-    'Where your game is now reads across FOUR AREAS \u2014 off the tee, irons, short game, putting \u2014 each with its headline number and the one thing its misses say.',
-    'It computes off your LIVE rounds alone as soon as they carry a round\u2019s worth of holes, and the older cards stand down and are counted out loud. Until then it says exactly which cards it read and when.',
-    'No benchmark column, on your call \u2014 the only detailed baseline is a years-old archive, and a target dressed up out of it is worse than the bare number. The comparison comes back when there are enough live rounds to measure against each other.',
-    'The putting tile switches itself from putts-a-hole to your MAKE RATE FROM 4\u20136 FT as soon as ten putts carry a distance \u2014 the number that is directly comparable to your mat test.',
-    'One tile is outlined: the area the focus belongs to. Nothing else is coloured, because with no benchmark behind it a red tile would be a verdict the page cannot support.' ] },
-  { b:'v60', d:'2026-08-24', items:[
-    'The build number now sits in the top right of Home. It is read out of the code actually running on your phone, so it is the way to check a change really landed \u2014 if it does not match what you were told shipped, it did not ship. Tap it for the update check.',
-    'Worth knowing why it earns the space: v59 was pushed but never published \u2014 the job that copies the site across was cancelled part-way, so your phone stayed on v58 while everything looked fine from this end.' ] },
-  { b:'v59', d:'2026-08-24', items:[
-    'Coach opens with one thing now: where your game is, and the single thing to focus on. It says what it read to get there \u2014 your last round, the last film, the drills you logged this week \u2014 so a focus built on a card from three weeks ago cannot pass for one built on Saturday.',
-    'Under the focus is the work: the drills that train THAT finding, with how many are due. Miss short off 44% of your playable misses and it hands you the three drills for missing short, not a general nudge to go and practise.',
-    'The drill bench and the library are now second and third on the page. They were sixth and last, under the to-do list and a link to Scores \u2014 the two pages Coach exists to reach were the two furthest from the top.',
-    'The rest of the findings are still there, ranked, further down \u2014 with the focus left out rather than repeated.',
-    'An open fault now links to ITS OWN lab. Every one of them pointed at the Putting Lab whatever it was of, so a swing fault sent you to the wrong page.' ] },
-  { b:'v58', d:'2026-08-24', items:[
-    'The drill bench now records WHICH drill you did, not just that you did one. Every drill has a Did it \u2713 button with a box for the result \u2014 7/10, 18, whatever that drill scores in \u2014 and it keeps the last run, the whole history, and a trend line once there are three numbers.',
-    'Reading a lesson no longer counts as doing its drill. Tapping \u201cwhy this drill exists\u201d used to quietly drop the drill off your shortlist \u2014 the one tap the page invites. Now a drill leaves the shortlist when you LOG it, and comes back when it has gone ten days unrun.',
-    'Every lab now says what trains its faults. Each open fault on a diagnosis card carries a line \u2014 how many drills train it, how many are due \u2014 that opens the bench filtered to that fault. Where nothing trains it, it says so rather than staying quiet.',
-    'And it did: three open faults had NO drill attached to them at all \u2014 the face-on film the putting lab is waiting on, nought-from-twelve up-and-downs, and your across-the-line top, whose own drill was not tagged with it. Thirteen lessons were re-tagged; every open fault in every lab now reaches at least one drill.',
-    'Opening a section no longer snaps shut when the page updates underneath you.' ] },
-  { b:'v57', d:'2026-08-24', items:[
-    'The AirBreak putting mat is on the kit list and marked owned ‚Äî you said you got it, so the drill bench counts it, the same as tapping the chip yourself.',
-    'Four new drills are built for it on the At-Home Putting shelf: an owner‚Äôs manual for the pumps, breakers in both directions (the pair that catches a left aim before a green does), the uphill‚Äìdownhill pace ladder, and a nine-hole pump game where no two putts are alike.',
-    'Every carpet drill you already had ‚Äî the coin gate, 20-in-a-row, the pop stroke ‚Äî runs on the mat unchanged, now with one known speed and a real hole that can lip a putt out.' ] },
-  { b:'v56', d:'2026-08-21', items:[
-    'Courses now flags TWO ROWS FOR ONE COURSE. Adding your round history brought in names that did not always match the ones you had already typed, and the list quietly grew a second row for the same place.',
-    'Sand Valley Golf Resort \u2014 Mammoth Dunes is gone; your own Mammoth Dunes row stays, with your rating and your PR on it, and it now has a location so it sorts by distance like the rest.',
-    'Anything else it finds sits in a Two rows, one course? card above the rankings. It never merges or deletes on its own \u2014 tap the row you want to lose and Delete it. Two courses at one club (Whistling Straits \u2014 Straits and \u2014 Irish) are never flagged against each other.' ] },
-  { b:'v55', d:'2026-08-21', items:[
-    'The course rankings sort three ways now \u2014 Rating, PR or Nearest. Rating is still what opens, and the one you pick sticks.',
-    'Nearest works off the same location the weather card asks for, and the arithmetic happens on this phone. Pick it with no fix on file and it asks for one there and then; say no and the list simply stays in its rating order.',
-    'Every course you have played now has a location on file \u2014 45 of them, added today. Nine are the club\u2019s own coordinate; the rest are the town centre standing in for it, which is what the \u2248 beside the mileage means. Straight-line miles, not drive time.',
-    'A course with no rating, no PR or no location sits at the BOTTOM of whichever sort you are in. It never counts as a zero and it never drops off the page.' ] },
-  { b:'v54', d:'2026-08-21', items:[
-    'The whole drill bench is drawn now \u2014 all 63 drills, not just the new ones. Every one opens with a diagram of the setup, then numbered steps, then a PASS MARK saying what a good session looks like.',
-    'Some of those diagrams answer a question on their own. The wedge matrix shows that six of your nine clock numbers have never been measured. The green-reading one shows the same putt needing three different lines at three speeds. The groove test makes the heel of the club the control sample for the worn middle.',
-    'Kill the laid-off top is now Kill the ACROSS-THE-LINE top. The drill was always the right one \u2014 the name was left over from before the fault was re-read on Aug 20, and the two words mean opposite things.',
-    'The bounce drill moved off the Range filter to the practice green, where it is actually done.' ] },
-  { b:'v53', d:'2026-08-21', items:[
-    'Your standing course plans now sort NEAREST FIRST. Round Prep puts the closest one at the top and prints the miles beside each name, so the plan for the course you are actually driving to is the one you land on.',
-    'It uses the location your phone already gives the weather card \u2014 that fix is now kept instead of thrown away, and the sorting happens on the phone. Nothing about where you are is sent anywhere to do it.',
-    'If the app has never had a fix, Round Prep shows a Sort by distance button instead and the list stays exactly as it was until you tap it.',
-    'The distances are straight-line miles to the course, not drive time. Sterling Farms and Wianno are pinned to the club itself; Pound Ridge and Lakeside are pinned to the town, which is why they show a \u2248 \u2014 good to a couple of miles, which is plenty to order a list. A plan with no location on file keeps its place at the bottom rather than disappearing.' ] },
-  { b:'v52', d:'2026-08-21', items:[
-    'Drills are drawn now. Every new range and practice-green drill comes with a diagram \u2014 where the headcover goes, where the phone goes, which way the club travels, what the divot has to do \u2014 so the setup is a picture instead of a paragraph.',
-    'And they read as instructions: one line of setup, numbered steps, then a PASS MARK saying what a good session actually looks like. The reasoning is still there, one tap away under Why this drill exists.',
-    'A wedge drill joins the range shelf: a club on the ground, the ball just ahead of it, and the divot has to start at or after the line. Every number on your carry ladder assumes a good strike, and seven of the twelve greens you missed at Sterling finished short.' ] },
-  { b:'v51', d:'2026-08-20', items:[
-    'The course box on Start a live round opens its own list. Tap it and every course you have a plan written for is right there \u2014 the upcoming ones first with their date, then the standing plans, each one saying how many hole notes it carries.',
-    'Underneath them sits everywhere else you have on file, marked where a scorecard is already on record, so a course with no plan still fills in its own spelling rather than being thumbed in from scratch.',
-    'It filters as you type and a tap fills the box \u2014 no keyboard needed to start a round at a course you have played or prepped.' ] },
-  { b:'v50', d:'2026-08-20', items:[
-    'What\u2019s new sends film to the right lab. Every film session in the log linked to the Putting Lab whatever it was of \u2014 so the driver breakdown that just landed would have opened your putting page. Swing film now goes to the Swing Lab, short-game film to Short Game, putting film to Putting. Rows already sitting in your log keep the link they were filed with; everything from here lands right.' ] },
-  { b:'v49', d:'2026-08-20', items:[
-    'Lakeside\u2019s real scorecard is on file \u2014 you photographed it, so par, stroke index, rating and slope now come off the club\u2019s own card instead of a simulator library.',
-    'Your stroke indexes there were WRONG and are now fixed, both on the card on file and on your Aug 20 round. That card prints three different handicap rows \u2014 one for Blue/White, one for Green, one for the forward tees \u2014 and the old source had copied the forward one. Off the whites the 3rd is stroke index 1, the 16th is 2, and the 7th at 275 yards is 15, not 9. Your scores were not touched.',
-    'The Aug 20 round now carries White, 70.5 and 129, so it produces a handicap differential at last.',
-    'The Lakeside plan is rebuilt as a standing plan with all eighteen holes on it \u2014 yardage, par and stroke index on every one, and the club the number asks for. It is 6,189 yards from the whites: eight of the ten par 4s are under 400, no par 3 is over 180, and only the 441-yard 16th really needs a driver.' ] },
-  { b:'v48', d:'2026-08-20', items:[
-    'The live hole gives you the screen back. Everything above Off the tee was eating a third of the phone before a single chip appeared \u2014 the scoring rows now start about 220px higher.',
-    'The 1\u201318 strip folds away. It starts collapsed and lives behind a 1\u201318 control in the par row, so it costs no room until you want to jump; opening it and tapping a hole closes it again.',
-    'On a live hole the app\u2019s own banner shrinks to just the night-mode button \u2014 the hole title, course and par row say where you are, and they now sit at the top of the screen.' ] },
-  { b:'v47', d:'2026-08-20', items:[
-    'The card gets checked before you tee off. Starting a live round now opens the whole scorecard ‚Äî every par, the total, and out and in ‚Äî so a wrong one gets caught on the first tee instead of on the last. Tap any hole to cycle its par.',
-    'No more silent par 4s. A course with no card on file used to prefill eighteen par 4s that looked exactly like a real scorecard. Guessed pars now render DASHED, on that screen and on the hole, so a placeholder can never pass for a card.',
-    'Six scorecards are on file ‚Äî Lakeside, Pound Ridge, Van Cortlandt, Hogs Head, Richter Park and Ferry Point. Lakeside was read off a real card table; the other five were pieced together from published data and are labelled that way, so glance at them against the card in your hand.',
-    'Your Aug 20 round at Lakeside has been corrected ‚Äî the real pars and stroke indexes are on it now, and your scores were not touched. It was logged before the card was on file, which is what put a par 4 on every hole.',
-    'On the hole screen, the next-hole button moved up above the scoring card and the prep note moved down below it.' ] },
-  { b:'v46', d:'2026-08-20', items:[
-    'Quick view on the live logger. A Full card / Quick view switch sits under the hole‚Äôs prep; flip it and the hole becomes one-line rows ‚Äî tee shot through score on one screen, no scrolling.',
-    'One row is open at a time with full-size chips. Answer it and the next unanswered row opens by itself; tap any row to fix it, and a row you don‚Äôt track just stays blank, same as the full card.',
-    'The switch remembers which view you used last, the full card stays one tap away, and every tap still saves instantly.' ] },
-  { b:'v45', d:'2026-08-20', items:[
-    'The putting rows are rebuilt. Putts is the total; Putt made is how long the one you holed was, with Given as one of its options; and First putt only appears once the total says there were two or more, to record where you started.',
-    'That gives a REAL make rate for the first time ‚Äî from a two-putt hole the app now knows one putt you missed and one you holed, both with distances, so the table counts putts struck rather than holes played.',
-    'The hole\u2019s prep now starts collapsed, showing just the one line to act on. Tap its header for the reasoning underneath.' ] },
-  { b:'v44', d:'2026-08-20', items:[
-    'A gimme chip for when you lag it up and it gets given.',
-    'Given putts are handled honestly. One given from close is a make you never hit, so it stays out of your make rate rather than padding it. One given after a lag is the opposite ‚Äî proof the lag finished inside the circle, which is the only proximity number a scorecard can produce.' ] },
-  { b:'v43', d:'2026-08-20', items:[
-    'The round prep now gets marked. Open a round played at a course with a plan and the card ends with How the plan held up ‚Äî what the plan called on each hole, what you hit, where both shots finished, what it scored.',
-    'Where a plan names a club or a direction to avoid, the card counts it: how often you took the call, and whether the miss it warned about is the one that happened. The Sterling Farms plan carries those on 11 of its holes now.',
-    'A plan is only marked against a round it was written BEFORE. Where it was built from that card, the block says so instead of pretending to have predicted it.' ] },
-  { b:'v42', d:'2026-08-20', items:[
-    'The live logger asks how far the first putt was ‚Äî six ranges, one tap: \u22643, 4\u20136, 7\u201312, 13\u201320, 21\u201330, 30+.',
-    'That turns your putt count into a putting stat. New table on Scores and on every card: makes and three-putts from each range, so a two-putt from forty feet stops looking like a two-putt from five.',
-    'It also puts a number on the two things the plans are sliced by ‚Äî holing the ones inside six feet, and leaving the long ones close. Distance control has been the open fault on feel alone; this is the first thing that can measure it on a green.' ] },
-  { b:'v41', d:'2026-08-20', items:[
-    'The notes you write on a hole now come back to you. Play that hole again and the note is on the hole card in the live logger, under your record for it.',
-    'Scores has a What you wrote on the course section ‚Äî every hole note you have written, newest first, tappable through to its round.',
-    'A finding about a hole that keeps costing you now quotes what you wrote on it, and a round\u2019s blow-up list shows the note off each hole.' ] },
-  { b:'v40', d:'2026-08-20', items:[
-    'Home now ends with What\u2019s new ‚Äî every change, newest first, with the day it was made. Tap any row to open what it changed.',
-    'The gear wear counters moved to the Bag, where the clubs they describe are.' ] },
-  { b:'v39', d:'2026-08-19', items:[
-    'Rounds you log live now outrank everything else. Where your live cards can answer a question on their own they answer it alone, and the finding says "you logged this live".',
-    'OB on the live logger ‚Äî one chip on Fairway and on Green. It gets priced rather than counted: stroke and distance is two strokes every time, and there is now an OB column in the off-the-tee club table.',
-    'A note on any hole, not just at the end of the round. One tap opens the box; it saves as you type.' ] },
-  { b:'v38', d:'2026-08-14', items:[
-    'Starting a live round no longer zooms the phone in and leaves it there.' ] },
-  { b:'v37', d:'2026-08-14', items:[
-    'The course cheat sheet describes the course rather than repeating the hole notes.' ] },
-  { b:'v36', d:'2026-08-14', items:[
-    'Pre-round cheat sheet, reachable from Home.',
-    'The app checks for a new build every time you open it and refreshes itself.' ] },
-];
-
-const GROOVE_LIFE = 80;  // rounds until a wedge face is considered spent
-const GRIP_LIFE = 40;    // rounds until regrip
-
-// ---------- Seed: everything already known from Jack's Drive folder ----------
-function seed(){
-  return {
-    v: 1,
-    profile: { name:'Jack', handicap:8.5, height:`5'10"`, stroke:'SBST', miss:'Left (short putts)' },
-    settings: { returnDeadline:'2026-10-15', deadlineEstimated:true, gripRounds:0 },
-    clubs: [
-      { id:'c1', name:'Scotty Phantom 7.5', cat:'putter', spec:'34" ¬∑ jet neck ¬∑ max toe flow',
-        status:'gaming', flow:'toe', rounds:0,
-        note:'Arc-suited head vs. your confirmed SBST stroke ‚Äî flagged as the equipment half of the left miss. In return window.' },
-      { id:'c2', name:'Scotty Newport 2', cat:'putter', spec:'Blade ¬∑ toe hang',
-        status:'backup', flow:'toe', rounds:0,
-        note:'Also arc-suited. Historically putted poorly with it ‚Äî the pattern fits.' },
-      { id:'c3', name:'Vokey SM11 60¬∞', cat:'wedge', loft:60, spec:'8¬∞ bounce ¬∑ M grind',
-        status:'ordered', rounds:0,
-        note:'The creative wedge ‚Äî opens wide for flops & splash. Changed from 10S: M grind is built for the open face.' },
-      { id:'c4', name:'Vokey SM11 56¬∞', cat:'wedge', loft:56, spec:'10¬∞ bounce ¬∑ S grind',
-        status:'ordered', rounds:0,
-        note:'Workhorse ‚Äî full & stock shots, standard bunkers. Changed from 8M for forgiveness on square deliveries.' },
-      { id:'c5', name:'Vokey SM11 50¬∞', cat:'wedge', loft:50, spec:'10¬∞ bounce ¬∑ S grind',
-        status:'gaming', rounds:0,
-        note:'Full-swing gap wedge ‚Äî already right for a shallow sweeper.' },
-      { id:'c6', name:'Cobra King Tec irons', cat:'iron', spec:'PW 44¬∞ (anchors the wedge ladder)',
-        status:'gaming', rounds:0, note:'Strong-lofted set. Confirm the PW stamp.' },
-    ],
-    pwLoft: 44,
-    bagHistory: [
-      { date:'2026-07', text:'56¬∞: 8M ‚Üí 10S ‚Äî hit mostly full & square; forgiving grind fits the job.' },
-      { date:'2026-07', text:'60¬∞: 10S ‚Üí 8M ‚Äî the club you open up; M grind is built for it.' },
-      { date:'2026', text:'Catalina Studio Style returned ‚Äî funded the Phantom 7.5.' },
-    ],
-    actions: [
-      { id:'a1', text:'Arc vs. straight ‚Äî ANSWERED: overhead confirms SBST ‚Üí zero-torque is the match', done:true, pri:false },
-      { id:'a2', text:'Demo zero-torque putters at 34" (L.A.B. DF3 / Mezz.1 Max, Odyssey S2S, Spider ZT)', done:false, pri:true },
-      { id:'a3', text:'Book a putter fitting inside the return window', done:false, pri:true },
-      { id:'a4', text:'Confirm the exact return deadline', done:false, pri:true },
-      { id:'a5', text:'Nose-drop eyeline test at 34"', done:false, pri:false },
-      { id:'a6', text:'Aim check on a straight 6-footer', done:false, pri:false },
-      { id:'a7', text:'Demo the SM11s: 56.10S feel ¬∑ 60.08M splash', done:false, pri:false },
-    ],
-    sessions: [
-      { date:'2026-07-17', setup:'3 strokes ¬∑ ground-level close-up', finding:'Tempo ~1:1 ¬∑ face closes ¬∑ early lift. Contact centered ‚úì',
-        detail: {
-          metrics: [
-            { k:'Tempo', v:'~1:1', s:'warn', n:'target 2:1' },
-            { k:'Contact', v:'Centered', s:'good', n:'off the sweet spot' },
-            { k:'Start line', v:'Up the track', s:'good', n:'aim solid' },
-            { k:'Face', v:'Closes', s:'warn', n:'toe-over, varies rep-to-rep' },
-            { k:'Lift', v:'Lifts early', s:'warn', n:'up & out after impact' },
-          ],
-          story:'The baseline. Three strokes on the indoor mat, filmed as a tight ground-level close-up of the clubhead. Contact was clean and centered on all three, and the ball started on a reasonable line ‚Äî aim and strike were never the problem. The faults: a quick, short-backswing stroke; the head popping up right after impact; and the toe rotating over through impact ‚Äî worst on stroke 2, calmer on stroke 3, which is what flagged it as timing-dependent.',
-          limits:'Clubhead-only close-up: posture, eyeline, stance and true path could not be assessed from this angle.',
-        } },
-      { date:'2026-07-18', setup:'2 strokes ¬∑ face-on / near-DTL', finding:'Path near-neutral ¬∑ start line straight ¬∑ early lift pronounced',
-        detail: {
-          metrics: [
-            { k:'Path', v:'Near-neutral', s:'good', n:'not a big arc' },
-            { k:'Face release', v:'Moderate', s:'mid', n:'less than the close-ups showed' },
-            { k:'Lift', v:'Pronounced ‚úó', s:'warn', n:'clearest fault on film' },
-            { k:'Start line', v:'On center', s:'good', n:'no left miss these reps' },
-            { k:'Tempo', v:'Brisk', s:'warn', n:'still quick' },
-          ],
-          story:'Wider framing unlocked the path question ‚Äî and the read was mild arc / nearly neutral, clearly not a big-arc stroke. The early lift became the headline: the head pops off the mat right after impact instead of chasing low, the most consistent fault across every stroke filmed to that point. Face rotation was present but moderate.',
-          limits:'Shot from behind-and-slightly-above rather than pure ball-height down-the-line, so the arc read was "best available," not final ‚Äî Session 3 settled it.',
-        } },
-      { date:'2026-07-18', setup:'9 clips ¬∑ overhead + DTL', finding:'Path confirmed STRAIGHT (SBST) ‚Üí zero-torque putter is the match',
-        detail: {
-          metrics: [
-            { k:'Path', v:'STRAIGHT ¬∑ SBST', s:'good', n:'overhead = gold standard' },
-            { k:'Face at takeaway', v:'Square-ish', s:'good', n:'no arc rotation' },
-            { k:'Start line', v:'Straight', s:'good', n:'good reps on the mat' },
-          ],
-          story:'The big one. The overhead angle ‚Äî the gold standard for path ‚Äî showed a clear straight-back-straight-through stroke across multiple Phantom 7.5 reps, superseding the earlier "mild arc" guess from angles that could not actually see path. Verdict: you are a zero-torque / face-balanced player, and both putters you own are arc-suited. The mismatch explains the recurring left miss: the putter wants to close the face and a straight stroke does not time that rotation.',
-          limits:'Overhead cannot see vertical movement, so the lift question stayed open.',
-        } },
-    ],
-    evolution: {
-      updated: '2026-07-18',
-      sessions: ['S1','S2','S3','S4','BL'],
-      metrics: [
-        { name:'Path', marks:['?','~','‚úì','‚úì','‚úì'], verdict:'SETTLED ‚Äî straight (SBST), confirmed from overhead across 15+ clips and both putters.', s:'good' },
-        { name:'Tempo / load', marks:['‚úó','‚úó','‚Äî','‚úì','‚úì'], verdict:'FIXED on film ‚Äî backswing load grew ~60% (0.40s ‚Üí 0.65s), ratio ‚âà2:1. Keep the One-Two drill.', s:'good' },
-        { name:'Face at impact', marks:['‚úó','~','‚Äî','‚úì','?'], verdict:'Square on the newest film. Historically timing-dependent ‚Äî zero-torque removes the timing requirement.', s:'mid' },
-        { name:'Early lift', marks:['‚úó','‚úó','‚Äî','?','‚úó'], verdict:'THE OPEN FAULT ‚Äî documented from 3 angles in the baseline. Needs a face-on clip to confirm the fix.', s:'warn' },
-        { name:'Start line / aim', marks:['‚úì','‚úì','‚úì','‚úì','‚úì'], verdict:'A strength in every session ever filmed. Protect it: pick a putter you can aim with confidence.', s:'good' },
-      ],
-    },
-    fiveFt: [],           // {date, results:[...20 of make/L/R/S/Lg]}
-    stats: [],            // stat snapshots (GHIN etc), oldest first ‚Äî see the `stats` feed type
-    drillLog: [],         // {date, drill}
-    tests: [],            // {date, putter, makes, note} ‚Äî 10-ball demo tests
-    // Launch-monitor sessions ‚Äî the numeric twin of `sessions`. Its OWN array rather than
-    // a flag on the film sessions, because the two sources have opposite blind spots: film
-    // sees the body and cannot measure the ball, radar measures the ball and never sees his
-    // posture. One array would have let a Trackman carry be quoted as filmed. See bayLog().
-    bays: [],             // {date, venue, unit, ball, norm, spin, discipline, setup, finding, detail, _fid}
-    // Trackman Combine results ‚Äî a fixed protocol scored 0‚Äì100, so unlike everything else
-    // the bay produces it is directly comparable against ITSELF over time. Same job as
-    // `tests` on the putting side: a repeatable benchmark, not a session.
-    combines: [],         // {id, date, venue, score, targets:[{yds, score, avgDist}], note}
-    shortlist: [
-      { name:'L.A.B. DF3', type:'Zero-torque ¬∑ XL mallet', price:479, demoed:false },
-      { name:'Odyssey Ai-One S2S Jailbird', type:'Zero-torque ¬∑ high-MOI', price:399, demoed:false },
-      { name:'L.A.B. Mezz.1 Max', type:'Zero-torque ¬∑ max MOI', price:449, demoed:false },
-      { name:'TaylorMade Spider ZT', type:'Zero-torque ¬∑ trusted shape', price:449, demoed:false },
-      { name:'Odyssey Ai-One S2S #7', type:'Zero-torque ¬∑ fang', price:349, demoed:false },
-      { name:'Scotty Phantom 7 DB', type:'Face-balanced ¬∑ easy swap', price:449, demoed:false },
-    ],
-    courses: [
-      { id:'x1', name:'Old Head', st:'Ireland', rating:null, pr:null, bucket:false, notes:'' },
-      { id:'x2', name:'Waterville', st:'Ireland', rating:null, pr:null, bucket:false, notes:'' },
-      { id:'x3', name:'Hogs Head', st:'Ireland', rating:null, pr:null, bucket:false, notes:'' },
-      { id:'x5', name:'Metedeconk National', st:'NJ', rating:null, pr:null, bucket:false, notes:'' },
-      { id:'x6', name:'Trump Links at Ferry Point', st:'NY', rating:null, pr:null, bucket:false, notes:'' },
-      { id:'x4', name:'Sand Valley', st:'WI', rating:null, pr:null, bucket:true, notes:'Next up.' },
-    ],
-    rounds: [],           // {date, course, score, putts, troubles:[], note}
-    mental: [],           // post-round debriefs ‚Äî {id, date, round, focus, triggers:[], when:[], note, next}
-    matrix: { 50:{h:null,t:null,f:null}, 56:{h:null,t:null,f:null}, 60:{h:null,t:null,f:null} },
-    carries: [
-      { club:'Driver', loft:'9¬∞', carry:235 },
-      { club:'Mini Driver', loft:'13.5¬∞', carry:220 },
-      { club:'2-iron (utility)', loft:'~17¬∞', carry:205 },
-      { club:'4-iron', loft:'21¬∞', carry:190 },
-      { club:'5-iron', loft:'23¬∞', carry:180 },
-      { club:'6-iron', loft:'26¬∞', carry:170 },
-      { club:'7-iron', loft:'29.5¬∞', carry:158 },
-      { club:'8-iron', loft:'34¬∞', carry:146 },
-      { club:'9-iron', loft:'39¬∞', carry:134 },
-      { club:'PW', loft:'44¬∞', carry:122 },
-      { club:'50¬∞ wedge', loft:'50¬∞', carry:108 },
-      { club:'56¬∞ wedge', loft:'56¬∞', carry:95 },
-      { club:'60¬∞ wedge', loft:'60¬∞', carry:80 },
-    ],
-    carriesCalibrated: false,
-    lessonsRead: [],
-    drillDays: [],        // ISO dates a drill was marked done
-    // WHICH drill was done, and what it scored. `drillDays` records only that SOMETHING
-    // was practised that day, so it can keep a streak alive and nothing else ‚Äî it cannot
-    // say the tape test has never been run, or that the coin gate is climbing. Every drill
-    // now carries a pass mark that produces a number, and a number with nowhere to go is
-    // the one kind of evidence this app has always refused to lose. {id, date, v} ‚Äî `v` is
-    // the result as he typed it ("7/10", "18"), optional, because doing the drill is worth
-    // recording even on a night he didn't count.
-    drillLog: [],
-    briefings: [],        // {id, course, date, focus, sections:[{t,b}]} ‚Äî pushed by Claude pre-round
-    // Published scorecards pushed by feed ‚Äî {course, par:[], si:[], nine, src}. Ranks
-    // below Jack's own cards and above the course-cards.js baseline. See holeLayout().
-    layouts: [],
-    // Lesson layer. `lessons.js` is the FROZEN BASELINE, exactly like seed() is for
-    // everything else; these three carry the live edits so a lesson change has the same
-    // append-only trail a plan change does. See lessons() below.
-    lessonEdits: {},      // { lessonId: {‚Ä¶patched fields} } ‚Äî from `lesson-update`
-    lessonAdds: [],       // whole lessons pushed by feed ‚Äî from `lesson-add`
-    lessonHidden: [],     // ids retired ‚Äî from `lesson-remove`
-    // The kit on hand, which is what the drill bench filters by. Owning something is a
-    // claim about the world, so this starts as ONLY what the record establishes ‚Äî the bag,
-    // the phone every filmed fault came off, the Miracle 201, the PUTTLAZR laser bought
-    // Aug 13 2026, and a tee, which anybody carrying that bag has. Everything else waits
-    // for a tap rather than being assumed.
-    kit: ['putter','phone','laser','m201','coins'],
-  };
-}
-
-// ---------- State ----------
-let S;
-function migrate(s){
-  // Additive upgrades for states saved by older app versions.
-  if(!s.feedApplied) s.feedApplied = [];
-  if(!s.stats) s.stats = [];
-  if(!s.faults) s.faults = [
-    { tag:'early-lift', why:'fault #1 in your filmed stroke sessions' },
-    { tag:'tempo', why:'your filmed tempo runs ~1:1 (target 2:1)' },
-  ];
-  if(!s.carries){ const fresh = seed(); s.carries = fresh.carries; s.carriesCalibrated = false; }
-  if(!s.briefings) s.briefings = [];
-  if(!s.layouts) s.layouts = [];             // scorecards pushed by feed ‚Äî see holeLayout()
-  if(!s.geo) s.geo = [];                     // course locations pushed by feed ‚Äî see courseGeo()
-  if(s.here === undefined) s.here = null;    // his last location fix ‚Äî see fetchHere()
-  if(!s.mental) s.mental = [];
-  if(!s.lessonEdits) s.lessonEdits = {};
-  if(!s.lessonAdds) s.lessonAdds = [];
-  if(!s.lessonHidden) s.lessonHidden = [];
-  if(!s.kit) s.kit = seed().kit;
-  if(!s.drillLog) s.drillLog = [];   // per-drill practice record ‚Äî see drillRuns()
-  if(!s.bays) s.bays = [];           // launch-monitor sessions ‚Äî see bayLog()
-  if(!s.combines) s.combines = [];   // Trackman Combine scores ‚Äî see combineCard()
-  if(s.live === undefined) s.live = null;   // a round being logged hole-by-hole
-  if(!s.planCalls) s.planCalls = {};         // his own club call on a plan's hole ‚Äî see planCall()
-  if(!s.updates) s.updates = [];            // the What's new log ‚Äî see recordUpdate()
-  if(s.updatesInit === undefined) s.updatesInit = false;
-  if(s.settings.seenBuild === undefined) s.settings.seenBuild = null;
-  if(!s.settings.seenUpdates) s.settings.seenUpdates = [];
-  // ONE GRID PER DISCIPLINE (Sep 11 2026). There was a single `S.evolution` and it was
-  // putting's, which is why the migration MOVES it rather than leaving it beside the new
-  // store: two homes for one kind of record is how they drift, and the second one is always
-  // the one nobody updates. `evoFor()` is the only reader from here on.
-  if(!s.grids){ s.grids = { putting: s.evolution || seed().evolution }; delete s.evolution; }
-  if(s.sessions.every(x => !x.detail)){
-    const fresh = seed();
-    // graft seed details onto matching pre-detail session rows
-    s.sessions.forEach(row => {
-      if(row.detail) return;
-      const match = fresh.sessions.find(f => f.setup === row.setup);
-      if(match) row.detail = match.detail;
-    });
-  }
-  return s;
-}
-function load(){
-  try { S = migrate(JSON.parse(localStorage.getItem(LS_KEY)) || seed()); }
-  catch(e){ S = migrate(seed()); }
-}
-function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
-
-// ---------- Utils ----------
-const $ = sel => document.querySelector(sel);
-function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-// ---- Reading helpers: long-form coaching stays whole, but arrives in layers ----
-// Bodies are authored with blank-line paragraph breaks; HTML would eat them.
-function prose(t, cls){
-  return String(t ?? '').split(/\n{2,}/).map(p => p.trim()).filter(Boolean)
-    .map(p => `<p class="${cls || 'lesson-body'}">${esc(p)}</p>`).join('');
-}
-// Split off the opening sentence so it can stand as the summary line.
-// lead + rest always reconstruct the whole text ‚Äî nothing is dropped.
-function splitLead(t){
-  const s = String(t ?? '').trim();
-  const re = /[.!?](?=\s|$)/g;
-  let m;
-  while((m = re.exec(s))){
-    const end = m.index + 1;
-    if(end < 40) continue;                                  // too short to stand alone
-    const lead = s.slice(0, end);
-    if(/(^|\s)[A-Z]\.$/.test(lead)) continue;               // initials, L.A.B., etc.
-    if(/\b(vs|approx|Dr|Mr|Mrs|No|St|Jr|Sr|e\.g|i\.e)\.$/i.test(lead)) continue;
-    return [lead, s.slice(end).trim()];
-  }
-  return [s, ''];
-}
-// One scannable line for a section: an authored `k`, else its opening sentence.
-function gist(s){
-  if(s.k) return s.k;
-  const lead = splitLead(s.b)[0];
-  return lead.length > 190 ? lead.slice(0, 170).replace(/\s+\S*$/, '') + '‚Ä¶' : lead;
-}
-// ----- A collapsible section (Aug 27 2026) -----
-// One pattern for every foldable section in the app. It is a plain <details> carrying an
-// ID, deliberately: render() already restores any open <details id=‚Ä¶> across a rerender(),
-// so the open/closed state costs no store, no bookkeeping, and cannot drift out of sync
-// with what is actually on screen. Never build a parallel open/closed map for this ‚Äî the
-// drill-bench bug CLAUDE.md records (an expanded section snapping shut on every in-place
-// update) is exactly what that machinery exists to prevent.
-//
-//   id    unique and STABLE ‚Äî it is the key the reopen-after-rerender works off
-//   label the section name, in the mono label voice (rendered uppercase by CSS)
-//   meta  the right-hand line: a count, a date, a hint. Optional.
-//   body  the section's HTML
-//   open  default state (true unless you have a reason)
-//   cls   extra classes ‚Äî `oncard` for the cream-on-green variant
-// The one screen that gets NO folds is the live logger: it already hides what cannot exist
-// yet, and two disclosure systems on the strictest screen in the app is one too many.
-function fold(id, label, meta, body, open = true, cls = ''){
-  return `<details class="fold ${cls}" id="${esc(id)}"${open ? ' open' : ''}>
-    <summary><span class="foldl">${esc(label)}</span>${
-      meta ? `<span class="foldm">${esc(meta)}</span>` : '<span class="foldm"></span>'}</summary>
-    <div class="foldb">${body}</div>
-  </details>`;
-}
-// The 4px rail down the left of a card carrying a finding, in the finding's own evidence
-// tier. Pair it with evTag() for the chip ‚Äî same five tiers, one vocabulary.
-const rail = ev => ev ? ` tierrail t-${ev}` : '';
-
-// Lead sentence up front, the rest one tap away.
-function expandable(t, cls){
-  const [lead, rest] = splitLead(t);
-  const c = cls || 'sm';
-  return rest ? `<p class="${c}">${esc(lead)}</p>
-    <details class="more"><summary>Read the rest</summary>${prose(rest, c)}</details>`
-    : `<p class="${c}">${esc(lead)}</p>`;
-}
-// A fault's `why` opens with its own status word ‚Äî the feed writes CLOSED or DOWNGRADED as
-// the first token when one is settled. Deriving status from that keeps ONE source of truth,
-// so a fault closing in the feed drops off the diagnosis card and out of Coach's to-do list
-// on its own. The old hardcoded diagnosis card is exactly what this replaces.
-const faultState = f => /^\s*CLOSED\b/i.test(f.why || '') ? 'closed'
-  : /^\s*DOWNGRADED\b/i.test(f.why || '') ? 'downgraded' : 'open';
-const faultLabel = t => String(t).replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
-// Faults are per-discipline. Everything logged before Aug 13 was putting, so an entry
-// without a `discipline` is putting ‚Äî that keeps the six existing faults where they are.
-const faultDisc = f => f.discipline || 'putting';
-const faultsFor = disc => S.faults.filter(f => faultDisc(f) === disc);
-// The line that keeps a lab and the drill bench honest with each other. A fault is a thing
-// to FIX, so the diagnosis has to be able to say what fixes it ‚Äî but drills have exactly one
-// home, so this is a pointer to the bench filtered to that fault, never a drill rendered
-// here. When the answer is nothing it says so out loud: an untrained open fault is a real
-// gap in the library, and a silent one is how a diagnosis goes on being restated for weeks
-// with no work attached. Same principle as the evolution grid's row of question marks ‚Äî
-// naming what is missing is the most useful thing the page can do.
-function faultDrillRow(tag){
-  const ds = drillsForTag(tag);
-  if(!ds.length) return `<p class="sm faint" style="margin-top:6px">No drill trains this yet ‚Äî
-    it is a diagnosis without a fix, which is worth saying out loud.</p>`;
-  const due = ds.filter(d => d.due).length;
-  return `<div class="linkrow" data-action="drills-for" data-tag="${esc(tag)}">
-    <span class="sm"><b>${ds.length} drill${ds.length === 1 ? '' : 's'} train${ds.length === 1 ? 's' : ''} this</b>${
-      due ? ` ¬∑ <b class="warn">${due} due</b>` : ' ¬∑ all run recently'}</span><span class="arr">‚Üí</span></div>`;
-}
-// The shared diagnosis card, used by every lab: open faults with their detail, settled
-// ones collapsed to a line. One renderer so a new lab gets a real diagnosis for free.
-// One row per open fault, each with its own evidence rail ‚Äî see faultRows() below, which
-// is the renderer both this and the labs hub draw, so a fault can never be presented two
-// different ways on two screens. `emptyMsg` is the lab's own words for a genuinely empty
-// list; it is a FALLBACK for a lab with no faults at all, never copy to lead with.
-function diagnosisCard(disc, emptyMsg){
-  const all = faultsFor(disc);
-  const open = all.filter(f => faultState(f) === 'open').length;
-  return `<div class="card">
-    <h2>The diagnosis</h2>
-    ${all.length ? faultRows(disc)
-      : `<p class="sm">${esc(emptyMsg || 'Nothing measured yet for this part of the game.')}</p>`}
-    ${open ? `<p class="sm faint" style="margin-top:8px">Tap a tier badge to see what the fault
-      was read off ‚Äî and what that source cannot tell you.</p>` : ''}
-  </div>`;
-}
-function readMins(b){
-  const w = (b.sections || []).reduce((n, s) => n + String(s.b || '').split(/\s+/).length, 0);
-  return Math.max(1, Math.round(w / 220));
-}
-// The local calendar day, never the UTC one. toISOString() is UTC, so east of Greenwich
-// this said tomorrow from 8pm Eastern onwards (7pm in winter) ‚Äî which is prime time for
-// this app: a round finished at 8.30 on a Sunday evening saved itself as Monday, a drill
-// logged at nine went on the wrong day of the streak, and What's landed stopped saying
-// "today" hours before the day was over. Golf happens in the evening; the clock has to
-// agree with the player, not with the server.
-function isoDay(d){
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-function today(){ return isoDay(new Date()); }
-function fmtDate(iso){
-  if(!iso) return '‚Äî';
-  const d = new Date(iso + (iso.length===10 ? 'T12:00:00' : ''));
-  return isNaN(d) ? iso : d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-}
-function daysLeft(iso){
-  if(!iso) return null;
-  return Math.ceil((new Date(iso+'T23:59:59') - new Date()) / 86400000);
-}
-function toast(msg){
-  let t = $('.toast');
-  if(!t){ t = document.createElement('div'); t.className='toast'; document.body.appendChild(t); }
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 1800);
-}
-function uid(){ return 'i' + Math.random().toString(36).slice(2,9); }
-function spark(vals, h=34, color='currentColor'){
-  if(vals.length < 2) return '<div class="sub">needs 2+ entries</div>';
-  const w = 120, mn = Math.min(...vals), mx = Math.max(...vals);
-  const pts = vals.map((v,i) =>
-    `${(i/(vals.length-1)*w).toFixed(1)},${(h-3-(mx===mn ? h/2 : (v-mn)/(mx-mn)*(h-6))).toFixed(1)}`).join(' ');
-  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="height:${h}px">
-    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.5"
-      stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg>`;
-}
-// Weather ‚Üí "plays like": cold air shortens carry ‚âà1% per 10¬∞F below 70.
-function playsFactor(){
-  const wx = S.weather;
-  if(!wx || Date.now() - wx.ts > 3*3600*1000) return null;
-  return 1 + (wx.t - 70) * 0.001;
-}
-const WX_ICON = c => c===0?'‚òÄÔ∏è':c<=3?'‚õÖÔ∏è':c<=48?'üå´':c<=67?'üå¶':c<=77?'üå®':c<=82?'üåß':'‚õà';
-
-// ---------- Derived ----------
-function latestFiveFt(){ return S.fiveFt.length ? S.fiveFt[S.fiveFt.length-1] : null; }
-function fiveFtScore(entry){
-  const filled = entry.results.filter(r => r);
-  return { makes: filled.filter(r => r==='make').length, total: filled.length };
-}
-function missCounts(){
-  const c = {L:0,R:0,S:0,Lg:0};
-  S.fiveFt.forEach(e => e.results.forEach(r => { if(c[r]!==undefined) c[r]++; }));
-  return c;
-}
-function struggles(){
-  // Struggle tags from the last 3 rounds + standing stroke faults
-  const tags = new Map(); // tag -> reason
-  // `troubles` is defaulted on every write path, but an imported backup or a hand-built
-  // round can arrive without it ‚Äî and this renders on Home, so an undefined here is a
-  // white screen on app open.
-  realRounds().slice(-3).forEach(r => (r.troubles || []).forEach(t =>
-    tags.set(t, `logged at ${r.course || 'your round'} on ${fmtDate(r.date)}`)));
-  const mc = missCounts();
-  if (mc.L > mc.R) tags.set('short-putts', `${mc.L} left misses in your 5-ft logs`);
-  // OPEN faults only. A fault whose `why` opens with CLOSED already drops off the lab's
-  // diagnosis card and out of Coach's to-do list, so letting it go on matching lessons was
-  // the one place a settled fault could still ask for work ‚Äî and it showed: the drill bench
-  // opened flagging a tempo drill FOR YOU underneath the words "CLOSED Jul 30 ‚úì".
-  S.faults.filter(f => faultState(f) === 'open').forEach(f => tags.set(f.tag, f.why));
-  return tags;
-}
-// The live lesson list: the frozen `lessons.js` baseline with every feed edit applied on
-// top. Nothing reads LESSONS directly ‚Äî a lesson change has to leave the same append-only
-// trail a plan change does, or a stale lesson can sit on the phone unnoticed (which is
-// exactly how a returned putter stayed named in the Equipment shelf for three weeks).
-function lessons(){
-  const base = typeof LESSONS !== 'undefined' ? LESSONS : [];
-  // Concat BEFORE patching: a feed-added lesson has to be patchable too, and it is the
-  // common case from here on, since every new lesson arrives through the feed.
-  return base.concat(S.lessonAdds || [])
-    .map(l => S.lessonEdits[l.id] ? { ...l, ...S.lessonEdits[l.id] } : l)
-    .filter(l => !(S.lessonHidden || []).includes(l.id));
-}
-function pickedLessons(){
-  const tags = struggles();
-  return lessons()
-    .map(l => {
-      const hit = l.tags.find(t => tags.has(t));
-      return hit ? { l, why: tags.get(hit) } : null;
-    })
-    .filter(Boolean)
-    .sort((a,b) => (S.lessonsRead.includes(a.l.id)?1:0) - (S.lessonsRead.includes(b.l.id)?1:0))
-    .slice(0,2);
-}
-function shelfCounts(){
-  const tags = struggles();
-  const by = {};
-  lessons().forEach(l => {
-    by[l.shelf] = by[l.shelf] || { n:0, forYou:0 };
-    by[l.shelf].n++;
-    if (l.tags.some(t => tags.has(t)) && !S.lessonsRead.includes(l.id)) by[l.shelf].forYou++;
-  });
-  return by;
-}
-
-// ----- The drill bench -----
-// "What can I do right now" is a different question from "what should I learn", and the
-// library only answers the second one. Every lesson already carries a `drill`, so the bench
-// is the same content asked the other way round ‚Äî sorted by the KIT in the house and the
-// PLACE he's standing, because those are what actually decide whether a drill happens.
-//
-// Two rules this is built on. A drill needing kit he hasn't marked is never hidden: it
-// drops to the bottom with the missing item named, since a silently shortened list reads as
-// "that's everything" ‚Äî the same failure the round-prep rules warn about. And kit is his to
-// declare, never inferred: reading a lesson about a yardstick is not evidence he owns one.
-const KIT = [
-  { k:'putter', lab:'Putter + carpet',  n:'Six feet of floor is a putting lab' },
-  { k:'airbreak', lab:'AirBreak putting mat', n:'PuttOut AirBreak ¬∑ pumps put break and slope under 8 ft of mat ¬∑ Aug 24 2026' },
-  { k:'phone',  lab:'Phone + a prop',   n:'Every fault in this app came off it' },
-  { k:'laser',  lab:'PUTTLAZR laser',   n:'Shaft-clamp aim laser ¬∑ bought Aug 13 2026' },
-  { k:'m201',   lab:'Miracle 201',      n:'The swing trainer that clicks' },
-  { k:'coins',  lab:'Coins or tees',    n:'Gates and targets, on any surface' },
-  { k:'ruler',  lab:'Metal yardstick',  n:'The $3 start-line machine' },
-  { k:'metro',  lab:'Metronome app',    n:'Free ‚Äî the tempo checks need it' },
-  { k:'powder', lab:'Foot powder or impact tape', n:'The tape test needs it' },
-  { k:'mirror', lab:'Putting mirror',   n:'Eye line and shoulders' },
-  { k:'sticks', lab:'Alignment sticks', n:'' },
-];
-const KIT_LAB = Object.fromEntries(KIT.map(g => [g.k, g.lab]));
-const PLACES = { home:'At home', green:'Practice green', range:'Range',
-                 bunker:'Practice bunker', course:'On the course' };
-
-// Where each baseline drill happens and what it needs. This lives in app.js rather than in
-// lessons.js because it is presentation metadata, not lesson content ‚Äî and lessons.js is a
-// frozen baseline. A lesson arriving through the feed can carry its own `where` / `kit`
-// instead, which is the route every new lesson takes from here on. An id in neither place
-// is fine: it reads as "anywhere, nothing needed" and shows under every filter, so a new
-// lesson can never fall off this page for want of a table entry.
-const DRILL_KIT = {
-  p1:{ where:'green' }, p2:{ where:'home', kit:['putter','metro'] },
-  p3:{ where:'home', kit:['putter','coins'] }, p4:{ where:'green', kit:['putter'] },
-  p5:{ where:'green', kit:['putter'] },
-  h1:{ where:'home', kit:['putter','coins'] }, h2:{ where:'home', kit:['putter','ruler'] },
-  h3:{ where:'home', kit:['putter'] }, h4:{ where:'home', kit:['putter','phone'] },
-  h5:{ where:'home', kit:['putter','metro'] }, h6:{ where:'home', kit:['putter'] },
-  h7:{ where:'home', kit:['putter','coins'] }, h8:{ where:'home', kit:['putter','coins'] },
-  h9:{ where:'home', kit:['putter'] },
-  sw1:{ where:'home', kit:['m201'] }, sw2:{ where:'home', kit:['m201'] },
-  sw3:{ where:'home', kit:['m201'] }, sw4:{ where:'home', kit:['m201'] },
-  sw5:{ where:'home', kit:['m201'] }, sw6:{ where:'home', kit:['m201','phone'] },
-  sw7:{ where:'home', kit:['m201'] },
-  g1:{ where:'green' }, g2:{ where:'green' }, g3:{ where:'course' },
-  g4:{ where:'green' }, g5:{ where:'green' },
-  w1:{ where:'range' }, w2:{ where:'range' }, w3:{ where:'green' }, w4:{ where:'green' },
-  c1:{ where:'course' }, c2:{ where:'course' }, c3:{ where:'course' }, c4:{ where:'course' },
-  m1:{ where:'range' }, m2:{ where:'course' }, m3:{ where:'green' },
-  b1:{ where:'bunker' }, b2:{ where:'bunker' }, b3:{ where:'bunker' },
-  e1:{ where:'green' }, e2:{ where:'home' }, e3:{ where:'home' }, e4:{ where:'course' },
-};
-const haveKit = k => (S.kit || []).includes(k);
-
-// ----- The practice record -----
-// What was actually DONE, per drill. The streak answers "did I practise on Tuesday"; this
-// answers "when did I last run the tape test, and is the coin gate climbing" ‚Äî which is the
-// question the pass marks were written for. Results are stored as typed, because a drill
-// scores in whatever unit it scores in (7/10, 18, a streak length); `drillNum()` pulls the
-// leading number out for a trend and gives up quietly when there isn't one, rather than
-// forcing every drill onto one scale.
-const drillRuns = id => (S.drillLog || []).filter(r => r.id === id);
-const lastRun = id => { const r = drillRuns(id); return r.length ? r[r.length - 1] : null; };
-const drillNum = v => { const m = /-?\d+(\.\d+)?/.exec(String(v || '')); return m ? +m[0] : null; };
-const daysSince = iso => iso == null ? null
-  : Math.max(0, Math.round((new Date(today() + 'T12:00:00') - new Date(iso + 'T12:00:00')) / 86400000));
-// A drill run inside this window counts as current work, so it stops crowding the
-// shortlist while the ones going stale move up. Ten days is a fortnight with a bad week in
-// it ‚Äî long enough that a drill done properly isn't nagging by the weekend, short enough
-// that nothing sits at the top of the page for a month unattended.
-const STALE_DAYS = 10;
-
-function drillList(){
-  const tags = struggles();
-  // A struggle tag arrives from one of two places and they are not equal evidence: a
-  // standing FAULT was measured off film, while a round tag is a trouble chip he tapped
-  // after playing. Both are worth surfacing; the filmed one goes first.
-  const faultTags = new Set(S.faults.filter(f => faultState(f) === 'open').map(f => f.tag));
-  return lessons().filter(l => l.drill).map(l => {
-    const m = DRILL_KIT[l.id] || {};
-    const kit = l.kit || m.kit || [];
-    const hit = l.tags.find(t => tags.has(t));
-    const runs = drillRuns(l.id), last = runs.length ? runs[runs.length - 1] : null;
-    const since = last ? daysSince(last.date) : null;
-    return { l, kit, where: l.where || m.where || null,
-             missing: kit.filter(k => !haveKit(k)),
-             tag: hit || null,
-             why: hit ? tags.get(hit) : null, filmed: hit ? faultTags.has(hit) : false,
-             runs, last, since,
-             // DUE, not unread. Reading a lesson is not doing its drill, and keying this off
-             // `lessonsRead` meant tapping "why this drill exists" quietly dropped the drill
-             // off the shortlist ‚Äî the one tap the page invites you to make.
-             due: !last || since >= STALE_DAYS };
-  });
-}
-// Which drills train a given fault. The labs diagnose and Coach trains, so this is the
-// join between them: a lab names its open faults, and this says what the bench has for
-// each one ‚Äî including, honestly, when the answer is nothing.
-const drillsForTag = tag => drillList().filter(d => d.l.tags.includes(tag));
-// ----- Drill diagrams -----
-// A drill is instructions, and instructions about where to stand, what goes on the ground
-// and which way the club travels are read off a picture in a second and out of a paragraph
-// in thirty. `viz` is a tiny scene ‚Äî a list of primitives on a 100-wide grid, top-down or
-// side-on ‚Äî authored per drill IN THE FEED, so a diagram arrives by the same append-only
-// route a lesson body does and needs no app release. Colours are theme variables, so night
-// mode needs no second drawing, and arrowheads are computed as polygons rather than SVG
-// markers because marker ids would collide across the dozen diagrams on the bench.
-const VIZ_C = { i:'var(--ink)', g:'var(--gtext)', b:'var(--btext)', f:'var(--faint)', s:'var(--soft)' };
-const vizC = k => VIZ_C[k] || VIZ_C.i;
-function vizHead(x1, y1, x2, y2, c, L, W){
-  L = L || 2.9; W = W || 1.7;
-  const dx = x2 - x1, dy = y2 - y1, m = Math.hypot(dx, dy) || 1;
-  const ux = dx/m, uy = dy/m, bx = x2 - ux*L, by = y2 - uy*L, px = -uy*W, py = ux*W;
-  return `<polygon points="${x2},${y2} ${bx+px},${by+py} ${bx-px},${by-py}" fill="${c}"/>`;
-}
-function drillViz(v){
-  if(!v || !Array.isArray(v.parts) || !v.parts.length) return '';
-  const H = +v.h || 62;
-  const out = v.parts.map(p => {
-    const c = vizC(p.c), w = p.w || 0.7, dash = p.d ? ' stroke-dasharray="2.2 1.8"' : '';
-    switch(p.k){
-      case 'band':
-        return `<rect x="0" y="${p.y}" width="100" height="${p.h}" fill="${c}" opacity=".12"/>`
-             + `<line x1="0" y1="${p.y}" x2="100" y2="${p.y}" stroke="${c}" stroke-width=".6"/>`;
-      case 'box':
-        return `<rect x="${p.x}" y="${p.y}" width="${p.bw}" height="${p.bh}" rx="${p.r || 1}"`
-             + ` fill="${p.f ? vizC(p.f) : 'none'}" fill-opacity="${p.f ? (p.o || .12) : 0}"`
-             + ` stroke="${c}" stroke-width="${w}"${dash}/>`;
-      case 'line':
-        return `<line x1="${p.x1}" y1="${p.y1}" x2="${p.x2}" y2="${p.y2}" stroke="${c}"`
-             + ` stroke-width="${w}"${dash} stroke-linecap="round"/>`;
-      case 'club':
-        return `<line x1="${p.x1}" y1="${p.y1}" x2="${p.x2}" y2="${p.y2}" stroke="${c}"`
-             + ` stroke-width="${p.w || 1.5}" stroke-linecap="round"/>`;
-      case 'arrow':
-        return `<line x1="${p.x1}" y1="${p.y1}" x2="${p.x2}" y2="${p.y2}" stroke="${c}"`
-             + ` stroke-width="${w}"${dash} stroke-linecap="round"/>` + vizHead(p.x1, p.y1, p.x2, p.y2, c);
-      case 'curve':
-        return `<path d="M${p.x1} ${p.y1} Q${p.cx} ${p.cy} ${p.x2} ${p.y2}" fill="none" stroke="${c}"`
-             + ` stroke-width="${w}"${dash} stroke-linecap="round"/>` + vizHead(p.cx, p.cy, p.x2, p.y2, c);
-      case 'ball':
-        return `<circle cx="${p.x}" cy="${p.y}" r="${p.r || 1.9}" fill="var(--card)"`
-             + ` stroke="${vizC('i')}" stroke-width=".6"/>`;
-      case 'dot':   return `<circle cx="${p.x}" cy="${p.y}" r="${p.r || 1.2}" fill="${c}"/>`;
-      case 'hole':  return `<circle cx="${p.x}" cy="${p.y}" r="${p.r || 2.1}" fill="${c}"/>`;
-      case 'ring':
-        return `<circle cx="${p.x}" cy="${p.y}" r="${p.r || 6}" fill="none" stroke="${c}"`
-             + ` stroke-width=".6" stroke-dasharray="1.8 1.6"/>`;
-      case 'obj':   // a headcover, a bottle, a range marker ‚Äî something in the way
-        return `<rect x="${p.x - 2.6}" y="${p.y - 1.6}" width="5.2" height="3.2" rx="1.5"`
-             + ` fill="${c}" fill-opacity=".22" stroke="${c}" stroke-width=".6"/>`;
-      case 'cam':
-        return `<rect x="${p.x - 3.2}" y="${p.y - 2.2}" width="6.4" height="4.4" rx="1"`
-             + ` fill="${c}" fill-opacity=".16" stroke="${c}" stroke-width=".7"/>`
-             + `<circle cx="${p.x}" cy="${p.y}" r="1.2" fill="none" stroke="${c}" stroke-width=".7"/>`;
-      case 'flag':
-        return `<line x1="${p.x}" y1="${p.y}" x2="${p.x}" y2="${p.y - 8}" stroke="${c}" stroke-width=".7"/>`
-             + `<polygon points="${p.x},${p.y-8} ${p.x+5},${p.y-6.3} ${p.x},${p.y-4.6}" fill="${c}"/>`;
-      case 'text':
-        return `<text x="${p.x}" y="${p.y}" font-size="${p.sz || 3.1}" font-weight="${p.bold ? 800 : 600}"`
-             + ` text-anchor="${p.a || 'middle'}" fill="${c}"`
-             + ` letter-spacing="${p.ls || .05}">${esc(p.t)}</text>`;
-      default: return '';
-    }
-  }).join('');
-  return `<figure class="dviz"><svg viewBox="0 0 100 ${H}" role="img" aria-label="${esc(v.cap || 'Drill setup')}">`
-       + `${out}</svg>${v.cap ? `<figcaption>${esc(v.cap)}</figcaption>` : ''}</figure>`;
-}
-// A drill renders the same way on the bench and inside its lesson. `steps` is the
-// instruction; `drill` is the one-line setup above it. A lesson with no `steps` is a
-// baseline one whose whole drill is the paragraph, so it still renders as prose ‚Äî the two
-// shapes coexist rather than one needing a migration.
-function drillBody(l){
-  const steps = (Array.isArray(l.steps) ? l.steps : []).filter(Boolean);
-  return `${steps.length ? `<p class="dlead">${esc(l.drill)}</p>` : prose(l.drill, 'lesson-body')}
-    ${drillViz(l.viz)}
-    ${steps.length ? `<ol class="dsteps">${steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}
-    ${l.score ? `<p class="dscore"><b>Pass mark</b> ${esc(l.score)}</p>` : ''}`;
-}
-
-// ----- The playable club list -----
-// This comes from the CARRY LADDER, not S.clubs: the bag holds the irons as a single
-// "KING TEC 4‚ÄìPW" entry, so it can't name the club that actually hit a shot. The ladder
-// is the real 13-club list and is already ordered longest to shortest. A hole stores the
-// key, never the label, so renaming a ladder row can't orphan old cards ‚Äî an unknown key
-// falls back to printing itself.
-// One slugger, used for club keys and for the DOM ids that let a <details> survive a
-// rerender(). Brackets and the degree sign go first so "Cobra KING TEC (16.5¬∞)" and
-// "Start line / aim" both come out as something stable and readable.
-function slug(name){
-  return String(name).toLowerCase().replace(/\(.*?\)/g, '').replace(/¬∞/g, '')
-    .trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
-const clubKey = slug;
-function clubAbbr(name){
-  const n = String(name || '');
-  if(/mini/i.test(n)) return 'Mini';
-  if(/driver/i.test(n)) return 'Dr';
-  const iron = n.match(/(\d+)\s*-?\s*iron/i);
-  if(iron) return iron[1] + 'i';
-  const wedge = n.match(/(\d{2})\s*¬∞?\s*wedge/i);
-  if(wedge) return wedge[1] + '¬∞';
-  const wood = n.match(/(\d+)\s*wood/i);
-  if(wood) return wood[1] + 'W';        // "5 wood" wraps in a chip; "5W" is what he'd write
-  if(/^pw/i.test(n)) return 'PW';
-  return n.length > 6 ? n.slice(0, 6) : n;
-}
-function bagClubs(){
-  return S.carries.map(c => ({ key:clubKey(c.club), name:c.club, abbr:clubAbbr(c.club),
-    wedge: /wedge/i.test(c.club) }));
-}
-function clubBy(key){ return bagClubs().find(c => c.key === key) || null; }
-// A club that has left the ladder still has to render on every old card it hit a shot on,
-// so an unknown key gets turned back into something readable rather than printing a slug.
-function clubFallback(key){
-  return String(key || '').replace(/-/g, ' ')
-    .replace(/\b(\d+)\s*(wedge)\b/i, '$1¬∞')
-    .replace(/\b(pw|sw|lw)\b/i, m => m.toUpperCase())
-    .replace(/\b[a-z]/g, c => c.toUpperCase());
-}
-function clubName(key){ const c = clubBy(key); return c ? c.name : clubFallback(key); }
-function clubTag(key){
-  const raw = String(key || '');
-  const phase =
-    /after slot/i.test(raw) ? ' ¬∑ slot' :
-    /before slot/i.test(raw) ? ' ¬∑ pre' :
-    /¬∑ open/i.test(raw) ? ' ¬∑ open' :
-    /¬∑ window/i.test(raw) ? ' ¬∑ run' :
-    /¬∑ rest/i.test(raw) ? ' ¬∑ rest' : '';
-  const base = raw.replace(/\s*¬∑\s*.*/i, '').trim() || raw;
-  const c = clubBy(base) || clubBy(raw);
-  const abbr = c ? c.abbr : clubAbbr(clubFallback(base));
-  return abbr + phase;
-}
-
-function groovePct(club){ return Math.max(0, Math.round(100 - (club.rounds||0)/GROOVE_LIFE*100)); }
-function weekStreak(){
-  // Mon..Sun of current week
-  const now = new Date(); const dow = (now.getDay()+6)%7;
-  const mon = new Date(now); mon.setDate(now.getDate()-dow);
-  return ['M','T','W','T','F','S','S'].map((lab,i) => {
-    const d = new Date(mon); d.setDate(mon.getDate()+i);
-    return { lab, hit: S.drillDays.includes(isoDay(d)) };
-  });
-}
-
-// ---------- Renderers ----------
-const TITLES = {
-  home:['Caddie HQ','Your bag, your stroke, your game ‚Äî one book.'],
-  bag:['My Bag','Every club, every spec, and the story of every change.'],
-  swing:['Swing Lab','Driver to wedge ‚Äî film, plans, and speed work.'],
-  positions:['Swing Positions','Where the body goes, address to finish.'],
-  game:['The Labs','Four parts of the game, each with its own workbench.'],
-  shortgame:['Short Game','Around the green ‚Äî where the strokes hide.'],
-  putting:['Putting Lab','Stroke, pace, and the short ones.'],
-  mental:['Mental Game','Staying locked in for eighteen ‚Äî decided off the course.'],
-  coach:['Coach','Lessons that follow your game ‚Äî not generic tips.'],
-  drills:['Drills','What you can actually do ‚Äî with the kit you own.'],
-  rounds:['Rounds','Your cards, the plans behind them, and the courses.'],
-  decisions:['Decisions','Equipment calls made with data, not vibes.'],
-  data:['Data & Backup','Your data lives on this device ‚Äî export it anywhere.'],
-  session:['Film Breakdown','Frame-by-frame findings from this session.'],
-  bay:['Bay Session','Every number the launch monitor produced.'],
-  sessions:['Days','Every capture, newest first ‚Äî not split by type.'],
-  briefing:['Round Prep','Course knowledge, tuned to your game.'],
-  shelf:['Coach','One shelf of the library.'],
-  lesson:['Coach','One lesson, and the drill that trains it.'],
-  round:['Round Detail','One card, hole by hole, and what it cost you.'],
-  live:['Live Round','Tap it in as you play ‚Äî it scores itself.'],
-  landed:['What‚Äôs landed','Every change to your app, newest first.'],
-  numbers:['Numbers','Every figure this app will quote, sourced and explained.'],
-  timeline:['Evidence','Rounds, bay, film and feed ‚Äî newest first.'],
-};
-
-// ----- Findability (v116) -----
-// Numbers that cannot be found, sourced, or explained are just decoration. This pass
-// adds one vocabulary of provenance chips, a glossary keyed by metric id, a Numbers
-// Index built from a single catalog, Today search over that same catalog plus nav
-// targets, and an Evidence timeline that stitches rounds / bay / film / feed rather
-// than inventing events. Today itself is five decision blocks. See CLAUDE.md.
-const PROV = {
-  'on-course': { lab:'ON-COURSE', cls:'p-live', title:'Logged live round / GHIN-style course facts' },
-  bay:         { lab:'BAY',       cls:'p-bay',  title:'Launch-monitor / Map My Bag session ‚Äî unmarked balls, indoor air' },
-  sim:         { lab:'SIM',       cls:'p-bay',  title:'Simulator round ‚Äî separate from outdoor scoring and handicap' },
-  trackman:    { lab:'TRACKMAN',  cls:'p-tm',   title:'Combine or an explicit Trackman field. Consistency is not SD.' },
-  measured:    { lab:'MEASURED',  cls:'p-meas', title:'An explicit measurement ‚Äî hosel stamp, film metric, scored test' },
-  estimated:   { lab:'ESTIMATED', cls:'p-est',  title:'A guess, a tilde loft, an unverified carry' },
-  offer:       { lab:'OFFER',     cls:'p-off',  title:'A meas.carry parked beside the live ladder, not yet accepted' },
-  fed:         { lab:'FED',       cls:'p-fed',  title:'Came from a coach-feed.json apply' },
-  self:        { lab:'SELF',      cls:'p-self', title:'Mental debrief / Jack-reported' },
-};
-function provBadge(kind){
-  const p = PROV[kind];
-  if(!p) return '';
-  return `<span class="prov ${p.cls}" title="${esc(p.title)}">${esc(p.lab)}</span>`;
-}
-function meaningBtn(metric){
-  if(!MEANING[metric]) return '';
-  return `<button type="button" class="meanbtn" data-action="meaning" data-metric="${esc(metric)}"
-    aria-label="What ${esc(MEANING[metric].title)} means" title="What this means">‚ìò</button>`;
-}
-function provOfCarry(row){
-  if(!row) return 'estimated';
-  const m = row.meas;
-  if(m && m.carry != null && row.carry != null && m.carry !== row.carry) return 'offer';
-  if(m){
-    const src = String(m.src || m.unit || '').toLowerCase();
-    if(/trackman|\btm\b|combine/.test(src)) return 'trackman';
-    return 'bay';
-  }
-  if(row.carry == null) return '';
-  return S.carriesCalibrated ? 'on-course' : 'estimated';
-}
-function provOfProfile(){
-  return 'on-course';
-}
-function openMeaning(metric, extra){
-  const m = MEANING[metric];
-  if(!m){ toast('No note on file for that number'); return; }
-  let v = document.getElementById('sheetveil');
-  if(!v){
-    v = document.createElement('div');
-    v.className = 'sheetveil'; v.id = 'sheetveil';
-    v.addEventListener('click', e => { if(e.target === v) closeCheat(); });
-    document.body.appendChild(v);
-  }
-  const deep = extra && extra.view === 'bay' && extra.i != null && extra.i !== ''
-    ? `<div class="linkrow" style="border-bottom:none;margin-top:10px" data-action="open-bay" data-i="${esc(String(extra.i))}">
-        <span><b>Open in app</b><br><span class="sm">The page that owns this number</span></span><span class="arr">‚Üí</span></div>`
-    : extra && extra.view
-    ? `<div class="linkrow" style="border-bottom:none;margin-top:10px" data-action="go" data-view="${esc(extra.view)}"${
-        extra.seg ? ` data-seg="${esc(extra.seg)}"` : ''}${
-        extra.id ? ` data-id="${esc(extra.id)}"` : ''}>
-        <span><b>Open in app</b><br><span class="sm">The page that owns this number</span></span><span class="arr">‚Üí</span></div>`
-    : '';
-  const chip = extra && extra.prov ? provBadge(extra.prov) : '';
-  v.innerHTML = `<div class="sheet card meansheet">
-    <div class="sheethead"><h2>${esc(m.title)}</h2>
-      <button class="btn ghost tiny" data-action="cheat-close">Close</button></div>
-    <div class="meanmeta">${chip}${extra && extra.value != null && extra.value !== ''
-      ? `<span class="meanval">${esc(String(extra.value))}${extra.unit ? ` ${esc(extra.unit)}` : ''}</span>` : ''}</div>
-    <p class="sm"><b>What it is.</b> ${esc(m.what)}</p>
-    <p class="sm"><b>Why it matters for you.</b> ${esc(m.why)}</p>
-    <p class="sm"><b>When not to trust it.</b> ${esc(m.caution)}</p>
-    ${deep}
-  </div>`;
-  const s = v.querySelector('.sheet');
-  if(s) s.scrollTop = 0;
-}
-
-const MEANING = {
-  handicap: {
-    title:'Handicap',
-    what:'The index you report ‚Äî GHIN-style, pushed onto the profile like every other number Today quotes.',
-    why:'It is the number the front page used to get stuck on, and the one a round has to be able to move. The small estimate under it is this app‚Äôs own reading of your rated cards.',
-    caution:'It is HIS number, relayed. An estimate off three rated rounds is not a GHIN, and a sim card never reaches it.'
-  },
-  carry: {
-    title:'Playing carry',
-    what:'The yardage the live logger offers off the tee and into the green. The ladder IS the roster.',
-    why:'Club choice on a hole is this number, not a radar printout. A gap of 15+ is a hole in the bag; 5 or less is two clubs fighting.',
-    caution:'Until you calibrate, every row is a starting point. A measured bay figure sitting beside it is an offer, not a correction, until you tap Use.'
-  },
-  'meas.carry': {
-    title:'Bay carry (offer)',
-    what:'A launch-monitor carry parked on the row as meas.carry ‚Äî shown beside your live number until you accept it.',
-    why:'So a radar session can arrive without silently rewriting the number you play off. You take it with a tap.',
-    caution:'Indoor, off a mat, often an unmarked ball, and the carry is a flight MODEL from measured launch ‚Äî not a ball anyone watched land. Bay numbers are not handicap authority.'
-  },
-  cons: {
-    title:'Trackman Consistency',
-    what:'Trackman‚Äôs own Consistency field from Map My Bag. It is a named product figure, not a statistic we derived.',
-    why:'It is the only spread number the screen actually printed. The swing lab turns it into a spread index (cons / carry) so clubs can be compared.',
-    caution:'Consistency is NOT standard deviation and must never be labelled ¬± or SD. A separate sd field, when present, is the actual standard-deviation row.'
-  },
-  sd: {
-    title:'Standard deviation',
-    what:'The actual standard-deviation of a measured sample, in yards, when the session produced one.',
-    why:'It is the statistical spread of THAT sample ‚Äî useful next to n= so you can see how many shots the figure rests on.',
-    caution:'Do not read it as Trackman Consistency. They are different fields. A one-session SD is not a season-long dispersion.'
-  },
-  fiveFootMake: {
-    title:'5-ft make rate',
-    what:'Makes out of 20 from five feet on the mat, with miss direction (L / R / short / long) on the ones that missed.',
-    why:'This is the short-putt number again. On-course make-rate-by-distance was retired because a card that only records the putt you HOLED can only climb toward 100%.',
-    caution:'A mat test is not a hole. One entry is a baseline, not a trend. The left-miss story lives in the all-time miss pattern, not in a single 20.'
-  },
-  lagInside3: {
-    title:'Lag inside 3 ft',
-    what:'Of lags whose finish is known, how many left a putt inside three feet ‚Äî a concession after a lag counts, because nobody concedes a twenty-footer.',
-    why:'It is the distance-control number the scorecard can actually produce. Both halves come off the same population so it can never exceed 100%.',
-    caution:'A first version of this read 15/15 because most second putts were given. Read ‚Äúthe lag left a tap-in‚Äù, not a measured proximity. Holes logged before putts-made tracking do not belong in the denominator.'
-  },
-  gir: {
-    title:'Greens in regulation',
-    what:'Share of holes where the approach (any club AT a green) finished on the putting surface in regulation.',
-    why:'It is the ‚Äúinto the green‚Äù tile Coach and Today quote from the same cards, labelled by the shot not the club in hand.',
-    caution:'A wood into a par 5 and a wedge from 90 are both in it. It moves the moment 18 live holes exist, because then only live cards are counted ‚Äî the provenance line says so.'
-  },
-  putts: {
-    title:'Putts',
-    what:'Putt counts per hole (1 / 2 / 3+) as a share of holes played, plus where the ones you holed were from.',
-    why:'A 2-putt from 40 feet is a good hole and a 2-putt from 5 is a dropped shot. The count alone cannot tell them apart; the made-distance row can.',
-    caution:'Chip-ins are none of the three rows, so the three need not sum to 100. A conceded first putt is not a make. Sim cards do not count.'
-  },
-  combineScore: {
-    title:'Combine score',
-    what:'Trackman‚Äôs own test: three shots each to fixed targets plus driver, twice over, scored 0‚Äì100 on carry and offline.',
-    why:'The only bay number that is directly comparable against itself, which is what makes it a benchmark rather than a session.',
-    caution:'A fixed protocol on a mat. It says nothing about a shot off a slope in wind. A trend needs three results; two points are a line through anything.'
-  },
-  faceAtImpact: {
-    title:'Face at impact',
-    what:'Face angle at impact, measured ‚Äî on putting, once, on film (Jul 30); on full shots, from the bay when the session produced it.',
-    why:'Start direction lives here. Negative means the face pointed left of the target line.',
-    caution:'One session is a reading, not a grip. Compare only with the same club, intended shot and conditions. Unmarked-ball curve is a different claim.'
-  },
-  grooveRounds: {
-    title:'Groove life',
-    what:'Rounds on a gaming wedge against a ~N-round groove life. The meter is 100% new, 0% at the life limit.',
-    why:'Spin drops noticeably below ~50% life. The most-worn face in the bag is the one the Wear card names.',
-    caution:'The counter advances every time you log a round, however you logged it. It is usage, not a groove-gauge measurement of the face.'
-  },
-  returnWindow: {
-    title:'Return window',
-    what:'Days left on a club that is still sittable-in-a-return-window. The flag lives on the club, not on one hardcoded head.',
-    why:'The decision has a clock. A window you cannot see is a window you will miss.',
-    caution:'An estimated deadline is estimated. Confirm with the shop. This is not a golf statistic.'
-  },
-};
-
-function actAttrs(a){
-  if(!a) return '';
-  return ` data-action="${a.a}"${a.v ? ` data-view="${a.v}"` : ''}${
-    a.seg ? ` data-seg="${esc(a.seg)}"` : ''}${
-    a.id ? ` data-id="${esc(a.id)}"` : ''}${
-    a.i != null && a.i !== '' ? ` data-i="${a.i}"` : ''}`;
-}
-function numbersCatalog(state){
-  const rows = [];
-  const push = row => { if(row && row.value != null && row.value !== '' && row.value !== '‚Äî') rows.push(row); };
-  const C = areaCards();
-  const ga = gameAreas(C.cards);
-  const A = ga.areas, st = ga.st;
-  const pc = (n, d) => d ? Math.round(n / d * 100) + '%' : null;
-  const idx = estIndex();
-  push({ id:'handicap', label:'Handicap', value:String(state.profile.handicap),
-    prov:provOfProfile(), view:'home', metric:'handicap',
-    trend: idx != null ? `${idx.toFixed(1)} est.` : null });
-  if(idx != null) push({ id:'index', label:'Estimated index', value:idx.toFixed(1),
-    prov: C.ev === 'live' ? 'on-course' : 'on-course', view:'rounds', seg:'cards', metric:'handicap' });
-  const lastFt = latestFiveFt();
-  if(lastFt){
-    const s = fiveFtScore(lastFt);
-    if(s.total) push({ id:'fiveFootMake', label:'5-ft makes', value:`${s.makes}/20`,
-      prov:'measured', view:'putting', metric:'fiveFootMake',
-      trend: lastFt.date ? fmtDate(lastFt.date) : null });
-  }
-  const close = lagClose(st.putts || { dist:new Map(), lagIn:0, lagN:0 });
-  if(close.n) push({ id:'lagInside3', label:'Lag inside 3 ft', value:`${close.in}/${close.n}`,
-    unit: pc(close.in, close.n), prov:'on-course', view:'putting', metric:'lagInside3' });
-  if(st.putts && st.putts.holes){
-    push({ id:'putts', label:'Putts / hole',
-      value:(st.putts.total / st.putts.holes).toFixed(2),
-      prov:'on-course', view:'putting', metric:'putts' });
-    push({ id:'onePutt', label:'1-putt rate', value:pc(st.putts.one, st.putts.holes),
-      prov:'on-course', view:'rounds', seg:'cards', metric:'putts' });
-  }
-  if(A && A.app) push({ id:'gir', label:'Into the green', value:A.app.v,
-    prov:'on-course', view:'rounds', seg:'cards', metric:'gir' });
-  if(A && A.tee) push({ id:'fw', label:'Off the tee', value:A.tee.v,
-    prov:'on-course', view:'rounds', seg:'cards', metric:'gir' });
-  if(A && A.short) push({ id:'updown', label:'Up & down', value:A.short.v,
-    prov:'on-course', view:'rounds', seg:'cards', metric:'gir' });
-  const miss = st.fw ? st.fw.n - st.fw.hit : 0;
-  if(miss) push({ id:'scramble', label:'Scramble (missed FW)', value:pc(st.fw.saved, miss),
-    prov:'on-course', view:'rounds', seg:'cards', metric:'gir' });
-  (state.carries || []).forEach((c, i) => {
-    const kind = provOfCarry(c);
-    if(c.carry != null) push({ id:'carry-'+clubKey(c.club), label:`${c.club} carry`,
-      value:String(c.carry), unit:'yd', prov: kind === 'offer' ? (S.carriesCalibrated ? 'on-course' : 'estimated') : kind,
-      view:'bag', metric:'carry', i });
-    if(c.meas && c.meas.carry != null && c.meas.carry !== c.carry)
-      push({ id:'offer-'+clubKey(c.club), label:`${c.club} bay offer`,
-        value:String(c.meas.carry), unit:'yd', prov:'offer', view:'bag', metric:'meas.carry', i });
-    if(c.meas && c.meas.cons != null)
-      push({ id:'cons-'+clubKey(c.club), label:`${c.club} Consistency`,
-        value:String(c.meas.cons), prov:'trackman', view:'bag', metric:'cons', i });
-    if(c.meas && c.meas.sd != null)
-      push({ id:'sd-'+clubKey(c.club), label:`${c.club} SD`,
-        value:'¬±'+c.meas.sd, unit:'yd', prov:'measured', view:'bag', metric:'sd', i });
-  });
-  const combos = (state.combines || []).slice().sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  if(combos.length){
-    const last = combos[combos.length-1];
-    if(last.score != null) push({ id:'combineScore', label:'Combine score', value:String(last.score),
-      prov:'trackman', view:'swing', metric:'combineScore',
-      trend: last.date ? fmtDate(last.date) : null });
-  }
-  const wedges = (state.clubs || []).filter(c => c.cat === 'wedge' && c.status === 'gaming');
-  wedges.forEach(c => {
-    if(c.rounds) push({ id:'groove-'+c.id, label:`${c.name} grooves`,
-      value: groovePct(c)+'%', unit:`${c.rounds} rds`, prov:'on-course', view:'bag', metric:'grooveRounds' });
-  });
-  const pending = pendingReturn();
-  if(pending){
-    const dl = daysLeft(state.settings.returnDeadline);
-    push({ id:'returnWindow', label:`Return ¬∑ ${pending.name}`,
-      value: dl==null ? 'unset' : dl+' days',
-      prov:'self', view:'decisions', metric:'returnWindow' });
-  }
-  const six = (state.bays || []).find(b => b._fid === 'bay-six-metric-baseline-20260916-v1');
-  if(six && six.detail && six.detail.metrics){
-    six.detail.metrics.forEach(m => {
-      const id = /face/i.test(m.k) ? 'faceAtImpact' : /carry/i.test(m.k) ? 'carry' : 'cons';
-      push({ id:'six-'+m.k, label:'Six-metric ¬∑ '+m.k, value:String(m.v),
-        prov:'trackman', view:'bay', metric: id, i: (state.bays||[]).indexOf(six) });
-    });
-  }
-  const faceBay = (state.bays || []).find(b => /putt/i.test(b.discipline||'') && /face/i.test(JSON.stringify(b.detail||b.finding||'')));
-  if(faceBay){
-    const i = (state.bays||[]).indexOf(faceBay);
-    push({ id:'faceAtImpact', label:'Face at impact (putting)', value:'measured',
-      prov:'measured', view:'bay', metric:'faceAtImpact', i });
-  }
-  return rows;
-}
-
-function catalogFilter(row, filter){
-  if(!filter || filter === 'all') return true;
-  if(filter === 'on-course') return row.prov === 'on-course';
-  if(filter === 'bay') return row.prov === 'bay' || row.prov === 'trackman';
-  if(filter === 'estimated') return row.prov === 'estimated';
-  if(filter === 'offers') return row.prov === 'offer';
-  return true;
-}
-function catalogMatch(row, q){
-  if(!q) return true;
-  const hay = `${row.label} ${row.value} ${row.id} ${row.metric || ''} ${row.unit || ''} ${row.trend || ''}`.toLowerCase();
-  return q.split(/\s+/).filter(Boolean).every(w => hay.includes(w));
-}
-
-function numbersView(arg){
-  if(arg && typeof arg === 'object'){
-    if(arg.filter) numbersFilter = arg.filter;
-    if(arg.q != null) numbersQ = arg.q;
-  }
-  const q = (numbersQ || '').trim().toLowerCase();
-  const all = numbersCatalog(S);
-  const rows = all.filter(r => catalogFilter(r, numbersFilter) && catalogMatch(r, q));
-  const FILT = [['all','All'],['on-course','On-course'],['bay','Bay'],['estimated','Estimated'],['offers','Offers']];
-  return `
-  <button class="backlink" data-action="go" data-view="home">‚Üê Today</button>
-  <div class="card">
-    <h2>Numbers</h2>
-    <p class="sm faint">Every figure this app will quote, with where it came from. Tap a row for what it means.</p>
-    <input id="numSearch" type="search" placeholder="Filter numbers‚Ä¶" value="${esc(numbersQ || '')}"
-      autocomplete="off" enterkeyhint="search" aria-label="Filter numbers">
-    <div class="chips numfilt" role="tablist">${FILT.map(([k,lab]) =>
-      `<button type="button" class="chip ${numbersFilter===k?'on':''}" data-action="numbers-filter" data-k="${k}">${lab}</button>`).join('')}</div>
-  </div>
-  <div class="card" id="numList">
-    ${rows.length ? rows.map(numRow).join('') : `<p class="sm faint">Nothing matches. Try All, or a club name.</p>`}
-  </div>`;
-}
-function numRow(r){
-  return `<div class="linkrow numrow" data-action="open-number" data-metric="${esc(r.metric || '')}"
-      data-view="${esc(r.view || 'home')}"${r.seg ? ` data-seg="${esc(r.seg)}"` : ''}${
-      r.i != null ? ` data-i="${r.i}"` : ''} data-prov="${esc(r.prov || '')}" data-value="${esc(String(r.value))}"
-      ${r.unit ? ` data-unit="${esc(r.unit)}"` : ''}>
-    <span><b>${esc(r.label)}</b><br><span class="sm">${esc(String(r.value))}${r.unit ? ` ${esc(r.unit)}` : ''}${
-      r.trend ? ` ¬∑ ${esc(r.trend)}` : ''}</span></span>
-    <span class="numend">${provBadge(r.prov)}${meaningBtn(r.metric)}<span class="arr">‚Üí</span></span>
-  </div>`;
-}
-
-function searchIndex(state){
-  const rows = [];
-  const add = (kind, label, haystack, act) => rows.push({ kind, label, haystack: (haystack||'').toLowerCase(), act });
-  numbersCatalog(state).forEach(n => add('Numbers', n.label,
-    `${n.label} ${n.value} ${n.id} ${n.metric||''} ${n.unit||''}`,
-    { a:'open-number', metric:n.metric, view:n.view, seg:n.seg, i:n.i, prov:n.prov, value:n.value, unit:n.unit }));
-  (state.clubs || []).forEach(c => add('Bag', c.name,
-    `${c.name} ${c.spec||''} ${c.note||''} ${c.cat||''} club`,
-    { a:'go', v:'bag' }));
-  (state.carries || []).forEach(c => add('Bag', c.club + ' (ladder)',
-    `${c.club} carry ladder 5-wood 5 wood`,
-    { a:'go', v:'bag' }));
-  (state.courses || []).forEach(c => add('Courses', c.name,
-    `${c.name} ${c.st||''} ${c.notes||''} course`,
-    { a:'go', v:'rounds', seg:'courses' }));
-  (state.rounds || []).forEach((r,i) => add('Courses', (r.course||'Round') + (r.sim ? ' (sim)' : ''),
-    `${r.course||''} ${r.date||''} round scorecard`,
-    { a:'open-round', i }));
-  (state.briefings || []).forEach(b => add('Plans', b.course || b.focus || 'Plan',
-    `${b.course||''} ${b.focus||''} briefing plan prep`,
-    { a:'open-briefing', id:b.id }));
-  lessons().forEach(l => add('Labs', l.title,
-    `${l.title} ${l.shelf||''} ${(l.body||'').slice(0,120)} lesson`,
-    { a:'open-lesson', id:l.id }));
-  drillList().forEach(d => add('Labs', d.l.title,
-    `${d.l.title} ${d.l.shelf||''} drill`,
-    { a:'go', v:'drills' }));
-  (state.bays || []).forEach((b,i) => add('Labs', b.setup || b.mode || 'Bay session',
-    `${b.setup||''} ${b.venue||''} ${b.mode||''} trackman bay range`,
-    { a:'open-bay', i }));
-  (state.sessions || []).forEach((s,i) => add('Labs', s.setup || 'Film',
-    `${s.setup||''} ${s.finding||''} film session`,
-    { a:'open-session', i }));
-  (state.combines || []).forEach(c => add('Numbers', 'Combine '+ (c.score != null ? c.score : ''),
-    `combine trackman ${c.note||''} ${c.venue||''}`,
-    { a:'go', v:'swing' }));
-  add('Numbers', 'The Combine', 'combine trackman benchmark score', { a:'go', v:'swing' });
-  add('Labs', 'Swing Lab', 'swing lab film bay', { a:'go', v:'swing' });
-  add('Labs', 'Putting Lab', 'putting lab 5-foot 5-ft 20-ball', { a:'go', v:'putting' });
-  add('Numbers', 'Numbers Index', 'numbers index catalog metrics', { a:'go', v:'numbers' });
-  add('Numbers', 'Evidence timeline', 'evidence timeline landed rounds bay film', { a:'go', v:'timeline' });
-  add('Labs', 'Days', 'sessions days range outdoor film simulator rounds', { a:'session-category', kind:'days' });
-  add('Labs', 'Cumulative', 'cumulative running picture evolving accuracy n holes', { a:'session-category', kind:'cumulative' });
-  return rows;
-}
-function searchResultsHTML(q){
-  const query = (q || '').trim().toLowerCase();
-  if(!query) return `<p class="sm faint" id="hqEmpty">Try ‚Äò5-wood‚Äô, ‚Äòcombine‚Äô, ‚Äòhandicap‚Äô‚Ä¶</p>`;
-  const words = query.split(/\s+/).filter(Boolean);
-  const hits = searchIndex(S).filter(r => words.every(w => r.haystack.includes(w) || r.label.toLowerCase().includes(w)));
-  if(!hits.length) return `<p class="sm faint">Nothing for ‚Äú${esc(q.trim())}‚Äù. Try ‚Äò5-wood‚Äô, ‚Äòcombine‚Äô, ‚Äòhandicap‚Äô‚Ä¶</p>`;
-  const groups = [];
-  hits.forEach(h => {
-    const last = groups[groups.length-1];
-    if(last && last.kind === h.kind) last.rows.push(h);
-    else groups.push({ kind:h.kind, rows:[h] });
-  });
-  return groups.map(g => `<div class="srchgrp"><div class="cgrp">${esc(g.kind)}</div>${
-    g.rows.slice(0,8).map(r => {
-      const a = r.act || {};
-      const attrs = [
-        a.a ? `data-action="${esc(a.a)}"` : '',
-        a.v ? `data-view="${esc(a.v)}"` : '',
-        a.seg ? `data-seg="${esc(a.seg)}"` : '',
-        a.id ? `data-id="${esc(a.id)}"` : '',
-        a.i != null ? `data-i="${a.i}"` : '',
-        a.metric ? `data-metric="${esc(a.metric)}"` : '',
-        a.prov ? `data-prov="${esc(a.prov)}"` : '',
-        a.value != null ? `data-value="${esc(String(a.value))}"` : '',
-        a.unit ? `data-unit="${esc(a.unit)}"` : '',
-        a.kind ? `data-kind="${esc(a.kind)}"` : '',
-      ].filter(Boolean).join(' ');
-      return `<div class="linkrow" ${attrs}><span><b>${esc(r.label)}</b></span><span class="arr">‚Üí</span></div>`;
-    }).join('')}</div>`).join('');
-}
-function todaySearch(){
-  // Empty Today does not print the hint ‚Äî the placeholder is the hint. Results
-  // appear only once there is a query, so the keyboard is not sitting over a list
-  // of instructions. searchResultsHTML still carries the 5-wood / combine / handicap
-  // empty copy for the no-hits case.
-  return `<div class="card hqsearch">
-    <label for="hqSearch">Search</label>
-    <input id="hqSearch" type="search" placeholder="5-wood, combine‚Ä¶"
-      value="${esc(searchQ || '')}" autocomplete="off" enterkeyhint="search" aria-label="Search the book">
-    <div id="hqResults">${searchQ ? searchResultsHTML(searchQ) : ''}</div>
-  </div>`;
-}
-
-function evidenceEvents(){
-  const ev = [];
-  (S.rounds || []).forEach((r, i) => {
-    ev.push({ d:r.date || '', title:(r.sim ? (r.trackmanHandicapRound ? 'TrackMan HCP round' : 'Indoor round') : (r.live ? 'Live round' : 'Round')) + ' ¬∑ ' + (r.course || ''),
-      gist:[r.score != null ? 'Score '+r.score : '', r.nine ? r.nine+' nine' : '', r.sim ? (r.trackmanHandicapRound ? 'TrackMan HCP ¬∑ indoor' : 'simulator ¬∑ indoor') : '']
-        .filter(Boolean).join(' ¬∑ '),
-      prov: r.sim ? 'sim' : 'on-course',
-      act:{ a:'open-round', i } });
-  });
-  (S.bays || []).forEach((b, i) => {
-    ev.push({ d:b.date || '', title:b.setup || b.mode || 'Bay session',
-      gist:bayGist(b), prov:'bay', act:{ a:'open-bay', i } });
-  });
-  (S.combines || []).forEach(c => {
-    ev.push({ d:c.date || '', title:'Combine' + (c.score != null ? ' ¬∑ '+c.score : ''),
-      gist:c.note || c.venue || 'Trackman Combine', prov:'trackman', act:{ a:'go', v:'swing' } });
-  });
-  (S.sessions || []).forEach((s, i) => {
-    ev.push({ d:s.date || '', title:s.setup || 'Filmed session',
-      gist:sessionGist(s), prov:'measured', act:{ a:'open-session', i } });
-  });
-  const SKIP = new Set(['round','round-update','bay','bay-update','session','session-update','combine','combine-remove']);
-  const KEEP = new Set(['carry-update','club-update','club-add','briefing','evolution','profile','layout','faults']);
-  (S.updates || []).forEach(u => {
-    if(SKIP.has(u.t) || !KEEP.has(u.t)) return;
-    ev.push({ d:u.d || '', title:u.h, gist:u.s || '', prov:'fed', act:u.act || null });
-  });
-  ev.sort((a, b) => (b.d || '').localeCompare(a.d || '') || (a.title||'').localeCompare(b.title||''));
-  return ev;
-}
-function timeline(){
-  const events = evidenceEvents();
-  return `
-  <button class="backlink" data-action="go" data-view="home">‚Üê Today</button>
-  <div class="card">
-    <h2>Evidence</h2>
-    <p class="sm faint">Rounds, bay sessions, film and feed applies ‚Äî newest first. Nothing here is invented; it is stitched from what is already on file.</p>
-  </div>
-  <div class="card">
-    ${events.length ? events.map(e => {
-      const attrs = actAttrs(e.act);
-      return `<div class="linkrow tlrow${e.act ? ' opens' : ''}"${attrs}>
-        <span><b>${esc(e.title)}</b><br><span class="sm clip2">${esc(e.gist || '')}</span>
-          <span class="sm faint">${e.d ? esc(fmtDate(e.d)) : ''}</span></span>
-        <span class="numend">${provBadge(e.prov)}${e.act ? '<span class="arr">‚Üí</span>' : ''}</span>
-      </div>`;
-    }).join('') : `<p class="sm faint">No evidence on file yet.</p>`}
-    <div class="linkrow" data-action="go" data-view="landed" style="border-bottom:none">
-      <span class="sm"><b>What‚Äôs landed</b> ‚Äî the changelog of pushes and builds</span><span class="arr">‚Üí</span></div>
-  </div>`;
-}
-
-function scoreboardCard(){
-  const C = areaCards();
-  const { st } = gameAreas(C.cards);
-  const lastFt = latestFiveFt();
-  const close = lagClose(st.putts || { dist:new Map(), lagIn:0, lagN:0 });
-  let metric = 'handicap', label = 'Handicap', value = String(S.profile.handicap),
-      prov = provOfProfile(), view = 'home', note = '';
-  if(lastFt){
-    const s = fiveFtScore(lastFt);
-    if(s.total){
-      metric = 'fiveFootMake'; label = '5-ft makes'; value = `${s.makes}/20`;
-      prov = 'measured'; view = 'putting';
-      note = lastFt.date ? `Last 20 ¬∑ ${fmtDate(lastFt.date)}` : 'Mat test ‚Äî the short-putt number';
-    }
-  }
-  if(metric === 'handicap' && close.n){
-    metric = 'lagInside3'; label = 'Lag inside 3 ft'; value = `${close.in}/${close.n}`;
-    prov = 'on-course'; view = 'putting';
-    note = pcSafe(close.in, close.n) + ' of lags whose finish is known';
-  }
-  if(metric === 'handicap'){
-    const idx = estIndex();
-    note = idx != null ? `${idx.toFixed(1)} estimated off your rated cards` : `${indexBasis().n} of 3 rated`;
-  }
-  return `<div class="card scoreboard" data-action="meaning" data-metric="${esc(metric)}" data-view="${esc(view)}" data-prov="${esc(prov)}" data-value="${esc(value)}">
-    <h2>The scoreboard</h2>
-    <div class="sbrow">
-      <div>
-        <div class="v">${esc(value)}${meaningBtn(metric)}</div>
-        <div class="l">${esc(label)}</div>
-      </div>
-      ${provBadge(prov)}
-    </div>
-    ${note ? `<p class="sm faint" style="margin-top:8px">${esc(note)}</p>` : ''}
-    ${C.cards.length && (metric === 'lagInside3' || metric === 'handicap') ? `<p class="sm faint">${areaProvLine(C)}</p>` : ''}
-  </div>`;
-}
-function pcSafe(n, d){ return d ? Math.round(n / d * 100) + '%' : '‚Äî'; }
-function areaProvLine(C){
-  if(!C.cards.length) return '';
-  return C.ev === 'live'
-    ? `Read off your ${C.liveCards.length} live round${C.liveCards.length===1?'':'s'} ‚Äî ${C.liveHoles} holes you tapped in standing on them${C.setAside ? `, with ${C.setAside} older card${C.setAside===1?'':'s'} set aside` : ''}.`
-    : `Read off ${C.cards.length} card${C.cards.length===1?'':'s'} on record ‚Äî ${C.allHoles} holes.`;
-}
-
-function workCard(){
-  const f = coachFocus(coachSignals());
-  const pick = pickedLessons()[0];
-  if(!f && !pick) return '';
-  const L = f && f.link;
-  return `<div class="card one${f ? rail(f.ev) : ''}">
-    <h2>The work</h2>
-    ${f ? `${evDrawer('ev-onething', 'The one thing', f.ev, f.src)}
-      <div class="oneh">${f.h}</div>
-      ${expandable(f.b)}
-      ${L ? `<div class="linkrow" data-action="${L.a}"${L.view ? ` data-view="${L.view}"` : ''}${
-        L.id ? ` data-id="${esc(L.id)}"` : ''}><span class="sm"><b>${esc(L.lab)}</b></span><span class="arr">‚Üí</span></div>` : ''}` : ''}
-    ${pick ? tipHTML(pick) : ''}
-    <button class="btn ghost tiny" data-action="go" data-view="coach">All lessons ‚Üí</button>
-  </div>`;
-}
-function prepCardThin(){
-  const p = coursePlans();
-  const next = [...p.up, ...p.standing, ...p.past][0];
-  const rest = p.up.length + p.standing.length + p.past.length - (next ? 1 : 0);
-  const wx = S.weather;
-  const wxLine = wx ? `<p class="sm faint">${WX_ICON(wx.code)} ${Math.round(wx.t)}¬∞ ¬∑ wind ${Math.round(wx.wind)} mph${
-    playsFactor() ? ` ¬∑ 150 plays like ${Math.round(150 / playsFactor())}` : ''} ¬∑ <span class="wxgo" data-action="get-weather">refresh</span></p>`
-    : `<p class="sm faint"><span class="wxgo" data-action="get-weather">Load conditions</span> ‚Äî temperature only, for the carry effect.</p>`;
-  return `<div class="card">
-    <h2>Next round</h2>
-    ${wxLine}
-    ${next ? planRow(next)
-      : `<p class="sm">No plan on file. Tell Claude the course and day ‚Äî a briefing built for <i>your</i> game lands here.</p>`}
-    ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="rounds" data-seg="prep">
-      <span class="sm"><b>All round prep</b> ¬∑ ${rest} more plan${rest===1?'':'s'}</span><span class="arr">‚Üí</span></div>` : ''}
-  </div>`;
-}
-function returnWindowCard(){
-  const pending = pendingReturn();
-  if(!pending) return '';
-  const dl = daysLeft(S.settings.returnDeadline);
-  return `<div class="card">
-    <h2>Open window</h2>
-    <h3>${dl===null ? 'Deadline not set' : dl + ' days left on the ' + esc(pending.name)} ${meaningBtn('returnWindow')} ${provBadge('self')}</h3>
-    <p class="sm">${dl===null
-      ? `<span class="warn">Deadline unknown</span> ‚Äî the ${esc(pending.name)} is still returnable and nothing here knows until when.`
-      : S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> ‚Äî confirm the real one with the shop.' : 'Deadline confirmed.'}</p>
-    <div class="formrow" style="margin-top:8px">
-      <div><label>Deadline</label><input type="date" id="deadlineInput" value="${esc(S.settings.returnDeadline||'')}"></div>
-      <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
-    </div>
-    <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker ‚Üí</button></p>
-  </div>`;
-}
-function todayShortcuts(){
-  return `<div class="card hqshort" role="group" aria-label="Shortcuts">
-    <div class="home-quicklinks">
-      <button class="btn ghost" data-action="focus-search">Search</button>
-      <button class="btn ghost" data-action="go" data-view="numbers">Numbers</button>
-      <button class="btn ghost" data-action="go" data-view="timeline">Evidence</button>
-      <button class="btn" data-action="go" data-view="live">${S.live?'Resume round':'Start round'}</button>
-    </div>
-  </div>`;
-}
-function whatsNewOneLiner(){
-  const days = upDays();
-  if(!days.length) return '';
-  const seen = new Set(S.settings.seenUpdates || []);
-  const day = days[0];
-  const fresh = upFresh([day], seen);
-  upMarkSeen(days, [day]);
-  const first = day.rows[0];
-  return `<div class="card">
-    <p class="sm"><b>What‚Äôs new.</b> ${esc(first ? first.h : 'Nothing yet')}${
-      first && first.b ? ` ¬∑ ${esc(first.b)}` : ''}${
-      fresh ? ` ¬∑ <span class="warn">${fresh} new</span>` : ''}.</p>
-    <div class="linkrow" style="border-bottom:none" data-action="go" data-view="timeline">
-      <span class="sm"><b>See Evidence</b> ‚Äî rounds, bay, film and feed, mixed by date</span><span class="arr">‚Üí</span></div>
-  </div>`;
-}
-
-let searchQ = '';
-let numbersQ = '';
-let numbersFilter = 'all';
-let searchT = 0;
-
-
-// ----- Rounds: one tab, three segments (Aug 27 2026, Jack's redesign) -----
-// Cards, the plans written for them, and the courses they were played on are three faces
-// of one subject, so they are segments of one tab rather than three places to be. Courses
-// stopped being a top-level tab (you reach a course through a round or a ranking, never
-// cold) and Round Prep moved out of the Game hub, which is now the four labs only.
-//
-// The three OLD view names stay alive as entry points ‚Äî every `go('courses')`, every
-// `render('scores')` in an action, and every `act:go('preps')` in the changelog still
-// resolve, they just land on the segment instead of a page of their own. Nothing
-// dead-ends, and no caller had to learn the new shape.
-const ROUND_SEGS = [
-  { k:'cards',   lab:'Cards',      view:'scores',
-    tag:'Every round, what it cost you, and what to fix.' },
-  { k:'prep',    lab:'Round prep', view:'preps',
-    tag:'Every course plan, kept for the next time.' },
-  { k:'courses', lab:'Courses',    view:'courses',
-    tag:'Everywhere you‚Äôve played, rated and remembered.' },
-];
-const SEG_OF = Object.fromEntries(ROUND_SEGS.map(s => [s.view, s.k]));
-// View-local state, exactly as the design specifies: which face of Rounds is showing is a
-// property of the view, not of the player, so it is a module variable and never saved.
-let roundsSeg = 'cards';
-function rounds(seg){
-  if(seg && ROUND_SEGS.some(s => s.k === seg)) roundsSeg = seg;
-  const cur = ROUND_SEGS.find(s => s.k === roundsSeg) || ROUND_SEGS[0];
-  const body = { cards:scores, prep:preps, courses }[cur.k];
-  return `<div class="segbar">${ROUND_SEGS.map(s =>
-    `<button class="seg ${s.k === cur.k ? 'on' : ''}" data-action="rounds-seg" data-k="${s.k}">${s.lab}</button>`).join('')}</div>
-  <div class="card flat"><div class="linkrow" data-action="go" data-view="timeline" style="border-bottom:none">
-    <span><b>Evidence ‚Üí</b><span class="sm"> Rounds, bay and film mixed by date</span></span><span class="arr">‚Üí</span></div></div>
-  ${body()}`;
-}
-
-// Which fault the bench is filtered to, set by a lab's diagnosis card. Deliberately a
-// module variable rather than a saved setting: it is a question asked once, and a filter
-// still quietly on next week would make the bench lie about what is due. It survives a
-// rerender (a chip tap) and is cleared by navigating anywhere else.
-let drillTag = null;
-// Which hole's club picker is open on a plan. Same rule as drillTag and for the same
-// reason: it is a question asked once, so it survives a chip tap (a rerender) and dies the
-// moment he navigates anywhere else. Nothing about an open picker belongs in the record.
-let planPick = null;
-function render(view, arg, keepScroll){
-  closeCheat();  // the cheat sheet overlay lives on <body>, so navigation must clear it
-  if(view !== 'drills') drillTag = null;
-  if(view !== 'briefing') planPick = null;
-  // Scores / Round Prep / Courses are segments of Rounds now. Resolving the old names
-  // here rather than at every call site is the whole reason nothing dead-ended when the
-  // nav changed shape: a link written a month ago still lands where it always meant to.
-  if(SEG_OF[view]){ arg = SEG_OF[view]; view = 'rounds'; }
-  current = { view, arg };
-  let [title, tag] = TITLES[view] || TITLES.home;
-  // The Rounds masthead says which face you're on ‚Äî the tab is one place, the segments
-  // are three subjects, and the strapline is the only thing that can tell them apart.
-  if(view === 'rounds'){
-    const s = ROUND_SEGS.find(x => x.k === (arg || roundsSeg));
-    if(s) tag = s.tag;
-  }
-  if(view === 'sessions'){
-    if(arg === 'cumulative'){
-      title = 'Cumulative';
-      tag = 'The running picture. It moves when a day lands.';
-    } else {
-      title = 'Days';
-      tag = 'Every capture, newest first ‚Äî not split by type.';
-    }
-  }
-  $('#pageTitle').textContent = title;
-  $('#pageTag').textContent = tag;
-  // Standing over a shot, the app's own masthead is pure overhead ‚Äî the hole screen
-  // already says where he is. On that one view it shrinks to the theme toggle, which
-  // hands roughly a fifth of the phone back to the rows he is actually tapping.
-  document.body.classList.toggle('lvfocus',
-    view === 'live' && !!S.live && S.live.stage === 'play');
-  // The build chip, top right of Home. It reads BUILD out of the code that is actually
-  // executing, which is the only honest answer to "did the update land?" ‚Äî a published
-  // version is not the same claim as an installed one, and the two have disagreed twice
-  // now (a suspended PWA serving stale code in August, and a publish job that was
-  // cancelled before it ever reached the branch Pages serves).
-  const bt = $('#buildTag');
-  if(bt){ bt.textContent = BUILD; bt.hidden = view !== 'home'; }
-  // The four labs live behind one nav button, so they all light it ‚Äî and so does every
-  // view that hangs off Rounds: a round card, and a course plan you opened from one.
-  const NAV_OF = { sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
-                   drills:'coach', shelf:'coach', lesson:'coach', landed:'home', numbers:'home', timeline:'home',
-                   round:'rounds', rounds:'rounds' };
-  const navView = NAV_OF[view] || view;
-  document.querySelectorAll('#nav button').forEach(b =>
-    b.classList.toggle('on', b.dataset.view === navView));
-  // The tee button is both "start" and "resume" ‚Äî the same tap, because from the player's
-  // side it is the same intention and live() already knows which one it is.
-  const teeLab = $('#navTeeLab');
-  if(teeLab) teeLab.textContent = S.live ? 'RESUME' : 'TEE';
-  const R = { home, bag, game, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
-  // An in-place update must not close what he has open. Redrawing the view replaces the
-  // DOM, so any <details> he expanded snaps shut ‚Äî which on the drill bench meant logging
-  // a drill collapsed the drill you were reading. Same distinction as the scroll position:
-  // preserved on a rerender (an update), reset on a render (a navigation). Only sections
-  // carrying an id take part, so nothing else has to change.
-  // BOTH states are restored, not just the open ones (Aug 27 2026): a section that defaults
-  // open would otherwise spring back open on the next in-place update, so folding the
-  // scorecard away and then tapping anything else would undo the fold. The DOM is still the
-  // only store ‚Äî this reads the state off the elements that were on screen a moment ago and
-  // puts it back ‚Äî which is the whole reason this pattern needs no bookkeeping.
-  const was = keepScroll
-    ? [...$('#view').querySelectorAll('details[id]')].map(d => [d.id, d.open]) : [];
-  $('#view').innerHTML = R(arg);
-  was.forEach(([id, open]) => { const d = document.getElementById(id); if(d) d.open = open; });
-  buildJumpBar();
-  if(!keepScroll) window.scrollTo(0,0);
-}
-
-// Every view is a stack of <h2> sections, so the in-page nav is built from the
-// rendered DOM rather than hand-maintained in each of the thirteen views ‚Äî
-// add a section anywhere and it shows up here for free.
-function buildJumpBar(){
-  const view = $('#view');
-  if(!view) return;
-  const hs = [...view.querySelectorAll('h2')];
-  if(hs.length < 2) return;
-  const bar = document.createElement('div');
-  bar.className = 'jumpbar';
-  bar.setAttribute('role', 'navigation');
-  bar.setAttribute('aria-label', 'On this page');
-  hs.forEach((h, i) => {
-    h.id = h.id || `sec${i}`;
-    const b = document.createElement('button');
-    b.className = 'jump';
-    b.dataset.jump = h.id;
-    // Headings read "Scoring mix ¬∑ 45 holes" or "Shaft at the top (down-the-line)".
-    // Keep the half before the dot, drop a trailing parenthetical.
-    b.textContent = h.textContent.split('¬∑')[0].replace(/\s*\([^)]*\)\s*$/, '').trim();
-    bar.appendChild(b);
-  });
-  // Below the segmented control where there is one: the segments say WHICH LIST you are
-  // looking at and the jump bar says where you are in it, so they can't be reordered.
-  const seg = view.querySelector('.segbar');
-  if(seg) seg.after(bar); else view.prepend(bar);
-}
-let current = { view:'home' };
-// Redrawing the view you're already on is an UPDATE, not a navigation ‚Äî jumping to the
-// top on every tap made the live logger unusable, since scoring a hole meant scrolling
-// back down six times. Navigation (nav bar, links, back) still resets to the top.
-function rerender(){
-  const y = window.scrollY;
-  render(current.view, current.arg, true);
-  if(window.scrollY !== y) window.scrollTo(0, y);
-}
-
-// ----- Round prep: every course plan, kept -----
-// What's coming up first, then the standing course plans (they don't expire ‚Äî that's the
-// point of them), then the played ones as an archive. Lab routines (Swing Focus, Golf
-// Mind‚Ä¶) stay in their labs: a standing plan only counts as ROUND prep if its course is
-// one Jack actually has.
-function coursePlans(){
-  const t = today();
-  const known = [...S.courses.map(c => c.name), ...S.rounds.map(r => r.course)].filter(Boolean);
-  return {
-    up: S.briefings.filter(b => b.date && b.date >= t)
-      .sort((a, b) => (a.date || '').localeCompare(b.date || '')),
-    // Standing plans are sorted NEAREST FIRST once his phone has given up a location and
-    // the courses have one on file. It is the right order for the question this list gets
-    // asked ‚Äî which of these am I playing? ‚Äî and it is only ever a re-ordering: a plan
-    // with no coordinate keeps its place at the bottom rather than dropping off.
-    standing: byDistance(
-      S.briefings.filter(b => !b.date && b.course && known.some(n => courseMatches(b.course, n)))),
-    past: S.briefings.filter(b => b.date && b.date < t)
-      .sort((a, b) => (b.date || '').localeCompare(a.date || '')),
-  };
-}
-// Nulls last, and stable within each group ‚Äî Array.prototype.sort is stable, so plans
-// with no location on file stay in the order the feed put them in.
-function byDistance(list){
-  if(!S.here) return list;
-  return [...list].sort((a, b) => {
-    const x = courseMiles(a.course), y = courseMiles(b.course);
-    if(x == null && y == null) return 0;
-    if(x == null) return 1;
-    if(y == null) return -1;
-    return x - y;
-  });
-}
-function planRow(b){
-  const t = today();
-  const tag = !b.date ? 'standing plan' : b.date < t ? `played ¬∑ ${fmtDate(b.date)}` : fmtDate(b.date);
-  const holes = (b.holes || []).filter(h => h && (h.play || h.note || (h.why || []).length)).length;
-  const mi = courseMilesLab(b.course);
-  return `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-    <span><b>${esc(b.course)}</b>${mi ? `<span class="mi">${mi}</span>` : ''}<span class="sm faint"> ¬∑ ${tag}${holes ? ` ¬∑ ${holes} hole notes` : ''}</span><br>
-    <span class="sm clip2">${esc(b.focus || 'Briefing ready')}</span></span><span class="arr">‚Üí</span></div>`;
-}
-// The line under the standing plans. It has to say which order they are in, because a list
-// that silently re-sorted itself is worse than one that never did ‚Äî and where the sort
-// could not run, it has to say why rather than looking unsorted.
-function standingNote(list){
-  const base = "These don't expire ‚Äî course knowledge keeps. Each one's hole notes surface on that hole while you're logging a live round there.";
-  const placed = list.filter(b => courseGeo(b.course)).length;
-  if(!S.here) return `${base}<br><br>${list.length > 1 && placed
-    ? `<button class="btn ghost tiny" data-action="locate">Sort by distance</button> ‚Äî nearest first. Your location is used on this phone to do the arithmetic and is not sent anywhere.`
-    : ''}`;
-  const missing = list.length - placed;
-  return `${base}<br><br>Sorted <b>nearest first</b>, from your last location fix (${fmtDate(isoDay(new Date(S.here.ts)))}) ‚Äî straight-line miles to the course, not drive time.${
-    missing ? ` ${missing} plan${missing > 1 ? 's have' : ' has'} no location on file yet, so ${missing > 1 ? 'they sit' : 'it sits'} at the bottom.` : ''}`;
-}
-function preps(){
-  const p = coursePlans();
-  const block = (title, list, note) => !list.length ? '' : `
-    <h2>${title}</h2>
-    <div class="card">${list.map(planRow).join('')}
-      ${note ? `<p class="sm faint" style="margin-top:8px">${note}</p>` : ''}</div>`;
-  const any = p.up.length + p.standing.length + p.past.length;
-  // No back link: this is the Round prep SEGMENT of Rounds now (Aug 27 2026), not a page
-  // you arrived at from somewhere ‚Äî the segmented control above it is the way back out.
-  return `
-  ${any ? cheatBtn('prep') : ''}
-  ${!any ? `<div class="card"><p class="sm">No course plans yet. Tell Claude where you're playing and one lands here ‚Äî tee strategy, the holes that cost you, lay-up numbers off your ladder, and a note on every hole the research can support.</p></div>` : ''}
-  ${block('Coming up', p.up)}
-  ${block('Standing course plans', p.standing, standingNote(p.standing))}
-  ${block('Played', p.past, 'Kept for the next time you go back.')}`;
-}
-
-// One row of the to-do list, used open and done alike ‚Äî the done ones stay tappable so a
-// wrongly-ticked action can be brought back. The BOX is the only toggle: putting
-// `toggle-action` on the whole <li> meant expanding "the rest" also marked it done.
-const ACTION_LANES = {
-  PUTTING:'PUTTING', SWING:'SWING', 'SWING FILM':'SWING', EQUIPMENT:'EQUIPMENT',
-  DRIVER:'DRIVER', APPROACH:'APPROACH', MENTAL:'MENTAL', LASER:'LASER',
-  'SHORT GAME':'SHORT GAME', GRIP:'GRIP', TRACKMAN:'TRACKMAN', PATH:'PATH',
-  BAY:'BAY', FILM:'FILM', LOG:'LOG'
-};
-const ACTION_LANE_ORDER = ['SWING','DRIVER','APPROACH','SHORT GAME','PUTTING',
-  'EQUIPMENT','GRIP','TRACKMAN','LASER','MENTAL','PATH','BAY','FILM','LOG','OTHER'];
-
-function actionMostlyCaps(t){
-  const letters = String(t).replace(/[^A-Za-z]/g,'');
-  const caps = String(t).replace(/[^A-Z]/g,'');
-  return letters.length >= 6 && caps.length / letters.length >= 0.72;
-}
-
-// Title the row; the rest of a.text is one tap away. lead + rest reconstruct the body ‚Äî
-// nothing is dropped. Presentation only: do not rewrite action text in the feed for this.
-function actionTitle(body){
-  const s = String(body || '').trim();
-  if(!s) return ['',''];
-  const hits = [];
-  const p = /\.(?:\s|$)/.exec(s); if(p) hits.push([p.index, p.index + p[0].length]);
-  const c = s.indexOf(':'); if(c >= 0) hits.push([c, c + 1]);
-  const d = /\s[‚Äî‚Äì]\s/.exec(s); if(d) hits.push([d.index, d.index + d[0].length]);
-  hits.sort((a,b) => a[0] - b[0]);
-  if(hits.length && hits[0][0] <= 56){
-    const [i, j] = hits[0];
-    const head = s.slice(0, i).trim();
-    const rest = s.slice(j).trim();
-    const ch = s[i];
-    if(actionMostlyCaps(head) && head.length >= 6 && head.length <= 56) return [head, rest];
-    if(ch === ':' && head.length >= 3) return [head, rest];
-    if(/[‚Äî‚Äì]/.test(s.slice(i, j)) && head.length >= 8 && head.length <= 48) return [head, rest];
-  }
-  const comma = s.match(/^(.{6,48}?),(\s+)([a-z])/);
-  if(comma && actionMostlyCaps(comma[1])) return [comma[1].trim(), s.slice(comma[1].length + 1).trim()];
-  const sent = s.match(/^(.{12,56}?[.!?])(\s|$)/);
-  if(sent) return [sent[1].replace(/[.!?]+$/,'').trim(), s.slice(sent[1].length).trim()];
-  if(s.length > 52){
-    const cut = s.slice(0, 52).replace(/\s+\S*$/, '');
-    return [cut + '‚Ä¶', s.slice(cut.length).trim()];
-  }
-  return [s, ''];
-}
-
-function actionShape(a){
-  const raw = String(a.text || '').trim();
-  let lane = '', body = raw;
-  const m = raw.match(/^([A-Z][A-Z0-9 /&]{1,22})\s*[‚Äî‚Äì]\s*([\s\S]+)$/);
-  if(m){
-    const key = m[1].replace(/\s+/g, ' ').trim();
-    if(ACTION_LANES[key]){ lane = ACTION_LANES[key]; body = m[2].trim(); }
-  }
-  let [title, rest] = actionTitle(body);
-  title = title.replace(/\s+/g, ' ').replace(/^[‚Äî‚Äì\s-]+|[‚Äî‚Äì\s-]+$/g, '');
-  if(title.length > 56){
-    rest = rest || body;
-    title = title.slice(0, 54).replace(/\s+\S*$/, '') + '‚Ä¶';
-  }
-  if(!title) title = body.slice(0, 52) || 'Action';
-  return { lane, title, rest, id:a.id, pri:!!a.pri, done:!!a.done };
-}
-
-const actionLi = a => {
-  const s = actionShape(a);
-  const chips = `${s.lane ? `<span class="actlane">${esc(s.lane)}</span>` : ''}${
-    a.pri && !a.done ? '<span class="pri">HIGH</span>' : ''}`;
-  const head = `<b class="actt">${esc(s.title)}</b>${chips}`;
-  const body = s.rest
-    ? `<details class="actd" id="act-rest-${esc(a.id)}"><summary>${head}</summary>${prose(s.rest, 'sm')}</details>`
-    : `<div class="acth">${head}</div>`;
-  return `<li class="${a.done ? 'done' : ''}">
-    <span class="box" data-action="toggle-action" data-id="${esc(a.id)}" role="checkbox" aria-checked="${a.done ? 'true' : 'false'}"></span>
-    <div class="actb">${body}</div>
-  </li>`;
-};
-
-function actionList(items){
-  return `<ul class="check">${items.map(actionLi).join('')}</ul>`;
-}
-
-function actionLaneRank(a){
-  const i = ACTION_LANE_ORDER.indexOf(actionShape(a).lane || 'OTHER');
-  return i < 0 ? 99 : i;
-}
-
-function actionBoard(open){
-  if(!open.length){
-    return '<p class="sm">Nothing open. Log a round or send Claude some film and the next things to do land here.</p>';
-  }
-  const high = open.filter(a => a.pri).slice().sort((a,b) => actionLaneRank(a) - actionLaneRank(b));
-  const rest = open.filter(a => !a.pri);
-  const by = {};
-  rest.forEach(a => {
-    const k = actionShape(a).lane || 'OTHER';
-    (by[k] || (by[k] = [])).push(a);
-  });
-  const parts = [];
-  if(high.length) parts.push(`<p class="actlab">High ¬∑ ${high.length}</p>${actionList(high)}`);
-  ACTION_LANE_ORDER.forEach(l => {
-    if(!by[l]) return;
-    parts.push(fold('act-lane-' + l.toLowerCase().replace(/\s+/g, '-'), l, String(by[l].length), actionList(by[l]), false));
-  });
-  Object.keys(by).forEach(l => {
-    if(ACTION_LANE_ORDER.includes(l)) return;
-    parts.push(fold('act-lane-' + l.toLowerCase().replace(/\s+/g, '-'), l, String(by[l].length), actionList(by[l]), false));
-  });
-  return parts.join('');
-}
-
-// The type column: three-to-six mono characters saying what KIND of change a row is,
-// tinted by the strength of the evidence behind that kind ‚Äî burgundy for a measurement or
-// a scorecard read off the real card, green for a round he played, green accent for the
-// coaching library, gold for a number nobody measured, neutral ink for everything else.
-// It is presentation metadata over the feed's own `type`, which is why it lives here and
-// not in the feed: a tint is a reading of the entry, and the entry is the record.
-// A type with no row falls through to a neutral UPDATE ‚Äî the same forward-compatibility
-// rule updateLine() follows, so a new feed type can never render as a blank column.
-const UP_TYPE = {
-  session:['FILM','u-m'], 'session-update':['FILM','u-m'], 'session-remove':['FILM','u-m'],
-  evolution:['GRID','u-m'], faults:['FAULT','u-m'], test:['TEST','u-m'], layout:['CARD','u-m'],
-  bay:['BAY','u-m'], 'bay-update':['BAY','u-m'], 'bay-remove':['BAY','u-m'],
-  combine:['COMBINE','u-m'], 'combine-remove':['COMBINE','u-m'],
-  round:['ROUND','u-l'], 'round-update':['ROUND','u-l'],
-  'lesson-add':['LESSON','u-k'], 'lesson-update':['LESSON','u-k'], 'lesson-remove':['LESSON','u-k'],
-  kit:['KIT','u-k'],
-  stats:['GHIN','u-u'], carries:['CARRY','u-u'], 'carry-update':['CARRY','u-u'],
-  'club-add':['BAG',''], 'club-update':['BAG',''], history:['BAG',''], 'history-edit':['BAG',''],
-  briefing:['PLAN',''], 'briefing-remove':['PLAN',''],
-  action:['TO-DO',''], 'action-done':['TO-DO',''], 'action-update':['TO-DO',''],
-  'course-add':['COURSE',''], 'course-remove':['COURSE',''], geo:['GEO',''],
-  debrief:['DEBRIEF',''], 'debrief-update':['DEBRIEF',''],
-  shortlist:['PUTTER',''], deadline:['WINDOW',''], build:['BUILD',''],
-  profile:['PLAYER','u-u'],
-};
-const upType = t => { const r = UP_TYPE[t] || ['UPDATE','']; return { l:r[0], c:r[1] }; };
-
-// ----- What's landed -----
-// Everything that has changed, newest first, in one place ‚Äî Jack asked for it on Home
-// under the coach tip. Two streams merge here: the coach feed (data ‚Äî plans, bag changes,
-// rounds, lessons) and RELEASES (the app itself, which the feed cannot carry). Grouped by
-// the day the change was made, so it reads as a log rather than a list.
-//
-// It renders in TWO places, and the split is Jack's (Aug 30 2026): the whole log on Today
-// ran to a hundred-odd rows, so the page you open every morning was mostly an archive of
-// changes you had already read. Today now carries the LATEST DAY only ‚Äî what actually
-// landed ‚Äî and the rest is one tap away on its own page. Nothing was cut; the block that
-// answers "what is different since yesterday" stopped also being the block that answers
-// "everything that has ever changed", because those are two different questions and only
-// the first one belongs on a home page.
-//
-// A row is tappable wherever the change has somewhere to be looked at, which is the point
-// of the block: it is a table of contents for what is different, not a substitute for it.
-
-// The days, newest first, with a day's duplicate headlines collapsed. Shared by both
-// renderers so the two can never disagree about what landed or when.
-function upDays(){
-  const rows = [];
-  (S.updates || []).forEach(u => rows.push({ d:u.d, k:u.id, t:u.t, h:u.h, s:u.s, act:u.act }));
-  // One row per RELEASE, not per note: three sentences of release copy set as three
-  // headlines shouts over the data changes around it, and a build is one event anyway.
-  RELEASES.forEach(r => rows.push({ d:r.d, k:`build:${r.b}`, t:'build', h:'The app updated',
-    b:r.b, items:r.items, s:'', act:null }));
-  // Stable sort on the date alone, so within one day the feed's own order survives and
-  // the app notes sit under the data changes they shipped alongside.
-  rows.sort((a, b) => (b.d || '').localeCompare(a.d || ''));
-  const days = [];
-  rows.forEach(r => {
-    const last = days[days.length - 1];
-    if(last && last.d === r.d) last.rows.push(r); else days.push({ d:r.d, rows:[r] });
-  });
-  // Three pushes to one plan on one day is one change to that plan, not three ‚Äî the feed
-  // is append-only and versions a plan by re-sending it, which is right for the data and
-  // pure noise in a changelog. Collapse them onto the newest, keep the count, and carry
-  // every merged id so the row is fresh if ANY of them is and all of them are marked seen.
-  // `recordUpdate()` UNSHIFTS, so `S.updates` ‚Äî and therefore every day here ‚Äî is already
-  // newest first. Keeping the first row hit for a headline is keeping the NEWEST push of
-  // that day, which is the one still true: three versions of a plan collapse onto v3, and
-  // a ladder row removed and re-added a few yards down the bag reads as the re-add rather
-  // than as having dropped out of the ladder. Do not "fix" this to keep the last one.
-  days.forEach(day => {
-    const byHead = new Map();
-    day.rows.forEach(r => {
-      const hit = byHead.get(r.h);
-      if(hit){ hit.n++; hit.keys.push(r.k); }
-      else byHead.set(r.h, Object.assign(r, { n:1, keys:[r.k] }));
-    });
-    day.rows = [...byHead.values()];
-  });
-  return days;
-}
-const upFresh = (days, seen) => days.reduce((a, day) =>
-  a + day.rows.filter(r => !r.keys.every(k => seen.has(k))).length, 0);
-
-// Mark seen only what was actually put on the screen. Today shows one day, so marking the
-// whole log read there would retire the "N new" flag on rows he has never been shown ‚Äî
-// the count is only worth anything if it means what it says. Additive, then pruned to
-// what is still on the list, so the set can't grow forever either.
-function upMarkSeen(days, shown){
-  // Boot renders Home before the feed has been fetched, so on the very first open after an
-  // upgrade this runs with nothing in the log yet. Marking seen there would consume this
-  // build's release notes in the same paint that introduced them, a second before the feed
-  // lands and redraws. So the first render is read-only and the one after it does the work.
-  if(!S.updatesInit) return;
-  const seen = new Set(S.settings.seenUpdates || []);
-  const now = new Set(shown.flatMap(day => day.rows.flatMap(r => r.keys)));
-  const next = days.flatMap(day => day.rows.flatMap(r => r.keys))
-    .filter(k => seen.has(k) || now.has(k));
-  if(next.length !== seen.size || next.some(k => !seen.has(k))){
-    S.settings.seenUpdates = next;
-    save();
-  }
-}
-
-const upAttrs = a => !a ? '' :
-  ` data-action="${a.a}"${a.v ? ` data-view="${a.v}"` : ''}${a.id ? ` data-id="${esc(a.id)}"` : ''}`;
-function upRows(day, seen){
-  return `<div class="upday"><div>${day.rows.map(r => { const ty = upType(r.t);
-    return `<div class="uprow${r.keys.every(k => seen.has(k)) ? '' : ' fresh'}${
-    r.act ? ' opens' : ''}"${upAttrs(r.act)}>
-    <div class="upt ${ty.c}">${esc(ty.l)}</div>
-    <div class="upm">
-      <div class="uph">${esc(r.h)}${r.b ? `<span class="upb">${esc(r.b)}</span>` : ''}${
-        r.n > 1 ? `<span class="upn">${r.n} updates</span>` : ''}</div>
-      ${r.s ? `<div class="ups">${esc(r.s)}</div>` : ''}
-      ${r.items ? `<ul class="upli">${r.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
-    </div>
-    <div class="upd">${fmtDate(day.d)}${r.act ? '<span class="arr">‚Üí</span>' : ''}</div>
-  </div>`; }).join('')}</div></div>`;
-}
-
-// Today's card: the latest day that has anything on it, and a way to the rest.
-function whatsNew(){
-  const days = upDays();
-  if(!days.length) return '';
-  const seen = new Set(S.settings.seenUpdates || []);
-  const day = days[0];
-  const rest = days.slice(1);
-  const fresh = upFresh([day], seen), restFresh = upFresh(rest, seen);
-  const restN = rest.reduce((a, d) => a + d.rows.length, 0);
-  upMarkSeen(days, [day]);
-  const n = day.rows.length;
-  const body = `
-    <p class="sm faint" style="margin:0 0 8px">${
-      day.d === today() ? 'Landed today' : `Nothing since ${fmtDate(day.d)} ‚Äî that day‚Äôs changes`}.</p>
-    ${upRows(day, seen)}
-    ${restN ? `<p class="sm" style="margin-top:10px"><button class="btn ghost tiny" data-action="go" data-view="landed">See everything that‚Äôs landed ‚Üí</button>
-      <span class="faint" style="margin-left:8px">${restN} more change${restN === 1 ? '' : 's'}${
-        restFresh ? ` ¬∑ ${restFresh} you haven‚Äôt seen` : ''}</span></p>` : ''}`;
-  return `<div class="card">${fold('fold-landed', "What's landed",
-    `${fresh ? fresh + ' new ¬∑ ' : ''}${n} change${n === 1 ? '' : 's'}`, body)}</div>`;
-}
-
-// The whole log, on its own page. Same rows, every day ‚Äî this is the archive Today used
-// to be, and the only place the seen-flag on an older row is allowed to be cleared.
-function landed(){
-  const days = upDays();
-  const seen = new Set(S.settings.seenUpdates || []);
-  const fresh = upFresh(days, seen);
-  upMarkSeen(days, days);
-  const n = days.reduce((a, d) => a + d.rows.length, 0);
-  if(!n) return `<button class="backlink" data-action="go" data-view="home">‚Üê Today</button>
-    <div class="card"><p class="sm faint">Nothing has landed yet. Changes show up here the moment they reach your phone.</p></div>`;
-  return `<button class="backlink" data-action="go" data-view="home">‚Üê Today</button>
-  <div class="card">
-    <h2>Everything that‚Äôs landed</h2>
-    ${fresh ? `<p class="sm"><b class="warn">${fresh} new</b> since you last opened this page.</p>` : ''}
-    ${days.map(day => upRows(day, seen)).join('')}
-    <p class="sm faint" style="margin-top:10px">Every change Claude has pushed, newest first ‚Äî plans, bag changes, rounds, lessons and coaching, plus what changed in the app itself. Tap any row to open what it changed. Dated by the day the change was made. Older entries drop off the bottom once there are ${UPDATE_CAP}; nothing is lost ‚Äî the change itself lives in the bag, the plan or the card it landed on.</p>
-  </div>`;
-}
-
-// ----- Today: the three blocks above the existing page (Aug 27 2026, Jack's redesign) -----
-// Conditions, the one thing, and the way onto the tee. Everything below them ‚Äî the stat
-// row, round prep, the numbers, the coach tip, the changelog, the return window and the
-// data links ‚Äî keeps the order it already had.
-//
-// AUG 30 2026, Jack's call: THE NUMBERS AND THE ONE THING SWAPPED PLACES. The four chart
-// tiles now sit directly under the weather and the focus sits below Round prep, next to
-// the coach tip it belongs with. oneThing() is unchanged and still renders coachFocus()
-// over coachSignals() ‚Äî the same pick Coach leads with ‚Äî so this is purely where it sits
-// on the page, not a change to what the page claims or in what order it decides it.
-
-// The weather, at arm's length in sun: the temperature at display size, the reading under
-// it, and the only thing the weather actually changes about his golf in a mono block on
-// the right. The arithmetic is playsFactor()'s and is unchanged ‚Äî roughly 1% of carry per
-// 10¬∞F below 70 ‚Äî and it is TEMPERATURE ONLY, which the card says out loud rather than
-// letting a wind reading sitting beside it imply otherwise. A stale reading is shown as
-// stale instead of being quietly recomputed: playsFactor() returns null past three hours.
-// The reading follows his SAVED fix, not him ‚Äî see fetchWeather(). That is invisible and
-// harmless while the fix is today's, and worth naming the moment it isn't: a temperature
-// pulled at yesterday's spot is a different claim from one pulled where he is standing.
-const hereOld = () => !!S.here && isoDay(new Date(S.here.ts)) !== today();
-function wxCard(){
-  const wx = S.weather, f = playsFactor();
-  const mins = wx ? Math.round((Date.now() - wx.ts) / 60000) : null;
-  const ago = mins == null ? '' : mins < 60 ? `${mins} min ago`
-    : `${Math.round(mins / 60)}h ago`;
-  if(!wx) return `<div class="wx" data-action="get-weather">
-    <div><div class="wxt">‚Äî¬∞</div><div class="wxc">Tap to load the conditions where you are</div></div>
-    <div class="wxr"><b>Plays like</b><span>needs a location fix</span></div></div>`;
-  const p150 = f ? Math.round(150 / f) : null;
-  const d = p150 == null ? null : p150 - 150;
-  return `<div class="wx" data-action="get-weather">
-    <div><div class="wxt">${WX_ICON(wx.code)} ${Math.round(wx.t)}¬∞</div>
-      <div class="wxc">Wind ${Math.round(wx.wind)} mph ¬∑ ${esc(ago)} ¬∑ ${
-        // ONE HINT, NOT TWO. Naming the fix's day AND keeping "tap to refresh" ran the line
-        // to three lines on a 13 mini and put the block 2px past the tab bar ‚Äî the tightest
-        // viewport has 3px of headroom, so this caption has no room to grow. They are also
-        // the wrong pair: once the fix is yesterday's, re-reading the weather at yesterday's
-        // spot is not the useful tap, and `moved?` is. So the slot swaps rather than adding.
-        hereOld() ? `${esc(fmtDate(isoDay(new Date(S.here.ts))))} fix` : 'tap to refresh'
-      } ¬∑ <span class="wxgo" data-action="relocate">moved?</span></div></div>
-    <div class="wxr"><b>Plays like</b>${f
-      ? `<span>150 ‚Üí <i>${p150}</i></span>
-         <span>${d === 0 ? 'no change at 150' : `${d > 0 ? '+' : ''}${d} yds ¬∑ ${Math.round(wx.t)}¬∞F air`}</span>
-         <span class="wxn">Temperature only ‚Äî the wind is not in this number.</span>`
-      : `<span>reading is over 3h old</span><span class="wxn">Tap to refresh and the carry effect comes back.</span>`}</div>
-  </div>`;
-}
-
-// The one thing. Not a list ‚Äî the single finding the ranked board leads with, which is the
-// same pick Coach makes (coachFocus over coachSignals), so the top of Today can never
-// quietly outrank the rest of the app. It carries its own tier: the 4px rail down the
-// side, and a tappable chip that opens what the claim is actually standing on.
-function oneThing(){
-  const f = coachFocus(coachSignals());
-  if(!f) return '';
-  const L = f.link;
-  return `<div class="card one${rail(f.ev)}">
-    ${evDrawer('ev-onething', 'The one thing', f.ev, f.src)}
-    <div class="oneh">${f.h}</div>
-    ${expandable(f.b)}
-    ${L ? `<div class="linkrow" data-action="${L.a}"${L.view ? ` data-view="${L.view}"` : ''}${
-      L.id ? ` data-id="${esc(L.id)}"` : ''}><span class="sm"><b>${esc(L.lab)}</b></span><span class="arr">‚Üí</span></div>` : ''}
-  </div>`;
-}
-
-// ----- Today: The numbers (Aug 30 2026, Jack's call) -----
-// EVERYTHING Today counts, in one block. A thin row of four ‚Äî handicap, courses, and the two
-// recovery numbers ‚Äî over four tiles, in the order a hole is played: the score, then off the
-// tee, then into the green, then on it. They were three separate blocks with the start button
-// in between; one heading over both is what Jack asked for and it reads as one subject.
-//
-// SCRAMBLE AND UP & DOWN ARE A PAIR, and the footnote says so because the words do not.
-// Jack's definitions, in his own words: "up and down is near green, scramble is errant drive
-// safe percentage." So they are the same question asked about two different mistakes ‚Äî did
-// you save the hole from off the FAIRWAY, and did you save it from off the GREEN. Note his
-// `scramble` is NOT the standard golf usage, which is up-and-down; that is exactly why the
-// line under the row spells both out rather than trusting the labels to carry it.
-//
-// THE BLOCK SAYS WHICH CARDS IT READ, and that line is not decoration. `areaCards()` flips
-// the whole sample from every card to the LIVE cards ONLY the moment 18 live holes exist ‚Äî
-// so finishing one round he logged himself moves every number here at once, by design. Coach
-// has always announced that; Today did not, and shipping these numbers without it is exactly
-// how Jack came to ask why they had all changed since the last update. A number that moves
-// for a good reason still has to say what the reason was.
-//
-// A tile may carry a SECOND, smaller number (`.sv`) that qualifies its headline one ‚Äî the
-// estimated index under the handicap, bogey-saves under scramble. That is Jack's fix for the
-// two-handicaps problem and it generalises: `handicap` and `est. index` are two readings of
-// one thing, and as equal tiles they read as a contradiction rather than as a figure and the
-// app's own estimate of it. Subordinating one says which is which in a way no amount of
-// prose underneath can. So a qualifying number belongs in the tile, small; the paragraph
-// below is for what a number MEANS, not for more numbers. Three of them are `gameAreas()` read through `areaCards()` ‚Äî the SAME
-// reader and the same card set Coach uses, so the front page and the coach can never quote
-// different fairway percentages at each other. Nothing here counts a hole for itself.
-//
-// What it replaced, and why, because both were live for weeks before anyone looked:
-//   ¬∑ 5-FT MAKES read "‚Äî ¬∑ needs 2+ entries" ‚Äî a mat test he has run once, so the tile that
-//     led the page had never shown a number. The putting tile answers what it was reaching
-//     for and does it off rounds he actually played.
-//   ¬∑ CARRY LADDER was a yardage, not a result: the top of the ladder is a fact about the
-//     bag, it lives on Bag, and it does not move between rounds.
-//   ¬∑ CONDITIONS was the weather card immediately above it, said again and smaller. Jack
-//     spotted it the moment the swap put the two next to each other, which is the useful
-//     lesson: a duplicate is invisible until the two copies are adjacent.
-//
-// A tile with no data renders a dash and says what would fill it ‚Äî never a zero, and never
-// a hidden tile, for the same reason `sortCourses()` puts nulls last: absent and zero are
-// different claims.
-// The label comes from AREA_LAB and the value line is formatted exactly as Coach formats
-// it, deliberately: these are the same three numbers in two places, and a tile calling it
-// "Greens hit" while Coach calls the identical figure "Irons" is how one number quietly
-// becomes two. One vocabulary, one reader, one card set.
-// `aside` is an optional block for the tile's top-right corner ‚Äî the space beside the
-// label and the headline number, which every tile has and none was using (Jack, Sep 8
-// 2026, pointing at it: "where I put the red line we can putt make stats"). It is free
-// height: the corner is already as tall as the label, the number and its caption, so
-// anything up to about three lines costs the numbers block nothing, and that block ends
-// 3px above the tab bar on a 13 mini. Anything taller belongs in a row instead.
-function numTile(lab, view, a, empty, extra, aside){
-  const head = `<div class="lab">${esc(lab)}</div>
-    ${a ? `<div class="big">${esc(a.v)}</div>
-           <div class="sub">${esc(a.u)}${a.raw ? ` ¬∑ ${esc(a.raw)}` : ''}</div>`
-        : `<div class="big faint">‚Äî</div><div class="sub">${esc(empty)}</div>`}`;
-  return `<div class="charttile opens" data-action="go" data-view="${view}">
-    ${aside ? `<div class="ptop"><div class="pleft">${head}</div>${aside}</div>` : head}
-    ${a ? (extra || '') : ''}
-  </div>`;
-}
-// The ranges he has actually holed from, in the corner. Makes only, and it can never become
-// a make rate: that needs putts he MISSED with a distance on them, which died with the
-// first-putt field on Sep 8 ‚Äî see *Putting by distance*. A range with nothing in it does not
-// render, the same rule the approach buckets follow, so this is as long as his record is.
-function puttMadeAside(st){
-  const made = puttRows(st.putts.dist).filter(e => e.made);
-  if(!made.length) return '';
-  return `<div class="pmade">
-    <div class="pml">Made from</div>
-    ${made.map(e => `<div class="pmr"><span>${esc(PD[e.k].lab)}</span><b>${e.made}</b></div>`).join('')}
-  </div>`;
-}
-
-// Which club found the fairway, in the room the Off-the-tee tile already had (Jack's ask,
-// Aug 30 2026): "we should add by club so we can see my driver percentage, 2 iron, any club
-// I'm hitting on par 4 or par 5s ‚Äî not par three clubs, those are in greens hit."
-//
-// That exclusion is free rather than a filter: `fwN` only counts a hole that recorded a
-// fairway, and `fw` is omitted on par 3s by design (a par 3 has no fairway to hit, and its
-// tee shot IS the approach). So a club used only off par 3s has `fwN === 0` and never
-// appears here ‚Äî which is the rule he stated, enforced by the shape of the data.
-//
-// Read straight off `scoreStats()`'s `tee` map, the same one the full table on Rounds uses,
-// so the tile and that table can never disagree about a club. Capped at four: the tile is a
-// glance, and the tile itself opens the full table.
-// Greens hit split by what was in his hands (Jack's ask, Aug 30 2026).
-//
-// THE UNION IS THE POINT. A shot at a green lives in one of two maps: `app` carries the
-// approach on a par 4 or 5, and `tee` carries a par 3 ‚Äî where `TEE_OWNS` hands the green to
-// the tee club, because there the tee shot IS the approach. Reading only `app` would silently
-// drop every par 3, which is the half of this he asked to see counted here. Nothing is double
-// counted: a tee entry only earns `girN` when the hole is a par 3.
-//
-// THE PW SITS WITH THE IRONS ‚Äî Jack's call, asked rather than guessed, because it is genuinely
-// ambiguous: it is part of the KING TEC 4‚ÄìPW set AND it anchors the wedge ladder at 44¬∞. The
-// wrong choice here would have looked exactly as authoritative as the right one.
-//
-// FOUR BUCKETS IN CLUB ORDER, Jack's split: woods ¬∑ 2i‚Äì5i ¬∑ 6i‚ÄìPW ¬∑ 50‚Äì60¬∞. Long and short
-// irons are separated because they are not the same shot ‚Äî a 4-iron from 200 and a 9-iron from
-// 140 have no business sharing a hit rate, and lumping them hid exactly the comparison the row
-// exists to make. Labelled by RANGE rather than "Irons"/"Wedges" so they read as a breakdown
-// of the tile above rather than as a competing name for it.
-//
-// The PW sits with the SHORT irons (`6i‚ÄìPW`) ‚Äî Jack's call, and the same one he made when
-// asked directly: grouped with the irons, not the wedges.
-const APPROACH_GROUP = k => {
-  if(/wedge$/.test(k)) return 'w';
-  const m = /^(\d+)-iron$/.exec(k);
-  if(m) return +m[1] <= 5 ? 'l' : 's';
-  return k === 'pw' ? 's' : 'x';
-};
-const APPROACH_LAB = { x:'Woods', l:'2i‚Äì5i', s:'6i‚ÄìPW', w:'50‚Äì60¬∞' };
-// Longest club to shortest, always ‚Äî a fixed ladder like PUTT_DIST, never sorted by volume.
-const APPROACH_ORDER = ['x', 'l', 's', 'w'];
-// The putting breakdown: how many putts a hole takes, and how long the ones he holes are
-// (Jack's ask, Sep 8 2026 ‚Äî "1 putt 2 putt 3 putt %s and make distances if possible").
-//
-// IT REPLACED A NUMBER THAT READ 100%. The tile led with the share of lags finishing inside
-// three feet, and on his first two live rounds that came out 15 of 15 ‚Äî because 12 of those
-// 15 second putts were CONCEDED, and a conceded putt is inside gimme range by definition.
-// The figure was arithmetically right and told him nothing: it measured how freely his
-// partners give short ones at least as much as how well he lags. A rate that can only come
-// out near 100% is not a measurement, and the fix was not to weight it ‚Äî it was to lead
-// with the counts, which are unambiguous, always available, and move with every hole.
-//
-// FOUR ROWS, AND THAT IS THE WHOLE BUDGET. The numbers block is sized to fit above the fold
-// (see *The numbers on Today*), the two bottom tiles share a grid row so the taller one sets
-// its height, and Into the green already runs to four. Each extra line costs about 18px of
-// the block, and the 13 mini ‚Äî the tightest viewport ‚Äî had 8px of headroom to give. The
-// first version of this had eight rows and put the block 28-63px past the nav on every
-// phone. So the counts get three rows and the make distances get ONE: the longest he holed,
-// which is the same fact `madeFrom()` calls out on the round card, in the same words. The
-// full distribution lives there and in Putting ¬∑ by distance on Rounds, where there is room
-// for it.
-//
-// The rows are a share of HOLES PLAYED, not of holes he putted on, so a hole he chipped in
-// is correctly none of the three and the three need not sum to 100. Chip-ins are named in
-// the read line rather than given a fourth row ‚Äî a row that only sometimes exists would
-// spend the budget the make distance is using.
-function puttMadeRows(st){
-  const P = st.putts;
-  if(!P.holes) return '';
-  const pc = n => `${Math.round(n / P.holes * 100)}%`;
-  // WHAT SHARE OF HIS MAKES WERE GIVEN ‚Äî and the denominator is the whole point.
-  //
-  // `known` is holes whose ending is ON THE CARD: he tapped a made distance, or he tapped
-  // Given. It is NOT `P.holes`. Jack, approving this: "First live round didn't have putts
-  // made tracking I don't think. Don't let that ruin the stats." He is right, and it would
-  // have: a round logged before he was tapping either chip records putt COUNTS and nothing
-  // about how the hole ended, so measuring against every hole played would quietly file
-  // eighteen unrecorded holes as concessions and print a number far too high.
-  //
-  // Both halves therefore come off the same population, which is the rule the 171% bug
-  // bought (see *Putting by distance*): a hole reaches this row by carrying evidence, never
-  // by failing to. A round that recorded no endings contributes nothing and cannot move it.
-  const given = P.gim + P.lagIn, known = P.distN + given;
-  return `<div class="tclub">
-    ${[['1-putt', P.one], ['2-putt', P.two], ['3+ putts', P.three]].map(([lab, n]) => `<div class="tcr">
-      <span class="tcn">${esc(lab)}</span>
-      <span class="tcv">${pc(n)}</span>
-      <span class="tcf">${n}/${P.holes}</span></div>`).join('')}
-    ${known ? `<div class="tcr">
-      <span class="tcn">Given</span>
-      <span class="tcv">${Math.round(given / known * 100)}%</span>
-      <span class="tcf">${given}/${known}</span></div>`
-      // The empty state is still an instruction rather than a blank ‚Äî but it takes the SAME
-      // one line the row it becomes will take. A wrapping `.tcnote` here ran to three lines
-      // and made the no-data case the tallest one on the page, which is how a tile with
-      // nothing in it ends up pushing the block past the tab bar.
-      : `<div class="tcr"><span class="tcn">Putts made ¬∑ tap them in</span>
-      <span class="tcv">‚Äî</span></div>`}
-  </div>`;
-}
-function greenClubRows(st){
-  const g = Object.fromEntries(APPROACH_ORDER.map(k => [k, { n:0, hit:0 }]));
-  [...st.app.values(), ...st.tee.values()].forEach(e => {
-    if(!e.girN) return;
-    const b = g[APPROACH_GROUP(e.key)];
-    b.n += e.girN; b.hit += e.girHit;
-  });
-  const rows = APPROACH_ORDER.filter(k => g[k].n);
-  if(rows.length < 2) return '';   // one bucket is not a split, it is the headline again
-  return `<div class="tclub">${rows.map(k => `<div class="tcr">
-    <span class="tcn">${esc(APPROACH_LAB[k])}</span>
-    <span class="tcv">${Math.round(g[k].hit / g[k].n * 100)}%</span>
-    <span class="tcf">${g[k].hit}/${g[k].n}</span></div>`).join('')}</div>`;
-}
-function teeClubRows(st){
-  const rows = [...st.tee.values()].filter(e => e.fwN)
-    .sort((a, b) => b.fwN - a.fwN || b.fwHit - a.fwHit).slice(0, 4);
-  // One club is not a split ‚Äî it would restate the headline underneath itself. Same guard
-  // the greens breakdown uses.
-  if(rows.length < 2) return '';
-  return `<div class="tclub">${rows.map(e => `<div class="tcr">
-    <span class="tcn">${esc(clubName(e.key))}</span>
-    <span class="tcv">${Math.round(e.fwHit / e.fwN * 100)}%</span>
-    <span class="tcf">${e.fwHit}/${e.fwN}</span></div>`).join('')}</div>`;
-}
-function theNumbers(){
-  const C = areaCards();
-  const { areas: A, st, sg } = gameAreas(C.cards);
-  const scored = realRounds().filter(r => r.score);
-  const last = scored.slice(-1)[0];
-  const simFull = S.rounds.filter(r => r.sim && r.holes?.length === 18 && Number.isFinite(r.score));
-  const latestSim = simFull.slice(-1)[0]; // most recently added full simulator card; play date may be unknown
-  const idx = estIndex();
-  const miss = st.fw.n - st.fw.hit;
-  const pc = (n, d) => d ? Math.round(n / d * 100) + '%' : '‚Äî';
-  return `
-  <section class="nums">
-  <h2>The numbers</h2>
-  <div class="rowgrid">
-    ${(() => {
-      const list = S.courses.filter(c => !c.bucket), n = coursesWithCards(list);
-      // The band is the link: the big number is his list, the small one is how much of it
-      // this app has a card for ‚Äî which moves the first time he logs a round somewhere new.
-      return `<div class="stat opens" data-action="go" data-view="rounds" data-seg="courses">
-        <div class="v">${list.length}</div><div class="l">Courses</div>${
-        // Short enough not to wrap at 320px, where a second line in one tile pushes the
-        // whole numbers block past the fold ‚Äî the row is only as short as its tallest card.
-        n ? `<div class="sv">${n} logged</div>` : ''}</div>`;
-    })()}
-    <div class="stat"><div class="v">${esc(S.profile.handicap)}${meaningBtn('handicap')}</div><div class="l">Handicap ${provBadge(provOfProfile())}</div>${
-      // The small number is the app's own estimate off his cards, and when there isn't one
-      // the band says how far off it is rather than going blank ‚Äî a tile that silently
-      // drops a row is how "why has this never moved" becomes a question he has to ask.
-      idx != null ? `<div class="sv">${idx.toFixed(1)} est.</div>`
-        : `<div class="sv">${indexBasis().n} of 3 rated</div>`}</div>
-    <div class="stat"><div class="v">${pc(st.fw.saved, miss)}</div><div class="l">Scramble</div>${
-      miss ? `<div class="sv">${pc(st.fw.bogey, miss)} bogey</div>` : ''}</div>
-    <div class="stat"><div class="v">${A.short ? esc(A.short.v) : '‚Äî'}</div><div class="l">Up &amp; down</div>${
-      sg.chances ? `<div class="sv">${pc(sg.bogey, sg.chances)} up &amp; 2</div>` : ''}</div>
-  </div>
-  <div class="rowgrid g2">
-    <div class="charttile opens" data-action="go" data-view="rounds" data-seg="cards">
-      <div class="lab">Round scores</div>
-      <div class="scorepair"><div class="big">${last ? esc(last.score) : '<span class="faint">‚Äî</span>'}</div>
-      <div class="simscore" title="Latest added full simulator score; ${simFull.length} full rounds" aria-label="Simulator: latest added full round ${latestSim ? esc(latestSim.score) : 'unavailable'}; ${simFull.length} full rounds">SIM <b>${latestSim ? esc(latestSim.score) : '‚Äî'}</b> ¬∑ ${simFull.length}</div></div>
-      <div class="sub">On-course ¬∑ ${realRounds().length} logged</div>
-      <div class="trend" style="color:var(--btext)">${spark(scored.map(r => r.score), 24)}</div></div>
-    ${numTile(AREA_LAB.tee, 'rounds', A.tee, 'no tee shots logged yet', teeClubRows(st))}
-    ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet', greenClubRows(st))}
-    ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet', puttMadeRows(st), puttMadeAside(st))}
-  </div>
-  <p class="sm faint" style="margin-top:8px">${C.cards.length ? `<b>Read off ${
-    C.ev === 'live'
-      ? `your ${C.liveCards.length} live round${C.liveCards.length === 1 ? '' : 's'} ‚Äî ${C.liveHoles} holes you tapped in standing on them${
-          C.setAside ? `, with ${C.setAside} older card${C.setAside === 1 ? '' : 's'} set aside` : ''}`
-      : `${C.cards.length} card${C.cards.length === 1 ? '' : 's'} on record ‚Äî ${C.allHoles} holes`}.</b> ` : ''}${miss
-    ? `<b>Scramble</b> is par or better after a missed fairway (${st.fw.saved} of ${miss}); <b>up &amp; down</b> is the same question off a missed green. The small figure under each is the tier below \u2014 par or bogey. `
-    : 'Scramble fills in once a card records a missed fairway. '}Off the same cards Coach reads ‚Äî tap any tile for the detail behind it.</p>
-  </section>`;
-}
-
-// The way onto the tee, at the size of the decision. One button, which is a START when
-// there is no round on the go and a RESUME when there is ‚Äî the same tap for the same
-// intention, exactly like the TEE button in the tab bar. The discard link only exists on
-// the resume face, because there is nothing to discard on the other one.
-function startRound(){
-  const L = S.live;
-  if(L){
-    const t = liveThru(L), h = L.holes[L.cur];
-    return `<button class="bigbtn" data-action="live-new">
-      <span class="bb-l">Resume your round<em>${esc(L.course)}</em></span>
-      <span class="bb-r">${t.n ? `${t.over > 0 ? '+' : ''}${t.over} THRU ${t.n} ‚Ä∫` : `HOLE ${h ? h.n : 1} ‚Ä∫`}</span></button>
-    <div class="bbfoot"><button class="btn ghost tiny" data-action="live-discard">Discard this round</button></div>`;
-  }
-  // "Card ready" is a claim about the scorecards on file, so it is only made where there
-  // are some ‚Äî otherwise the first course he types gets eighteen placeholder par 4s and
-  // the card check screen says so.
-  const ready = coursesWithLayout().length;
-  return `<button class="bigbtn" data-action="live-new">
-    <span class="bb-l">Play a live round<em>One screen a hole ¬∑ saves on every tap</em></span>
-    <span class="bb-r">${ready ? 'CARD READY ‚Ä∫' : 'NEW CARD ‚Ä∫'}</span></button>`;
-}
-
-// ----- Home -----
-function home(){
-  // Aug 30 running order (Jack's swap), restored in v117 after v116 replaced it.
-  // v149: weather + The numbers lead. Shortcuts / search sit below, not above.
-  // v148: every-club remaining/best-5 and path+face lanes are Cumulative, not Today.
-  const dl = daysLeft(S.settings.returnDeadline);
-  const pending = pendingReturn();
-  const picks = pickedLessons().slice(0,1);
-  return `
-  ${wxCard()}
-  ${theNumbers()}
-  ${startRound()}
-
-  ${(() => {
-    const p = coursePlans();
-    const next = [...p.up, ...p.standing, ...p.past][0];
-    const rest = p.up.length + p.standing.length + p.past.length - (next ? 1 : 0);
-    return `<div class="card">
-      <h2>Round prep</h2>
-      ${next ? planRow(next)
-      : `<p class="sm">Playing somewhere soon? Tell Claude the course and day ‚Äî a briefing built for <i>your</i> game (tee strategy, key holes, lay-up numbers off your ladder, greens notes) lands here before the round. Your standing plans (Swing Focus, Swing Positions, Swing Thoughts) live in the <b>Swing</b> lab, and the at-home training lives in <b>Coach</b>.</p>`}
-      ${rest > 0 ? `<div class="linkrow" data-action="go" data-view="rounds" data-seg="prep">
-        <span class="sm"><b>All round prep</b> ¬∑ ${rest} more plan${rest === 1 ? '' : 's'} on file</span><span class="arr">‚Üí</span></div>` : ''}
-      ${S.live ? '' : `<div class="linkrow" data-action="live-new">
-        <span><b>Play a live round</b><br><span class="sm">Tap each hole in as you go ‚Äî clubs, fairways, greens, putts</span></span><span class="arr">‚Üí</span></div>`}
-      <div class="linkrow" style="border-bottom:none;padding-bottom:0"
-        data-action="cheat-open" data-disc="${next ? 'prep' : 'swing'}">
-        <span><b>‚ö° Cheat sheet</b><br><span class="sm">The pre-round read ‚Äî course, swing, short game, putting, mental</span></span><span class="arr">‚Üí</span></div>
-    </div>`;
-  })()}
-
-  ${oneThing()}
-
-  ${picks.length ? `<div class="card">
-    <h2>From your coach today</h2>
-    ${picks.map(p => tipHTML(p)).join('')}
-    <button class="btn ghost tiny" data-action="go" data-view="coach">All lessons ‚Üí</button>
-  </div>` : ''}
-
-  ${whatsNew()}
-
-  ${sessionShortcuts()}
-  <div class="home-quicklinks" role="group" aria-label="Quick navigation">
-    <button class="btn ghost" data-action="go" data-view="bag">My Bag</button>
-    <button class="btn ghost" data-action="go" data-view="drills">Practice Drills</button>
-    <button class="btn ghost" data-action="go" data-view="rounds" data-seg="prep">Round Prep</button>
-    <button class="btn" data-action="go" data-view="live">${S.live?'Resume Round':'Start Round'}</button>
-  </div>
-  ${todaySearch()}
-
-  ${!pending ? '' : `
-  <div class="card">
-    <h2>Putter return window</h2>
-    <h3>${dl===null ? 'Deadline not set' : dl + ' days left on the ' + esc(pending.name)}</h3>
-    <p class="sm">${dl===null
-      ? `<span class="warn">Deadline unknown</span> ‚Äî the ${esc(pending.name)} is still returnable and nothing here knows until when. Find the receipt, confirm the window with the shop, and set it below.`
-      : S.settings.deadlineEstimated ? '<span class="warn">Estimated deadline</span> ‚Äî confirm the real one with the shop and update it below.' : 'Deadline confirmed.'}</p>
-    <div class="formrow" style="margin-top:8px">
-      <div><label>Deadline</label><input type="date" id="deadlineInput" value="${esc(S.settings.returnDeadline||'')}"></div>
-      <div style="align-self:end"><button class="btn ghost" data-action="save-deadline">Save deadline</button></div>
-    </div>
-    <p class="sm" style="margin-top:8px"><button class="btn tiny burg" data-action="go" data-view="decisions">Open the decision tracker ‚Üí</button></p>
-  </div>`}
-
-  <div class="card flat">
-    <div class="linkrow" data-action="go" data-view="numbers"><b>Numbers</b><span class="arr">‚Üí</span></div>
-    <div class="linkrow" data-action="go" data-view="timeline"><b>Evidence</b><span class="arr">‚Üí</span></div>
-    <div class="linkrow" data-action="go" data-view="decisions"><b>Decisions</b><span class="arr">‚Üí</span></div>
-    <div class="linkrow" data-action="go" data-view="data"><b>Data & backup</b><span class="arr">‚Üí</span></div>
-  </div>`;
-}
-
-function tipHTML(p){
-  const read = S.lessonsRead.includes(p.l.id);
-  return `<div class="tipcard" data-action="open-lesson" data-id="${p.l.id}" style="cursor:pointer">
-    <div class="src">${esc(p.l.shelf)} ¬∑ ${p.l.min} min read${read?' ¬∑ read ‚úì':''}</div>
-    <h4>${esc(p.l.title)}</h4>
-    <p class="sm">${esc(p.l.body.slice(0,140))}‚Ä¶</p>
-    <div class="why">Why you're seeing this: ${esc(p.why)}.</div>
-  </div>`;
-}
-
-// ----- Bag -----
-// Order the bag the way it sits in real life: driver ‚Üí woods ‚Üí hybrids ‚Üí
-// irons ‚Üí wedges ‚Üí putter, then by loft within each category.
-const CAT_RANK = { wood:0, hybrid:1, iron:2, wedge:3, putter:4, ball:5, other:6 };
-function clubLoft(c){
-  if(typeof c.loft === 'number') return c.loft;
-  const deg = ((c.spec || '') + ' ' + (c.name || '')).match(/(\d+(?:\.\d+)?)\s*¬∞/);
-  if(deg) return parseFloat(deg[1]);
-  const iron = (c.name || '').match(/(\d+)\s*-?\s*iron/i);   // "2-iron" sorts ahead of the 4‚ÄìPW set
-  if(iron) return 15 + parseInt(iron[1], 10) * 3.5;
-  return 999;
-}
-const bagSort = (a, b) => (CAT_RANK[a.cat] ?? 5) - (CAT_RANK[b.cat] ?? 5) || clubLoft(a) - clubLoft(b);
-// The mono type label down the left of a roster row. It is read off the club's OWN NAME
-// wherever the name says what the club is ("Utility 2-iron" ‚Üí UTILITY, "5-wood" ‚Üí 5-WOOD),
-// and off its loft where the name doesn't, so nothing here is a classification invented on
-// the club's behalf. Anything unrecognised falls back to the category, which is data.
-function clubType(c){
-  const n = c.name || '';
-  if(c.cat === 'putter') return 'PUTTER';
-  if(c.cat === 'wedge') return c.loft ? `${c.loft}¬∞ WEDGE` : 'WEDGE';
-  if(/mini\s*driver/i.test(n)) return 'MINI DRIVER';
-  if(/driver/i.test(n)) return 'DRIVER';
-  const wood = n.match(/(\d+)\s*-?\s*wood/i);
-  if(wood) return `${wood[1]}-WOOD`;
-  if(/utility/i.test(n)) return 'UTILITY';
-  const iron = n.match(/(\d+)\s*-?\s*iron/i);
-  if(iron) return `${iron[1]}-IRON`;
-  if(c.cat === 'iron') return 'IRONS';
-  return String(c.cat || 'club').toUpperCase();
-}
-// The Vokey shorthand, composed out of the club's real loft and its real spec string ‚Äî
-// "50.08F" is loft, bounce and grind, and every one of those three is on `S.clubs`. Where
-// the spec doesn't carry a bounce and a grind (every club that isn't a wedge), this is
-// simply the loft, and where there is no loft either it is the spec as written.
-function wedgeSpec(c){
-  const m = /(\d+(?:\.\d+)?)\s*¬∞?\s*bounce\s*¬∑?\s*([A-Z])\s*grind/i.exec(c.spec || '');
-  return m && c.loft ? `${c.loft}.${String(Math.round(+m[1])).padStart(2, '0')}${m[2].toUpperCase()}` : null;
-}
-// The loft line, and it will only print a loft it can actually SOURCE. `clubLoft()` guesses
-// one from the iron number so the bag can be sorted, which is fine for an ordering and a
-// lie about a club: the KING TEC utility comes out of it at 22¬∞ when the record says ~17¬∞.
-// So: the club's own `loft`, else a degree figure written in its spec, else the ladder
-// row's loft, else the spec's own first phrase. A putter's spec carries a LIE angle rather
-// than a loft, and an iron SET has no single loft at all ‚Äî both are named, not numbered.
-function clubSpecLine(c){
-  const head = () => (c.spec || '').split('¬∑')[0].replace(/\(.*?\)/g, '').trim().toUpperCase();
-  const w = wedgeSpec(c);
-  if(w) return w;
-  if(c.cat === 'putter') return head() || 'PUTTER';
-  if(typeof c.loft === 'number') return `${c.loft}¬∞`;
-  const deg = ((c.spec || '') + ' ' + (c.name || '')).match(/(\d+(?:\.\d+)?)\s*¬∞/);
-  if(deg && clubType(c) !== 'IRONS') return `${deg[1]}¬∞`;
-  const row = carryRow(c);
-  if(row && row.loft) return String(row.loft);
-  return head();
-}
-// A bag club, joined to its row on the carry ladder. `clubAbbr()` is the app's existing
-// authority for turning a club name into a short key, so running it over both sides is a
-// join the app already trusts everywhere else rather than a new piece of string-matching ‚Äî
-// and it is deliberately strict: an abbreviation that fell through to the name-slice
-// fallback is not a match, and the iron SET matches nothing, which is right, because it
-// spans seven ladder rows and no single one of them is "the irons".
-const ABBR_OK = /^(Mini|Dr|PW|\d+i|\d+¬∞|\d+W)$/;
-// Hyphens are spelling, not meaning: the bag says "5-wood" and the ladder says "5 wood".
-// Normalised here rather than in clubAbbr(), which is what every saved card's club chip
-// renders through and is not worth disturbing for a join.
-const abbrOf = n => clubAbbr(String(n || '').replace(/[-‚Äì‚Äî]/g, ' '));
-function carryRow(c){
-  if(c.cat === 'wedge' && c.loft) return S.carries.find(x => x.club === `${c.loft}¬∞ wedge`) || null;
-  const k = abbrOf(c.name);
-  if(!ABBR_OK.test(k)) return null;
-  return S.carries.find(x => abbrOf(x.club) === k) || null;
-}
-const ladderLoft = row => { const m = /(\d+(?:\.\d+)?)/.exec(row.loft || ''); return m ? +m[0] : null; };
-// Two clubs within a degree and a half of each other on the ladder are fighting for one
-// number ‚Äî the classic gapping trap, and in this bag a live question rather than a general
-// one. It is arithmetic over the ladder's own lofts, so it says nothing the data doesn't.
-// Two measured rows can say the overlap in the unit that actually decides it. The loft
-// flag is arithmetic and says nothing about distance ‚Äî which is exactly the mini-driver vs
-// 2-iron question, two clubs 1.5¬∞ apart and four inches of shaft different. Where both rows
-// carry a measured number the app can finally answer it instead of raising it.
-function ladderGapYds(a, b){
-  // The number the row SHOWS, not the one the bay offered ‚Äî where he has kept his own figure
-  // over a measured one, the yards he plays are his. A row with no `meas` yields nothing:
-  // a gap between a measurement and an estimate is not a measured gap.
-  const v = r => (r && r.meas && r.carry != null ? r.carry : null);
-  const av = v(a), bv = v(b);
-  return av != null && bv != null ? Math.abs(av - bv) : null;
-}
-function ladderOverlap(row){
-  const i = S.carries.indexOf(row), l = ladderLoft(row);
-  if(i < 0 || l == null) return null;
-  return [S.carries[i - 1], S.carries[i + 1]].find(o => {
-    const ol = o ? ladderLoft(o) : null;
-    return ol != null && Math.abs(ol - l) <= 1.5;
-  }) || null;
-}
-// The status pill. Every state here is something the club's own record SAYS, never a read
-// of its notes: a closed return window is `returnWindow:false`, an unmeasured carry is a
-// null on the ladder row, an overlap is two ladder lofts inside a degree and a half. A club
-// with none of them in play is simply in the bag.
-function clubPill(c){
-  const mismatch = c.cat === 'putter' && c.flow === 'toe' && S.profile.stroke === 'SBST';
-  if(mismatch) return ['MISMATCH', 'p-burg'];
-  if(c.returnWindow === true) return ['IN RETURN WINDOW', 'p-gold'];
-  if(c.returnWindow === false) return ['DECIDED', 'p-burg'];
-  if(c.status === 'ordered') return ['ON ORDER', 'p-gold'];
-  if(c.status === 'wishlist') return ['SCOUTING', 'p-gold'];
-  if(c.status !== 'gaming') return ['BENCHED', 'p-plain'];
-  const row = carryRow(c);
-  if(row && row.carry == null) return ['UNMEASURED', 'p-gold'];
-  if(row && ladderOverlap(row)) return ['OVERLAP', 'p-gold'];
-  return ['IN PLAY', 'p-green'];
-}
-function futureFitCard(c){
-  const f = c && c.futureFit;
-  if(!f) return '';
-  const signed = v => `${v > 0 ? '+' : ''}${Number(v).toFixed(1).replace(/\.0$/, '')}¬∞`;
-  const effective = +(Number(f.baseLoft || c.loft || 0) + Number(f.loft || 0)).toFixed(1);
-  const lie = f.lie === 0 ? 'standard lie' : `${Math.abs(f.lie)}¬∞ ${f.lie > 0 ? 'upright' : 'flat'}`;
-  const target = f.target || {};
-  const targetEffective = +(Number(f.baseLoft || c.loft || 0) + Number(target.loft || 0)).toFixed(1);
-  return `<details class="ff33-card">
-    <summary><span><b>FutureFit33 ¬∑ ${esc(f.current)}</b><small>${effective}¬∞ effective ¬∑ ${esc(lie)}</small></span><span>ADJUSTMENT CHART ‚Ä∫</span></summary>
-    <div class="ff33-current warn"><b>Currently reported: ${esc(f.current)}</b> ¬∑ ${signed(f.loft)} loft ¬∑ ${esc(lie)} ¬∑ ${effective}¬∞ effective loft.</div>
-    ${target.code ? `<div class="ff33-target"><b>Higher-launch test: ${esc(target.code)}</b> ¬∑ ${signed(target.loft)} loft ¬∑ ${Math.abs(target.lie)}¬∞ ${target.lie > 0 ? 'upright' : 'flat'} ¬∑ ${targetEffective}¬∞ effective loft.</div>` : ''}
-    <img src="futurefit33-rh.jpg" alt="Cobra FutureFit33 right-handed loft and lie adjustment chart">
-    <p class="sm faint">Read vertically for loft: highest at the top, lowest at the bottom. Read horizontally for lie: upright left, flat right. A1 is standard. Saved from Cobra's official right-handed chart.</p>
-  </details>`;
-}
-// The roster row: what it is, what it is, what it measures, and where it stands.
-function clubRow(c){
-  const [pill, pcls] = clubPill(c);
-  const row = carryRow(c);
-  const mismatch = c.cat === 'putter' && c.flow === 'toe' && S.profile.stroke === 'SBST';
-  const ov = row ? ladderOverlap(row) : null;
-  return `<div class="crow">
-    <div class="ct">${esc(clubType(c))}</div>
-    <div class="cm">
-      <div class="cn">${esc(c.name)}</div>
-      <div class="cs">${esc(clubSpecLine(c))}${row && row.carry != null ? ` ¬∑ carries ${row.carry}` : ''}${
-        row && row.carry == null ? ' ¬∑ carry unmeasured' : ''}</div>
-      ${c.note ? expandable(c.note) : ''}
-      ${futureFitCard(c)}
-      ${mismatch ? `<p class="sm warn">Toe-flow head on your straight (SBST) stroke ‚Äî see Decisions.</p>` : ''}
-      ${ov ? `<p class="sm faint">Sits ${Math.abs(ladderLoft(ov) - ladderLoft(row)).toFixed(1)}¬∞ off the
-        ${esc(ov.club)} on the ladder.${(() => { const g = ladderGapYds(row, ov);
-          return g == null ? '' : g <= 8
-            ? ` Measured, they carry <b>${g} yards apart</b> ‚Äî so this one is real, not just loft arithmetic.`
-            : ` Measured, they carry <b>${g} yards apart</b>, so the flag is loft and not distance.`; })()}</p>` : ''}
-      ${c.cat === 'wedge' && c.status === 'gaming'
-        ? `<div class="meter grn" title="groove life"><span style="width:${groovePct(c)}%"></span></div>
-           <div class="sm faint">Groove life ${groovePct(c)}% ¬∑ ${c.rounds || 0} rounds</div>` : ''}
-    </div>
-    <div class="cp"><span class="pill ${pcls}">${esc(pill)}</span></div>
-  </div>`;
-}
-// ----- Grinds & bounce -----
-// The one explanatory block in the bag, and it is here because the three wedges are three
-// deliberately different tools and nothing on the card said so. The letters and bounces are
-// read out of `S.clubs` ‚Äî his real Vokey specs ‚Äî and the copy explains what those numbers
-// mean, which is knowledge about wedges rather than a claim about his game. The one claim
-// about his game is the closing note, and it says it is UNMEASURED, because it is.
-const GRIND_LORE = {
-  F:['Full sole', 'The sweeper. A full, unrelieved sole with the most material behind the leading edge ‚Äî it resists digging on a square face and a shallow strike. Built for full swings, which is what this club mostly gets.', 'FULL SWINGS ¬∑ SQUARE FACE'],
-  S:['Sole grind, trailing-edge relief', 'The workhorse. Heel and trailing edge trimmed just enough to sit down on a slightly open face without the leading edge lifting. Mid bounce, so it works on firm and normal turf alike ‚Äî the reason it can take full shots, half shots and bunker shots all day.', 'DO-EVERYTHING ¬∑ FULL TO OPEN'],
-  M:['Crescent, heel-toe-trailing relief', 'The creative one. Material removed from heel, toe and trailing edge so the face can open wide, lie flat, and slide under the ball without the leading edge rising. Low bounce, so it wants a shallow attack and firm-to-normal turf ‚Äî it punishes a steep, digging strike.', 'FLOPS ¬∑ SPLASH ¬∑ OPEN FACE'],
-  K:['Widest sole, highest bounce', 'The widest, highest-bounce sole Vokey makes. A bunker specialist for soft sand and fluffy lies ‚Äî it refuses to dig, which is exactly why it is clumsy off a tight fairway.'],
-  D:['Crescent with high bounce', 'The M shape with the bounce turned up. Made for a steep, digging attack angle: the relief lets you open it, and the bounce keeps a steep strike from burying.'],
-  L:['Fully relieved, very low bounce', 'The most relieved sole in the range. Firm turf and tight lies only, and it demands a shallow, precise strike ‚Äî a low-handicap tool with almost no margin.'],
-  T:['Narrow tour sole, low bounce', 'A narrow, tour-shaped low-bounce sole. Similar brief to the L, made for players who slide the club rather than dig it.'],
-};
-// Bands are inclusive of their top figure and matched in order, so an 8¬∞ sole reads LOW and
-// a 12¬∞ reads MID ‚Äî which is how a fitter would call them, and how Jack's three land.
-const BOUNCE_BANDS = [
-  ['LOW ¬∑ 4‚Äì8¬∞', 'Firm turf, tight lies, a shallow attack. Less protection from a fat strike.', 4, 8],
-  ['MID ¬∑ 8‚Äì12¬∞', 'The all-conditions band. Forgiving on both turf types and out of sand.', 8, 12],
-  ['HIGH ¬∑ OVER 12¬∞', 'Soft turf, fluffy sand, a steep attack. Skids rather than digs ‚Äî and can bounce off firm ground into the middle of the ball.', 12, 99],
-];
-function grindsCard(wedges){
-  const mine = wedges.map(w => {
-    const m = /(\d+(?:\.\d+)?)\s*¬∞?\s*bounce\s*¬∑?\s*([A-Z])\s*grind/i.exec(w.spec || '');
-    return m ? { w, bounce:+m[1], g:m[2].toUpperCase() } : null;
-  }).filter(Boolean);
-  if(!mine.length) return '';
-  const band = b => BOUNCE_BANDS.findIndex(([, , lo, hi]) => b >= lo && b <= hi);
-  const absent = ['K', 'D', 'L', 'T'].filter(k => !mine.some(x => x.g === k));
-  return `
-  <p class="sm"><b>Bounce</b> is the angle between the leading edge and the sole ‚Äî how hard the
-    club resists digging. <b>Grind</b> is what has been shaved off that sole, which decides how
-    the club sits when you open the face. Your three are deliberately different tools.</p>
-  ${mine.map(x => `<div class="grind">
-    <div class="gl">${esc(x.g)}</div>
-    <div class="gm">
-      <div class="gs">${esc(x.w.loft ? `${x.w.loft}¬∞` : '')} ¬∑ ${x.bounce}¬∞ BOUNCE${
-        wedgeSpec(x.w) ? ` ¬∑ ${esc(wedgeSpec(x.w))}` : ''}</div>
-      <div class="gn">${esc(GRIND_LORE[x.g] ? GRIND_LORE[x.g][0] : 'Grind')}</div>
-      <p class="sm">${esc(GRIND_LORE[x.g] ? GRIND_LORE[x.g][1] : '')}</p>
-      ${GRIND_LORE[x.g] && GRIND_LORE[x.g][2] ? `<div class="gu">${esc(GRIND_LORE[x.g][2])}</div>` : ''}
-    </div>
-  </div>`).join('')}
-  <div class="bbands">${BOUNCE_BANDS.map(([lab, body], i) => {
-    const here = mine.filter(x => band(x.bounce) === i);
-    return `<div class="bband">
-      <div class="bl">${esc(lab)}</div>
-      <p class="sm">${esc(body)}</p>
-      <div class="bm ${here.length ? '' : 'none'}">${here.length
-        ? esc(here.map(x => `your ${x.w.loft}¬∞`).join(' ¬∑ ')) : 'nothing of yours here'}</div>
-    </div>`; }).join('')}
-  ${absent.length ? `<p class="sm" style="margin-top:10px"><b>The grinds you don't have</b>, and why
-    each exists ‚Äî so the three above read as choices rather than as what came in the box.</p>
-  ${absent.map(k => `<div class="gabs"><span class="gk">${esc(k)}</span>
-    <span class="sm"><b>${esc(GRIND_LORE[k][0])}.</b> ${esc(GRIND_LORE[k][1])}</span></div>`).join('')}` : ''}
-  <div class="goldnote">
-    <div class="gnl">What this cannot tell you</div>
-    <p class="sm">Whether the M grind on the 60¬∞ suits your attack angle is a <b>measurement</b>
-      question, and no film of your pitching motion exists. A low-bounce crescent is the least
-      forgiving choice there is for a steep, digging strike ‚Äî and nothing on file says which kind
-      of strike you have. Until there is film, this section describes the tools, not the fit.</p>
-  </div>`;
-}
-// ----- The carry ladder -----
-// Bars against a fixed 300-yard scale, so the shape of the ladder is the shape of the bag
-// and every row shares one axis. Three rules the design turns on: the CARRY LIVES IN ITS
-// OWN COLUMN and never inside the bar (an editable number laid over a coloured bar is
-// unreadable in sun and untappable with a thumb); a null carry draws NO BAR at all, because
-// a guessed length is a measurement claim; and the ESTIMATED badge appears only while
-// `S.carriesCalibrated` is false ‚Äî once he has calibrated, saying otherwise would be a lie
-// about his own numbers.
-const LADDER_MAX = 300;
-// ----- Where a ladder number came from (Sep 11 2026) -----
-// A row is `{club, loft, carry}` and says nothing about its own provenance, which was
-// honest while every figure on it was a guess and becomes a LIE the moment a measured
-// number lands beside an estimate: 241 off a radar and 205 off nothing look identical.
-// `meas` is the record of what produced it ‚Äî and never the authority. His calibrated
-// number stays the one the app plays off; where the two differ the row shows both and he
-// takes the measured one with a tap. See `carry-update` in applyFeed().
-//
-// The caption only appears once SOMETHING is measured. Before that the whole-ladder gold
-// note already says every row is an estimate, and thirteen rows each repeating it would be
-// 13px of noise a page tall.
-function ladderBadge(row){
-  const m = row.meas;
-  const kind = provOfCarry(row);
-  const liveKind = kind === 'offer' ? (S.carriesCalibrated ? 'on-course' : 'estimated') : kind;
-  if(!liveKind && !m) return '';
-  const meta = [];
-  if(m && m.n) meta.push('n=' + m.n);
-  if(m && m.date) meta.push(fmtDate(m.date));
-  if(m && m.cons != null) meta.push('Consistency ' + m.cons + ' ¬∑ not SD');
-  if(m && m.sd != null) meta.push('SD ¬±' + m.sd);
-  if(m && m.ball) meta.push(m.ball);
-  if(m && m.spin === 'estimated') meta.push('spin est.');
-  if(m && m.norm && !/\b70\s*¬∞?F/i.test(m.norm)) meta.push('norm unconfirmed');
-  return `<div class="lprov">${liveKind ? provBadge(liveKind) : ''}${meaningBtn('carry')}${
-    meta.length ? `<span class="lmeas">${esc(meta.join(' ¬∑ '))}</span>` : ''}</div>`;
-}
-// The one place the two numbers meet. A measured figure he has not accepted is an offer,
-// not a correction ‚Äî so it renders beside his own with the arithmetic visible and a button,
-// rather than replacing it and hoping he notices.
-function ladderOffer(row, i){
-  const m = row.meas;
-  if(!m || m.carry == null || m.carry === row.carry) return '';
-  const lead = row.carry == null ? `the bay says ${m.carry}`
-    : `${S.carriesCalibrated ? 'yours' : 'ladder'} ${row.carry} ¬∑ the bay says ${m.carry}`;
-  return `<span class="lmeas offer">${provBadge('offer')}${meaningBtn('meas.carry')}${lead}
-    <button class="btn ghost tiny" data-action="use-bay-carry" data-i="${i}">use ${m.carry}</button></span>`;
-}
-function ladderCard(){
-  const pf = playsFactor();
-  const anyMeas = S.carries.some(c => c.meas);
-  return `
-  ${anyMeas || S.carriesCalibrated ? '' : `<div class="goldnote">
-    <div class="gnl">Estimated ¬∑ not calibrated</div>
-    <p class="sm">No number here has been measured yet ‚Äî they are starting points for your game.
-      Edit any row as a real carry comes in from the range or the course.</p>
-  </div>`}
-  ${anyMeas ? `<p class="sm faint" style="margin-top:6px">Every row now says where its number
-    came from. A measured one carries the date, how many shots it averages, the spread, and
-    the ball it was hit with ‚Äî which is what decides whether it transfers to the course.</p>` : ''}
-  <div class="ladr">${S.carries.map((c, i) => {
-    const next = S.carries[i + 1];
-    const gap = next && c.carry && next.carry ? c.carry - next.carry : null;
-    const badge = ladderBadge(c);
-    const offer = ladderOffer(c, i);
-    return `<div class="lgrp"><div class="lrow">
-      <span class="lc">${esc(clubAbbr(c.club))}</span>
-      <span class="lb">${c.carry != null
-        ? `<i style="width:${Math.min(100, Math.round(c.carry / LADDER_MAX * 100))}%"></i>`
-        : '<em>unmeasured</em>'}</span>
-      <span class="lv"><input data-carry="${i}" inputmode="numeric" value="${c.carry ?? ''}" placeholder="‚Äî">${
-        pf && c.carry ? `<b>${Math.round(c.carry * pf)} today</b>` : ''}</span>
-      <span class="lg ${gap !== null && (gap >= 15 || gap <= 5) ? 'wide' : ''}">${
-        gap !== null ? `${gap}` : '¬∑'}</span>
-    </div>${badge}${offer}</div>`; }).join('')}</div>
-  <div class="lfoot"><span>0</span><span>${LADDER_MAX} yd scale</span></div>
-  <button class="btn ghost tiny" data-action="save-carries">Save carries</button>
-  ${pf ? `<p class="sm faint" style="margin-top:8px">"Today" = carry adjusted for ${Math.round(S.weather.t)}¬∞F air (${
-    pf > 1 ? '+' : ''}${((pf - 1) * 100).toFixed(1)}%).</p>` : ''}
-  <div class="goldnote">
-    <div class="gnl">The ladder IS the roster</div>
-    <p class="sm">This list is what the live logger offers you off the tee and into the green, so
-      it stays as long as the bag is ‚Äî a club leaving or joining is a ladder change as much as a
-      bag change. Gap column: <b>15 yd or more</b> is a hole in the bag, <b>5 or less</b> is two
-      clubs fighting for one number.</p>
-    <p class="sm">A <b>measured</b> row was read off a launch monitor and carries its date, its
-      shot count and its spread. It is still an indoor number off a mat, and the carry is
-      computed from measured launch rather than watched to the ground ‚Äî so your own cards stay
-      the check on it.</p>
-  </div>`;
-}
-function bag(){
-  const lineup = S.clubs.filter(c => c.status === 'gaming' || c.status === 'ordered').sort(bagSort);
-  const bullpen = S.clubs.filter(c => c.status === 'backup').sort(bagSort);
-  const wishlist = S.clubs.filter(c => c.status === 'wishlist').sort(bagSort);
-  const wedges = S.clubs.filter(c => c.cat === 'wedge' && c.loft).sort((a, b) => a.loft - b.loft);
-  // Grouped the way the bag is carried: the long clubs, the irons, the wedges, the putter.
-  // Every group is drawn from `S.clubs` by CATEGORY, so a club can only appear where its own
-  // record puts it, and an empty group doesn't render.
-  const GROUPS = [['Woods &amp; long clubs', ['wood', 'hybrid']], ['Irons', ['iron']],
-    ['Wedges', ['wedge']], ['Putter', ['putter']], ['Everything else', ['ball', 'other']]];
-  const groups = GROUPS.map(([lab, cats]) => [lab, lineup.filter(c => cats.includes(c.cat))])
-    .filter(([, cs]) => cs.length);
-  return `
-  ${sessionShortcuts()}
-  <div class="card">
-    ${fold('bag-roster', 'In the bag', `${lineup.length} CLUB${lineup.length === 1 ? '' : 'S'}`,
-      groups.length ? groups.map(([lab, cs]) => `<div class="cgrp">${lab}</div>
-        ${cs.map(clubRow).join('')}`).join('')
-        : '<p class="sm faint">Nothing gaming yet.</p>')}
-  </div>
-
-  ${wedges.length ? `<div class="card">
-    ${fold('bag-grinds', 'Grinds & bounce', `${wedges.length} WEDGES`, grindsCard(wedges), false)}
-  </div>` : ''}
-
-  ${bullpen.length || wishlist.length ? `<div class="card bench">
-    ${fold('bag-bench', 'On the bench', `${bullpen.length + wishlist.length} OWNED, NOT IN THE 14`, `
-      ${bullpen.map(clubRow).join('')}
-      ${wishlist.length ? `<div class="cgrp">Scouting list</div>${wishlist.map(clubRow).join('')}` : ''}
-      <p class="rdf">Kept, not gone. What a benched club did is still true ‚Äî its tee-shot
-        record stays in the off-the-tee table as history, it just stops accumulating. Nothing
-        here is sold, and a club has come back off this shelf before.</p>`, false)}
-  </div>` : ''}
-  <div class="formrow" style="margin-top:6px">
-    <button class="btn" data-action="show-add-club">+ Add a club</button>
-  </div>
-  <div id="addClubForm" class="card" style="display:none">
-    <div class="cgrp">New club</div>
-    <label>Name</label><input id="clNa" placeholder="e.g. TaylorMade Qi35 driver">
-    <div class="formrow">
-      <div><label>Category</label><select id="clCat"><option value="wood">Driver / wood</option><option value="hybrid">Hybrid</option><option value="iron">Irons</option><option value="wedge">Wedge</option><option value="putter">Putter</option><option value="ball">Ball</option><option value="other">Other</option></select></div>
-      <div><label>Status</label><select id="clSt"><option value="gaming">Starting lineup</option><option value="ordered">On order</option><option value="backup">Bullpen</option><option value="wishlist">Scouting list</option></select></div>
-    </div>
-    <label>Specs (loft, shaft, flex‚Ä¶)</label><input id="clSp" placeholder="e.g. 9¬∞ ¬∑ Ventus Blue 6S">
-    <label>Notes</label><input id="clNo" placeholder="Why it's in the bag">
-    <div style="margin-top:10px"><button class="btn" data-action="add-club">Save club</button></div>
-  </div>
-
-  ${(() => {
-    // The wear counters used to live on Home. Home is the what's-changed page now, and
-    // these belong with the clubs they describe anyway: the groove meter is already on
-    // every wedge card above, and the grip count had nowhere else at all.
-    const w = S.clubs.filter(c => c.cat === 'wedge' && c.status === 'gaming')
-      .sort((a, b) => groovePct(a) - groovePct(b))[0];
-    return `<h2>Wear</h2>
-    <div class="card">
-      <p class="sm"><b>Grips</b> ‚Äî round ${S.settings.gripRounds} of ~${GRIP_LIFE} before a regrip.${
-        w ? ` <b>Grooves</b> ‚Äî the ${esc(w.name)} is the most worn face in the bag at ${groovePct(w)}% of its ${GROOVE_LIFE}-round life; spin drops noticeably below ~50%.` : ''}</p>
-      ${w ? `<div class="meter grn"><span style="width:${groovePct(w)}%"></span></div>` : ''}
-      <p class="sm faint" style="margin-top:8px">Both counters advance automatically every time you log a round, however you logged it.</p>
-    </div>`;
-  })()}
-
-  <div class="card">
-    ${fold('bag-ladder', 'Carry ladder',
-      S.carriesCalibrated ? `${S.carries.length} CLUBS` : 'ESTIMATED ¬∑ NOT CALIBRATED', ladderCard())}
-  </div>
-
-  ${wedges.length ? `<h2>Wedge gapping ladder</h2>
-  <div class="card">${ladderHTML(wedges)}</div>` : ''}
-
-  <h2>Wedge yardage matrix</h2>
-  <div class="card">
-    <p class="sm">Carries per swing length ‚Äî fill in from a range session (Lesson: "The clock system").</p>
-    <table><tr><th>Club</th><th>¬Ω (9:00)</th><th>¬æ (10:30)</th><th>Full</th></tr>
-      ${Object.keys(S.matrix).map(L => `<tr><td><b>${L}¬∞</b></td>
-        ${['h','t','f'].map(k => `<td><input data-matrix="${L}.${k}" inputmode="numeric" style="width:56px;text-align:center;padding:6px 4px" value="${S.matrix[L][k] ?? ''}" placeholder="‚Äî"></td>`).join('')}
-      </tr>`).join('')}
-    </table>
-    <button class="btn ghost tiny" data-action="save-matrix">Save carries</button>
-  </div>
-
-  <div class="card">
-    ${fold('bag-history', 'Bag history', `${S.bagHistory.length} CHANGES`, `
-      <div class="bhist">${S.bagHistory.map(h => `<div class="bhr">
-        <span class="d">${esc(h.date)}</span><span class="t">${esc(h.text)}</span></div>`).join('')}</div>
-      <div class="formrow" style="margin-top:10px">
-        <input id="newHist" placeholder="Log a change (what & why)‚Ä¶">
-        <button class="btn ghost" data-action="add-history">Log it</button>
-      </div>`, false)}
-  </div>`;
-}
-
-// `clubCard()` ‚Äî the old boxed club tile ‚Äî was removed on Aug 27 2026 when the roster
-// became a grouped list. `clubRow()` above replaces it, and nothing else rendered it.
-
-function ladderHTML(wedges){
-  const pw = S.pwLoft;
-  const lofts = [pw, ...wedges.map(w=>w.loft)];
-  const span = lofts[lofts.length-1] - pw;
-  let marks = `<div class="mk pw" style="left:0%"><div class="pin"></div><div class="lab">${pw}¬∞</div><div class="nm">PW</div></div>`;
-  let gaps = '';
-  for(let i=1;i<lofts.length;i++){
-    const left = (lofts[i]-pw)/span*100;
-    const mid = ((lofts[i]+lofts[i-1])/2-pw)/span*100;
-    const w = wedges[i-1];
-    marks += `<div class="mk" style="left:${left}%"><div class="pin"></div><div class="lab">${lofts[i]}¬∞</div><div class="nm">${esc((w.spec||'').split('¬∑')[0].trim())}</div></div>`;
-    gaps += `<div class="gapb" style="left:${mid}%">${lofts[i]-lofts[i-1]}¬∞</div>`;
-  }
-  return `<div class="ladder">${gaps}${marks}</div>
-    <p class="sm faint">Off the ${pw}¬∞ PW. Repeatedly stuck between clubs at one yardage? That's the sign to revisit this (Lesson: "Loft gaps beat brand loyalty").</p>`;
-}
-
-// ----- Putting Lab -----
-// A session belongs to the Swing Lab if its setup names the full swing or a
-// full-swing club; everything else (the putter project) stays in the Putting Lab.
-// Read setup only ‚Äî putting findings mention "backswing", which must not match.
-function sessionDiscipline(s){
-  const t = s.setup || '';
-  if(/chip|pitch|bunker|short[\s-]?game|greenside/i.test(t)) return 'short-game';
-  return /full[\s-]?swing|driver|\biron\b|\bwedge\b|mini/i.test(t) ? 'swing' : 'putting';
-}
-
-// ----- Stroke evolution grid -----
-// The grid IS the interface. Seven verdicts running to paragraphs used to print in
-// full under the table, which made the most useful block on the page the one you
-// scroll past. Every row now shows its marks and a two-or-three-word STATE, and its
-// reasoning is one tap away. Two things moved out of this function and into the DATA
-// so a future rebuild is a feed push rather than an app change: the per-column blurbs
-// (`notes`, parallel to `sessions`) and the closing footnote (`foot`). A metric with
-// no `state` renders without one, so an older grid still reads.
-// A grid per discipline. Putting's is the one that exists today; a swing grid is what a
-// run of bay sessions turns into, and the renderer needed nothing but an argument because
-// the rows were always data. A discipline with no grid renders NOTHING ‚Äî an empty grid is a
-// heading over a promise, which is the failure the retired 5-ft tile is the worked example of.
-const evoFor = disc => (S.grids || {})[disc || 'putting'] || null;
-function evolutionCard(disc){
-  const e = evoFor(disc);
-  if(!e || !e.metrics || !e.metrics.length) return '';
-  const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
-  const mc = mk => mk === '\u2713' ? 'var(--green)' : mk === '\u2717' ? 'var(--burg)' : 'var(--faint)';
-  const notes = e.notes || [];
-  return `<div class="card">
-    <p class="sm faint" style="margin-bottom:6px">${provBadge('measured')} Tap a row for the reasoning behind it. ${meaningBtn('faceAtImpact')}</p>
-    <div class="evo" style="--n:${e.sessions.length}">
-      <div class="evohead"><span></span>${e.sessions.map(x => `<span>${esc(x)}</span>`).join('')}</div>
-      ${e.metrics.map(m => `<details class="evorow" id="evo-${slug(m.name)}">
-        <summary><span class="evon"><b>${esc(m.name)}</b>${m.state
-          ? `<span class="evos" style="color:${sc[m.s] || 'var(--ink)'}">${esc(m.state)}</span>` : ''}</span>${
-          m.marks.map(mk => `<span class="evom" style="color:${mc(mk)}">${esc(mk)}</span>`).join('')}</summary>
-        <p class="sm">${esc(m.verdict)}</p>
-      </details>`).join('')}
-    </div>
-    <p class="sm faint" style="margin-top:10px">\u2713 good \u00b7 \u2717 fault \u00b7 ~ partial \u00b7 ? that angle couldn't see it \u00b7 \u2014 not assessed.
-    A dash means that batch couldn't answer that row, not that it went badly.</p>
-    ${notes.length ? `<details class="more"><summary>What the ${e.sessions.length} columns are</summary>
-      ${e.sessions.map((x,i) => `<p class="sm" style="margin:5px 0"><b>${esc(x)}</b> \u2014 ${esc(notes[i] || '')}</p>`).join('')}
-      ${e.foot ? `<p class="sm faint" style="margin-top:7px">${esc(e.foot)}</p>` : ''}
-    </details>` : ''}
-  </div>`;
-}
-
-// ----- The film room log -----
-// The lab pages get a SCANNABLE list, not the full text. Findings here run to
-// paragraphs, and three table columns at phone width turned the log into a wall of
-// prose you had to read to navigate. A row is now the date, how big the batch was,
-// and ONE line saying what it concluded; the whole breakdown stays one tap away in
-// sessionView(). Same rule as a briefing section's `k`: an authored one-liner wins,
-// the finding's opening sentence is the fallback, so older sessions still read fine.
-// Write `detail.gist` on any session whose finding does not open with its headline.
-function sessionGist(s){
-  if(s.detail && s.detail.gist) return s.detail.gist;
-  const lead = splitLead(s.finding)[0];
-  return lead.length > 150 ? lead.slice(0, 132).replace(/\s+\S*$/, '') + '‚Ä¶' : lead;
-}
-// "23 clips" off the front of the setup line. Filmed sessions all start with a count;
-// one he logs himself by hand usually doesn't, and then the chip is simply absent.
-function sessionSize(s){
-  const m = /(\d+)\s*(?:phone\s+)?(clips?|strokes?|stills?|putts?)/i.exec(s.setup || '');
-  return m ? m[1] + ' ' + m[2].toLowerCase() : '';
-}
-// NEWEST FIRST everywhere ‚Äî a log you scan reads down from the last time you filmed.
-function sessionLog(list, empty){
-  if(!list.length) return `<p class="sm">${empty}</p>`;
-  return `<p class="sm faint" style="margin-bottom:2px">Tap a session for the full film breakdown.</p>
-  ${list.map(({s,i}) => `<div class="seslog" data-action="open-session" data-i="${i}">
-    <div class="sesh"><b>${fmtDate(s.date)}</b><span class="sesm">${esc(sessionSize(s))}${s.detail ? ' ‚ñ∏' : ''}</span></div>
-    <div class="sesg">${esc(sessionGist(s))}</div>
-  </div>`).join('')}`;
-}
-
-// ----- The bay: launch-monitor sessions (Sep 11 2026) -----
-// The numeric twin of the film room, and the first source in this project that measures the
-// ball and the club directly rather than inferring them from a frame or a scorecard.
-//
-// A bay session declares its own `discipline` ‚Äî nothing is read out of the setup line the
-// way sessionDiscipline() has to guess, because the entry is written already knowing which
-// lab it is for.
-const BAY_DISC = b => (b && b.discipline) || 'swing';
-function baysFor(disc){
-  return (S.bays || []).map((b, i) => ({ b, i }))
-    .filter(o => BAY_DISC(o.b) === disc)
-    .sort((x, y) => (y.b.date || '').localeCompare(x.b.date || ''));
-}
-// Same rule as a film session's gist: an authored line wins, the finding's opening sentence
-// is the fallback, so a session pushed without one still reads in the log.
-function bayGist(b){
-  if(b && b.detail && b.detail.gist) return b.detail.gist;
-  const lead = splitLead((b && b.finding) || '')[0];
-  return lead.length > 150 ? lead.slice(0, 132).replace(/\s+\S*$/, '') + '‚Ä¶' : lead;
-}
-const baySize = b => {
-  const d = (b && b.detail) || {};
-  if(Array.isArray(d.rangeShots) && d.rangeShots.length){
-    const n = analysisClubs(d).reduce((s,c)=>s+(+c.n||0),0);
-    if(n) return n + ' shots';
-  }
-  const m = /(\d+)\s*(shots?|balls?|swings?|putts?|drives?|strokes?)/i.exec((b && b.setup) || '');
-  return m ? m[1] + ' ' + m[2].toLowerCase() : '';
-};
-function bayLiveSetup(b){
-  const d = (b && b.detail) || {};
-  if(!Array.isArray(d.rangeShots) || !d.rangeShots.length) return (b && b.setup) || '';
-  const clubs = analysisClubs(d);
-  const n = clubs.reduce((s,c)=>s+(+c.n||0),0);
-  if(d.combinedDay) return `${n} usable shots ¬∑ ${clubs.map(c=>`${c.club}: ${c.n}`).join(' ¬∑ ')}`;
-  if(!n) return (b && b.setup) || '';
-  const strip = c => clubTag(c.club).replace(/ ¬∑ (slot|pre|open|run|rest)/,'');
-  const first = clubs.filter(c => !/¬∑ /.test(c.club)).map(c => `${strip(c)} ${c.n}`);
-  const seq = clubs.filter(c => /¬∑ (open|window|rest)/i.test(c.club)).map(c => `${clubTag(c.club)} ${c.n}`);
-  const after = clubs.filter(c => /after slot/i.test(c.club)).map(c => `${strip(c)} ${c.n}`);
-  const targets = clubs.filter(c => /¬∑ target /i.test(c.club)).map(c => `${clubCanon(c.club)} target ${c.club.split('target ')[1]}: ${c.n}`);
-  const bits = [`${n} remaining`];
-  if(first.length) bits.push('first ' + first.join(' ¬∑ '));
-  if(seq.length) bits.push(seq.join(' ¬∑ '));
-  if(targets.length) bits.push(targets.join(' ¬∑ '));
-  if(after.length) bits.push('after slot ' + after.join(' ¬∑ '));
-  return bits.join(' ¬∑ ');
-}
-// WHAT THE NUMBERS WERE TAKEN UNDER, on every screen they appear on. Three facts decide
-// whether two sessions are comparable and whether a carry transfers to the course, and not
-// one of them is visible in the number itself:
-//   ¬∑ the BALL ‚Äî an unmarked range ball is not his gamer, and indoors a radar needs roughly
-//     two ball revolutions inside the window it can see to MEASURE spin. On a plain ball it
-//     frequently cannot, and estimates one instead.
-//   ¬∑ the NORMALIZATION the bay was set to. `playsFactor()` treats a stored carry as a 70¬∞F
-//     number, so a session normalized to anything else is a systematic error in one
-//     direction with nothing on screen to show it.
-//   ¬∑ whether SPIN was measured or estimated. Carry is computed from launch AND spin, so an
-//     estimated spin makes the carry a model built on a modelled input ‚Äî still far better
-//     than a guess, and not the same claim as a measurement.
-function bayProv(b){
-  const chips = [];
-  if(b.venue) chips.push(['', b.venue]);
-  if(b.unit) chips.push(['', b.unit]);
-  if(b.ball) chips.push([/unmark|range|venue/i.test(b.ball) ? 'warn' : 'ok', 'ball ¬∑ ' + b.ball]);
-  if(b.norm) chips.push([/\b70\s*¬∞?F/i.test(b.norm) ? 'ok' : 'warn', 'norm ¬∑ ' + b.norm]);
-  if(b.spin) chips.push([b.spin === 'measured' ? 'ok' : 'warn', 'spin ¬∑ ' + b.spin]);
-  if(!chips.length) return '';
-  return `<div class="bayp">${chips.map(([c, t]) =>
-    `<span class="bpc ${c}">${esc(t)}</span>`).join('')}</div>`;
-}
-// One column per parameter, and a column renders only where some club row actually carries
-// it ‚Äî the same rule the approach buckets follow, and the reason a carry-only session draws
-// four columns instead of thirteen empty ones. Thirteen will not fit a phone whatever the
-// padding does, so the table is a `.tscroll`: it scrolls inside its own box rather than
-// taking the page sideways with it.
-const baySgn = v => {
-  const n = +Number(v);
-  if(!Number.isFinite(n)) return String(v);
-  const r = +n.toFixed(1);
-  const mag = Math.abs(r).toFixed(1);
-  if(r === 0) return '0.0';
-  return (r > 0 ? '+' : '-') + mag;
-};
-const BAY_COLS = [
-  ['n',     'N',       v => v],
-  ['carry', 'CARRY',   v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
-  ['best',  'BEST 5',  v => Number(v).toFixed(1)],
-  ['cons',  'CONSIST.',v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
-  ['sd',    '¬±',       v => Math.round(v)],
-  ['total', 'TOTAL',   v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
-  ['curve', 'CURVE yd', baySgn],
-  ['cs',    'CLUB MPH', v => Number(v).toFixed(1).replace(/\.0$/, '')],
-  ['bs',    'BALL MPH', v => Number(v).toFixed(1).replace(/\.0$/, '')],
-  ['smash', 'SMASH',   v => Number(v).toFixed(2)],
-  ['la',    'LAUNCH¬∞', v => Number(v).toFixed(1)],
-  ['apex',  'APEX FT', v => Number(v).toFixed(1)],
-  ['spin',  'SPIN',    v => String(Math.round(v))],
-  ['aoa',   'ATTACK¬∞', baySgn],
-  ['ld',    'DIR¬∞',    baySgn],
-  ['dynLoft','DYN LOFT¬∞', v => Number(v).toFixed(1)],
-  ['spinLoft','SPIN LOFT¬∞', v => Number(v).toFixed(1)],
-  ['path',  'PATH¬∞',   baySgn],
-  ['face',  'FACE¬∞',   baySgn],
-  ['ftp',   'F‚ÄìP¬∞',    baySgn],
-];
-function bayClubTable(clubs){
-  if(!Array.isArray(clubs) || !clubs.length) return '';
-  const cols = BAY_COLS.filter(([k]) => clubs.some(c => c[k] != null));
-  if(!cols.length) return '';
-  return `<div class="tscroll bay-clubs"><table>
-    <thead><tr><th>CLUB</th>${cols.map(([, lab]) => `<th>${esc(lab)}</th>`).join('')}</tr></thead>
-    <tbody>${clubs.map(c => `<tr><td><b>${esc(c.club ? clubTag(c.club) : '‚Äî')}</b></td>
-      ${cols.map(([k, , f]) => `<td>${c[k] == null ? '¬∑' : esc(String(f(c[k]))) + (k === 'apex' && c.metricCounts?.apex ? ` <small>n=${c.metricCounts.apex}</small>` : '')}</td>`).join('')}</tr>`).join('')}
-    </tbody></table></div>`;
-}
-// A session should be readable before it becomes a spreadsheet. Bar lengths share one
-// scale within THIS session; the printed number remains the evidence. Gaps are simply the
-// difference between adjacent displayed carries, so an overlap or inversion is a prompt
-// to test the clubs again ‚Äî not permission to rewrite the outdoor ladder.
-function bayGapKind(g){
-  if(g <= 0) return ['inverted', 'INVERTED'];
-  if(g < 6) return ['overlap', 'OVERLAP'];
-  if(g > 20) return ['stretch', 'STRETCH'];
-  return ['', 'GAP'];
-}
-function bayCarryVisual(clubs){
-  const rows = (clubs || []).filter(c => c.carry != null && Number.isFinite(+c.carry));
-  if(rows.length < 2) return '';
-  const max = Math.max(...rows.map(c => +c.carry), 1);
-  return `<div class="bayviz" aria-label="Carry ladder visual">
-    <div class="bvtitle"><b>Carry shape</b><span>longest bar = longest carry here</span></div>
-    ${rows.map((c, i) => {
-      const carry = +c.carry;
-      const next = rows[i + 1];
-      const gap = next ? carry - (+next.carry) : null;
-      const [kind, label] = gap == null ? ['', ''] : bayGapKind(gap);
-      return `<div class="bvitem">
-        <div class="bvrow"><span class="bvname">${esc(c.club ? clubTag(c.club) : '‚Äî')}</span>
-          <span class="bvtrack"><i class="bvbar" style="width:${Math.max(3, carry / max * 100).toFixed(1)}%"></i></span>
-          <b class="bvnum">${carry.toFixed(1)}</b></div>
-        ${gap == null ? '' : `<div class="bvgap ${kind}"><span>${esc(label)}</span><b>${gap > 0 ? '+' : ''}${gap.toFixed(1)} yd</b></div>`}
-      </div>`;
-    }).join('')}
-    <p class="bvcap">TrackMan carry, in yards‚Äînot automatic replacements for playing yardages. Normalization and measurement limitations are recorded with each session.</p>
-  </div>`;
-}
-function bayConsistencyVisual(clubs){
-  const rows = (clubs || []).filter(c => c.cons != null && Number.isFinite(+c.cons));
-  if(rows.length < 2) return '';
-  const max = Math.max(...rows.map(c => +c.cons), 1);
-  return `<div class="bayviz bvcons" aria-label="TrackMan consistency visual">
-    <div class="bvtitle"><b>Consistency shape</b><span>shorter reported value = shorter bar</span></div>
-    ${rows.map(c => `<div class="bvrow"><span class="bvname">${esc(c.club ? clubTag(c.club) : '‚Äî')}</span>
-      <span class="bvtrack"><i class="bvbar" style="width:${Math.max(3, (+c.cons) / max * 100).toFixed(1)}%"></i></span>
-      <b class="bvnum">${(+c.cons).toFixed(1)}</b></div>`).join('')}
-    <p class="bvcap">TrackMan's displayed ‚ÄúConsistency‚Äù value. Its formula and unit were not shown, so this compares the screen values without relabelling them as standard deviation.</p>
-  </div>`;
-}
-function bayDeliveryVisual(delivery){
-  const rows = (delivery || []).filter(c => (c.path != null && Number.isFinite(+c.path)) || (c.face != null && Number.isFinite(+c.face)));
-  if(rows.length < 2) return '';
-  const pos = v => Math.max(0, Math.min(100, 50 + (+v / 16 * 50))).toFixed(1);
-  const points = (vals, kind) => (vals || []).filter(Number.isFinite).map(v =>
-    `<i class="bvdshot ${kind}" style="left:${pos(v)}%"></i>`).join('');
-  return `<div class="bayviz bvdelivery" aria-label="Club delivery direction visual">
-    <div class="bvtitle"><b>Path + face</b><span>left ‚Üê 0¬∞ ‚Üí right</span></div>
-    <div class="bvdlegend"><span class="path">‚óè club path</span><span class="face">‚óè face angle</span><span>ring = average</span></div>
-    ${rows.map(c => `<div class="bvditem"><div class="bvdrow"><span class="bvname">${esc(c.club ? clubTag(c.club) : '‚Äî')}</span>
-      <span class="bvdaxis">${points(c.paths, 'path')}${points(c.faces, 'face')}
-      ${c.path != null && Number.isFinite(+c.path) ? `<i class="bvdot path" style="left:${pos(c.path)}%" title="Average path ${baySgn(c.path)}¬∞"></i>` : ''}
-      ${c.face != null && Number.isFinite(+c.face) ? `<i class="bvdot face" style="left:${pos(c.face)}%" title="Average face ${baySgn(c.face)}¬∞"></i>` : ''}</span></div>
-      <div class="bvdnums"><span>PATH <b>${baySgn(c.path)}¬∞</b></span><span>FACE <b>${baySgn(c.face)}¬∞</b></span><span>F‚ÄìP <b>${baySgn(c.ftp)}¬∞</b></span></div></div>`).join('')}
-    <p class="bvcap">Every small dot is one measured shot; the outlined rings are club averages. Negative is left of the target line. Face-to-path (F‚ÄìP) is face angle minus club path: positive means the face was open to the path. Scale: ¬±16¬∞.</p>
-  </div>`;
-}
-function rangeShotMedian(xs){
-  if(!xs.length) return null;
-  const a = xs.slice().sort((x,y)=>x-y);
-  const m = Math.floor(a.length / 2);
-  return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
-}
-// Range mishits (tops / skulls) are cut from the live bay record (v129).
-// On-course rounds keep every shot. Clear mishit: carry under half the median
-// of the rest of that club that day, or mishit:true. Two shots are not a median.
-function isClearMishit(shot, group){
-  if(shot && shot.mishit === true) return true;
-  if(!shot || shot.carry == null || !Number.isFinite(+shot.carry)) return false;
-  const carries = (group || []).map(s => s.carry).filter(v => v != null && Number.isFinite(+v)).map(Number);
-  if(carries.length < 3) return false;
-  const medAll = rangeShotMedian(carries);
-  if(!(medAll > 0)) return false;
-  // Other tops must not drag the median down (the 112-yard 5-wood with 8' of
-  // apex survived 0.5√ó of a median that still had 3.6 / 47.3 / 80.4 in it).
-  const cluster = carries.filter(c => c >= medAll * 0.5);
-  const med = rangeShotMedian(cluster.length >= 2 ? cluster : carries);
-  return med > 0 && +shot.carry < med * (2/3);
-}
-function struckShots(group){
-  const shots = (group && group.shots) || [];
-  if(group?.retainedOnly===true)return shots;
-  return shots.filter(s => !isClearMishit(s, shots));
-}
-function mishitShots(group){
-  const shots = (group && group.shots) || [];
-  if(group?.retainedOnly===true)return [];
-  return shots.filter(s => isClearMishit(s, shots));
-}
-function premierN(n){
-  if(n >= 5) return 5;
-  if(n >= 3) return 3;
-  return 0;
-}
-function shotRank(s){
-  if(s && s.carry != null && Number.isFinite(+s.carry)) return +s.carry;
-  if(s && s.smash != null && Number.isFinite(+s.smash)) return +s.smash;
-  if(s && s.bs != null && Number.isFinite(+s.bs)) return +s.bs;
-  return -Infinity;
-}
-function premierShots(group){
-  const shots = struckShots(group).slice().sort((a,b) => shotRank(b) - shotRank(a));
-  const n = premierN(shots.length);
-  return n ? shots.slice(0, n) : [];
-}
-function premierMeans(group){
-  const shots = premierShots(group);
-  if(!shots.length) return null;
-  const n = k => meanKeyed(shots, k);
-  const carry = n('carry'), total = n('total');
-  return {
-    n: shots.length,
-    of: struckShots(group).length,
-    carry: carry != null ? +carry.toFixed(1) : null,
-    total: total != null ? +total.toFixed(1) : null,
-    path: n('path'),
-    face: n('face'),
-    ftp: n('ftp'),
-    smash: n('smash'),
-    la: n('la'),
-    bs: n('bs'),
-    cs: n('cs'),
-    spin: n('spin'),
-    aoa: n('aoa'),
-    ld: n('ld'),
-    dynLoft: n('dynLoft'),
-    spinLoft: n('spinLoft'),
-    shots
-  };
-}
-function premierLine(p){
-  if(!p) return '';
-  const bits = ['Best ' + p.n + ' of ' + p.of];
-  if(p.carry != null) bits.push('carry ' + Number(p.carry).toFixed(1));
-  if(p.total != null) bits.push('total ' + Number(p.total).toFixed(1));
-  if(p.path != null) bits.push('path ' + baySgn(+Number(p.path).toFixed(1)) + '¬∞');
-  if(p.ftp != null) bits.push('face-to-path ' + baySgn(+Number(p.ftp).toFixed(1)) + '¬∞');
-  if(p.smash != null) bits.push('smash ' + (+p.smash).toFixed(2));
-  return bits.join(' ¬∑ ');
-}
-function meanKeyed(shots, key){
-  const xs = (shots || []).map(s => s[key]).filter(v => v != null && Number.isFinite(+v)).map(Number);
-  return xs.length ? xs.reduce((a,b)=>a+b,0) / xs.length : null;
-}
-// TrackMan's shot-height readout is feet/inches; keep the original in the
-// shot table and convert only for an explicitly labelled club-level mean.
-function apexFeet(value){
-  if(typeof value === 'number') return Number.isFinite(value) ? value : null;
-  if(typeof value !== 'string') return null;
-  const match = value.trim().match(/^(\d+)'(?:\s*(\d+(?:\.\d+)?)\s*"?)?$/);
-  return match && (+match[2] || 0) < 12 ? +match[1] + (+match[2] || 0)/12 : null;
-}
-function analysisClubs(detail){
-  const groups = (detail || {}).rangeShots;
-  const clubs = (detail || {}).clubs || [];
-  if(!Array.isArray(groups) || !groups.length) return clubs;
-  const fromShots = groups.map((g, i) => {
-    const struck = struckShots(g);
-    const held = mishitShots(g);
-    const prem = premierMeans(g);
-    const base = clubs.find(c => c.club === g.club) || clubs[i] || {};
-    const metricKeys = ['carry','total','cs','bs','smash','la','spin','aoa','ld','dynLoft','spinLoft','path','face','ftp'];
-    const metricCounts = {};
-    const rnd = (k, d) => {
-      const v = meanKeyed(struck, k);
-      if(v != null){
-        metricCounts[k] = struck.filter(s => s[k] != null && Number.isFinite(+s[k])).length;
-        return +Number(v).toFixed(d);
-      }
-      if(base[k] != null && Number.isFinite(+base[k])){
-        const prior = base.metricCounts && base.metricCounts[k];
-        metricCounts[k] = prior != null && Number.isFinite(+prior) ? +prior
-          : (base.n != null && Number.isFinite(+base.n) ? +base.n : 0);
-        return +Number(base[k]).toFixed(d);
-      }
-      metricCounts[k] = 0;
-      return null;
-    };
-    const metrics = Object.fromEntries(metricKeys.map(k => [k, rnd(k, k === 'spin' ? 0 : (k === 'smash' ? 2 : 1))]));
-    const apexReadings = struck.map(s => apexFeet(s.height)).filter(v => v != null);
-    metricCounts.apex = apexReadings.length;
-    const apex = apexReadings.length
-      ? +(apexReadings.reduce((sum, v) => sum + v, 0)/apexReadings.length).toFixed(1)
-      : (base.apex != null && Number.isFinite(+base.apex) ? +base.apex : null);
-    return Object.assign({}, base, {
-      club: g.club,
-      n: struck.length,
-      nAll: struck.length,
-      held: held.length,
-      metricCounts,
-      carry: metrics.carry,
-      total: metrics.total,
-      best: prem && prem.carry != null ? prem.carry : null,
-      bestN: prem ? prem.n : null,
-      cs: metrics.cs, bs: metrics.bs, smash: metrics.smash, la: metrics.la, apex,
-      spin: metrics.spin, aoa: metrics.aoa, ld: metrics.ld,
-      dynLoft: metrics.dynLoft, spinLoft: metrics.spinLoft,
-      path: metrics.path, face: metrics.face, ftp: metrics.ftp,
-      displayedCarry: base.displayedCarry != null ? base.displayedCarry : base.carry,
-      displayedN: base.n
-    });
-  });
-  const seen = new Set(fromShots.map(c => c.club));
-  return fromShots.concat(clubs.filter(c => !seen.has(c.club)));
-}
-function analysisDelivery(detail){
-  const groups = (detail || {}).rangeShots;
-  const stored = (detail || {}).delivery || [];
-  if(!Array.isArray(groups) || !groups.length) return stored;
-  const fromShots = groups.map(g => {
-    const struck = struckShots(g);
-    const paths = struck.map(s => s.path).filter(v => v != null && Number.isFinite(+v));
-    const faces = struck.map(s => s.face).filter(v => v != null && Number.isFinite(+v));
-    const ftps = struck.map(s => s.ftp).filter(v => v != null && Number.isFinite(+v));
-    return {
-      club: g.club,
-      path: meanKeyed(struck, 'path'),
-      face: meanKeyed(struck, 'face'),
-      ftp: meanKeyed(struck, 'ftp'),
-      paths, faces, ftps,
-      n: struck.length,
-      held: mishitShots(g).length
-    };
-  }).filter(d => d.path != null || d.face != null);
-  const seen = new Set(fromShots.map(d => d.club));
-  return fromShots.concat(stored.filter(d => d && !seen.has(d.club)));
-}
-function rangeDelLine(d){
-  if(!d || (d.path == null && d.ftp == null)) return '';
-  const bits = [];
-  if(d.path != null) bits.push('path ' + baySgn(+Number(d.path).toFixed(1)) + '¬∞');
-  if(d.ftp != null) bits.push('face-to-path ' + baySgn(+Number(d.ftp).toFixed(1)) + '¬∞');
-  bits.push('n=' + d.n);
-  return bits.join(' ¬∑ ');
-}
-function rangeShotVisuals(d){
-  const groups=d.rangeShots;
-  if(!Array.isArray(groups)||!groups.length) return '';
-  const clubs=analysisClubs(d);
-  const delivery=analysisDelivery(d);
-  const nums=groups.flatMap(c=>{
-    const avg=clubs.find(x=>x.club===c.club) || {};
-    const struck=struckShots(c);
-    const prem=premierMeans(c);
-    return [c.target, avg.carry, avg.total, prem && prem.carry, prem && prem.total, ...struck.map(s=>s.total), ...struck.map(s=>s.carry)];
-  }).filter(Number.isFinite);
-  const max=Math.max(1,...nums);
-  const x=v=>(10+v/max*280).toFixed(1);
-  const avgOf=c=>clubs.find(x=>x.club===c.club) || {};
-  const delOf=c=>delivery.find(x=>x.club===c.club);
-  const finiteValues=(shots,key)=>shots.map(s=>s[key]).filter(v=>v!=null&&Number.isFinite(+v)).map(Number);
-  const deliveryBlock=c=>{
-    const shots=struckShots(c);
-    const specs=[['path','PATH','¬∞'],['face','FACE','¬∞'],['ftp','F‚ÄìP','¬∞']];
-    const values=specs.map(([key])=>[key,finiteValues(shots,key)]).filter(([,xs])=>xs.length);
-    if(!values.length)return '';
-    const limit=Math.max(2,Math.ceil(Math.max(...values.flatMap(([,xs])=>xs.map(Math.abs)))/2)*2);
-    const pos=v=>(50+Number(v)/limit*50).toFixed(2);
-    return `<div class="range-delivery" aria-label="${esc(c.club)} delivery angles">
-      <b>Delivery direction</b><span class="range-evidence-n">${values.reduce((n,[,xs])=>n+xs.length,0)} measured values</span>
-      ${values.map(([key,xs])=>{const avg=meanKeyed(shots,key);const zero=key==='ftp'?'face square to path':'target line';const ends=key==='ftp'?['closed','open']:['left','right'];return `<div class="range-angle-group"><div class="range-angle-row">
-        <span>${key==='ftp'?'F‚ÄìP':key.toUpperCase()}</span><div class="range-angle-track" aria-label="${key==='ftp'?'Face-to-path':key==='path'?'Club path':'Face angle'}: ${xs.length} shots, mean ${baySgn(avg)} degrees; zero is ${zero}">
-          ${xs.map(v=>`<i class="range-angle-dot" style="left:${pos(v)}%"></i>`).join('')}
-          <i class="range-angle-mean" style="left:${pos(avg)}%"></i>
-        </div><b>${baySgn(avg)}¬∞</b><small>n=${xs.length}</small></div>
-        <div class="range-angle-scale-row"><span></span><div class="range-angle-scale"><span>‚àí${limit}¬∞</span><span>+${limit}¬∞</span></div></div>
-        <p class="range-angle-reference">Center = ${zero}; negative ${ends[0]}, positive ${ends[1]}.</p></div>`;}).join('')}
-    </div>`;
-  };
-  const metricSummary=c=>{
-    const shots=struckShots(c);
-    const specs=[['smash','Smash factor','√ó',2],['cs','Club speed','mph',1],['bs','Ball speed','mph',1],['spin','Spin','rpm',0],['la','Launch','¬∞',1]];
-    const rows=specs.map(([key,label,unit,dec])=>{
-      const xs=finiteValues(shots,key); if(!xs.length)return '';
-      const avg=xs.reduce((a,b)=>a+b,0)/xs.length,min=Math.min(...xs),max=Math.max(...xs);
-      const span=max-min || Math.max(Math.abs(avg)*.08,1);
-      const lo=min-span*.08,hi=max+span*.08;
-      const pos=v=>Math.max(0,Math.min(100,(v-lo)/(hi-lo)*100)).toFixed(2);
-      const fmt=v=>dec===0?String(Math.round(v)):v.toFixed(dec);
-      return `<div class="range-metric"><div class="range-metric-head"><span>${label}</span><b>${fmt(avg)} <small>${unit}</small></b><em>n=${xs.length}</em></div>
-        <div class="range-metric-track" role="img" aria-label="${label}: mean ${fmt(avg)} ${unit}, ${xs.length} measured shots, range ${fmt(min)} to ${fmt(max)}">
-          ${xs.map(v=>`<i style="left:${pos(v)}%"></i>`).join('')}<b style="left:${pos(avg)}%"></b></div>
-        <div class="range-metric-range"><span>${fmt(min)}</span><span>range</span><span>${fmt(max)}</span></div></div>`;
-    }).filter(Boolean);
-    return rows.length?`<div class="range-evidence"><div class="range-evidence-title"><b>Measured-shot profile</b><span>remaining shots ¬∑ dots show this day's range, not ideal bands ¬∑ smash = ball √∑ club speed ¬∑ spin rpm ¬∑ launch degrees</span></div><div class="range-metric-grid">${rows.join('')}</div><p class="sm faint">Each metric uses only shots with that reading; n is its sample count. Strike efficiency (smash) describes speed transfer, not contact location.</p></div>`:'';
-  };
-  const evidenceBlock=c=>`<div class="range-evidence-club" data-club="${esc(c.club)}"><h4>${esc(c.club)} ¬∑ ${struckShots(c).length} remaining shots</h4>${deliveryBlock(c)}${metricSummary(c)}</div>`;
-  const caption=d.rangeCaption || (d.rangeSource
-      ? 'Carry means are TrackMan\'s displayed averages. Total means for 9i and 56¬∞ are calculated from the transcribed rows. Target hits are the recorded checkmarks, not inferred from distance alone.'
-      : 'Green is carry. Gold is total. Best 5 is the longest 5 carries of that batch.');
-  const barBlock=c=>{
-    const avg=avgOf(c);
-    const del=rangeDelLine(delOf(c));
-    const prem=premierMeans(c);
-    const screen=avg.displayedCarry != null ? +avg.displayedCarry : null;
-    const bestBar = prem && prem.carry != null
-      ? `<div class="range-bar-row best"><span>Best ${prem.n}</span><span class="range-track"><i style="width:${prem.carry/max*100}%"></i></span><b>${prem.carry.toFixed(1)}</b></div>
-      ${prem.total!=null?`<div class="range-bar-row total best-tot"><span>Best tot</span><span class="range-track"><i style="width:${prem.total/max*100}%"></i></span><b>${Number(prem.total).toFixed(1)}</b></div>`:''}`
-      : '';
-    const bestLine = prem ? `<p class="sm faint">${esc(premierLine(prem))}</p>` : '';
-    const retainedIds = new Set(struckShots(c).map(s => s.shot));
-    const targetHits = hits => (hits || []).filter(id => retainedIds.has(id)).length;
-    if(avg.carry != null){
-      return `<div class="range-club">
-      <h4>${esc(c.club)} ¬∑ ${avg.n} shots</h4>
-      <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
-      ${avg.total!=null?`<div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${(+avg.total).toFixed(1)}</b></div>`:''}
-      ${bestBar}
-      ${c.target!=null?`<p class="sm">Target ${c.target} yd ¬∑ carry hits <b>${targetHits(c.carryHits)}/${retainedIds.size}</b> ¬∑ total hits <b>${targetHits(c.totalHits)}/${retainedIds.size}</b></p>`:''}
-      ${del?`<p class="sm faint">${esc(del)}</p>`:''}
-      ${bestLine}
-    </div>`;
-    }
-    if(screen != null){
-      return `<div class="range-club">
-      <h4>${esc(c.club)} ¬∑ screen ¬∑ n=${avg.displayedN || (c.shots||[]).length}</h4>
-      <div class="range-bar-row"><span>Screen</span><span class="range-track"><i class="range-screen" style="width:${screen/max*100}%"></i></span><b>${screen.toFixed(1)}</b></div>
-      <p class="sm faint">Per-shot carries were off-screen, so this cannot be cleaned.${del ? ' '+esc(del)+'.' : ''}</p>
-      ${bestLine}
-    </div>`;
-    }
-    if(del || prem){
-      return `<div class="range-club">
-      <h4>${esc(c.club)} ¬∑ ${avg.n || (c.shots||[]).length} shots ¬∑ no carry</h4>
-      ${del?`<p class="sm faint">${esc(del)}. Per-shot carries were off-screen.</p>`:''}
-      ${bestLine}
-    </div>`;
-    }
-    return '';
-  };
-  const spreadBlock=c=>{
-    const struck=struckShots(c).filter(s=>s.carry!=null && Number.isFinite(+s.carry));
-    if(!struck.length){
-      const del=rangeDelLine(delOf(c));
-      const prem=premierMeans(c);
-      return `<div class="range-club"><b>${esc(c.club)}</b>
-      <p class="sm faint">No per-shot carries ‚Äî that column was off-screen.${del ? ' '+esc(del)+'.' : ''}${prem ? ' '+esc(premierLine(prem))+'.' : ''}</p></div>`;
-    }
-    const carries=struck.map(s=>+s.carry);
-    const top=new Set(premierShots(c));
-    return `<div class="range-club"><b>${esc(c.club)}</b>
-      <svg viewBox="0 0 300 84" role="img" aria-label="${esc(c.club)} carry spread: ${carries.join(', ')} yards.${c.target!=null?` Target ${c.target} yards.`:''}">
-      <line x1="10" x2="290" y1="62" y2="62" stroke="currentColor" opacity=".35"/>
-      ${c.target!=null?`<line x1="${x(c.target)}" x2="${x(c.target)}" y1="8" y2="65" stroke="var(--burg)" stroke-dasharray="4 3"/>`:''}
-      ${struck.map((s,i)=>`<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="${top.has(s)?'#aa842c':'var(--green)'}"><title>${top.has(s)?'Best ¬∑ ':''}Shot ${s.shot}: ${s.carry} yd carry${s.total!=null?`, ${s.total} yd total`:''}</title></circle>`).join('')}
-      <text x="10" y="80" fill="currentColor" font-size="10">0 yd</text><text x="290" y="80" text-anchor="end" fill="currentColor" font-size="10">${Math.round(max)} yd</text></svg>
-      <p class="sm faint">Carry range ${Math.min(...carries).toFixed(1)}‚Äì${Math.max(...carries).toFixed(1)} yd${top.size?` ¬∑ gold = best ${top.size}`:''}</p></div>`;
-  };
-  return `<section class="range-analysis" aria-label="Range shot analysis">
-    <h3>Carry vs total</h3><p class="sm">Green = carry. Gold = total. Best 5 is the longest 5 carries of that batch (best 3 if fewer than 5) ‚Äî still carry, not total. Distances in yards.</p>
-    ${groups.map(barBlock).join('')}
-    <p class="bvcap">${esc(caption)}</p>
-    <h3>Every carry</h3><p class="sm">${groups.some(c=>c.target!=null)?'Vertical line = target distance. ':''}Green dots = remaining carries. Gold dots = the longest 5. All clubs share the same scale.</p>
-    ${groups.map(spreadBlock).join('')}
-    <h3>Delivery and shot quality</h3><p class="sm">Path and face use the target line as 0¬∞. Face-to-path uses 0¬∞ for face square to path (negative = closed; positive = open). Outlined marker is the mean; small dots are individual remaining shots.</p>
-    ${groups.map(evidenceBlock).join('')}
-  </section>`;
-}
-function rangeShotTables(d){
-  if(!Array.isArray(d.rangeShots)) return '';
-  const groups=d.rangeShots.map(c=>({club:c.club, shots:struckShots(c), distanceSeconds:c.distanceSeconds, metricSeconds:c.metricSeconds}));
-  const n=groups.reduce((s,c)=>s+c.shots.length,0);
-  if(!n) return '';
-  const all=[['shot','#'],['carry','Carry yd'],['total','Total yd'],['carryHit','Carry hit'],['totalHit','Total hit'],['side','Carry side'],['curve','Curve'],['height','Apex'],['cs','Club mph'],['bs','Ball mph'],['smash','Smash'],['la','Launch¬∞'],['ld','Launch dir¬∞'],['spin','Spin rpm'],['aoa','Attack¬∞'],['path','Path¬∞'],['face','Face¬∞'],['ftp','F‚ÄìP¬∞']];
-  const cols=all.filter(([k])=>k==='shot'||groups.some(c=>c.shots.some(s=>s[k]!=null)));
-  return `<h2>${n} shots ¬∑ exact data</h2><div class="card"><p class="sm">Open a club below; swipe its table sideways for speed, spin and delivery. A dash means unavailable or not transcribed‚Äînot zero.</p>
-    ${groups.map(c=>`<details class="sect"><summary><b>${esc(c.club)} ¬∑ ${c.shots.length}</b></summary>
-      <div class="tscroll" tabindex="0" role="region" aria-label="${esc(c.club)} shot data"><table><thead><tr>${cols.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>
-      ${c.shots.map(s=>`<tr>${cols.map(([k])=>`<td>${s[k]==null?'‚Äî':typeof s[k]==='boolean'?(s[k]?'Yes':'No'):esc(String(s[k]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
-      ${c.distanceSeconds?`<p class="sm faint">Video reference: distance rows around ${c.distanceSeconds.join(', ')} seconds; supplementary columns around ${c.metricSeconds.join(', ')} seconds.</p>`:''}</details>`).join('')}
-    ${d.rangeSource?`<details class="sect"><summary>Source & coverage</summary><p class="sm">${esc(d.rangeSource.source)} ¬∑ ${esc(d.rangeSource.alias)}. ${esc(d.rangeSource.dateEvidence)} ${esc(d.rangeSource.coverage)}</p></details>`:''}</div>`;
-}
-function bayVisualMarkup(d){
-  if(!d || !Array.isArray(d.clubs) || !d.clubs.length) return '';
-  const delivery = analysisDelivery(d);
-  const deliveryNote = d.rangeShots
-    ? 'Path and face rings are the club averages for each block.'
-    : (d.rangeDeliveryNote || '');
-  return `${d.rangeShots?rangeShotVisuals(d):bayCarryVisual(d.clubs)}
-    ${d.rangeShots?'':bayConsistencyVisual(d.clubs)}
-    ${deliveryNote?`<p class="sm">${esc(deliveryNote)}</p>`:''}
-    ${bayDeliveryVisual(delivery.length ? delivery : d.clubs)}`;
-}
-function roundReviewBays(){
-  return (S.bays || []).map(b => ({
-    ...b,
-    detail:{ ...(b.detail || {}), clubs:analysisClubs(b.detail || {}) }
-  }));
-}
-function roundBayVisuals(r){
-  const i = (S.bays || []).findIndex(b => b._fid === r.review?.bayId);
-  if(i < 0) return '';
-  const b = S.bays[i], visuals = bayVisualMarkup(b.detail || {});
-  if(!visuals) return '';
-  return `<details class="card" id="round-range-reference"><summary>Optional comparison ¬∑ ${esc(fmtDate(b.date))} range session</summary>
-    <p class="sm">Separate practice session: ${esc(b.setup || '')}. Its range shots are not part of this round.</p>
-    <button class="btn" data-action="open-bay" data-i="${i}">Open range charts & exact data</button></details>`;
-}
-
-const SESSION_TYPES = [['days','Days'],['cumulative','Cumulative']];
-const DAY_FILTERS = [
-  ['days','All'],
-  ['outdoor','On-course'],
-  ['range','Bay'],
-  ['sim','Indoor'],
-  ['film','Film'],
-];
-// Captures, mixed. Four types used to be four homes; they are filters on one list now.
-function allDayRows(){
-  const rows = [];
-  (S.bays || []).forEach((b, i) => rows.push({
-    date:b.date, kind:'range', title:b.mode || b.setup || 'Bay session',
-    sub:[b.venue, bayLiveSetup(b) || b.setup].filter(Boolean).join(' ¬∑ '),
-    action:'open-bay', i, prov:'bay'
-  }));
-  (S.sessions || []).forEach((s, i) => rows.push({
-    date:s.date, kind:'film', title:s.setup || 'Filmed session',
-    sub:[sessionDiscipline(s), sessionGist(s)].filter(Boolean).join(' ¬∑ '),
-    action:'open-session', i, prov:'measured'
-  }));
-  (S.rounds || []).forEach((r, i) => rows.push({
-    date:r.date, kind:r.sim ? 'sim' : 'outdoor', title:r.course || 'Round',
-    sub:[r.score != null ? 'Score '+r.score : '', r.nine ? r.nine+' holes' : '',
-         r.sim ? (r.trackmanHandicapRound ? 'TrackMan HCP round ¬∑ indoor' : 'simulator ¬∑ indoor') : (r.live ? 'logged live' : '')]
-      .filter(Boolean).join(' ¬∑ '),
-    action:'open-round', i, prov:r.sim ? 'sim' : 'on-course'
-  }));
-  rows.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (a.title || '').localeCompare(b.title || ''));
-  return rows;
-}
-function sessionShortcuts(){
-  return `<section class="card session-shortcuts" aria-label="Days and cumulative"><h2>The record</h2>
-    <p class="sm">Days stay days. Cumulative is the analysis they add up to ‚Äî path, face, what is working, what to do.</p>
-    <div class="session-grid">
-      <button class="session-tile" data-action="session-category" data-kind="days"><b>Days</b><span>Every capture, newest first ‚Üí</span></button>
-      <button class="session-tile" data-action="session-category" data-kind="cumulative"><b>Cumulative</b><span>Every club ‚Äî remaining, best 5, path, face ‚Üí</span></button>
-    </div></section>`;
-}
-function sessionLibrary(kind='days'){
-  const kinds = new Set(['days','cumulative','range','sim','outdoor','film']);
-  if(!kinds.has(kind)) kind = 'days';
-  const segs = `<div class="segbar" role="tablist" aria-label="Record">
-    <button class="seg ${kind!=='cumulative'?'on':''}" data-action="session-category" data-kind="days">Days</button>
-    <button class="seg ${kind==='cumulative'?'on':''}" data-action="session-category" data-kind="cumulative">Cumulative</button>
-  </div>`;
-  if(kind === 'cumulative') return segs + cumulativeView();
-  const filter = (kind === 'days' || !kind) ? 'days' : kind;
-  const rows = allDayRows().filter(r => filter === 'days' || r.kind === filter);
-  const pending = (filter==='days' || filter==='range') && !(S.bays||[]).some(b => b._fid==='bay-20260915-range-54')
-    ? `<article class="card session-pending"><h3>Sep 15 ¬∑ Range practice</h3><p class="sm">The 54-shot analysis is available in the latest coach feed. Reconnect and refresh to download this session.</p></article>` : '';
-  return `${segs}
-  <div class="session-filters" role="group" aria-label="Filter days">${DAY_FILTERS.map(([k,lab]) =>
-    `<button class="btn ${filter===k?'':'ghost'}" data-action="session-category" data-kind="${k}" aria-pressed="${filter===k}">${lab}</button>`).join('')}</div>
-  <h2>Days</h2>
-  <p class="sm faint">Newest first ¬∑ ${rows.length} on file. A chip says what kind of day it was ‚Äî it is not a second list.</p>
-  ${pending}${rows.length ? rows.map(x => `<button class="card session-row" data-action="${esc(x.action)}"${
-      x.i != null ? ` data-i="${x.i}"` : ''}${x.view ? ` data-view="${esc(x.view)}"` : ''}>
-      <span class="session-date">${esc(x.date ? fmtDate(x.date) : 'Date unknown')} ${provBadge(x.prov)}</span>
-      <b>${esc(x.title)}</b><span>${esc(x.sub || '')}</span>
-      <span class="session-open">Open ‚Üí</span></button>`).join('')
-    : '<div class="card"><p>No days in this filter yet.</p></div>'}`;
-}
-function evoNow(disc){
-  const e = evoFor(disc);
-  if(!e || !e.metrics || !e.metrics.length) return null;
-  const col = Math.max(0, (e.sessions || []).length - 1);
-  return {
-    lab: (e.sessions || [])[col] || 'latest batch',
-    rows: e.metrics.map(m => ({
-      name:m.name, state:m.state || '',
-      mark:(m.marks && m.marks[col] != null) ? m.marks[col] : '‚Äî',
-      s:m.s
-    }))
-  };
-}
-
-function clubBaseName(name){
-  return String(name || '').replace(/\s*¬∑\s*.*$/i, '').replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
-}
-function clubPhaseOf(name){
-  const raw = String(name || '');
-  if(/after slot/i.test(raw)) return 'after slot';
-  if(/before slot/i.test(raw)) return 'before slot';
-  if(/¬∑\s*open/i.test(raw)) return 'open';
-  if(/¬∑\s*window/i.test(raw)) return 'window';
-  if(/¬∑\s*rest/i.test(raw)) return 'rest';
-  return 'stock';
-}
-function clubCanon(name){
-  const raw = clubBaseName(name);
-  if(/mini/i.test(raw)) return 'Mini';
-  if(/driver/i.test(raw)) return 'Dr';
-  const iron = raw.match(/(\d+)\s*-?\s*iron/i);
-  if(iron) return iron[1] + 'i';
-  const wood = raw.match(/(\d+)\s*-?\s*w(?:ood)?\b/i);
-  if(wood) return wood[1] + 'W';
-  const wedge = raw.match(/(\d{2})\s*¬∞/);
-  if(wedge) return wedge[1] + '¬∞';
-  if(/^pw\b/i.test(raw)) return 'PW';
-  return clubAbbr(raw);
-}
-function clubCanonLabel(canon){
-  const fromBag = (S.carries || []).find(c => clubCanon(c.club) === canon);
-  if(fromBag) return fromBag.club;
-  const map = { Dr:'Driver', Mini:'Mini Driver', '3W':'3-wood', '5W':'5-wood',
-    '2i':'2-iron', '5i':'5-iron', '6i':'6-iron', '7i':'7-iron', '8i':'8-iron', '9i':'9-iron',
-    PW:'PW', '50¬∞':'50¬∞', '56¬∞':'56¬∞', '60¬∞':'60¬∞' };
-  return map[canon] || canon;
-}
-function primaryClubsForDay(clubs){
-  const list = clubs || [];
-  const named = list.filter(c => clubPhaseOf(c.club) !== 'stock');
-  const stock = list.filter(c => clubPhaseOf(c.club) === 'stock');
-  if(named.some(c => ['open','window','rest'].includes(clubPhaseOf(c.club)))) return named;
-  return stock.concat(named);
-}
-function fillDelivery(c){
-  let path = c && c.path != null && Number.isFinite(+c.path) ? +(+c.path).toFixed(1) : null;
-  let face = c && c.face != null && Number.isFinite(+c.face) ? +(+c.face).toFixed(1) : null;
-  let ftp  = c && c.ftp  != null && Number.isFinite(+c.ftp)  ? +(+c.ftp).toFixed(1)  : null;
-  if(ftp == null && face != null && path != null) ftp = +(face - path).toFixed(1);
-  if(face == null && path != null && ftp != null) face = +(path + ftp).toFixed(1);
-  if(path == null && face != null && ftp != null) path = +(face - ftp).toFixed(1);
-  return { path, face, ftp };
-}
-function num1(v, d){
-  if(v == null || !Number.isFinite(+v)) return null;
-  return +(+v).toFixed(d);
-}
-function fillMetrics(c){
-  const d = fillDelivery(c);
-  const cs = num1(c && c.cs, 1), bs = num1(c && c.bs, 1);
-  let smash = num1(c && c.smash, 2);
-  if(smash == null && bs != null && cs) smash = +(bs / cs).toFixed(2);
-  let dynLoft = num1(c && c.dynLoft, 1);
-  let spinLoft = num1(c && c.spinLoft, 1);
-  const aoa = num1(c && c.aoa, 1);
-  if(spinLoft == null && dynLoft != null && aoa != null) spinLoft = +(dynLoft - aoa).toFixed(1);
-  if(dynLoft == null && spinLoft != null && aoa != null) dynLoft = +(spinLoft + aoa).toFixed(1);
-  return {
-    ...d,
-    smash, cs, bs, aoa, dynLoft, spinLoft,
-    la: num1(c && c.la, 1),
-    spin: c && c.spin != null && Number.isFinite(+c.spin) ? Math.round(+c.spin) : null,
-    ld: num1(c && c.ld, 1),
-    total: num1(c && c.total, 1)
-  };
-}
-const BAG_CANON = ['Dr','Mini','3W','5W','2i','5i','6i','7i','8i','9i','PW','50¬∞','56¬∞','60¬∞'];
-function deliveryMatch(dels, club){
-  const k = clubCanon(club), phase = clubPhaseOf(club);
-  return (dels || []).find(d => d.club === club)
-    || (dels || []).find(d => clubCanon(d.club) === k && clubPhaseOf(d.club) === phase)
-    || null;
-}
-function shotAngles(del, key){
-  return (del && del[key] ? del[key] : []).filter(v => v != null && Number.isFinite(+v)).map(Number);
-}
-function rollRemaining(pts){
-  const metricKeys = ['carry','best','total','smash','cs','bs','la','spin','aoa','dynLoft','spinLoft','ld','path','face','ftp'];
-  const metricCounts = {};
-  const w = key => {
-    let sum = 0, wt = 0;
-    (pts || []).forEach(p => {
-      const v = p[key];
-      const explicit = p.metricCounts && Object.prototype.hasOwnProperty.call(p.metricCounts, key);
-      const n = explicit ? p.metricCounts[key] : p.n;
-      if(v == null || !Number.isFinite(+v)) return;
-      if(n == null || !Number.isFinite(+n) || !(+n > 0)) return;
-      sum += +v * +n;
-      wt += +n;
-    });
-    metricCounts[key] = wt;
-    return wt ? sum / wt : null;
-  };
-  const n = (pts || []).reduce((s, p) => s + (p.n != null && Number.isFinite(+p.n) ? +p.n : 0), 0);
-  const raw = {
-    n: n || null, metricCounts,
-    carry: w('carry'), best: w('best'), total: w('total'),
-    smash: w('smash'), cs: w('cs'), bs: w('bs'), la: w('la'), spin: w('spin'),
-    aoa: w('aoa'), dynLoft: w('dynLoft'), spinLoft: w('spinLoft'), ld: w('ld'),
-    path: w('path'), face: w('face'), ftp: w('ftp')
-  };
-  const d = fillDelivery(raw);
-  return {
-    ...raw, ...d,
-    smash: raw.smash != null ? +(+raw.smash).toFixed(2) : null,
-    spin: raw.spin != null ? Math.round(+raw.spin) : null
-  };
-}
-function cumulativeClubSeries(){
-  const by = new Map();
-  baysFor('swing').slice().sort((a,b) => (a.b.date || '').localeCompare(b.b.date || '')).forEach(({ b, i }) => {
-    const detail = b.detail || {};
-    const dels = analysisDelivery(detail);
-    primaryClubsForDay(analysisClubs(detail)).forEach(c => {
-      const k = clubCanon(c.club);
-      if(!k) return;
-      const d = fillMetrics(c);
-      if(d.path == null && d.face == null && c.carry == null && c.best == null) return;
-      const del = deliveryMatch(dels, c.club);
-      if(!by.has(k)) by.set(k, []);
-      by.get(k).push({
-        date: b.date, i, phase: clubPhaseOf(c.club), metricCounts: c.metricCounts,
-        n: c.n, carry: c.carry, best: c.best, bestN: c.bestN, total: d.total,
-        smash: d.smash, cs: d.cs, bs: d.bs, la: d.la, spin: d.spin,
-        aoa: d.aoa, dynLoft: d.dynLoft, spinLoft: d.spinLoft, ld: d.ld,
-        path: d.path, face: d.face, ftp: d.ftp,
-        paths: shotAngles(del, 'paths'),
-        faces: shotAngles(del, 'faces')
-      });
-    });
-  });
-  return by;
-}
-function cumulativeClubKeys(by){
-  return BAG_CANON.filter(k => by.has(k)).concat([...by.keys()].filter(k => !BAG_CANON.includes(k)));
-}
-function cumulativeClubDelivery(){
-  const by = cumulativeClubSeries();
-  if(!by.size) return [];
-  return cumulativeClubKeys(by).map(k => {
-    const pts = by.get(k);
-    const roll = rollRemaining(pts);
-    return {
-      club: clubCanonLabel(k),
-      path: roll.path, face: roll.face, ftp: roll.ftp, n: roll.n,
-      paths: pts.flatMap(p => p.paths || []),
-      faces: pts.flatMap(p => p.faces || [])
-    };
-  }).filter(d => (d.path != null && Number.isFinite(+d.path)) || (d.face != null && Number.isFinite(+d.face)));
-}
-function cumulativeClubFaceCard(){
-  const viz = bayDeliveryVisual(cumulativeClubDelivery());
-  if(!viz) return '';
-  return `<div class="card">
-    <h2>Every club ¬∑ path + face ${provBadge('bay')}</h2>
-    <p class="sm">Every remaining shot on file, one row per club. Small dots are the shots; rings are the rolling remaining mean. No slot, no window ‚Äî after-slot stays on the day it happened.</p>
-    ${viz}
-  </div>`;
-}
-function cumulativeBagTable(){
-  const by = cumulativeClubSeries();
-  if(!by.size) return '';
-  const keys = cumulativeClubKeys(by);
-  const yd = v => v == null || !Number.isFinite(+v) ? '¬∑' : Number(v).toFixed(1);
-  const deg = v => v == null || !Number.isFinite(+v) ? '¬∑' : baySgn(v) + '¬∞';
-  const smash = v => v == null || !Number.isFinite(+v) ? '¬∑' : Number(v).toFixed(2);
-  const mph = v => v == null || !Number.isFinite(+v) ? '¬∑' : Number(v).toFixed(1).replace(/\.0$/, '');
-  const spin = v => v == null || !Number.isFinite(+v) ? '¬∑' : String(Math.round(v));
-  return `<div class="tscroll bay-clubs cum-bag"><table>
-    <thead><tr>
-      <th>CLUB</th><th>BEST 5</th><th>CARRY</th><th>SMASH</th><th>CLUB</th><th>BALL</th>
-      <th>LAUNCH¬∞</th><th>SPIN</th><th>AoA¬∞</th><th>DYN LOFT¬∞</th>
-      <th>PATH¬∞</th><th>FACE¬∞</th><th>F‚ÄìP¬∞</th><th>DIR¬∞</th><th>N</th><th>DAY</th>
-    </tr></thead>
-    <tbody>${keys.map(k => {
-      const pts = by.get(k);
-      const last = pts[pts.length - 1];
-      const roll = rollRemaining(pts);
-      const firstBest = pts.find(p => p.best != null);
-      const lastBest = [...pts].reverse().find(p => p.best != null);
-      const delta = firstBest && lastBest && pts.length > 1 && firstBest !== lastBest
-        ? +(lastBest.best - firstBest.best).toFixed(1) : null;
-      return `<tr data-action="open-bay" data-i="${last.i}" style="cursor:pointer">
-        <td><b>${esc(clubCanonLabel(k))}</b></td>
-        <td><b class="cum-best">${yd(lastBest ? lastBest.best : roll.best)}</b>${delta != null ? `<div class="sm faint">${delta > 0 ? '+' : ''}${delta}</div>` : ''}</td>
-        <td>${yd(roll.carry)}</td>
-        <td>${smash(roll.smash)}</td>
-        <td>${mph(roll.cs)}</td>
-        <td>${mph(roll.bs)}</td>
-        <td>${yd(roll.la)}</td>
-        <td>${spin(roll.spin)}</td>
-        <td>${deg(roll.aoa)}</td>
-        <td>${deg(roll.dynLoft)}</td>
-        <td>${deg(roll.path)}</td>
-        <td>${deg(roll.face)}</td>
-        <td>${deg(roll.ftp)}</td>
-        <td>${deg(roll.ld)}</td>
-        <td>${roll.n == null ? '¬∑' : roll.n}</td>
-        <td>${esc(fmtDate(last.date))}</td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table></div>
-  <p class="sm faint" style="margin-top:8px">Rolling remaining mean of every club on file, weighted by remaining n across days. One row per club ‚Äî slot and window stay on the day they happened. Best 5 is the latest batch ceiling, in burgundy. Missing readings stay a dash. Open a day to see its captured shots and source. Indoor carry is a simulator result, not a calibrated outdoor playing yardage.</p>`;
-}
-function cumulativeBagCard(fromHome){
-  const table = cumulativeBagTable();
-  if(!table) return '';
-  return `<div class="card">
-    <h2>Every club ¬∑ remaining & best 5 ${provBadge('bay')}</h2>
-    <p class="sm">The bag, read off the bays. Smash, speeds, launch, spin, attack, path, face ‚Äî the numbers that measure. Come back after the next lounge day and watch the row move.</p>
-    ${table}
-    ${fromHome ? `<div class="linkrow" data-action="session-category" data-kind="cumulative" style="border-bottom:none;margin-top:8px">
-      <span class="sm"><b>Full cumulative</b> ‚Äî path across days, what to do</span><span class="arr">‚Üí</span></div>` : ''}
-  </div>`;
-}
-
-function cumulativePathBays(){
-  return baysFor('swing').filter(o =>
-    analysisDelivery(o.b.detail || {}).some(d => d.path != null && Number.isFinite(+d.path)));
-}
-function cumulativeFlightRead(delivery){
-  const rows = (delivery || []).filter(d => d.path != null && Number.isFinite(+d.path));
-  if(!rows.length) return '';
-  const mean = xs => xs.reduce((a,b)=>a+b,0)/xs.length;
-  const paths = rows.map(d => +d.path);
-  const faces = rows.filter(d => d.face != null && Number.isFinite(+d.face)).map(d => +d.face);
-  const ftps = rows.filter(d => d.ftp != null && Number.isFinite(+d.ftp)).map(d => +d.ftp);
-  const allLeft = paths.every(p => p < 0);
-  const meanP = mean(paths);
-  const meanF = faces.length ? mean(faces) : null;
-  const meanFtp = ftps.length ? mean(ftps) : null;
-  let ball = 'Not enough face numbers on this session to name the curve.';
-  if(meanF != null && meanFtp != null){
-    if(meanF < 0 && meanFtp > 0) ball = 'Face left of the target and open to that path. For a centered strike, this tends toward a left start and rightward curve. This describes the session averages; individual shots may differ.';
-    else if(meanF < 0 && meanFtp < 0) ball = 'Face left of the target and closed to the path. Start left, curve left.';
-    else if(meanF > 0 && meanFtp > 0) ball = 'Face right of the target and open to the path. Start right, curve right.';
-    else ball = 'Face right of the target and closed to the path. Start right, curve left.';
-  }
-  return `<p class="sm cum-flight"><b>${allLeft ? 'Every club path on this session is left of the target' : 'Club path is mixed'}</b>
-    ¬∑ mean path ${esc(baySgn(meanP))}¬∞${meanF != null ? ` ¬∑ mean face ${esc(baySgn(meanF))}¬∞` : ''}${meanFtp != null ? ` ¬∑ mean face-to-path ${esc(baySgn(meanFtp))}¬∞` : ''}.
-    ${esc(ball)} Test path and face together rather than treating either average as a swing diagnosis. ${meaningBtn('faceAtImpact')}</p>`;
-}
-function cumulativePathHistory(){
-  const list = cumulativePathBays();
-  if(!list.length) return '';
-  const pos = v => Math.max(0, Math.min(100, 50 + (+v / 16 * 50))).toFixed(1);
-  return `<div class="cump-hist" aria-label="Club path across bay days">
-    <div class="bvtitle"><b>Path across days</b><span>left ‚Üê 0¬∞ ‚Üí right</span></div>
-    ${list.map(({ b }) => {
-      const rows = analysisDelivery(b.detail || {}).filter(d => d.path != null && Number.isFinite(+d.path));
-      const avg = rows.reduce((s,d)=>s+(+d.path),0)/rows.length;
-      return `<div class="cump-row">
-        <span class="cump-date">${esc(fmtDate(b.date))}</span>
-        <span class="bvdaxis">${rows.map(d =>
-          `<i class="bvdshot path" style="left:${pos(d.path)}%" title="${esc(clubTag(d.club))} ${baySgn(d.path)}¬∞"></i>`).join('')}
-          <i class="bvdot path" style="left:${pos(avg)}%" title="Session mean ${baySgn(avg)}¬∞"></i></span>
-        <b>${esc(baySgn(avg))}¬∞</b></div>`;
-    }).join('')}
-    <p class="bvcap">Each small dot is one club's average path that day. The ring is the mean of those clubs ‚Äî a shape, not a number to type. Negative is out-to-in.</p>
-  </div>`;
-}
-
-// Derived from the same reviewed cohorts as Days. Nothing here writes playing yardages.
-function cumulativeOverview(){
-  const by = cumulativeClubSeries();
-  const rows = cumulativeClubKeys(by).map(k => {
-    const pts = by.get(k), roll = rollRemaining(pts);
-    return {k, pts, roll, last:pts[pts.length-1]};
-  });
-  const num = (v,d=1) => v == null || !Number.isFinite(+v) ? '‚Äî' : (+v).toFixed(d);
-  const scale = Math.max(1,...rows.map(r=>r.roll.carry || 0));
-  const candidates = rows.map(r=>{
-    const p = [...r.pts].reverse().find(p=>p.carry != null && p.best != null && p.n >= 5);
-    return {...r,p,gap:p ? p.best-p.carry : -1};
-  }).filter(r=>r.p && r.gap >= 0).sort((a,b)=>b.gap-a.gap);
-  const focus = candidates[0];
-  return `<nav class="cum-jumps" aria-label="Cumulative sections">
-    <a href="#cum-plan">Plan</a><a href="#cum-bag">Bag & trends</a><a href="#cum-course">On course</a><a href="#cum-evidence">Evidence</a>
-  </nav>
-  <section class="card cum-plan" id="cum-plan">
-    <span class="eyebrow">Your next session</span><h2>Turn the record into a test</h2>
-    ${focus ? `<p><b>${esc(clubCanonLabel(focus.k))}: make the usual shot more like your better ones.</b>
-    In the ${esc(fmtDate(focus.p.date))} block, retained carry averaged ${num(focus.p.carry)} yd; best ${focus.p.bestN || 5} averaged ${num(focus.p.best)} yd.
-    That ${num(focus.gap)} yd gap is a consistency question, not promised distance.</p>
-    <div class="cum-steps"><div><b>01 ¬∑ Establish</b><p>Warm up, then record 10 shots with this club and one target. Keep the same setup and ball conditions.</p></div>
-    <div><b>02 ¬∑ Compare</b><p>Compare retained carry and its spread with this block. Track path and face-to-path alongside it; chasing the longest shot alone will miss the pattern.</p></div>
-    <div><b>03 ¬∑ Decide</b><p>Look for a smaller gap to your best shots without a wider miss. Repeat on another day before changing a playing yardage.</p></div></div>
-    <button class="btn" data-action="open-bay" data-i="${focus.p.i}">Open the baseline session</button>`
-    : '<p>Build a baseline: record 10 shots with one club, one target and readable carry/total. Add path and face when available.</p>'}
-    <p class="sm faint">Suggested measurement plan. The club is selected by the largest available latest-block best-shot gap, not estimated strokes lost.</p>
-  </section>
-  <section class="card" id="cum-bag"><span class="eyebrow">Range evidence</span><h2>Your bag at a glance</h2>
-    <p class="sm">Bars show rolling indoor carry. Open a club for its session history and delivery. Total includes roll; carry is distance through the air.</p>
-    <div class="cum-club-list">${rows.map(({k,pts,roll,last})=>{
-      const measured = pts.filter(p=>p.carry != null);
-      const history = measured.slice(-6);
-      const max = Math.max(1,...history.map(p=>p.carry));
-      return `<details class="cum-club"><summary><span class="cum-club-name">${esc(clubCanonLabel(k))}</span>
-        <span class="cum-bar"><i style="width:${Math.max(0,(roll.carry || 0)/scale*100)}%"></i></span>
-        <span><b>${num(roll.carry)}</b><small>yd carry ¬∑ n=${roll.metricCounts.carry || 0}</small></span></summary>
-        <div class="cum-club-body"><div class="cum-metrics">
-          <span><b>${num(roll.total)}</b>Total yd ¬∑ n=${roll.metricCounts.total || 0}</span>
-          <span><b>${num(roll.smash,2)}</b>Smash ¬∑ n=${roll.metricCounts.smash || 0}</span>
-          <span><b>${num(roll.path)}¬∞</b>Path ¬∑ n=${roll.metricCounts.path || 0}</span>
-          <span><b>${num(roll.ftp)}¬∞</b>Face‚Äìpath ¬∑ n=${roll.metricCounts.ftp || 0}</span>
-        </div><p class="sm">Smash is ball speed √∑ club speed. Path is club travel relative to target; face‚Äìpath is where the face points relative to that travel. Positive angles point right, negative left.</p>
-        <h3>Recent carry readings</h3>
-        ${history.map(p=>`<button class="cum-history" data-action="open-bay" data-i="${p.i}"><span>${esc(fmtDate(p.date))}<small>${esc(p.phase)} ¬∑ n=${p.metricCounts?.carry ?? p.n ?? '‚Äî'}</small></span><span class="cum-bar"><i style="width:${Math.max(0,p.carry/max*100)}%"></i></span><b>${num(p.carry)}</b></button>`).join('') || '<p class="sm">No readable carry history yet.</p>'}
-        <p class="sm faint">Up to six recorded blocks; same-day blocks are not separate days. Setup, intent and conditions can differ, so movement alone does not prove improvement.</p>
-        <button class="btn" data-action="open-bay" data-i="${last.i}">Latest source ¬∑ ${esc(fmtDate(last.date))}</button></div></details>`;
-    }).join('') || '<p>No reviewed range clubs yet. Open Days to check your sessions.</p>'}</div>
-  </section>`;
-}
-function cumulativeView(){
-  const C = areaCards();
-  const { areas:A } = gameAreas(C.cards);
-  const outdoor = realRounds().length;
-  const indoor = (S.rounds || []).filter(r => r.sim).length;
-  const bays = (S.bays || []).length;
-  const films = (S.sessions || []).length;
-  const counted = AREAS.filter(k => A[k]);
-  const thin = counted.length && Math.min(...counted.map(k => A[k].n)) < 36;
-  const sig = coachSignals();
-  const f = coachFocus(sig);
-  const ft = focusTag(f);
-  const since = coachSince();
-  const pathBays = cumulativePathBays();
-  const latest = pathBays[0] || null;
-  const delivery = latest ? analysisDelivery(latest.b.detail || {}) : [];
-  const openFaults = (S.faults || []).filter(x => faultState(x) === 'open');
-  const shutFaults = (S.faults || []).filter(x => faultState(x) !== 'open');
-  const evoBits = ['swing','putting','short-game'].flatMap(d => {
-    const now = evoNow(d);
-    return now ? now.rows.map(r => ({ disc:d, lab:now.lab, ...r })) : [];
-  });
-  const evoGood = evoBits.filter(r => r.mark === '\u2713' || r.mark === '~');
-  const evoBad = evoBits.filter(r => r.mark === '\u2717' || r.mark === '?');
-  const allPathsLeft = pathBays.length && pathBays.every(({ b }) => {
-    const rows = analysisDelivery(b.detail || {}).filter(d => d.path != null && Number.isFinite(+d.path));
-    return rows.length && rows.every(d => +d.path < 0);
-  });
-  const recs = (S.actions || []).filter(a => !a.done);
-  const recShow = recs.filter(a => a.pri).concat(recs.filter(a => !a.pri)).slice(0, 4);
-  const tile = k => {
-    const a = A[k];
-    const on = f && areaOf(f) === k;
-    return `<div class="area${on ? ' focus' : ''}">
-      <div class="l">${esc(AREA_LAB[k])}${on ? ' ¬∑ focus' : ''}</div>
-      ${a ? `<div class="v">${esc(a.v)}</div><div class="u">${esc(a.u)}${a.raw ? ` ¬∑ ${esc(a.raw)}` : ''} ¬∑ n=${a.n}</div>
-             <div class="rd">${a.read}</div>`
-          : `<div class="v faint">‚Äî</div><div class="u">not logged yet</div>
-             <div class="rd">Log a live round and this fills itself in.</div>`}
-    </div>`;
-  };
-  return `
-  <h2>Cumulative</h2>
-  <div class="card">
-    <p class="sm">Days stay days. This is what they add up to ‚Äî the analysis, the pictures, and what to do next. It updates when reviewed data is imported. Sample counts show coverage, not measurement accuracy.</p>
-    <div class="cum-n">
-      <span>${C.liveHoles} live holes</span>
-      <span>${outdoor} outdoor round${outdoor===1?'':'s'}</span>
-      <span>${bays} bay session${bays===1?'':'s'}</span>
-      <span>${films} film day${films===1?'':'s'}</span>
-      ${indoor ? `<span>${indoor} indoor ‚Äî listed, not in the four</span>` : ''}
-    </div>
-    ${since.length ? `<p class="sm faint" style="margin-top:8px">Standing on ${esc(since.join(' ¬∑ '))}.</p>` : ''}
-  </div>
-
-  ${cumulativeOverview()}
-  <details class="card cum-detail"><summary>All club metrics ¬∑ full table</summary>${cumulativeBagTable()}</details>
-  <details class="cum-detail"><summary class="card">Delivery patterns ¬∑ path & face</summary>
-  ${cumulativeClubFaceCard()}</details>
-
-  ${f ? `<div class="card">
-    <h2>The one thing</h2>
-    <div class="tipcard ${f.sev === 'good' ? 'green' : ''}${rail(f.ev)}">
-      <div class="src">Focus right now ¬∑ ${esc(f.src)}${evTag(f.ev)}</div>
-      <h4>${f.h}</h4>${expandable(f.b)}
-      ${ft ? faultDrillRow(ft) : ''}
-    </div>
-  </div>` : ''}
-
-  <div class="card">
-    <h2 id="cum-evidence">Working ¬∑ needs work</h2>
-    <p class="sm faint">Closed faults and checkmarks on one side. Open faults and the measured miss on the other. These coaching assessments change when reviewed findings are published.</p>
-    <div class="cum-split">
-      <div class="cum-col work">
-        <h3>Working</h3>
-        ${shutFaults.length ? `<ul>${shutFaults.map(x =>
-          `<li><b>${esc(faultLabel(x.tag))}</b> ¬∑ ${faultState(x)==='downgraded'?'downgraded':'measured shut'}</li>`).join('')}</ul>`
-          : '<p class="sm faint">Nothing measured shut yet.</p>'}
-        ${evoGood.length ? `<p class="sm" style="margin-top:8px">${evoGood.map(r =>
-          `<span class="cum-mark good">${esc(r.mark)} ${esc(r.name)}</span>`).join('')}</p>` : ''}
-      </div>
-      <div class="cum-col need">
-        <h3>Needs work</h3>
-        ${allPathsLeft ? `<p class="sm"><b>Out-to-in path</b> ‚Äî every measured club, every bay day. That is the swing job.</p>` : ''}
-        ${openFaults.length ? `<ul>${openFaults.map(x =>
-          `<li><b>${esc(faultLabel(x.tag))}</b> ¬∑ ${esc(faultDisc(x).replace('-', ' '))}</li>`).join('')}</ul>`
-          : '<p class="sm faint">No open faults on the card.</p>'}
-        ${evoBad.length ? `<p class="sm" style="margin-top:8px">${evoBad.map(r =>
-          `<span class="cum-mark bad">${esc(r.mark)} ${esc(r.name)}</span>`).join('')}</p>` : ''}
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>Club path + face ${provBadge('bay')}</h2>
-    <p class="sm">Path describes club travel; face helps explain start direction and face-to-path helps explain curvature. Launch-monitor readings alone do not establish the body movement causing them.</p>
-    <div class="hipcompare">${pathDiagram()}</div>
-    ${latest ? `<p class="sm faint" style="margin-top:10px">Latest measured day ¬∑ ${esc(fmtDate(latest.b.date))} ¬∑ ${esc(latest.b.mode || latest.b.setup || 'bay')}. ${provBadge('trackman')}</p>
-      ${cumulativeFlightRead(delivery)}` : '<p class="sm">No bay session has a path reading yet.</p>'}
-    ${cumulativePathHistory()}
-  </div>
-
-  <div class="card">
-    <h2 id="cum-course">On course ${provBadge('on-course')}</h2>
-    <p class="sm faint">${C.cards.length ? areaProvLine(C) : 'Nothing on-course on file yet.'}
-      ${indoor ? ' Indoor rounds are days you can open. They never enter these four.' : ''}</p>
-    <div class="areagrid">${AREAS.map(tile).join('')}</div>
-    ${thin ? `<p class="sm faint">Thin sample ‚Äî some of these rest on fewer than 36 recorded holes, which is a flag rather than a rate.</p>` : ''}
-  </div>
-
-  ${latest && latest.b.finding ? `<div class="card cum-lane">
-    <h2>Latest from the bay ¬∑ ${esc(fmtDate(latest.b.date))} ${provBadge('bay')}</h2>
-    ${expandable(latest.b.finding)}
-    <div class="linkrow" data-action="open-bay" data-i="${latest.i}" style="margin-top:8px;border-bottom:none">
-      <span class="sm"><b>Open that day</b> ‚Äî every shot, the charts, the table</span><span class="arr">‚Üí</span></div>
-  </div>` : ''}
-
-  ${recShow.length ? `<div class="card">
-    <h2>What to do</h2>
-    <p class="sm faint">Open items, priority first. The work lives here so it does not hide behind another door.</p>
-    ${recShow.map(a => `<div class="cum-rec">${expandable(a.text)}</div>`).join('')}
-  </div>` : ''}
-
-  <div class="card"><h2>Explore the whole record</h2>
-    <p class="sm">Simulator scores and shot profiles have their own context. Putting, short-game and swing assessments above retain their reviewed evidence.</p>
-    <div class="cum-jumps"><button class="btn" data-action="session-category" data-kind="sim">Simulator rounds (${indoor})</button><button class="btn" data-action="session-category" data-kind="film">Swing & putting film (${films})</button></div>
-  </div>
-  <div class="card flat">
-    <div class="linkrow" data-action="session-category" data-kind="days" style="border-bottom:none">
-      <span><b>Days ‚Üí</b><span class="sm"> the captures this picture is standing on</span></span><span class="arr">‚Üí</span></div>
-  </div>`;
-}
-// NEWEST FIRST, same row shape as the film log ‚Äî the lab still reads as one record of what
-// has been captured, with the BAY chip saying which kind of capture a row was.
-function bayLog(list){
-  return `<p class="sm faint" style="margin-bottom:2px">Tap a session for every number it produced.</p>
-  ${list.map(({ b, i }) => `<div class="seslog" data-action="open-bay" data-i="${i}">
-    <div class="sesh"><b>${fmtDate(b.date)}</b><span class="sesm"><span class="bayc">BAY</span>${
-      esc(baySize(b))}${b.detail ? ' ‚ñ∏' : ''}</span></div>
-    <div class="sesg">${esc(bayGist(b))}</div>
-  </div>`).join('')}`;
-}
-// ----- The Combine (Sep 11 2026) -----
-// Trackman's own test: three shots each to nine target yardages plus driver, twice over ‚Äî
-// 60 shots ‚Äî scored 0‚Äì100 against the distance carried and how far offline it finished.
-// The only thing a bay produces that is directly comparable against ITSELF, which is what
-// makes it a BENCHMARK rather than a session, and why it renders as a table of results
-// rather than into the labs.
-//
-// Two rules borrowed from the drill log, both about not drawing a conclusion out of two
-// numbers: the trend line needs THREE results, and a per-target row only renders where the
-// target was actually hit at (an absent yardage is absent, never a zero).
-function combineCard(){
-  const list = (S.combines || []).slice().sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-  if(!list.length) return '';
-  const last = list[list.length - 1];
-  const scored = list.filter(c => c.score != null).map(c => c.score);
-  const yds = [...new Set(list.flatMap(c => (c.targets || []).map(t => t.yds)))].sort((a, b) => a - b);
-  return `<h2>The Combine</h2>
-  <div class="card">
-    <div class="rowgrid g3">
-      <div class="stat"><div class="v">${esc(last.score != null ? last.score : '‚Äî')}${meaningBtn('combineScore')}</div>
-        <div class="l">Latest ${provBadge('trackman')}</div></div>
-      <div class="stat"><div class="v">${esc(scored.length ? Math.max(...scored) : '‚Äî')}</div>
-        <div class="l">Best</div></div>
-      <div class="stat"><div class="v">${list.length}</div><div class="l">Taken</div></div>
-    </div>
-    ${scored.length >= 3 ? `<div class="trend" style="color:var(--t-bay);margin-top:10px">${spark(scored, 30, 'var(--t-bay)')}</div>`
-      : `<p class="sm faint" style="margin-top:8px">A trend needs three results ‚Äî two points are a line through anything.</p>`}
-    ${yds.length ? `<div class="tscroll" style="margin-top:10px"><table>
-      <thead><tr><th>TARGET</th>${list.map(c => `<th>${esc(fmtDate(c.date).replace(/,.*$/, ''))}</th>`).join('')}</tr></thead>
-      <tbody>${yds.map(y => `<tr><td><b>${esc(y)}</b></td>${list.map(c => {
-        const t = (c.targets || []).find(x => x.yds === y);
-        return `<td>${t ? esc(t.score != null ? t.score : (t.avgDist != null ? t.avgDist + '‚Ä≤' : '¬∑')) : '¬∑'}</td>`;
-      }).join('')}</tr>`).join('')}</tbody></table></div>
-      <p class="sm faint" style="margin-top:8px">Score out of 100 per target ‚Äî distance carried and how far
-        offline it finished. A blank is a yardage that test did not ask for.</p>` : ''}
-    ${last.note ? `<p class="sm" style="margin-top:8px">"${esc(last.note)}"</p>` : ''}
-    ${evDrawer('combine-ev', 'These scores', 'bay',
-      `${list.length} Combine${list.length === 1 ? '' : 's'}${last.venue ? ' ¬∑ ' + last.venue : ''}`,
-      'A fixed protocol to fixed targets on a mat ‚Äî which is what makes it comparable to your own earlier attempts, and what stops it saying anything about a shot off a slope in wind.')}
-  </div>`;
-}
-function bayBlock(disc, empty){
-  const list = baysFor(disc);
-  return `${disc === 'swing' ? sessionShortcuts() : ''}<h2>The bay ¬∑ measured numbers</h2>
-  <div class="card">
-    ${list.length ? bayLog(list) : `<p class="sm">${empty}</p>`}
-  </div>`;
-}
-function sixMetricGuide(b){
-  if(!b || b._fid !== 'bay-six-metric-baseline-20260916-v1') return '';
-  return `<h2>What these six numbers mean</h2><div class="card">
-    <p class="sm">${provBadge('trackman')} This is one TrackMan shot‚Äînot a club average. Compare future readings only with the same confirmed club, intended shot and conditions. ${meaningBtn('faceAtImpact')}${meaningBtn('cons')}${meaningBtn('carry')}</p>
-    <div class="rowgrid g3" style="margin-top:10px">
-      <div class="stat"><div class="v">128.5</div><div class="l">Ball speed ¬∑ mph</div><p class="sm">How fast the ball left the face. Higher at a similar swing speed usually means more distance.</p></div>
-      <div class="stat"><div class="v">1.42</div><div class="l">Smash factor</div><p class="sm">Strike efficiency: ball speed divided by club speed. Higher with the same club and speed means a more centered strike. Driver-only reference: 1.47‚Äì1.50 is excellent.</p></div>
-      <div class="stat"><div class="v">‚àí1.6¬∞ ${meaningBtn('faceAtImpact')}</div><div class="l">Face angle ${provBadge('trackman')}</div><p class="sm">Start direction. Negative means the face pointed left, so this ball started left of the target line.</p></div>
-      <div class="stat"><div class="v">+6.5¬∞</div><div class="l">Face-to-path</div><p class="sm">Curve control. Positive means the face was open to the path. With the ‚àí1.6¬∞ face, this is a left-starting ball that peels right‚Äîa pull fade / bigger-cut pattern. Bring it closer to zero before chasing speed.</p></div>
-      <div class="stat"><div class="v">3,979</div><div class="l">Spin rate ¬∑ rpm</div><p class="sm">Controls flight, roll and how much the ball can curve. The club is unconfirmed, so this is a comparison number‚Äînot yet called high or low.</p></div>
-      <div class="stat"><div class="v">193.7 ${meaningBtn('carry')}</div><div class="l">Carry ¬∑ yd ${provBadge('bay')}</div><p class="sm">Air distance before roll‚Äîthe number for clearing hazards and holding greens. It is not a new bag yardage until repeated.</p></div>
-    </div>
-    <p class="sm" style="margin-top:10px"><b>Your immediate priority:</b> improve face-to-path consistency while keeping the face near your intended start line. That makes the ball flight more predictable; speed and carry become easier to trust afterward.</p>
-  </div>`;
-}
-function bayDayData(b){
-  const api=window.CaddieBayTakeaways;
-  if(!api||!b.date||BAY_DISC(b)!=='swing')return null;
-  const bays=(S.bays||[]).map((x,index)=>({...x,index,detail:{...(x.detail||{}),
-    rangeShots:(x.detail?.rangeShots||[]).map(g=>({...g,canon:clubCanon(g.club)}))}}));
-  return api.prepare(b.date,bays,isClearMishit);
-}
-function bayDayTakeaways(b,day=bayDayData(b)){
-  const api=window.CaddieBayTakeaways;
-  if(!day)return '';
-  return api.render(day,api.build(day));
-}
-function bayView(i){
-  let b = (S.bays || [])[+i];
-  if(!b) return game();
-  const day=bayDayData(b);
-  const d = day?.usable ? {combinedDay:true,clubs:day.clubs.map(g=>({club:g.club,n:g.shots.length})),rangeShots:day.clubs,
-    rangeCaption:'One combined full-day set per club. Missing-distance rows and clear mishits excluded in their original source blocks.'} : b.detail || {};
-  if(day?.usable)b={...b,detail:d,venue:'Full-day range review',ball:'See source notes',norm:'See source notes',spin:'See source notes',
-    finding:`${day.usable} usable shots across ${day.clubs.length} clubs. All same-club blocks combined; averages are calculated from individual retained readings, not averages of block averages.`};
-  const analyzed = analysisClubs(d);
-  const delivery = analysisDelivery(d);
-  const clubRows = analyzed.map(c => {
-    const x = delivery.find(v => v.club === c.club);
-    const row = { ...c };
-    if(row.path == null && x && x.path != null) row.path = +Number(x.path).toFixed(1);
-    if(row.face == null && x && x.face != null) row.face = +Number(x.face).toFixed(1);
-    if(row.ftp == null && x && x.ftp != null) row.ftp = +Number(x.ftp).toFixed(1);
-    if(row.carry == null && row.displayedCarry != null) row.carry = row.displayedCarry;
-    return row;
-  });
-  const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
-  const LAB = { swing:['swing','Swing Lab'], 'short-game':['shortgame','Short Game'],
-                putting:['putting','Putting Lab'], mental:['mental','Mental Game'] };
-  const [view, label] = LAB[BAY_DISC(b)] || LAB.swing;
-  return `
-  <button class="backlink" data-action="session-category" data-kind="days">‚Üê Days</button>
-  <h2>${esc(fmtDate(b.date))} ¬∑ ${esc(b.mode || 'Range practice')}</h2>
-  <p class="sm">${esc(b.venue || '')} ¬∑ ${esc(bayLiveSetup(b) || b.setup || '')}</p>
-  ${bayDayTakeaways(b,day)}
-  ${d.clubs && d.clubs.length ? `<div class="card bayvisuals">${bayVisualMarkup(d)}</div>` : ''}
-  <div class="card">
-    <h2>${fmtDate(b.date)} ¬∑ bay session</h2>
-    <h3>${esc(bayLiveSetup(b) || b.setup || '')}</h3>
-    ${bayProv(b)}
-    ${d.metrics && d.metrics.length ? `<div class="rowgrid g3" style="margin:12px 0 4px">
-      ${d.metrics.map(m => `<div class="stat" style="border-top-color:${sc[m.s] || 'var(--green)'}">
-        <div class="v" style="font-size:13px;color:${sc[m.s] || 'var(--green)'}">${esc(m.v)}</div>
-        <div class="l">${esc(m.k)}</div>
-        <div class="n" style="font-size:9px;color:var(--faint);font-family:var(--sans);margin-top:2px">${esc(m.n || '')}</div>
-      </div>`).join('')}
-    </div>` : ''}
-    ${b.finding ? `<p class="sm" style="margin-top:10px">${esc(b.finding)}</p>` : ''}
-  </div>
-  ${sixMetricGuide(b)}
-  ${d.clubs && d.clubs.length ? `<h2>Exact club data</h2>
-  <div class="card">
-    ${bayClubTable(clubRows)}
-    <p class="sm faint" style="margin-top:8px">A column only appears where the session
-      actually produced it. Carry is computed from measured launch ‚Äî it is a modelled flight,
-      not a ball anyone watched land.</p>
-  </div>` : ''}
-  ${rangeShotTables(d)}
-  ${d.story ? `<h2>What the numbers said</h2><div class="card">${prose(d.story)}
-    ${d.limits ? `<details class="sect"><summary><b>What the bay couldn't see</b><span class="gist">${
-      esc(splitLead(d.limits)[0])}</span></summary>${prose(d.limits)}</details>` : ''}
-  </div>` : ''}
-  <div class="card flat">${evDrawer('bay-ev-' + (+i), 'These numbers', 'bay',
-    [b.venue, baySize(b), b.ball ? 'ball ¬∑ ' + b.ball : ''].filter(Boolean).join(' ¬∑ '),
-    b.spin === 'estimated' ? 'Spin was estimated rather than measured on this session, so every carry here is a model built partly on a modelled input.' : '')}</div>`;
-}
-
-// ----- Lab plan blocks -----
-// Pre-shot routines head every lab: they're what you read standing on the first tee,
-// so they sit above the diagnosis rather than buried under it.
-const isRoutine = b => /routine/i.test(b.course || '');
-// Which standing plans belong to a lab ‚Äî ONE source, shared by the lab views, the hub
-// rows and the cheat sheet. The swing lab is the catch-all for any plan with no
-// discipline, EXCEPT course plans, which have none by design and belong to Round Prep
-// (that's the Aug 14 audit fix ‚Äî Sterling Farms was rendering as a swing plan).
-function plansFor(disc){
-  if(disc !== 'swing') return S.briefings.filter(b => !b.date && b.discipline === disc);
-  const known = S.courses.map(c => c.name);
-  return S.briefings.filter(b => !b.date
-    && !['putting','mental','short-game'].includes(b.discipline || 'swing')
-    && !known.some(n => courseMatches(b.course, n)));
-}
-function planLinks(list){
-  return list.map(b => `<div class="linkrow" data-action="open-briefing" data-id="${b.id}">
-      <span><b>${esc(b.course)}</b><br><span class="sm clip2">${esc(b.focus || 'Plan ready')}</span></span><span class="arr">‚Üí</span></div>`).join('');
-}
-function routineBlock(plans){
-  const r = plans.filter(isRoutine);
-  return r.length ? `<h2>Pre-round ¬∑ routine</h2>
-  <div class="card">${planLinks(r)}</div>` : '';
-}
-
-// ----- Pre-round cheat sheet -----
-// One screen, read in the parking lot. Nothing on it is authored twice: the chips are
-// the lead plan's own rules[], the focus line is that plan's focus, and the watch list
-// is the open faults off the diagnosis card ‚Äî so the sheet updates itself whenever a
-// feed entry updates the plan or settles a fault, with no second copy to keep current.
-function cheatBtn(disc){
-  return `<button class="cheatbtn" data-action="cheat-open" data-disc="${disc}">‚ö° Cheat sheet<span>the pre-round read ¬∑ one screen</span></button>`;
-}
-// A rule chip compressed to the phrase you act on. The plans author their rules with
-// the payload up front ("Set the face BARELY OPEN ‚Äî that's your square"), so the lead
-// clause IS the cue; the reasoning stays one tap away in the full plan.
-function cheatCue(r){
-  let t = String(r || '').trim();
-  if(t.length <= 44) return t;
-  const dash = t.split(/\s+[‚Äî‚Äì]\s+/)[0];
-  if(dash.length <= 52) return dash;
-  t = splitLead(dash)[0];
-  if(t.length <= 52) return t;
-  t = t.split(/,\s/)[0];
-  return t.length <= 56 ? t : t.slice(0, 52).replace(/\s+\S*$/, '') + '‚Ä¶';
-}
-// Per-lab art ‚Äî a picture instead of a paragraph. Like the Swing Positions guide this
-// is hardcoded presentation, and it draws the standing plans' HEADLINE instructions:
-// if a plan's headline changes (the face call, the landing-spot rule, the guard-the-
-// start read), the drawing here has to change with it. Theme-aware via CSS vars.
-const CHEAT_ART = {
-  swing(){
-    // The two positions the whole plan hangs on: address, and the top ‚Äî where the
-    // laid-off re-route starts and the ONE thought (trail elbow) does its work.
-    const d = posData();
-    return `<div class="sheetart"><div class="duo">
-      <div>${posSvg(d[0])}<div class="cap">Address ¬∑ 50/50, hinge from the hips</div></div>
-      <div>${posSvg(d[2])}<div class="cap">Top ¬∑ trail elbow DOWN &amp; IN FRONT</div></div>
-    </div></div>`;
-  },
-  putting(){
-    // Overhead, drawn for a RIGHT-hander: you stand at the bottom of the frame facing
-    // the ball, so the target is off to your LEFT ‚Äî hole left, ball in front of you,
-    // putter head behind it on the right, shaft running back down to your hands.
-    // The stance is drawn on purpose: without feet a horizontal line diagram reads
-    // the same for a lefty, which is exactly the confusion this replaces.
-    // OPEN for a righty here = the face turned CLOCKWISE off the line (SVG rotate is
-    // clockwise), so the arc arrow at the toe has to swing right. Flip either one and
-    // the picture starts teaching the miss instead of the fix.
-    const INK='var(--ink)', GRN='var(--gtext)', FNT='var(--faint)';
-    return `<div class="sheetart"><svg viewBox="0 0 320 128" role="img" aria-label="Overhead for a right-hander: hole left, face barely open, read pace before break">
-      <line x1="48" y1="50" x2="238" y2="50" style="stroke:${FNT};stroke-width:1.5;stroke-dasharray:5 5;opacity:.7"/>
-      <circle cx="32" cy="50" r="9" style="fill:none;stroke:${INK};stroke-width:2.5"/>
-      <circle cx="32" cy="50" r="2.5" style="fill:${FNT}"/>
-      <rect x="264" y="35" width="5" height="30" rx="2" style="fill:none;stroke:${FNT};stroke-width:1.5;stroke-dasharray:3 3"/>
-      <g transform="rotate(9 266.5 50)">
-        <rect x="264" y="35" width="5" height="30" rx="2" style="fill:${GRN}"/>
-        <line x1="269" y1="56" x2="288" y2="92" style="stroke:${GRN};stroke-width:3;stroke-linecap:round"/>
-      </g>
-      <circle cx="250" cy="50" r="6.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>
-      <path d="M 258 27 A 22 22 0 0 1 274 30" style="fill:none;stroke:${GRN};stroke-width:2"/>
-      <polygon points="279,32 269,26 269,35" style="fill:${GRN}"/>
-      <text x="312" y="16" text-anchor="end" style="fill:${GRN};font:800 11px var(--sans)">Face BARELY OPEN ‚Äî that IS your square</text>
-      <ellipse cx="232" cy="104" rx="13" ry="6" transform="rotate(-20 232 104)" style="fill:${INK};opacity:.75"/>
-      <ellipse cx="272" cy="107" rx="13" ry="6" style="fill:${INK};opacity:.75"/>
-      <text x="316" y="126" text-anchor="end" style="fill:${FNT};font:italic 9px var(--sans)">your stance ¬∑ ball inside the lead heel</text>
-      <path d="M 196 76 q -28 -13 -54 0 q -24 11 -46 2" style="fill:none;stroke:${INK};stroke-width:2;opacity:.55"/>
-      <polygon points="88,76 98,71 97,80" style="fill:${INK};opacity:.55"/>
-      <text x="10" y="97" style="fill:${INK};font:800 11px var(--sans)">Read PACE first ‚Äî break second</text>
-    </svg></div>`;
-  },
-  'short-game'(){
-    const INK='var(--ink)', GRN='var(--gtext)', FNT='var(--faint)', BURG='var(--btext)';
-    return `<div class="sheetart"><svg viewBox="0 0 320 112" role="img" aria-label="Pick a landing spot and take the lowest shot that works">
-      <line x1="8" y1="96" x2="312" y2="96" style="stroke:${FNT};stroke-width:1.5"/>
-      <rect x="150" y="93.5" width="162" height="5" rx="2.5" style="fill:${GRN};opacity:.45"/>
-      <ellipse cx="122" cy="96" rx="20" ry="4.5" style="fill:${FNT};opacity:.5"/>
-      <line x1="282" y1="93" x2="282" y2="40" style="stroke:${INK};stroke-width:2"/>
-      <polygon points="282,40 300,46 282,52" style="fill:${BURG}"/>
-      <circle cx="30" cy="90" r="5.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>
-      <path d="M 30 88 Q 100 34 178 92" style="fill:none;stroke:${INK};stroke-width:2.5"/>
-      <line x1="184" y1="92" x2="266" y2="92" style="stroke:${INK};stroke-width:2;stroke-dasharray:3 5"/>
-      <path d="M 30 88 Q 140 -18 254 90" style="fill:none;stroke:${FNT};stroke-width:1.5;stroke-dasharray:4 4"/>
-      <circle cx="178" cy="93" r="6" style="fill:none;stroke:${GRN};stroke-width:2.5"/>
-      <text x="118" y="24" style="fill:${GRN};font:800 11px var(--sans)">Land it HERE, let it roll</text>
-      <line x1="172" y1="30" x2="178" y2="84" style="stroke:${GRN};stroke-width:1.5;stroke-dasharray:2 3"/>
-      <text x="8" y="48" style="fill:${INK};font:800 10.5px var(--sans)">LOW beats high</text>
-      <text x="312" y="110" text-anchor="end" style="fill:${FNT};font:italic 9.5px var(--sans)">pitch: only over trouble</text>
-      <text x="104" y="110" style="fill:${FNT};font:italic 9.5px var(--sans)">bunker</text>
-    </svg></div>`;
-  },
-  mental(){
-    const INK='var(--ink)', GRN='var(--gtext)', FNT='var(--faint)', BURG='var(--btext)';
-    const dots = Array.from({length:18}, (_,i) => {
-      const x = 21 + i * 16.4;
-      const guard = i < 3, last = i === 17;
-      return `<circle cx="${x}" cy="34" r="5.5" style="fill:${last?GRN:'none'};stroke:${guard?BURG:FNT};stroke-width:${guard?2.5:1.5}"/>`;
-    }).join('');
-    return `<div class="sheetart"><svg viewBox="0 0 320 100" role="img" aria-label="Guard holes 1 to 3; attention on for the shot, off on the walk">
-      ${dots}
-      <path d="M 15 20 h 44" style="stroke:${BURG};stroke-width:2"/>
-      <text x="64" y="23" style="fill:${BURG};font:800 10.5px var(--sans)">guard the START ‚Äî that's where it lands</text>
-      <text x="314" y="53" text-anchor="end" style="fill:${GRN};font:800 10.5px var(--sans)">change NOTHING</text>
-      <path d="M 16 84 h 30 v-16 h 11 v16 h 44 v-16 h 11 v16 h 44 v-16 h 11 v16 h 46" style="fill:none;stroke:${GRN};stroke-width:2"/>
-      <text x="64" y="62" style="fill:${GRN};font:800 10px var(--sans)">ON 30s</text>
-      <text x="126" y="97" style="fill:${INK};font:800 10px var(--sans)">OFF on the walk</text>
-    </svg></div>`;
-  },
-};
-// The tab row: the four labs plus the course you're about to play. Round Prep isn't a
-// lab (no faults, no film, and its content is per-COURSE rather than standing), so it
-// rides alongside LABS here rather than being forced into it.
-// A FUNCTION, not a const array: `LABS` is declared further down the file, so building
-// this at load time reads it inside its temporal dead zone and throws ‚Äî which kills the
-// whole IIFE and white-screens the app. Evaluate it when a sheet is drawn instead.
-const cheatTabs = () => [...LABS.map(l => ({ k:l.disc, ic:l.ic, short:l.short || l.name })),
-  { k:'prep', ic:'üóí', short:'Course' }];
-function cheatHead(disc, title){
-  return `
-  <div class="sheethead">
-    <h2>${esc(title)}</h2>
-    <button class="minibtn" data-action="cheat-close">‚úï Close</button>
-  </div>
-  <div class="sheettabs">${cheatTabs().map(t => `<span class="${t.k === disc ? 'on' : ''}"
-    data-action="cheat-open" data-disc="${t.k}">${t.ic} ${esc(t.short)}</span>`).join('')}</div>`;
-}
-// The course sheet. Unlike a lab, this one has to pick WHICH plan: the next dated
-// briefing is unambiguous, and a lone standing plan is too ‚Äî otherwise it can't know
-// which course he's playing today, so it asks instead of guessing.
-function cheatPrep(id){
-  const p = coursePlans();
-  const list = [...p.up, ...p.standing];
-  const b = (id && S.briefings.find(x => x.id === id))
-    || p.up[0] || (list.length === 1 ? list[0] : null);
-  if(!b) return `${cheatHead('prep', 'üóí Round Prep')}
-    ${list.length ? `<p class="sm" style="margin:11px 0 2px">Which course are you playing?</p>
-      ${list.map(x => `<div class="linkrow" data-action="cheat-open" data-disc="prep" data-id="${x.id}">
-        <span class="sm"><b>${esc(x.course)}</b>${x.date ? ` ¬∑ ${fmtDate(x.date)}` : ''}</span><span class="arr">‚Üí</span></div>`).join('')}`
-    : `<p class="sm" style="margin-top:11px">No course plans yet. Tell Claude where you're playing and one lands here ‚Äî tee strategy, the hazards, and a note on every hole the research supports.</p>`}`;
-  const sh = courseShape(b);
-  return `${cheatHead('prep', 'üóí ' + (b.course.length > 22 ? b.course.slice(0, 21) + '‚Ä¶' : b.course))}
-  <p class="sm" style="margin-top:11px">${b.date ? `<b class="warn">${fmtDate(b.date)}</b> ¬∑ ` : ''}${esc(b.focus || 'Plan ready')}</p>
-  ${sh.rules.length ? `<div class="cues">${sh.rules.map(r => `<span>${esc(cheatCue(r))}</span>`).join('')}</div>` : ''}
-  ${sh.plays.length ? `<p class="sm sheetwatch"><b>How it plays</b></p>
-    <ul class="hi-why" style="margin-top:5px">${sh.plays.map(t => `<li>${emph(t)}</li>`).join('')}</ul>` : ''}
-  ${sh.record.length ? `<p class="sm sheetwatch"><b>Your record here</b></p>
-    <ul class="hi-why" style="margin-top:5px">${sh.record.map(t => `<li>${emph(t)}</li>`).join('')}</ul>` : ''}
-  <div class="linkrow" style="border-bottom:none;margin-top:8px" data-action="open-briefing" data-id="${b.id}">
-    <span class="sm"><b>The full plan</b>${sh.noted ? ` ¬∑ ${sh.noted} hole notes` : ''}</span><span class="arr">‚Üí</span></div>
-  <p class="sm faint" style="margin-top:2px">Hole by hole reaches you on the tee ‚Äî each note shows on its own hole while you log the round.</p>
-  ${list.length > 1 ? `<div class="linkrow" style="border-bottom:none" data-action="cheat-open" data-disc="prep" data-id="pick">
-    <span class="sm faint">Playing somewhere else?</span><span class="arr">‚Üí</span></div>` : ''}`;
-}
-// What the course IS, rather than what each hole is ‚Äî the hole notes already reach him
-// on the tee through the live logger, so repeating them here spends the one screen he
-// reads before a round on something he's about to be told anyway. Everything below is
-// computed: the plan's own tee calls and hazard warnings counted up into a character,
-// and his own cards at the course asked what it actually costs him.
-function courseShape(b){
-  const holes = (b.holes || []).filter(h => h && h.n);
-  const plays = [], record = [];
-  const has = (h, re) => re.test(`${h.avoid || ''} ${h.play || ''} ${h.note || ''} ${(h.why || []).join(' ')}`);
-  // TEE POLICY. A course that wants irons off the tee is the single most useful thing
-  // to know walking to the 1st, and the plan already decided it hole by hole.
-  const tee = holes.filter(h => h.play);
-  const drv = tee.filter(h => /\bdriver\b/i.test(h.play) && !/not driver|isn't driver|no driver/i.test(h.play));
-  if(tee.length >= 6) plays.push(drv.length <= tee.length / 3
-    ? `*Driver on ${drv.length} of ${tee.length}* tee calls ‚Äî this is a *positioning* course, not a long one`
-    : `*Driver on ${drv.length} of ${tee.length}* tee calls ‚Äî it lets you have it`);
-  // HAZARD CENSUS by kind. Which hazards exist and how many, not where each one is.
-  // Naming the holes keeps it a fact about the course ("the water is on 13") rather than
-  // a tee instruction ("13: wood, right-center") ‚Äî the instruction arrives on the tee.
-  const kinds = [[/\bwater\b|\bpond\b|\bcreek\b/i, 'Water'], [/\bbunker/i, 'Bunkers'],
-                 [/\btree/i, 'Trees'], [/\bO\.?B\b|out of bounds/i, 'OB']];
-  const cen = kinds.map(([re, lab]) => [lab, holes.filter(h => has(h, re)).map(h => h.n)]).filter(x => x[1].length);
-  const ord = n => n + (['th','st','nd','rd'][n % 10] && n % 100 - n % 10 !== 10 ? ['th','st','nd','rd'][n % 10] || 'th' : 'th');
-  if(cen.length) plays.push(cen.map(([lab, ns]) =>
-    `*${lab}* on ${ns.length === 1 ? `the ${ord(ns[0])}` : ns.join(', ')}`).join(' ¬∑ '));
-  // THE RECURRING MISS. When one direction is the warning on hole after hole, that's a
-  // property of the course, and it's worth knowing whether it's also his own miss.
-  const dirs = [[/\bshort\b/i, 'SHORT'], [/\bright\b/i, 'RIGHT'], [/\bleft\b/i, 'LEFT'], [/\blong\b/i, 'LONG']]
-    .map(([re, lab]) => [lab, holes.filter(h => h.avoid && re.test(h.avoid)).length])
-    .sort((x, y) => y[1] - x[1])[0];
-  if(dirs && dirs[1] >= 3) plays.push(`*${dirs[0]}* is the warning on ${dirs[1]} holes ‚Äî the miss this course punishes`);
-  // HIS OWN CARDS. Par mix comes off a card rather than the plan, since a briefing's
-  // holes carry yardages but never pars.
-  const rds = preferExact(
-    S.rounds.filter(r => courseMatches(r.course, b.course) && (r.holes || []).length),
-    b.course, r => r.course);
-  const full = rds.find(r => r.holes.length >= 18) || rds[0];
-  if(full){
-    const hs = full.holes.filter(h => h && h.par != null);
-    const p3 = hs.filter(h => h.par === 3).length, p5 = hs.filter(h => h.par === 5).length;
-    if(hs.length >= 9) plays.push(`Par ${hs.reduce((s, h) => s + h.par, 0)} ‚Äî *${p3} par 3s*, *${p5} par 5s*`);
-  }
-  const scored = rds.filter(r => r.score != null);
-  if(scored.length){
-    const best = scored.reduce((a, r) => r.score < a.score ? r : a);
-    record.push(`${scored.length} round${scored.length > 1 ? 's' : ''} here ¬∑ best *${best.score}*${best.par ? ` (${best.score - best.par > 0 ? '+' : ''}${best.score - best.par})` : ''}`);
-  }
-  // Where the strokes actually went last time ‚Äî greens, and the tee shots that took the
-  // approach away before it was hit. Both are course-level, neither is a hole note.
-  const card = (rds.slice().sort((a, b2) => (b2.date || '').localeCompare(a.date || ''))[0] || {}).holes || [];
-  const gir = card.filter(h => h.gir === true).length, miss = card.filter(h => h.gir === false).length;
-  const dead = card.filter(h => h.noshot).length;
-  if(gir + miss >= 9) record.push(`Last time: *${gir} greens*${dead ? ` ¬∑ *${dead} tee shots* left no play at the green` : ''}`);
-  // The stretch that costs him. Four consecutive holes, so it names a part of the course
-  // ("the turn", "the closing stretch") rather than a hole he'll be told about anyway.
-  if(card.length >= 12){
-    const d = card.filter(h => h.par != null && h.s != null);
-    let worst = null;
-    for(let i = 0; i + 4 <= d.length; i++){
-      const w = d.slice(i, i + 4), over = w.reduce((s, h) => s + (h.s - h.par), 0);
-      if(!worst || over > worst.over) worst = { over, a:w[0].n, b:w[3].n };
-    }
-    if(worst && worst.over >= 4) record.push(`*${worst.a}‚Äì${worst.b}* is where it went: *+${worst.over}* across four holes`);
-  }
-  // A rule scoped to one hole ("13: WATER ‚Äî wood off the tee") is a tee instruction, and
-  // the tee is where he'll get it. Only the rules that describe the whole course survive
-  // onto this sheet; the rest are on the full plan and on the hole itself.
-  const holeScoped = r => /^\s*\d{1,2}\s*(?:[‚Äì-]\s*\d{1,2}\s*)?[:.]/.test(r)
-    || /^\s*(?:the\s+)?(?:\d{1,2}(?:st|nd|rd|th)|1st|2nd|3rd)\b/i.test(r);
-  const rules = (b.rules || []).filter(r => !holeScoped(r));
-  return { plays, record, rules,
-    noted: holes.filter(h => h.play || h.note || (h.why || []).length).length };
-}
-function cheatSheet(disc, arg){
-  if(disc === 'prep') return cheatPrep(arg === 'pick' ? null : arg);
-  const lab = LABS.find(l => l.disc === disc);
-  const plans = plansFor(disc);
-  const lead = plans.find(isRoutine) || plans[0];
-  const open = faultsFor(disc).filter(f => faultState(f) === 'open');
-  // Same pick as the Mental tab's "one job" card: newest debrief that set one.
-  const oneJob = disc === 'mental' ? (S.mental || []).map((d, i) => ({ d, i }))
-    .sort((a, b) => (b.d.date || '').localeCompare(a.d.date || '') || b.i - a.i)
-    .map(o => o.d).find(d => d.next) : null;
-  return `
-  ${cheatHead(disc, `${lab ? `${lab.ic} ${lab.name}` : ''} ¬∑ before you play`)}
-  ${oneJob ? `<div class="tipcard" style="margin-top:11px"><h4>One job</h4><p class="sm"><b>${esc(oneJob.next)}</b></p></div>` : ''}
-  ${CHEAT_ART[disc] ? CHEAT_ART[disc]() : ''}
-  ${lead
-    ? ((lead.rules || []).length ? `<div class="cues">${lead.rules.map(r => `<span>${esc(cheatCue(r))}</span>`).join('')}</div>` : '')
-    : `<p class="sm" style="margin-top:9px">No standing plan in this lab yet ‚Äî ask Claude for one and this sheet builds itself from it.</p>`}
-  ${open.length ? `<p class="sm sheetwatch"><b>Watch for:</b> ${open.map(f => `<b class="warn">${esc(faultLabel(f.tag))}</b>`).join(' ¬∑ ')}</p>` : ''}
-  ${lead ? `<div class="linkrow" style="border-bottom:none;margin-top:8px" data-action="open-briefing" data-id="${lead.id}">
-    <span class="sm"><b>${esc(lead.course)}</b> ‚Äî the full plan</span><span class="arr">‚Üí</span></div>` : ''}`;
-}
-// Opening a sheet and switching between them are the same call: if the overlay is
-// already up, only its contents are swapped. That keeps the pre-round read as ONE
-// pass through the whole game ‚Äî swing, short game, putting, mental ‚Äî instead of four
-// separate trips out to the hub and back.
-function openCheat(disc, arg){
-  let v = document.getElementById('sheetveil');
-  if(!v){
-    v = document.createElement('div');
-    v.className = 'sheetveil'; v.id = 'sheetveil';
-    v.addEventListener('click', e => { if(e.target === v) closeCheat(); });
-    document.body.appendChild(v);
-  }
-  v.innerHTML = `<div class="sheet card">${cheatSheet(disc, arg)}</div>`;
-  const s = v.querySelector('.sheet');
-  if(s) s.scrollTop = 0;   // a switched sheet starts at its own top, not the last one's
-}
-function closeCheat(){
-  const v = document.getElementById('sheetveil');
-  if(v) v.remove();
-}
-
-// ----- Swing Lab -----
-// ----- The swing readout (Sep 17 2026) -----
-// Jack's ask: "show me what I'm doing wrong." This is that page, and it is a READER over
-// the swing bay sessions ‚Äî never a fifth tally. Every figure below is one a bay session
-// already carries, asked a different question, which is the same rule `gameAreas()` and
-// Today's numbers block follow. Push a new bay session with the same fields and every
-// chart here redraws itself; there is nothing to edit in code when the next map lands.
-//
-// Two honesty rules the charts are built around, both learned from data already on file:
-//   - TrackMan's "Consistency" is ITS OWN figure and its formula was never on screen, so
-//     the spread chart divides it by the carry and calls the result a SPREAD INDEX. It is
-//     not a coefficient of variation and must never be relabelled one (the `cons` rule).
-//   - A curve figure comes off a modelled spin axis on an unmarked ball; a path and a face
-//     come off the radar. Where the two disagree the chart says so instead of picking a
-//     winner ‚Äî see `swingReconcile()`.
-const SPREAD_BANDS = [[7, 'good', 'tight'], [9, 'mid', 'marginal'], [Infinity, 'warn', 'loose']];
-const spreadBand = pct => SPREAD_BANDS.find(b => pct < b[0]);
-const hasCarry = b => ((b.detail || {}).clubs || []).filter(c => c.carry != null).length;
-// The fullest bag map wins, newest breaking a tie: a six-club range session is a practice
-// set, a thirteen-club map is the bag. A session with fewer than six carries is neither.
-function bagMapBay(){
-  return baysFor('swing').map(o => o.b).filter(b => hasCarry(b) >= 6)
-    .sort((a, b) => hasCarry(b) - hasCarry(a) || (b.date || '').localeCompare(a.date || ''))[0] || null;
-}
-function strikeBay(){
-  return baysFor('swing').map(o => o.b).find(b => Array.isArray((b.detail || {}).strike)) || null;
-}
-const yd = v => (v > 0 ? '+' : '') + Number(v).toFixed(1);
-
-// 1 ¬∑ WHERE THE BALL FINISHES ‚Äî the headline finding drawn rather than stated.
-// Top-down: down the page is downrange, across the page is yards right of where the ball
-// started. The two axes do NOT share a scale ‚Äî a 24-yard curve on a 196-yard carry is 12%
-// and would be a wiggle at true scale ‚Äî so the stretch factor is printed in the caption
-// and every endpoint carries its exact yardage. An exaggerated axis that says so is a
-// chart; one that doesn't is a lie.
-function swingFlightChart(rows){
-  const use = rows.filter(c => c.curve != null && c.carry != null).sort((a, b) => b.carry - a.carry);
-  if(use.length < 3) return '';
-  const W = 300, H = 212, X0 = 34, TOP = 18, BASE = 178;
-  const maxC = Math.max(...use.map(c => Math.abs(c.curve)), 1);
-  const maxY = Math.max(...use.map(c => c.carry), 1);
-  const kx = Math.min(6.2, (W - X0 - 66) / maxC), ky = (BASE - TOP) / maxY;
-  const stretch = Math.round(kx / ky);
-  // Endpoint labels collide wherever two carries sit within a few yards ‚Äî declutter by
-  // walking down the sorted list and pushing each label clear of the one above it.
-  let last = -99;
-  const pts = use.map(c => {
-    const dx = c.curve * kx, h = c.carry * ky;
-    const ey = BASE - h, ex = X0 + dx;
-    const ly = Math.max(ey, last + 11); last = ly;
-    return { c, ex, ey, ly };
-  });
-  return `<figure class="swfig"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Ball flight: ${
-    use.map(c => `${c.club} carries ${c.carry} yards and finishes ${Math.abs(c.curve).toFixed(1)} yards ${c.curve < 0 ? 'left' : 'right'}`).join('; ')}.">
-    ${[100, 200].filter(v => v <= maxY).map(v => `<line x1="${X0}" y1="${(BASE - v * ky).toFixed(1)}" x2="${
-      W - 8}" y2="${(BASE - v * ky).toFixed(1)}" stroke="var(--line2)"/><text x="${X0 - 3}" y="${
-      (BASE - v * ky - 3).toFixed(1)}" text-anchor="end" style="fill:var(--faint);font:9px var(--mono)">${v}</text>`).join('')}
-    <text x="${X0 - 3}" y="${BASE - 4}" text-anchor="end" style="fill:var(--faint);font:9px var(--mono)">0</text>
-    <line x1="${X0}" y1="${TOP - 4}" x2="${X0}" y2="${BASE}" stroke="var(--line)" stroke-dasharray="3 4"/>
-    <text x="${X0 - 3}" y="${TOP + 2}" text-anchor="end" style="fill:var(--faint);font:800 8px var(--sans)">START</text>
-    <text x="${X0 - 3}" y="${TOP + 12}" text-anchor="end" style="fill:var(--faint);font:800 8px var(--sans)">LINE</text>
-    ${[0, 10, 20, 30].filter(v => v <= maxC + 6).map(v => `<line x1="${(X0 + v * kx).toFixed(1)}" y1="${BASE}" x2="${
-      (X0 + v * kx).toFixed(1)}" y2="${BASE + 5}" stroke="var(--line)"/><text x="${(X0 + v * kx).toFixed(1)}" y="${
-      BASE + 16}" text-anchor="middle" style="fill:var(--faint);font:9px var(--mono)">${v}</text>`).join('')}
-    <line x1="${X0}" y1="${BASE}" x2="${W - 8}" y2="${BASE}" stroke="var(--line)"/>
-    <text x="${W - 8}" y="${BASE + 16}" text-anchor="end" style="fill:var(--faint);font:italic 9px var(--sans)">yards right ‚Üí</text>
-    ${pts.map(({ c, ex, ey, ly }) => {
-      const dx = ex - X0, h = BASE - ey;
-      return `<path d="M ${X0} ${BASE} C ${X0} ${(BASE - h * .55).toFixed(1)} ${(X0 + dx * .16).toFixed(1)} ${
-        (BASE - h * .82).toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}" fill="none" stroke="var(--burg)"
-        stroke-width="2" opacity="${(.34 + .1 * Math.abs(c.curve) / maxC * 6).toFixed(2)}" stroke-linecap="round"/>
-      <circle cx="${ex.toFixed(1)}" cy="${ey.toFixed(1)}" r="3.4" fill="var(--burg)"/>
-      ${Math.abs(ly - ey) > 1.5 ? `<line x1="${(ex + 3.4).toFixed(1)}" y1="${ey.toFixed(1)}" x2="${
-        (ex + 7).toFixed(1)}" y2="${ly.toFixed(1)}" stroke="var(--burg)" stroke-width="1" opacity=".45"/>` : ''}
-      <text x="${(ex + 9).toFixed(1)}" y="${(ly + 3).toFixed(1)}" style="fill:var(--ink);font:800 9px var(--sans);paint-order:stroke;stroke:var(--card);stroke-width:3.5px;stroke-linejoin:round">${
-        esc(clubTag(c.club))} <tspan style="fill:var(--btext);font-family:var(--mono);font-weight:400">${
-        yd(c.curve)}</tspan></text>`;
-    }).join('')}
-  </svg>
-  <figcaption class="bvcap">Every club finishes RIGHT of where it started, and the miss grows with the
-    club. Sideways is stretched about ${stretch}√ó against downrange so the shape is readable ‚Äî the yard
-    figures beside each club are exact, and the numbers down the left are carry in yards. Curve is
-    TrackMan's own figure: how far the ball finished from the line it launched on.</figcaption></figure>`;
-}
-
-// 2 ¬∑ WHERE ON THE FACE ‚Äî the one thing here that is optically measured rather than
-// modelled, which is why it survives the curve caveat intact. One slot per club so five
-// dots inside 30mm of face never stack on each other.
-function swingFaceMap(strike){
-  const use = (strike || []).filter(s => s.offset != null);
-  if(use.length < 2) return '';
-  const W = 300, FX = 42, FW = 216, FY = 36, FH = 96, CX = FX + FW / 2;
-  const span = Math.max(9, ...use.map(s => Math.abs(s.offset))) + 4;
-  const kx = (FW / 2 - 24) / span;
-  return `<figure class="swfig"><svg viewBox="0 0 ${W} 164" role="img" aria-label="Impact location: ${
-    use.map(s => `${s.club} ${Math.abs(s.offset)} millimetres ${s.offset < 0 ? 'heel' : 'toe'}`).join('; ')}.">
-    <text x="${FX}" y="${FY - 8}" style="fill:var(--faint);font:800 9px var(--sans)">‚óÄ HEEL</text>
-    <text x="${CX}" y="${FY - 8}" text-anchor="middle" style="fill:var(--faint);font:800 9px var(--sans)">CENTRE</text>
-    <text x="${FX + FW}" y="${FY - 8}" text-anchor="end" style="fill:var(--faint);font:800 9px var(--sans)">TOE ‚ñ∂</text>
-    <rect x="${FX}" y="${FY}" width="${FW}" height="${FH}" rx="9" fill="var(--card2)" stroke="var(--line)"/>
-    <line x1="${CX}" y1="${FY + 4}" x2="${CX}" y2="${FY + FH - 4}" stroke="var(--soft)" stroke-dasharray="3 3"/>
-    ${use.map((s, i) => {
-      const y = FY + FH * (i + .5) / use.length, x = CX + s.offset * kx, heel = s.offset < 0;
-      return `<line x1="${CX}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"
-        stroke="var(--burg)" stroke-width="1.2" opacity=".4"/>
-      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.6" fill="${heel ? 'var(--gold)' : 'var(--burg)'}"/>
-      <text x="${FX + 7}" y="${(y + 3.2).toFixed(1)}" style="fill:var(--ink);font:800 9px var(--sans)">${esc(clubTag(s.club))}</text>
-      <text x="${FX + FW - 7}" y="${(y + 3.2).toFixed(1)}" text-anchor="end" style="fill:var(--soft);font:9px var(--mono)">${
-        Math.abs(s.offset).toFixed(1)}mm ${heel ? 'heel' : 'toe'}</text>`;
-    }).join('')}
-  </svg>
-  <figcaption class="bvcap">Read it as the clubface looking back at you. The wedge is struck on the HEEL
-    and everything longer on the TOE ‚Äî a consistent bias, not scatter. That split is the classic
-    lie-angle signature (wedges too upright, long clubs too flat), but a posture that changes between a
-    wedge and a wood makes exactly the same picture. One lie-board session separates them; until then it
-    is a question, not a verdict.</figcaption></figure>`;
-}
-
-// 3 ¬∑ WHICH CLUBS YOU CAN TRUST. The bar is TrackMan's Consistency as a share of the carry
-// ‚Äî a SPREAD INDEX, deliberately not called a CV, because the formula behind Consistency
-// was never on screen. Sorted loosest first: the page should open on the problem.
-function swingSpread(rows){
-  const use = rows.filter(c => c.carry && c.cons != null)
-    .map(c => ({ ...c, pct: c.cons / c.carry * 100 })).sort((a, b) => b.pct - a.pct);
-  if(use.length < 4) return '';
-  const max = Math.max(...use.map(c => c.pct));
-  return `<div class="bayviz swspread">
-    ${use.map(c => { const [, cls, word] = spreadBand(c.pct);
-      return `<div class="bvrow sw-${cls}"><span class="bvname">${esc(clubTag(c.club))}</span>
-        <span class="bvtrack"><i class="bvbar" style="width:${Math.max(4, c.pct / max * 100).toFixed(1)}%"></i></span>
-        <b class="bvnum">${c.pct.toFixed(1)}%</b></div>`;
-    }).join('')}
-    <div class="swkey"><span class="sw-good">under 7% tight</span><span class="sw-mid">7‚Äì9% marginal</span><span class="sw-warn">over 9% loose</span></div>
-    <p class="bvcap">TrackMan's own ‚ÄúConsistency‚Äù figure divided by that club's carry, so the clubs can be
-      compared to each other. It is NOT a standard deviation ‚Äî TrackMan never showed its formula, and
-      relabelling it would invent a precision the screen did not claim. Six shots a club: enough to rank
-      them, not enough to condemn one.</p></div>`;
-}
-
-// 4 ¬∑ THE LADDER, in carry order rather than bag order ‚Äî which is the whole point, because
-// an inversion is only visible when the clubs are sorted by what they actually do. Bands
-// are chained at under 6 yards apart, and the rule is printed rather than assumed.
-function swingLadder(rows){
-  const use = rows.filter(c => c.carry != null).sort((a, b) => b.carry - a.carry);
-  if(use.length < 4) return '';
-  const max = use[0].carry;
-  let bands = 1;
-  use.forEach((c, i) => { if(i && use[i - 1].carry - c.carry >= 6) bands++; });
-  return `<div class="bayviz swladder">
-    <div class="bvtitle"><b>${use.length} clubs ¬∑ ${bands} distance bands</b><span>sorted by carry, not by bag order</span></div>
-    ${use.map((c, i) => { const next = use[i + 1];
-      const gap = next ? c.carry - next.carry : null;
-      const [kind, label] = gap == null ? ['', ''] : bayGapKind(gap);
-      return `<div class="bvitem"><div class="bvrow"><span class="bvname">${esc(clubTag(c.club))}</span>
-        <span class="bvtrack"><i class="bvbar" style="width:${Math.max(4, c.carry / max * 100).toFixed(1)}%"></i></span>
-        <b class="bvnum">${Number(c.carry).toFixed(1)}</b></div>
-        ${gap == null ? '' : `<div class="bvgap ${kind}"><span>${esc(label)}</span><b>${gap.toFixed(1)} yd</b></div>`}</div>`;
-    }).join('')}
-    <p class="bvcap">A band is a run of clubs inside 6 yards of each other ‚Äî clubs that do one job between
-      them. Bag order and carry order disagree in this sample, which is what an inversion is. Six shots a
-      club exposes the question; it does not decide an equipment change on its own.</p></div>`;
-}
-
-// 5 ¬∑ THE DRIVER'S UNSPENT SPEED. Ball speed against club speed, and what the same swing
-// would carry at a tour strike. The yardage is a DERIVATION and prints its own arithmetic.
-const SMASH_BENCH = 1.48, YD_PER_MPH = 2.2;
-function swingSmash(c){
-  if(!c || c.cs == null || c.bs == null) return '';
-  const now = c.bs / c.cs, could = c.cs * SMASH_BENCH, gain = could - c.bs;
-  if(gain <= 0) return '';
-  const p = v => Math.max(0, Math.min(100, (v - 1.15) / (1.55 - 1.15) * 100)).toFixed(1);
-  return `<div class="bayviz swsmash">
-    <div class="bvtitle"><b>Driver ¬∑ strike, not speed</b><span>${c.n || 6} shots</span></div>
-    <div class="swgauge"><i class="swfill" style="width:${p(now)}%"></i>
-      <i class="swmark" style="left:${p(SMASH_BENCH)}%"></i></div>
-    <div class="swgnums"><span>YOURS <b>${now.toFixed(2)}</b></span><span>TOUR <b>${SMASH_BENCH.toFixed(2)}</b></span></div>
-    <p class="sm">Club speed <b>${c.cs}</b> mph is already a 230-yard club. Ball speed is
-      <b>${c.bs}</b> mph. At a tour-standard strike the same swing would leave at
-      <b>${could.toFixed(1)}</b> mph ‚Äî <b>${gain.toFixed(1)} mph</b> more, which is roughly
-      <b>${Math.round(gain * YD_PER_MPH)} yards</b> at ${YD_PER_MPH} yards per mph.</p>
-    <p class="bvcap">A derivation, not a measurement: the tour smash benchmark and the yards-per-mph
-      conversion are both published averages, not your numbers. What is measured is the club speed and
-      the ball speed. The gap between them is a strike, and the face map above is where to look for it.</p></div>`;
-}
-
-// 6 ¬∑ DO THE NUMBERS AGREE? The contradiction, stated rather than resolved.
-// A face-to-path comes off the radar at impact; a curve is computed from a spin axis that
-// an unmarked indoor ball frequently makes the unit ESTIMATE. So where they disagree, one
-// of the two is wrong and nothing in the capture says which ‚Äî the honest rendering names
-// both candidates and the one session that settles it.
-function reconcile(ftp, curve){
-  if(Math.abs(curve) <= 6 && Math.abs(ftp) <= 3) return true;
-  if(Math.sign(curve) !== Math.sign(ftp)) return false;
-  return Math.abs(curve) <= Math.abs(ftp) * 5 + 6;
-}
-function swingReconcile(clubs, delivery){
-  const dmap = {};
-  (delivery || []).forEach(d => { if(d.ftp != null) dmap[d.club] = d.ftp; });
-  const use = clubs.filter(c => c.curve != null && dmap[c.club] != null)
-    .map(c => ({ ...c, ftp:dmap[c.club], ok:reconcile(dmap[c.club], c.curve) }));
-  if(use.length < 3) return '';
-  const bad = use.filter(c => !c.ok);
-  if(!bad.length) return '';
-  return `<div class="bayviz swrec">
-    ${use.map(c => `<div class="swrrow ${c.ok ? '' : 'off'}"><span class="bvname">${esc(clubTag(c.club))}</span>
-      <span class="swrn">F‚ÄìP ${baySgn(c.ftp)}¬∞</span><span class="swrn">curve ${yd(c.curve)} yd</span>
-      <span class="swrv">${c.ok ? 'agrees' : 'clash'}</span></div>`).join('')}
-    <p class="bvcap"><b>${bad.length} of ${use.length} disagree, and they are the ${
-      bad.every(c => /wood|driver|3w/i.test(c.club)) ? 'woods' : 'longest clubs'}.</b>
-      A face ${bad.some(c => c.ftp < 0) ? 'square or closed' : 'square'} to the path cannot bend a ball
-      ${Math.round(Math.min(...bad.map(c => Math.abs(c.curve))))}+ yards, so one of the two readings is
-      wrong on these clubs: either the face number, or a curve computed from a spin axis the unit had to
-      estimate off an unmarked ball. Nothing in this capture tells them apart. On the irons and wedges
-      the face-to-path is large enough that the curve agrees almost by construction ‚Äî those clubs do not
-      test it. <b>It changes nothing about the diagnosis:</b> the path is measured out-to-in on every
-      club in every session, and the ball is measured finishing right in every session. Only the exact
-      face figure on the woods is in doubt, and one session on a marked ball settles it.</p></div>`;
-}
-
-// A section exists only once it can be answered ‚Äî the live logger's rule. An empty fold is
-// a heading over a promise, which is the failure the retired 5-ft tile is the example of.
-const foldIf = (id, label, meta, body, open) => body ? fold(id, label, meta, body, open) : '';
-function swingReadout(){
-  const map = bagMapBay();
-  if(!map) return '';
-  const d = map.detail || {}, clubs = (d.clubs || []).filter(c => c.carry != null);
-  const st = strikeBay(), strike = (st && (st.detail || {}).strike) || [];
-  const driver = clubs.find(c => /driver/i.test(c.club) && !/mini/i.test(c.club));
-  const flight = swingFlightChart(clubs), face = swingFaceMap(strike);
-  if(!flight && !face && !clubs.length) return '';
-  const src = [`${fmtDate(map.date)} ¬∑ ${map.mode || 'bag map'}`]
-    .concat(st && st !== map ? [`${fmtDate(st.date)} ¬∑ strike read`] : []);
-  return `<h2>What the numbers say</h2>
-  <div class="card swread">
-    <div class="swhead">${evTag('bay')}<span class="sm">Read off ${esc(src.join(' + '))}. Radar, indoors,
-      off a mat ‚Äî see each session for what that cannot see.</span></div>
-    ${flight ? `<h3>1 ¬∑ Where the ball finishes</h3>${flight}` : ''}
-    ${face ? `<h3>2 ¬∑ Where you strike it</h3>${face}` : ''}
-    ${foldIf('sw-spread', 'Which clubs you can trust', 'spread by club', swingSpread(clubs), true)}
-    ${foldIf('sw-ladder', 'What the bag actually covers', 'carry order', swingLadder(clubs), false)}
-    ${foldIf('sw-smash', 'The driver‚Äôs unspent speed', 'smash factor', swingSmash(driver), false)}
-    ${foldIf('sw-rec', 'Do the numbers agree?', 'the one contradiction', swingReconcile(clubs, d.delivery), false)}
-  </div>`;
-}
-
-function swing(){
-  const sessions = S.sessions.map((s,i) => ({ s, i })).filter(o => sessionDiscipline(o.s) === 'swing').reverse();
-  // Anything not explicitly claimed by another lab lands here ‚Äî plansFor('swing') is the
-  // catch-all, minus course plans; see its comment.
-  const plans = plansFor('swing');
-  const other = plans.filter(b => !isRoutine(b));
-  return `
-  ${labBar('swing')}
-  ${cheatBtn('swing')}
-  ${routineBlock(plans)}
-
-  ${other.length ? `<h2>Plans</h2>
-  <div class="card">
-    ${planLinks(other)}
-  </div>` : ''}
-
-  ${diagnosisCard('swing', 'No swing faults on the card yet ‚Äî send film and they land here.')}
-
-  ${swingReadout()}
-
-  <div class="card flat"><div class="linkrow" data-action="go" data-view="positions">
-    <span><b>üìê Swing Positions ¬∑ visual guide</b><br><span class="sm">Body checkpoints, address ‚Üí finish, with a slide-vs-clear hip diagram</span></span><span class="arr">‚Üí</span></div></div>
-
-  <h2>Film room</h2>
-  <div class="card">
-    ${sessionLog(sessions, 'No swing sessions logged yet. Send Claude swing clips ‚Äî down-the-line and face-on ‚Äî and the breakdowns land here.')}
-  </div>
-
-  ${bayBlock('swing', 'No bay sessions yet. Log in at the bay with the Trackman app, hit the gapping order \u2014 driver, mini, 2-iron, 5-wood first \u2014 and send the club summary. Club path, face-to-path and attack angle are measured on any ball; spin needs a marked one.')}
-
-  ${evoFor('swing') ? `<h2>Swing evolution ¬∑ batch by batch</h2>${evolutionCard('swing')}` : ''}
-
-  ${combineCard()}
-
-  <h2>Filming guide</h2>
-  <div class="card flat">
-    <p class="sm"><b>1 ¬∑ Down-the-line</b> ‚Äî behind the ball, camera at hand/hip height on the target line: plane, path, shaft position at the top.<br>
-    <b>2 ¬∑ Face-on</b> ‚Äî chest height, square to you: posture, weight shift, hip clearance, low point.<br>
-    Film 3 swings per angle in slo-mo (240fps), and grab the sim's numbers ‚Äî path, attack angle, face-to-path, spin, carry.</p>
-  </div>`;
-}
-
-// ----- Swing Positions ¬∑ visual guide (inline SVG, theme-aware) -----
-// Face-on figure, richer anatomy: shoe shapes (flat / flared / up on the toe),
-// pressure pills with % (green = loaded foot), pelvis belt + buckle, cap,
-// hip-clearing arc with degrees, and motion arrows (arms drop, foot press).
-// Trail side (right, for a RH golfer) draws on the viewer's LEFT; target is right.
-function posSvg(p, solid){
-  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)', CLB='var(--soft)', CARD='var(--card)';
-  const G=220; // ground line
-  const ln=(a,b,c,w=6)=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" style="stroke:${c};stroke-width:${w};stroke-linecap:round"/>`;
-  // In solid mode the figure is a filled silhouette: fat capsule limbs, solid
-  // torso & head, card-color underlays so arms/club/belt read on top of the body.
-  const legW=solid?11:6, armW=solid?8:4.5;
-  const under=(a,b,w)=>solid?ln(a,b,CARD,w+3.5):'';
-  const shT=[p.sh[0]-p.shW, p.sh[1]+(p.tiltT||0)], shL=[p.sh[0]+p.shW, p.sh[1]+(p.tiltL||0)];
-  const hipT=[p.hip[0]-p.hipW, p.hip[1]], hipL=[p.hip[0]+p.hipW, p.hip[1]];
-  const shoe=(x,mode)=>{
-    const r=`<rect x="${x-12}" y="${G-8}" width="25" height="9" rx="4.5" style="fill:${INK}"/>`;
-    if(mode==='flare') return `<g transform="rotate(-16 ${x} ${G-4})">${r}</g>`;
-    if(mode==='toe')   return `<g transform="rotate(55 ${x+10} ${G-2})">${r}</g>`;
-    return r;
-  };
-  const pill=(x,pct)=>{const hot=pct>=60;
-    return `<rect x="${x-14}" y="${G+7}" width="28" height="14" rx="7" style="fill:${hot?GRN:'none'};stroke:${hot?GRN:FNT};stroke-width:1.5"/>
-    <text x="${x}" y="${G+17.5}" text-anchor="middle" style="fill:${hot?CARD:FNT};font:800 9px var(--sans)">${pct}</text>`;};
-  const wl=Math.round(p.wtLead*100);
-  const legT = ln(hipT,p.kneeT,INK,legW)+ln(p.kneeT,[p.footT,G-6],INK,legW-1);
-  const legL = under(hipL,p.kneeL,legW)+under(p.kneeL,[p.footL,G-6],legW-1)
-    + ln(hipL,p.kneeL,p.post?GRN:INK,legW)+ln(p.kneeL,[p.footL,G-6],p.post?GRN:INK,legW-1);
-  const club = p.club?`${under(p.hands,p.club,3.5)}${ln(p.hands,p.club,CLB,3.5)}
-    <path d="M ${p.club[0]} ${p.club[1]} l ${p.blade[0]} ${p.blade[1]} l ${p.blade[2]} ${p.blade[3]}" style="fill:none;stroke:${CLB};stroke-width:5;stroke-linecap:round"/>`:'';
-  const cap = `<path d="M ${p.head[0]-8} ${p.head[1]-4} A 9 9 0 0 1 ${p.head[0]+8} ${p.head[1]-4}" style="fill:${INK}"/>
-    <line x1="${p.head[0]+5}" y1="${p.head[1]-5}" x2="${p.head[0]+(p.bill||8)+5}" y2="${p.head[1]-3}" style="stroke:${INK};stroke-width:4;stroke-linecap:round"/>`;
-  return `<svg viewBox="0 0 200 246" role="img" aria-label="${esc(p.name)}">
-    <line x1="10" y1="${G}" x2="182" y2="${G}" style="stroke:${FNT};stroke-width:1.5;opacity:.6"/>
-    <polygon points="190,${G} 181,${G-4.5} 181,${G+4.5}" style="fill:${FNT};opacity:.7"/>
-    <text x="164" y="${G-6}" style="fill:${FNT};font:italic 8.5px var(--sans)">target</text>
-    ${pill(p.footT,100-wl)}${pill(p.footL,wl)}
-    ${legT}${legL}
-    ${shoe(p.footT,p.toeT?'toe':'flat')}${shoe(p.footL,p.flareL?'flare':(p.toeL?'toe':'flat'))}
-    <polygon points="${hipT[0]},${hipT[1]} ${hipL[0]},${hipL[1]} ${shL[0]},${shL[1]} ${shT[0]},${shT[1]}" style="fill:${INK};opacity:${solid?1:.13}${solid?`;stroke:${INK};stroke-width:7;stroke-linejoin:round`:''}"/>
-    ${solid?'':`<line x1="${p.hip[0]}" y1="${p.hip[1]}" x2="${p.sh[0]}" y2="${p.sh[1]}" style="stroke:${INK};stroke-width:4;opacity:.5"/>`}
-    ${ln(shT,shL,INK,solid?11:6.5)}
-    ${under(shT,p.hands,armW)}${under(shL,p.hands,armW)}
-    ${ln(shT,p.hands,INK,armW)}${ln(shL,p.hands,INK,armW)}
-    ${club}
-    <circle cx="${p.hands[0]}" cy="${p.hands[1]}" r="${solid?4.5:3.5}" style="fill:${INK}${solid?`;stroke:${CARD};stroke-width:2`:''}"/>
-    ${solid?`<line x1="${hipT[0]}" y1="${hipT[1]}" x2="${hipL[0]}" y2="${hipL[1]}" style="stroke:${CARD};stroke-width:10;stroke-linecap:round"/>`:''}
-    <line x1="${hipT[0]}" y1="${hipT[1]}" x2="${hipL[0]}" y2="${hipL[1]}" style="stroke:${BURG};stroke-width:${solid?6:7};stroke-linecap:round"/>
-    ${p.hipOpen?`<circle cx="${hipL[0]}" cy="${hipL[1]}" r="4.5" style="fill:${BURG}"/>`:''}
-    <line x1="${p.sh[0]}" y1="${p.sh[1]}" x2="${p.head[0]}" y2="${p.head[1]+8}" style="stroke:${INK};stroke-width:${solid?7:4.5}"/>
-    ${solid?`<circle cx="${p.head[0]}" cy="${p.head[1]}" r="11.5" style="fill:${CARD};opacity:.92"/>`:''}
-    <circle cx="${p.head[0]}" cy="${p.head[1]}" r="8.5" style="fill:${solid?INK:CARD};stroke:${INK};stroke-width:4"/>
-    ${cap}
-    ${p.ball?`<ellipse cx="${p.ball[0]}" cy="${G-1.5}" rx="6" ry="2" style="fill:${FNT};opacity:.35"/><circle cx="${p.ball[0]}" cy="${p.ball[1]}" r="4.5" style="fill:#fff;stroke:${INK};stroke-width:2"/>`:''}
-    ${p.hipOpen?`<path d="M ${hipL[0]+7} ${p.hip[1]-16} q 17 6 11 24" style="fill:none;stroke:${BURG};stroke-width:2.5"/><polygon points="${hipL[0]+15},${p.hip[1]+10} ${hipL[0]+24},${p.hip[1]+3} ${hipL[0]+25},${p.hip[1]+13}" style="fill:${BURG}"/>`:''}
-    ${p.deg?`<text x="${hipL[0]+16}" y="${p.hip[1]+26}" style="fill:${BURG};font:800 9px var(--sans)">${p.deg}</text>`:''}
-    ${p.drop?`<path d="M 50 92 q -6 26 8 44" style="fill:none;stroke:${INK};stroke-width:2.5;stroke-dasharray:4 3"/><polygon points="58,136 46,132 54,125" style="fill:${INK}"/><text x="30" y="88" style="fill:${INK};font:italic 800 9px var(--sans)">drop</text>`:''}
-    ${p.press?`<line x1="${p.footL}" y1="${G-40}" x2="${p.footL}" y2="${G-18}" style="stroke:${GRN};stroke-width:3"/><polygon points="${p.footL},${G-12} ${p.footL-5},${G-20} ${p.footL+5},${G-20}" style="fill:${GRN}"/>`:''}
-  </svg>`;
-}
-function posFig(p, solid){
-  return `<div class="posfig">${posSvg(p, solid)}<div class="posname">${p.n} ¬∑ ${esc(p.name)}</div>
-  <div class="poschips">${p.chips.map(c=>`<span>${esc(c)}</span>`).join('')}</div></div>`;
-}
-// The six checkpoints, matched to the "Swing Positions ‚Äî Body Checkpoints" plan.
-function posData(){
-  return [
-    {n:1, name:'Address', head:[96,95], bill:7, sh:[97,110], shW:17, tiltT:3, tiltL:-3, hip:[100,151], hipW:12,
-      kneeT:[82,184], kneeL:[118,184], footT:74, footL:126, flareL:true, hands:[105,163],
-      club:[96,211], blade:[7,2,2,-7], ball:[100,215], wtLead:0.5,
-      chips:['50/50 on the arches','hinge from the hip sockets','lead foot flared 20‚Äì30¬∞','ball center (irons) ¬∑ hands under chin']},
-    {n:2, name:'Takeaway', head:[95,95], bill:7, sh:[96,110], shW:17, tiltT:2, tiltL:-2, hip:[100,151], hipW:12,
-      kneeT:[82,184], kneeL:[118,184], footT:74, footL:126, flareL:true, hands:[79,159],
-      club:[38,153], blade:[-2,-10,0,0], ball:[100,215], wtLead:0.45,
-      chips:['one piece ‚Äî chest & arms together','shaft parallel ¬∑ toe up','trail hip turns behind ‚Äî no sway']},
-    {n:3, name:'Top', head:[93,94], bill:6, sh:[97,108], shW:16, tiltT:-7, tiltL:7, hip:[99,151], hipW:11,
-      kneeT:[82,184], kneeL:[116,183], footT:74, footL:126, flareL:true, hands:[62,70],
-      club:[106,53], blade:[7,-3,0,0], wtLead:0.25,
-      chips:['shoulders ~90¬∞ ¬∑ hips ~45¬∞','loaded into the trail glute','trail knee holds flex','shaft points on line']},
-    {n:4, name:'Transition', head:[93,95], bill:6, sh:[98,109], shW:16, tiltT:-4, tiltL:4, hip:[101,150], hipW:11,
-      kneeT:[86,184], kneeL:[118,183], footT:76, footL:126, flareL:true, hands:[76,118],
-      club:[54,80], blade:[-2,-8,0,0], wtLead:0.6, hipOpen:true, drop:true, press:true,
-      chips:['1 ¬∑ press the lead foot','2 ¬∑ lead hip clears back & up','3 ¬∑ arms DROP into the slot']},
-    {n:5, name:'Impact', head:[91,94], bill:7, sh:[96,108], shW:16, tiltT:-2, tiltL:2, hip:[102,149], hipW:11,
-      kneeT:[88,185], kneeL:[120,182], footT:76, footL:126, toeT:true, hands:[114,160],
-      club:[95,211], blade:[7,2,2,-7], ball:[100,215], wtLead:0.85, hipOpen:true, deg:'35‚Äì45¬∞', post:true,
-      chips:['80‚Äì90% into the lead foot','lead leg posts up','hips open ¬∑ buckle left of ball','hands ahead ¬∑ head behind ball']},
-    {n:6, name:'Finish', head:[104,92], bill:8, sh:[102,106], shW:13, tiltT:0, tiltL:0, hip:[100,150], hipW:9,
-      kneeT:[90,186], kneeL:[118,183], footT:80, footL:122, toeT:true, hands:[120,70],
-      club:[84,52], blade:[-7,-4,0,0], wtLead:0.95, hipOpen:true, post:true,
-      chips:['belt buckle past the target','tall & stacked on the lead leg','trail laces to target ¬∑ hold 3s']},
-  ];
-}
-// Top-down: the pelvis sliding at the target vs rotating (clearing).
-function hipTopDown(){
-  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)';
-  const stage=`<line x1="16" y1="132" x2="150" y2="132" style="stroke:${FNT};stroke-width:2;stroke-dasharray:4 4"/><polygon points="150,132 142,128 142,136" style="fill:${FNT}"/><text x="58" y="147" style="fill:${FNT};font:9px var(--sans)">target ‚Üí</text><ellipse cx="50" cy="110" rx="15" ry="8" style="fill:none;stroke:${INK};stroke-width:3"/><ellipse cx="112" cy="110" rx="15" ry="8" style="fill:none;stroke:${INK};stroke-width:3"/>`;
-  const pelvis=(c)=>`<rect x="56" y="58" width="52" height="24" rx="11" style="fill:${c};opacity:.13"/><rect x="56" y="58" width="52" height="24" rx="11" style="fill:none;stroke:${c};stroke-width:4"/><circle cx="106" cy="70" r="4.5" style="fill:${c}"/>`;
-  const slide=`<svg viewBox="0 0 168 156" role="img" aria-label="Hips sliding sideways">
-    ${stage}${pelvis(BURG)}
-    <line x1="90" y1="40" x2="140" y2="40" style="stroke:${BURG};stroke-width:4"/><polygon points="140,40 131,35 131,45" style="fill:${BURG}"/>
-    <text x="10" y="19" style="fill:${BURG};font:bold 12px var(--sans)">‚úó SLIDE</text>
-  </svg>`;
-  const clear=`<svg viewBox="0 0 168 156" role="img" aria-label="Hips rotating and clearing">
-    ${stage}
-    <!-- The wall sits BEHIND the golfer (up the panel, away from the target line),
-         because that is the direction the lead hip retreats into. Negative rotation
-         is counter-clockwise on screen: lead hip back and up, trail hip toward the ball. -->
-    <line x1="88" y1="34" x2="152" y2="34" style="stroke:${FNT};stroke-width:3;stroke-dasharray:3 3"/><text x="124" y="28" style="fill:${FNT};font:8px var(--sans)">wall</text>
-    <g transform="rotate(-34 82 70)">${pelvis(GRN)}</g>
-    <path d="M 112 78 q 10 -24 -4 -34" style="fill:none;stroke:${GRN};stroke-width:4"/><polygon points="108,38 102,49 114,48" style="fill:${GRN}"/>
-    <text x="10" y="19" style="fill:${GRN};font:bold 12px var(--sans)">‚úì CLEAR</text>
-  </svg>`;
-  return `<div class="posfig">${slide}</div><div class="posfig">${clear}</div>`;
-}
-// Down-the-line: where the shaft points at the top ‚Äî the across-the-line fault.
-function topShaft(){
-  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)';
-  return `<svg viewBox="0 0 270 100" role="img" aria-label="Shaft at the top: on line vs across the line">
-    <line x1="28" y1="66" x2="242" y2="66" style="stroke:${FNT};stroke-width:2;stroke-dasharray:5 4"/>
-    <polygon points="28,66 37,61 37,71" style="fill:${FNT}"/>
-    <text x="42" y="60" style="fill:${FNT};font:9px var(--sans)">target</text>
-    <circle cx="206" cy="66" r="5" style="fill:${INK}"/>
-    <text x="214" y="63" style="fill:${INK};font:8px var(--sans)">hands</text>
-    <line x1="206" y1="66" x2="60" y2="66" style="stroke:${GRN};stroke-width:5;stroke-linecap:round"/>
-    <circle cx="60" cy="66" r="5.5" style="fill:${GRN}"/>
-    <text x="58" y="86" style="fill:${GRN};font:bold 10px var(--sans)">‚úì on line ‚Äî points at the target</text>
-    <line x1="206" y1="66" x2="66" y2="30" style="stroke:${BURG};stroke-width:5;stroke-linecap:round;stroke-dasharray:2 3"/>
-    <circle cx="66" cy="30" r="5.5" style="fill:${BURG}"/>
-    <text x="30" y="20" style="fill:${BURG};font:bold 10px var(--sans)">‚úó across the line ‚Äî points right (your tendency)</text>
-  </svg>`;
-}
-// Top-down club path + ball flight: over-the-top slice vs from-the-inside.
-function pathDiagram(){
-  const INK='var(--ink)', BURG='var(--burg)', GRN='var(--gtext)', FNT='var(--faint)';
-  const stage=`<line x1="84" y1="150" x2="84" y2="34" style="stroke:${FNT};stroke-width:1.5;stroke-dasharray:4 4"/><polygon points="84,30 96,35 84,40" style="fill:${FNT}"/><text x="90" y="30" style="fill:${FNT};font:8px var(--sans)">target</text><circle cx="84" cy="150" r="4" style="fill:#fff;stroke:${INK};stroke-width:2"/>`;
-  const ott=`<svg viewBox="0 0 168 168" role="img" aria-label="Over the top, out-to-in, slice">
-    ${stage}
-    <line x1="120" y1="166" x2="52" y2="126" style="stroke:${BURG};stroke-width:5;stroke-linecap:round"/><polygon points="52,126 63,127 57,136" style="fill:${BURG}"/>
-    <text x="112" y="150" style="fill:${BURG};font:8px var(--sans)">out‚Üíin</text>
-    <path d="M 84 150 C 84 112 100 84 128 50" style="fill:none;stroke:${BURG};stroke-width:3;stroke-dasharray:5 4"/><polygon points="128,50 120,58 131,60" style="fill:${BURG}"/>
-    <text x="8" y="18" style="fill:${BURG};font:bold 11px var(--sans)">‚úó Over the top ‚Üí slice</text>
-  </svg>`;
-  const inside=`<svg viewBox="0 0 168 168" role="img" aria-label="From the inside, straight or draw">
-    ${stage}
-    <line x1="48" y1="166" x2="116" y2="126" style="stroke:${GRN};stroke-width:5;stroke-linecap:round"/><polygon points="116,126 105,127 111,136" style="fill:${GRN}"/>
-    <text x="40" y="150" style="fill:${GRN};font:8px var(--sans)">in‚Üíout</text>
-    <path d="M 84 150 C 84 112 80 84 74 50" style="fill:none;stroke:${GRN};stroke-width:3"/><polygon points="74,50 70,60 80,57" style="fill:${GRN}"/>
-    <text x="8" y="18" style="fill:${GRN};font:bold 11px var(--sans)">‚úì From the inside</text>
-  </svg>`;
-  return `<div class="posfig">${ott}</div><div class="posfig">${inside}</div>`;
-}
-function swingPositions(){
-  const plan = S.briefings.find(b => /Swing Positions/i.test(b.course));
-  const F = posData();
-  const legend = `<div class="poslegend">
-    <span><i style="background:var(--burg)"></i>pelvis / belt line</span>
-    <span><i style="background:var(--gtext)"></i>lead leg posting up</span>
-    <span><i style="background:var(--gtext);border-radius:7px;height:10px"></i>pressure pill ¬∑ % under foot</span>
-    <span><i class="arc"></i>hips clearing</span>
-  </div>`;
-  return `
-  <button class="backlink" data-action="go" data-view="swing">‚Üê Swing Lab</button>
-  <div class="card">
-    <h2>Swing Positions ¬∑ visual guide</h2>
-    <p class="sm">The six face-on checkpoints, address to finish ‚Äî freeze each one in a mirror and match it. The pill under each foot is pressure (green = the loaded foot); the burgundy belt is your pelvis. Trail side = right, lead = left, target to the right.</p>
-    ${legend}
-    <div class="posgrid">${F.map(p=>posFig(p,true)).join('')}</div>
-  </div>
-  <div class="card">
-    <h2>The hips ¬∑ slide vs clear <span class="sm faint">(top-down)</span></h2>
-    <div class="hipcompare">${hipTopDown()}</div>
-    <p class="sm" style="margin-top:8px"><b class="warn">Slide</b> = the pelvis shifts sideways at the target and stays closed ‚Äî no speed, hands flip to save the face. <b style="color:var(--gtext)">Clear</b> = the pelvis turns, the lead hip pulls back to the <b>wall</b> behind it and up, and the belt buckle ends left of the ball. Feet shift, hips spin.</p>
-  </div>
-  <div class="card">
-    <h2>Shaft at the top <span class="sm faint">(down-the-line)</span></h2>
-    <div class="posfig" style="padding:8px 6px">${topShaft()}</div>
-    <p class="sm" style="margin-top:8px">Your tendency is <b class="warn">across the line</b> ‚Äî at the top the shaft points right of the target. The fix is Fix 1: feel the <b>trail elbow lead down</b> and the shaft drops back <b style="color:var(--gtext)">on line</b>. The one-handed Miracle 201 drop trains this directly ‚Äî it's in <b>Coach</b>, on the At-Home Swing shelf.</p>
-  </div>
-  <div class="card">
-    <h2>Club path ¬∑ your slice <span class="sm faint">(top-down)</span></h2>
-    <div class="hipcompare">${pathDiagram()}</div>
-    <p class="sm" style="margin-top:8px">Your slice is an <b class="warn">over-the-top</b> path ‚Äî the upper body throws the club out, then across the ball <b>out-to-in</b>; an open face turns that into start-left, curve-right. <b>Same cure as everything above:</b> shallow the club (the one-handed drop) and let the hips CLEAR so the club falls behind you and swings from the <b style="color:var(--gtext)">inside</b>. Feel it: swing out toward right-center field; a headcover just <i>outside</i> the ball that you must miss forces the inside path. Fix the path first ‚Äî then the face.</p>
-  </div>
-  ${plan ? `<div class="card flat"><div class="linkrow" data-action="open-briefing" data-id="${plan.id}"><b>Read the full checkpoint detail</b><span class="arr">‚Üí</span></div></div>` : ''}`;
-}
-
-function putting(){
-  const entries = S.fiveFt.slice(-6);
-  const mc = missCounts();
-  // The lab diagnoses; Coach trains. This page used to carry two hardcoded drills of its
-  // own, which is how one of them went on prescribing a tempo fix for a fault that closed
-  // on film in July. Drills have exactly one home now ‚Äî the bench in Coach.
-  const putDrills = drillList().filter(d => !d.missing.length &&
-    /Putting/.test(d.l.shelf)).length;
-  const plans = plansFor('putting');
-  const other = plans.filter(b => !isRoutine(b));
-  return `
-  ${labBar('putting')}
-  ${cheatBtn('putting')}
-  ${routineBlock(plans)}
-
-  ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
-
-  ${diagnosisCard('putting')}
-
-  <div class="card flat"><div class="linkrow" data-action="go" data-view="drills">
-    <span><b>Training lives in Coach</b><br><span class="sm">${putDrills} putting drills you have the kit for ‚Äî the drill bench keeps them all, with the streak</span></span><span class="arr">‚Üí</span></div></div>
-
-  <h2>Film room</h2>
-  <div class="card">
-    ${sessionLog(S.sessions.map((s,i) => ({s,i})).filter(o => sessionDiscipline(o.s) === 'putting').reverse(), 'No putting film yet ‚Äî send clips and the breakdowns land here.')}
-    <details><summary>+ Log a session</summary>
-      <label>Setup (angle ¬∑ strokes)</label><input id="sesSetup" placeholder="e.g. 5 strokes ¬∑ overhead, zero-torque demo">
-      <label>Finding</label><input id="sesFind" placeholder="What the film showed">
-      <div style="margin-top:10px"><button class="btn" data-action="add-session">Save session</button></div>
-    </details>
-  </div>
-
-  ${bayBlock('putting', 'No bay putting data yet. Trackman\u2019s putting analysis measures face angle at impact, path and launch direction \u2014 and needs no marked ball. Face at impact has been measured once in this project, on Jul 30. Twenty putts settles whether \u201cbarely open\u201d is delivering square.')}
-
-  <h2>Stroke evolution ¬∑ on the LINK.2.1</h2>
-  ${evolutionCard('putting')}
-
-  <h2>Filming guide</h2>
-  <div class="card flat">
-    <p class="sm"><b>1 ¬∑ Overhead</b> ‚Äî the gold standard for path (this is what settled SBST).<br>
-    <b>2 ¬∑ Down-the-line</b> ‚Äî behind the ball at hip height: start line, face at address.<br>
-    <b>3 ¬∑ Face-on</b> ‚Äî waist height: posture, eyeline, tempo.<br>
-    Film 3‚Äì5 strokes per angle so rep-to-rep patterns show.<br>
-    <b>Shooting with the laser?</b> It needs a scale in frame or the clip can't be measured ‚Äî the protocol is in Coach, <i>Filming the beam so it can actually be measured</i>.</p>
-  </div>
-
-  <h2>5-footer scoreboard</h2>
-  <div class="card">
-    <p class="sm">Tap each ball: <b>green = make</b>, then cycle the miss ‚Äî L, R, S (short), Lg (long). Tap again to clear.</p>
-    <div class="tapgrid" id="tapgrid">
-      ${Array.from({length:20}, (_,i)=>`<div class="tap" data-tap="${i}" data-state="">${i+1}</div>`).join('')}
-    </div>
-    <button class="btn" data-action="save-fiveft">Save today's 20</button>
-    ${entries.length ? `
-    <div class="spark">
-      ${entries.map(e => { const s=fiveFtScore(e); return `<div class="c"><div class="b ${e===latestFiveFt()?'hot':''}" style="height:${Math.max(4, s.total? s.makes/20*56 : 2)}px"></div><div class="t">${fmtDate(e.date)}</div></div>`; }).join('')}
-      <div class="c"><div class="b goal" style="height:${17/20*56}px"></div><div class="t">goal 17</div></div>
-    </div>
-    <p class="sm" style="margin-top:8px">All-time miss pattern: <b>${mc.L} left</b> ¬∑ ${mc.R} right ¬∑ ${mc.S} short ¬∑ ${mc.Lg} long ${mc.L>mc.R?'‚Äî <span class="warn">the left miss is still the story</span>':'‚Äî <span class="good">left miss under control</span>'}</p>` : '<p class="sm faint" style="margin-top:8px">No entries yet ‚Äî the first 20-ball test sets your baseline.</p>'}
-  </div>`;
-}
-
-// ----- Mental game -----
-// An OFF-COURSE tab. Nothing here is meant to be tapped mid-round ‚Äî the point of the
-// mental game is that the responses are decided at home and merely executed on the
-// course, so this page is where the deciding happens and where the round gets reviewed
-// afterwards. It leads with the thing Jack's own cards can already answer.
-//
-// "I get upset and it costs me" and "I don't close" are both claims about WHERE in a
-// round the strokes go, and every hole-by-hole card carries that. So the measurement
-// speaks first and the debrief ‚Äî his own read, written after the fact ‚Äî is the weaker
-// witness, the same film-over-feel rule the rest of the app runs on.
-const perHole = o => o && o.n ? o.over / o.n : null;
-const sgn = v => (v > 0 ? '+' : '') + v.toFixed(2);
-
-function mentalStats(){
-  // Six holes is the floor: a card shorter than that has no "closing stretch" to speak of
-  // and can't say anything about the shape of a round.
-  const src = withHoles()
-    .map(r => ({ live: !!r.live,
-      d: r.holes.filter(h => h && h.par != null && h.s != null).map(h => h.s - h.par) }))
-    .filter(x => x.d.length >= 6);
-  const cards = src.map(x => x.d);
-  // Same precedence rule as the Scores page: a card he tapped in on the hole outranks one
-  // reconstructed afterwards, so the tab says which kind of card it is reading.
-  const liveHoles = src.filter(x => x.live).reduce((a, x) => a + x.d.length, 0);
-  const m = { rounds:cards.length, liveRounds:src.filter(x => x.live).length, liveHoles, all:{n:0,over:0}, blow:{n:0,shots:0},
-    afterBog:{n:0,over:0,save:0}, afterDbl:{n:0,over:0},
-    thirds:[{n:0,over:0},{n:0,over:0},{n:0,over:0}],
-    close:{n:0,over:0}, before:{n:0,over:0}, inPos:{n:0,over:0,rounds:0},
-    open:{n:0,over:0}, second:{n:0,over:0}, badOpen:{n:0,over:0,rounds:0}, okOpen:{n:0,over:0,rounds:0} };
-  const acc = (o, v) => { o.n++; o.over += v; };
-  cards.forEach(d => {
-    // The first tee is its own event, and the two holes after it are the rattle test:
-    // does the opening hole cost you the hole, or does it cost you the round?
-    acc(m.open, d[0]);
-    if(d.length > 1) acc(m.second, d[1]);
-    const rest = d[0] >= 2 ? m.badOpen : m.okOpen;
-    rest.rounds++;
-    d.slice(1).forEach(v => acc(rest, v));
-    d.forEach((v, i) => {
-      acc(m.all, v);
-      if(v >= 2){ m.blow.n++; m.blow.shots += v; }
-      acc(m.thirds[Math.min(2, Math.floor(i * 3 / d.length))], v);
-      if(i >= d.length - 3) acc(m.close, v); else acc(m.before, v);
-      if(i){
-        // The reset test: what the hole AFTER a dropped shot costs, against his own average.
-        if(d[i-1] >= 1){ acc(m.afterBog, v); if(v <= 0) m.afterBog.save++; }
-        if(d[i-1] >= 2) acc(m.afterDbl, v);
-      }
-    });
-  });
-  // Closing when there was something to close. A fade only counts as a fade if the round
-  // was going at least as well as usual when he got to the last three.
-  const base = perHole(m.all);
-  if(base != null) cards.forEach(d => {
-    const head = d.slice(0, d.length - 3);
-    if(!head.length || head.reduce((a, b) => a + b, 0) / head.length > base) return;
-    m.inPos.rounds++;
-    d.slice(-3).forEach(v => acc(m.inPos, v));
-  });
-  return m;
-}
-
-// Same contract as every other tip generator: nothing fires without a sample behind it,
-// each card carries the number that triggered it, and a finding that comes out GOOD says
-// so rather than being quietly dropped ‚Äî "the cards don't show what you think" is one of
-// the more useful things this page can tell him.
-function mentalTips(m){
-  const EV = evOf(m.liveHoles || 0, m.all.n || 0);
-  const t = [];
-  const base = perHole(m.all);
-  if(base == null) return t;
-  const thin = `Six-ish rounds is a first read, not a verdict ‚Äî it grows every time you log a card hole by hole.`;
-
-  if(m.afterBog.n >= 12){
-    const a = perHole(m.afterBog), gap = a - base;
-    const save = Math.round(m.afterBog.save / m.afterBog.n * 100);
-    t.push(gap >= 0.2
-      ? { ev:EV, s:'warn', src:`The reset ¬∑ ${m.afterBog.n} holes`, h:'The hole after a dropped shot costs you extra',
-          b:`It plays ${sgn(a)} a hole against ${sgn(base)} across every hole you've logged ‚Äî ${sgn(gap)} of tax for carrying the last one${m.afterDbl.n >= 6 ? `, and ${sgn(perHole(m.afterDbl))} after a double or worse` : ''}. That is the measured version of what you described, and it has a fix with a landmark in it: ten yards of walking, then the hole is filed. ${thin}` }
-      : { ev:EV, s:'good', src:`The reset ¬∑ ${m.afterBog.n} holes`, h:'Your cards do not show a tilt tax',
-          b:`The hole after a dropped shot plays ${sgn(a)} against ${sgn(base)} overall, and you make par or better on ${save}% of them${m.afterDbl.n >= 6 ? ` ‚Äî ${sgn(perHole(m.afterDbl))} even after a double or worse` : ''}. So the anger is real as an experience and it is NOT currently showing up as strokes on the next tee. Two honest readings: the damage may be landing inside the bad hole rather than after it (see below), or the sample is still small. ${thin} Either way, do not spend practice on a reset problem the scorecard cannot find.` });
-  }
-
-  // Coach already carries the doubles finding from the scoring side; what's new here is
-  // only the framing, so this one stays on the Mental tab rather than going up twice.
-  if(m.blow.n && m.all.over > 0 && m.blow.shots / m.all.over >= 0.25)
-    t.push({ ev:EV, s:'warn', coach:false, src:`Where it actually lands ¬∑ ${m.blow.n} holes`, h:'The damage is inside the bad hole, not after it',
-      b:`${m.blow.n} holes of double bogey or worse across ${m.all.n} played, costing ${m.blow.shots} strokes ‚Äî ${Math.round(m.blow.shots / m.all.over * 100)}% of everything you've lost to par. A blow-up hole is where a bad decision gets made while you're already hot: the hero recovery, the second aggressive club, the flop you'd bet against. The mental work with the biggest number attached to it is not calming down afterwards, it is the one club you pick while still angry, DURING the hole.` });
-
-  if(m.close.n >= 9 && m.before.n >= 18){
-    const c = perHole(m.close), b = perHole(m.before), gap = c - b;
-    t.push(gap >= 0.2
-      ? { ev:EV, s:'warn', src:`Closing ¬∑ ${m.close.n} holes`, h:'You fade over the last three',
-          b:`The closing three play ${sgn(c)} a hole against ${sgn(b)} for everything before them${m.inPos.rounds >= 3 ? `, and ${sgn(perHole(m.inPos))} across the ${m.inPos.rounds} rounds that were going well when you got there` : ''}. That is the shape you described, measured. The counter is deliberately boring: same routine, same target selection, one more club, aimed at the middle. ${thin}` }
-      : { ev:EV, s:'good', src:`Closing ¬∑ ${m.close.n} holes`, h:'The closing stretch is not where your strokes go',
-          b:`The last three holes play ${sgn(c)} a hole against ${sgn(b)} for everything before them${m.inPos.rounds >= 3 ? `, and ${sgn(perHole(m.inPos))} across the ${m.inPos.rounds} rounds that were going well when you reached them` : ''}. So "not closing" is so far a MATCH feeling rather than a scoring one ‚Äî which is worth knowing, because it means the fix is about how the last three feel, not about a swing that leaves you. ${thin} Match play doesn't live in these cards at all: log the ones that matter and this line can start answering the question you're actually asking.` });
-  }
-
-  // The rattle test. Two separate questions that get answered as one thing in the retelling:
-  // what does the opening hole cost, and does it cost you anything AFTER it? They can come
-  // out opposite ways, and they point at completely different fixes if they do.
-  if(m.open.n >= 4){
-    const o = perHole(m.open), s2 = perHole(m.second);
-    const bleed = (m.badOpen.n >= 8 && m.okOpen.n >= 8) ? perHole(m.badOpen) - perHole(m.okOpen) : null;
-    if(o - base >= 0.3) t.push({ ev:EV, s:'warn', src:`The first tee ¬∑ ${m.open.n} starts`,
-      h:`Your opening hole costs ${sgn(o)} a hole`,
-      b:`${sgn(o)} across ${m.open.n} opening holes against ${sgn(base)} for every hole you've logged ‚Äî the most concentrated leak in your data, and it happens before you've hit anything else. ${s2 != null ? `Then the SECOND hole plays ${sgn(s2)}, which is ${Math.abs(s2 - base) < 0.15 ? 'your average almost exactly' : s2 < base ? 'better than your average' : 'still above your average'}. ` : ''}${bleed != null ? `And the rest of a round after a bad opening plays ${sgn(perHole(m.badOpen))} against ${sgn(perHole(m.okOpen))} after a clean one${bleed <= 0.1 ? ' ‚Äî no worse, so it does not bleed' : ''}. ` : ''}${bleed != null && bleed <= 0.1
-        ? 'So it costs you the opening hole and nothing after it. That makes this a WARM-UP and first-swing problem rather than a mental-toughness one: you do not need to recover better, you need to arrive with a swing. Prime the feel before the tee instead of hunting for it on the 4th.'
-        : 'Worth watching whether it bleeds into the rest of the round as more cards come in ‚Äî that is the difference between a warm-up fix and a reset fix.'}` });
-  }
-
-  if(m.all.n >= 27){
-    const v = m.thirds.map(perHole);
-    const worst = v.indexOf(Math.max(...v)), best = v.indexOf(Math.min(...v));
-    const LAB = ['the opening third', 'the middle third', 'the closing third'];
-    if(v[worst] - v[best] >= 0.25)
-      t.push({ ev:EV, s: worst === 2 ? 'warn' : 'mid', coach: worst === 2, src:`Shape of a round ¬∑ ${m.all.n} holes`,
-        h:`Your strokes cluster in ${LAB[worst]}`,
-        b:`Per hole: ${sgn(v[0])} opening ¬∑ ${sgn(v[1])} middle ¬∑ ${sgn(v[2])} closing. ${worst === 2
-          ? 'The worst third is the last one, so attention is the likeliest suspect ‚Äî this is the shape a fade actually has.'
-          : worst === 0 ? 'The worst third is the FIRST one, which is a warm-up problem rather than a focus problem ‚Äî you are settling into the round instead of starting in it.'
-          : 'The worst third is the middle, which is usually where a round stops being new and nobody is watching the clock yet. It is the least glamorous place to lose shots and the easiest to fix with a target you say out loud.'}` });
-  }
-
-  // The debriefs get their own voice, ranked below every measurement on the page.
-  const d = S.mental || [];
-  if(d.length >= 3){
-    const c = new Map();
-    d.forEach(x => (x.triggers || []).forEach(k => c.set(k, (c.get(k) || 0) + 1)));
-    const top = [...c.entries()].sort((a, b) => b[1] - a[1])[0];
-    const tr = top && MENTAL_TRIGGERS.find(x => x.k === top[0]);
-    if(tr && top[1] >= 2) t.push({ ev:'self', s:'mid', src:`Your debriefs ¬∑ ${d.length} rounds`,
-      h:`"${esc(tr.lab)}" is your most-logged trigger`,
-      b:`Logged after ${top[1]} of ${d.length} rounds. Your plan for it: ${tr.then} A trigger this repeatable is worth rehearsing off the course rather than meeting fresh every time.` });
-  }
-
-  // Does a trigger actually COST anything? Only answerable where a debrief is tied to a
-  // card with holes on it: WHICH rounds go in the bucket is his own read, but what they
-  // cost is measured. That hybrid is why it still ranks `self` ‚Äî the arithmetic is only
-  // ever as good as the label on the bucket.
-  MENTAL_TRIGGERS.forEach(x => {
-    // Three separate cards AND 27 holes: an 18-hole round and a nine would otherwise clear
-    // a hole-count gate on two rounds, and two rounds cannot carry a claim this loud.
-    const cards = d.filter(e => (e.triggers || []).includes(x.k)).map(debriefRound).filter(Boolean);
-    const v = cards.flat();
-    if(cards.length < 3 || v.length < 27) return;
-    const a = v.reduce((p, q) => p + q, 0) / v.length, gap = a - base;
-    if(gap >= 0.2) t.push({ ev:'self', s:'warn', src:`"${x.lab}" ¬∑ ${cards.length} rounds`,
-      h:`Rounds where "${x.lab.toLowerCase()}" fired cost you ${sgn(gap)} a hole`,
-      b:`They play ${sgn(a)} across ${v.length} holes against ${sgn(base)} for everything you've logged ‚Äî about ${(gap * 18).toFixed(1)} strokes a round. Which rounds belong in that bucket is your own read, so this is only ever as good as the labelling; the strokes themselves are off the cards. Your plan for it: ${x.then}` });
-  });
-  return t.sort((a, b) => EV_RANK[a.ev || 'snapshot'] - EV_RANK[b.ev || 'snapshot']);
-}
-
-// What the card says about the part of the round a debrief flagged. A diary entry sitting
-// next to its own numbers is worth more than either alone ‚Äî and it is the only route by
-// which a self-reported trigger ever earns, or loses, its credibility.
-const WHEN_THIRD = { open:0, mid:1, close:2 };
-function debriefRound(d){
-  if(!d.round) return null;
-  // Two nines at the same course on the same day are two different cards, so `nine`
-  // is part of the key wherever the debrief carries it.
-  const r = S.rounds.find(x => x.date === d.round.date && x.course === d.round.course
-    && (d.round.nine == null || (x.nine || null) === d.round.nine)
-    && Array.isArray(x.holes) && x.holes.length >= 6);
-  if(!r) return null;
-  const v = r.holes.filter(h => h && h.par != null && h.s != null).map(h => h.s - h.par);
-  return v.length >= 6 ? v : null;
-}
-function debriefCard(d, base){
-  const v = debriefRound(d);
-  if(!v) return '';
-  const th = [[], [], []];
-  v.forEach((x, i) => th[Math.min(2, Math.floor(i * 3 / v.length))].push(x));
-  const LAB = ['opening third', 'middle third', 'closing third'];
-  const parts = (d.when || []).filter(k => WHEN_THIRD[k] != null)
-    .map(k => { const s = th[WHEN_THIRD[k]]; return `${LAB[WHEN_THIRD[k]]} ${sgn(s.reduce((a, b) => a + b, 0) / s.length)}`; });
-  const tot = v.reduce((a, b) => a + b, 0);
-  const r = S.rounds.find(x => x.date === d.round.date && x.course === d.round.course
-    && (d.round.nine == null || (x.nine || null) === d.round.nine));
-  const match = matchLine(r);
-  return `<br><span class="sm faint">That card: ${tot > 0 ? '+' : ''}${tot} over ${v.length} holes${
-    match ? ` ¬∑ <b>${match}</b>` : ''}${parts.length ? ` ¬∑ ${parts.join(' ¬∑ ')} a hole` : ''}${
-    base != null ? ` ¬∑ you average ${sgn(base)}` : ''}</span>`;
-}
-
-// ----- Match play -----
-// The only place the "I don't close" question can actually be answered. A stroke-play card
-// cannot see a match: you can shoot your best score of the week and still lose, and you can
-// hand back a two-hole lead without a single number on the card moving. So the result rides
-// on the round itself (`result` W/L/T and `margin` in holes, signed from Jack's side) and
-// the Mental tab reads it here.
-function matchLine(r){
-  if(!r || !r.result) return '';
-  const m = Math.abs(r.margin || 0);
-  return r.result === 'T' ? 'halved'
-    : `${r.result === 'W' ? 'won' : 'lost'} ${m ? `${m} ${r.result === 'W' ? 'up' : 'down'}` : ''}`.trim();
-}
-function matchStats(){
-  const ms = withHoles().filter(r => r.result && r.holes.length >= 6)
-    .map(r => ({ r, vs: roundVsPar(r), margin: r.margin || 0 }))
-    // `matchNo` wins where it's known: an event can play the back nine first, so date
-    // order is not match order and numbering them 1..n by date renames Jack's own matches.
-    .sort((a, b) => (a.r.matchNo || 99) - (b.r.matchNo || 99)
-      || (a.r.date || '').localeCompare(b.r.date || ''));
-  const w = ms.filter(m => m.r.result === 'W').length, l = ms.filter(m => m.r.result === 'L').length;
-  // "Live at the finish" is the set the closing question is actually about: halved, or
-  // decided by a single hole. A 4&3 loss was never a closing problem.
-  const live = ms.filter(m => m.r.result === 'T' || Math.abs(m.margin) <= 1);
-  return { ms, w, l, t: ms.length - w - l, live, holes: ms.reduce((a, m) => a + m.margin, 0) };
-}
-
-function mentalCounts(){
-  const c = {};
-  (S.mental || []).forEach(d => (d.triggers || []).forEach(k => c[k] = (c[k] || 0) + 1));
-  return c;
-}
-
-function mental(){
-  const m = mentalStats();
-  const tips = mentalTips(m);
-  // Newest first BY DATE, not by insertion ‚Äî a debrief written on Tuesday about Sunday's
-  // round must not sit above Monday's. Insertion order only breaks ties.
-  const logs = (S.mental || []).map((d, i) => ({ d, i }))
-    .sort((a, b) => (b.d.date || '').localeCompare(a.d.date || '') || b.i - a.i)
-    .map(o => o.d);
-  const counts = mentalCounts();
-  const focus = logs.filter(d => d.focus).map(d => d.focus);
-  const avgFocus = focus.length ? focus.reduce((a, b) => a + b, 0) / focus.length : null;
-  const next = logs.find(d => d.next);
-  const plans = plansFor('mental');
-  const other = plans.filter(b => !isRoutine(b));
-  const rounds = realRounds().slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10);
-  const v = m.thirds.map(perHole);
-  const worst = v.every(x => x != null) ? v.indexOf(Math.max(...v)) : -1;
-  const THIRD = ['Opening third', 'Middle third', 'Closing third'];
-  return `
-  ${labBar('mental')}
-  ${cheatBtn('mental')}
-  ${next ? `<div class="card">
-    <h2>Next round ¬∑ one job</h2>
-    <p class="sm"><b>${esc(next.next)}</b></p>
-    <p class="sm faint" style="margin-top:6px">You wrote that after ${next.round ? esc(next.round.course) : 'your last round'}${next.date ? ` on ${fmtDate(next.date)}` : ''}. One job is the limit ‚Äî a list of five is the same as none.</p>
-  </div>` : ''}
-
-  <div class="card">
-    <p class="sm"><b>This page is for the kitchen table, not the golf course.</b> Everything a mental game does on the course is execution; the deciding happens here, before and after. What you get: what your own cards say about the two things you described ‚Äî the anger tax and the fade ‚Äî an if-then plan for every trigger that keeps getting you, and a debrief to fill in the evening after you play.</p>
-  </div>
-
-  ${routineBlock(plans)}
-  ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>` : ''}
-
-  <h2>What your cards say</h2>
-  ${m.all.n ? `<div class="rowgrid g3">
-    ${m.thirds.map((th, i) => `<div class="stat ${i === worst && v[worst] - Math.min(...v) >= 0.25 ? 'alert' : ''}">
-      <div class="v">${th.n ? sgn(perHole(th)) : '‚Äî'}</div><div class="l">${THIRD[i]}</div></div>`).join('')}
-  </div>
-  <div class="card">
-    <table><tr><th>Situation</th><th>Holes</th><th>Per hole</th><th>vs. you</th></tr>
-      ${[['The opening hole', m.open], ['The second hole', m.second],
-         [`After a bad opening${m.badOpen.rounds ? ` ¬∑ ${m.badOpen.rounds} rounds` : ''}`, m.badOpen],
-         [`After a clean opening${m.okOpen.rounds ? ` ¬∑ ${m.okOpen.rounds} rounds` : ''}`, m.okOpen],
-         ['Every hole logged', m.all], ['After a bogey or worse', m.afterBog], ['After a double or worse', m.afterDbl],
-         ['The closing three', m.close], ['Everything before them', m.before],
-         [`Closing when it was going well${m.inPos.rounds ? ` ¬∑ ${m.inPos.rounds} rounds` : ''}`, m.inPos]]
-        .filter(([, o]) => o.n).map(([lab, o]) => {
-          const p = perHole(o), d = p - perHole(m.all);
-          return `<tr><td class="sm"><b>${lab}</b></td><td>${o.n}</td>
-            <td><b style="color:${p >= 1 ? 'var(--burg)' : p <= 0.5 ? 'var(--green)' : 'var(--ink)'}">${sgn(p)}</b></td>
-            <td class="sm">${Math.abs(d) < 0.05 ? '<span class="faint">‚Äî</span>'
-              : `<b style="color:${d > 0 ? 'var(--burg)' : 'var(--green)'}">${sgn(d)}</b>`}</td></tr>`;
-        }).join('')}
-    </table>
-    <p class="sm faint" style="margin-top:8px">Counted from ${m.rounds} of your own hole-by-hole cards. "vs. you" compares each situation against your own average hole ‚Äî so it answers whether the situation costs you anything, not whether you're a good golfer in it.</p>
-  </div>` : `<div class="card"><p class="sm">Nothing to measure yet. This section reads your hole-by-hole cards ‚Äî the reset test (what the hole after a dropped shot costs), the closing three, and the shape of a round in thirds. Log a live round and it fills itself in.</p></div>`}
-
-  ${tips.length ? `<div class="card">
-    ${tips.map(t => `<div class="tipcard ${t.s === 'good' ? 'green' : ''}">
-      <div class="src">${esc(t.src)}${evTag(t.ev)}</div><h4>${t.h}</h4>${expandable(t.b)}</div>`).join('')}
-    <p class="sm faint">Measurement first, your own read last. A "good" card here is not a compliment ‚Äî it means the cards can't find the thing you described, which is worth knowing before you spend practice on it.</p>
-  </div>` : ''}
-
-  ${(() => {
-    const M = matchStats();
-    if(M.ms.length < 3) return '';
-    const base = perHole(m.all);
-    return `
-  <h2>Match play ¬∑ ${M.w}‚Äì${M.l}${M.t ? `‚Äì${M.t}` : ''}</h2>
-  <div class="card">
-    <table><tr><th>Match</th><th>Score</th><th>vs par</th><th>Result</th></tr>
-      ${M.ms.map((x, i) => `<tr>
-        <td class="sm"><b>${x.r.matchNo || i + 1}</b> <span class="faint">${fmtDate(x.r.date)}${x.r.nine ? ` ${x.r.nine === 'B' ? 'back' : 'front'}` : ''}</span></td>
-        <td>${x.r.score ?? '‚Äî'}</td><td class="sm">${x.vs != null ? `${x.vs > 0 ? '+' : ''}${x.vs}` : '‚Äî'}</td>
-        <td class="sm"><b style="color:${x.r.result === 'W' ? 'var(--green)' : x.r.result === 'T' ? 'var(--ink)' : 'var(--burg)'}">${esc(matchLine(x.r))}</b></td></tr>`).join('')}
-    </table>
-    <p class="sm" style="margin-top:8px">${M.live.length
-      ? `<b>${M.live.length} of ${M.ms.length} ${M.live.length === 1 ? 'was' : 'were'} live at the finish</b> ‚Äî halved or decided by a single hole. Those are the only ones the closing question is about; a match lost by more than that was decided by scoring, not by nerve. ${M.live.length >= 2 ? 'Look at what your debriefs say about those specific rounds ‚Äî if one mechanism keeps turning up in them, that is your closing problem, whatever it turns out to be.' : ''}`
-      : 'None of these were decided by a single hole, so none of them can carry a closing story ‚Äî they were decided by scoring.'}</p>
-    <p class="sm faint" style="margin-top:8px">A match result is the only thing that can answer "I get up and don't close" ‚Äî a scorecard can't see it. You can shoot your best score of the week and lose, and hand back a lead without a number on the card moving. Tell Claude the result of a match and it lands here.</p>
-  </div>`;
-  })()}
-
-  <h2>Triggers ¬∑ decided in advance</h2>
-  <div class="card">
-    <p class="sm">An if-then plan beats willpower because it removes the deciding. Read these cold, at home, until the response is boring ‚Äî that is the whole mechanism.${Object.keys(counts).length ? '' : ' The counts fill in as you log debriefs.'}</p>
-    ${MENTAL_TRIGGERS.map(x => `<div class="tipcard">
-      <div class="src">If ¬∑ ${esc(x.lab)}${counts[x.k] ? ` ¬∑ logged ${counts[x.k]}√ó` : ''}</div>
-      <h4>${esc(x.blurb)}</h4>
-      <p class="sm"><b>Then:</b> ${esc(x.then)}</p></div>`).join('')}
-  </div>
-
-  <h2>Round debrief</h2>
-  <div class="card">
-    <p class="sm">The evening after you play, not on the drive home. Two minutes: how locked in you were, what fired, and the one job for next time.</p>
-    <div class="formrow">
-      <div><label>Date</label><input type="date" id="mtDate" value="${today()}"></div>
-      <div><label>Round</label><select id="mtRound">
-        <option value="">Not logged / practice</option>
-        ${rounds.map((r, i) => `<option value="${i}">${fmtDate(r.date)} ¬∑ ${esc(r.course || 'round')}${r.nine ? ` ${r.nine === 'B' ? 'back' : 'front'}` : ''}${r.score != null ? ` (${r.score})` : ''}</option>`).join('')}
-      </select></div>
-    </div>
-    <label>How locked in were you?</label>
-    <div class="chips" id="mtFocus">${[1,2,3,4,5].map(n =>
-      `<span class="chip" data-action="mental-focus" data-focus="${n}">${n} ¬∑ ${FOCUS_LAB[n]}</span>`).join('')}</div>
-    <label>What fired?</label>
-    <div class="chips" id="mtTriggers" data-multi>${MENTAL_TRIGGERS.map(x =>
-      `<span class="chip" data-trig="${x.k}">${esc(x.lab)}</span>`).join('')}</div>
-    <label>When?</label>
-    <div class="chips" id="mtWhen" data-multi>${MENTAL_WHEN.map(([k, lab]) =>
-      `<span class="chip" data-when="${k}">${lab}</span>`).join('')}</div>
-    <label>What actually happened</label><input id="mtNote" placeholder="e.g. two groups backed up on 7, stood over it waiting, blocked it right">
-    <label>One job next round</label><input id="mtNext" placeholder="e.g. wait off the tee box ‚Äî routine starts when it's my turn">
-    <div style="margin-top:10px"><button class="btn" data-action="save-debrief">Save debrief</button></div>
-  </div>
-
-  ${logs.length ? `<h2>Debrief log ¬∑ ${logs.length}</h2>
-  <div class="card">
-    ${avgFocus != null ? `<p class="sm">Focus averages <b>${avgFocus.toFixed(1)} / 5</b> across ${focus.length} rounds${focus.length >= 3 ? ` ¬∑ newest three ${focus.slice(0,3).join(' ¬∑ ')}` : ''}. Your own read, so it is the softest number on this page ‚Äî but it is the only one that knows how the round felt.</p>` : ''}
-    ${logs.map((d, i) => `<div class="linkrow" style="align-items:flex-start${i === logs.length - 1 ? ';border-bottom:none' : ''}">
-      <span><b>${fmtDate(d.date)}${d.round ? ` ¬∑ ${esc(d.round.course)}` : ''}</b>${d.focus ? ` <span class="sm faint">${d.focus}/5 ${FOCUS_LAB[d.focus]}</span>` : ''}
-      ${(d.triggers || []).length ? `<br><span class="sm">${d.triggers.map(k => esc((MENTAL_TRIGGERS.find(x => x.k === k) || {}).lab || k)).join(' ¬∑ ')}${(d.when || []).length ? ` <span class="faint">‚Äî ${d.when.map(k => esc((MENTAL_WHEN.find(w => w[0] === k) || [])[1] || k)).join(', ')}</span>` : ''}</span>` : ''}
-      ${d.note ? `<br><span class="sm faint">${esc(d.note)}</span>` : ''}
-      ${debriefCard(d, perHole(m.all))}
-      ${d.next ? `<br><span class="sm"><b>Next:</b> ${esc(d.next)}</span>` : ''}</span>
-      <button class="minibtn" data-action="del-debrief" data-id="${esc(d.id)}">√ó</button></div>`).join('')}
-  </div>` : ''}
-
-  <h2>Off-course reps</h2>
-  <div class="card">
-    <p class="sm">The mental game is a skill, and a skill only ever attempted under pressure never improves. The reps that transfer are drills like any other, so they live on the bench in Coach with the rest ‚Äî routines with no ball, practising with the interference, and three to leave.</p>
-    <div class="linkrow" data-action="go" data-view="drills"><span><b>The drill bench</b><br><span class="sm">Every drill you have the kit for, filtered by where you are</span></span><span class="arr">‚Üí</span></div>
-    <div class="linkrow" data-action="open-shelf" data-shelf="Mental Game"><span><b>Mental Game lessons</b><br><span class="sm">One target one thought ¬∑ the 10-yard reset ¬∑ practice like it counts</span></span><span class="arr">‚Üí</span></div>
-    <div class="linkrow" data-action="open-lesson" data-id="c4"><span><b>Bogey is not an emergency</b><br><span class="sm">The lesson behind the blow-up finding above</span></span><span class="arr">‚Üí</span></div>
-    <div class="linkrow" data-action="go" data-view="putting" style="border-bottom:none"><span><b>Putting Lab ¬∑ the 20-ball test</b><br><span class="sm">Pressure with a score on it</span></span><span class="arr">‚Üí</span></div>
-  </div>`;
-}
-
-// ----- Coach -----
-// Find a standing plan by title so a finding can point at the page that fixes it.
-function planIdBy(re, disc){
-  const b = S.briefings.find(x => !x.date && re.test(x.course || '') &&
-    (disc ? (x.discipline || 'swing') === disc : true));
-  return b ? b.id : null;
-}
-// Everything Caddie HQ knows, ranked. Measured findings outrank standing faults,
-// which outrank to-dos ‚Äî a number you can point at beats an opinion.
-function coachSignals(){
-  const st = scoreStats();
-  const out = scoreTips(st).map(t => ({ sev:t.s, src:t.src, h:t.h, b:t.b, ev:t.ev, key:t.key, link:null }));
-  out.forEach(t => {
-    if(/opening hole/i.test(t.h)){ const id = planIdBy(/routine/i, 'full-swing'); if(id) t.link = { a:'open-briefing', id, lab:'Open the swing routine' }; }
-    else if(/par 3/i.test(t.h)) t.link = { a:'go', view:'swing', lab:'Swing lab' };
-    else if(/par 5/i.test(t.h)) t.link = { a:'go', view:'bag', lab:'Check the wedge ladder' };
-    else if(/double/i.test(t.h)) t.link = { a:'go', view:'scores', lab:'See the full breakdown' };
-  });
-  const last = latestFiveFt();
-  if(last){
-    const s = fiveFtScore(last), mc = missCounts();
-    const id = planIdBy(/routine/i, 'putting');
-    out.push({ sev: s.makes >= 17 ? 'good' : 'warn', src:'Putting ¬∑ measured', ev:'measured',
-      h:`${s.makes}/${s.total} from 5 feet`,
-      b:`Last logged test${mc.L || mc.R ? ` ¬∑ all-time misses ${mc.L} left / ${mc.R} right / ${mc.S} short / ${mc.Lg} long` : ''}. ${s.makes >= 17 ? 'At or past the goal of 17 ‚Äî hold it there.' : 'Goal is 17. ' + (mc.L > mc.R ? 'The left miss is still the pattern.' : 'Miss pattern is balanced ‚Äî this is pace and read, not face.')}`,
-      link: id ? { a:'open-briefing', id, lab:'Open the putting routine' } : { a:'go', view:'putting', lab:'Putting lab' } });
-  }
-  // The mental findings are computed from the same cards, so they belong in the same
-  // ranked list ‚Äî but only the ones that say something is wrong. A "the cards can't find
-  // it" card is the point of the Mental tab and pointless as a Coach to-do.
-  mentalTips(mentalStats()).filter(t => t.s !== 'good' && t.coach !== false).forEach(t => out.push({
-    sev:t.s, src:t.src, h:t.h, b:t.b, ev:t.ev, link:{ a:'go', view:'mental', lab:'Mental Game' } }));
-  // Open ones only ‚Äî a closed fault is a record, not a to-do, and listing it under
-  // "Open fault" was telling him to work on early lift and stance creep months after both
-  // were measured shut.
-  // Each one links to ITS OWN lab, and carries its tag so the focus card can name the
-  // drills that train it. Both were wrong before: every fault linked to the Putting Lab
-  // whatever it was of, so a swing fault sent him to the wrong page ‚Äî the same bug the
-  // film log had in v50, in the one place it is most confusing.
-  S.faults.filter(f => faultState(f) === 'open').forEach(f => {
-    const disc = faultDisc(f), lab = LABS.find(l => l.disc === disc);
-    out.push({ sev:'mid', src:`Open fault ¬∑ ${lab ? lab.name : disc}`, ev:'measured',
-      h:faultLabel(f.tag), b:f.why, tag:f.tag,
-      link:{ a:'go', view:LAB_VIEW[disc] || 'putting', lab:`${lab ? lab.name : 'Putting'} lab` } });
-  });
-  // Severity decides the band, evidence decides the order inside it ‚Äî so the warnings
-  // still lead, but within them his own rounds speak before a pasted season average.
-  // Array.sort is stable, so scoreTips' evidence order survives this pass.
-  const order = { warn:0, mid:1, good:2 };
-  return out.sort((a,b) => order[a.sev] - order[b.sev]
-    || EV_RANK[a.ev || 'snapshot'] - EV_RANK[b.ev || 'snapshot']);
-}
-
-// ----- The four areas -----
-// Jack's instruction (Aug 24 2026): the top of Coach reads high level across off the tee,
-// irons, short game and putting, off the live round data. So this is a READER over the
-// stats the app already computes ‚Äî scoreStats() and shortGameStats(), both scoped to a
-// card set ‚Äî rather than a fourth place that counts holes for itself. Two numbers that
-// disagree about the same round would be worse than no numbers.
-//
-// There is deliberately NO benchmark column. Jack's call: the only snapshot carrying
-// fairway / GIR / scrambling detail is a 47-round archive from an older tracking app, and
-// measuring today's game against a years-old baseline dressed up as a target is worse than
-// showing the number on its own. When there are enough live rounds to compare against each
-// other, that is the comparison worth building.
-const AREAS = ['tee', 'app', 'short', 'putt'];
-// `app` is INTO THE GREEN, not "Irons" (Jack, Aug 30 2026). It was named for the club he
-// usually has in hand, but the area is every shot at a green ‚Äî a wood into a par 5 and a wedge
-// from 90 are both in it, and the by-club breakdown made that plain the moment it rendered a
-// Woods row under a heading saying Irons. Renamed HERE rather than on Today so Coach and Today
-// stay one vocabulary; it also matches `clubTables()`, whose table has always been called
-// "Into the green ¬∑ by club".
-const AREA_LAB = { tee:'Off the tee', app:'Into the green', short:'Short game', putt:'Putting' };
-// Which area a ranked finding belongs to. Written down rather than inferred, and it admits
-// gaps: a finding about doubles or the opening hole belongs to no single area, and one that
-// maps nowhere simply highlights no tile. Same rule as FOCUS_TAG ‚Äî a wrong join reads
-// exactly like a right one.
-const AREA_OF = {
-  // scoreTips keys
-  'tee-club':'tee', 'greens-lost-at-tee':'tee', 'ob':'tee',
-  'approach-dir':'app', 'par-3s':'app', 'par-5s':'app',
-  'three-putts':'putt', 'putt-short':'putt', 'putt-lag':'putt', 'putt-tap':'putt',
-  // fault + struggle tags
-  'off-tee':'tee', 'missing-short':'app', 'approach':'app', 'wedge-distance':'app',
-  'up-and-down':'short', 'chipping':'short', 'bunkers':'short',
-  'short-putts':'putt', 'pace-calibration':'putt', 'strike-location':'putt',
-  'delivery-unverified':'putt', 'start-line-left':'putt', 'early-lift':'putt',
-  'stance-creep':'putt',
-};
-const areaOf = f => !f ? null : (AREA_OF[f.key] || AREA_OF[f.tag] || null);
-
-// Returns the four areas AND the stats they were computed from, so every line on the card
-// speaks about the same set of cards. Reading the tiles off the live rounds and the summary
-// line off everything would be a quiet lie about what the card is showing.
-// WHICH CARDS THE AREA NUMBERS ARE READ OFF. Extracted so Today's four tiles and Coach's
-// four areas can never disagree about the same round ‚Äî they are the same numbers in two
-// places, and two front pages quoting different fairway percentages would be worse than
-// neither quoting one. The live-only rule and the reasoning behind it live at coachHero().
-function areaCards(){
-  const all = withHoles();
-  const liveCards = all.filter(r => r.live);
-  const holesIn = rs => rs.reduce((a, r) => a + r.holes.filter(h => h.s != null).length, 0);
-  const liveHoles = holesIn(liveCards), allHoles = holesIn(all);
-  const ev = liveHoles >= 18 ? 'live' : 'round';
-  return { all, liveCards, liveHoles, allHoles, ev,
-    cards: ev === 'live' ? liveCards : all,
-    setAside: ev === 'live' ? all.length - liveCards.length : 0 };
-}
-function gameAreas(rounds){
-  const st = scoreStats(rounds);
-  const sg = shortGameStats(rounds);
-  const pct = (n, d) => d ? Math.round(n / d * 100) : null;
-  // topDir() yields an [key, count] entry, and it filters to the real directions ‚Äî OB is a
-  // price, not an aim reading, so it never becomes "your miss goes OB".
-  const dirs = m => { const t = topDir(m); return t ? { k:t[0], n:t[1] } : null; };
-  const out = {};
-
-  // OFF THE TEE. Fairways, then the two things that price a miss: a tee shot that left no
-  // play at all, and one that went out of bounds ‚Äî two strokes before there is a ball in
-  // play. Neither is a direction, which is why they are named rather than folded in.
-  const fwMiss = dirs(st.fw.miss), ob = st.fw.miss.OB || 0;
-  out.tee = st.fw.n ? {
-    v:`${pct(st.fw.hit, st.fw.n)}%`, u:'fairways', raw:`${st.fw.hit}/${st.fw.n}`, n:st.fw.n,
-    read:[ fwMiss ? `${fwMiss.n} of ${st.fw.n - st.fw.hit} misses went <b>${esc((MISS_LAB[fwMiss.k] || fwMiss.k).toLowerCase())}</b>` : '',
-           st.green.noshot ? `${st.green.noshot} left <b>no play</b> at the green` : '',
-           ob ? `${ob} <b>out of bounds</b> ‚Äî ${ob * 2} strokes` : '' ].filter(Boolean).join('. ') + '.'
-  } : null;
-
-  // IRONS. Greens in regulation, and where the misses finish ‚Äî with the conceded ones held
-  // out, because a green the tee shot already took away asks a driving question, not a club
-  // one. That split is the whole point of the noshot flag.
-  const gMiss = dirs(st.green.miss);
-  const playable = Object.entries(st.green.miss).reduce((a, [, v]) => a + v, 0);
-  out.app = st.green.n ? {
-    v:`${pct(st.green.hit, st.green.n)}%`, u:'greens', raw:`${st.green.hit}/${st.green.n}`, n:st.green.n,
-    read:[ gMiss ? `${gMiss.n} of ${playable} playable misses finished <b>${esc((MISS_LAB[gMiss.k] || gMiss.k).toLowerCase())}</b>` : '',
-           st.green.noshot ? `${st.green.noshot} charged to the tee` : '' ].filter(Boolean).join('. ') + '.'
-  } : null;
-
-  // SHORT GAME. Up and down off every missed green ‚Äî including the ones the tee shot ruined,
-  // because you scramble from where the ball is, not from where you meant to be.
-  out.short = sg.chances ? {
-    v:`${sg.saved}/${sg.chances}`, u:'up & down', raw:`${pct(sg.saved, sg.chances)}%`, n:sg.chances,
-    read:`${sg.chances} chance${sg.chances === 1 ? '' : 's'} to save a hole, ${sg.saved ? `<b>${sg.saved}</b> taken` : '<b>none</b> taken'}.`
-  } : null;
-
-  // PUTTING. Putts a hole, always ‚Äî it needs nothing but the putt count, it exists from the
-  // first hole he logs, and it moves with every one after. It led with the share of lags
-  // finishing inside three feet until Sep 8 2026, which came out 15 of 15 on his first two
-  // live rounds because twelve of those second putts were CONCEDED; see `puttMadeRows()`
-  // for why a rate that can only land near 100% was replaced rather than reweighted.
-  const P = st.putts;
-  out.putt = P.holes ? {
-    v:(P.total / P.holes).toFixed(2), u:`putts a hole ¬∑ ${P.total}`, raw:'', n:P.holes,
-    read:`${P.one} one-putt${P.one === 1 ? '' : 's'}, ${P.two} two-putt${P.two === 1 ? '' : 's'} and ${
-      P.three} three-putt${P.three === 1 ? '' : 's'} over ${P.holes} holes${
-      P.zero ? `, plus ${P.zero} you chipped in` : ''}.${
-      // Putt COUNTS come off every card; how a hole ENDED ‚Äî holed at a distance, or given ‚Äî
-      // only off the holes where he tapped one of those chips. Where that is the smaller
-      // number, say so, because the Given share and the made distances are computed over it
-      // and a reader is entitled to know they are not over all of it.
-      (() => { const k = P.distN + P.gim + P.lagIn;
-        return k && k < P.holes ? ` ${k} of those holes recorded how the hole ended ‚Äî the makes and the given share are off those.` : ''; })()}`
-  } : null;
-
-  return { areas:out, st, sg };
-}
-
-// ----- The top of Coach: where the game is, and the one thing to work on -----
-// Jack's instruction (Aug 24 2026): the only thing above the drills and the library is a
-// high-level read of where he is and what to focus on right now. So this is deliberately
-// ONE focus, not a ranked list ‚Äî the ranked list still exists further down and is where
-// the other findings live. Three parts, in the order a coach would say them: what the
-// record currently says, what that makes the priority, and what to go and do about it.
-//
-// Everything here is derived from what is already computed. No new claim is invented at
-// the top of the page: the focus is the highest-ranked signal `coachSignals()` produced,
-// carrying its own evidence badge, so the strongest evidence still leads and the card
-// cannot quietly outrank the page below it.
-// A finding computed from scorecards and a drill that trains it are two vocabularies, so
-// the join has to be written down rather than guessed. Only entries where the drill really
-// does train the thing the finding names belong here ‚Äî a wrong join reads exactly like a
-// right one, which is why the fallback below claims nothing at all rather than pointing at
-// the nearest tag. A finding with no entry is fine and common: "your opening hole runs
-// +1.4" is a routine problem, and the plan it links to is the right answer, not a drill.
-const FOCUS_TAG = {
-  'approach-dir':'missing-short',  // the short-miss finding IS the missing-short fault
-  'three-putts':'three-putts', 'putt-lag':'pace-calibration', 'putt-short':'short-putts',
-  'putt-tap':'short-putts', 'tee-club':'off-tee', 'greens-lost-at-tee':'off-tee',
-  'ob':'off-tee', 'par-5s':'wedge-distance', 'worst-hole':'mental',
-};
-const focusTag = f => f ? (f.tag || FOCUS_TAG[f.key] || null) : null;
-function coachFocus(sig){
-  // Warnings first, then whatever leads. `coachSignals()` has already sorted by severity
-  // and then by evidence, so the first of each band is the right pick without re-sorting.
-  return sig.find(t => t.sev === 'warn') || sig.find(t => t.sev === 'mid') || sig[0] || null;
-}
-// What the read is standing on, said plainly and with dates. "Based on the recent info we
-// have" is only meaningful if the page says WHICH info and HOW recent ‚Äî a focus built on a
-// card from three weeks ago is a different thing from one built on Saturday's round.
-function coachSince(){
-  const bits = [];
-  const rs = realRounds().filter(r => r.date).slice().sort((a,b) => a.date.localeCompare(b.date));
-  const lr = rs[rs.length - 1];
-  if(lr) bits.push(`your last round${lr.course ? ` at ${lr.course}` : ''} on ${fmtDate(lr.date)}${lr.live ? ' (logged live)' : ''}`);
-  const ss = S.sessions.filter(x => x.date).slice().sort((a,b) => a.date.localeCompare(b.date));
-  const ls = ss[ss.length - 1];
-  if(ls) bits.push(`film from ${fmtDate(ls.date)}`);
-  const week = (S.drillLog || []).filter(r => daysSince(r.date) <= 6);
-  if(week.length) bits.push(`${week.length} drill${week.length === 1 ? '' : 's'} logged this week`);
-  return bits;
-}
-function coachHero(sig, dr){
-  // LIVE FIRST (standing instruction, Aug 19 2026), and the way scoreTips() already does it:
-  // once the live cards can carry the read on their own, they carry it ALONE and the older
-  // cards stand down. A round's worth of live holes is the bar.
-  //
-  // Note this deliberately does NOT use evOf()'s second clause ‚Äî at-least-half-the-sample.
-  // That rule exists to stop a number computed from MIXED cards wearing a badge saying he
-  // logged it live, which would be laundering. Computing from the live cards only removes
-  // the mixture, so the badge is earned by construction rather than by a threshold. The
-  // header says how many older cards were set aside, so nothing disappears quietly.
-  const C = areaCards();
-  const { all, liveHoles, allHoles, ev, cards, setAside } = C;
-  const { areas: A, st: stC } = gameAreas(cards);
-  const f = coachFocus(sig), fArea = areaOf(f);
-  const since = coachSince();
-  const up = coursePlans().up[0];
-  // The focus is a fault ‚Üí say exactly what trains it, which is the same row the labs use.
-  // Anything else ‚Üí the bench, claiming nothing about a match it cannot vouch for.
-  const ft = focusTag(f);
-  const work = ft ? faultDrillRow(ft)
-    : `<div class="linkrow" data-action="go" data-view="drills">
-         <span class="sm"><b>${dr.ready} drills on the bench</b> ‚Äî nothing on the shelf trains this one
-           directly; it is a decision, not a stroke.</span><span class="arr">‚Üí</span></div>`;
-  // What this was read off, with dates on it. The only tile that gets a coloured top is the
-  // one the focus belongs to ‚Äî with no benchmark to measure against, a red tile would be an
-  // invented verdict, whereas "this is the one we are working on" is a fact about the page.
-  const tile = k => {
-    const a = A[k], on = fArea === k;
-    return `<div class="area${on ? ' focus' : ''}">
-      <div class="l">${esc(AREA_LAB[k])}${on ? ' ¬∑ focus' : ''}</div>
-      ${a ? `<div class="v">${esc(a.v)}</div><div class="u">${esc(a.u)}${a.raw ? ` ¬∑ ${esc(a.raw)}` : ''}</div>
-             <div class="rd">${a.read}</div>`
-          : `<div class="v faint">‚Äî</div><div class="u">not logged yet</div>
-             <div class="rd">Log a live round and this fills itself in.</div>`}
-    </div>`;
-  };
-  const counted = AREAS.filter(k => A[k]);
-  const thin = counted.length && Math.min(...counted.map(k => A[k].n)) < 36;
-  const rounds = cards.length;
-  // The read, at the size of a thing somebody said to you. It states nothing the page below
-  // doesn't ‚Äî it is the same sentence the card always carried, set in the display voice,
-  // with the three standing facts about the player under it. The profile is the only thing
-  // here that isn't computed, and every one of its three is on `S.profile`.
-  const read = allHoles
-    ? `${ev === 'live'
-        ? `${rounds} live round${rounds === 1 ? '' : 's'} ‚Äî ${liveHoles} holes you logged standing on them`
-        : `${rounds} card${rounds === 1 ? '' : 's'} on record ‚Äî ${allHoles} holes`}${
-      stC.holes ? `, running ${(stC.over / stC.holes).toFixed(2)} a hole over par` : ''}.`
-    : 'Nothing measured yet. Everything on this page is built from your own numbers, so it stays blank until there are some.';
-  const facts = [[S.profile.handicap, 'Handicap'], [S.profile.stroke, 'Stroke ¬∑ confirmed'],
-    [S.profile.miss, 'Signature miss']].filter(x => x[0] != null && x[0] !== '');
-  return `
-  <div class="card readcard">
-    ${fold('coach-read', 'Where the game is', allHoles ? EV_LAB[ev].toUpperCase() : '', `
-      <p class="readh">${esc(read)}</p>
-      ${setAside ? `<p class="reads">${setAside} older card${setAside === 1 ? '' : 's'} set aside ‚Äî this is your live rounds only.</p>` : ''}
-      ${since.length ? `<p class="reads">Read off ${esc(since.join(' ¬∑ '))}.</p>` : ''}
-      <div class="readst">${facts.map(([v, k]) =>
-        `<div><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join('')}</div>`, true, 'oncard')}
-  </div>
-
-  <div class="card">
-    ${allHoles ? `
-      <div class="areagrid">${AREAS.map(tile).join('')}</div>
-      ${thin ? `<p class="sm faint">Thin sample ‚Äî some of these rest on fewer than 36 recorded
-        holes, which is a flag rather than a rate. They redraw off every live round you log.</p>` : ''}`
-      : `<p class="sm">Log a live round and these four fill themselves in.</p>`}
-    ${f ? `<div class="tipcard ${f.sev === 'good' ? 'green' : ''}${rail(f.ev)}" style="margin-top:12px">
-      <div class="src">Focus right now ¬∑ ${esc(f.src)}${evTag(f.ev)}</div>
-      <h4>${f.h}</h4>${expandable(f.b)}
-      ${work}
-    </div>
-    ${sig.length > 1 ? `<p class="sm faint">${sig.length - 1} other finding${sig.length === 2 ? '' : 's'} on the board, ranked further down this page.</p>` : ''}` : ''}
-    ${up ? `<div class="linkrow" data-action="open-briefing" data-id="${esc(up.id)}">
-      <span class="sm"><b>Next up: ${esc(up.course || 'your round')}</b> ¬∑ ${fmtDate(up.date)} ‚Äî the plan is written</span><span class="arr">‚Üí</span></div>` : ''}
-  </div>`;
-}
-
-function coach(){
-  const st = scoreStats();
-  const sig = coachSignals();
-  const picks = pickedLessons();
-  const counts = shelfCounts();
-  const streak = weekStreak();
-  const dl = drillList().filter(d => !d.missing.length);
-  const dr = { ready: dl.length, home: dl.filter(d => d.where === 'home').length,
-               forYou: dl.filter(d => d.why && d.due).length,
-               week: (S.drillLog || []).filter(r => daysSince(r.date) <= 6).length };
-  const open = S.actions.filter(a => !a.done);
-  const others = sig.filter(t => t !== coachFocus(sig));
-  // No plan list here on purpose. Coach owns LESSONS, DRILLS and the to-do list; a plan
-  // belongs to its lab, and a course plan to Round Prep. Listing every standing plan here
-  // as well put each one in two places and flattened the discipline split that the labs
-  // exist to make ‚Äî a course prep and a putting routine sat in one undifferentiated column.
-  // The tips below still deep-link to a specific plan, which is the useful version: a
-  // pointer earned by context rather than a second copy of the shelf.
-  const linkFor = l => !l ? '' :
-    `<div class="linkrow" data-action="${l.a}"${l.id ? ` data-id="${esc(l.id)}"` : ''}${l.view ? ` data-view="${l.view}"` : ''}>
-       <span class="sm"><b>${esc(l.lab)}</b></span><span class="arr">‚Üí</span></div>`;
-  // ORDER (Jack's instruction, Aug 24 2026): one high-level read of where he is and what
-  // to focus on, then the two things he actually came here to open ‚Äî the bench and the
-  // library. Everything else is detail and sits below them. Before this, the drills were
-  // the sixth block on the page and the library the last, under a to-do list and a link to
-  // Scores: the two pages Coach exists to reach were the two furthest from the top.
-  return `
-  ${coachHero(sig, dr)}
-
-  <div class="card">
-    ${fold('coach-drills', 'Drill bench',
-      `${dr.ready} READY${dr.forYou ? ` ¬∑ ${dr.forYou} FOR YOU` : ''}`, `
-      <div class="linkrow" data-action="go" data-view="drills">
-        <span><b>Open the drill bench</b><br><span class="sm">${dr.ready} drills you have the kit for${dr.home ? ` ¬∑ ${dr.home} at home` : ''}${dr.forYou ? ` ¬∑ <b>${dr.forYou} matched to your game</b>` : ''}</span></span><span class="arr">‚Üí</span></div>
-      ${dr.week ? `<p class="sm">${dr.week} logged in the last seven days.</p>` : ''}
-      <p class="sm faint">Every lesson's drill in one list, filtered by the kit in the house and where you're standing. Drills live here and nowhere else.</p>`)}
-  </div>
-
-  <div class="card">
-    ${fold('coach-library', 'The library',
-      `${Object.values(counts).reduce((a, c) => a + c.n, 0)} LESSONS`, `
-      <div class="shelf-grid">
-        ${Object.entries(counts).map(([name,c]) => `
-          <div class="shelf" data-action="open-shelf" data-shelf="${esc(name)}">
-            <div class="nm">${esc(name)}</div>
-            <div class="ct">${c.n} lessons</div>
-            ${c.forYou ? `<span class="new">${c.forYou} FOR YOU</span>` : ''}
-          </div>`).join('')}
-      </div>`)}
-  </div>
-
-  <h2>Keep the streak</h2>
-  <div class="card">
-    ${picks.length ? picks.map(tipHTML).join('') : '<p class="sm">Lessons matched to your struggles appear here as you log rounds.</p>'}
-    <button class="btn" data-action="drill-done">Mark today's work done ¬∑ keep streak</button>
-    <div class="streak">${streak.map(d=>`<div class="day ${d.hit?'hit':''}">${d.lab}</div>`).join('')}</div>
-  </div>
-
-  ${others.length ? `<h2>Everything else on the board ¬∑ ranked</h2>
-  <div class="card">
-    ${others.slice(0,6).map(t => `<div class="tipcard ${t.sev === 'good' ? 'green' : ''}">
-      <div class="src">${esc(t.src)}${evTag(t.ev)}</div><h4>${t.h}</h4>${expandable(t.b)}
-      ${linkFor(t.link)}</div>`).join('')}
-    <p class="sm faint">The focus at the top of this page is left out of this list rather than repeated. Ranked by how good the evidence is: rounds you logged hole by hole lead, then what you've measured, then the GHIN summaries ‚Äî those are somebody else's arithmetic over a season, so they speak last. Within that, the warnings come first.</p>
-  </div>` : ''}
-
-  <h2>Next actions${open.length ? ` ¬∑ ${open.length}` : ''}</h2>
-  <div class="card actcard">
-    ${actionBoard(open)}
-    ${S.actions.some(a => a.done) ? `<details class="more" id="act-done">
-      <summary>${S.actions.filter(a => a.done).length} done</summary>
-      ${actionList(S.actions.filter(a => a.done))}
-    </details>` : ''}
-    <div class="formrow" style="margin-top:10px">
-      <input id="newAction" placeholder="Add an action item‚Ä¶">
-      <button class="btn ghost" data-action="add-action">Add</button>
-    </div>
-  </div>
-
-  <div class="card flat"><div class="linkrow" data-action="go" data-view="rounds" data-seg="cards">
-    <span><b>Score history &amp; analytics</b><br><span class="sm">${S.rounds.length ? `${S.rounds.length} rounds ¬∑ scoring mix, par splits, worst holes` : 'Log a round ‚Äî the coaching above is built from them'} ¬∑ logging lives there</span></span><span class="arr">‚Üí</span></div></div>`;
-}
-
-function shelf(name){
-  const tags = struggles();
-  const items = lessons().filter(l => l.shelf === name);
-  return `
-  <button class="backlink" data-action="go" data-view="coach">‚Üê Coach</button>
-  <h2>${esc(name)}</h2>
-  ${items.map(l => {
-    const forYou = l.tags.some(t=>tags.has(t)) && !S.lessonsRead.includes(l.id);
-    const read = S.lessonsRead.includes(l.id);
-    return `<div class="card" data-action="open-lesson" data-id="${l.id}" style="cursor:pointer">
-      <h3>${esc(l.title)}</h3>
-      <p class="sm faint">${l.min} min ${forYou?'¬∑ <span class="warn">FOR YOU</span>':''} ${read?'¬∑ read ‚úì':''}</p>
-    </div>`; }).join('')}`;
-}
-
-function lesson(id){
-  const l = lessons().find(x=>x.id===id);
-  if(!l) return coach();
-  if(!S.lessonsRead.includes(id)){ S.lessonsRead.push(id); save(); }
-  return `
-  <button class="backlink" data-action="open-shelf" data-shelf="${esc(l.shelf)}">‚Üê ${esc(l.shelf)}</button>
-  <div class="card">
-    <h2>${esc(l.shelf)} ¬∑ ${l.min} min</h2>
-    <h3 style="font-size:19px">${esc(l.title)}</h3>
-    <p class="lesson-body">${esc(l.body)}</p>
-    ${l.drill ? `<div class="lesson-drill"><b>Drill</b>${drillBody(l)}</div>` : ''}
-    <div style="margin-top:12px"><button class="btn" data-action="drill-done">Did the work ¬∑ keep streak</button></div>
-  </div>`;
-}
-
-// One drill's practice record, and the form that adds to it. The result box is optional on
-// purpose: logging that the work happened is worth something on its own, and a required
-// number would just teach him to skip the button on a night he didn't count. The trend line
-// only appears once there are three numbers to draw, because two points are a line through
-// anything. Input font-size is left to the stylesheet ‚Äî see the 16px rule; a smaller one
-// here zooms the whole page on iOS and never zooms back.
-function runRecord(d){
-  const nums = d.runs.map(r => drillNum(r.v)).filter(v => v != null);
-  const hist = d.runs.slice(-6).reverse();
-  return `<div class="drun">
-    <p class="sm">${d.last
-      ? `<b>Last run ${fmtDate(d.last.date)}</b>${d.since === 0 ? ' ¬∑ today' : d.since === 1 ? ' ¬∑ yesterday' : ` ¬∑ ${d.since} days ago`}${
-          d.last.v ? ` ¬∑ scored <b>${esc(d.last.v)}</b>` : ''}${d.runs.length > 1 ? ` ¬∑ ${d.runs.length} runs on record` : ''}`
-      : '<b>Never run.</b> Nothing on record for this one yet.'}</p>
-    ${nums.length >= 3 ? `<div class="sm faint">Last ${nums.length} results ${spark(nums, 26, 'var(--gtext)')}</div>` : ''}
-    ${hist.length > 1 ? `<details class="more"><summary>${d.runs.length} runs</summary>
-      <p class="sm faint">${hist.map(r => `${fmtDate(r.date)}${r.v ? ` ¬∑ ${esc(r.v)}` : ''}`).join(' ¬∑ ')}</p></details>` : ''}
-    <div class="formrow" style="margin-top:8px">
-      <input id="dres-${esc(d.l.id)}" placeholder="Result (optional) ‚Äî e.g. ${esc(passHint(d.l))}">
-      <button class="minibtn" data-action="log-drill" data-id="${esc(d.l.id)}">Did it ‚úì</button>
-    </div>
-  </div>`;
-}
-// A placeholder taken from the drill's own pass mark, so the box asks for the unit that
-// drill actually scores in rather than a generic number.
-function passHint(l){
-  const m = /(\d+\s*\/\s*\d+)/.exec(l.score || '');
-  return m ? m[1].replace(/\s+/g, '') : '7/10';
-}
-
-// ----- The drill bench -----
-// Sorted the way a decision actually gets made: is it for me, can I do it here, do I own
-// the thing. Blocked drills stay on the page under their own heading ‚Äî see drillList().
-function drills(){
-  const all = drillList();
-  const place = S.settings.drillPlace || 'all';
-  // A fault filter arrives from a lab's diagnosis card, so the bench can answer "what
-  // trains THIS" without a lab ever growing a drill section of its own. It is deliberately
-  // not sticky in settings: it is a question asked once, and a filter still silently on
-  // next week would make the page lie about what is due.
-  const tag = drillTag;
-  const here = d => place === 'all' || !d.where || d.where === place;
-  const inTag = d => !tag || d.l.tags.includes(tag);
-  const shown = all.filter(d => here(d) && inTag(d));
-  const ready = shown.filter(d => !d.missing.length);
-  // Matching on tags alone flags roughly half the library, which is a list, not a
-  // priority. So the top group is capped at six and ordered filmed-fault first, then by
-  // what has gone longest without being run ‚Äî and the ones that don't make the cut keep
-  // their FOR YOU badge in the group below rather than disappearing, so the page never
-  // claims the shortlist is everything.
-  const matched = ready.filter(d => d.why && d.due)
-    .sort((a,b) => (b.filmed ? 1 : 0) - (a.filmed ? 1 : 0)
-                || (b.since == null ? 1e6 : b.since) - (a.since == null ? 1e6 : a.since));
-  const forYou = matched.slice(0,6);
-  const rest = ready.filter(d => !forYou.includes(d));
-  const spill = matched.length - forYou.length;
-  const blocked = shown.filter(d => d.missing.length);
-  const week = (S.drillLog || []).filter(r => daysSince(r.date) <= 6);
-  const chip = (k, lab, n) => `<span class="chip ${place === k ? 'on' : ''}" data-action="pick-place" data-place="${k}">${esc(lab)}${n ? ` ¬∑ ${n}` : ''}</span>`;
-  const card = d => {
-    // Naming the place is only worth a line when the list spans more than one of them.
-    const label = [d.l.shelf].concat(place === 'all' ? [d.where ? PLACES[d.where] : 'Anywhere'] : []).join(' ¬∑ ');
-    return `<details class="sect" id="drill-${esc(d.l.id)}">
-      <summary><b>${esc(label)}${d.why && d.due ? ' <span class="warn">FOR YOU</span>' : ''}</b>
-        <span class="gist">${esc(d.l.title)}</span></summary>
-      ${d.missing.length ? `<p class="sm warn"><b>Needs ${esc(d.missing.map(k => KIT_LAB[k] || k).join(' + '))}</b> ‚Äî mark it above once you have it.</p>` : ''}
-      ${d.why ? `<p class="sm faint">Matched to your game: ${esc(splitLead(d.why)[0])}</p>` : ''}
-      ${drillBody(d.l)}
-      ${d.kit.length ? `<div class="chips">${d.kit.map(k => `<span class="chip static ${haveKit(k) ? 'grn' : 'ns'}">${esc(KIT_LAB[k] || k)}</span>`).join('')}</div>` : ''}
-      ${runRecord(d)}
-      <div class="linkrow" data-action="open-lesson" data-id="${esc(d.l.id)}">
-        <span class="sm"><b>Why this drill exists</b> ‚Äî read the lesson</span><span class="arr">‚Üí</span></div>
-    </details>`;
-  };
-  const group = (title, list, note) => !list.length ? '' : `
-    <div class="secthead"><h2>${title} ¬∑ ${list.length}</h2>
-      <button class="minibtn" data-action="toggle-sections">Expand all</button></div>
-    ${note ? `<p class="sm faint" style="margin:-4px 0 6px">${note}</p>` : ''}
-    <div class="card">${list.map(card).join('')}</div>`;
-  return `
-  <button class="backlink" data-action="go" data-view="coach">‚Üê Coach</button>
-
-  ${tag ? `<div class="card">
-    <h2>Training one fault</h2>
-    <p class="sm">Showing only what trains <b class="warn">${esc(faultLabel(tag))}</b> ‚Äî the finding that sent you
-      here is on the page you came from.
-      ${shown.length ? `${shown.length} drill${shown.length === 1 ? '' : 's'}.` : 'Nothing in the library trains it yet.'}</p>
-    <div class="chips"><span class="chip on" data-action="clear-drill-tag">‚úï Show every drill</span></div>
-  </div>` : ''}
-
-  <div class="card">
-    <h2>Your practice week</h2>
-    <p class="sm">${week.length
-      ? `<b>${week.length} drill${week.length === 1 ? '' : 's'}</b> logged in the last seven days${
-          (S.drillLog || []).length > week.length ? ` ¬∑ ${(S.drillLog || []).length} on record all told` : ''}.`
-      : 'Nothing logged in the last seven days. Tap <b>Did it ‚úì</b> under a drill when you run it ‚Äî that is what turns a pass mark into a trend.'}</p>
-    <p class="sm faint">Logging a drill records WHICH one and what it scored, so the bench can put the ones going stale back at the top. It keeps the streak alive too.</p>
-  </div>
-
-  <h2>What you've got</h2>
-  <div class="card">
-    <p class="sm">Tap what you own. Nothing is assumed ‚Äî the ones already lit are the ones your record proves, plus a tee, which anyone carrying that bag has.</p>
-    <div class="chips">
-      ${KIT.map(g => `<span class="chip ${haveKit(g.k) ? 'grn' : ''}" data-action="toggle-kit" data-kit="${g.k}">${esc(g.lab)}</span>`).join('')}
-    </div>
-    <p class="sm faint">A drill needing something you haven't marked doesn't vanish ‚Äî it drops to the bottom of this page with the missing item named.</p>
-  </div>
-
-  <h2>Where are you?</h2>
-  <div class="card">
-    <div class="chips">
-      ${chip('all', 'Everything', all.length)}
-      ${Object.entries(PLACES).map(([k, lab]) =>
-        chip(k, lab, all.filter(d => d.where === k).length)).join('')}
-    </div>
-  </div>
-
-  ${group('For you right now', forYou,
-    `Matched to a fault or a struggle that is currently open, film-measured ones first, then whatever has gone longest unrun ‚Äî and you have the kit for every one.${spill ? ` ${spill} more carry the badge below.` : ''}`)}
-  ${group('Ready to go', rest)}
-  ${group('Needs kit you haven\'t marked', blocked,
-    'Not hidden, just parked ‚Äî every one of these is a tap on the kit list away.')}
-  ${!shown.length ? '<div class="card"><p class="sm">Nothing filed under that place yet.</p></div>' : ''}
-  <p class="sm faint" style="margin:10px 0">Every drill here belongs to a lesson in the library ‚Äî this page is the same shelf sorted by what you can actually do today. A drill drops off the shortlist when you log it, and comes back when it goes stale; close the fault it trains in a lab and it stops being flagged at all.</p>`;
-}
-
-// ----- Session deep-dive -----
-function sessionView(i){
-  const s = S.sessions[+i];
-  if(!s) return putting();
-  const d = s.detail;
-  const sc = { good:'var(--green)', warn:'var(--burg)', mid:'var(--ink)' };
-  const disc = sessionDiscipline(s);
-  const SESSION_LAB = { swing:['swing','Swing Lab'], 'short-game':['shortgame','Short Game'], putting:['putting','Putting Lab'] };
-  return `
-  <button class="backlink" data-action="go" data-view="${SESSION_LAB[disc][0]}">‚Üê ${SESSION_LAB[disc][1]}</button>
-  <div class="card">
-    <h2>${fmtDate(s.date)} ¬∑ film breakdown</h2>
-    <h3>${esc(s.setup)}</h3>
-    ${!d ? `<p class="sm" style="margin-top:8px">${esc(s.finding)}</p>
-      <p class="sm faint">No deep-dive attached ‚Äî sessions you log yourself carry the summary only. Filmed sessions analyzed by Claude arrive with the full breakdown.</p>` : `
-    <div class="rowgrid g3" style="margin:12px 0 4px">
-      ${d.metrics.map(m => `<div class="stat" style="border-top-color:${sc[m.s]||'var(--green)'}">
-        <div class="v" style="font-size:13px;color:${sc[m.s]||'var(--green)'}">${esc(m.v)}</div>
-        <div class="l">${esc(m.k)}</div>
-        <div class="n" style="font-size:9px;color:var(--faint);font-family:var(--sans);margin-top:2px">${esc(m.n||'')}</div>
-      </div>`).join('')}
-    </div>
-    <h2 style="margin-top:14px">What the film showed</h2>
-    ${prose(d.story)}
-    ${d.compare ? `<details class="sect"><summary><b>Versus prior sessions</b><span class="gist">${esc(splitLead(d.compare)[0])}</span></summary>${prose(d.compare)}</details>` : ''}
-    ${d.limits ? `<details class="sect"><summary><b>What this angle couldn't see</b><span class="gist">${esc(splitLead(d.limits)[0])}</span></summary>${prose(d.limits)}</details>` : ''}
-    `}
-  </div>`;
-}
-
-// ----- Round-prep briefing -----
-function briefing(id){
-  const b = S.briefings.find(x => x.id === id);
-  if(!b) return home();
-  const played = S.courses.find(c => c.name.toLowerCase() === b.course.toLowerCase());
-  const wx = playsFactor();
-  // An undated plan is usually a lab routine, but a COURSE plan is undated too ‚Äî course
-  // knowledge doesn't expire ‚Äî and sending that one back to the Swing Lab is nonsense.
-  const isCourse = !!played || S.rounds.some(r => courseMatches(r.course, b.course));
-  // Back where it came from. A discipline plan belongs to its lab; a COURSE plan belongs
-  // to Round Prep ‚Äî which is the second segment of Rounds since Aug 27 2026, so the link
-  // names the tab and the segment rather than a page of its own.
-  const LAB = { putting:['putting','Putting Lab'], mental:['mental','Mental Game'], 'short-game':['shortgame','Short Game'] };
-  const lab = LAB[b.discipline] || ['swing','Swing Lab'];
-  const [backView, backLabel] = b.date || isCourse ? ['rounds','Round Prep'] : lab;
-  const backSeg = backView === 'rounds' ? ' data-seg="prep"' : '';
-  return `
-  <button class="backlink" data-action="go" data-view="${backView}"${backSeg}>‚Üê ${backLabel}</button>
-  <div class="card">
-    <h2>${b.date ? 'Round prep ¬∑ ' + fmtDate(b.date) : 'Standing plan'}</h2>
-    <h3 style="font-size:19px">${esc(b.course)}</h3>
-    ${b.focus ? `<p class="sm" style="margin-top:4px"><b class="warn">${b.date ? "Today's one focus:" : 'The short version:'}</b> ${esc(b.focus)}</p>` : ''}
-    ${played ? `<p class="sm faint" style="margin-top:6px">Your history: ${played.rating != null ? 'rated ' + Number(played.rating).toFixed(2) : 'unrated'}${played.pr != null ? ' ¬∑ PR ' + esc(played.pr) : ''}${played.notes ? ' ¬∑ "' + esc(played.notes) + '"' : ''}</p>` : ''}
-    ${wx ? `<p class="sm faint">Conditions now: ${Math.round(S.weather.t)}¬∞F ‚Äî carries play ${wx>1?'+':''}${((wx-1)*100).toFixed(1)}% (see the ladder's Today column).</p>` : ''}
-  </div>
-  ${b.rules && b.rules.length ? `<div class="card flat">
-    <h2>If you read nothing else</h2>
-    <div class="steprules top">${b.rules.map(r => `<span>${esc(r)}</span>`).join('')}</div>
-  </div>` : ''}
-  ${b.steps && b.steps.length ? `<div class="card">
-    <h2>The routine</h2>
-    <ol class="steps">${b.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
-  </div>` : ''}
-  ${(() => {
-    // HOLE BY HOLE, AND EDITABLE (Sep 12 2026). Every row reads through briefHole(), which
-    // is where his own club call is merged in ‚Äî so this table and the tee are the same
-    // sentence by construction rather than by two renderers agreeing.
-    const HN = planHoleNums(b);
-    const listed = HN.all.filter(n => briefHole(b, n) || (b.holes || []).some(h => h && h.n === n && (h.play || h.note || (h.why || []).length)));
-    if(!(b.holes || []).length && !HN.mine.length) return '';
-    const spare = HN.all.filter(n => !listed.includes(n));
-    const row = n => {
-      const hn = briefHole(b, n) || (b.holes || []).find(h => h && h.n === n) || { n };
-      const rows = holeRows(hn), mine = myCall(hn), open = planPick === n;
-      return `<tr><td><b>${n}</b>${hn.yds ? `<br><span class="sm faint">${hn.yds}y</span>` : ''}</td>
-        <td class="sm">
-        ${rows.length ? `<dl class="hi-grid">${rows.map(([k, v, cls]) =>
-          `<dt>${esc(k)}</dt><dd class="${cls}">${v}</dd>`).join('')}</dl>` : ''}
-        ${hn.note ? emph(hn.note) : ''}
-        ${(hn.why || []).length ? `<ul class="hi-why">${hn.why.map(w => `<li>${emph(w)}</li>`).join('')}</ul>` : ''}
-        <div class="callbar">
-          <button class="minibtn${mine ? ' on' : ''}" data-action="plan-pick" data-n="${n}">${
-            mine ? 'Your club ‚ñæ' : 'Ôºã Your club'}</button>
-          ${mine ? `<button class="minibtn" data-action="plan-call-clear" data-n="${n}">Use the plan</button>` : ''}
-        </div>
-        ${open ? `<div class="chips callpick">${bagClubs().map(c =>
-            `<span class="chip${(hn.club || []).includes(c.key) && hn.yours ? ' grn' : ''}"
-               data-action="plan-call" data-n="${n}" data-k="${esc(c.key)}">${esc(c.name)}</span>`).join('')}
-          </div>
-          <p class="sm faint" style="margin-top:4px">Tap one or two ‚Äî a call can name a choice. It reaches you on this hole while you log the round, and the plan's own line stays underneath it.</p>` : ''}
-        </td></tr>`;
-    };
-    return `<div class="card">
-    <h2>Hole by hole</h2>
-    <table><tr><th>Hole</th><th>The play</th></tr>
-      ${listed.map(row).join('')}
-      ${planPick && !listed.includes(planPick) ? row(planPick) : ''}
-    </table>
-    ${spare.length ? `<div class="chips" style="margin-top:8px">
-      <span class="sm faint" style="align-self:center;margin-right:4px">Your club on another hole:</span>
-      ${spare.filter(n => n !== planPick).map(n =>
-        `<span class="chip" data-action="plan-pick" data-n="${n}">${n}</span>`).join('')}</div>` : ''}
-    <p class="sm faint" style="margin-top:8px">Each of these surfaces on its own hole while you're logging a live round ‚Äî that's the point of writing them. <b>Your club overrules the plan's</b> on the tee and on the round card afterwards; the plan's own call stays on the page underneath it, and a later update to this plan will not wipe your pick.</p>
-  </div>`;
-  })()}
-  ${(b.sections || []).length ? `<div class="card">
-    <div class="secthead">
-      <h2>The detail</h2>
-      <button class="minibtn" data-action="toggle-sections">Expand all</button>
-    </div>
-    <p class="sm faint" style="margin:-4px 0 6px">${b.sections.length} sections ¬∑ about ${readMins(b)} min end to end. Tap any one to open it.</p>
-    ${b.sections.map(s => `<details class="sect">
-      <summary><b>${esc(s.t)}</b><span class="gist">${esc(gist(s))}</span></summary>
-      ${prose(s.b)}
-    </details>`).join('')}
-  </div>` : ''}
-  <p class="sm faint" style="margin:10px 0">Briefed by Claude from course research + your bag, carries, and stroke history.</p>`;
-}
-
-// ----- Short game -----
-// Nothing new is logged for this: it is the green-miss and up-and-down data already sitting
-// in the hole arrays, asked as a short-game question instead of a scoring one.
-// Takes an optional card set, exactly as scoreStats() does, so the same arithmetic can be
-// asked of the live cards alone or of everything ‚Äî one implementation, two scopes, and no
-// way for the lab's number and the Coach card's number to drift apart.
-function shortGameStats(rounds){
-  // `saved` is up and down ‚Äî par or better from a missed green. `bogey` is the tier below it,
-  // par OR bogey: reached the green and two-putted, or better. Exactly the same pair, counted
-  // exactly the same way, as `fw.saved` / `fw.bogey` in scoreStats() ‚Äî the two tiles are one
-  // question about two different mistakes, so their second numbers have to mean one thing.
-  const a = { holes:0, gir:0, miss:{}, chances:0, saved:0, bogey:0, noshot:0, rounds:0, live:0 };
-  (rounds || withHoles()).forEach(r => {
-    let counted = false;
-    r.holes.forEach(h => {
-      if(h.gir === undefined || h.gir === null) return;
-      if(!counted){ a.rounds++; counted = true; }
-      a.holes++;
-      if(h.gir){ a.gir++; return; }
-      if(h.noshot) a.noshot++;
-      const k = h.gmiss || 'X';
-      a.miss[k] = (a.miss[k] || 0) + 1;
-      // You scramble from where the ball IS ‚Äî a conceded green still counts, same rule the
-      // round card uses, so the two numbers can never disagree.
-      a.chances++;
-      if(r.live) a.live++;
-      // Nested, so par-or-better can never drift outside par-or-bogey.
-      if(h.s != null && h.par != null && h.s - h.par <= 1){ a.bogey++; if(h.s - h.par <= 0) a.saved++; }
-    });
-  });
-  return a;
-}
-function shortgame(){
-  const pc = (n, d) => d ? Math.round(n / d * 100) : 0;
-  const plans = plansFor('short-game');
-  const other = plans.filter(b => !isRoutine(b));
-  const a = shortGameStats();
-  const sessions = S.sessions.map((x,i) => ({ s:x, i })).filter(o => sessionDiscipline(o.s) === 'short-game').reverse();
-  const missRow = Object.entries(a.miss).sort((x,y) => y[1]-x[1])
-    .map(([k,v]) => `${v} ${MISS_LAB[k] || k}`).join(' ¬∑ ');
-  return `
-  ${labBar('short-game')}
-  ${cheatBtn('short-game')}
-  ${routineBlock(plans)}
-
-  ${other.length ? `<h2>Plans</h2><div class="card">${planLinks(other)}</div>`
-    : `<h2>Plans</h2><div class="card"><p class="sm">No short-game plan yet ‚Äî ask Claude for one and it lands here.</p></div>`}
-
-  ${a.holes ? `<div class="rowgrid g3">
-    <div class="stat"><div class="v">${pc(a.gir, a.holes)}%</div><div class="l">Greens hit</div></div>
-    <div class="stat"><div class="v">${pc(a.saved, a.chances)}%</div><div class="l">Up &amp; down</div></div>
-    <div class="stat"><div class="v">${a.chances}</div><div class="l">Greens missed</div></div>
-  </div>
-  <div class="card">
-    <h2>Around the green ¬∑ what the cards say</h2>
-    <p class="sm"><b>${a.saved} of ${a.chances}</b> missed greens saved, over ${a.holes} recorded holes${a.rounds ? ` in ${a.rounds} round${a.rounds>1?'s':''}` : ''}.
-    ${missRow ? `Where they finished: ${esc(missRow)}.` : ''}</p>
-    ${a.holes < 36 ? `<p class="sm faint" style="margin-top:6px">Thin sample ‚Äî ${a.holes} of the 36 recorded holes this starts speaking confidently at. Log greens and misses on the live round and this fills itself.</p>` : ''}
-  </div>` : `<div class="card"><h2>Around the green</h2>
-    <p class="sm">Nothing logged yet. Every green you mark missed on a live round ‚Äî and where it finished ‚Äî lands here as scrambling data.</p></div>`}
-
-  ${diagnosisCard('short-game', 'No short-game faults on the card yet. Log a few rounds with green misses, or send chipping film, and they land here.')}
-
-  <h2>Film room</h2>
-  <div class="card">
-    ${sessionLog(sessions, 'No short-game film yet. Send chipping, pitching or bunker clips ‚Äî name the shot in the message and they file themselves here.')}
-  </div>
-
-  ${bayBlock('short-game', 'No bay short-game data yet. A launch monitor measures the wedge matrix in one sitting \u2014 50, 56 and 60 at half, three-quarter and full. Six of those nine numbers have never been measured.')}
-
-  ${evoFor('short-game') ? `<h2>Short game evolution ¬∑ batch by batch</h2>${evolutionCard('short-game')}` : ''}
-
-  <h2>Train it</h2>
-  <div class="card flat">
-    <div class="linkrow" data-action="open-shelf" data-shelf="Wedges &amp; Short Game"><span><b>Wedges &amp; Short Game</b><br><span class="sm">Clock system, bounce, chip vs pitch, landing spots</span></span><span class="arr">‚Üí</span></div>
-    <div class="linkrow" data-action="open-shelf" data-shelf="Bunker Play"><span><b>Bunker Play</b><br><span class="sm">Splash, distance by follow-through, plugged lies</span></span><span class="arr">‚Üí</span></div>
-    <div class="linkrow" data-action="go" data-view="drills" style="border-bottom:none"><span><b>The drill bench</b><br><span class="sm">Every drill you have the kit for, filtered by where you are</span></span><span class="arr">‚Üí</span></div>
-  </div>`;
-}
-
-// ----- The labs hub -----
-// Four labs behind one nav button. The bar was at eight tabs and a short-game lab would
-// have made nine; these four are the same KIND of thing ‚Äî a discipline with faults, film
-// and plans ‚Äî so they belong behind one door. Training is deliberately NOT on that list:
-// drills live on the bench in Coach, one home for all of them. Nor is Round Prep, as of
-// Aug 27 2026 ‚Äî a course plan is about the round you are about to play, not about a part
-// of your game, so it sits in Rounds beside the cards it gets judged against.
-// `short` is the cheat sheet's tab label ‚Äî four have to sit in one row on a phone.
-const LABS = [
-  { view:'swing',     disc:'swing',       ic:'üèå', name:'Full Swing',  short:'Swing', sub:'Driver to wedge ‚Äî film, plans, speed work.' },
-  { view:'shortgame', disc:'short-game',  ic:'‚õ≥', name:'Short Game',  short:'Short', sub:'Around the green ‚Äî chipping, pitching, bunkers.' },
-  { view:'putting',   disc:'putting',     ic:'‚óé', name:'Putting',     short:'Putting', sub:'Stroke, pace and the short ones.' },
-  { view:'mental',    disc:'mental',      ic:'üß†', name:'Mental',      short:'Mental', sub:'Staying locked in ‚Äî decided off the course.' },
-];
-// THE PLANS SIT DIRECTLY UNDER THE ROUTINE, ABOVE THE DIAGNOSIS (Jack's instruction,
-// Aug 30 2026) ‚Äî same reason the hub's way-in moved up, one level down. The plans are what
-// you came to READ; the diagnosis is what they are built on, and on any lab with faults
-// open it is several screens of reading between the top of the page and the workshop log.
-// A lab's order is now: which lab ¬∑ the cheat sheet ¬∑ the routine ¬∑ the plans ¬∑ the
-// diagnosis ¬∑ the film ¬∑ the rest. Mental already read this way and was left alone.
-//
-// The lab switcher, at the top of every lab (Jack's instruction, Aug 30 2026). Before
-// this, moving from Putting to Short Game meant going back to the hub and picking again ‚Äî
-// two taps and a page you did not want, on the four pages most likely to be read one after
-// another. Same idiom as the Rounds segmented control, and the same relationship to the
-// jump bar underneath it: the segments say WHICH lab you are in, the jump bar says where
-// you are inside it, so buildJumpBar() puts itself after this and the order can't invert.
-//
-// FIXED ORDER, always ‚Äî LABS order, the same standing instruction the hub follows. A bar
-// that reordered itself would defeat the muscle memory that is the entire reason it is
-// here. The lab you are already in is inert rather than a link: it is a state, not a
-// destination, and a tap that reloads the page you are on reads as a dead control.
-function labBar(disc){
-  return `<div class="segbar labs">${LABS.map(l => l.disc === disc
-    ? `<button class="seg on" aria-current="page">${esc(l.short)}</button>`
-    : `<button class="seg" data-action="go" data-view="${l.view}">${esc(l.short)}</button>`
-  ).join('')}</div>`;
-}
-function labRow(l, last){
-  const open = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;
-  const plans = plansFor(l.disc).length;
-  return `<div class="linkrow" data-action="go" data-view="${l.view}"${last ? ' style="border-bottom:none"' : ''}>
-    <span><b>${l.ic} ${esc(l.name)}</b><br><span class="sm">${esc(l.sub)}</span>
-    <br><span class="sm faint">${open ? `${open} open fault${open>1?'s':''}` : 'no open faults'} ¬∑ ${plans} plan${plans===1?'':'s'}</span></span>
-    <span class="arr">‚Üí</span></div>`;
-}
-// ----- What a fault was read off (Aug 27 2026) -----
-// A fault carries `{tag, why}` and nothing else, so the evidence tier it renders with has
-// to be WRITTEN DOWN rather than guessed at, exactly like FOCUS_TAG and DRILL_KIT. Every
-// entry below is grounded in what that fault's own text says its basis is, and the `src`
-// is the sample it names ‚Äî nothing here is a number or a source invented on its behalf.
-//
-// A tag with NO entry is normal and fine: it renders with no rail and no chip, and the card
-// claims nothing about where it came from. That is the honest failure mode, and it is why
-// this table is explicit rather than inferred from the prose ‚Äî a fault text saying "filmed"
-// and one saying "the film could not settle it" read identically to a keyword scan.
-const FAULT_EV = {
-  // Read off the Aug 12 Sterling Farms card ‚Äî a scorecard, hole by hole, typed up after.
-  'pace-calibration':['round', '18 holes at Sterling Farms, Aug 12 ‚Äî 38 putts, three 3-putts'],
-  'up-and-down':['round', '12 missed greens on one card ‚Äî Sterling Farms, Aug 12'],
-  'missing-short':['round', '12 green misses on one card ‚Äî 7 of them short'],
-  // Read off film, and each says so: the measurement exists, or it is the measurement that
-  // could not be made from the angles shot.
-  'strike-location':['measured', 'Aug 10 evening start lines ‚Äî ~0.8¬∞ scatter either side, no bias'],
-  'delivery-unverified':['measured', 'Aug 10 ‚Äî 23 oblique clips and six on the target line, neither able to see lean'],
-  'across-the-line-top':['measured', 'Jul 26 film, both clubs'],
-  'posture-through-impact':['measured', 'Aug 17 film ‚Äî the first that caught a finish'],
-  // Sep 17 2026: this moved off `self` and it is the biggest tier change the project has made.
-  // It sat at `self` for weeks because seven stills could neither confirm nor refute it and the
-  // only witness was Jack's own read of his own miss. Three bay sessions now measure BOTH halves
-  // ‚Äî an out-to-in club path on every club, and a ball that finishes right on every club read for
-  // curve. A tier is a property of the SOURCE, so the moment a radar answers the question the
-  // fault was waiting on, the tier moves with it.
-  'over-the-top-slice':['bay', 'Sep 14 bag map + Sep 15 range + Sep 18 3w/5w/7i ‚Äî out-to-in path on every club, ball right on every club that was read for curve'],
-  'strike-quality':['bay', 'Sep 14 bag map (78 shots) + a Sep 17 strike read of range footage (5 clubs, impact location optically measured)'],
-};
-const faultEv = f => FAULT_EV[f.tag] || null;
-// The diagnosis, one row per open fault, each carrying its own tier rail and a tappable
-// chip that opens what the fault was read off. Settled ones collapse to a line ‚Äî the same
-// behaviour `faultState()` has always produced, drawn instead of listed.
-function faultRows(disc){
-  const all = faultsFor(disc);
-  const open = all.filter(f => faultState(f) === 'open');
-  const settled = all.filter(f => faultState(f) !== 'open');
-  if(!all.length) return `<p class="sm">Nothing here is measured yet. No film, no faults ‚Äî
-    this lab fills itself the moment something gets shot or logged.</p>`;
-  return `${open.length ? open.map(f => { const e = faultEv(f);
-    return `<div class="faultrow${rail(e ? e[0] : null)}">
-      ${e ? evDrawer(`ev-fault-${f.tag}`, 'Diagnosis', e[0], e[1])
-          : '<div class="evdl">Diagnosis</div>'}
-      <h4>${esc(faultLabel(f.tag))}</h4>
-      ${expandable(f.why)}
-      ${faultDrillRow(f.tag)}
-    </div>`; }).join('')
-    : `<p class="sm">No open faults here ‚Äî everything tracked in this lab has been measured shut.</p>`}
-  ${settled.length ? `<p class="sm faint" style="margin-top:10px"><b>Settled:</b> ${settled.map(f =>
-      esc(faultLabel(f.tag)) + (faultState(f) === 'downgraded' ? ' (downgraded)' : ' ‚úì')).join(' ¬∑ ')}</p>` : ''}`;
-}
-// FIXED ORDER, always (Jack's instruction, Aug 14 2026): Swing ¬∑ Short Game ¬∑ Putting ¬∑
-// Mental, top down ‚Äî LABS order. It used to float the last-opened lab to the top, which
-// meant the row you wanted was in a different place every visit ‚Äî muscle memory beats
-// recency on a page whose whole job is to get you somewhere else in one tap. Add a new lab
-// to the END of LABS rather than reordering it.
-//
-// The hub is the four labs and NOTHING ELSE (Aug 27 2026, Jack's redesign). Round Prep
-// used to sit at the bottom of this list; it lives in Rounds now, beside the cards its
-// plans get judged against. This page is the game you are working on, not the round you
-// are about to play.
-//
-// THE WAY INTO THE LAB SITS DIRECTLY UNDER THE GRID (Jack's instruction, Aug 30 2026). It
-// was the last thing on the page, under a diagnosis that runs several screens on any lab
-// with faults open ‚Äî so picking Putting and then actually opening Putting were separated
-// by everything the hub had to say about it. Picking a lab and entering it are one motion;
-// the diagnosis is what you read INSTEAD of going in, not something to scroll past on the
-// way. The selected tile is still a second door (it reads OPEN LAB ‚Ä∫), which is why this
-// row can be plain rather than shouting.
-// Which lab the hub is showing. View-local state, like `roundsSeg`: which face of the hub
-// you last looked at is a property of the page, not of the player, so it is a module
-// variable and never saved. Switching is a rerender() ‚Äî you have not gone anywhere.
-let gameLab = LABS[0].disc;
-function game(){
-  const cur = LABS.find(l => l.disc === gameLab) || LABS[0];
-  const clips = S.sessions.filter(s => sessionDiscipline(s) === cur.disc).length;
-  const bayN = baysFor(cur.disc).length;
-  const plans = plansFor(cur.disc).length;
-  const open = faultsFor(cur.disc).filter(f => faultState(f) === 'open').length;
-  return `
-  ${sessionShortcuts()}
-  <div class="labgrid">${LABS.map(l => {
-    const on = l.disc === cur.disc;
-    const n = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;
-    return `<button class="labsel ${on ? 'on' : ''}" data-action="${on ? 'go' : 'game-lab'}"
-      data-view="${l.view}" data-disc="${l.disc}">
-      <span class="k">${n ? `${n} OPEN` : 'CLEAR'}${on ? ' ¬∑ OPEN LAB ‚Ä∫' : ''}</span>
-      <span class="nm">${esc(l.name)}</span>
-      <span class="sb">${esc(l.sub)}</span></button>`; }).join('')}</div>
-
-  <div class="card flat">
-    <div class="linkrow" data-action="go" data-view="${cur.view}">
-      <span><b>Open the ${esc(cur.name)} lab</b><br><span class="sm">The film room, the plans,
-        and everything this diagnosis is built on</span></span><span class="arr">‚Üí</span></div>
-    <div class="linkrow" data-action="go" data-view="numbers">
-      <span><b>Numbers</b><br><span class="sm">Every figure, sourced and explained</span></span><span class="arr">‚Üí</span></div>
-    <div class="linkrow" data-action="go" data-view="timeline" style="border-bottom:none">
-      <span><b>Evidence</b><br><span class="sm">Rounds, bay, film and feed ‚Äî newest first</span></span><span class="arr">‚Üí</span></div>
-  </div>
-
-  <div class="card">
-    ${fold('game-diag', 'Diagnosis', `${cur.name.toUpperCase()} ¬∑ ${
-      open ? `${open} OPEN FAULT${open === 1 ? '' : 'S'}` : 'NOTHING OPEN'}`, faultRows(cur.disc))}
-  </div>
-
-  <div class="twoup">
-    <div class="card tu"><div class="rdl">Film room</div>
-      <b>${clips || '‚Äî'}</b>
-      <span>${clips ? `session${clips === 1 ? '' : 's'} on file` : 'no film on file'}${
-        bayN ? ` ¬∑ ${bayN} in the bay` : ''}</span></div>
-    <div class="card tu"><div class="rdl">Standing plans</div>
-      <b>${plans || '‚Äî'}</b>
-      <span>${plans ? 'sliced by situation' : 'none written yet'}</span></div>
-  </div>`;
-}
-
-// ----- Courses -----
-// The rankings answer three different questions and they do not share an order: which
-// course did you like best, where have you played best, and which of these could you get
-// to today. So the list sorts by any of the three and says which one it is in ‚Äî a list
-// that silently re-ordered itself is worse than one that never did.
-//
-// Two rules hold across all three. NULLS GO LAST, never to zero: a course you have not
-// rated is not a course you rated 0, and one with no PR on file is not one you shot
-// nothing at. And the sort is only ever a re-ordering ‚Äî nothing drops off the page for
-// want of a value. Array.prototype.sort is stable, so ties keep the order they were added
-// in rather than shuffling between renders.
-// ----- Two rows, one course -----
-// Importing a batch of courses from anywhere else is how a list ends up with two rows for
-// one course: his spelling and the import's differ, and `course-add` only dedupes on an
-// EXACT name match. Caught the day the round history landed ‚Äî he already had "Mammoth
-// Dunes" and the import added "Sand Valley Golf Resort ‚Äî Mammoth Dunes" beside it.
-//
-// This only ever NAMES the pairs worth a look. It never merges and never deletes: which
-// spelling survives is his call, and the rating, PR and notes on those rows are his data,
-// not something to be picked between by a heuristic.
-const COURSE_STOP = new Set(['golf','club','course','courses','country','the','at','of','and','cc','gc','resort']);
-const courseWords = n => (n || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
-  .split(' ').filter(w => w && !COURSE_STOP.has(w));
-function courseDupes(list){
-  const sub = (a, b) => a.length > 0 && a.every(w => b.includes(w));
-  const out = [];
-  for(let i = 0; i < list.length; i++) for(let j = i + 1; j < list.length; j++){
-    const a = list[i], b = list[j];
-    // Two courses at one facility are written "Facility ‚Äî Course" and are genuinely two
-    // rows. Whistling Straits' Straits and Irish are not a duplicate of each other, and
-    // flagging them as one would train him to ignore this card.
-    if(/ ‚Äî /.test(a.name || '') && / ‚Äî /.test(b.name || '')) continue;
-    const wa = courseWords(a.name), wb = courseWords(b.name);
-    if(sub(wa, wb) || sub(wb, wa)) out.push([a, b]);
-  }
-  return out;
-}
-
-const COURSE_SORTS = [['rating','Rating'], ['pr','PR'], ['dist','Nearest']];
-function courseSortKey(){
-  const k = S.settings.courseSort;
-  return COURSE_SORTS.some(x => x[0] === k) ? k : 'rating';
-}
-function sortCourses(list, key){
-  // PR reads `coursePR()`, not the typed field ‚Äî a round he logged that beat his old PR
-  // is a fact the app can see, and a list that sorted by the stale number while the row
-  // beside it printed the new one would be the worst of both.
-  const val = c => key === 'pr' ? ((p => p ? p.v : null)(coursePR(c)))
-    : key === 'dist' ? courseMiles(c.name)
-    : (c.rating != null ? +c.rating : null);
-  // Rating counts DOWN from the best; a PR and a distance both count up from the lowest.
-  const dir = key === 'rating' ? -1 : 1;
-  return [...list].sort((a, b) => {
-    const x = val(a), y = val(b);
-    if(x == null && y == null) return 0;
-    if(x == null) return 1;
-    if(y == null) return -1;
-    return (x - y) * dir;
-  });
-}
-// What the current order is, what it leaves at the bottom, and ‚Äî on distance ‚Äî where the
-// fix came from and that these are straight-line miles. Same honesty guards as Round Prep,
-// which sorts the standing plans off the same location.
-function courseSortNote(list, key){
-  const missing = (n, what) => !n ? '' :
-    ` ${n} ${n > 1 ? 'have' : 'has'} no ${what} on file, so ${n > 1 ? 'they sit' : 'it sits'} at the bottom rather than counting as a zero.`;
-  if(key === 'pr'){
-    const beat = list.filter(c => (p => p && p.src === 'beat')(coursePR(c))).length;
-    return `<b>Best score first.</b>${missing(list.filter(c => !coursePR(c)).length, 'score')} A PR is the lowest you have typed in OR the lowest full card you have logged, whichever is better ‚Äî so a round you log that beats it moves this list on its own.${
-      beat ? ` <b>${beat}</b> ${beat > 1 ? 'have been beaten' : 'has been beaten'} by a card you logged.` : ''}`;
-  }
-  if(key === 'dist'){
-    const placed = list.filter(c => courseGeo(c.name)).length;
-    if(!S.here) return `Sorted by rating for now ‚Äî your phone hasn't given up a location yet.<br><br>${
-      placed ? `<button class="btn ghost tiny" data-action="locate">Use my location</button> ‚Äî the arithmetic happens on this phone and nothing about where you are is sent anywhere.`
-             : 'No course here has a location on file yet, so there is nothing to measure from.'}`;
-    return `<b>Nearest first</b>, from your last location fix (${fmtDate(isoDay(new Date(S.here.ts)))}) ‚Äî straight-line miles to the course, <b>not drive time</b>.${
-      missing(list.length - placed, 'location')}`;
-  }
-  return `<b>Your rating, best first.</b>${missing(list.filter(c => c.rating == null).length, 'rating')}`;
-}
-function courses(){
-  const played = S.courses.filter(c=>!c.bucket);
-  const bucket = S.courses.filter(c=>c.bucket);
-  const states = new Set(played.map(c=>c.st).filter(Boolean));
-  const rated = played.filter(c=>c.rating!=null);
-  const avg = rated.length ? (rated.reduce((s,c)=>s+ +c.rating,0)/rated.length).toFixed(1) : '‚Äî';
-  // Distance falls back to the rating order until the phone has given up a fix ‚Äî the list
-  // still renders in a sensible order, and the note under it says why it isn't distance.
-  const key = courseSortKey();
-  const live = key === 'dist' && !S.here ? 'rating' : key;
-  const sorted = sortCourses(played, live);
-  // One row renderer, shared by the rankings and the duplicate check.
-  // The row carries his rating, the reconciled PR and ‚Äî where he has actually logged
-  // cards there ‚Äî how many. A PR the app read off one of those cards is marked, so a
-  // number that appeared without him typing it can never look like one he did.
-  const row = c => {
-    const mi = courseMilesLab(c.name);
-    const pr = coursePR(c), rec = courseRecord(c.name);
-    return `<div class="crs" data-action="edit-course" data-id="${c.id}">
-      <span class="nm">${esc(c.name)}<span class="st">${esc(c.st||'')}</span>${mi ? `<span class="mi">${mi}</span>` : ''}${
-        rec ? `<span class="mi pl">${rec.n} card${rec.n === 1 ? '' : 's'}</span>` : ''}</span>
-      <span class="rt">${c.rating!=null? Number(c.rating).toFixed(2) : '‚Äî'}${
-        pr ? ` ¬∑ PR ${esc(pr.v)}${pr.src === 'typed' ? '' : '<i class="prq" title="read off a card you logged">‚ñ™</i>'}` : ''}</span>
-    </div>`;
-  };
-  return `
-  <div class="rowgrid g3">
-    <div class="stat"><div class="v">${played.length}</div><div class="l">Played</div>${
-      (n => n ? `<div class="sv">${n} with cards</div>` : '')(coursesWithCards(played))}</div>
-    <div class="stat"><div class="v">${states.size}</div><div class="l">States/Countries</div></div>
-    <div class="stat"><div class="v">${avg}</div><div class="l">Avg rating</div></div>
-  </div>
-
-  ${(() => {
-    const d = courseDupes(S.courses);
-    if(!d.length) return '';
-    return `<h2>Two rows, one course?</h2>
-    <div class="card">
-      ${d.map(pair => `<div class="dupe">${pair.map(row).join('')}</div>`).join('')}
-      <p class="sm faint" style="margin-top:8px">These look like the same course under two names ‚Äî usually one you added yourself and one that came in with an import. Tap the row you want to lose and <b>Delete</b> it; the other keeps its rating, PR and notes. If they really are two courses, ignore this. Two courses at one club are written <i>Facility ‚Äî Course</i> and are never flagged against each other.</p>
-    </div>`;
-  })()}
-
-  <h2>The rankings</h2>
-  <div class="card">
-    <div class="chips">${COURSE_SORTS.map(([k,l]) =>
-      `<span class="chip ${k===key?'on':''}" data-action="course-sort" data-k="${k}">${l}</span>`).join('')}</div>
-    ${sorted.length ? sorted.map(row).join('') : '<p class="sm">No courses yet ‚Äî add your first below.</p>'}
-    <p class="sm faint" style="margin-top:8px">${courseSortNote(played, key)}<br><br>Tap a course to edit its rating, PR or notes. Seeded from your course sheet ‚Äî fix anything I guessed wrong.</p>
-  </div>
-
-  <h2>Bucket list</h2>
-  <div class="card flat">
-    ${bucket.length ? bucket.map(c=>`<div class="crs" data-action="edit-course" data-id="${c.id}">
-      <span class="nm">${esc(c.name)}<span class="st">${esc(c.st||'')}</span>${
-        courseMilesLab(c.name) ? `<span class="mi">${courseMilesLab(c.name)}</span>` : ''}</span><span class="rt">someday</span></div>`).join('') : '<p class="sm">Nothing queued.</p>'}
-  </div>
-
-  <h2 id="courseFormAnchor">${editingCourse ? 'Edit course' : 'Add a course'}</h2>
-  ${(() => {
-    // What his own cards say about this course, above the fields he types. It is READ-ONLY
-    // and nothing here is written back: the rating, PR and notes below are his, and a
-    // derived number quietly overwriting one is how a hand-typed field stops being worth
-    // having. The one place the two meet is the PR line, which says plainly when a card
-    // beat what he typed rather than changing it for him.
-    if(!editingCourse) return '';
-    const rec = courseRecord(editingCourse.name);
-    if(!rec) return `<div class="card flat"><p class="sm faint">No rounds logged here yet.
-      Play one with the live logger and this fills in with your record ‚Äî plays, best, average against par ‚Äî
-      and your PR starts keeping itself.</p></div>`;
-    const pr = coursePR(editingCourse);
-    const sc = r => `${r.score}${roundVsPar(r) != null ? ` (${roundVsPar(r) > 0 ? '+' : ''}${roundVsPar(r)})` : ''}`;
-    return `<div class="card">
-      <div class="rdl">Your record here</div>
-      <div class="rowgrid g3" style="margin-top:6px">
-        <div class="stat"><div class="v">${rec.n}</div><div class="l">Rounds</div>${
-          rec.live ? `<div class="sv">${rec.live} live</div>` : ''}</div>
-        <div class="stat"><div class="v">${rec.best ? rec.best.score : rec.bestNine ? rec.bestNine.score : '‚Äî'}</div>
-          <div class="l">Best ${rec.best ? '18' : rec.bestNine ? '9' : ''}</div>${
-          rec.best && rec.bestNine ? `<div class="sv">${rec.bestNine.score} for 9</div>` : ''}</div>
-        <div class="stat"><div class="v">${rec.avgVsPar == null ? '‚Äî' : `${rec.avgVsPar > 0 ? '+' : ''}${rec.avgVsPar.toFixed(1)}`}</div>
-          <div class="l">Avg vs par</div></div>
-      </div>
-      <p class="sm" style="margin-top:8px">Last played <b>${esc(fmtDate(rec.last.date))}</b> ‚Äî ${sc(rec.last)}.${
-        rec.best ? ` Best round here: <b>${sc(rec.best)}</b> on ${esc(fmtDate(rec.best.date))}.` : ''}</p>
-      ${pr && pr.src === 'beat' ? `<p class="sm" style="margin-top:6px"><b>Your PR field says ${esc(pr.was)}, but you have logged a ${pr.v} here.</b>
-        The list uses the ${pr.v}. Your typed number is left exactly as you wrote it ‚Äî change it below if you want to, or leave it.</p>`
-        : pr && pr.src === 'logged' ? `<p class="sm" style="margin-top:6px">PR <b>${pr.v}</b> comes off the card you logged on ${esc(fmtDate(pr.r.date))}. Type one below only if you have beaten it somewhere I have no card for.</p>` : ''}
-      <p class="sm faint" style="margin-top:6px">Read off your own cards. Nothing here overwrites what you type below.</p>
-    </div>`;
-  })()}
-  <div class="card">
-    <label>Name</label><input id="coNa" list="courseDbList" placeholder="Start typing ‚Äî the directory suggests as you go" value="${esc(editingCourse?.name||'')}">
-    <datalist id="courseDbList">${(typeof COURSE_DB!=='undefined'?COURSE_DB:[]).map(c=>`<option value="${esc(c.n)}">${esc(c.st)}</option>`).join('')}</datalist>
-    <div class="formrow g3">
-      <div><label>State</label><input id="coSt" maxlength="14" value="${esc(editingCourse?.st||'')}" placeholder="MA"></div>
-      <div><label>Your rating 0‚Äì10</label><input id="coRt" inputmode="decimal" value="${editingCourse?.rating ?? ''}" placeholder="7.5"></div>
-      <div><label>PR score</label><input id="coPr" inputmode="numeric" value="${editingCourse?.pr ?? ''}" placeholder="82"></div>
-    </div>
-    <label>Notes (the hole that ate you, local knowledge‚Ä¶)</label>
-    <textarea id="coNo" rows="2">${esc(editingCourse?.notes||'')}</textarea>
-    <div class="chips"><span class="chip ${editingCourse?.bucket?'grn':''}" id="coBucket">Bucket list</span></div>
-    <div style="margin-top:10px">
-      <button class="btn" data-action="save-course">${editingCourse?'Save changes':'Add course'}</button>
-      ${editingCourse ? `<button class="btn ghost" data-action="cancel-edit-course">Cancel</button>
-      <button class="btn burg" data-action="delete-course">Delete</button>` : ''}
-    </div>
-  </div>`;
-}
-let editingCourse = null;
-
-// ----- Decisions -----
-function decisions(){
-  const dl = daysLeft(S.settings.returnDeadline);
-  const idx = estIndex();
-  const decided = S.clubs.find(c => c.cat==='putter' && c.status==='gaming' && c.flow==='zt');
-  const pending = pendingReturn();
-  return `
-  <button class="backlink" data-action="go" data-view="home">‚Üê Home</button>
-  <div class="card">
-    <h2>The putter call</h2>
-    ${decided ? `<p class="sm"><b class="good">DECIDED ‚úì ‚Äî ${esc(decided.name)} is in the bag.</b> ${!pending
-        ? 'The equipment half of the left miss is settled. Next: the face-on clip and the 20-ball baseline to confirm the miss is gone.'
-        : pending === decided
-          ? `Not final though ‚Äî <b>the gamer itself is still inside its return window</b> (${dl===null?'deadline unknown':dl+' days left'}). Grind it on the numbers and decide on purpose, rather than letting the window lapse or sending it back on a feeling.`
-          : `Still open: the return window on the ${esc(pending.name)} (<b>${dl===null?'deadline unknown':dl+' days left'}</b>).`}</p>`
-    : `<p class="sm">Exchange for a <b>zero-torque at 34"</b>. Demo ‚Üí 10-ball test ‚Üí decide. <b>${dl===null?'Deadline not set':dl+' days left'}.</b></p>`}
-  </div>
-
-  <h2>Shortlist ¬∑ from your fitted top-10</h2>
-  <div class="card">
-    <table><tr><th>Putter</th><th>Type</th><th>~$</th><th>Demoed</th></tr>
-    ${S.shortlist.map((p,i)=>`<tr>
-      <td><b>${esc(p.name)}</b></td><td class="sm">${esc(p.type)}</td><td>${p.price}</td>
-      <td><span class="chip ${p.demoed?'grn':''}" data-action="toggle-demo" data-i="${i}">${p.demoed?'‚úì yes':'not yet'}</span></td></tr>`).join('')}
-    </table>
-  </div>
-
-  <h2>10-ball 5-footer test</h2>
-  <div class="card">
-    <p class="sm">Head-to-head vs. the 7.5 control ‚Äî same green, same putt, full routine. Log every run:</p>
-    <div class="formrow g3">
-      <div><label>Putter</label><input id="tePutter" list="testPutters" placeholder="Phantom 7.5 (control)"></div>
-      <div><label>Makes /10</label><input id="teMakes" inputmode="numeric" placeholder="7"></div>
-      <div style="align-self:end"><button class="btn" data-action="save-test">Log run</button></div>
-    </div>
-    <datalist id="testPutters">
-      <option value="Phantom 7.5 (control)">${S.shortlist.map(p=>`<option value="${esc(p.name)}">`).join('')}
-    </datalist>
-    <label>Miss pattern / feel notes</label><input id="teNote" placeholder="e.g. both misses right ‚Äî no more left!">
-    ${S.tests.length ? `<table style="margin-top:12px"><tr><th>Date</th><th>Putter</th><th>Makes</th><th>Notes</th></tr>
-      ${S.tests.slice().reverse().map(t=>`<tr><td>${fmtDate(t.date)}</td><td><b>${esc(t.putter)}</b></td><td><b>${esc(t.makes)}</b>/10</td><td class="sm">${esc(t.note||'')}</td></tr>`).join('')}</table>` : ''}
-    <div class="tipcard" style="margin-top:12px"><div class="src">Decision rule</div>
-      <p class="sm">The winner needs the left miss to visibly dry up vs. the control ‚Äî then give it 2‚Äì3 weeks before final judgment. Get the lie set flat at pickup.</p></div>
-  </div>`;
-}
-
-// ----- Scores: history, analytics, tips -----
-// Rounds arrive two ways: logged in-app (a total only) and pushed through the
-// coach feed with hole-by-hole detail. Every analytic below degrades to nothing
-// when `holes` is missing, so old score-only rounds never break the page.
-// ----- A simulator round is a round, and it is not THIS record (Sep 11 2026) -----
-// A Trackman round is real golf and real shot data, played off a perfect mat in still air
-// with software greens. The USGA does not accept one for a Handicap Index, and a sim round
-// of Pebble knows the real course rating and slope ‚Äî so the exclusion has to be
-// UNCONDITIONAL rather than something that falls out of a missing rating.
-//
-// `realRounds()` is the door. Everything that computes a claim about his golf reads it;
-// only the round LIST and `roundView()` read `S.rounds` directly, because a sim card is
-// still his card and still worth opening. Guarding here rather than at thirty call sites is
-// what stops the next reader being the one that forgot.
-function realRounds(){ return S.rounds.filter(r => !r.sim); }
-function withHoles(){ return realRounds().filter(r => Array.isArray(r.holes) && r.holes.length); }
-function roundPar(r){
-  if(r.par != null) return r.par;
-  if(Array.isArray(r.holes)) return r.holes.reduce((a,h) => a + (h.par || 0), 0);
-  return null;
-}
-function roundVsPar(r){ const p = roundPar(r); return (p != null && r.score != null) ? r.score - p : null; }
-// USGA score differential. On a 9-hole card the 9-hole rating/slope give a
-// 9-hole differential ‚Äî doubling it is the 18-hole equivalent.
-function roundDiff(r){
-  // Indoors never reaches the index ‚Äî see realRounds(). First line, before anything else,
-  // because a sim round at a rated course has everything a differential needs.
-  if(r.sim) return null;
-  if(r.rating == null || !r.slope || r.score == null) return null;
-  const d = (113 / r.slope) * (r.score - r.rating);
-  return (r.holes && r.holes.length <= 9) ? d * 2 : d;
-}
-
-// Stat snapshots pasted in from whatever app produced them (GHIN, older trackers).
-// Stored as a list so an old baseline and a current read can sit side by side ‚Äî
-// the delta between them is worth more than either one alone. Snapshots carry
-// their own sample sizes, and everything here degrades when a field is absent.
-// The gamer putter's in-play date, so the app can tell which data predates it.
-function putterSince(){
-  const p = S.clubs.find(c => c.cat === 'putter' && c.status === 'gaming' && c.since);
-  return p ? p.since : null;
-}
-// Whatever is currently sittable-in-a-return-window. The flag lives on the club so the
-// countdown follows the gear rather than one hardcoded head ‚Äî the gamer itself can be
-// the thing on the clock, which is exactly the case the old Phantom-only check missed.
-function pendingReturn(){
-  return S.clubs.find(c => c.returnWindow && c.status !== 'returned') || null;
-}
-// A snapshot's `coversThrough` is the last round it includes ‚Äî NOT the day it was
-// read off the phone, which is why the read date can't be used for this.
-function statsCoverPutter(){
-  const since = putterSince();
-  if(!since) return true;
-  return S.stats.some(s => (s.coversThrough || '') >= since)
-      || S.rounds.some(r => (r.date || '') >= since);
-}
-
-function latestStats(){ return S.stats && S.stats.length ? S.stats[S.stats.length-1] : null; }
-function baselineStats(){ return S.stats && S.stats.length > 1 ? S.stats[0] : null; }
-function parOrBetter(g){ const s = g && g.scoring; return s ? (s.birdie||0) + (s.par||0) : null; }
-// These are sums of pasted percentages, so they arrive with float dust on them
-// (40.699999999999996). Never print one raw.
-const pc1 = v => v == null ? '‚Äî' : `${(+v).toFixed(1)}%`;
-function blowUps(g){ const s = g && g.scoring; return s ? (s.double||0) + (s.triple||0) : null; }
-// Up-and-down rate: some sources give a percentage, GHIN gives a per-round count
-// that only means something against how many greens were missed.
-function upDownPct(g){
-  if(!g) return null;
-  if(g.upDownPct != null) return g.upDownPct;
-  if(g.upDownsPerRound != null && g.gir != null){
-    const missed = 18 * (1 - g.gir / 100);
-    return missed > 0 ? (g.upDownsPerRound / missed) * 100 : null;
-  }
-  return null;
-}
-
-// `live` names the areas where hole-by-hole cards now carry a bigger, better-measured
-// sample than this pasted snapshot does. Film is king; by the same rule, a hole you
-// recorded beats a season average somebody else computed ‚Äî so those tips stand down and
-// the live ones on the Scores page speak instead.
-function statTips(live){
-  const g = latestStats(), b = baselineStats();
-  const t = [];
-  if(!g) return t;
-  live = live || {};
-  const a = g.approach, p = g.putting, ap = g.avgByPar || {}, d = g.driving;
-  const nAdv = g.roundsAdvanced || g.rounds || 0, nSc = g.roundsScoring || g.rounds || 0;
-  const thin = n => n < 5 ? ` (only ${n} round${n===1?'':'s'} behind this ‚Äî indicative, not settled)` : '';
-
-  // The headline when there's a baseline: where the strokes actually moved.
-  if(b){
-    const dPutts = (b.putts != null && g.putts != null) ? b.putts - g.putts : null;
-    const dGir = (b.gir != null && g.gir != null) ? g.gir - b.gir : null;
-    if(dPutts != null && dPutts >= 1.5 && dGir != null && dGir <= -3)
-      t.push({ ev:'snapshot', s:'warn', src:`Then vs now ¬∑ ${b.rounds || b.roundsScoring} rds ‚Üí ${nSc} rds`, h:'The leak is tee-to-green',
-        b:`Putts per round are DOWN ${dPutts.toFixed(1)} (${b.putts.toFixed(1)} ‚Üí ${g.putts.toFixed(1)}), but greens in regulation fell ${Math.abs(dGir).toFixed(1)} points (${b.gir}% ‚Üí ${g.gir}%)${b.driving && d ? ` and fairways ${b.driving.fairway}% ‚Üí ${d.fairway}%` : ''}, and scoring barely moved: par-or-better ${pc1(parOrBetter(b))} ‚Üí ${pc1(parOrBetter(g))}, doubles ${pc1(blowUps(b))} ‚Üí ${pc1(blowUps(g))}. Whatever you saved on the greens you handed back before you got there. The strokes are tee-to-green.` });
-    const dOne = (b.putting && p && b.putting.one != null && p.one != null) ? p.one - b.putting.one : null;
-    if(dPutts != null && dPutts >= 1.5 && dOne != null && Math.abs(dOne) <= 2)
-      t.push({ ev:'snapshot', s:'mid', src:'Read this one carefully', h:'The putting gain is partly an artefact',
-        b:`Putts per round dropped ${dPutts.toFixed(1)}, but the one-putt rate is flat (${b.putting.one}% ‚Üí ${p.one}%). Missing more greens mechanically lowers putts per round ‚Äî you chip on and putt once instead of lagging from forty feet. So the drop is at least partly fewer greens hit, not a better stroke.` });
-  }
-
-  if(!statsCoverPutter()){
-    const pn = (S.clubs.find(c => c.cat === 'putter' && c.status === 'gaming') || {}).name || 'the current putter';
-    t.push({ ev:'snapshot', s:'warn', src:'Nothing measured yet', h:`No round data covers ${pn}`,
-      b:`Every stat here ‚Äî and every round logged ‚Äî predates it. The mat tests and the stroke film are promising, but they are not scoring. Until a round is played and logged with it, its effect on your score is unmeasured, and nothing in this list should be read as a verdict on it either way. Play one, log the putts, and it becomes answerable.` });
-  }
-
-  if(a && a.short != null && !live.approach){
-    const sides = (a.left || 0) + (a.right || 0);
-    if(a.short >= 30 && a.short >= sides)
-      t.push({ ev:'snapshot', s:'warn', src:`Approach ¬∑ ${nAdv} rounds`, h:'You miss short, not sideways',
-        b:`${a.short}% of approaches finish SHORT against ${a.left||0}% left, ${a.right||0}% right and ${a.long||0}% long. That is not dispersion ‚Äî a scattergun misses every direction. A miss that only ever goes one way is a DISTANCE problem: the number you're clubbing to is longer than the club actually carries. Club up one when between clubs, and re-baseline your ladder to AVERAGE carry rather than your best strike. A yardage set built from your purest 7-iron comes up short all day${thin(nAdv)}.` });
-  }
-  const ud = upDownPct(g), udB = upDownPct(b);
-  if(ud != null && ud < 30)
-    t.push({ ev:'snapshot', s:'warn', src:`Short game ¬∑ ${nAdv} rounds`, h:`Scrambling around ${Math.round(ud)}%`,
-      b:`${g.gir != null ? `At ${g.gir}% greens you're missing about ${(18*(1-g.gir/100)).toFixed(0)} a round. ` : ''}Every miss you don't convert is a bogey at best.${udB != null ? ` And this isn't new ‚Äî it was ${udB.toFixed(0)}% in the older data too, so it's a standing weakness rather than a bad patch.` : ''} With greens hit this low, up-and-down rate moves your score more than ball-striking does, and it's the cheapest thing here to practise${thin(nAdv)}.` });
-  if(p && p.three != null && p.three >= 10 && !live.putting)
-    t.push({ ev:'snapshot', s:'warn', src:`Putting ¬∑ ${nAdv} rounds`, h:`${p.three}% three-putts or worse`,
-      b:`Roughly ${(p.three/100*18).toFixed(1)} a round, against ${p.one||0}% one-putts. Three-putts are a PACE fault, not a line fault ‚Äî the first putt is finishing outside gimme range. Same signature as the lag work already on your card${thin(nAdv)}.` });
-  if(ap[5] != null && ap[4] != null && (ap[5] - 5) >= 0.6)
-    t.push({ ev:'snapshot', s:'mid', src:`Scoring ¬∑ ${nSc} rounds`, h:'Par 5s give you nothing',
-      b:`Averaging ${ap[5].toFixed(2)} on par 5s ‚Äî barely better relative to par than your ${ap[4].toFixed(2)} on par 4s. The textbook line is that a par 5 is where a mid-handicap gets a free run at birdie ‚Äî that is general advice about mid-handicaps, not a reading of your card; the average above is yours. Decide the lay-up off your wedge ladder so the third shot is a number you own.` });
-  const blow = blowUps(g);
-  if(blow != null && blow >= 15)
-    t.push({ ev:'snapshot', s:'warn', src:`Scoring ¬∑ ${nSc} rounds`, h:`${blow}% of holes are double or worse`,
-      b:`Across ${nSc} rounds, so this is the baseline rather than one bad week. Against ${g.scoring.birdie||0}% birdies, your score is decided by the bad holes, not the good ones. Taking the punch-out instead of the hero shot is worth more strokes than any swing change.` });
-  return t;
-}
-
-function statsCard(){
-  const g = latestStats(), b = baselineStats();
-  if(!g) return '';
-  const pc = v => v == null ? '‚Äî' : `${(+v).toFixed(v % 1 ? 1 : 0)}%`;
-  const nm = v => v == null ? '‚Äî' : (+v).toFixed(v % 1 ? 2 : 1);
-  const rows = [
-    ['Par or better', parOrBetter(b), parOrBetter(g), pc, 'up'],
-    ['Double or worse', blowUps(b), blowUps(g), pc, 'down'],
-    ['Birdies', b && b.scoring && b.scoring.birdie, g.scoring && g.scoring.birdie, pc, 'up'],
-    ['Avg ¬∑ par 3', b && b.avgByPar && b.avgByPar[3], g.avgByPar && g.avgByPar[3], nm, 'down'],
-    ['Avg ¬∑ par 4', b && b.avgByPar && b.avgByPar[4], g.avgByPar && g.avgByPar[4], nm, 'down'],
-    ['Avg ¬∑ par 5', b && b.avgByPar && b.avgByPar[5], g.avgByPar && g.avgByPar[5], nm, 'down'],
-    ['Greens in reg.', b && b.gir, g.gir, pc, 'up'],
-    ['Fairways hit', b && b.driving && b.driving.fairway, g.driving && g.driving.fairway, pc, 'up'],
-    ['Putts / round', b && b.putts, g.putts, nm, 'down'],
-    ['One-putts', b && b.putting && b.putting.one, g.putting && g.putting.one, pc, 'up'],
-    ['Up & down', upDownPct(b), upDownPct(g), pc, 'up'],
-  ].filter(r => r[2] != null);
-  const arrow = (was, now, dir) => {
-    if(was == null || now == null) return '';
-    const d = now - was;
-    if(Math.abs(d) < 0.05) return '<span class="faint">‚Äî</span>';
-    const good = dir === 'up' ? d > 0 : d < 0;
-    return `<b style="color:${good ? 'var(--green)' : 'var(--burg)'}">${d > 0 ? '+' : ''}${d.toFixed(Math.abs(d) < 10 ? 1 : 0)}</b>`;
-  };
-  const a = g.approach;
-  return `
-  <h2>Tracked stats</h2>
-  <div class="card">
-    <table><tr><th>Metric</th>${b ? `<th>${esc(b.label || 'Then')}</th>` : ''}<th>${esc(g.label || 'Now')}</th>${b ? '<th>Œî</th>' : ''}</tr>
-      ${rows.map(([k, was, now, fmt, dir]) => `<tr><td class="sm"><b>${k}</b></td>
-        ${b ? `<td class="sm faint">${fmt(was)}</td>` : ''}<td><b>${fmt(now)}</b></td>
-        ${b ? `<td class="sm">${arrow(was, now, dir)}</td>` : ''}</tr>`).join('')}
-    </table>
-    ${a && a.short != null ? `<p class="sm" style="margin-top:8px">Approach misses: <b class="warn">${a.short}% short</b> ¬∑ ${a.left||0}% left ¬∑ ${a.right||0}% right ¬∑ ${a.long||0}% long.</p>` : ''}
-    <p class="sm faint" style="margin-top:8px">
-      ${b ? `<b>${esc(b.label||'Then')}</b> ‚Äî ${b.rounds || b.roundsScoring} rounds${b.avgScore ? `, averaging ${b.avgScore}` : ''}. ` : ''}
-      <b>${esc(g.label||'Now')}</b> ‚Äî ${g.roundsScoring || g.rounds} rounds of scoring${g.roundsAdvanced && g.roundsAdvanced !== (g.roundsScoring || g.rounds) ? `, but only ${g.roundsAdvanced} with the shot-level detail, so treat greens, fairways and putts as indicative` : ''}.</p>
-  </div>
-  ${statsTrend()}`;
-}
-
-// Every snapshot in date order. The Then/Now table only ever shows the oldest and the
-// newest, so a season that sits between them is invisible without this.
-function statsTrend(){
-  const list = (S.stats || []).filter(s => s.scoring || s.avgByPar);
-  if(list.length < 3) return '';
-  const pc = v => v == null ? '‚Äî' : `${(+v).toFixed(v % 1 ? 1 : 0)}%`;
-  const nm = v => v == null ? '‚Äî' : (+v).toFixed(2);
-  const ap = (s, n) => s.avgByPar && s.avgByPar[n];
-  return `
-  <h2>Year by year</h2>
-  <div class="card">
-    <table><tr><th>Span</th><th>Par+</th><th>Dbl+</th><th>P3</th><th>P4</th><th>P5</th></tr>
-      ${list.map(s => `<tr>
-        <td class="sm"><b>${esc(s.label || fmtDate(s.date))}</b><br><span class="faint">${s.roundsScoring || s.rounds || '‚Äî'} rds</span></td>
-        <td><b>${pc(parOrBetter(s))}</b></td>
-        <td><b>${pc(blowUps(s))}</b></td>
-        <td class="sm">${nm(ap(s, 3))}</td>
-        <td class="sm">${nm(ap(s, 4))}</td>
-        <td class="sm">${nm(ap(s, 5))}</td></tr>`).join('')}
-    </table>
-    ${(() => {
-      // Posted scores are a wider net than the scoring summary ‚Äî GHIN's donut only counts
-      // rounds entered hole-by-hole, so the two round counts rarely agree.
-      const posted = list.filter(s => s.avgScore != null);
-      return posted.length ? `<p class="sm">Posted scores ‚Äî ${posted.map(s =>
-        `<b>${esc(s.label || fmtDate(s.date))}</b>: ${s.roundsPosted || s.roundsScoring || s.rounds || '‚Äî'} rds, avg ${s.avgScore}${
-          s.lowScore != null && s.highScore != null ? ` (${s.lowScore}‚Äì${s.highScore})` : ''}`).join(' ¬∑ ')}.</p>` : '';
-    })()}
-    <p class="sm faint">Par+ = par or better ¬∑ Dbl+ = double or worse ¬∑ P3/P4/P5 = scoring average by par.
-    Sample sizes and course difficulty differ year to year, so read the direction rather than the decimals.</p>
-  </div>`;
-}
-
-// Best 40% of score differentials, the way a handicap index is built. Needs a few
-// rounds behind it before it means anything, so it stays null until then.
-function estIndex(){
-  const d = realRounds().map(roundDiff).filter(v => v != null).sort((a,b) => a - b);
-  if(d.length < 3) return null;
-  const n = Math.max(1, Math.round(d.length * 0.4));
-  return d.slice(0, n).reduce((a,b) => a + b, 0) / n;
-}
-// WHY THE INDEX IS OR ISN'T MOVING. An estimate that sits still after a round he logged
-// looks broken, and the reason is never visible from the number: a differential needs a
-// rating AND a slope AND a full nine or eighteen, and a live card only carries them if a
-// rated card at that course came first or he typed them on the finish screen. So every
-// place that prints the estimate can also print what it was built on and what is missing ‚Äî
-// an absent number that says why is worth more than one that just says nothing.
-function indexBasis(){
-  const scored = realRounds().filter(r => r.score != null);
-  const rated = scored.filter(r => roundDiff(r) != null);
-  return { n:rated.length, scored:scored.length, short:Math.max(0, 3 - rated.length),
-    missing: scored.filter(r => roundDiff(r) == null && fullCard(r)).length };
-}
-
-// ----- What his own cards say about a course -----
-// The course name is the join key everywhere in this app, so a record is just the rounds
-// that carry it. Everything here is DERIVED ‚Äî nothing is written back onto the course row,
-// because his typed rating, PR and notes are his and a computed number must never quietly
-// overwrite one. See `coursePR()` for how the two are reconciled.
-const sameCourse = (a, b) => (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase();
-// How many of the courses on his list he has actually logged a card at. His course list is
-// his own history and rightly bigger than what this app has seen, so the two counts sit
-// together rather than one standing in for the other.
-function coursesWithCards(list){
-  return (list || S.courses).filter(c => courseRounds(c.name).some(r => r.score != null)).length;
-}
-function courseRounds(name){
-  // Sim cards are out: a virtual Pebble round is not a round at Pebble, and letting one set
-  // a PR or a course average would put a number he has never shot on a course he may never
-  // have played. See realRounds().
-  return realRounds().filter(r => sameCourse(r.course, name));
-}
-// A nine and an eighteen are not comparable scores, so they are kept apart rather than
-// pooled into one "best" that would flatter whichever format he happened to play short.
-function courseRecord(name){
-  const rs = courseRounds(name).filter(r => r.score != null);
-  if(!rs.length) return null;
-  const holes = r => (Array.isArray(r.holes) && r.holes.length) || (r.nine ? 9 : 18);
-  const full = rs.filter(r => holes(r) >= 18), nine = rs.filter(r => holes(r) < 18);
-  const low = list => list.length ? list.reduce((a, r) => r.score < a.score ? r : a) : null;
-  const vs = rs.map(roundVsPar).filter(v => v != null);
-  return { n:rs.length, best:low(full), bestNine:low(nine), live:rs.filter(r => r.live).length,
-    last: rs.slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0],
-    avgVsPar: vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : null };
-}
-// His typed PR against the lowest full card he has actually logged. HIS NUMBER IS NEVER
-// OVERWRITTEN ‚Äî courses he played before this app existed have a PR and no card, and that
-// is exactly the value of a hand-typed field. But a round he logged that BEAT it is a fact
-// the app can see and he should not have to retype, so the better of the two is what the
-// list shows and sorts by, and `src` says which one it came from.
-function coursePR(c){
-  const typed = c && c.pr != null && c.pr !== '' ? +c.pr : null;
-  const rec = courseRecord(c && c.name);
-  const logged = rec && rec.best ? rec.best.score : null;
-  if(typed == null && logged == null) return null;
-  if(logged == null) return { v:typed, src:'typed' };
-  if(typed == null) return { v:logged, src:'logged', r:rec.best };
-  return logged < typed ? { v:logged, src:'beat', r:rec.best, was:typed } : { v:typed, src:'typed' };
-}
-
-function scoreStats(rounds){
-  const rs = rounds || withHoles();
-  const mix = { eagle:0, birdie:0, par:0, bogey:0, double:0, triple:0 };
-  const byPar = { 3:{n:0,over:0,red:0}, 4:{n:0,over:0,red:0}, 5:{n:0,over:0,red:0} };
-  const opening = { n:0, over:0 };
-  const spots = new Map();
-  const tee = new Map(), app = new Map();
-  // `saved` / `bogey` are the SCRAMBLE numbers (Jack's word, Aug 30 2026): of the tee shots
-  // that missed the fairway, how many still scored par or better, and how many still scored
-  // bogey or better. His own definition, and deliberately the mirror of up & down ‚Äî that one
-  // asks whether he saved the hole from off the GREEN, this asks whether he saved it from
-  // off the FAIRWAY. Counted here rather than anywhere else so no second pass over the holes
-  // can ever disagree with the fairway percentage sitting beside it.
-  const fw = { n:0, hit:0, saved:0, bogey:0, miss:{} }, green = { n:0, hit:0, miss:{}, noshot:0 };
-  // One bucket per putt count, and ZERO is its own ‚Äî a hole he chipped in is not a
-  // one-putt, it is a hole he never putted on, and rolling it in would flatter the number
-  // this page exists to move. The four are exclusive, so their shares are directly
-  // comparable and they sum to the holes that recorded a putt count.
-  const putts = { holes:0, total:0, zero:0, one:0, two:0, three:0,
-    lagHoles:0, gim:0, lagIn:0, lagN:0, dist:new Map(), distN:0 };
-  // How much of this sample Jack logged himself, on the hole. It decides which evidence
-  // badge the findings below carry and when the pasted GHIN claims stand down ‚Äî see
-  // EV_RANK. Counted per hole rather than per round, because a nine and an eighteen are
-  // not the same amount of evidence.
-  const live = { rounds:0, holes:0, fw:0, green:0, putts:0, puttDist:0 };
-  let holes = 0, over = 0;
-  rs.forEach(r => { if(r.live) live.rounds++; });
-  rs.forEach(r => r.holes.forEach((h, i) => {
-    if(h.s == null || h.par == null) return;
-    const L = !!r.live;
-    const d = h.s - h.par;
-    holes++; over += d;
-    if(L) live.holes++;
-    if(d <= -2) mix.eagle++; else if(d === -1) mix.birdie++; else if(d === 0) mix.par++;
-    else if(d === 1) mix.bogey++; else if(d === 2) mix.double++; else mix.triple++;
-    const p = byPar[h.par];
-    if(p){ p.n++; p.over += d; if(d < 0) p.red++; }
-    if(i === 0){ opening.n++; opening.over += d; }
-    const n = h.n ?? i + 1;
-    const k = `${r.course}|${n}`;
-    const e = spots.get(k) || { course:r.course, hole:n, par:h.par, n:0, over:0, notes:[] };
-    e.n++; e.over += d;
-    // Carried, not counted. The worst-hole finding is arithmetic; what he wrote standing
-    // on the hole is the only record of why it keeps happening, and it rides along so the
-    // finding can quote it rather than leave him to remember.
-    if(h.note) e.notes.push({ text:h.note, date:r.date, over:d });
-    spots.set(k, e);
-    // Shot detail. Recorded per hole since the live logger existed; absent on the older
-    // score-only cards, which is why every consumer below gates on its own sample size.
-    if(h.putts != null){
-      putts.holes++; putts.total += h.putts;
-      if(L) live.putts++;
-      if(h.putts === 0) putts.zero++; else if(h.putts === 1) putts.one++;
-      else if(h.putts === 2) putts.two++; else putts.three++;
-      puttTally(putts, h);
-      if(puttMadeK(h)){ bagPutt(putts.dist, h); putts.distN++; if(L) live.puttDist++; }
-    }
-    if(h.gir != null){
-      green.n++;
-      if(L) live.green++;
-      if(h.gir) green.hit++;
-      else if(h.noshot) green.noshot++;      // charged to the tee, not the approach
-      else { const g = h.gmiss || 'X'; green.miss[g] = (green.miss[g] || 0) + 1; }
-    }
-    if(h.fw != null){
-      fw.n++;
-      if(L) live.fw++;
-      if(h.fw) fw.hit++;
-      else {
-        const g = h.fmiss || 'X'; fw.miss[g] = (fw.miss[g] || 0) + 1;
-        // `d` is this hole against par, and the loop has already returned on a hole with no
-        // score, so every missed fairway counted here has one. Nested, not two conditions:
-        // par-or-better is a subset of bogey-or-better, and they must never drift apart.
-        if(d <= 1){ fw.bogey++; if(d <= 0) fw.saved++; }
-      }
-    }
-    if(h.tee) bagShot(tee, h.tee, h, d, TEE_OWNS(h));
-    if(h.app) bagShot(app, h.app, h, d, APP_OWNS);
-  }));
-  const worst = [...spots.values()].filter(e => e.n >= 2)
-    .sort((a,b) => (b.over / b.n) - (a.over / a.n)).slice(0, 5);
-  return { rs, mix, byPar, opening, worst, holes, over, tee, app, fw, green, putts, live };
-}
-
-// Which badge a finding computed off the hole sample should wear. `live` is claimed only
-// when his own live cards actually carry the sample ‚Äî a round's worth of them, and at
-// least half of everything counted ‚Äî because a badge that says "you logged this live" over
-// a number mostly made of fed-in rounds would be exactly the kind of laundering the
-// evidence ranks exist to prevent.
-function evOf(liveHoles, allHoles){
-  return liveHoles >= 18 && liveHoles >= allHoles * 0.5 ? 'live' : 'round';
-}
-
-// Every finding carries WHERE IT CAME FROM, and the strength of that source decides the
-// order it's read in. Rounds Jack logged hole by hole are the strongest thing he owns:
-// he was there, he recorded it, and it is his own current game. A pasted GHIN summary is
-// somebody else's arithmetic over a season that may predate the bag he's playing ‚Äî still
-// worth having, but it goes last. Same rule as "film is king", applied to the numbers.
-// `self` is the weakest rank on purpose: a debrief is Jack telling us how the round felt,
-// which is the mental tab's only available witness for anything a scorecard can't see ‚Äî
-// and still the first thing to give way when a card disagrees with it.
-//
-// `live` sits ABOVE `round` (standing instruction, Aug 19 2026). A card logged in the live
-// logger was recorded ON the hole, between shots, with the bag he is playing today ‚Äî
-// nothing sits between the shot and the record. Everything else, however good, is one
-// remove further away: typed up afterwards from memory, or fed in from a summary. So as
-// soon as his live cards carry a question, they are what the app answers it from, and the
-// weaker sources stand down rather than being averaged in beside them.
-// `bay` sits between them (Sep 11 2026): a radar reading beats a frame counted by hand off
-// a phone, and a card he actually played beats any number taken off a perfect lie. Both
-// `bay` and `measured` are observations, which is why both wear a solid chip ‚Äî what
-// separates them is what they can see, and that is what EV_BLIND is for.
-const EV_RANK = { live:0, round:1, bay:2, measured:3, snapshot:4, self:5 };
-const EV_LAB = { live:'you logged this live', round:'from your rounds', bay:'measured in the bay',
-  measured:'measured', snapshot:'GHIN summary', self:'your own read' };
-const evTag = ev => ev ? ` <span class="ev ${ev}">${EV_LAB[ev]}</span>` : '';
-
-// ----- The evidence disclosure (Aug 27 2026) -----
-// Every finding already says where it came from; this is the door behind that badge.
-// Tapping the tier chip opens EVIDENCE USED: what was counted, what it was read off, and ‚Äî
-// the part that matters ‚Äî what this source CANNOT tell you. The first two come from the
-// finding itself (its own `src` is the sample it fired on); the third is written down PER
-// TIER rather than per finding, because it is a property of the source and not of the
-// number: a scorecard cannot see a stroke however many holes of it there are, and a season
-// summary cannot be broken back down to a hole. Nothing here is invented about a specific
-// finding ‚Äî a made-up limitation reads exactly like a real one, which is the whole failure
-// the tier ladder exists to prevent.
-//
-// It is ONE `<details id=‚Ä¶>`, deliberately: render() reopens any open <details> carrying an
-// id after a rerender(), so the open state costs no store and cannot drift out of sync.
-// Reuse it wherever a finding renders ‚Äî Today, the labs, the round card ‚Äî so a tier is
-// never explained two different ways on two screens.
-const EV_SOURCE = {
-  live:'Cards you logged hole by hole in the live logger ‚Äî recorded on the hole, between shots, with the bag you are playing today.',
-  round:'Your own scorecards, typed up after the round rather than tapped in on the hole.',
-  bay:'A launch monitor in a simulator bay ‚Äî radar-measured club delivery and ball launch, indoors, off a mat.',
-  measured:'A measurement ‚Äî film of the stroke, or a scored test.',
-  snapshot:'A season summary somebody else computed, pasted in.',
-  self:'Your own account of a round, written afterwards.' };
-const EV_BLIND = {
-  live:'A card records WHAT happened, never why. Nothing on it measures the stroke that produced it, and nothing reads the notes you wrote on it.',
-  round:'One remove from the shot ‚Äî written up after the round, so a hole detail is only as good as the memory of it. And a scorecard still cannot see a stroke.',
-  bay:'A perfect lie, still air, no slope and nothing at stake ‚Äî and the carry is a flight MODEL computed from measured launch, not a ball anyone watched land. It cannot tell you what this swing does off grass, in wind, with a score going.',
-  measured:'Measured in one place on one day. Whether it holds up on the course is a different question, and this is not it.',
-  snapshot:'It cannot be broken back down to a hole, and it may predate the bag you are playing. It is an average, not an event.',
-  self:'Not a measurement. Nothing on a card confirms or contradicts it ‚Äî it is the only witness for what a scorecard cannot see, and it is still a feel.' };
-// id     unique and STABLE ‚Äî the key the reopen-after-rerender works off
-// label  the header text left of the chip
-// ev     the tier, one of the five
-// sample what was counted ‚Äî pass the finding's own `src`, never a number you invented
-// more   optional extra sentence about what THIS finding leaves unmeasured
-function evDrawer(id, label, ev, sample, more){
-  const tier = ev || 'snapshot';
-  return `<details class="evdis" id="${esc(id)}">
-    <summary><span class="evdl">${esc(label)}</span><span class="ev ${tier}">${esc(EV_LAB[tier] || tier)}</span></summary>
-    <div class="evpanel"><b>Evidence used</b>
-      <dl>${sample ? `<dt>Sample</dt><dd>${esc(sample)}</dd>` : ''}
-        <dt>Source</dt><dd>${esc(EV_SOURCE[tier] || '')}</dd>
-        <dt>Not measured</dt><dd>${esc(EV_BLIND[tier] || '')}${more ? ' ' + esc(more) : ''}</dd></dl>
-    </div>
-  </details>`;
-}
-
-// Tips fire off thresholds in the data, so they only appear once there's
-// enough of it to mean anything. Each one carries the number that triggered it.
-// Every finding this page can make out of hole data, computed over whatever set of cards
-// it is handed and badged with where they came from. Each one carries a stable `key` so
-// the same finding computed two ways can be recognised as the same finding ‚Äî which is
-// what lets the live-card version of it replace the all-cards version below.
-function holeTips(st, EV){
-  const t = [];
-
-  // The tee-club verdict. This is the question a bag with both a driver and a mini
-  // driver in it exists to answer, and it needs both clubs to have had a real run.
-  const teeRun = [...st.tee.values()].filter(e => e.fwN >= 8);
-  if(teeRun.length >= 2){
-    const rate = e => e.fwHit / e.fwN * 100;
-    const rank = teeRun.slice().sort((x, y) => rate(y) - rate(x));
-    const straight = rank[0], wild = rank[rank.length - 1];
-    if(rate(straight) - rate(wild) >= 15){
-      const sPer = straight.over / straight.n, wPer = wild.over / wild.n;
-      const scoresBetter = wPer < sPer - 0.1;
-      t.push({ key:'tee-club', ev:EV, s: scoresBetter ? 'mid' : 'warn', src:`Off the tee ¬∑ ${straight.fwN + wild.fwN} tee shots`,
-        h:`${clubName(straight.key)} finds ${Math.round(rate(straight))}% of fairways ¬∑ ${clubName(wild.key)} ${Math.round(rate(wild))}%`,
-        b:`Across ${straight.fwN} and ${wild.fwN} recorded tee shots. The holes score ${sPer > 0 ? '+' : ''}${sPer.toFixed(2)} a hole with the ${clubName(straight.key)} against ${wPer > 0 ? '+' : ''}${wPer.toFixed(2)} with the ${clubName(wild.key)}. ${scoresBetter
-          ? `So the wilder club is still the one that scores ‚Äî the extra length is paying for the misses. Keep hitting it; this is the case AGAINST clubbing down out of fear.`
-          : `So the ${clubName(wild.key)} is costing you position and buying nothing back. On the tight holes that is a free ${(wPer - sPer).toFixed(2)} a hole for taking the ${clubName(straight.key)} instead ‚Äî the fairway-finder earning its slot in the bag.`}` });
-    }
-  }
-
-  // The hole-measured twin of the snapshot's "you miss short". This one counts greens
-  // you recorded yourself rather than an average computed elsewhere ‚Äî and only the ones
-  // you had a play at, because a green the drive took away can't answer a club question.
-  if(st.green.n >= 18){
-    const missed = st.green.n - st.green.hit;
-    const real = missed - st.green.noshot;
-    const top = topDir(st.green.miss);
-    if(real >= 8 && top && top[1] / real >= 0.4)
-      t.push({ key:'approach-dir', ev:EV, s:'warn', src:`Approach ¬∑ ${real} playable misses`, h:`${Math.round(top[1] / real * 100)}% of your playable green misses go ${MISS_LAB[top[0]] || top[0]}`,
-        b:`${top[1]} of ${real}${st.green.noshot ? `, after setting aside ${st.green.noshot} green${st.green.noshot === 1 ? '' : 's'} the tee shot took away` : ''}, off ${st.green.hit}/${st.green.n} greens hit. A miss that only ever goes one way is not dispersion ‚Äî dispersion sprays every direction. ${top[0] === 'S'
-          ? 'Short is a DISTANCE fault: the number you are clubbing to is longer than the club actually carries. Club to cover the middle-to-back of the green, and re-baseline the ladder to average carry rather than your purest strike.'
-          : top[0] === 'Lg' ? 'Long is usually adrenaline or an overcorrection off a run of short ones ‚Äî worth checking whether these follow your good drives.'
-          : 'A one-sided miss this consistent is face-and-path, not club selection. That one belongs in the Swing lab.'}` });
-
-    // The other half of the split: when enough greens are conceded at the tee, the
-    // approach numbers are a symptom and the driving is the disease.
-    if(st.green.noshot >= 4 && st.green.noshot / missed >= 0.25){
-      const worst = [...st.tee.values()].filter(e => e.noshot).sort((x, y) => y.noshot - x.noshot)[0];
-      t.push({ key:'greens-lost-at-tee', ev:EV, s:'warn', src:`Off the tee ¬∑ ${st.green.noshot} of ${missed} green misses`, h:`${Math.round(st.green.noshot / missed * 100)}% of your green misses were lost at the tee`,
-        b:`${st.green.noshot} of ${missed} missed greens came from holes where you had no realistic play once you reached the ball ‚Äî the stroke was gone before the approach club came out of the bag. Approach practice cannot touch these${worst ? `, and ${clubName(worst.key)} accounts for ${worst.noshot} of them across ${worst.n} tee shots` : ''}. Compare that against the fairway percentages above: finding the short grass matters less than never being dead, and those are different bets.` });
-    }
-  }
-
-  if(st.putts.holes >= 36){
-    const rate = st.putts.three / st.putts.holes;
-    if(rate >= 0.08)
-      t.push({ key:'three-putts', ev:EV, s:'warn', src:`Putting ¬∑ ${st.putts.holes} holes recorded`, h:`${st.putts.three} three-putts in ${st.putts.holes} holes`,
-        b:`${(rate * 18).toFixed(1)} a round, against ${st.putts.one} one-putts and ${(st.putts.total / st.putts.holes).toFixed(2)} putts a hole overall. Three-putts are a PACE fault, not a line fault ‚Äî the first putt is finishing outside gimme range. This is the live-round evidence for the standing distance-control priority, and the 30-ft ladder is what turns it into a number you can move.` });
-  }
-
-  // Out of bounds is the one miss with a fixed price on it, so it is the one finding on
-  // this page that needs no interpretation at all: count them, multiply by two.
-  const obT = st.fw.miss.OB || 0, obG = st.green.miss.OB || 0, obN = obT + obG;
-  if(obN >= 2 && st.holes >= 18)
-    t.push({ key:'ob', ev:EV, s:'warn', src:`Out of bounds ¬∑ ${obN} shot${obN === 1 ? '' : 's'}`,
-      h:`OB has cost you ${obN * 2} strokes across ${st.holes} holes`,
-      b:`${obT ? `${obT} off the tee` : ''}${obT && obG ? ' and ' : ''}${obG ? `${obG} on a shot at the green` : ''}. Out of bounds is stroke and distance ‚Äî one penalty plus replaying the shot, so every one of these is two strokes before you have a ball in play, and it does not appear anywhere in your fairway or green percentages as anything worse than an ordinary miss. That is ${(obN * 2 / st.holes * 18).toFixed(1)} strokes a round of pure penalty. The fix is never a swing fix on the day: it is the club and the start line on the holes where OB is actually in play, decided on the tee before the swing rather than after it.` });
-
-  // ---- What the length of the putt he HOLED answers that a putt count never could ----
-  // A two-putt hole records where the second putt was struck from, which is where the LAG
-  // finished ‚Äî the only proximity measurement a scorecard can make.
-  //
-  // THE WARNING IS THE THREE-PUTT RATE, NOT THE PROXIMITY. A conceded lag finished inside
-  // gimme range, which is true and is the best result on the ladder ‚Äî but on his first two
-  // live rounds twelve of fifteen second putts were given, so a proximity share built on
-  // them read 100% and was measuring his partners' generosity as much as his pace. The
-  // three-putt rate cannot be flattered that way: nobody concedes their way out of one. So
-  // that decides the verdict, and the proximity split rides along underneath with the
-  // concessions counted out loud rather than folded in silently.
-  //
-  // What is NOT here any more, on purpose: the 4-6 ft conversion and the inside-3 ft miss
-  // count, both of which needed the distance of a putt he MISSED. The card stopped
-  // recording that on Sep 8 2026, so the mat test is the short-putt number again.
-  if(st.putts.lagHoles >= 8){
-    const P = st.putts.dist, close = lagClose(st.putts);
-    const rate = st.putts.three / st.putts.lagHoles;
-    const far = ['l', 'xl', 'xxl'].reduce((a, k) => a + ((P.get(k) || {}).lag || 0), 0);
-    const held = close.in - st.putts.lagIn;      // lags he actually holed out from inside 3 ft
-    t.push({ key:'putt-lag', ev:EV, s: rate >= 0.15 ? 'warn' : 'good',
-      src:`Putting ¬∑ ${st.putts.lagHoles} holes that needed a second putt`,
-      h: rate >= 0.15
-        ? `${st.putts.three} three-putts ‚Äî ${Math.round(rate * 100)}% of the holes you had to lag`
-        : `${Math.round((1 - rate) * 100)}% of your lags get down in two`,
-      b:`${rate >= 0.15
-          ? `That is the open fault with a number on it: you are failing to get down in two on one lag in ${(1 / rate).toFixed(1)}. A three-putt from range is pace, not line ‚Äî the first putt finishes outside gimme range and the second one is a real putt.`
-          : `${st.putts.three} three-putt${st.putts.three === 1 ? '' : 's'} across ${st.putts.lagHoles} holes that needed a second putt is what good pace looks like on a scorecard.`}${
-        close.n ? ` Of the ${close.n} whose finish you recorded, <b>${close.in}</b> left a putt inside three feet ‚Äî but ${
-          st.putts.lagIn} of those were <b>conceded</b> rather than holed${held ? ` and ${held} you actually holed out` : ''}, so read that as "the lag left a tap-in", not as a measured distance. ${
-          far} finished from thirteen feet or more.` : ''} The 30-ft ladder is the drill that moves this: log shorts, spread and green speed, and watch the three-putt row rather than your total putts.` });
-  }
-
-  const blowN = st.mix.double + st.mix.triple;
-  const blowShots = st.mix.double * 2 + st.mix.triple * 3;
-  const share = st.over > 0 ? blowShots / st.over : 0;
-  if(blowN && share >= 0.25) t.push({ key:'doubles', ev:EV, s:'warn', src:'Biggest single lever', h:'Doubles are your gap',
-    b:`${blowN} holes of double bogey or worse across ${st.holes} played ‚Äî that's ${blowShots} strokes, ${Math.round(share*100)}% of everything you've lost to par. Eliminating blow-ups is worth more than any extra birdies: par golf with zero doubles beats birdie golf with four. On a hole that starts badly, take the punch-out and the bogey instead of the hero shot.` });
-  if(st.opening.n >= 3){
-    const avg = st.opening.over / st.opening.n;
-    if(avg >= 0.8) t.push({ key:'opening', ev:EV, s:'warn', src:'Cheapest fix on the list', h:'Your opening hole is a leak',
-      b:`${st.opening.over > 0 ? '+' : ''}${st.opening.over} across ${st.opening.n} opening holes ‚Äî ${avg.toFixed(1)} a hole before you've settled. That's a warm-up problem, not a swing problem. Prime the feel before the first tee (slow one-handed reps, then blend to two hands) rather than hunting for it on the 4th.` });
-  }
-  const p3 = st.byPar[3], p4 = st.byPar[4], p5 = st.byPar[5];
-  // A par 3 takes the driver out of your hands, so it should be clearly your best
-  // scoring hole. Parity with the par 4s is itself the finding.
-  // A handful of par 3s at one course must not outvote a season of them.
-  const bp = (latestStats() || {}).avgByPar;
-  const bigSampleSaysFine = bp && bp[3] != null && bp[4] != null && (bp[3] - 3) < (bp[4] - 4) * 0.9;
-  if(!bigSampleSaysFine && p3.n >= 6 && p4.n >= 6 && (p3.over / p3.n) >= (p4.over / p4.n) * 0.9) t.push({ key:'par-3s', ev:EV, s:'warn', src:'Where it points', h:'Par 3s are no better than your par 4s',
-    b:`+${(p3.over/p3.n).toFixed(2)} a hole on par 3s against +${(p4.over/p4.n).toFixed(2)} on par 4s. There's no driver on a par 3 and no second shot to recover with, so it should be comfortably your best hole type ‚Äî level with the par 4s means the tee shot itself isn't finding greens. That's iron control, not driving. Club to cover the front edge rather than to reach the pin.` });
-  if(p5.n >= 4 && p5.red === 0) t.push({ key:'par-5s', ev:EV, s:'mid', src:'Missing offense', h:'No birdies on par 5s',
-    b:`${p5.n} par-5 holes played, zero under par. The textbook line is that par 5s are where a mid-handicap makes his money ‚Äî general advice about mid-handicaps, not something read off your holes; the count above is yours. Decide the lay-up off your wedge ladder so the third shot is a NUMBER you own rather than whatever's left ‚Äî 60¬∞‚Üí80 ¬∑ 56¬∞‚Üí95 ¬∑ 50¬∞‚Üí108 ¬∑ PW‚Üí122.` });
-  const w = st.worst[0];
-  if(w && (w.over / w.n) >= 1.5) t.push({ key:'worst-hole', ev:EV, s:'warn', src:'One hole', h:`${esc(w.course)} hole ${w.hole} is eating you`,
-    b:`+${w.over} across ${w.n} plays on a par ${w.par} ‚Äî ${(w.over/w.n).toFixed(1)} a go. One hole played a handful of times shouldn't cost this much. Next time you see it, play it as a bogey hole on purpose and take the trouble out of the equation.${
-      (w.notes || []).length ? ` You wrote on it: ${w.notes.slice(-2).map(x => `&ldquo;${esc(x.text)}&rdquo; <span class="faint">${fmtDate(x.date)}</span>`).join(' ¬∑ ')} ‚Äî that is the part the number can't tell you.` : ''}` });
-  const parRate = (st.mix.par + st.mix.birdie + st.mix.eagle) / st.holes;
-  if(parRate >= 0.4) t.push({ key:'pars', ev:EV, s:'good', src:'Protect this', h:'You make a lot of pars',
-    b:`${Math.round(parRate*100)}% of holes played at par or better. The base game is there ‚Äî the scoring gap is the tail, not the average.` });
-  return t;
-}
-
-// LIVE CARDS TAKE PRECEDENCE (standing instruction, Aug 19 2026). Where the rounds Jack
-// logged on the course can make a finding on their own, that finding is computed FROM
-// THEM ‚Äî not from them averaged in with cards typed up afterwards ‚Äî and it replaces the
-// all-cards version of the same finding rather than sitting next to it. Where they can't
-// yet, the full sample still speaks and the badge says so, so nothing is ever lost by
-// preferring the better evidence: the worst case is the answer he had before.
-//
-// Below the hole findings sit the GHIN summaries, and those stand down entirely on the
-// two questions his own holes now answer better.
-function scoreTips(st){
-  // Two rounds' worth of recorded greens/putts is enough to outrank a pasted average ‚Äî
-  // and MOST OF ONE ROUND is enough when he logged it live, because that card was recorded
-  // on the hole with the bag he is playing now, which is more than a season average can
-  // claim however many rounds are behind it.
-  const t = statTips({ approach: st.green.n >= 36 || st.live.green >= 14,
-                       putting: st.putts.holes >= 36 || st.live.putts >= 14 });
-  if(!st.holes) return t;
-  const all = holeTips(st, 'round');
-  // One live round is not a season, but it is enough for the findings whose own gates it
-  // clears ‚Äî and those gates are what stop a thin sample speaking in the first place.
-  const lv = st.live.holes >= 18 && st.live.holes < st.holes
-    ? holeTips(scoreStats(st.rs.filter(r => r.live)), 'live') : null;
-  if(lv){
-    const spoken = new Set(lv.map(x => x.key));
-    t.push(...lv, ...all.filter(x => !spoken.has(x.key)));
-  } else {
-    // No separate live read to make ‚Äî either the live cards are too thin to clear any gate
-    // on their own, or they ARE every card, in which case the whole page is live evidence.
-    const ev = evOf(st.live.holes, st.holes);
-    t.push(...(ev === 'live' ? all.map(x => Object.assign({}, x, { ev })) : all));
-  }
-  return t.sort((a, b) => EV_RANK[a.ev || 'snapshot'] - EV_RANK[b.ev || 'snapshot']);
-}
-
-const missSplit = m => Object.entries(m).sort((x, y) => y[1] - x[1])
-  .map(([k, v]) => `${v} ${MISS_LAB[k] || k}`).join(' ¬∑ ');
-
-// The club tables. These are the sections the live logger exists to fill: they stay
-// invisible until a round has actually been logged with the club recorded, and the
-// approach table waits for a bigger sample because that row is optional to fill in.
-function clubTables(st){
-  const tee = [...st.tee.values()].sort((a, b) => b.n - a.n);
-  const app = [...st.app.values()].filter(e => e.girN).sort((a, b) => b.n - a.n);
-  const appTotal = app.reduce((a, e) => a + e.n, 0);
-  const pct = (n, d) => d ? `${Math.round(n / d * 100)}%` : '‚Äî';
-  return `
-  ${tee.length ? `<h2>Off the tee ¬∑ by club</h2>
-  <div class="card">
-    <table><tr><th>Club</th><th>Tees</th><th>Found it</th><th>Dead</th><th>OB</th><th>Per hole</th></tr>
-      ${tee.map(e => {
-        // Par 3s have no fairway to hit, so the green is that tee shot's own result.
-        const par3 = !e.fwN && e.girN;
-        const n = par3 ? e.girN : e.fwN, hit = par3 ? e.girHit : e.fwHit;
-        return `<tr>
-        <td class="sm"><b>${esc(clubName(e.key))}</b>${par3 ? '<br><span class="sm faint">par 3s</span>' : ''}
-          ${(m => m ? `<br><span class="sm faint">${m}</span>` : '')(missSplit(par3 ? e.girMiss : e.fwMiss))}</td>
-        <td>${e.n}</td>
-        <td>${n ? `<b>${pct(hit, n)}</b><span class="sm faint"> ${hit}/${n}${par3 ? ' grn' : ''}</span>` : '<span class="faint">‚Äî</span>'}</td>
-        <td>${e.noshot ? `<b style="color:var(--burg)">${e.noshot}</b><span class="sm faint"> ${pct(e.noshot, e.n)}</span>` : '<span class="faint">‚Äî</span>'}</td>
-        ${(ob => `<td>${ob ? `<b style="color:var(--burg)">${ob}</b><span class="sm faint"> ${ob * 2} str</span>` : '<span class="faint">‚Äî</span>'}</td>`)((e.fwMiss.OB || 0) + (e.girMiss.OB || 0))}
-        <td><b style="color:${e.over / e.n >= 1 ? 'var(--burg)' : e.over / e.n <= 0.5 ? 'var(--green)' : 'var(--ink)'}">${e.over > 0 ? '+' : ''}${(e.over / e.n).toFixed(2)}</b></td></tr>`;
-      }).join('')}
-    </table>
-    <p class="sm faint" style="margin-top:8px">"Found it" is fairways for a club hit off a par 4 or 5, and greens for one hit off a par 3 ‚Äî on a par 3 the tee shot is the approach, so the green is its own result. <b>"Dead"</b> is the holes it left you no play at the green, which convicts a club far better than a fairway percentage: most rough is playable and none of these were. <b>"OB"</b> is out of bounds with that club and what it cost ‚Äî two strokes each, stroke and distance ‚Äî because a club that finds the fairway two thirds of the time and goes OB with the rest is not the club the percentage makes it look like. "Per hole" is your score against par on the holes you hit that club ‚Äî a club that finds more fairways but scores no better is not saving you anything, and that comparison is the whole point of this table.</p>
-  </div>` : ''}
-
-  ${appTotal >= 10 ? `<h2>Into the green ¬∑ by club</h2>
-  <div class="card">
-    <table><tr><th>Club</th><th>Shots</th><th>Greens</th><th>Misses</th><th>Per hole</th></tr>
-      ${app.map(e => `<tr>
-        <td class="sm"><b>${esc(clubName(e.key))}</b></td>
-        <td>${e.n}</td>
-        <td><b>${pct(e.girHit, e.girN)}</b><span class="sm faint"> ${e.girHit}/${e.girN}</span></td>
-        <td class="sm">${missSplit(e.girMiss) || '‚Äî'}</td>
-        <td><b>${e.over > 0 ? '+' : ''}${(e.over / e.n).toFixed(2)}</b></td></tr>`).join('')}
-    </table>
-    <p class="sm faint" style="margin-top:8px">Approach club is the optional row in the live logger, so this counts only the shots where you tapped it in.</p>
-  </div>` : ''}`;
-}
-
-// Putting by distance. One question per column, and they share an axis because they share
-// a field: the length of the putt he HOLED. What that length means depends on how many
-// putts the hole took, which is why the two columns are counted apart rather than summed ‚Äî
-// a putt holed first time is a CONVERSION from that range, and a putt holed second is
-// where the LAG left him. There is no make rate here and there is not meant to be: a card
-// only carries a distance for the putts that went in, so a rate over them could only climb
-// (see the note by `puttMadeK`). The short-putt conversion is the 5-ft mat test's job.
-function puttDistTable(P, note){
-  const rows = puttRows(P.dist);
-  if(!rows.length && !P.lagIn) return '';
-  const pct = (n, d) => d ? `${Math.round(n / d * 100)}%` : '‚Äî';
-  // The population a proximity share is taken of is the holes whose lag finish is KNOWN ‚Äî
-  // a made distance, or a concession, which is a finish (inside gimme range) and not a gap.
-  // Numerator and denominator come off the same set, so the rate cannot exceed 100%.
-  const lagN = P.lagN || 0, close = lagClose(P);
-  return `
-  <h2>Putting ¬∑ by distance</h2>
-  <div class="card">
-    <table><tr><th>From</th><th>Holed</th><th>One-putt</th><th>Lag left you here</th></tr>
-      ${rows.map(e => `<tr>
-        <td class="sm"><b>${esc(PD[e.k].lab)}</b><span class="sm faint"> ft</span></td>
-        <td>${e.made ? `<b>${e.made}</b>` : '<span class="faint">‚Äî</span>'}</td>
-        <td class="sm">${e.one || '<span class="faint">‚Äî</span>'}</td>
-        <td>${e.lag ? `<b>${e.lag}</b>${lagN ? `<span class="sm faint"> ${pct(e.lag, lagN)}</span>` : ''}`
-          : '<span class="faint">‚Äî</span>'}</td></tr>`).join('')}
-      ${P.lagIn ? `<tr><td class="sm"><b>given</b><span class="sm faint"> inside</span></td>
-        <td><span class="faint">‚Äî</span></td><td class="sm"><span class="faint">‚Äî</span></td>
-        <td><b>${P.lagIn}</b>${lagN ? `<span class="sm faint"> ${pct(P.lagIn, lagN)}</span>` : ''}</td></tr>` : ''}
-    </table>
-    ${(() => {
-      // Two populations, and each carries its own denominator out loud. The lags with a
-      // known finish are a subset of the holes that needed a second putt ‚Äî cards logged
-      // before the distances existed have the hole but not the length ‚Äî so pairing a
-      // count off one with a total off the other would read as a rate and be neither.
-      const bits = [];
-      // The three-putt count leads, because it is the half nobody can concede his way out
-      // of. The proximity share follows with the conceded ones named ‚Äî see the note in
-      // `holeTips()`: fold them in silently and this line reads 100% on a card where his
-      // partners simply gave everything short.
-      if(P.three && P.lagHoles) bits.push(`<b>${P.three} of ${P.lagHoles}</b> holes that needed a second putt still took three`);
-      if(close.n) bits.push(`<b>${close.in} of ${close.n}</b> recorded lags (${pct(close.in, close.n)}) left a putt inside three feet${
-        P.lagIn ? `, ${P.lagIn} of them conceded rather than holed` : ''}`);
-      return bits.length ? `<p class="sm" style="margin-top:8px">${bits.join(' ¬∑ ')}. That is distance control stated as a proximity number rather than as a putt count, and it is the row the 30-ft ladder drill is supposed to move.</p>` : '';
-    })()}
-    ${P.gim ? `<p class="sm" style="margin-top:8px"><b>${P.gim} first putt${P.gim === 1 ? ' was' : 's were'} given.</b> Those are out of the Holed column entirely rather than counted as made ‚Äî a putt nobody made you hit is not a putt you made, and the one number this project cannot afford to flatter is the short one.</p>` : ''}
-    <p class="sm faint" style="margin-top:8px">${note || `<b>Holed</b> is every putt that went in from that range. <b>One-putt</b> is the ones you holed first time ‚Äî a conversion. <b>Lag left you here</b> is where the hole's second putt was struck from, which is a proximity reading and the pace question. There is no make rate by distance: the card records how long the putt you HOLED was, so the ones you missed carry no distance to count against it.`}</p>
-  </div>`;
-}
-
-// The quick-entry card. It lives at the BOTTOM of Scores ‚Äî rounds are the input to this
-// page, so the form belongs with them rather than in Coach, which reads them. Shared with
-// the empty state, because a page that has no rounds is exactly where the form matters most.
-function logRoundCard(){
-  return `
-  <h2>Log a round ¬∑ 60 seconds</h2>
-  <div class="card">
-    <div class="formrow g3">
-      <div><label>Score</label><input id="rdScore" inputmode="numeric" placeholder="84"></div>
-      <div><label>Putts</label><input id="rdPutts" inputmode="numeric" placeholder="34"></div>
-      <div><label>Date</label><input id="rdDate" type="date" value="${today()}"></div>
-    </div>
-    <label>Course</label>
-    <input id="rdCourse" list="courseList" placeholder="Start typing‚Ä¶">
-    <datalist id="courseList">${S.courses.map(c=>`<option value="${esc(c.name)}">`).join('')}</datalist>
-    <label>What gave you trouble? (tap all that apply)</label>
-    <div class="chips" id="troubleChips">
-      ${TROUBLES.map(([k,lab])=>`<span class="chip" data-trouble="${k}">${lab}</span>`).join('')}
-    </div>
-    <label>Anything else</label>
-    <textarea id="rdNote" rows="2" placeholder='"Wind got me on the back nine‚Ä¶"'></textarea>
-    <div style="margin-top:10px"><button class="btn" data-action="save-round">Save round ‚Üí Coach updates</button></div>
-    <p class="sm faint" style="margin-top:8px">Hole-by-hole detail is what powers everything on this page ‚Äî send Claude a GHIN round summary and it lands with every hole.</p>
-    <div class="linkrow" data-action="live-new" style="border-bottom:none">
-      <span class="sm"><b>${S.live ? 'Resume your live round' : 'Or play it live, hole by hole'}</b> ‚Äî every detail, no typing</span><span class="arr">‚Üí</span></div>
-  </div>`;
-}
-
-function scores(){
-  // Two lists on purpose: `all` is what the page COUNTS (outdoor cards only ‚Äî see
-  // realRounds()), `list` is what it SHOWS. A sim round is still his card and still opens;
-  // it just never moves an average, a best, or the trend line.
-  const all = realRounds().slice().sort((a,b) => (a.date || '').localeCompare(b.date || ''));
-  const list = S.rounds.slice().sort((a,b) => (a.date || '').localeCompare(b.date || ''));
-  const simN = list.length - all.length;
-  if(!list.length) return `
-  <div class="card">
-    <h2>No rounds yet</h2>
-    <p class="sm">Log one below, or send Claude your GHIN round summaries and they'll land here with the hole-by-hole detail ‚Äî which is what unlocks the analytics: scoring mix, par-3/4/5 splits, your worst holes, and tips built from your own numbers.</p>
-  </div>
-  ${logRoundCard()}`;
-  const st = scoreStats();
-  const tips = scoreTips(st);
-  const idx = estIndex();
-  const vs = all.map(roundVsPar).filter(v => v != null);
-  const best = all.filter(r => roundVsPar(r) != null).sort((a,b) => roundVsPar(a) - roundVsPar(b))[0];
-  const pct = n => st.holes ? (n / st.holes * 100) : 0;
-  const bar = [['birdie','Birdie or better',st.mix.eagle+st.mix.birdie],['par','Par',st.mix.par],
-               ['bogey','Bogey',st.mix.bogey],['double','Double+',st.mix.double+st.mix.triple]];
-  return `
-  <div class="rowgrid g3">
-    <div class="stat"><div class="v">${all.length}</div><div class="l">Rounds</div></div>
-    <div class="stat"><div class="v">${st.holes || '‚Äî'}</div><div class="l">Holes analysed</div></div>
-    <div class="stat"><div class="v">${idx != null ? idx.toFixed(1) : '‚Äî'}</div><div class="l">Est. index</div>${
-      (b => `<div class="sv">${b.n} rated card${b.n === 1 ? '' : 's'}</div>`)(indexBasis())}</div>
-  </div>
-
-  ${(() => {
-    // An estimate that does not move after a round he logged looks broken, and the reason
-    // is never visible from the number: a differential needs a rating, a slope and a full
-    // nine or eighteen. So the page says which of his cards can produce one and which
-    // cannot, and what to do about the ones that cannot ‚Äî the same rule the tiles follow,
-    // that an absent number explains itself rather than rendering a dash and stopping.
-    const b = indexBasis();
-    if(!b.scored) return '';
-    return `<div class="card flat"><p class="sm">${
-      idx != null ? `Estimated index off the best 40% of <b>${b.n}</b> rated card${b.n === 1 ? '' : 's'}, the way an index is built.`
-        : b.n ? `<b>${b.n} of your cards carr${b.n === 1 ? 'ies' : 'y'} a rating</b> ‚Äî the estimate starts at three.`
-              : `<b>None of your cards carry a course rating yet</b>, so there is no estimated index to show.`}${
-      b.missing ? ` <b>${b.missing}</b> full card${b.missing === 1 ? '' : 's'} of yours ${b.missing === 1 ? 'has' : 'have'} no rating and slope on ${b.missing === 1 ? 'it' : 'them'} ‚Äî tap the round and tell Claude which tees you played, or tap the tees on the finish screen next time if the course card is on file.` : ''}</p></div>`;
-  })()}
-
-  ${vs.length > 1 ? `<div class="card">
-    <div class="charttile"><div class="lab">Score vs par ¬∑ by round</div>
-      <div style="color:var(--gtext)">${spark(all.map(roundVsPar).filter(v => v != null))}</div>
-      <div class="sub">${best ? `Best: ${esc(best.course || 'round')} ${best.score} (${roundVsPar(best) > 0 ? '+' : ''}${roundVsPar(best)}) ¬∑ ${fmtDate(best.date)}` : ''}</div></div>
-  </div>` : ''}
-
-  ${st.holes ? `
-  <h2>Scoring mix ¬∑ ${st.holes} holes</h2>
-  <div class="card">
-    <div class="mixbar">${bar.filter(b => b[2]).map(b => `<span class="${b[0]}" style="width:${pct(b[2])}%"></span>`).join('')}</div>
-    <table style="margin-top:10px"><tr><th>Result</th><th>Holes</th><th>Share</th></tr>
-      ${bar.map(b => `<tr><td class="sm"><b>${b[1]}</b></td><td>${b[2]}</td><td class="sm">${pct(b[2]).toFixed(0)}%</td></tr>`).join('')}
-    </table>
-    <p class="sm faint" style="margin-top:8px">Total ${st.over > 0 ? '+' : ''}${st.over} over ${st.holes} holes ¬∑ ${(st.over/st.holes).toFixed(2)} a hole.</p>
-  </div>
-
-  <h2>By par</h2>
-  <div class="card">
-    <table><tr><th>Par</th><th>Holes</th><th>Over</th><th>Per hole</th><th>Under</th></tr>
-      ${[3,4,5].filter(p => st.byPar[p].n).map(p => { const d = st.byPar[p]; return `<tr>
-        <td><b>Par ${p}</b></td><td>${d.n}</td><td>${d.over > 0 ? '+' : ''}${d.over}</td>
-        <td><b style="color:${d.over/d.n >= 1 ? 'var(--burg)' : d.over/d.n <= 0.5 ? 'var(--green)' : 'var(--ink)'}">${(d.over/d.n).toFixed(2)}</b></td>
-        <td class="sm">${d.red || '‚Äî'}</td></tr>`; }).join('')}
-    </table>
-    ${st.opening.n >= 2 ? `<p class="sm" style="margin-top:8px">Opening hole of each round: <b>${st.opening.over > 0 ? '+' : ''}${st.opening.over}</b> across ${st.opening.n} starts ¬∑ ${(st.opening.over/st.opening.n).toFixed(1)} a hole.</p>` : ''}
-  </div>` : `<div class="card"><p class="sm faint">Hole-by-hole detail unlocks the scoring mix, the par splits and the tips. Send Claude your GHIN round summaries and they'll be filled in.</p></div>`}
-
-  ${clubTables(st)}
-
-  ${st.green.n || st.fw.n || st.putts.holes ? `<h2>Where the misses go</h2>
-  <div class="card">
-    <table><tr><th>Recorded</th><th>Hit</th><th>Rate</th><th>Misses</th></tr>
-      ${st.fw.n ? `<tr><td class="sm"><b>Fairways</b></td><td>${st.fw.hit}/${st.fw.n}</td>
-        <td><b>${Math.round(st.fw.hit / st.fw.n * 100)}%</b></td>
-        <td class="sm">${missSplit(st.fw.miss) || '‚Äî'}</td></tr>` : ''}
-      ${st.green.n ? `<tr><td class="sm"><b>Greens</b></td><td>${st.green.hit}/${st.green.n}</td>
-        <td><b>${Math.round(st.green.hit / st.green.n * 100)}%</b></td>
-        <td class="sm">${missSplit(st.green.miss) || '‚Äî'}</td></tr>` : ''}
-    </table>
-    ${st.green.noshot ? `<p class="sm" style="margin-top:8px"><b>${st.green.noshot} of the ${st.green.n - st.green.hit} missed greens were conceded at the tee</b> ‚Äî no play at the green by the time you reached the ball. They're left out of the miss directions above, because they answer a driving question rather than a club one.</p>` : ''}
-    ${st.putts.holes ? `<p class="sm" style="margin-top:8px"><b>Putting</b> ‚Äî ${st.putts.one} one-putts and ${st.putts.three} three-putts across ${st.putts.holes} recorded holes ¬∑ ${(st.putts.total / st.putts.holes).toFixed(2)} a hole, ${(st.putts.total / st.putts.holes * 18).toFixed(1)} a round.</p>` : ''}
-    <p class="sm faint" style="margin-top:8px">Counted hole by hole from your own cards ‚Äî not an average computed somewhere else.</p>
-  </div>` : ''}
-
-  ${puttDistTable(st.putts)}
-
-  ${st.worst.length ? `<h2>Holes that cost you most</h2>
-  <div class="card">
-    <table><tr><th>Course</th><th>Hole</th><th>Par</th><th>Plays</th><th>Avg</th></tr>
-      ${st.worst.map(w => `<tr><td class="sm">${esc(w.course || '‚Äî')}</td><td><b>${w.hole}</b></td><td>${w.par}</td><td>${w.n}</td>
-        <td><b style="color:var(--burg)">+${(w.over/w.n).toFixed(1)}</b></td></tr>`).join('')}
-    </table>
-    <p class="sm faint" style="margin-top:8px">Holes played at least twice, worst average first.</p>
-  </div>` : ''}
-
-  ${tips.length ? `<h2>How to improve</h2>
-  <div class="card">
-    ${tips.map(t => `<div class="tipcard ${t.s === 'good' ? 'green' : ''}">
-      <div class="src">${esc(t.src)}${evTag(t.ev)}</div><h4>${t.h}</h4><p class="sm">${t.b}</p></div>`).join('')}
-    <p class="sm faint">Strongest evidence first: the rounds you logged live on the course, then the rest of your cards, then the GHIN summaries ‚Äî and a summary claim stands down entirely once your own holes can answer it. These change as the data does.</p>
-  </div>` : ''}
-
-  ${statsCard()}
-
-  <h2>Every round</h2>
-  <div class="card">
-    <div class="tscroll"><table><tr><th>Date</th><th>Course</th><th>Tees</th><th>Score</th><th>vs par</th><th>Putts</th></tr>
-      ${list.slice().reverse().map(r => { const v = roundVsPar(r); return `<tr data-action="open-round" data-i="${S.rounds.indexOf(r)}" style="cursor:pointer">
-        <td style="white-space:nowrap">${fmtDate(r.date)} <span class="faint rgo">‚ñ∏</span></td>
-        <td class="sm rtxt">${esc(r.course || '‚Äî')}${r.nine ? ` <span class="faint">${r.nine === 'F' ? 'front' : 'back'}</span>` : ''}${
-          r.live ? ' <span class="ev live">live</span>' : ''}${
-          r.sim ? ` <span class="ev bay">${r.trackmanHandicapRound ? 'TM HCP' : 'sim'}</span>` : ''}</td>
-        <td class="sm rtxt">${esc(r.tees || '‚Äî')}</td>
-        <td><b>${esc(r.score ?? '‚Äî')}</b></td>
-        <td class="sm">${v == null ? '‚Äî' : `<b style="color:${v > 5 ? 'var(--burg)' : v <= 2 ? 'var(--green)' : 'var(--ink)'}">${v > 0 ? '+' : ''}${v}</b>`}</td>
-        <td class="sm">${esc(r.putts ?? '‚Äî')}</td></tr>`; }).join('')}
-    </table></div>
-    <p class="sm faint" style="margin-top:8px">Tap any round for the hole-by-hole card and its own breakdown.${
-      st.live.rounds ? ` <b>${st.live.rounds}</b> of these you logged live, hole by hole ‚Äî ${st.live.holes} of the ${st.holes} holes analysed above. Those are the cards everything here speaks from first.` : ''}${
-      simN ? ` <b>${simN}</b> ${simN === 1 ? 'is a round' : 'are rounds'} played indoors on a simulator ‚Äî listed here and counted in nothing above, because a mat is not turf and the greens were software.` : ''}${
-      all.some(r => r.note) ? ` Latest note: "${esc(all.filter(r=>r.note).slice(-1)[0].note)}"` : ''}</p>
-  </div>
-
-  ${(() => {
-    // EVERY note he has written, newest first. Until now a note was only visible inside
-    // the round card it was written on, which made the one field that records WHY the
-    // hardest thing on the page to find. They are quoted, never parsed: free text reaches
-    // the app's logic by being handed back where it applies ‚Äî this list, the finding it
-    // belongs to, and the tee box he wrote it on ‚Äî not by being scanned for keywords,
-    // which would be inference wearing a measurement's badge.
-    const notes = [];
-    // Indexed against S.rounds because the row opens that card ‚Äî but a sim round's notes
-    // are not "what you wrote on the course", so they are skipped rather than filtered out
-    // of the array, which would shift every index after them.
-    S.rounds.forEach((r, i) => { if(r.sim) return;
-      (Array.isArray(r.holes) ? r.holes : []).forEach(h => {
-        if(h && h.note) notes.push({ r, i, n:h.n, text:h.note });
-      }); });
-    if(!notes.length) return '';
-    notes.sort((a, b) => (b.r.date || '').localeCompare(a.r.date || '') || b.i - a.i);
-    const show = notes.slice(0, 12);
-    return `<h2>What you wrote on the course</h2>
-    <div class="card">
-      <dl class="holenotes">${show.map(x => `<dt data-action="open-round" data-i="${x.i}" style="cursor:pointer">${esc(x.n)}</dt>
-        <dd data-action="open-round" data-i="${x.i}" style="cursor:pointer">${esc(x.text)}
-          <span class="sm faint">‚Äî ${esc(x.r.course || 'your round')}${x.r.nine ? ` ${x.r.nine === 'F' ? 'front' : 'back'}` : ''} ¬∑ ${fmtDate(x.r.date)}</span></dd>`).join('')}</dl>
-      <p class="sm faint" style="margin-top:8px">${notes.length > show.length ? `The newest ${show.length} of ${notes.length}. ` : ''}Written on the hole itself, while you could still see the shot ‚Äî the only part of a card that remembers <b>why</b>. Tap one to open its round. Play that hole again and the note comes back to you on the tee.</p>
-    </div>` ;
-  })()}
-
-  ${logRoundCard()}`;
-}
-
-// ----- The prep loop, closed (Aug 20 2026) -----
-// A course plan's per-hole notes only ever travelled ONE WAY: onto the tee, through the
-// live logger. Nothing ever came back afterwards to ask whether the call was taken or
-// whether it worked ‚Äî which made the per-hole research the single biggest write-only file
-// in the app. The record fed the plan (`holeRecord()` prints his history on the hole card);
-// the plan never fed the record.
-//
-// This joins a played card to the plan covering that course, hole by hole: what the plan
-// called, what he actually hit, where the ball finished, what it scored.
-//
-// It counts only STRUCTURED fields ‚Äî `club` (carry-ladder keys the call names) and
-// `avoidDir` (a DIRS code) ‚Äî and never the prose. The prose is quoted BESIDE the result,
-// which needs no interpretation, but "the plan said avoid right" is a claim and a claim
-// gets a field. The existing plans prove why: `avoid` reads "*Right*. That is where you
-// had no play" on one hole and "The long second" on another, and only one of those two
-// words is a direction. Same rule as a hole note ‚Äî carried, not parsed.
-// A plan's authoring date lives in its feed id, same as everywhere else in the app.
-const planWritten = b => { const m = /(20\d{2})(\d{2})(\d{2})/.exec((b && b.id) || '');
-  return m ? `${m[1]}-${m[2]}-${m[3]}` : null; };
-function planHeld(r){
-  const plan = liveBriefing(r);
-  if(!plan || !Array.isArray(plan.holes) || !plan.holes.length) return null;
-  const rows = [];
-  (Array.isArray(r.holes) ? r.holes : []).forEach(h => {
-    const hn = h && h.s != null && h.par != null ? briefHole(plan, h.n) : null;
-    if(!hn) return;
-    const warned = DIRS.includes(hn.avoidDir) ? hn.avoidDir : null;
-    rows.push({ h, hn, lab: hn.playAs || 'Tee', call: hn.play || hn.note || '',
-      // Was the call taken? Answerable only where the plan names the clubs it meant.
-      onPlan: Array.isArray(hn.club) && hn.club.length && h.tee ? hn.club.includes(h.tee) : null,
-      // Did the warned miss actually happen? Only where the plan names a direction.
-      // `avoidOn` scopes the warning to the shot it was about ‚Äî a tree down the right of
-      // the fairway and a bunker short of the green are different warnings, and counting
-      // either finish against either warning would inflate the hit rate. Omitted = either.
-      warned, hit: !warned ? null
-        : hn.avoidOn === 'tee' ? h.fmiss === warned
-        : hn.avoidOn === 'green' ? h.gmiss === warned
-        : (h.fmiss === warned || h.gmiss === warned),
-      d: h.s - h.par });
-  });
-  if(!rows.length) return null;
-  const took = rows.filter(x => x.onPlan !== null), warn = rows.filter(x => x.warned);
-  const onN = took.filter(x => x.onPlan).length;
-  // WHOSE CALL THE RATE IS ABOUT. Once he has overruled a hole, `briefHole()` hands back
-  // HIS club, so the took-the-call rate is measured against his own pick ‚Äî which is right,
-  // because that is the call he carried to the tee. It stops being right the moment the
-  // page still calls it the plan's, so the number says how many were his.
-  const sum = { mine: took.filter(x => x.hn.yours).length,
-    n:rows.length, took:took.length, onN,
-    onOver: took.filter(x => x.onPlan).reduce((a, x) => a + x.d, 0),
-    offOver: took.filter(x => !x.onPlan).reduce((a, x) => a + x.d, 0),
-    warn:warn.length, warnHit: warn.filter(x => x.hit).length,
-    over: rows.reduce((a, x) => a + x.d, 0) };
-  // A plan only TESTS a round it predates. The Sterling Farms plan was written the same
-  // day off this very card ‚Äî it describes the round, it did not predict it, and calling
-  // that "the plan held up" would be marking my own homework. The block says which it is.
-  //
-  // A feed id carries a DAY and not a time, so a plan written the morning of a round and
-  // one written up from its card that evening are indistinguishable here. Not grading
-  // either is right ‚Äî under-claiming is the safe failure ‚Äî but the COPY must not assert
-  // the round was among the plan's sources when nothing knows that. `sameDay` and
-  // `undated` exist so the card can say which of the three cases it is in.
-  const w = planWritten(plan);
-  return { plan, rows, sum, retro: !w || !r.date || w >= r.date, written:w,
-    sameDay: !!(w && r.date && w === r.date), undated: !w || !r.date };
-}
-
-// ----- Single round deep dive -----
-// Rounds arrive with wildly different detail. The early cards are par-and-score only;
-// the Aug 12 card is the first carrying a putt count, a green result and a tee result
-// on every hole. Everything below is computed from whatever a round actually has, and
-// each block hides itself when the data behind it isn't there ‚Äî so a 60-second logged
-// round still opens, it just shows less.
-// `OB` is deliberately in here alongside the directions even though it is not one: it is
-// where the ball FINISHED, which is what this map is for, and it renders in the miss
-// splits and on the card exactly like the rest. What it is not is a dispersion reading ‚Äî
-// every place that asks "which way does the miss go" filters it out through DIRS below,
-// because "40% of your misses go OB" answers a penalty question, not an aim one.
-const MISS_LAB = { S:'short', L:'left', R:'right', Lg:'long', OB:'OB', X:'other' };
-const MISS_KEY = { S:'short', L:'left', R:'right', Lg:'long' };  // ‚Üí the stats-baseline field
-// The finishes that are a direction. Sorting a miss map for a pattern goes through this.
-const DIRS = ['S', 'L', 'R', 'Lg', 'X'];
-const topDir = m => Object.entries(m).filter(([k]) => DIRS.includes(k)).sort((x, y) => y[1] - x[1])[0];
-// OB is stroke and distance: the penalty plus replaying the shot. Two strokes every time,
-// before he has a ball in play ‚Äî which is why it gets counted rather than filed as a bad
-// drive, and why nothing here reads it as a direction.
-
-// One distance's record, built from the ONE putt a hole now carries a distance for ‚Äî the
-// one he holed. Two different questions land in the same row and they are counted apart,
-// because the number of putts the hole took changes what that distance MEANS:
-//   `one` ‚Äî the hole took a single putt, so this is a putt he CONVERTED from that range.
-//   `lag` ‚Äî the hole took two or more, so this is where the lag LEFT him: a proximity
-//           reading, and the closest thing a scorecard has ever produced to one.
-//   `made` ‚Äî the two together, i.e. every putt holed from this range.
-// There is deliberately no `att` and no make rate: see the note by `puttMadeK` ‚Äî the only
-// putts a card still carries a distance for are the ones that went in.
-const puttCell = () => ({ made:0, one:0, lag:0 });
-function bagPutt(map, h){
-  const m = puttMadeK(h);
-  if(!m) return;
-  let e = map.get(m);
-  if(!e){ e = puttCell(); e.k = m; map.set(m, e); }
-  e.made++;
-  if(h.putts <= 1) e.one++; else e.lag++;
-}
-// The tallies that have no distance to sit under, counted onto the round's putting record
-// rather than into a range row. A conceded putt has no measured length, and filing one
-// under a range would be an inference wearing a measurement's badge:
-//   `gim`   ‚Äî given from the FIRST putt: a make he never hit, so it is not a make.
-//   `lagIn` ‚Äî given after a lag: the lag finished inside gimme range, which is the BEST
-//             proximity result there is and belongs in the same population as `lag`.
-//   `lagHoles` ‚Äî holes that took a second putt at all: the population a share is taken of.
-//   `lagN`  ‚Äî of those, the ones whose finish is known (a made distance, or conceded).
-function puttTally(P, h){
-  if(h.putts >= 2){
-    P.lagHoles++;
-    if(lagGiven(h)){ P.lagIn++; P.lagN++; }
-    else if(puttMadeK(h)) P.lagN++;
-  }
-  if(conceded(h)) P.gim++;
-}
-// Of the lags whose finish is known, how many left a putt inside three feet ‚Äî a conceded
-// one included, because nobody concedes a twenty-footer. This is the distance-control
-// number, and both halves come off the same population so it can never exceed 100%.
-function lagClose(P){
-  const t = P.dist.get('t');
-  return { in:(t ? t.lag : 0) + P.lagIn, n:P.lagN };
-}
-// In table order rather than in the order they turned up, because these are a ladder.
-const puttRows = map => PUTT_DIST.map(d => map.get(d.k)).filter(Boolean);
-// One shot's worth of club record, shared by the per-round card and the season roll-up so
-// the two can never disagree about what a club did. `over` is strokes against par on the
-// holes that club was hit ‚Äî a fairway finder that scores no better is worth knowing about.
-//
-// A club only gets credited with the results it actually produced: the fairway belongs to
-// the tee shot, and the green belongs to whatever hit at it ‚Äî which is the approach club,
-// except on a par 3, where the tee shot IS the approach. Crediting a driver with the green
-// its 7-iron hit would make every tee-club number meaningless.
-function bagShot(map, key, h, d, own){
-  let e = map.get(key);
-  if(!e){ e = { key, n:0, over:0, fwN:0, fwHit:0, fwMiss:{}, girN:0, girHit:0, girMiss:{}, noshot:0 }; map.set(key, e); }
-  e.n++;
-  if(d != null) e.over += d;
-  if(own.fw && h.fw != null){
-    e.fwN++;
-    if(h.fw) e.fwHit++; else { const k = h.fmiss || 'X'; e.fwMiss[k] = (e.fwMiss[k] || 0) + 1; }
-  }
-  if(own.green && h.gir != null){
-    e.girN++;
-    if(h.gir) e.girHit++; else { const k = h.gmiss || 'X'; e.girMiss[k] = (e.girMiss[k] || 0) + 1; }
-  }
-  // Leaving no play at the green is the tee shot's doing, so it lands on the tee club ‚Äî
-  // and it convicts a club far better than a fairway percentage does, because plenty of
-  // rough is perfectly playable and none of this is.
-  if(own.tee && h.noshot) e.noshot++;
-  return e;
-}
-const TEE_OWNS = h => ({ fw:true, green: h.par === 3, tee:true });
-const APP_OWNS = { fw:false, green:true, tee:false };
-
-function roundAnalysis(r){
-  const H = (Array.isArray(r.holes) ? r.holes : []).filter(h => h && h.par != null && h.s != null);
-  const a = { holes:H, par:roundPar(r), score:r.score ?? null, vs:roundVsPar(r),
-    mix:{ eagle:0, birdie:0, par:0, bogey:0, double:0, triple:0 },
-    byPar:{ 3:{n:0,over:0}, 4:{n:0,over:0}, 5:{n:0,over:0} },
-    putts:{ n:0, total:0, one:0, two:0, three:0, lagHoles:0, gim:0, lagIn:0, lagN:0,
-      girN:0, girTot:0, offN:0, offTot:0, threes:[], dist:new Map(), distN:0 },
-    gir:{ n:0, hit:0, miss:{}, noshot:0, noshotHoles:[] }, fw:{ n:0, hit:0, miss:{} },
-    tee:new Map(), app:new Map(),
-    scramble:{ chances:0, saved:0 }, blowups:[], nines:[] };
-  H.forEach(h => {
-    const d = h.s - h.par;
-    if(d <= -2) a.mix.eagle++; else if(d === -1) a.mix.birdie++; else if(d === 0) a.mix.par++;
-    else if(d === 1) a.mix.bogey++; else if(d === 2) a.mix.double++; else a.mix.triple++;
-    if(a.byPar[h.par]){ a.byPar[h.par].n++; a.byPar[h.par].over += d; }
-    if(d >= 2) a.blowups.push(h);
-    if(h.putts != null){
-      a.putts.n++; a.putts.total += h.putts;
-      if(h.putts <= 1) a.putts.one++; else if(h.putts === 2) a.putts.two++;
-      else { a.putts.three++; a.putts.threes.push(h); }
-      if(h.gir === true){ a.putts.girN++; a.putts.girTot += h.putts; }
-      else if(h.gir === false){ a.putts.offN++; a.putts.offTot += h.putts; }
-      puttTally(a.putts, h);
-      if(puttMadeK(h)){ bagPutt(a.putts.dist, h); a.putts.distN++; }
-    }
-    if(h.gir != null){
-      a.gir.n++;
-      if(h.gir) a.gir.hit++;
-      else {
-        // Two different faults wear the same result. A green missed from a playable
-        // position asks a club question; a green the tee shot already took away asks a
-        // driving one. Only the first belongs in the miss-direction read ‚Äî but BOTH stay
-        // in gir.n, because a miss is a miss and the flag explains it, it doesn't erase it.
-        if(h.noshot){ a.gir.noshot++; a.gir.noshotHoles.push(h.n); }
-        else { const k = h.gmiss || 'X'; a.gir.miss[k] = (a.gir.miss[k] || 0) + 1; }
-        // A missed green is an up-and-down chance however you got there, so every miss
-        // counts here: you scramble from where the ball is, not from where you meant to be.
-        a.scramble.chances++; if(d <= 0) a.scramble.saved++;
-      }
-    }
-    if(h.fw != null){
-      a.fw.n++;
-      if(h.fw) a.fw.hit++;
-      else { const k = h.fmiss || 'X'; a.fw.miss[k] = (a.fw.miss[k] || 0) + 1; }
-    }
-    if(h.tee) bagShot(a.tee, h.tee, h, d, TEE_OWNS(h));
-    if(h.app) bagShot(a.app, h.app, h, d, APP_OWNS);
-  });
-  if(!a.putts.n && r.putts != null) a.putts.total = r.putts;   // round-level count only
-  if(H.length > 9) [['Out',0,9],['In',9,18]].forEach(([lab,s,e]) => {
-    const seg = H.slice(s,e); if(!seg.length) return;
-    a.nines.push({ lab, par:seg.reduce((x,h)=>x+h.par,0), score:seg.reduce((x,h)=>x+h.s,0),
-      putts: seg.every(h => h.putts != null) ? seg.reduce((x,h)=>x+h.putts,0) : null,
-      gir: seg.filter(h => h.gir === true).length,
-      girN: seg.filter(h => h.gir != null).length,
-      fw: seg.filter(h => h.fw === true).length,
-      fwN: seg.filter(h => h.fw != null).length });
-  });
-  a.blowups.sort((x,y) => (y.s - y.par) - (x.s - x.par));
-  return a;
-}
-
-// Round-scoped coaching. Same rule as the season tips: every card carries the number
-// that triggered it, and nothing fires without enough data behind it to mean something.
-function roundTips(r, a){
-  const t = [];
-  const g = latestStats() || {};
-  const pct = (n, d) => d ? Math.round(n / d * 100) : null;
-  const missed = a.gir.n - a.gir.hit;
-
-  // Only greens you had a real play at can answer a club question.
-  const real = missed - a.gir.noshot;
-  if(a.gir.noshot >= 2)
-    t.push({ s:'warn', src:'Off the tee ‚Üí approach', h:`${a.gir.noshot} green${a.gir.noshot === 1 ? '' : 's'} the drive took away`,
-      b:`Hole${a.gir.noshot === 1 ? '' : 's'} ${a.gir.noshotHoles.join(', ')} ‚Äî no realistic play at the green once you got to the ball. These are NOT approach misses, whatever the shot that followed them looked like: the stroke was lost at the tee and only showed up one shot later. They stay out of the miss-direction read below${real ? `, which is computed over the ${real} green${real === 1 ? '' : 's'} you did have a shot at` : ''}. If this keeps recurring, the fix is a club off the tee that leaves you playing, not a different number into the green.` });
-
-  const gm = topDir(a.gir.miss);
-  if(gm && real >= 4 && gm[1] / real >= 0.4 && gm[1] >= 3){
-    const [dir, n] = gm;
-    const base = g.approach && MISS_KEY[dir] ? g.approach[MISS_KEY[dir]] : null;
-    const holes = a.holes.filter(h => h.gir === false && !h.noshot && (h.gmiss || 'X') === dir).map(h => h.n).join(', ');
-    t.push({ s:'warn', src:'Approach', h:`${n} of your ${real} playable green misses went ${MISS_LAB[dir] || dir}`,
-      b: `Holes ${holes}.${base != null ? ` Your tracked average is ${base}% ${MISS_LAB[dir]}, so this is the pattern rather than a bad day.` : ''} ${
-        dir === 'S' ? 'Short is the one miss that can never finish close ‚Äî it is where the bunkers and the false fronts live. Club to cover the BACK of the green: take the number to the flag, add the flag-to-back yardage, and pick the club that carries the middle of that window. And stop clubbing off your best strike ‚Äî the ladder numbers are carries, and a three-quarter strike out of rough is 8‚Äì10 short of them.'
-        : dir === 'Lg' ? 'Long is usually a club-selection overcorrection or an adrenaline strike. Note whether these were the holes you had a good drive on.'
-        : 'A one-sided miss on this many greens is a face-and-path pattern, not bad luck. It is a swing item ‚Äî take it to the Swing lab rather than to club selection.' }` });
-  }
-
-  const obHoles = a.holes.filter(h => h.fmiss === 'OB' || h.gmiss === 'OB');
-  if(obHoles.length)
-    t.push({ s:'warn', src:`Out of bounds ¬∑ ${obHoles.length} shot${obHoles.length === 1 ? '' : 's'}`,
-      h:`${obHoles.length * 2} strokes of penalty on hole${obHoles.length === 1 ? '' : 's'} ${obHoles.map(h => h.n).join(', ')}`,
-      b:`Stroke and distance: the penalty plus replaying the shot. ${obHoles.length * 2} strokes${a.vs != null ? ` of the ${a.vs > 0 ? '+' : ''}${a.vs} you finished on` : ''}, and none of them a golf shot. These sit inside the miss counts above as ordinary misses, which understates them ‚Äî read this line first.` });
-
-  const fm = topDir(a.fw.miss);
-  const fwMissed = a.fw.n - a.fw.hit;
-  if(fm && fwMissed >= 4 && fm[1] / fwMissed >= 0.5 && fm[1] >= 3)
-    t.push({ s:'warn', src:'Off the tee', h:`${fm[1]} of your ${fwMissed} tee misses went ${MISS_LAB[fm[0]] || fm[0]}`,
-      b:`${a.fw.hit} of ${a.fw.n} fairways${g.driving && g.driving.fairway != null ? ` against a tracked ${g.driving.fairway}%` : ''}. A miss that repeats to one side is a start-line pattern you can aim around for a round and fix in practice ‚Äî set the tee shot up to bring the ${MISS_LAB[fm[0]] === 'left' ? 'left' : 'right'} side into play and let the miss finish in the short grass.` });
-
-  // Two clubs off the tee on the same card is a controlled comparison: same day, same
-  // wind, same swing. It only speaks when both got a real run at it.
-  const teeRun = [...a.tee.values()].filter(e => e.fwN >= 3).sort((x, y) => y.fwHit / y.fwN - x.fwHit / x.fwN);
-  if(teeRun.length >= 2){
-    const best = teeRun[0], worst = teeRun[teeRun.length - 1];
-    const rate = e => Math.round(e.fwHit / e.fwN * 100);
-    if(rate(best) - rate(worst) >= 25)
-      t.push({ s:'mid', src:'Off the tee ¬∑ this card', h:`${clubName(best.key)} found ${best.fwHit}/${best.fwN} fairways ¬∑ ${clubName(worst.key)} ${worst.fwHit}/${worst.fwN}`,
-        b:`On the same day, in the same wind. ${clubName(worst.key)} holes played to ${worst.over > 0 ? '+' : ''}${(worst.over / worst.n).toFixed(1)} a hole against ${best.over > 0 ? '+' : ''}${(best.over / best.n).toFixed(1)} with the ${clubName(best.key)}${
-          worst.over / worst.n > best.over / best.n ? ' ‚Äî so the extra length bought nothing here' : ' ‚Äî so the misses cost less than the position gained, which is the case FOR keeping it in hand'}. One round is one round; the season table on Scores is where this either holds up or dissolves.` });
-  }
-
-  if(a.putts.three >= 2)
-    t.push({ s:'warn', src:'Putting ¬∑ pace', h:`${a.putts.three} three-putts ‚Äî ${a.putts.three} strokes`,
-      b:`Holes ${a.putts.threes.map(h => h.n + (puttMadeK(h) ? ` (finally holed from ${pdName(puttMadeK(h))})`
-        : h.gimme ? ' (last one given)' : '')).join(', ')}.${
-        a.putts.threes.some(h => h.gir === true) ? ' At least one came from a green hit in regulation, which is a par turned into a bogey by pace alone.' : ''} This is distance control, the open fault, and it is what the 30-ft ladder exists to measure.${
-        a.putts.threes.every(h => puttMadeK(h)) ? ` The length of the one that finally dropped is the useful part: a three-putt that ended with a tap-in was two bad lags, and one that ended from six feet was a short putt missed after them.` : ''}` });
-
-  if(a.putts.girN >= 3 && a.putts.offN >= 3){
-    const on = a.putts.girTot / a.putts.girN, off = a.putts.offTot / a.putts.offN;
-    t.push({ s: on > 2.05 ? 'warn' : 'good', src:'Putting ¬∑ split', h:`${on.toFixed(2)} putts on greens hit ¬∑ ${off.toFixed(2)} on greens missed`,
-      b:`${on > 2.05 ? `Over two putts a green when you hit it in regulation is the putter, not the short game ‚Äî ${a.putts.girN} greens hit and you did not convert one of them into a one-putt beyond the birdie.`
-        : `At or under two putts a green when you hit it, which is where it should be.`} Off the green, ${off.toFixed(2)} means your chips are finishing at two-putt range rather than tap-in range ‚Äî every tenth you take off that number is a shot a round.` });
-  }
-
-  if(a.putts.n >= 9){
-    const onePc = pct(a.putts.one, a.putts.n), base = g.putting && g.putting.one;
-    t.push({ s: a.putts.one <= 1 ? 'mid' : 'good', src:'Putting ¬∑ conversion', h:`${a.putts.one} one-putt${a.putts.one === 1 ? '' : 's'} in ${a.putts.n} holes`,
-      b:`${onePc}% of holes${base != null ? ` against a tracked ${base}%` : ''}. ${a.putts.one <= 1
-        ? `Holing out is where the strokes are: two-putting everything from everywhere still costs you the round. If the come-backers are going in but nothing from range is, that is a pace-and-read problem, not a stroke problem ‚Äî and it matches "not dropping the 10‚Äì20 footers".`
-        : `Converting at this rate is what keeps a scrambling round respectable.`}` });
-  }
-
-  if(a.scramble.chances >= 6){
-    const sp = pct(a.scramble.saved, a.scramble.chances);
-    const base = g.upDownsPerRound != null && g.gir != null
-      ? Math.round(g.upDownsPerRound / (18 * (1 - g.gir / 100)) * 100) : null;
-    t.push({ s: sp >= 30 ? 'good' : 'warn', src:'Scrambling', h:`${a.scramble.saved} of ${a.scramble.chances} greens missed and still saved ¬∑ ${sp}%`,
-      b:`With ${a.gir.hit} greens hit, the short game played ${a.scramble.chances} holes of this round${base != null ? `. Your tracked rate is about ${base}%` : ''}. At this green rate, up-and-down percentage moves your score more than ball-striking does ‚Äî it is the cheapest thing on the list to practise.` });
-  }
-
-  if(a.nines.length === 2){
-    const [o, i] = a.nines, d = (i.score - i.par) - (o.score - o.par);
-    if(Math.abs(d) >= 4) t.push({ s:'mid', src:'Shape of the round', h:`The ${d > 0 ? 'back' : 'front'} nine cost you ${Math.abs(d)} more`,
-      b:`Out ${o.score} (${o.score - o.par > 0 ? '+' : ''}${o.score - o.par}) ¬∑ In ${i.score} (${i.score - i.par > 0 ? '+' : ''}${i.score - i.par}). A gap this size inside one round is usually fitness, focus or a swing thought that drifted ‚Äî not a different golfer. Worth noting what changed at the turn.` });
-  }
-
-  if(a.blowups.length){
-    const cost = a.blowups.reduce((x,h) => x + (h.s - h.par - 1), 0);
-    t.push({ s:'warn', src:'Biggest single lever', h:`${a.blowups.length} hole${a.blowups.length === 1 ? '' : 's'} of double or worse ¬∑ ${cost} stroke${cost === 1 ? '' : 's'} over bogey`,
-      b:`${a.blowups.map(h => `hole ${h.n} (par ${h.par}, ${h.s})${h.note ? ` ‚Äî &ldquo;${esc(h.note)}&rdquo;` : ''}`).join(' ¬∑ ')}. Turning each of these into a bogey is ${cost} shots without hitting one better shot. On a hole that starts badly, take the punch-out.` });
-  }
-
-  // Stroke index tiers. A card where the easy holes cost as much as the hard ones is
-  // a scoring problem rather than a ball-striking one ‚Äî the course offered and you passed.
-  if(a.holes.length >= 18 && a.holes.every(h => h.si)){
-    const tier = lo => a.holes.filter(h => h.si >= lo && h.si <= lo + 5)
-      .reduce((x,h) => x + (h.s - h.par), 0);
-    const hard = tier(1), mid = tier(7), easy = tier(13);
-    t.push({ s: easy >= hard ? 'warn' : 'mid', src:'By stroke index',
-      h:`Hardest six +${hard} ¬∑ middle six +${mid} ¬∑ easiest six +${easy}`,
-      b:`${easy >= hard
-        ? `The six holes the card says are easiest cost you as much as the six hardest. That is not ball-striking ‚Äî the hard holes are being played about as well as they can be. It is scoring: the give-away holes are not giving anything back, and those are where a round gets better without a better swing.`
-        : `The gradient runs the right way ‚Äî the easy holes are cheaper than the hard ones, which is what a stroke index is supposed to produce.`} On the six easiest, the plan is a fairway, a middle-of-the-green number and a two-putt; there is nothing to attack.` });
-  }
-
-  const good = a.mix.par + a.mix.birdie + a.mix.eagle;
-  if(a.holes.length >= 9 && good / a.holes.length >= 0.28)
-    t.push({ s:'good', src:'Protect this', h:`${good} holes at par or better`,
-      b:`${Math.round(good / a.holes.length * 100)}% of the card${a.mix.birdie + a.mix.eagle ? `, including ${a.mix.birdie + a.mix.eagle} under par` : ''}. The base game showed up ‚Äî the gap in this round is the tail, not the average.` });
-
-  const order = { warn:0, mid:1, good:2 };
-  return t.sort((x,y) => order[x.s] - order[y.s]);
-}
-
-// This round's rates against whatever tracked baseline exists, so a number has
-// something to be good or bad against.
-function roundVsBaseline(a){
-  const g = latestStats();
-  if(!g) return '';
-  const pct = (n, d) => d ? n / d * 100 : null;
-  const rows = [
-    ['Greens in reg.', a.gir.n ? pct(a.gir.hit, a.gir.n) : null, g.gir, 'up'],
-    ['Fairways hit', a.fw.n ? pct(a.fw.hit, a.fw.n) : null, g.driving && g.driving.fairway, 'up'],
-    ['Putts', a.putts.total || null, g.putts, 'down'],
-    ['One-putts', a.putts.n ? pct(a.putts.one, a.putts.n) : null, g.putting && g.putting.one, 'up'],
-    ['Three-putts', a.putts.n ? pct(a.putts.three, a.putts.n) : null, g.putting && g.putting.three, 'down'],
-    ['Par or better', a.holes.length ? pct(a.mix.par + a.mix.birdie + a.mix.eagle, a.holes.length) : null, parOrBetter(g), 'up'],
-    ['Double or worse', a.holes.length ? pct(a.mix.double + a.mix.triple, a.holes.length) : null, blowUps(g), 'down'],
-  ].filter(r => r[1] != null && r[2] != null);
-  if(rows.length < 3) return '';
-  const fmt = (k, v) => k === 'Putts' ? (+v).toFixed(v % 1 ? 1 : 0) : `${(+v).toFixed(0)}%`;
-  return `
-  <h2>This round vs your baseline</h2>
-  <div class="card">
-    <table><tr><th>Metric</th><th>This round</th><th>${esc(g.label || 'Tracked')}</th><th>Œî</th></tr>
-      ${rows.map(([k, now, was, dir]) => {
-        const d = now - was, better = dir === 'up' ? d > 0 : d < 0;
-        return `<tr><td class="sm"><b>${k}</b></td><td><b>${fmt(k, now)}</b></td>
-          <td class="sm faint">${fmt(k, was)}</td>
-          <td class="sm"><b style="color:${Math.abs(d) < 0.5 ? 'var(--faint)' : better ? 'var(--green)' : 'var(--burg)'}">${
-            Math.abs(d) < 0.5 ? '‚Äî' : `${d > 0 ? '+' : ''}${d.toFixed(Math.abs(d) < 10 ? 1 : 0)}`}</b></td></tr>`;
-      }).join('')}
-    </table>
-    <p class="sm faint" style="margin-top:8px">One round against ${g.roundsScoring || g.rounds || 'the'} tracked rounds ‚Äî read the direction, not the decimals.</p>
-  </div>`;
-}
-
-// ----- The round card, drawn as a card (Aug 27 2026, Jack's redesign) -----
-// Everything below this line is PRESENTATION over `roundAnalysis()` ‚Äî it counts nothing of
-// its own, on purpose. Two numbers disagreeing about the same round would be worse than no
-// numbers, so a new block here is always a reader over `a`, never a fourth place that walks
-// the hole array. Same rule `gameAreas()` follows on Coach.
-
-// Scorecard convention, and the only place in the app that draws it: circle under par,
-// square over, doubled for two or more either way. `mark()` inside roundView() draws the
-// same four states for the detail table ‚Äî one vocabulary, two sizes.
-const SC_MARK = h => { const d = h.s - h.par;
-  return d <= -2 ? 'eag' : d === -1 ? 'bird' : d === 0 ? 'par' : d === 1 ? 'bog' : 'dbl'; };
-
-// One nine, as a scorecard: five rows sharing one set of column widths, so HOLE, PAR, SI,
-// SCORE and PUTTS line up under each other the way they do on paper. Each row hides itself
-// when the card never carried it ‚Äî a score-only round still draws, it just draws less.
-function cardBlock(hs, lab){
-  const anySI = hs.some(h => h.si != null), anyPutt = hs.some(h => h.putts != null);
-  const allPutt = hs.every(h => h.putts != null);
-  const cells = (cls, f) => hs.map(h => `<div class="scc ${cls}">${esc(f(h))}</div>`).join('');
-  const tot = f => hs.reduce((x, h) => x + (f(h) || 0), 0);
-  return `<div class="scblk">
-    <div class="scr"><div class="sck">HOLE</div>${cells('n', h => h.n ?? '')}<div class="sct lab">${esc(lab)}</div></div>
-    <div class="scr"><div class="sck">PAR</div>${cells('p', h => h.par)}<div class="sct">${tot(h => h.par)}</div></div>
-    ${anySI ? `<div class="scr"><div class="sck">SI</div>${cells('si', h => h.si ?? '')}<div class="sct"></div></div>` : ''}
-    <div class="scr"><div class="sck">SCORE</div>${hs.map(h =>
-      `<div class="scc"><span class="scm ${SC_MARK(h)}">${h.s}</span></div>`).join('')}<div class="sct big">${tot(h => h.s)}</div></div>
-    ${anyPutt ? `<div class="scr"><div class="sck">PUTTS</div>${cells('pu', h => h.putts ?? '')}<div class="sct">${
-      allPutt ? tot(h => h.putts) : ''}</div></div>` : ''}
-  </div>`;
-}
-// The round in eighteen bars. They grow from a FIXED 48px track rather than being scaled
-// to fill one, so every bar on the card shares a baseline and the score row underneath
-// reads as a row ‚Äî the whole point of the graphic is the shape of the round at a glance.
-function roundBars(a){
-  if(!a.holes.length) return '';
-  const max = Math.max(...a.holes.map(h => h.s));
-  return `<div class="rdbars">${a.holes.map(h => `<div class="rdb">
-    <div class="n">${h.n ?? ''}</div>
-    <div class="tr"><i class="${SC_MARK(h)}" style="height:${Math.max(8, Math.round(h.s / max * 100))}%"></i></div>
-    <div class="s">${h.s}</div></div>`).join('')}</div>`;
-}
-// Where the greens went, as a picture. DIRECTIONS ONLY ‚Äî `topDir()`'s rule, drawn: OB is
-// where a ball finished but it is not a way to miss, so it is priced in the caption in
-// strokes instead of taking a cell, and a green the drive already took away is counted
-// beside the map rather than inside it, because it asks a driving question and not a club
-// one. Both of those are the same distinctions the round's own findings draw.
-function missMap(a){
-  if(!a.gir.n) return '';
-  const m = a.gir.miss, at = k => m[k] || 0;
-  const peak = Math.max(1, ...DIRS.map(at));
-  const lvl = v => !v ? 0 : v >= peak ? 3 : v >= peak / 2 ? 2 : 1;
-  const cell = k => !k ? '<div class="mmc off"></div>'
-    : k === 'H' ? `<div class="mmc hit"><b>${a.gir.hit}</b><i>hit</i></div>`
-    : `<div class="mmc l${lvl(at(k))}"><b>${at(k) || '¬∑'}</b><i>${esc(MISS_LAB[k])}</i></div>`;
-  const ob = (a.holes.filter(h => h.gmiss === 'OB').length);
-  const foot = [`Centre is a green hit`,
-    a.gir.noshot ? `${a.gir.noshot} the drive left no play at` : '',
-    ob ? `${ob} out of bounds ¬∑ ${ob * 2} strokes` : '',
-    at('X') ? `${at('X')} recorded without a direction` : ''].filter(Boolean).join(' ¬∑ ');
-  return `<div class="card mmap">
-    <div class="rdl">Miss map</div>
-    <div class="mmg">${['', 'Lg', '', 'L', 'H', 'R', '', 'S', ''].map(cell).join('')}</div>
-    <p class="rdf">${esc(foot)}. Directions only ‚Äî out of bounds is a price, not a way to miss.</p>
-  </div>`;
-}
-// The distances he actually holed from, which is the question "how many putts" cannot ask.
-// Reads `bagPutt()`'s `made` column through the same map the by-distance table uses, so
-// the two can never disagree; the longest one is called out because it is the ceiling of
-// the day and a single number he will remember.
-function madeFrom(P){
-  const rows = puttRows(P.dist);
-  const made = rows.filter(e => e.made);
-  if(!made.length) return '';
-  const peak = Math.max(...made.map(e => e.made));
-  const longest = made[made.length - 1];
-  return `<div class="card mfrom">
-    <div class="rdl">Putts made from</div>
-    <div class="mfl">${made.map(e => `<div class="mfr">
-      <span class="d">${esc(PD[e.k].lab)}‚Ä≤</span>
-      <span class="b"><i style="width:${Math.round(e.made / peak * 100)}%"></i></span>
-      <span class="n">${e.made}</span></div>`).join('')}</div>
-    <p class="rdf">Longest holed ¬∑ ${esc(PD[longest.k].lab)} ft${
-      longest.k === PUTT_DIST[PUTT_DIST.length - 1].k ? '' : ` ¬∑ nothing dropped beyond it`}.</p>
-  </div>`;
-}
-// By club, on this card alone. "In play" is fairways for a club hit off a par 4 or 5 and
-// greens for one hit off a par 3 ‚Äî on a par 3 the tee shot IS the approach ‚Äî which is the
-// same split `clubTables()` makes for the season, computed off the same `bagShot()` record.
-function roundClubs(a){
-  const tee = [...a.tee.values()].sort((x, y) => y.n - x.n);
-  const app = [...a.app.values()].filter(e => e.girN).sort((x, y) => y.n - x.n);
-  if(!tee.length && !app.length) return '';
-  const pct = (n, d) => d ? `${Math.round(n / d * 100)}%` : '‚Äî';
-  const row = (e, kind) => {
-    const par3 = kind === 'tee' && !e.fwN && e.girN;
-    const n = kind === 'app' || par3 ? e.girN : e.fwN;
-    const hit = kind === 'app' || par3 ? e.girHit : e.fwHit;
-    const miss = kind === 'app' || par3 ? e.girMiss : e.fwMiss;
-    const top = topDir(miss);
-    const bad = [e.noshot ? `${e.noshot} dead` : '',
-      (miss.OB || 0) ? `${miss.OB} OB` : ''].filter(Boolean).join(' ¬∑ ');
-    return `<div class="rcr">
-      <span class="c">${esc(clubName(e.key))}${par3 ? '<i> par 3s</i>' : ''}</span>
-      <span class="n">${e.n}</span>
-      <span class="p">${n ? `${pct(hit, n)} <i>${hit}/${n}</i>` : '‚Äî'}</span>
-      <span class="t">${top ? `${top[1]} ${esc(MISS_LAB[top[0]] || top[0])}` : '‚Äî'}${
-        bad ? ` <b>${esc(bad)}</b>` : ''}</span></div>`;
-  };
-  return `${tee.length ? `<div class="rchead"><span class="c">Off the tee</span><span class="n">shots</span>
-      <span class="p">in play</span><span class="t">tendency</span></div>
-    ${tee.map(e => row(e, 'tee')).join('')}` : ''}
-  ${app.length ? `<div class="rchead" style="margin-top:10px"><span class="c">Into the green</span><span class="n">shots</span>
-      <span class="p">greens</span><span class="t">tendency</span></div>
-    ${app.map(e => row(e, 'app')).join('')}` : ''}
-  <p class="rdf">"In play" is the fairway for a club hit off a par 4 or 5 and the green for one
-    hit off a par 3. <b>Dead</b> is a tee shot that left no play at the green; <b>OB</b> is two
-    strokes each. This card only ‚Äî the season version is on Cards.</p>`;
-}
-
-function roundView(i){
-  const r = S.rounds[+i];
-  if(!r) return scores();
-  const a = roundAnalysis(r);
-  const tips = roundTips(r, a);
-  const played = S.courses.find(c => (c.name || '').toLowerCase() === (r.course || '').toLowerCase());
-  // Traditional card markers: circle under par, square over.
-  const mark = h => {
-    const d = h.s - h.par;
-    const cls = d <= -2 ? 'eag' : d === -1 ? 'bird' : d === 0 ? 'par' : d === 1 ? 'bog' : 'dbl';
-    return `<span class="mark ${cls}">${h.s}</span>`;
-  };
-  // The club sits under the result, so one column answers both "what did you hit" and
-  // "where did it finish" without a sixth column on a phone-width card.
-  const res = (v, missKey, club, noshot) => {
-    const out = v === true ? '<span class="res ok">‚úì</span>'
-      // On a conceded green the direction is beside the point ‚Äî the headline fact about
-      // the hole is that the tee shot ended it.
-      : v === false ? `<span class="res no${noshot ? ' ns' : ''}">${noshot ? 'no shot' : (MISS_LAB[missKey] || '‚úó')}</span>`
-      : '<span class="faint">¬∑</span>';
-    return club ? `${out}<span class="cl">${esc(clubTag(club))}</span>` : out;
-  };
-  const subRow = n => `<tr class="sub"><td>${n.lab}</td><td>${n.par}</td><td>${n.score}</td>
-    <td>${n.putts ?? ''}</td><td>${n.girN ? n.gir : ''}</td><td>${n.fwN ? n.fw : ''}</td></tr>`;
-  const rows = [];
-  a.holes.forEach((h, idx) => {
-    rows.push(`<tr data-review-hole="${h.n ?? idx + 1}"><td><b>${h.n ?? idx + 1}</b>${h.si ? `<span class="si"> ${h.si}</span>` : ''}${
+Y™Áäx-ÆÈ‹j◊ù¢Îi∫⁄+äßj[hëÈ‹¢ÈÌ€è=ÁDËµ©h∫⁄n∂XßzÕK àÿYYHH8†%òX⁄…‹»€€à€€[X[ôŸ[ù\ãàò[ö[HîÀÿÿ[›‹òYŸKõ»òX⁄Ÿ[ôà
+ã¬äù[ò›[€ä
+^¬â›\ŸH›öX›	Œ¬Çò€€ú›◊“—VHH	ÿÿYYZW›åIŒ¬ò€€ú›ì’PìT»H¬à…›ôYK\]…À	ÃÀ\]…◊K…‹⁄‹ù\]…À	‘⁄‹ù]…◊K…ÿù[öŸ\ú…À	–ù[öŸ\ú…◊Kà…€Ÿôã]YIÀ	”ŸôàHYI◊K…ÿ\õÿX⁄	À	–\õÿX⁄	◊K…ÿ⁄\[ô…À	–⁄\[ô…◊Kà…›ŸYŸKY\›[òŸIÀ	’ŸYŸH\›[òŸI◊K…€Y[ù[	À	”Y[ù[	◊KóN¬ò€€ú›RT‘◊–÷P”HH……À	€XZŸIÀ	”	À	‘âÀ	‘…À	”…◊N»À»KYù\›]\¬ãÀ»›»€ô»H]ÿ\Àà€ôH\€àH‹ôY[ã[ô]\»⁄]\õú»H]€›[ù[ù»BãÀ»][ô»›]\›XŒàHã\]úõ€HôY]\»H€€Ÿ€H[ôHã\]úõ€HH\»Hõ‹YãÀ»⁄›[ôH]€›[ù[€ôHÿ[õõ›[[H\\ùÇãÀ¬ãÀ»Hõ›[ô\öY\»\ôHõ›Ÿ[ô\öX»8†%]ô\ûH€ôHŸà[H\»H[ôH\»õ⁄ôX›[ôXYHò]‹ÀãÀ»⁄X⁄\»⁄]XZŸ\»HùX⁄Ÿ]»€‹ù€›[ù[ôŒÇãÀ»8¢i»\Z[àò[ôŸKàŸ\\ò][ô»]›‹»⁄[[Y\»[ôõ][ô»HXZŸHò]K[ôHZ\‹¬ãÀ»úõ€H[ú⁄YH]\»HôX[]ô[ùò]\à[àHõ›[ô[ô»\úõ‹ãÇãÀ»8†$ÕàHÿ€‹ö[ô»õ€ôK[ôT»õ€ôNàHKYù\›⁄]»[àHZYHŸà][ôBãÀ»YùZ\‹»€à⁄‹ù]»\»Hõ›Y⁄[[ôHŸàH⁄€H]\àÿYÿKà⁄\ôBãÀ»⁄‹ù]»8†%H‹›õ⁄ŸX\Y\ÀÇãÀ»¯†$ÃLàHXZŸK\€€YH⁄[ô›»8†%ö\ôYH⁄[òŸ\»[ô\àÿ]ô\Àà⁄\ôH›õ⁄Ÿ\»\ôH€€ãÇãÀ»L¯†$Ãå€À\]\úö]‹ûH⁄\ôHHXZŸH\»Hõ€ù\ÀàHö\ú›ôX[XŸH\›ÇãÀ»åx†$ÃÃY»õ‹\éàôYK\]ö\⁄»›\ù»»€[Xà›Y\Hõ›Y⁄\ôKÇãÀ»Ã
+»HY\à\›[òŸKàHÃYù‹ö[ô\»YX\›\ôY\ôK€»H€ãX€›\úŸHù[Xô\ÇãÀ»\»\ôX›H€€\\òXõH»HòX›XŸH€ôHõ‹àHö\ú›[YKÇò€€ú›U—T’H¬à»Œâ›	ÀXéâ¯¢i…Àò[YNâ⁄[ú⁄YH»ù	»Kà»Œâ‹…ÀXéâÕ8†$ÕâÀò[YNâÕ8†$Õàù	»Kà»Œâ€IÀXéâÕ¯†$ÃLâÀò[YNâÕ¯†$ÃLàù	»Kà»Œâ€	ÀXéâÃL¯†$Ãå	Àò[YNâÃL¯†$Ãåù	»Kà»Œâﬁ	ÀXéâÃåx†$ÃÃ	Àò[YNâÃåx†$ÃÃù	»Kà»Œâﬁ	ÀXéâÃÃ
+…Àò[YNâ€›ô\àÃù	»KóN¬ò€€ú›HÿöôX›ôúõ€Q[ùöY\ U—T’õX\
+OàŸöÀJJN¬ãÀ»H€€òŸYY]àH\›€ôH€àH€Hÿ\»⁄]ô[àò]\à[à€Yà]›[”’Sï¬ãÀ»8†%Hÿ€‹ô\»]]ô\ûXõŸHŸ\»8†%ù]]ÿ\»ô]ô\à›ùX⁄À[ôHYôô\ô[òŸHX]\ú»[ÇãÀ»€»‹‹⁄]H\ôX›[€úŒÇãÀ»0≠»⁄]ô[àúõ€HHíTî’]]\»HXZŸHHô]ô\à]à€›[ù[ô»]\»€ôH[ôõ]\¬ãÀ»^X›HHù[Xô\à\»⁄€Hõ⁄ôX›\»Xõ›]
+H⁄‹ù€ô\ K€»]€€Y\»›]ŸÇãÀ»HXZŸHò]H[ù\ô[Hò]\à[àôZ[ô»‹ôY]Yà[›Hÿ[õõ›YX\›\ôHH]]ãÀ»ÿ\»õ›][\Yàö[H\»⁄[ôÀ\YY»Hÿ€‹ôXÿ\ôÇãÀ»0≠»⁄]ô[àYù\àHQÀ]\»H‹‹⁄]H8†%]öY[òŸHHö\ú›]ö[ö\⁄Y[ú⁄YBãÀ»⁄[[YHò[ôŸK⁄X⁄\»H€‹Ÿ\›[ô»»Hõﬁ[Z]HYX\›\ô[Y[ùHÿ\ô\»[ôãÀ»H›òZY⁄⁄[àõ‹àH‹[à\›[òŸKX€€ùõ€ò][Çò€€ú›€€òŸYYHOàHZô⁄[[YH	âàú]»OOHN»À»HXZŸHHô]ô\à]ò€€ú›Y—⁄]ô[àHOàHZô⁄[[YH	âàú]»èHé»À»HY»]ö[ö\⁄Y[ú⁄YHH⁄\ò€BãÀ»H€HôX€‹ô»”ëH]ûH\›[òŸH
+Ÿ\åçà8†%òX⁄…‹»ÿ[à›[]»[ôBãÀ»[ô›ŸàH]H€Y[ôõ›[ô»[ŸH»\€àH‹ôY[äNÇãÀ»X8†%H]]—SïSãà€àH€ôK\]€H]\»H€õH]\ôHÿ\Œ»€àBãÀ»€ôŸ\à€ôH]\»⁄\ôHHQ»Yù[K⁄X⁄\»Hõﬁ[Z]HYX\›\ô[Y[ù[ôãÀ»H€õH€ôHHÿ€‹ôXÿ\ô\»]ô\àôY[àXõH»õŸXŸKÇãÀ»⁄[[YX8†%H\›€ôHÿ\»⁄]ô[à[ú›XYŸà€Y€»\ôH\»õ»XYH\›[òŸKàYù\ÇãÀ»HY»]YX[ú»]ö[ö\⁄Y[ú⁄YH⁄[[YHò[ôŸK⁄X⁄\»Hô\›õﬁ[Z]BãÀ»ô\›[€àHY\àò]\à[àHZ\‹⁄[ô»€ôKÇãÀ»8†%⁄\ôHHö\ú›]›\ùYàëUTëQ\»[à[ú]àH]ôHŸŸŸ\à›‹YãÀ»\⁄⁄[ô»€àŸ\åçãà€ÿ\ô»›[ÿ\úûH][ô›[ô[ô\à]€»BãÀ»ôXY\àô[›»›^\»8†%ù]õ›[ô»€€\]\»Hò]HŸôà][ûH[‹ôKôXÿ]\ŸHBãÀ»öY[]›‹»ôZ[ô»ŸŸŸY€›[›\ù⁄\ŸHöYùHù[Xô\à]ZY]KÇãÀ»õ›ôXY\ú»€\ò]Hÿ\ô»‹ö][àôYõ‹ôHX^\›Y⁄\ôHH⁄[ô€H\›[òŸHÿ\¬ãÀ»›‹ôY\»⁄]]ô\àH]€›[ù8†%õ›[ô»\»»ôHZY‹ò]Y»ŸY\€›[ù[ôÀÇò€€ú›]ö\ú›»HOà
+
+ú]»èHà»úà
+úHú
+JHù[
+N¬ò€€ú›]XYR»HOà
+ô⁄[[YH»ù[à
+
+ú]»OOHH»
+úHú
+HàúJHù[
+JN¬ãÀ»“HTëHT»ì»PR—HêUHñHT’Sê—HSñHS‘ëKà]€⁄»Hö\ú›]	‹»\›[òŸH¬ãÀ»ôX€‹ôH]HRT‘—Q⁄]H\›[òŸH€à]»⁄]›]]öY[]ô\ûH]Hÿ\ôãÀ»ÿ\úöY\»H\›[òŸHõ‹à\»€ôH]Ÿ[ù[ã€»HXZŸHò]H€€\]Y›ô\à[Hÿ[à€õBãÀ»]ô\à€[Xà›ÿ\ôL	Kà]\»õ›Hò]HŸ][ô»ô]\ã]\»H[õ€Z[ò]‹à€⁄[ô¬ãÀ»Z\‹⁄[ô»8†%Hÿ[YHòZ[\ôH\»HMÃIHY»ò]K€ôH›\X\õY\ãà€»HY\àô[›¬ãÀ»€›[ù»€Y]»[ô⁄\ôHHY»Yù[K[ôÿ^\»€Œ»H⁄‹ù\]€€ùô\ú⁄[€ÇãÀ»Ÿ[ùòX⁄»»HKYùX]\›⁄X⁄\»⁄\ôH]]ôYôYõ‹ôH]Y»åÇò€€ú›ò[YHH»Oà
+⁄◊H»ò[YNö»JKõò[YN¬ãÀ»HY[ù[Xâ‹»õÿÿXù[\ûKàHö^YŸ][àòX⁄…‹»›€à€‹ôÀ€»]íH€›\Ÿ]ûBãÀ»›\Y›YôààôX€€Y\»€€Y][ô»€›[ùXõHX‹õ‹‹»õ›[ô»[ú›XYŸàHôY[[ô»]ôXY¬ãÀ»Hÿ[YH]ô\ûH[YKàXX⁄€ôHÿ\úöY\»]»QãUSà8†%Hô\‹€úŸH\»X⁄YY]€YKãÀ»ŸôàH€›\úŸK⁄X⁄\»H⁄€H⁄[ùŸàX⁄Y[ô»][àYò[òŸNà€àHMYBãÀ»\ôH\»õ»X⁄Y[ôÀ€õH⁄[ô»⁄]]ô\àÿ\»[ôXYHX⁄YYÇò€€ú›QSïS’íQ——Tî»H¬à»Œâ€‹[ô\âÀXéâ”‹[ö[ô»YH⁄›	Àõ\òéâ’ô]»Hö\ú›€ôH]ÿ^H[ô]ò]Y[›KâÀà[éâ’HôX€›ô\ûHôYY»õ»ö^[ô»8†%[›\àŸX€€ô€H^\»][›\àŸX\€€à]ô\òYŸH[ôHòY‹[ö[ô»Ÿ\»õ›ôYX›Hõ›[ôà⁄]H‹[ö[ô»€H€‹›»\»H‹[ö[ô»€K⁄X⁄XZŸ\»\»H–TìKUT[ôö\ú›\›⁄[ô»õÿõ[Kõ›Hô\⁄[Y[òŸH€ôKàö[YHHôY[ôYõ‹ôHHYHò]\à[à[ù[ô»õ‹à]€àH[ô€€[Z]»Hù[\à›⁄[ô»€àH\›[ú›XYŸàHÿYôH⁄‹ù€ôH8†%[›\à›€à€€àZ[ôõ›Hÿ^\»H›òZY⁄ö]ô\àò[ôYY»H”ë—Tà›⁄[ôÀàYàHZ\‹»\»€⁄[ô»€€Y]⁄\ôH[›\à\›X[Z\‹»Ÿ\»õ›]\»H›⁄[ô»]Y\›[€à[ô]ôYY»ö[HŸàH””›⁄[ôÀõ›Hÿ\õYY]\€ôKâ»Kà»Œâ‹€›…ÀXéâ‘€›»^IÀõ\òéâ’ÿZ][ô»€à]ô\ûH⁄›»H‹õ›\ZXYô]ô\à[›ô\ÀâÀà[éâ—»õ››[ô›ô\àHò[X\õKàÿZ]U–VHúõ€H]8†%X⁄»H€Xà[ôH\ôŸ]⁄[H[›HÿZ][ô›\ùHõ›][ôH€õH⁄[à]\»X›X[H[›\à\õãà[›\àõ›][ôH\»Hö^Y[ô›»]HÿZ][ô»\[à›]⁄YH]ô]ô\à[ú⁄YH]â»Kà»Œâ‹\ùô\âÀXéâ‘ò[ô€H\ùô\ú…Àõ\òéâ–⁄]\ã⁄[[Y\À€€Y[€ôH›[ô[ô»[à[›\à^Y[[ôKâÀà[éâ’H€õHô\‹€úŸH]òZ[XõH\»⁄\ôH[›H›[ôà[›ôH€»^H\ôH›]Ÿà[›\à^Y[[ôHõ‹àH[àŸX€€ô»H⁄›ZŸ\Àà[›HŸ]€ôH€€[Y[ù[à[›\àXY[à]\»H€›\úŸH€€ô][€à8†%[›H»õ›\ô›YH⁄]⁄[ôZ]\ãàÿ]⁄HíTî’ëQH”T»‹X⁄YöXÿ[Nà€àH€ôHÿ\ô⁄\ôH[›HŸŸŸY\À]\»⁄\ôHH[XYŸHŸ[ùâ»Kà»Œâÿ€‹⁄[ô…ÀXéâ—Yõ›€‹ŸIÀõ\òéâ’\[àHX]⁄‹àH€€Ÿÿ€‹ôH€⁄[ôÀ[ô]€\YâÀà[éâ‘ÿ[YHõ›][ôKÿ[YH\ôŸ]Ÿ[X›[€à\»Hõô€H8†%€‹⁄[ô»\»õ›HYôô\ô[ù⁄⁄[]\»HôYù\ÿ[»⁄[ôŸH[û][ôÀàH€ôHY⁄][X]H⁄[ôŸNà€ôH[‹ôH€XãZ[YY]HZYKà]\»õ›X›[ô»HXY€‹úôX›N»›Y\ö[ô»\»õ›â»Kà»Œâÿ[ôŸ\âÀXéâ–[ôŸ\à]H⁄›	Àõ\òéâ“]ÿ\»€€ôK[ô[›Hÿ\úöYY]»Hô^€ôKâÀà[éâ’[àX\ô»Ÿàÿ[⁄[ôÀ[àH€Xà€Ÿ\»òX⁄»[àHòY»[ôH€H\»ö[YàHù[H\»õ›ô»õ›ôH[ô‹ûHà8†%]\»][ôŸ\àŸ]»H€€ùZ[ô\à⁄][à[ô[›Hÿ[àŸYKâ»Kà»ŒâŸöYù	ÀXéâ–⁄X⁄ŸY›]	Àõ\òéâ’Ÿ[ùõ›Y⁄H[›[€ú»8†%õ»\ôŸ]õ»õ›][ôKâÀà[éâ–][ù[€à€€Y\»òX⁄»õ›Y⁄H\ôŸ]õ›õ›Y⁄Yôõ‹ùàô^⁄›ò[YHH€X[\›[ô»[›Hÿ[àŸYH8†%Húò[ò⁄H[›Ÿ\à[ôKHù[öŸ\à\8†%›]›YàYà[›Hÿ[õõ›ò[YH€ôK[›H\ôHõ›[àHõ›[ôY]â»Kà»Œâ‹ÿ€‹ôIÀXéâ‘ÿ€‹ôHX]	Àõ\òéâ–Y[ô»Hõ›[ô\⁄[H]ÿ\»›[€⁄[ôÀâÀà[éâ–€€ùô\ù]»H€H[àúõ€ùŸà[›Nà⁄]ù[Xô\àXZŸ\»T»€Hö[ôO»^H]€ôKàH\ö]Y]X»›[€‹ö‹»[àHÿ\ãâ»Kà»Œâ‹ù\⁄	ÀXéâ‘ù\⁄Y	Àõ\òéâ‘^YY]ZX⁄Ÿ\à[à[›\à›€àõ›][ôKâÀà[éâ–€›[ùHôX]»8†%ôXY€ôHôZX\úÿ[›\[ã€Ààù\⁄[ô»⁄›‹»\\»HôZX\úÿ[\ÿ\X\ö[ô»ö\ú›]ô\ûH[YK€»]\»H€ôH»⁄X⁄Àâ»Kà»ŒâÿõŸIÀXéâ’\ôY0≠»[ô‹ûH0≠»›	Àõ\òéâ–H\⁄Xÿ[›]HŸX\ö[ô»HY[ù[€‹›[YKâÀà[éâ—X]ôYõ‹ôH[›HXY€õ‹ŸH[›\àXYàÿ]\à]]ô\ûHYHúõ€HHL[ôõ€Ÿ]H\õà⁄]\à[›Hÿ[ù]‹àõ›8†%H›[ô[ô»YöXŸH\»]H›Ÿà]K\õ›[ô€€\Ÿ\»\ôHõ€Ÿ›Yÿ\àò]\à[à⁄\òX›\ãà]\»Ÿ[ô\ò[òX›XŸKõ›€€Y][ô»YX\›\ôYXõ›][›Kâ»KóN¬ò€€ú›QSïS’“SàH÷…€‹[âÀ	”‹[ö[ô»€\…◊K…€ZY	À	”ZYI◊K…ÿ€‹ŸIÀ	–€‹⁄[ô»›ô]⁄	◊K…ÿYù\âÀ	–Yù\àHõ›À]\	◊WN¬ò€€ú›ì–’T◊”PàH……À	—€€ôIÀ	‘]⁄IÀ	“[à[ô›]	À	—€€Ÿ	À	”ÿ⁄ŸY[â◊N¬ãÀ»ù[\\»“U–P“X[à›Àöú»8†%^I‹ôHHÿ[YHùZ[[ôH]HXà⁄›‹»\¬ãÀ»€ôH€»ö\»Hô]»ô\ú⁄[€àX›X[H€àH€ôO»à\»[ú›Ÿ\òXõH⁄]›]›Y\‹⁄[ôÀÇò€€ú›ïRSH	›åMçIŒ¬ãÀ»H\	‹»›€à⁄[ôŸ[ŸÀà€ÿX⁄YôYYöú€€àÿ\úöY\»UH\]\»[ô[õõ›[òŸ\»]Ÿ[ÇãÀ»õ›Y⁄[N»H⁄[ôŸH»H\U—Sà\»õ»›\àõ›]H€ù»H€ôH[ôõ›⁄\ôBãÀ»[ŸH»ÿ^H⁄]]Y€»]\»‹ö][à\ôH[ôY\ôŸY[ù»€YI‹»⁄]	‹»ô]»õÿ⁄¬ãÀ»[€ô‹⁄YHHôYY\]\Ààô]Ÿ\›ö\ú›àYHõÿ⁄»⁄[ô]ô\àïRS\»ù[\Y8†%[ÇãÀ»\]HHÿ[â›ŸYH[ôY\»[ô\›[ô›Z\⁄XõHúõ€H€ôH]Yâ›Çò€€ú›ëSPT—T»H¬à»éâ›åMçIÀâÃåçãLKLåâÀ][\Œñ¬à	’HÀU””—QTTàT»”àHêQ»–TëàHŸôöX⁄X[öY⁄Z[ôYù]\ôQö]Ã»⁄\ù\»ÿ]ôYŸôõ[ôHô\⁄YHHÀPQTàL»\»ôX€‹ôY\»H›\úô[ùHô\‹ùYŸ][ôŒàMå0¨YôôX›]ôHŸù[ôKå0¨õ]àç»\»X\öŸY\»HY⁄\ã[][ò⁄\›àMãç¨[ôç¨õ]à\»€‹úôX›»HX\õY\àô]ô\úŸY⁄\ùôXYâ»HKà»éâ›åMç	ÀâÃåçãLKLåâÀ][\Œñ…””ëHïSQVH—UTà”Péàò^HZŸX]ÿ^\À⁄\ù»[ôXõ\»€€Xö[ôHô]Z[ôY⁄›»X‹õ‹‹»ÿ[YKX€Xàõÿ⁄‹ÀàZŸX]ÿ^\»^Z[à⁄]Hù[Xô\ú»YX[à[ô⁄]ôHYX\›\òXõHô^›\Àà\›[òŸKY\⁄õ›‹»[ô€X\àZ\⁄]»›^H›]»‹öY⁄[ò[õÿ⁄»]Z[»ô[XZ[à^[ôXõKâ◊HKà»éâ›åMå…ÀâÃåçãLKLåâÀ][\Œñ…–’SUSUUëHì’»ì’‘»îì”HSà»UíQSê—Nàö\›X[ÿ\úûHY\ã^[ôXõH€Xà\›‹öY\ÀHYX\›\ôYô^\Ÿ\‹⁄[€à\››]€‹à\ôX\»[ô⁄[][]‹àXÿŸ\‹Ààù[Xõ\»[ô€ÿX⁄[ô»]Z[ô[XZ[à]òZ[XõKàÿ[\H€›[ù»\ÿ‹öXôH€›ô\òYŸKõ›Xÿ›\òXﬁKâ◊HKà»éâ›åMåâÀâÃåçãLKLåâÀ][\Œñ¬à	–TVì’»TPTî»SàVP’”PàUH⁄[àHò^HŸ\‹⁄[€àôX€‹ôY⁄›ZY⁄à]\»H]ô\òYŸHZY⁄[àôY]X‹õ‹‹»ôXYXõKõ€ã[Z\⁄]⁄›Œ»à⁄›‹»›»X[ûH›\YY]àH‹öY⁄[ò[ôY]X[ôZ[ò⁄\»⁄›ôXY[ô‹»ô[XZ[à[àH⁄›XõKàŸ\‹⁄[€ú»⁄]›]ZY⁄»õ›ÿZ[à[à[ùô[ùYò[YKâ»HKà»éâ›åMåIÀâÃåçãLKLåâÀ][\Œñ…–””TUHêSë—H—T‘“S”éà[€›\òŸH⁄›»ô]öY]ŸYX‹õ‹‹»õ›Ÿ\[Xô\àåàôX€‹ô[ô‹ÀàŸ[ôH\›[òŸKY\⁄õ›‹»^€YY[ù\ô[H[ôö]ôH€X\àZ\⁄]»[›]àå»\ÿXõH⁄›»X‹õ‹‹»’ÀUÀ€»ZHõÿ⁄‹À⁄H[ôM∞¨à€X[ôYÿ\úûK››[]ŸòXŸK›öZŸK][ò⁄ô\›Yö]ôH€€\\ö\€€ú»[ô‹X⁄YöX»òX›XŸHZŸX]ÿ^\Àâ◊HKà»éâ›åMå	ÀâÃåçãLKLåâÀ][\Œñ¬à	’R—PU–VT»ì’»””QHîì”HPP“ì’Sëàÿ€‹ö[ô»‹‹ù[ö]Y\»[ô€Xã[]ô[òXŸK‹]ÿ\úûK›öZŸK‹YY‹[à[ô][ò⁄ôXY[ô‹»€€\]Hõ‹àH›õ€ôŸ\›ÿ\ôÀàXX⁄⁄›‹»]öY[òŸKHö\›X[Hô^\Ÿ\‹⁄[€àX›[€à[ô[ö‹»»]»€\Àà›]€‹àÿ€‹ôXÿ\ô»Ÿ]Hÿ[YHÿ€‹ö[ô»[ô⁄[ôN»‹\úŸHôX€‹ô»⁄›»ô]Ÿ\àÿ\ôÀâ»HKà»éâ›åMNIÀâÃåçãLKLåâÀ][\Œñ¬à	“VëSSëH”Pàì—íST»ì’»“’»HëP”‘ëQïSPëTîÀàXX⁄Ÿ[X›Y€Xà\»]»›€à]Yò[ôŸHôYô\ô[òŸKYX\›\ôYõ›[ôÿ\úûK›[[ô]⁄]ÿ[\H€›[ùÀàòX⁄”X[à€XàŸ[X›[€ú»\ôHõ›ö\⁄[€ò[[ôZ^YZ[ù[ù⁄›»\ôHõ›ô\Ÿ[ùY\»ù[\›⁄[ô»€Xà\›[òŸ\Àà›\à[ô€‹àÿ\ô»ŸY\Z\àŸ\\ò]H]öY[òŸHù[\ÀâÀà	’—VH“’‘»H“SH–”‘ëHô\⁄YHH›]€‹àõ›[ôÿ€‹ôNàH[‹›ôXŸ[ùHYY€€\]H⁄[][]‹àÿ\ô[ôù[Xô\àŸàù[[ô€‹àõ›[ôÀàHö[ôKZ€Hö\ùX[õ›[ô›^\»[à^\»ù]Ÿ\»õ›[ù\à]ÿ€‹ôH[ôH‹à›]€‹àY]öX‹Àâ»HKà»éâ›åMN	ÀâÃåçãLKLåâÀ][\Œñ¬à	––TîñHSë’STëH—TTêUKà‹Y€\‹»€HHÀ]€€Ÿÿ\úöYYNKçYŸ[ùçY[à›[»Hõ›Y⁄[ôYùÃY»H€Kà‹Y€\‹»⁄›[\›\›[òŸ\»õ›»\ŸHZ\àôX€‹ôY›[^ô[[ôHŸY\»]»Ÿ\\ò]HYX\›\ô[Y[ùÀ[ôö\ùX[úõ€ù[ö[ôHÿ\úûK[€õH[\»õ»€ôŸ\à€Z[H»ôH›[\›[òŸKà^\›[ô»[ú›[»ôXŸZ]ôHH€‹úôX›[€úÀâ»HKà»éâ›åMM…ÀâÃåçãLKLåâÀ][\Œñ¬à	–”PTàRT“U»’U—à”Pà””TTíT””îÀà⁄[][]‹à€XàõŸö[\»^€YH€€ôö\õYYZ\⁄]»[ô^ô[YH⁄‹ùù[\⁄›ÿ\úûH›]Y\úÀà\›[òŸH[ô]\ŸHHÿ[YHô[XZ[ö[ô»⁄›À⁄]€›[ù»⁄›€ãà]ô\ûH⁄››^\»[àH\›‹ûH[ôHõ›[ôÿ€‹ôKâ»HKà»éâ›åMMâÀâÃåçãLKLåâÀ][\Œñ¬à	‘‘Q”T‘»”Pà””TTíT””î»TëH””ìëP’Qà[⁄^€Xú»õ›»⁄›»Z\àôX€‹ôYò^Hÿ\úûH[ô]⁄]H€›\òŸH]H[ôõÿ⁄ÀàH›\úô[ùÀ]€€Ÿ\Ÿ\»]»›€àŸ\[Xô\àNò[ôŸH⁄›ÀàŸ\[Xô\àåà\õ€ú»[ôŸ\[Xô\àMH⁄‹ù€Xú»]ôHZ\à›€à[ö‹Àâ»HKà»éâ›åMMIÀâÃåçãLKLåâÀ][\Œñ¬à	‘‘Q”T‘»T»—TSPëTàåãàòX⁄»€€ôö\õYYH^H]H[ô]]ÿ\»\»ö\ú›òX⁄”X[à‘õ›[ôàHòX⁄”X[àõŸö[Hÿ‹ôY[ú⁄›⁄›‹»‘Àç⁄]€ôHõ›[ôà‹Y€\‹»Hõ›»⁄]»ô\⁄YH^ô[[ôH[à[ô€‹à⁄][à‘Xô[»›]€‹à[ôXÿ\›^\»Ÿ\\ò]Kàô]ö[›\€H[\‹ùY€ô\»ôXŸZ]ôHH€‹úôX›[€ãâ»HKà»éâ›åMM	ÀâÃåçãLKLåâÀ][\Œñ¬à	‘—QHPP““’àò[ôŸHõŸö[\»⁄›»]òXŸKòXŸK]À\]€X\⁄‹YY‹[à[ô][ò⁄⁄][ô]öYX[ôXY[ô‹À]ô\òYŸ\»[ôYX\›\ôYÿ[\H€›[ùÀàòXŸK‹]ôYô\ô[òŸHH\ôŸ]»òXŸK]À\]ôYô\ô[òŸ\»H€Xà]âÀà	‘”’Tê—HëTRTî»TëHSê”QQà€‹úôX›YÀZ\õ€à»KZ\õ€àò[ôŸH]K^ô[[ôH[ô‹Y€\‹»Hõ›»ôXX⁄^\›[ô»[ú›[ÀàX\õY\àåMLK›åMLà\ÿ‹ö\[€ú»ô[›»\ôH\›‹öXÿ[[ô›\\úŸYYûHH€›\òŸH]Y]â»HKà»éâ›åML…ÀâÃåçãLKLåâÀ][\Œñ¬à	‘”’Tê—H“P“ŒàŸ^x†&\»›\YYò[ôŸHöY[‹»⁄›»ÀZ\õ€à[ôKZ\õ€ãàHô]ö[›\»Z\õ€à»€€Xö[ôYçã\⁄›ôX€‹ô\ŸYH‹õ€ô»]öY[òŸKàô]»€›\òŸK[[öŸY€‹úôX›[€ú»[€»ôXX⁄€ô\»][ôXYH[\‹ùYH€ôX€‹ôâÀà	‘ëSPPìHTUTŒà⁄[][]‹à[ô›]€‹àõ›[ô»ŸY\Ÿ\\ò]HY[ù]Y\Ààô[X\ŸH⁄X⁄‹»ò[Y]HX]⁄[ô»\ÿÿX⁄Hô\ú⁄[€ú»[ôù[àôYõ‹ôHHŸXú⁄]H\»Xõ\⁄Yâ»HKà»éâ›åMLâÀâÃåçãLKLåâÀ][\Œñ¬à	‘—TåàêSë—HT»”ëH—T‘“S”ãàXõ›]€»›\úÀõ›H[‹õö[ô»ÿ\ô[ô[àYù\õõ€€àÿ\ôàZ\õ€à›^\»Lãå»èL»Yù\àH€‹õKàKZ\õ€à\»õ›Xõ\»úõ€H]ö\⁄]8†%çà⁄›Àô[XZ[ö[ô»MKå[àŸùåãåp¨]8¢$åÀå∞¨â»HKà»éâ›åMLIÀâÃåçãLKLåâÀ][\Œñ¬à	‘‘Q”T‘»HT»”àH–TëàòX⁄”X[à€€ãKÃMKàMà⁄›»›‹ôY⁄]ÿ\úûK]òXŸK]À\]€X\⁄‹[ã[ò[ZX»Ÿù[ôô[XZ[ö[ôÀ]ÀZ€Kà⁄[][]‹àÿ\ô8†%]Ÿ\»õ›⁄[ôŸHHïSPëTî»‹àõ€[ô»ò^H]ô\òYŸ\ÀâÀà	“VëSSëHT»Tí—Q”ÀàôXÿ\[\»úõ€HHÿ€‹ôXÿ\ô
+íTàLKÃM“TàKÃNÿ‹ò[XõHå…KKçà]À⁄€Kö]ö[ô»åéÃçJH\»HòX⁄»ö[ôHÿ€‹ô\Ààúõ€ùö[ôH€Hÿ€‹ô\»Ÿ\ôHõ›€à]ÿ\ô[ô\ôHõ›[ùô[ùYà^H]H[ö€õ›€à8†%[\‹ù^H\»Xô[Y\»›X⁄â»HKà»éâ›åML	ÀâÃåçãLKLåâÀ][\Œñ¬à	’HïSTêTàT»”ëHì’Àà›⁄\H⁄Y]ÿ^\»õ‹àõ›[ôô\€ÿX⁄HôX€‹ôà]\ŸY»‹ò\€ù»HŸX€€ô[ôH›ô\àHŸX]\ãâ»HKà»éâ›åMIÀâÃåçãLKLåâÀ][\Œñ¬à	’—VH‘Sî»”àHïSPëTîÀàŸX]\ã[àHõ›\à[\À[à›\ùõ›[ôà^\À›[][]]ôKŸX\ò⁄[ôHô\›⁄][ô\à]8†%H[‹õö[ô»öY]»\»Hÿ€‹ôXõÿ\ôYÿZ[ãâÀà	—UëTñH”Pà’VT»”à’SUSUUëKàHòY»XõHYõ›€€YHòX⁄»€ù»Ÿ^Kâ»HKà»éâ›åM	ÀâÃåçãLKLåâÀ][\Œñ¬à	—UëTñH”PàT»’SUSUUëKì’—VKàHô[XZ[ö[ôÀÿô\›MHXõH[ôH]
+»òXŸH[ô\»]ôH€à›[][]]ôKàŸ^H\»H€‹à8†%^\»[ô›[][]]ôH[\À[àHô\›ŸàH[‹õö[ôÀâÀà	—VT»’VHVTÀà\Hÿ\\ôHõ‹à]^x†&\»ù[Xô\úÀàHòY»[›H€€YHòX⁄»»\»›[][]]ôKâ»HKà»éâ›åM…ÀâÃåçãLKLåâÀ][\Œñ¬à	—SêSRP»—ï–T»”àH–‘ëQSîÀà»Õãép¨L0¨ÕKé0¨Z\õ€àô[XZ[ö[ô»åÀçp¨
+Håãé0¨]ô»[ò€YYH€‹õJKKZ\õ€àNKç0¨à›‹ôY€à]ô\ûH⁄›\»[\X›ZY⁄à‹[àŸùÿ\»H\⁄8†%õ›[ùô[ùYâÀà	‘—TåàêSë—HT»”àHêQÀàZ\õ€àô[XZ[ö[ô»Lãå»èL»Yù\àH€‹õKàKZ\õ€àô[XZ[ö[ô»LåÀåàèNHŸàLö\⁄XõKàõ€[ô»ô[XZ[ö[ôÀõ›H\›^Kà€Xú»⁄]›]HŸù€€[[à›[\⁄â»HKà»éâ›åMâÀâÃåçãLKLåâÀ][\Œñ¬à	—UëTñH”PàT»êP—KUÀTU”à’SUSUUëKàÿ[YH^\»\»H^Hÿ\ôŒà€X[›»\ôHô[XZ[ö[ô»⁄›»
+]‹ôY[ãòXŸH€€
+Kö[ô‹»\ôHHõ€[ô»ô[XZ[ö[ô»YX[ãù[Xô\ú»\ôHU»êP—H»∏†$‘à€ôHõ›»\à€Xà8†%õ»€›õ»⁄[ô›Àõ»ô\›âÀà	’HPìHT»ì”Së»ëSPRSíSëÀì’HT’ì–“ÀàŸZY⁄YûHô[XZ[ö[ô»àX‹õ‹‹»^\ÀàYù\ã\€››^\»€àH^H]\[ôYàHòY»\»⁄]H^\»Y\Àâ»HKà»éâ›åMIÀâÃåçãLKLåâÀ][\Œñ¬à	—UëTñH”Pàì’»T»HïSPëTî»UQPT’TëKà€X\⁄€Xà‹YYò[‹YY][ò⁄‹[ã]X⁄À]òXŸKòXŸK]À\]][ò⁄\ôX›[€à8†%[ô[ò[ZX»Ÿù»‹[àŸù⁄[àHÿ\\ôH[ò€Y\»[Kàô\›H›^\»ù\ô›[ôKâÀà	‘”PT“T»êS0Ì»”Pà⁄[à€X\⁄\»Z\‹⁄[ôÀàõ›[ô»[ùô[ùYà[ô€‹à[õX\öŸYò[Œà]òXŸK‹YYÀ][ò⁄\ôHYX\›\ôY»‹[à[ôÿ\úûH\ôH›[H[Ÿ[â»HKà»éâ›åM	ÀâÃåçãLKLåâÀ][\Œñ¬à	”ëVP’S”î»TëHHUHì’ÀàHÃÀZ][Hÿ[\»H\›à€ôH[ôHXX⁄Q“ö\ú›Hô\›‹õ›\YûH[ôH[ôõ€Yà\H[ôHõ‹àH€ÿX⁄[ôÀà\Hõﬁ»X⁄»]8†%‹[ö[ô»]õ»€ôŸ\àX\ö‹»]€ôKâÀà	”ì’Së»–T»SUQà]ô\ûHX›[€à\»›[\ôKàH\‹ÿ^H\»€ôH\]ÿ^Kõ›H[ô»[›H]ôH»ôXY»ö[ôHõÿãâ»HKà»éâ›åM…ÀâÃåçãLKLåâÀ][\Œñ¬à	—UëTñH”PàT»”à”QHSë’SUSUUëKàô[XZ[ö[ô»ÿ\úûKô\›K]òXŸKòXŸK]À\]8†%]\›õÿ⁄»Ÿà]ô\ûH€Xà€àö[Kàô\›H\»ù\ô›[ôKàôYÿ]]ôH]\»›]]ÀZ[ãàÀZ\õ€àô\›8¢$çÀç∞¨»8¢$åKå0¨»
+Õãçp¨àÀ]€€ŸYù\à€›8¢$åãå0¨»8¢$åç∞¨»
+ÃKç0¨âÀà	’T»T»HêQ»S’H””QHêP“»Àà^\»›^H^\ÀàHXõH\»⁄]^HY\Àà[ô€‹à[õX\öŸYò[Œà][ôòXŸH\ôHYX\›\ôY»ÿ\úûH\»›[H[Ÿ[â»HKà»éâ›åMâÀâÃåçãLKLåâÀ][\Œñ¬à	“Sà»’Uà]\»HõÿãàòXŸH\»[ôXYHôX\à‹]X\ôH8†%€‹⁄[ô»]€›[€⁄Àà\ôŸ]0¨»
+Ã∞¨àÀ]€€Ÿ[ôXYHõ›ôY]à8¢$çãåp¨8°§à8¢$åãå0¨Yù\àH€›[ô][âÀà	ÕÀRTì”àT»HêRSíSë»”Pãà]ô]ô\à»8¢$å∞¨à€€Ÿ»€⁄]^H€€ãàŸYŸ\»[ôXYH⁄]ôX\àô\õ»8†%X]ôH[Kàô^ò^Nàô[XZ[ö[ô»]\»Hÿ€‹ôXõÿ\ôõ›ô\›Kâ»HKà»éâ›åMIÀâÃåçãLKLNIÀ][\Œñ¬à	ÃãRTì”àååMKà€‹ö⁄[ô»ù[Nà[ú⁄YHÕåãZ\õ€é»\›ÕåÀ]€€Ÿ‹àK]€€Ÿà›[öY›\ö[ô»]›]àò[à€‹ù[ôà€€Ÿ»€àH»»H»Mà»\»ååà8†%À]€€ŸãZ\õ€à\»€‹ŸKâ»HKà»éâ›åM	ÀâÃåçãLKLN	À][\Œñ¬à	’êSà”‘ïSë”S‘îì’ÀàãZ\õ€à\»HòZ\ùÿ^Hö[ô\ãàÀ]€€Ÿ‹àK]€€ŸYà]ôYY»»ôHY⁄‹àò]Àà»\»ååà8†%À]€€Ÿ]HZYKà‹[ú»»SKâ»HKà»éâ›åLŒIÀâÃåçãLKLN	À][\Œñ¬à	’êSà”‘ïSë”S‘îì’Àà€\›XõX»€›\úŸH[àH€›[ùûKãàX\ôÀ\àÃàÀ]€€Ÿ\»HòZ\ùÿ^Hö[ô\ãà»\»ååã\›]ô\ûHYX\›\ôYÿ\úûH8†%ZYK€»]Ààà[ôLà\ôHôYK\⁄›\à\Àà‹[ú»»SKâ»HKà»éâ›åLŒ	ÀâÃåçãLKLN	À][\Œñ¬à	—‘ì“»““S8†%ïSPëTà‘ïSê“àŸ€€ã[ù[Xô\ãX‹ù[ò⁄\õú»Hò]»XõH[ù»ô[XZ[ö[ôÀô\›K[ôH‹õ›\HŸ\]Y[òŸHXYKà⁄[ô›»ú»ò\Ÿ[[ôKàZ\⁄]»›]àÿ\úûH[àôYàöY[»⁄⁄[ò[úÿ‹öXô\Œ»\»€ôHX⁄Y\Ààõ›HYŸKâ»HKà»éâ›åLÕ…ÀâÃåçãLKLN	À][\Œñ¬à	ÕÀRTì”àT»H“Së’ÀàHŸ\]Y[òŸKõ›Hô[Y[Xô\ôY‹]à‹[àLLÀçHèLãàù[àLŒåàèMH[à[àLK^X\ôò[ôàô\›LééHèLå»ô\›HMãçãàòXŸK]À\]éH8°§àÀåH8°§àãçKà]ô]ô\à»8¢$å∞¨àHÀ]€€ŸYù\ã\€›[à\»Yõ›â»HKà»éâ›åLÕâÀâÃåçãLKLN	À][\Œñ¬à	ÕÀRTì”à”’T»”à“’Ààö\ú›MYù\à€»]LL»LMÀàôYõ‹ôHLLÀçHèLãàYù\àLÃç»èLçH»ô\›HMÀåKà]ò\ô[H[›ôY
+8¢$éå∞¨8°§à8¢$çÀå¨
+KàòXŸK]À\]Y
+éH8°§àKé
+KàôYH€‹õ\»›]àÿ[YH›Y⁄\»HÀ]€€Ÿ»HÀ]€€Ÿ⁄[ôŸY]HÀZ\õ€à⁄[ôŸY›öZŸKâ»HKà»éâ›åLÕIÀâÃåçãLKLN	À][\Œñ¬à	—‘ì“»““Sì’HQ—KàöY[»[ò[\⁄\»\»Ÿ€€ã]öY[ÀX[ò[\⁄\»8†%HôX[‹õ⁄»⁄⁄[[àHô\Àõ›H›⁄[ô»Xàÿ‹ôY[ãàŸ[ôHòX⁄”X[àÿ‹õ€‹àH›⁄[ô»€\[ô]ôXY»ÿ\úûH[àôYàH^òHYŸHúõ€HåLÕ\»€€ôKâ»HKà»éâ›åLÃ…ÀâÃåçãLKLN	À][\Œñ¬à	‘ì”—îëPQHVH–Tëà]ö[ô‹»Y€»’‹»[ô€»U‹»⁄]õ»Yù\ã\€›Xô[àXY\à›[ÿZYH⁄›»Yù\àH‹»Ÿ\ôH›]à8¢$å∞¨‹›]»X⁄[X[ô^»8¢$çãåp¨àYù\ã\€›õ›‹»õ›»ÿ^H’»0≠»€›àH€›[ù\»ô[XZ[ö[ô»⁄›Àõ›Hò]»[Kâ»HKà»éâ›åLÃâÀâÃåçãLKLN	À][\Œñ¬à	––TîñHú»’SXô[Yà8†'[8†'Hÿ\»ÿ\úûH[ô8†'ô\›x†'Hÿ\»Z[ùY€€ZŸH›[8†%]ÿ\»HZ^]\à‹ôY[à\»ÿ\úûKà€€\»›[àô\›H\»H€ôŸ\›Hÿ\úöY\»
+‹ôY[àò\ãù\ô›[ôHù[Xô\äKõ›H›[â»HKà»éâ›åLÃIÀâÃåçãLKLN	À][\Œñ¬à	–”PàPìHT»HPìHQ–RSãàòXŸH[ôòXŸK]À\]Ÿ\ôH[\[ô»MãYX⁄[X[õÿ]ÀYù\ã\€›õ›‹»Yõ»‹YY‹‹[à]ô[à›Y⁄H⁄›»Y[K[ôH€Xàò[Y\»ÿ‹õ€YŸôàHÿ‹ôY[ãà[ô€\»»€ôHX⁄[X[à€Xà€€[[à›^\»]àYù\ã\€›À]€€Ÿ[ôK]€€Ÿõ›»⁄›»€X\⁄‹YY][ò⁄‹[àúõ€HH⁄›»[›H[ôXYHŸ[ùâÀà	‘ÿ[YHŸ\Nù[Xô\úÀàÀZ\õ€àLÃKç»»ô\›HMKéàLLà›[›]â»HKà»éâ›åLÃ	ÀâÃåçãLKLN	À][\Œñ¬à	ÕÀRTì”à–TîíQT»TëHSãàLÃKç»èLLH8†%]ÿ\»HôX[]ô\òYŸKõ»‹Ààô\›H\»MKéà€€ú⁄\›[òﬁHLãçà]8¢$çãép¨âÀà	ÃLLàT»’UàHYù\ã\€›K]€€Ÿ]LLàX\ô»»8†,àŸà\^ÿ\»HZ\⁄]à[ã[YYX[àŸ\]ôXÿ]\ŸH›\à‹»YòYŸŸYHYYX[à›€ãàH›]\»õ›»€À]\ô»ŸàH€\›\à]X›X[H€›\àK]€€ŸYù\éàMÕKå»èM»»ô\›HNãåâ»HKà»éâ›åLéIÀâÃåçãLKLN	À][\Œñ¬à	‘êSë—H‘»TëH’UàH⁄›[€àHò^H\»€€ôHúõ€HHôX€‹ô8†%õ›ù\›Y[ãà€ãX€›\úŸHõ›[ô»ŸY\]ô\ûH⁄›âÀà	–Sú»ëT’Kà]ô\ûHò]⁄õ›»⁄›‹»Hô[XZ[ö[ô»]ô\òYŸH[ôHô\›HŸà]ò]⁄
+ô\›»Yà]\»⁄‹ù
+Kò[öŸYûHÿ\úûK⁄]‹ŸH⁄›¯†&H]òXŸK]À\][ô€X\⁄àÀ]€€Ÿö\ú›õÿ⁄ŒàMÕãçH[»NLKåô\›KàYù\à€›àNç»NLãçÀâ»HKà»éâ›åLé	ÀâÃåçãLKLN	À][\Œñ¬à	”RT“U»TëH—ëàH–Tëà‹»[ô⁄›[»›^H[àHôYY€»H]ô\òYŸH›^\»€ô\›8†%[›Hù\›»õ›]ôH»€⁄»]çàX\ô»ô^»NMãàò\úÀ›À[ôH⁄›XõH\ôHH›ùX⁄»ò[»€õKâÀà	‘ÿ[YHù[Xô\ú»\»ôYõ‹ôNàÀ]€€ŸMÕãçH»NçYù\à€›àK]€€ŸMŒKåH»MçÀçàõ›[ô»Z^Yõ›[ô»[]Yâ»HKà»éâ›åLç…ÀâÃåçãLKLN	À][\Œñ¬à	ÃÀU””—QïTà”’T»–TîíQT»ì’Ààÿ‹ôY[àMLå»èNH[ò€YY€»‹»
+åKçKLãçäKà›ùX⁄»\»NçèM»8†%€ôŸ\à[àHö\ú›õÿ⁄¯†&\»MÕãçKà]8¢$åãå0¨
+ÿ\»8¢$çãåp¨
+KàMLå»\»õ›H€XãâÀà	‘ÿ[YH^K›[]»›€àõÿ⁄Àà]ôHY\à[ò⁄[ôŸYâ»HKà»éâ›åLçâÀâÃåçãLKLN	À][\Œñ¬à	ÕÀRTì”àT»”àHVH–Tëàÿ\úûHú»›[ÿ\»⁄⁄\[ô»[ûH€Xà⁄]õ»\ã\⁄›ÿ\úöY\À€»[]ô[àÀZ\õ€à⁄›»]ôY€õH[àHXõHô[›»Hõ€àHÀZ\õ€àõ›»⁄›‹»€à]ÿ\ôàÿ‹ôY[àLÃKçÀXô[Yÿ‹ôY[àôXÿ]\ŸH‹ŸHÿ\úöY\»Ÿ\ôHŸôã\ÿ‹ôY[à[ôÿ[õõ›ôH€X[ôY\»]8¢$çãép¨[ôòXŸK]À\]
+Õãç0¨âÀà	‘–‘ëQSàMMÀçàõ»€ôŸ\à‹ò\»€ù»]»›€à[ôH[ô\àK]€€Ÿà[[›]ÿ‹ôY[àù[Xô\ú»⁄][ô\àHò\ãõ›[àH]Kâ»HKà»éâ›åLçIÀâÃåçãLKLN	À][\Œñ¬à	–QïTà”’–SQHVKà[ùÿ^Hõ›Y⁄òX⁄»›\ùYõ‹[ô»HòZ[
+öY⁄
+H[ô»Ÿ][‹ôH[ãX[ôY›€ãà‹ŸH⁄›»\ôHZ\à›€àõÿ⁄»8†%õ›Z^Y[ù»Hö\ú›Xõÿ⁄»]ô\òYŸKâÀà	‘US’ëQàÀ]€€Ÿ8¢$çãåp¨8°§à8¢$åKç¨
+èN
+KàK]€€Ÿ8¢$çç¨8°§à8¢$åãåp¨
+èN
+KàòXŸK]À\]Yõ›Y⁄[ãàK]€€Ÿ›ùX⁄»ÿ\úûHMçÀç8†%õ›€ôŸ\à[àHö\ú›õÿ⁄¯†&\»MŒKåKàÀ]€€ŸYù\éàÿ\úöY\»Ÿôã\ÿ‹ôY[ãÿ‹ôY[àMLå»\»õ›H€Xãâ»HKà»éâ›åLç	ÀâÃåçãLKLN	À][\Œñ¬à	ÃMLT»—ëàHÀU””—à]ÿ\»òX⁄”X[∏†&\»ÿ‹ôY[à]ô\òYŸH⁄]€»‹»[à]õ›H⁄›[ôõ›H€XãàHÀ]€€Ÿù[Xô\à\»MÕãçHèNH›ùX⁄ÀàH€»‹»›^H€àH^KX\öŸY[›]âÀà	–êQ»—ëëTàT»MÕãçKõ›MLà]ôHÿ\úûH›[õ[ö»8†%»õ›\H]€ù»H€›\úŸHY\ãàô[ùYHò[Àõ‹õX[^ôH€ã[\õ›⁄›€ãâ»HKà»éâ›åLå…ÀâÃåçãLKLN	À][\Œñ¬à	’HÀRTì”à–T»SàHëP”‘ëSëÀà[]ô[à⁄›Œà]òXŸK]À\]€X\⁄‹YY][ò⁄‹[ãà\ã\⁄›ÿ\úöY\»Ÿ\ôHŸôã\ÿ‹ôY[ã€»\ôH\»õ»€X[ôYÀZ\õ€àÿ\úûH8†%Hÿ‹ôY[àù[Xô\à›^\»LÃKçÀà[]ô\ûH\»€€\]H[ôõ›»⁄]»€àH^H[ô[à›[][]]ôKâÀà	ÕÀRTì”àêP—KUÀTU
+Õãç0¨8†%H[‹›‹[àŸàHôYH€Xú»Ÿ^Kà]8¢$çãép¨]ô\ûH⁄›YùŸàH\ôŸ]à]\»Hÿ[YH›]]ÀZ[à\»H€€ŸÀ⁄][‹ôH›]€à]âÀà	–H€Xà⁄][]ô\ûH[ôõ»\ã\⁄›ÿ\úûH\»õ»€ôŸ\àõ‹Yúõ€HHö[ô‹Àà[ò[\⁄\»›[ÿ[õõ›€X[àHÿ\úûH]ÿ[õõ›ŸYKâ»HKà»éâ›åLåâÀâÃåçãLKLN	À][\Œñ¬à	”RT“U»TëH—ëàHUëTêQ—Kà[ò[\⁄\»\»H›ùX⁄»ò[ÀàH‹‹à⁄›[8†%ÿ\úûH[ô\à[àHô\›Ÿà]€Xà]^H8†%\»[›]ŸàHò\úÀHö[ô‹À[ô›[][]]ôKà]›^\»€àH^H[ô[àHXõKX\öŸYõ›[]YâÀà	’HÀU””—ëPQT»MÕãçKì’MLà€»‹»
+çãçÕéJH›]Ÿà[]ô[ãàHK]€€Ÿ\»MŒKåKõ›MMÀçãàÿ[YHù[H€àHŸ\MHò[ôŸNàH^X\ô[ôMK^X\ôö]ô\ú»\ôHŸôàH]ô\òYŸH^HŸ\ôH⁄][ô»[ãâÀà	’HëUíQU»ì–—T‘»T»Sà”UQKõYàò[úÿ‹öXôH]ô\ûH⁄›à€X[àH[ò[\⁄\Ààö[ùõ›úÀà⁄X⁄»H\ö]Y]XÀàö]ôHÃåÃŒLàÿ[YH€€[Z]\»H€ŸKâ»HKà»éâ›åLåIÀâÃåçãLKLN	À][\Œñ¬à	–’SUSUUëHT»HSêST“T»ì’Àà€‹ö⁄[ô»ú»ôYY»€‹öÀH›ô\ã]K]‹X›\ôK][ôòXŸHúõ€H]ô\ûHò^H^KH€ôH[ô»»À[ôH‹[à][\»8†%€à]YŸKõ›ôZ[ô[õ›\à€‹ãâÀà	‘UP‘ì‘‘»VT»\»Hö\›X[à]ô\ûH€Xà]ô\òYŸH\»H›Hö[ô»\»]^x†&\»⁄\KàŸ\MŸ\MH[ôŸ\N[⁄]YùŸàô\õÀàòXŸH‹[à»]]\»H[YòYKàö^H]ö\ú›âÀà	—^\»›[›^H^\ÀàŸ^H\»[ù›X⁄Yâ»HKà»éâ›åLå	ÀâÃåçãLKLN	À][\Œñ¬à	”ëU»ÀU””—íTî’”“ÀàòX⁄”X[à\‹^YYMLåèLLK€€ú⁄\›[òﬁHNçà8†%]]ô\òYŸH[ò€Y\»€»‹»
+çãç[ôÕéJKàH›\àö[ôH]ô\òYŸHMÕãçK⁄]õ›\àŸà[H]Nx†$ÃåKàòX⁄Œàô[[X^ö[ôÀà]\»H›ùX⁄»ò[õ›HMLâÀà	ÕKU””—\‹^YYMMÀçàôXÿ]\ŸHŸà€ôHéçN»€X[ôYMŒKåK⁄X⁄⁄]»€àHŸ\MX\MÕÀçãàÀRTì”àLÃKç»èLLH€€ú»Lãç
+Ÿ\Mÿ\»LÕKéH»LãçJKà\ã\⁄›ÀZ\õ€àÿ\úöY\»Ÿ\ôHŸôã\ÿ‹ôY[ãâÀà	”ì”ëH—àT»ëTP—T»HUëHQTãàõ‹õX[^ôH€ã[\õ›⁄›€ãô[ùYHò[ÀàHÀ]€€Ÿõ›»›^\»õ[ö»^Ÿ\õ‹à\»Ÿôô\ãà»õ›\HML[ô»õ›\HHZ[öx†&\»Nãç€ù»\»XYâ»HKà»éâ›åLNIÀâÃåçãLKLN	À][\Œñ¬à	–êQ»’“U“àHZ[öHö]ô\à\»’UŸàHM
+Ÿ\
+KàHZ\õ€à›^\»›]àH€ÿúòHÀPQTÀ]€€Ÿ\»Sà8†%›ÿ⁄»Mp¨õ⁄ôX›[ò[HõYHåôY›[\ã€€àÿ[^H“’HçéM	NNHÿ[YKY^Kà€ô»[ô\»ö]ô\à0≠»\»À]€€Ÿ0≠»NKçp¨K]€€Ÿ0≠»ãZ\õ€ãâÀà	’HëU»ÀU””—T»ì»–TîñKà»õ›\ö»HŸ\MòX⁄”X[à›»Nãç€à]8†%]Xô[ÿ\»HZ[öKàõ›€€Ÿ»⁄]õ[ö»[ù[[›H][KàôXYHù]\ôQö]Ã»€Y]ôH
+›ÿ⁄»Mp¨0¨L∞¨
+H⁄[à[›H]ôH][à[ôâÀà	—^\»[ô›[][]]ôH\ôH€à\»ùZ[YàåLNYõ›[ôà€ôH\›Ÿà]ô\ûHÿ\\ôK[ô€ôHù[õö[ô»X›\ôH][›ô\»⁄[àH^H[ôÀâ»HKà»éâ›åLN	ÀâÃåçãLKLN	À][\Œñ¬à	—VT»TëH”ëHT’Q–RSãàò[ôŸH»⁄[][]‹à»›]€‹à»ö[HŸ\ôHõ›\à€‹ú»€ù»Hÿ[YH]Yÿ\\ô\À€»HŸYZ»Ÿà€‹ö»€⁄ŸYZŸHõ›\à\ÀàŸ^H[ôÿ[YHõ›»‹[à^\»
+]ô\ûHÿ\\ôKô]Ÿ\›ö\ú›ö[\à⁄\»Yà[›Hÿ[ù€ôH⁄[ô
+H[ô›[][]]ôKâÀà	–’SUSUUëHT»HïSìíSë»P’TëKàÿ[YHõ›\à€ãX€›\úŸH\ôX\»€ÿX⁄[ôŸ^H[ôXYH€€\]H8†%]Ÿ\»õ›[ùô[ùHöYùù[Xô\ãàHà\»€àHYŸH
+]ôH€\Àò^HŸ\‹⁄[€úÀö[H^\ K[ôH⁄[][]‹àõ›[ô\»H^H[›Hÿ[à‹[ãô]ô\àH€H[à\ŸHõ›\ãàò^H[ôö[H⁄][àZ\à›€à[ô\Àà][›ô\»⁄[àH^H[ôÀâ»HKà»éâ›åLM…ÀâÃåçãLKLN	À][\Œñ¬à	’HSQHT»êP“ÀàåLMàô\XŸYHÿ€‹ôXÿ\ô\ö]YŸH›[\⁄Y]⁄]HÀ[[ôH⁄\ö[K€»Ÿ^Hô[ô\ôY\»[ú›[YS8†%€\YŸX\ò⁄õ»ÿ\ôÀõ»‹ôX[H\\ãõ»ò]ãàHKçÃK[[ôH⁄Y]\»ô\›‹ôY»ö[ôXö[]H‘‘»\»\[ôYõ››Xú›]]YâÀà	’—VHT»HQ—HêP“»T“Q”ëQQ–RSéàŸ\‹⁄[€úÀ]ZX⁄»[ö‹ÀŸX]\ãHù[Xô\ú»[\À›\ù‹ô\›[YHõ›[ôõ›[ôô\H€ôH[ôÀH€ÿX⁄\⁄]8†&\»[ôYàŸX\ò⁄ù[Xô\ú»[ô]öY[òŸH\ôHYY€à‹8†%^H»õ›ô\XŸH‹ŸHõÿ⁄‹ÀâÀà	‘ŸX\ò⁄õ»€ôŸ\à[\»H[\H[ù€ù»H€YHYŸKà\H»ö[\é»ûHK]€€Ÿ€€Xö[ôK[ôXÿ\àù[Xô\ú»[ô]öY[òŸH⁄]⁄]X⁄\⁄[€ú»]Hõ›€HŸàŸ^Kâ»HKà»éâ›åLMâÀâÃåçãLKLN	À][\Œñ¬à	—íSëPíSUHT‘Œà]ô\ûHù[Xô\à[›Hÿ[à][›Hõ›»ŸX\ú»Hõ›ô[ò[òŸH⁄\8†%”ãP”’Tî—KêVKêP“”PSãQPT’TëQT’SPUQ—ëëTãëQ—Sà8†%[ô[à8§Ê]‹[ú»⁄]]YX[úÀ⁄H]X]\ú»õ‹à[›K[ô⁄[àõ›»ù\›]âÀà	”ïSPëTî»SëV
+Ÿ^H8°§àù[Xô\úÀ[€»úõ€Hÿ[YJNà€ôHŸX\ò⁄XõKö[\òXõHÿ][Ÿ»Ÿà[ôXÿ\KYùXZŸ\ÀYÀZ[ú⁄YKLÀ]ô\ûHY\àÿ\úûH[ô\öŸYò^HŸôô\ã€€Xö[ôHÿ€‹ôK‹õ€›ôH€›[ù\ú»[ô‹[àô]\õà⁄[ô›‹Àà\Hõ›»»HYX[ö[ô»⁄Y][à‹[à[à\âÀà	’—VH—PTê“ö[ô»H€XãH€›\úŸKH\‹€€à[ôHY]öX»úõ€HHÿ[YHÿ][ŸÀà]öY[òŸH\»Hô]Ÿ\›Yö\ú›[Y[[ôHŸà]ôHõ›[ôÀò^KŸö[H[ôôYY\Y\»8†%›]⁄Yõ›[ùô[ùYâÀà	’—VHT»íUëHì–“‘ŒàH€‹öÀ€ôHÿ€‹ôXõÿ\ôù[Xô\ãô^\õ›[ôô\[à‹[àô]\õà⁄[ô›»Yà\ôH\»€ôK[ô⁄‹ù›]»
+ŸX\ò⁄0≠»ù[Xô\ú»0≠»]öY[òŸH0≠»›\ù‘ô\›[YJKàH€ô»‹öY»]ôH[àù[Xô\ú»[ô]öY[òŸHõ›Ààÿ[YH]H8†%X\⁄Y\à»ö[ô[ôù\›â»HKà»éâ›åLMIÀâÃåçãLKLM…À][\Œñ¬à	’H”P—HT»QPT’TëQà€»›⁄[ô»ô\‹ù»Ÿôàö]ôHYYHò[YõY⁄ù[Xô\ú»õÿõŸHY[Yà]ô\ûH€Xà[›H]ö[ö\⁄\»íQ“Ÿà⁄\ôH]›\ùYúõ€H
+ÃKéX\ô»€àHLLå»
+ÃççH€àHö]ô\ãà]ô\⁄YHH›]]ÀZ[à€Xà][ôXYH€àö[Kõ›[ô\»ŸàH›ô\ã]K]‹Z\‹»\ôHõ›»YX\›\ô[Y[ù»ò]\à[àH[‹ûHXõ›][›\à›€àÿ[YKâÀà	–HëU»Q—HU“’‘»Uàÿ[YHLåNLà›⁄[ô»õ›»‹[ú»⁄]Hù[Xô\ú»ÿ^HLåM[›\àò[õY⁄ò]€à€XàûH€XãH€XôòXŸHX\Ÿà⁄\ôH[›HX›X[H›öZŸH]⁄X⁄€Xú»\ôHô\X]XõH[ô⁄X⁄\ôHõ›[ô⁄]Hö]ô\à\»X]ö[ô»€àHXõKâÀà	’“TëHS’HUU”àHêP—Kõ‹àHö\ú›[YNàHMóLå\»›ùX⁄»ãç[H€àHQS€àö]ôHŸàö]ôH⁄›»[ô]ô\ûH€ôŸ\à€Xà€àH—KàŸ]HYHõÿ\ô€à]ôYõ‹ôH‹õ€›ö[ô»[û][ô»LåM\ôH\»HÀY»€àHõÿ\ôÿ^Z[ô»⁄KâÀà	’HíUëTàT»HåÃVPTë”PàSëPQKàMç\Ÿà€Xà‹YYLéKéH\Ÿàò[‹YYà]H›\ã\›[ô\ô›öZŸHHÿ[YH›⁄[ô»X]ô\»Ké\ò\›\àLåMXõ›]åàX\ô»LåM[ôHŸ[ùôK\›öZŸHö[\»€àH€ÿX⁄ô[ò⁄õ‹à]âÀà	’H›⁄[ô»Xà\»]»ö\ú›]õ€][€à‹öYö]ôH€€[[ú»Ÿà⁄]\»ôY[àÿ\\ôY[ô[àõ›‹»Ÿà⁄]][ú›Ÿ\ôYàH€»õ›‹»]\ôH[\⁄\»LåM⁄YùX[à[ôHõŸH[›ôHôZ[ôH]LåM\ôHH€ô\»]ÿ^H⁄]»ö[Hô^âÀà	’€»[ô‹»Hô\‹ù»€›‹õ€ô»Ÿ\ôH€‹úôX›Yò]\à[à€‹YYà[›\àö]ô\à€X\⁄\»KåŒõ›HKåÕàõ›ÿ›[Y[ù»ö[ùY[ô[›\àåLåÿ\»ô]ô\àZ\‹⁄[ô»úõ€HHòY»X\LåM]\»HY⁄\›€Xà[›H›€ãâ»HKà»éâ›åLM	ÀâÃåçãLKLM…À][\Œñ¬à	’H“VSïSPëTàêT—SSëHì’»VRSî»U—Séà]ô\ûHù[Xô\àÿ^\»⁄]]€€ùõ€À⁄][›\àôXY[ô»YX[úÀ[ô⁄X⁄€€\\ö\€€ú»\ôHò[YàH[[YYX]Hö[‹ö]H\»òXŸK]À\]€€ú⁄\›[òﬁH⁄]òXŸH€€ùõ€8†%õ›õ[ôH⁄\⁄[ô»‹YYâÀà	–”‘îëP’êSQìQ“ëPQà8¢$åKç∞¨òXŸH⁄]
+Õãçp¨òXŸK]À\]\»HYù\›\ù[ô»ò[]Y[»öY⁄
+[òYH»öYŸŸ\à›]
+Kõ›Hò]»‹à€⁄Àâ»HKà»éâ›åLL…ÀâÃåçãLKLM…À][\Œñ¬à	÷S’Tà“VêP““Së»ïSPëTî»TëHì’»HQP–UQêT—SSëNàò[‹YYLéçH\€X\⁄KçãòXŸH[ô€H8¢$åKç∞¨òXŸK]À\]
+Õãçp¨‹[àÀMŒHúH[ôÿ\úûHNLÀç»Yà‹[à€YH8°§àŸ\‹⁄[€ú»8°§àò[ôŸHŸ\‹⁄[€ú»8°§à⁄^[Y]öX»ò\Ÿ[[ôKâÀà	’\»\»H‹öY⁄[ò[€ôK\⁄›òX⁄”X[à[ô[8†%õ›HŸ\\ò]Hö\ùX[\õ›[ôôXY[ô‹Àà]Ÿ]»HöY[»»òX⁄Œ»]Ÿ\»õ›ô\XŸHH€Xàÿ\úûH‹à€Z[HH\ú€€ò[]ô\òYŸKâ»HKà»éâ›åLLâÀâÃåçãLKLMâÀ][\Œñ¬à	’êP“”PSàîì”ïíSëHQQà⁄[][]‹àõ›[ô»õ›»[ò€Y\»HŸ\Màö\ùX[úõ€ùö[ôH8†%»€à\àÕà8†%⁄]HôX€‹ô[ô¯†&\»ô\öYöYY€Hÿ€‹ô\Àà€HLÿ\»⁄›€à[ò€€\]K€»õ»òX⁄À[ö[ôHÿ€‹ôH‹à][ô»ô\›[ÿ\»[ùô[ùYâÀà	’H“VïSPëTî»UPUTàTëHSàH“’Q—Téà‹[ãÿ\úûKòXŸK]À\]€X\⁄òXŸH[ô€H[ôò[‹YY\X\àŸŸ]\à⁄\ô]ô\àHôX€‹ô[ô»⁄›ŸY[Kà^H\ôH⁄[][]‹à]öY[òŸH€õH[ô»õ›⁄[ôŸH›]€‹àÿ€‹ö[ô»‹à^Z[ô»ÿ\úöY\Àâ»HKà»éâ›åLLIÀâÃåçãLKLMâÀ][\Œñ¬à	‘—TMHêSë—HíQS»SêSVëQà€YH8°§àò[ôŸHŸ\‹⁄[€ú»8°§àŸ\MHõ›»‹[ú»[M⁄›Àÿ\úûK]ô\ú›\À]›[⁄\ùÀ⁄›‹ôXY\ôŸ]ô\›[»[ôôXYXõH[]ô\ûH]KàŸ\\ò]Húõ€HŸ\MX\^HòY»[ôò[Xù[ö[€ãâÀà	—]ô\ûH⁄‹ù⁄››^\»[àH[ò[\⁄\Ààÿ\úûH[ô›[\ôŸ]]»\ôH€›[ùYŸ\\ò][N»Z\‹⁄[ô»ôXY[ô‹»›^Hõ[öÀà^\›[ô»^Z[ô»X\ôYŸ\»\ôH[ò⁄[ôŸYâ»HKà»éâ›åLL	ÀâÃåçãLKLMIÀ][\Œñ¬à	‘—T‘“S”î»ì’»T»U»’”à”QNà‹[àò[ôŸHŸ\‹⁄[€ú»‹à⁄[][]‹àõ›[ô»\ôX›Húõ€HŸ^Kÿ[YH‹àòYÀà]Yÿ\ô»Ÿ\\ò]HòX›XŸK^YYõ›[ô»[ô›⁄[ô»öY[‹ÀâÀà	‘ò[ôŸH⁄\ù»]ôH[ú⁄YHZ\à›€àŸ\‹⁄[€ãàò[Xù[ö[€àŸY\»]»›€à⁄›]öY[òŸH[ô[à‹[€ò[[ö»»H€\àòY»X\àHŸ\MHò[ôŸHôX€‹ô[ô»\»\›YŸ\\ò][H\»]ÿZ][ô»ù[[ò[\⁄\Àâ»HKà»éâ›åLIÀâÃåçãLKLMIÀ][\Œñ¬à	’HêP“”PSàíT’PS»TëHì’»îì”ïSë—SïTàSàHêSPïSíS”àì’SëëUíQUŒàÿ\úûH⁄\K€€ú⁄\›[òﬁH[ô]]ô\ú›\ÀYòXŸH\X\àôYõ‹ôHH‹ö][àZŸX]ÿ^\À⁄]€ôH\»Hù[ò^HŸ\‹⁄[€ãâÀà	–Hô]»\K[€òŸHô\Z\àô\›‹ô\»Hù[LÀX€XàX\^HòY»ôX€‹ô€à€ô\»⁄\ôHHö\ú›[]ô\ûH\]Hô\XŸY]]KàHõ›[ôô]öY]»õ›»‹[ú»⁄]Hö\›X[]öY[òŸH[ú›XYŸàXZ⁄[ô»[›H[ùõ‹à]â»HKà»éâ›åL	ÀâÃåçãLKLMIÀ][\Œñ¬à	’HêVHì’»“’‘»H“TH—àHêQÀì’ïT’H‘ëPQ“QUàÿÿ[Yÿ\úûHò\ú»ŸY\]ô\ûH^X›òX⁄”X[àù[Xô\àö\⁄XõH⁄[HõY‹»ÿ[›]›ô\õ\À[ùô\ùYÿ\»[ô[ù\›X[H\ôŸH›ô]⁄\»ô]ŸY[àYòXŸ[ù€XúÀâÀà	‘USëêP—HTëHì’»íT’PS”Œà]ô\ûHôX€‹ôY⁄›\»H›H›][ôYö[ô‹»\ôHH€Xà]ô\òYŸ\À[ôXX⁄õ›»ö[ù»]òXŸH[ô€H[ôòXŸK]À\]ŸŸ]\ãàòX⁄”X[à€€ú⁄\›[òﬁH\»]»›€àŸ\\ò]Hö\›X[[ô\»õ›Z\€Xô[Y\»›[ô\ô]öX][€ãâ»HKà»éâ›åL…ÀâÃåçãLKLMIÀ][\Œñ¬à	’HêSPïSíS”àQ—Tàì’»””ïRSî»SNH”’SïQì”ãTUSë»“’Œà›[›õ⁄Ÿ\»Z[ù\»éHòX⁄”X[ãX\‹⁄Y€ôY]ÀàôYHÿ[òŸ[Y][Yÿ[à⁄›»Ÿ\ôHô[[›ôY[ôç€€\ŸY[Y[[ôH⁄›»Ÿ\ôHYYâÀà	—^[ôY⁄›»ŸY\Z\àôXYXõH[]ô\ûHY]öX‹Àà⁄›»⁄‹ŸH]H[ô[ÿ\»ô]ô\à‹[ôY›[ŸY\HŸ[X›Y€Xã€‹úôX›YX›X[€Xã\‹^YY\›[òŸH[ôö[ö\⁄[ô»YKàõ›[ô»Z\‹⁄[ô»\»ö[Y⁄]ô\õÀâ»HKà»éâ›åLâÀâÃåçãLKLMIÀ][\Œñ¬à	‘ì’Së”PàQSïUQT»TëHì’»””ëíTìQQà]ô\ûHòX⁄”X[à›»Xô[[àò[Xù[ö[€àÿ\»HZ[öHö]ô\ã]ô\ûHå0¨Xô[ÿ\»HM∞¨[ô]ô\ûHãZ\õ€àXô[ÿ\»HãZ\õ€à8†%H€‹Ÿ\›Ÿ[X›Y€Xà⁄[àHXô[ÿ\»õ›⁄[ôŸYâÀà	”ÿùö[›\»ù[›⁄[ô‹»[ô\ùX[M∞¨⁄›»õ›»‹[]HHõ›[ô€XàõŸö[\ÀàHLã^X\ôãZ\õ€à[ôåK^X\ôKZ\õ€àô[XZ[à[ò€\‹⁄YöYYôXÿ]\ŸH›⁄[ô»[ô›\»õ›€X\àúõ€HHôX€‹ô[ôÀâ»HKà»éâ›åLIÀâÃåçãLKLMIÀ][\Œñ¬à	‘“SUSU‘àì’SëëUíQU»€€õôX›»Hò[Xù[ö[€àÿ€‹ôXÿ\ô»ô\öYöYY⁄›ÿúŸ\ùò][€úÀHò^HŸ\‹⁄[€ã€XàõŸö[\ÀôYH]öY[òŸKXòX⁄ŸYZŸX]ÿ^\»[ôHŸŸŸYô^\Ÿ\‹⁄[€à\›âÀà	’H”PàS’H—SP’QT»ì’S–VT»H”PàS’HUàòX⁄»\ŸY€õHö]ô\ãZ[öHö]ô\ãK]€€ŸãZ\õ€ãKZ\õ€à[ôM∞¨àôX€‹ôYXô[»›^Hö\⁄XõKù][òŸ\ùZ[à⁄›Y[ù]Y\»»õ›[ù\à€Xà]ô\òYŸ\»‹à⁄[ôŸH^Z[ô»ÿ\úöY\ÀâÀà	’HåLÀ›åL[\Hò^Hÿ\»ÿ]\ŸYûHHù[òÿ]Y[ùò[YXõ\⁄Yî””àôYY8†%õ›õ›ô[à»ôHHÿX⁄Hõÿõ[KàH€€\]HôYYÿ\»ô\Z\ôY[ôô\öYöYYû]KYõ‹ãXû]Kà⁄[][]‹àô\›[»ô[XZ[àŸ\\ò]Húõ€H›]€‹àôX€‹ô»[ô][ô»⁄⁄[â»HKà»éâ›åL	ÀâÃåçãLKLMIÀ][\Œñ¬à	’HêVHëQQì’»ñTT‘—T»“UPàQ—T◊	»SãSRSïUHQ—H–P“KàåL»€›[\úö]ôHôYõ‹ôHHòX⁄€X[à]Hö[H]H€ôW	‹»ôX\ô\›ÿX⁄KX]ö[ô»›⁄[ô»Xà€‹úôX›H\‹òYYù]›[ÿ^Z[ô»8†'õ»ò^HŸ\‹⁄[€ú»Y]∏†'HHôYYô\]Y\›õ›»ÿ\úöY\»Hù[õö[ô»ùZ[[à]»Tì€»€ŸH[ô]H[ôŸŸ]\à⁄]›]ô\Ÿ][ô»[û][ôÀâ»HKà»éâ›åL…ÀâÃåçãLKLMIÀ][\Œñ¬à	÷S’TàíTî’ïSêP“”PSàêQ»PTT»SãàHŸ\MŸ\‹⁄[€à€»Œ⁄›»X‹õ‹‹»L»€XúÀ⁄^\à€Xã⁄]H^X›€ôKYX⁄[X[ÿ\úûH[ôòX⁄€X[à€€ú⁄\›[òﬁHöY›\ô\»úõ€HHÿ‹ôY[àôX€‹ô[ô‹ÀâÀà	’H”ë»SëT»QPT’TëQSì’Q“»T“»HíQ“UQT’S”éàö]ô\àNMKéHòX⁄€X[à›»Xô[NãçK]€€ŸMÕÀçà[ôãZ\õ€àMLãåÀàH›À]ÀM]»ÿ\\»€õHéX\ôÀ⁄[HK]€€Ÿ»ãZ\õ€à\»çKåÀâÀà	’HTì”àQTàT»ì’HQTàQUàHÀZ\õ€àÿ\úöYYLÕKéKãZ\õ€àLÕçH[ôKZ\õ€àLéåŒ»»ÿ\úöYYLLÀåàYÿZ[ú›KZ\õ€àLLåãà‹ŸH\ôHŸ\‹⁄[€àö[ô[ô‹Àõ›ô]»€›\úŸHX\ôYŸ\ÀôXÿ]\ŸHHô[ùYHò[»Ÿ\ôH[õX\öŸY[ôHõ‹õX[^ò][€à[\\ò]\ôHÿ\»õ›⁄›€ãâÀà	–ÿ\úûHŸôô\ú»ŸY\HX⁄[X[òX⁄€X[àX›X[Hô\‹ùY[ôõ›»⁄›»]ô[àô\⁄YHHõ[ö»Y\àõ›ÀàHò^HXõHXô[»òX⁄€X[à””î“T’Sê÷H\»€€ú⁄\›[òﬁHò]\à[à⁄[[ùHÿ[[ô»]›[ô\ô]öX][€ãâ»HKà»éâ›åLâÀâÃåçãLKLLâÀ][\Œñ¬à	÷S’H–Sà—US’Tà’”à”Pà”àSñH”H—àHSãà‹[àH€›\úŸH[à[àõ›[ôô\\LåX˚Ô"»[›\à€XóLåY€àH€KX⁄»€ôH‹à€»Ÿôà[›\àY\ãà]⁄›‹»\»S’Tà–SXõ›ôHH[óLåN\»[ôHLåM⁄X⁄›^\»€àHYŸKôXÿ]\ŸHHÿ[[›Hÿ[õõ›ŸYHHôX\€€ö[ô»õ‹à\»€ôH[›Hÿ[õõ›\ô›YH⁄]ô^[YHõ›[ôâÀà	“]ôXX⁄\»HYKà€à]€H[àH]ôHŸŸŸ\àH€€\ŸYô\ÿ\ôXY»⁄][›\à€Xàò]\à[àH[óLåN\À[ôHõ›[ôÿ\ôYù\ùÿ\ô»X\ö‹»H€\»⁄\ôHHÿ[]‹òYYÿ\»[›\ú»ò]\à[àô\ŸX\ò⁄YàLåX’\ŸHH[óLåY]»]òX⁄ÀâÀà	’HTïUPUTîŒà[›\àX⁄»›\ùö]ô\»Hô^\]H»][ãà[ú»Ÿ]ôK\Ÿ[ù⁄€H]ô\ûH[YHH€‹ôŸà€ôH⁄[ôŸ\À€»[àY]›‹ôY[ú⁄YHH[à€›[ôH⁄\Y⁄[[ùHLåM[›\ú»\»ö[YYÿZ[ú›H€›\úŸH[ú›XYà\›YûHôK\\⁄[ô»HòZ\ò⁄[ôY[à[ô\àHô]»ô\ú⁄[€àYù\àŸ][ô»H€XéàHÿ[[âÀà	÷[›Hÿ[à[€»Ÿ]H€Xà€àH€HH[àÿ^\»õ›[ô»Xõ›]LåM‹ŸH\ôHH€\»[›H\ôH[‹›ZŸ[H»]ôH[›\à›€àöY]»€ã[ô]›[ôXX⁄\»[›H€àHYKâ»HKà»éâ›åLIÀâÃåçãLKLLâÀ][\Œñ¬à	“’»HSàSTT»ëPQPìHì’Àà[›HÿZYHö[ö\⁄Y€€[[àÿ\»õ›X\ﬁH»ÿÿ[ã[ô]ÿ\€óLåN]LåM]ÿ\»€»[ô\»Ÿàõ‹ŸH‹]YY^ôY[ù»Hò\úõ›»€€[[ã€»LåX€õ»^H]]LåY[ôLåX◊LåNLÿ\õôYLåY‹ò\Y»ôYH[ôõ›\à[ô\»[ô[›HY»ôXY]ô\ûHŸ[»ö[ôHòY€\ÀâÀà	””ëHSëHTà“’ôXÿ]\ŸHH€Xà[ô⁄]]€XàY\ôH€ôHòX›àQH⁄]H€Xà[›H][ô⁄\ôHHò[ö[ö\⁄Y‘ìà⁄]H€Xà[à[ô⁄]\à[›Hõ›[ôH‹ôY[ãàH‹ôY[àòZ[›€àHYù⁄\ôHH⁄›€‹›õ›[ôÀù\ô›[ôH⁄\ôH]YLåM€»[›Hÿ[àŸYHH€WLåN\»›‹ûH⁄]›]ôXY[ô»H€‹ôâÀà	’H[óLåN\»€‹ô»⁄]Xõ›ôHHZ\õ[ôH[ôHô\›[ô[›»][àHÿ[YHŸ[⁄X⁄\»⁄]ÿ]ôHHõ‹ŸH]»⁄YòX⁄ÀàYX\›\ôYYÿZ[ú›H€ùZ[àHXõH\»“‘ïTà]]ô\ûH€ôH⁄YLåMéL‹⁄‹ù\à]ÃåL\]ŒLLåM[ôõ›[ô»‹ò\ÀâÀà	–HôYHX\ö‹»Hö[ö\⁄H[à€[›H»]õ⁄Yà€àH\à»\ôH\»€ôH[ôKõ›€ÀôXÿ]\ŸHHYH⁄›T»H\õÿX⁄à[ôHYH⁄›]Yùõ»^H]H‹ôY[àôXY»PQHÿ[YH€‹ôHŸôã]K]YH€XàXõH\Ÿ\Àâ»HKà»éâ›åL	ÀâÃåçãLKLLâÀ][\Œñ¬à	÷S’TàêRTê“S“QSTàì’Së€›HëQ[à€à]»ÿ\ôõ›HõX⁄◊LåN\»LåM⁄X⁄\»Hö^úõ€HX\õY\àŸ^H€‹ö⁄[ô»€àHôX[õ›[ôò]\à[à€àH\›€ôKà]ÿ\»Hö\ú›õ›[ô]ô\à^YY]HÕãZ€HòX⁄[]H[à\»\âÀà	—íVQ€àHÿ[YHÿ\ôàLåX“›»H[à[\LåY€[›HHôY[àÿ\»‹ö][àLåXŸúõ€H\»õ›[ô[[€ô»›\ú◊LåYà]ÿ\»õ›LåM]ÿ\»‹ö][à][‹õö[ô»Ÿôàô\ŸX\ò⁄[ô[›\à€ÿ€‹ôXÿ\ôàH[à\»]YûH]»ôYYY⁄X⁄ÿ\úöY\»HVH[ôõ›H[YK€»H\Ÿ[ùZ[ô[Hÿ[õõ›[H[à‹ö][àôYõ‹ôH[›HYYŸôàúõ€H€ôH‹ö][à\]]ô[ö[ôÀà]›[Ÿ\»õ›‹òYHHÿ[YKY^H[à
+[ô\ãX€Z[Z[ô»\»HÿYôHÿ^H»ôH‹õ€ô Kù]]õ›»ÿ^\»]\»⁄K[ú›XYŸà\‹Ÿ\ù[ô»⁄\ôHH[àÿ[YHúõ€Kà]ôX€€Y\»HôX[\›Hô^[YH[›H^H\ôKâÀà	”õ»€›\úŸHò][ô»€à]ÿ\ô\»[Xô\ò]Kõ›[à›ô\ú⁄Y⁄àHXõ\⁄Yò][ô»[ô€‹Hõ‹àòZ\ò⁄[⁄Y[\à»õ›ô\€€ôH€X[õHLåMŸ]ô\ò[ò\öX[ùÀ[ô€ôHöY›\ôH€€Y\»òX⁄»[ô\àõ›€›\úŸ\Àà[€]YHHò][ô»[ô€‹HŸôà[›\à“Sà‹›‹àHÿ€‹ôXÿ\ô[ô]ÿ[àôHòX⁄Ÿö[Y€ù»Hÿ\ô⁄]H\â»HKà»éâ›éNIÀâÃåçãLKLLâÀ][\Œñ¬à	—íSíT“Së»Hì’SëSë–UíSë»”ëHTëH”»TÀSëH—P””ë”ëHÿ\»Y[ôÀà€àHô]öY]»ÿ‹ôY[àHÿ]ôHù]€àÿ\»H\›[ô»[àHõ‹õH8†%[ô\àHYH⁄\ÀHò][ô»öY[ÀHYôô\ô[ùX[[ôKHõ›XõH⁄\»[ôHõ›\»õﬁXõ›]Hÿ‹ôY[à[ôH[à›€ãà€»Hõ›[ô€›[ôH\Y[à›ô\àõ›\à›\úÀô]öY]ŸY[ôYù⁄][ô»[úÿ]ôY[àHòYù⁄[H]ô\ûHù[Xô\à[àH\›[ôXY€»õ›[ôÀà]\[ôYŸ^KâÀà	’Hÿ]ôH\»õ›»[õôYXõ›ôHHXàò\àõ‹àH⁄€HŸàHô]öY]»ÿ‹ôY[ã⁄]H€H€›[ù[ôH[ôHÿ^Z[ô»õ›[ô»ôXX⁄\»[›\àôX€‹ô[ù[[›H\]à]Ÿ]\»òX⁄»[ù»HYŸH]Hõ›€Hò]\à[àõÿ][ô»›ô\àH\›ÿ\ôàYX\›\ôY[àõ›[Y\»]ÃåÕÕH[ôŒL⁄]Hõ›⁄⁄[][]Yà€X\àŸàHXàò\à]ô\ûH[YK[ôHù]€à\»ú[âÀà	’H[Yà]]ô\à\[ú»YÿZ[éàHZYHXàôXY»ëT’SQH[ú›XYŸàQKà]€õH]ô\àYX[ú»Hõ›[ô\»›[‹[à[àHòYù8†%õ›[ô»\»‹›\][ôö[ö\⁄ÿ]ö[ôÀà[›\àõ›[ô\»›[\ôKâ»HKà»éâ›éN	ÀâÃåçãLKLLâÀ][\Œñ¬à	—êRTê“S“QSTà\»ô\Y8†%õ›ZY⁄Y[úÀôXÿ]\ŸH[›HYõ›€õ›»Y]⁄X⁄€ôH[›HŸ\ôH^Z[ôÀàHõX⁄»[ôHôY\ôH€»Ÿ\\ò]H›[ô[ô»[ú»[àõ›[ôô\[ôõ›\ôH€à[›\à€›\úŸH\›⁄]HòX⁄[]H€àHX\€»^H€‹ù⁄]]ô\û][ô»[ŸHûH\›[òŸKâÀà	’HìP“»\»H\ô\àÿ\ô
+ÃãåÃLé
+H[ôH€ôH⁄]ôX[€KXûKZ€Hô\ŸX\ò⁄ôZ[ô]àMàŸàN€\À[ò€Y[ô»Hõ[ôYH⁄›€àHõô⁄\ôH[›HÿZ]õ‹àHô[Hõ¯†&\»›€àò]õ›\ö]H]HÃÃ^X\ô]H[]ò]Y‹ôY[à€àMà⁄\ôH€ô»\»HÿYôHZ\‹À[ôH\à»›ô\àHÿ]Z[»]MÀà]»\à‹»]ô\òYŸHMÕH8†%[›\àKZ\õ€ãâÀà	’HëQ€›ô\ú»H€\»[ôÿ^\»€Ààõ›[ô»Xõ\⁄Y\ÿ‹öXô\»H›\à\ùY[ã€»ò]\à[à[ùô[ùYH[ô\»H[à⁄]ô\»[›HH›ùX›\ôH]T»€›\òŸYàKKL[ôN\ôH›Y\[ôHõ›\ùY[àô]ŸY[à[H\ôHõ][ôÿ€‹ôXXõKà⁄[ô[ôH‹ôY[ú»\ôHHYô[òŸKâÀà	’⁄\ôHH[∏†&\»YöXŸHõ›Y⁄[›\à›€à›⁄[ô»]ÿ^\»⁄X⁄\»⁄X⁄à€»€\»€àHõX⁄»ÿ[ùHò]Œ»[›\à‹[àò][\»[à›ô\ã]K]‹€XŸK€»‹ŸHõ›\»X€[ôHH€›\òŸx†&\»YöXŸH[ô[[›H^H\ôH⁄[ô»]àHNÿ[ù»HòYK⁄X⁄\»H€ôH€H›]\ôH⁄\ôH[›\àZ\‹»\»[à\‹Ÿ]âÀà	—íVQSëU”’SUëHíUSàS’H”S‘îì’Œà⁄]€»€›\úŸ\»]€ôHòX⁄[]HH\X]⁄YH[à€àHò[YHëQì‘ëHH\⁄€»õ›[ú»X]⁄YZ]\àõ›[ô[ô⁄X⁄]ô\à€ôH[ôYö\ú›€€ãàö]ô[à[àHúõ›‹Ÿ\àôYõ‹ôH[ôYù\éà€àH€ùZ[Hõ›[ô›\ùY€àHëQÿ\»Ÿ\ùôYHõX⁄¯†&\»[à€à]ô\ûH€Kà[à^X›ò[YHõ›»⁄[ú»›]öY⁄[ôHõ›[ôÿ\ô‹òY\»Hÿ\ôYÿZ[ú›HöY⁄[àõ‹àHÿ[YHôX\€€ãà]ô[ù›Yôö^\»ZŸH8†'ôYZ€X[à8†%ÿ‹ò[Xõx†'H›[X]⁄Hõ›[ôŸŸŸY[ô\àHZ[àò[YK^X›H\»ôYõ‹ôKâÀà	”õ»ÿ€‹ôXÿ\ô\»€àö[Hõ‹àZ]\à€›\úŸNà]ô\ûHÿ€‹ôXÿ\ô‹›ÿ\»[úôXX⁄XõHúõ€H\ôK€»\à[ô›õ⁄ŸH[ô^€›[õ›ôH€›\òŸYàHŸŸŸ\à⁄[\⁄»[›H»Ÿ]\à\»[›H€»Hö\ú›[YHõ›[ô[ôôYö[]Yù\à]à€›\òŸ\»⁄]ô[àõ‹àõ›€›\úŸ\»]ô[àÿ^HHõX⁄»\»\àÃ[ô\àÃH8†%[›\àÿ\ôŸ]\»]â»HKà»éâ›éM…ÀâÃåçãLKLLIÀ][\Œñ¬à	’Hô\›ŸàHòX⁄€X[à€‹öÀùZ[õ›»ò]\à[àÿZ][ô»õ‹à]H»ù\›YûH]LåMHÿ[YHôX\€€àHY\à[ôHò^HŸ\‹⁄[€ú»Ÿ[ù[àôYõ‹ôH[›\àö\ú›Ÿ\‹⁄[€ãâÀà	‘“SUSU‘àì’Së»]ôHH€YK[ôHÿ[\õ›[ô[KàH⁄[Hÿ\ô\»›‹ôY\›Y⁄]H“SHòYŸH[ô‹[ú»»Hù[€KXûKZ€Hõ›[ôÿ\ôLåM[ô]\»€›[ùY[àì’SëŒàõ›[›\à[ôXÿ\õ›HŸ^H[\Àõ›€ÿX⁄LåN\»õ›\à\ôX\Àõ›[›\àà‹à[›\àôX€‹ô]H€›\úŸKàHT—–HŸ\»õ›XÿŸ\H⁄[][]‹àÿ€‹ôK[ôHòX⁄€X[àõ›[ôŸàXòõH€õ›‹»HôX[ò][ô»[ô€‹K€»Hõÿ⁄»\»Xú€€]Hò]\à[à€€Y][ô»]\[ô»€àHZ\‹⁄[ô»ù[Xô\ãâÀà	’H€ôH[ô»H⁄[Hÿ\ôX^H›[[H\\»⁄]H”H\»LåM]»\à[ô›õ⁄ŸH[ô^⁄X⁄H⁄[][]‹àô[ô\ú»Xÿ›\ò][Kà]ÿ[àô]ô\à[]⁄]S’H»€à]€Nà[›\àôX€‹ô\ôH[ôH€Xà[›H]\ôHôXYŸôà›]€‹àÿ\ô»€õKôXÿ]\ŸH[ô€‹ú»\ôH\»õ»[ò[Hõ‹àHòYö]ôKâÀà	–H⁄[][]‹à]\»›ùX⁄»€àHõ]X]⁄]HúôXZ»\YYûH€Ÿùÿ\ôK€»XYH\›[òŸ\»\ôHõ›€à]ÿ^H€àHÿ^H[ãàH]€›[ù›^\»LåM[›H€⁄»‹ŸH›õ⁄Ÿ\ÀâÀà	—UëTñHPà–SàUëHU»’”àUì”US”à‘íQõ›Àõ›ù\›][ôÀàHù[àŸàò^HŸ\‹⁄[€ú»\»⁄]ö[»H›⁄[ô»€ôNà]X⁄»[ô€K€Xà]òXŸK]À\]ò]⁄ûHò]⁄⁄]Hÿ[YHLçÃL»»LçÃM»»»X\ö‹»[ôHÿ[YHù[H]Hõ›»Ÿà]Y\›[€àX\ö‹»\»H[‹›\ŸYù[õ›»€àHYŸKàHXà⁄]õ»‹öY⁄›‹»õ›[ô»][ò]\à[à[à[\HXõKâÀà	’H””PíSëH\»[ãàòX⁄€X[óLåN\»›€à\›LåMå⁄›»»ö[ôHX\ôYŸ\»\»ö]ô\ãÿ€‹ôY›]ŸàLLåM\»H€õH[ô»Hò^HõŸXŸ\»]\»\ôX›H€€\\òXõH»[›\à›€à\›][\€»]ô[ô\ú»\»Hô[ò⁄X\ö»[àH›⁄[ô»Xéà]\›ô\››»X[ûHZŸ[ãH\ã]\ôŸ]XõK[ôHô[ô€òŸH\ôH\ôHôYKâÀà	—XX⁄Xàõ›»ôXY»Hÿ[YHÿ^H‹»õ›€NàHö[KHò^KH‹öYHò]⁄\»Y\À[àHô[ò⁄X\öÀàH›⁄[ô»‹öY[ôH€€Xö[ôHŸ\ôHXõ›ôHHò^Hõÿ⁄»ö\ú›⁄X⁄Y€ôHYŸHXX⁄[ô»HôXY[ô»‹ô\àHô^YŸH€€ùòYX›Yâ»HKà»éâ›éMâÀâÃåçãLKLLIÀ][\Œñ¬à	’êP“”PSãàH\ÿ[àõ›»€][ò⁄[[€ö]‹àù[Xô\úÀ€»HŸ\‹⁄[€ú»]H›[ôŸH]ôH€€Y]⁄\ôH»[ô[ú›XYŸà⁄][ô»[àH⁄]à€»XŸ\»⁄›»]àHÿ\úûHY\ã[ôHô]»ïHò^Hàõÿ⁄»[àH›⁄[ôÀ⁄‹ùÿ[YH[ô][ô»XúÀâÀà	—UëTñHQTàì’»ì’»–VT»“TëHU»ïSPëTà–SQHîì”HLåMH]H]ÿ\»YX\›\ôY›»X[ûH⁄›»]]ô\òYŸ\ÀH‹ôXY[ôHò[]ÿ\»]⁄]àõ›‹»]]ôHô]ô\àôY[àYX\›\ôYÿ^Hô\›[X]Yàò]\à[à⁄][ô»\ôH€⁄⁄[ô»Y[ùXÿ[»€ôH]\ÀàHÿ\[€ú»€õH\X\à€òŸH€€Y][ô»€àHY\à\»Ÿ[ùZ[ô[HYX\›\ôY»[ù[[àH€€õ›H€›ô\ú»]\»ôYõ‹ôKâÀà	’H‹ôXY\»ô]»LåMLåNHX\ô»€àHö]ô\à\»Hù[Xô\à\»\\»ô]ô\àYõ‹à[ûH€Xã[ô]\»H€ôH]X⁄Y\»H\àÀâÀà	–HYX\›\ôYÿ\úûHëUëTà]ZY]H›ô\ù‹ö]\»Hù[Xô\à[›H\YàHõ›»⁄›‹»õ›LåMû[›\ú»åÃLç»Hò^Hÿ^\»çHàLåM⁄]Hù]€à»ZŸH]àõ[ö»õ›‹»]⁄[\Hö[ÀôXÿ]\ŸH\ôH\»õ›[ô»\ôH»õ›X›âÀà	’HZ[öKYö]ô\à»ãZ\õ€à’ëTìTõY»ÿ[àö[ò[H[ú›Ÿ\à]Ÿ[ãàŸ^H]\»Ÿù\ö]Y]X»[ôÿ^\»€Œ»€òŸHõ›õ›‹»\ôHYX\›\ôY]›]\»Hÿ\[àPTëÀ⁄X⁄\»H]Y\›[€àHÀZ[ò⁄Z[öH[ôHŒKZ[ò⁄ö]ö[ô»\õ€àX›X[H‹ŸKâÀà	–Hò^HŸ\‹⁄[€à‹[ú»ZŸHHö[HúôXZŸ›€éà⁄]]YX\›\ôY€XàûH€Xã[àHXõH]ÿ‹õ€»[à]»›€àõﬁàH€€[[à€õH\X\ú»⁄\ôHHŸ\‹⁄[€àõŸXŸY]âÀà	’ôYHòX›»XY]ô\ûHò^HŸ\‹⁄[€ãôXÿ]\ŸHõ€ôHŸà[H\»ö\⁄XõH[àHù[Xô\éàHêSHò^WLåN\»õ‹õX[^ò][€àŸ][ôÀ[ô⁄]\à‹[àÿ\»QPT’TëQ‹à\›[X]Yà[ô€‹ú»HòY\àôYY»Xõ›]€»ò[ô]õ€][€ú»»YX\›\ôH‹[àLåM€àH›[ôŸWLåN\»Z[à⁄]Hò[»]\›[X]\»€ôH[ú›XY[ô⁄[òŸHÿ\úûH\»€€\]Yúõ€H][ò⁄[ô‹[ã]XZŸ\»Hÿ\úûHH[Ÿ[ùZ[€àH[Ÿ[Y[ú]àô]\à[àH›Y\‹Ààõ›Hÿ[YH\»HYX\›\ô[Y[ùâÀà	”ô]»]öY[òŸHòYŸNàQPT’TëQSàHêVKà]ò[ö‹»Xõ›ôHö[H[ôô[›»[›\à›€àõ›[ô»LåMHòY\àôX]»Húò[YH€›[ùYûH[ôŸôàH€ôK[ôHÿ\ô[›HX›X[H^YYôX]»[ûHù[Xô\àZŸ[àŸôàH\ôôX›YKà\[ô»]ÿ^\»⁄]HX]ÿ[õõ›ŸYNà›[Z\ãõ»€‹Kõ›[ô»]›ZŸKâÀà	”õ›[ô»[ô€‹ú»›X⁄\»[›\à[ôXÿ\[›\à€ãX€›\úŸH›]»‹àH]ôHŸŸŸ\ãà]ÿ[€Ÿ\»[à⁄]⁄[][]‹àõ›[ôÀ⁄X⁄\ôHõ›ùZ[Y]â»HKà»éâ›éMIÀâÃåçãLKLIÀ][\Œñ¬à	÷[›\àZŸ\⁄YHö]ô\àö[H\»]YUQ»MÀõ›]Y»åà[›H€€ôö\õYYH€\LåN\»]K[ô]ÿ\»€àHôX€‹ô\»]Y»åLåM⁄X⁄ÿ\»]ZY]H€Z[Z[ô»]ÿ[YHŸôà[›\à]Y»åõ›[ô]ZŸ\⁄YKà]Yõ›à]õ›[ô\»HôX[Ÿ\\ò]H^HôYH^\»]\ã[ô]»ÿ€‹ô\À\ú»[ôÃçKÃLéH\ôH[ù›X⁄YâÀà	’H€‹úôX›[€àõ€›‹»Hö[H]ô\û]⁄\ôH]\»⁄]YLåMH›⁄[ô»ò][ÀH‹›\ôH[ãH⁄X⁄‹⁄[ùYŸKHÿ\\ôHÀYÀ[ôH]öY[òŸH⁄\[ô\àH‹›\ôHò][⁄X⁄\ŸY»ôXYLåX–]Y»åö[WLåY€àHÿ\ô⁄‹ŸH^õ›»ÿ^\»]Y»MÀâÀà	—]ô\ûH’Tà]Y»å\»Yù[€ôH€à\ú‹ŸNà[›\àõ›[ôH^H[›H›Ÿ‹ò\YHÿ€‹ôXÿ\ô[ôH]\»[ú»Ÿ\ôHY]Yà€õHH^HHÿ[Y\òHõ€Y[›ôYâÀà	’[ô\àH€ŸàHö[YYŸ\‹⁄[€óLåN\»UHÿ[àõ›»ôH€‹úôX›Yúõ€HHôYY][à]€›[õ›ôYõ‹ôHLåMH€õHÿ^H»⁄[ôŸH€ôHÿ\»»[]HHŸ\‹⁄[€à[ôôKXY]⁄X⁄õ›‹»]ÿ^H]ô\û][ô»[ôXYH]X⁄Y»]â»HKà»éâ›éM	ÀâÃåçãLKL	À][\Œñ¬à	‘USë»õ›»⁄›‹»⁄\ôH[›\àXZŸ\»ÿ[YHúõ€KàH\›[òŸHò[ôŸ\»⁄][àH€‹õô\àô\⁄YHHù[Xô\àLåM€ôH[ôH\àò[ôŸH[›H]ôHX›X[H€Yúõ€K[ôò[ôŸ\»[›H]ôHõ›[ô»[à»õ›\X\àLåM[ô“UëSà\»Hõ›\ùõ›ÀôXY[ô»ZŸHHôYHXõ›ôH]âÀà	—⁄]ô[à\»€›[ùYŸôàH⁄\[›H\Y›ô\àH€\»]X›X[HôX€‹ôY[à[ô[ôŒàHXYH\›[òŸK‹àH€€òŸ\‹⁄[€ãàì’›ô\à]ô\ûH€H[›H^YYà[›\àö\ú›]ôHõ›[ôYõ›òX⁄»]»XYK[ô\»\»⁄]›‹»‹ŸHZY⁄Y[à€\»ôZ[ô»ôXY\»⁄[[Y\»[ô[ôõ][ô»Hù[Xô\àLåM^H\ôH⁄[\Hõ›[à]âÀà	–€ÿX⁄LåN\»][ô»[ôHõ›»ÿ^\»›»X[ûH€\»ôX€‹ôY[à[ô[ôÀ€»H⁄\ôHZŸ[à›ô\àZY⁄Y[àŸà[›\à\ùK\⁄^ÿ[àô]ô\àôXY\»›Y⁄]ÿ[YHŸôà[Ÿà[KâÀà	”€ôŸ\›XYHÿ[YH›]à]\»H\›[ôHŸàHò[ôŸH\›õ›À€»ŸY\[ô»]ÿZYHÿ[YH[ô»⁄XŸHLåM[ô]ÿ\»ôZ[ô»›]Ÿôà»ì€ôŸ\›XYLåçàà€àHò\úõ›Ÿ\›€ôKâÀà	”õ›[ô»[ŸH[›ôYàHK\]ã\][ô »õ›‹»›[ôXY›ô\à]ô\ûH€H[›H^YY[ôH[H\»Hÿ[YHZY⁄]ÿ\À€»Hõÿ⁄»€X\ú»HXàò\àûH^X›H⁄]]YôYõ‹ôKâ»HKà»éâ›éL…ÀâÃåçãLKL	À][\Œñ¬à	’Hÿÿ][€àõ€\⁄›[›‹\õö[ô»\àH\ÿ\»\⁄⁄[ô»S‘»õ‹àHúô\⁄‹⁄][€à]ô\ûH[YH[›H‹[ôY]LåM]\»⁄]]H[›»X[Ÿ»€àÿ‹ôY[àXX⁄[‹õö[ôÀà]õ›»\Ÿ\»Hö^][ôXYHYÿ]ôY€»‹[ö[ô»H\\⁄‹»õ‹àõ›[ô»][âÀà	“]\⁄‹»[àôYHXŸ\»õ›»[ô]ô\ûH€ôHŸà[H\»H\[›HXYNàHŸX]\àÿ\ôHö\ú›[YH€àHô]»€ôKS’ëQ»€à]ÿ\ô[ôH\›[òŸH€‹ù»€àõ›[ôô\[ô€›\úŸ\Àà[à‹[ú»[àHõ›»Ÿ[ùúõ€H[]ô[àõ€\»»€ôKâÀà	’H€ô\›òYNàH[\\ò]\ôHõ›»õ€›‹»[›\àÿ]ôYö^ò]\à[à[›Kà⁄[H]ö^\»Ÿ^WLåN\»[›H€›[ô]ô\à€õ›»HYôô\ô[òŸKà€òŸH]\»€\ãHÿ\ôò[Y\»H^H]ÿ\»ZŸ[à[ô[›ôY»⁄]»öY⁄ô\⁄YH]LåM€ôH\[ô[›H\ôH›\úô[ùYÿZ[ãâÀà	’€‹ù€õ›⁄[ôÀôXÿ]\ŸH]\»H[àõÿõŸHÿ[à€ŸH\õ›[ôà⁄]\à[›»›X⁄‹»\»S‘◊LåN\»X⁄\⁄[€ãõ›H\LåN\À[ôõ‹àHŸXà\€àH€YHÿ‹ôY[à]Ÿù[àŸ\»õ›àõ›[ô»€àHYŸHÿ[àXZŸH]›X⁄Àà⁄]HYŸHÿ[à»\»›‹\⁄⁄[ôÀ⁄X⁄\»⁄]\»\Àâ»HKà»éâ›éLâÀâÃåçãLKL	À][\Œñ¬à	–Hõ›[ô[›H\H[ù»Ÿ»Hõ›[ô€àHõ›[ô»Xàõ»€ôŸ\àúôXZ‹»HYŸKà]ÿ\»ÿ]ö[ô»ö[ôH[ô[àò[ö\⁄[ô»LåMHõ›[ô\›[ôŸ^WLåN\»[ôXÿ\[Hõ››‹Yò]⁄[ôÀôXÿ]\ŸHH[ôXÿ\⁄X⁄»ôXYH€KXûKZ€H\úò^HŸôàHÿ\ô]\»ô]ô\àY€ôKà\Yõ›[ô»\ôHÿ€‹ôK]»[ôHõ›HûH\⁄Y€ãà[û][ô»[ôXYHÿ]ôY\»ö[ôH[ô⁄›‹»\õ›ÀâÀà	—]ô\ûHõ›[ô›‹Yÿ‹õ€[ô»HYŸH⁄Y]ÿ^\»€àHò\úõ›»€ôKà⁄^€€[[ú»ŸàZ[ö[][H⁄YYõ›ö]HÃåÿ\ôLåM‹àHÕÕ\€ôHLåM€»H⁄€HYŸH€YàHXõHõ›»Y⁄[ú»]»›€à‹X⁄[ô»€àH€ôH[ôYà]]ô\à›[ÿ[õõ›ö]ÿ‹õ€»[ú⁄YH]»›€àõﬁ[ú›XYŸàòYŸ⁄[ô»HYŸH⁄]]âÀà	”õ›[ô»ÿ\»õ‹Y»»]à[⁄^€€[[ú»\ôH›[\ôKàHY[ô»[ô\ÀH€€[[àXY[ô‹»⁄]ôH\Z\à]\à‹X⁄[ôÀ[ôH]HLåÿH€àH]H€Ÿ\»LåMHÿ\[€à[ô\õôX][ôXYH[»[›HHõ›»\»\XõKà\H⁄^ô\»\ôH[ù›X⁄YâÀà	–H€ô»€›\úŸH‹àYHò[YHÿ[àõ»€ôŸ\àX⁄YH›»⁄YH]XõH\»»ôKà]‹ò\»[ú›XY⁄X⁄X]\ú»ôXÿ]\ŸH‹ŸH\ôHH€»€€[[ú»[›H\H[›\úŸ[ãâ»HKà»éâ›éLIÀâÃåçãLKL	À][\Œñ¬à	÷[›\àòY»›⁄]⁄\»[ãàHRSíHíUëTà\»òX⁄»]MKçWLå[ô\»HòZ\ùÿ^Hö[ô\àYÿZ[é»HKU””—õ‹Y»NKçWLå[ô[›ôY›€àHòY»[ù»H€›HRTì”àù\›Yù»HZ\õ€à\»›]à›[õ›\ùY[à€XúÀ[ôHYH⁄\»[àH]ôHŸŸŸ\àõ›»Ÿôô\à^X›H]Ÿ]âÀà	–õ›€€Ÿ»⁄]€àHÿ\úûHY\à⁄]ì»ù[Xô\ã[ô]\»€à\ú‹ŸKàHZ[öWLåN\»€ååÿ\»[à\›[X]H]LÀçWLå[ô\»\»õ›]€Xã[ôHK]€€Ÿ\»ô]ô\àôY[àYX\›\ôY][ûHŸùàH›Y\‹»ôXY»^X›HZŸHHYX\›\ô[Y[ù€òŸH]\»€àHY\ãâÀà	’HòY»õY‹»HãZ\õ€à\»[à’ëTìTõ›Àà]\»Ÿù\ö]Y]X»[ôõ›[ô»[ŸHLåM]MKçWLåHZ[öH⁄]»^X›HKçWLåŸôà]⁄X⁄\»⁄\ôHHù[Hö\ô\ÀàHÀZ[ò⁄Z[öHö]ô\à[ôHŒKZ[ò⁄ö]ö[ô»\õ€à»õ›ÿ\úûHHÿ[YH\›[òŸH⁄]]ô\àZ\àŸù»ÿ^N»HõY»\»H\ÿ^Z[ô»H]Y\›[€à\»‹[ãõ›[ú›Ÿ\ö[ô»]âÀà	—]ô\ûH[à]€[›H»]HZ\õ€à\»ôY[àôK\ôXYà⁄X[õõÀ›[ôöYŸH[ôZŸ\⁄YHY[]ô[àÿ[»ô]ŸY[à[HŸôàH€Xà[›Hõ»€ôŸ\àÿ\úûHLåM^Hõ›»€€YHŸôàHãZ\õ€óLåN\»åH‹àHKZ\õ€óLåN\»N⁄]HX]ô\»[›ôY»X]⁄[ôXX⁄[óLåN\»\\àòZ[ÿ^\»⁄]⁄[ôŸYà›\õ[ô»ò\õ\◊LåNHK]€€Ÿÿ[»›[ò[YHH€Xà[›Hÿ\úûN»Hõ›H\ôHÿ^\»]\»ôYHY‹ôY\»ŸXZŸ\à[àH€ôH]][KâÀà	‘›⁄[ô»›Y⁄»\»HŸX›[€à\à€€ŸYÿZ[ã[ôHò[ôŸHö[»]Ÿ\ôH€€\\ö[ô»ö]ô\àYÿZ[ú›HK]€€Ÿ\ôH€€\\ö[ô»ö]ô\àYÿZ[ú›HZ[öHö]ô\à[ú›XYâÀà	‘€X[[ô»€à⁄]LåN\»[ôYàHòY»⁄[ôŸHõ›»ÿ^\»⁄X⁄€Xà]ÿ\»ò]\à[àHY]ÿ\»ö[Y[ô\ãâ»HKà»éâ›éL	ÀâÃåçãLKL	À][\Œñ¬à	‘USë»õ›»ôXY»K\]ã\][ô »]»\»\òŸ[ùYŸ\»ŸàH€\»[›H^YY⁄]Hò]»€›[ù»ô\⁄YH[K[ôH€ôŸ\›][›H€Y[ô\õôX]àHXY[ôH\»]»H€KâÀà	“]ÿ\»⁄›⁄[ô»L	Kà][HY⁄]H⁄\ôHŸà[›\àY‹»ö[ö\⁄[ô»[ú⁄YHôYHôY][ô€à[›\à€»]ôHõ›[ô»]ÿ[YH›]MHŸàMH8†%ôXÿ]\ŸHLàŸà‹ŸHŸX€€ô]»Ÿ\ôH“UëSã[ôH€€òŸYY]\»[ú⁄YH⁄[[YHò[ôŸHûHYö[ö][€ãàHù[Xô\àÿ\»öY⁄[ô€[›Hõ›[ôŒà]ÿ\»YX\›\ö[ô»›»úôY[H[›\à\ùô\ú»⁄]ôH⁄‹ù€ô\ÀàHò]H]ÿ[à€õH[ôôX\àL	H\»õ›HYX\›\ô[Y[ùâÀà	’⁄\ôH]õﬁ[Z]Hù[Xô\à›[\X\ú»8†%HY»ö[ô[ô»[ô][ô»0≠»ûH\›[òŸH8†%]õ›»ÿ^\»›»X[ûHŸ\ôH€€òŸYYò]\à[à€Y€»[›Hÿ[àŸYH⁄X⁄[à\»[›\úÀâÀà	’H⁄€Hù[Xô\ú»õÿ⁄»€›H]HY⁄\à»XZŸHõ€€K›]ŸàXY[ô»[ôY[ô»€õKà]õ›»€X\ú»HXàò\àûHM\€àH€X[\›€ôH[ôXõ›]L€à[›\ú»8†%]ÿ\»ù[õö[ô»T’]€òŸH[›HY]ôH][ô»]H€àHÿ\ô⁄X⁄õ›[ô»YYX\›\ôYôYõ‹ôKâ»HKà»éâ›éIÀâÃåçãLKL	À][\Œñ¬à	–Hõ›[ô[›Hö[ö\⁄õ›»[›ô\»[›\àSëP–TàHö[ö\⁄ÿ‹ôY[àŸôô\ú»HY\»\»⁄\»⁄\ôHH€›\úŸWLåN\»ÿ€‹ôXÿ\ô\»€àö[H8†%\⁄]H[ôHò][ô»[ô€‹Hö[[\Ÿ[ô\»[ã[ô][»[›HHYôô\ô[ùX[[ô⁄\ôH[›\à\›[X]Y[ô^[ô»ôYõ‹ôH[›Hÿ]ôKâÀà	”ZŸ\⁄YH\»Hö\ú›€›\úŸH⁄\ôY\à[ö]ôHYHõ›‹»ŸôàHÿ\ô[›H›Ÿ‹ò\Y
+õYHÃãåÀÃLÃHLç»⁄]HÃçKÃLéHLç»‹ôY[àéçÃLå»Lç»€€çKéÃLL»Lç»ôYçåÀÃLLJKà^HYôY[à⁄][ô»[àHö[H⁄[òŸH]Y›\›[ôŸ\ôH[úôXX⁄XõH8†%HôYY[ùûH]€‹úôX›YH›õ⁄ŸH[ô^ÿ\»ô\X⁄[ô»H⁄€Hÿ\ôYHò][ô‹»[ò€YYâÀà	–[ûHù[ÿ\ô[ôXYHÿ]ôY⁄]›]Hò][ô»ÿ[àôHö^Yúõ€HHÿ\ô]Ÿ[éà‹[àHõ›[ô[ôHYH⁄\»\ôH\ôKâÀà	’H\›[X]Y[ô^ÿ^\»⁄]]ô\›»€ãàŸ^WLåN\»[ôXÿ\[Hÿ\úöY\»][ôõ›[ô»õ›»ÿ^\»›»X[ûHŸà[›\àÿ\ô»ÿ\úûHHò][ô»[ô›»X[ûHù[€ô\»\ôHZ\‹⁄[ô»€ôH8†%€»Hù[Xô\à]\»õ›[›ôY[»[›H⁄H[ú›XYŸàù\›⁄][ô»\ôKâÀà	÷[›\ààŸY\»]Ÿ[ãàH€›\úŸWLåN\»à\»õ›»H›Ÿ\›[›H]ôH\Y[à‘àH›Ÿ\›ù[ÿ\ô[›H]ôHŸŸŸY⁄X⁄]ô\à\»ô]\ã[ôH\›€‹ù»ûH]8†%€»H€€Ÿõ›[ô[›ô\»]€à]»›€ãà[›\à\Yù[Xô\à\»ô]ô\à›ô\ù‹ö][é»⁄\ôHHÿ\ôôX]]H€›\úŸHÿ^\»€»[ôX]ô\»[›\ú»[€ôKâÀà	—]ô\ûH€›\úŸH[›H\õ›»‹[ú»⁄]S’TàëP”‘ëTëHXõ›ôHHöY[»8†%õ›[ô»^YYô\›N
+[ôô\›JK]ô\òYŸHYÿZ[ú›\ã[ô⁄[à[›H\›^YY]àHò[ö⁄[ô‹»⁄›»›»X[ûHÿ\ô»[›H]ôH]XX⁄€›\úŸK[ôŸ^H€›[ù»›»X[ûHŸà[›\à€›\úŸ\»]ôH€ôKâÀà	÷[›\à[ôXÿ\ÿ[àôH\⁄YûH€]YHõ›»[ú›XYŸà[›H\[ô»]à]ÿ\»H€ôHù[Xô\à€àHúõ€ùYŸH⁄]õ»õ›]H[à8†%⁄X⁄\»›»H\ÿ[YH»ÿ^HçH⁄[H[›\à“Sà[ô^ÿZYLKåH[ôH€õHö^€àŸôô\àÿ\»HÀY»[[ô»[›H»€»[ô⁄[ôŸH][›\úŸ[ãâ»HKà»éâ›é	ÀâÃåçãLKL	À][\Œñ¬à	—íTî’U\»ŸôàH]ôHŸŸŸ\ãàH‹ôY[àõ›»\⁄‹»€»]Y\›[€ú»[ú›XYŸàôYH8†%›»X[ûH]À[ô›»€ô»H€ôH[›H€Yÿ\Ààõ›[ô»[ŸHXõ›]ŸŸ⁄[ô»H€H⁄[ôŸYâÀà	’][ô›Ÿ\»[‹ôH€‹ö»[à]€⁄‹»ZŸKà€àH€H]€⁄»€»]ÀH][›H€YT»⁄\ôH[›\àY»ö[ö\⁄Y8†%€»H\›[YX\›\ô\»\›[òŸH€€ùõ€[ôYX\›\ô\»]\»Hõﬁ[Z]Hù[Xô\àò]\à[à\»H€›[ùŸàôYK\]ÀâÀà	‘][ô»0≠»ûH\›[òŸH\»ôXùZ[\õ›[ô]à›»X[ûH[›H€Yúõ€HXX⁄ò[ôŸK›»X[ûHŸà‹ŸHŸ\ôH€ôK\]À[ô⁄\ôH[›\àY‹»Yù[›H8†%⁄]€€òŸYYY‹»€›[ùY\»[ú⁄YHôYHôY]ôXÿ]\ŸHõÿõŸH€€òŸY\»HŸ[ùKYõ€›\ãà€ÿX⁄8†&\»][ô»XY[ôH\»õ›»H⁄\ôHŸàY‹»]ö[ö\⁄[ú⁄YHôYHôY]âÀà	’⁄]]€‹›ÀZ[õNà\ôH\»õ»€ôŸ\àHXZŸHò]HûH\›[òŸK[ôõ»8†$Õàù€€ùô\ú⁄[€àŸôàH€›\úŸKàôX€‹ô[ô»H][›HRT‘—Q⁄]H\›[òŸH€à]ôYYYHö\ú›\]öY[8†%⁄]›]]]ô\ûH]Hÿ\ô€õ›‹»H[ô›Ÿà\»€ôH]Ÿ[ù[ã[ôHò]H›ô\à‹ŸH€›[€õH]ô\à€[Xà›ÿ\ôL	KàHKYùX]\›\»H⁄‹ù\]ù[Xô\àYÿZ[ã\»]ÿ\»ôYõ‹ôH]Y›\›âÀà	”€õ›[ô»ŸY\]ô\ûH\›[òŸH[›H[ôXYH\Y[ã[ôHÿ€‹ôXÿ\ô›[⁄›‹»⁄\ôHHö\ú›]›\ùY€àHÿ\ô»]ÿ\úûH€ôKâ»HKà»éâ›é…ÀâÃåçãLKLâÀ][\Œñ¬à	—ö^YHMÃIH€à][ô»Lç»ûH\›[òŸKàH€›[ùŸàY‹»]ö[ö\⁄Y[ú⁄YH⁄[[YHò[ôŸH€›ô\ú»]ô\ûH\›[òŸH[›H›\ùYH]úõ€Kù]]ÿ\»ôZ[ô»]öYYûH[›\àö\ú›]»úõ€H\›\ùY[àôY]€õHLåM€»Hÿ\ô⁄]Ÿ[ôHŸà[HYÿZ[ú›Ÿ]ô[à€ô»ö\ú›]»ö[ùYH\òŸ[ùYŸH›ô\àLâÀà	“]õ›»ôXY»\»H⁄\ôHŸàH€\»⁄\ôH[›HX›X[HYHŸX€€ô]»]⁄X⁄\»H€õHŸ]‹ŸHŸ[ôHÿ[àôH\ùŸãà€à]ÿ\ô]\»LàŸàMK€»	KàH€›[ù]Ÿ[àÿ\»öY⁄[[€ôÀ[ôõ›[ô»[ŸH€àHXõH[›ôYLåMHôYK\]ò]H[ôHXZŸHò]\»Ÿ\ôHô]ô\àYôôX›Yâ»HKà»éâ›éâÀâÃåçãLLÃIÀ][\Œñ¬à	’HëV”Hù]€àõ›»⁄]»Xõ›ôHHXàò\à€àH€H[›H]ôHö[ö\⁄YLåMõ»ÿ‹õ€[ô»»Ÿ]ŸôàH€Kà]ÿ\»Xõ›]ô[›»Hõ€[à]ZX⁄»öY]À€»]ô\ûH€H€‹›[›HHÿ‹õ€[›H⁄›[ô]ô\à]ôHY»XZŸKâÀà	’HXY\à\»€X[\ãà€Hàÿ\»‹ò\[ô»€ù»€»[ô\»€à[›\à€ôK⁄X⁄€‹›€à]»›€é»H€Hù[Xô\ã\ã›õ⁄ŸH[ô^ÿ\ô[ôö[ö\⁄õ›»⁄]€à€ôH[ôH[ôH⁄€H‹ôY[àõÿ⁄»\»N⁄‹ù\ãà]\»›X⁄ﬁK€»]\»NòX⁄»€à[ZY⁄Y[à€\ÀâÀà	’H€Hô\[›ôYòX⁄»Pì’ëHHÿ€‹ö[ô»õ›‹À⁄\ôHH‘‘»[ÿ^\»ÿZY]ô[€ôŸYLåM]\»HYKXõﬁôXY€»]€Ÿ\»ZXYŸàH\Àà]›[\úö]ô\»€€\ŸY⁄]H€ôH[ôH»X›€à⁄›⁄[ôÀâÀà	’H\òY‹ò\^Z[ö[ô»H⁄\»[›ôY»Hô\ûHõ›€Kà[›H€õ›»›»]€‹ö‹»ûHõ›Œ»]ÿ\»⁄][ô»ô]ŸY[àHÿ\ô[ôHô^ù]€ãâÀà	—ö^YH⁄Y]ÿ^\»ÿ‹õ€]Hò\úõ›Ÿ\›€ôH⁄YàH⁄YH€XàXòúô]öX][€à[àHö]ôKH‹à⁄^X⁄\õ›»ÿ\»\⁄[ô»H\›⁄\\›HYŸH[ôòYŸ⁄[ô»H⁄€HYŸH⁄]]â»HKà»éâ›éIÀâÃåçãLLÃ	À][\Œñ¬à	–[õ›\à[\»ö]€à€ôHÿ‹ôY[àõ›Àà]ÿ\»€\[ô»Hõ›€H€»€à[›\à€ôHLåM[ôõ›€à[ûH\⁄›‹úõ›‹Ÿ\ãôXÿ]\ŸHHõ›⁄[ô€YKZ[ôXÿ]‹à[úŸ]»]X]Xõ›]L\ôHô\‹ù\»ô\õ»]ô\û]⁄\ôH[ŸKà⁄[][]Y[›\à€ôHõ‹\õH[ô]ÿ\»Œ›ô\ãâÀà	”õ›[ô»⁄ò[öÀàH‹XŸHÿ[YH›]ŸàY[ô»[ôÿ\ŒàHY⁄\àX\›XYH€Y⁄H⁄‹ù\àŸX]\àÿ\ô[ôHù[Xô\ú»€‹⁄[ô»\\»€ôHõÿ⁄»[ú›XYŸà⁄][ô»ZŸHôYH[úô[]Y€ô\Àà\H⁄^ô\»\ôH[ù›X⁄YLåM[›H[ôXYH€YH\ŸHôXY€X[â»HKà»éâ›é	ÀâÃåçãLLÃ	À][\Œñ¬à	“Tì”î»\»õ›»Sï»H‘ëQSàLåM€à€ÿX⁄\»Ÿ[\»Ÿ^K€»]\»€ôHò[YH[ôõ›€ÀàH[Hÿ\»ò[YYõ‹àH€Xà\›X[H[à[›\à[ôù]H\ôXH\»]ô\ûH⁄›]H‹ôY[éàH€€Ÿ[ù»H\àH[ôHŸYŸHúõ€HL\ôHõ›[à]⁄X⁄H€€Ÿ»õ›»XYHÿùö[›\ÀâÀà	“]»úôXZŸ›€à‹]»õ›\àÿ^\»[à€Xà‹ô\éà€€ŸÀöWLåLÕZKöWLåL‘ÀLLåLÕåLåà€ô»[ô⁄‹ù\õ€ú»Ÿ\ôH⁄\ö[ô»€ôH]ò]K[ôHZ\õ€àúõ€Hå[ôHKZ\õ€àúõ€HM\ôHõ›Hÿ[YH⁄›LåM[\[ô»[HYH€€\\ö\€€àHõ›»^\›»»XZŸKâÀà	’H€€Ÿ»[ôH€õH\X\ú»€òŸH[›HX›X[H€»]H‹ôY[à⁄]€ôK€»]›^\»›]ŸàHÿ^H[ù[]\»€€Y][ô»»ÿ^Kâ»HKà»éâ›é…ÀâÃåçãLLÃ	À][\Œñ¬à	‘USë»õ›»úôXZ‹»›€àHÿ[YHÿ^H\»H›\à€»LåM[›\àXZŸHò]HûHH\›[òŸH[›H›ùX⁄»H]úõ€K[àHY\éà[ú⁄YHÀLåLÕã◊LåLÃLà[ô€»€ã⁄›⁄[ô»Hõ›\àò[ôŸ\»[›H]ôH^YY[‹›âÀà	“]ÿ^\»€€Y][ô»ôYõ‹ôH]]H^\›À⁄X⁄\»H⁄[ùŸàY[ô»]õ›Œà[ù[€»ò[ôŸ\»ÿ\úûHH]][»[›H»\H\›[òŸH€àH‹ôY[ã€»H‹XŸH\»[à[ú›ùX›[€àò]\à[àH€H[àHÿ\ôâÀà	’]ò]H\»\àU’ïP“Àõ›\à€HLåMH€À\]ôX€‹ô»€ôH[›HZ\‹ŸY[ô€ôH[›H€Yõ›⁄]\›[òŸ\À⁄X⁄\»^X›H⁄HHŸŸŸ\à\⁄‹»õ‹àHXYH][ôHö\ú›]Ÿ\\ò][Kâ»HKà»éâ›éâÀâÃåçãLLÃ	À][\Œñ¬à	”—ëàHQHõ›»úôXZ‹»›€àûH€Xà[àHõ€€H]Y‹\ôHLåMö]ô\ããZ\õ€ã⁄]]ô\à[›H]⁄]HòZ\ùÿ^Hò]H[ôHò]»€›[ùô\⁄YHXX⁄à\à‹»\ôHYù›]Ÿà]^X›H\»[›HÿZYàH\à»\»õ»òZ\ùÿ^K€»H€Xà\ŸY€õH\ôHô]ô\à\X\úÀâÀà	“Tì”î»‹]»Hÿ[YHÿ^KûH⁄]ÿ\»[à[›\à[ôŒàöWLåL‘ÀLLåLÕåLå[ô€€Ÿ»⁄[à[›H€»]H‹ôY[à⁄]€ôKà\ãL»YH⁄›»TëH€›[ùY\ôHLåM€àH\à»HYH⁄›\»H\õÿX⁄€»]\»⁄\ôHH‹ôY[àô[€ô‹ÀâÀà	’H»\»€›[ùY⁄]H\õ€ú»LåM[›\àÿ[à]ÿ\»Ÿ[ùZ[ô[H[XöY›[›\Œà]\»\ùŸàHLåL‘»Ÿ][ô][€»[ò⁄‹ú»[›\àŸYŸHY\à]LåâÀà	–õ›\ôHôXYŸôàHÿ[YH€XàXõH][ôXYH]ô\»€àõ›[ôÀ€»H[H[ô]XõHÿ[àô]ô\à\ÿY‹ôYKà\Z]\à[Hõ‹àHù[ô\ú⁄[€à⁄]HXYYö]ôH[ô–à€€[[úÀâ»HKà»éâ›éIÀâÃåçãLLÃ	À][\Œñ¬à	—ö^Y⁄]éúõ⁄ŸH€à—ëàHQKà[ö[ô»Hÿ\[€ú»\Y\⁄Y]€ôH»Hõ›€HŸà]»ÿ\ôX]ö[ô»Hÿ\ô]ŸY[àHÕâH[ôH€‹ô[ô\à]LåM⁄X⁄\»⁄]Húõ⁄Ÿ[àÿ\ô€⁄‹»ZŸKàHÿ\[€à⁄]»[ô\à]»ù[Xô\àYÿZ[ãHô[ô[ôH€àì’Së–”‘ëT»[›ôY»Hõ›€HYŸK[ô[ôYH^[ô\»›[[ôH\X‹õ‹‹»Hõ›Àâ»HKà»éâ›é	ÀâÃåçãLLÃ	À][\Œñ¬à	’Hù[Xô\ú»[ô\»\õ‹\õHõ›Àà”’Tî—T»\»õ»ŸX€€ôù[Xô\ã€»]»Xô[ÿ\»⁄][ô»⁄\ôHH›\àôYHYZ\ú»LåMHõ›»ôXY\»õ›\àÿ\ô»]ôYHYôô\ô[ùZY⁄Ààò[YKXô[[ôH€X[öY›\ôH\ôHõ›»ôYHö^Yò[ô»X‹õ‹‹»H⁄€Hõ›À[ôT	à’”àö]»€à€ôH[ôH€àHò\úõ›»€ôH[ú›XYŸà‹ò\[ôÀâÀà	‘ÿ[YHö^€àHõ›\à[\»ô[›Œàì’Së–”‘ëT»ÿ\úöY\»Hô[ô[ôH[ô—ëàHQHŸ\»õ›⁄X⁄YYùZ\àÿ\[€à[ô\»Õ\\ùàõ›ÿ\[€ú»⁄]€àHÿ[YHò\Ÿ[[ôHõ›Àâ»HKà»éâ›çŒIÀâÃåçãLLÃ	À][\Œñ¬à	’Hù[Xô\ú»õ›»ÿ^\»⁄X⁄ÿ\ô»]ÿ\»ôXYŸôã]H‹ŸàH[ôH[ô\à]à]\»H[ú›Ÿ\à»⁄H^H[[›ôYà€òŸH[›H]ôHN€\»[›HŸŸŸY[›\úŸ[ãH⁄€Hõÿ⁄»›⁄]⁄\»»[›\à]ôHõ›[ô»”ìH[ôŸ]»H€\àÿ\ô»\⁄YHLåM€»ö[ö\⁄[ô»€ôHõ›[ô[›H\Y[àôX€€\]\»]ô\ûHù[Xô\à]€òŸKà€ÿX⁄\»[ÿ^\»ÿZY€Œ»\»õÿ⁄»ÿ\»õ›⁄X⁄\»HùYÀâÀà	”õ›[ô»Xõ›]›»[ûHŸà[H\»ÿ[›[]Y⁄[ôŸYà⁄X⁄ŸY[ôHûH[ôKâ»HKà»éâ›çŒ	ÀâÃåçãLLÃ	À][\Œñ¬à	’T	à’”àõ›»ÿ\úöY\»]»›€à€X[ŸX€€ôù[Xô\àHÿ^Hÿ‹ò[XõHŸ\»LåMH\X[ôLàò]Kà€‹ùŸYZ[ô»ŸŸ]\éà[›H]ôHÿ]ôYŸàLàZ\‹ŸY‹ôY[úÀù]ÕIHŸà[H›[ÿ[YH[à]õŸŸ^H‹àô]\ãàHXY[ôH[€ôHôXYZŸHõ›[ô»ÿ\»ôZ[ô»ÿ]ôY»HY\à[ô\à]ÿ^\»⁄]X›X[H\[ôYâÀà	–”’Tî—T»[›ôY»HYùŸàHõ›»[ô\»õ›»H[ö»›òZY⁄»[›\à€›\úŸH\›â»HKà»éâ›çÕ…ÀâÃåçãLLÃ	À][\Œñ¬à	’H€»[ôXÿ\»\ôH€ôH[Hõ›ÀàSëP–TŸY\»HöY»ù[Xô\à[ôH\›[X]Y[ô^Ÿôà[›\àŸŸŸYÿ\ô»⁄]»[ô\à]€X[LåM^HŸ\ôH€»ôXY[ô‹»Ÿà€ôH[ô»⁄YHûH⁄YH\»\]X[À⁄X⁄ôXY»\»H€€ùòYX›[€àò]\à[à\»HöY›\ôH[ôH\LåN\»\›[X]HŸà]âÀà	’HúôYY[H\»–‘êSPìK[›\àYö[ö][€éà\à‹àô]\àYù\àHZ\‹ŸYòZ\ùÿ^KàHŸà€»ò\ã⁄]HõŸŸ^K[‹ãXô]\àò]H[ô\à][àHÿ[YH€X[\HLåMå…KâÀà	‘ÿ‹ò[XõH[ô\	à›€à\ôHHZ\à[ôH[ôH[ô\àHõÿ⁄»ÿ^\»€ÀôXÿ]\ŸHH€‹ô»»õ›àHÿ[YH]Y\›[€à\⁄ŸYXõ›]€»Yôô\ô[ùZ\›ZŸ\»LåMY[›Hÿ]ôHH€Húõ€HŸôàHòZ\ùÿ^K[ôY[›Hÿ]ôH]úõ€HŸôàH‹ôY[ãà€‹ùõYŸ⁄[ô»][›\àLåX‹ÿ‹ò[XõWLåY\»õ›H›[ô\ô€€à\ÿYŸK⁄X⁄\»\X[ôY›€ãâ»HKà»éâ›çÕIÀâÃåçãLLÃ	À][\Œñ¬à	’Hù[Xô\ú»\»õ›»]ô\û][ô»Ÿ^H€›[ùÀ[ô\à€ôHXY[ôŒàH[ôXÿ\õ›»[›H\ŸY»ÿ‹õ€\›Hõ›[ôù]€à»ôXX⁄[ô[ô\à]õ›\à]ôHù[Xô\ú»[àH‹ô\àH€H\»^YYLåM[›\à\›ÿ€‹ôKŸôàHYK\õ€úÀ][ôÀà\[ûH[Hõ‹à⁄]\»ôZ[ô]âÀà	’T	à’”àô\XŸYKYùXZŸ\»[à]‹õ›À€»Hõ›»[ôH[\»ŸŸ]\à€›ô\à[õ›\à\ù»Ÿà[›\àÿ[YKâÀà	’ôYH[\»Ÿ[ùàKQïPR—T»Yô]ô\à⁄›€àHù[Xô\àLåM]ôYY»€»X]\›»[ô\ôH\»€ôKà–TîñHQTàÿ\»HòX›Xõ›][›\àòYÀõ›Hô\›[[ô]]ô\»€àòYÀà””ëUS”î»ÿ\»HŸX]\àÿ\ô\ôX›HXõ›ôH]ÿZYYÿZ[à[ô€X[\àLåM[›H‹›Y]€ôK[ô]ÿ\»€õHö\⁄XõHôXÿ]\ŸHH›ÿ\Yù\›]H€»⁄YHûH⁄YKâÀà	’HôYHô]»ù[Xô\ú»\ôHôXYŸôàHÿ[YHÿ\ô»[ôHÿ[YHôXY\à€ÿX⁄\Ÿ\À€»Húõ€ùYŸH[ôH€ÿX⁄ÿ[õõ›][›H[›HYôô\ô[ù\òŸ[ùYŸ\ÀâÀà	’H€ÿ⁄»õ»€ôŸ\à⁄]»€à‹ŸàHX\›XYàH\Z[ù»[ô\àH›]\»ò\àûH\⁄Y€ãù]õ›[ô»ÿ\»ô\Ÿ\ùö[ô»õ€€Hõ‹à]]H‹LåM€õH]Hõ›€KâÀà	’€»⁄[ôŸ\»Z[YY]Hÿ‹õ€[ô»€]⁄⁄\ôHHYŸH⁄›‹»õ›Y⁄\›HXàò\éàHùXòô\ãXò[ôõ›[òŸH\»Ÿôã[ôHXàò\àõ›»Ÿ]»]»›€à^Y\à€»]›‹»YŸ⁄[ô»ôZ[ôHò\›õX⁄Àà[YHYà[›H›[ŸYH][ô⁄]\à]\»H€YK\ÿ‹ôY[à\‹àÿYò\öHLåM^H€›[ôHYôô\ô[ùÿ]\Ÿ\Àâ»HKà»éâ›çÕ	ÀâÃåçãLLÃ	À][\Œñ¬à	”€àŸ^KHù[Xô\ú»[ôH€ôH[ô»›ÿ\YXŸ\ÀàHõ›\à[\»LåMKYùXZŸ\Àõ›[ôÿ€‹ô\Àÿ\úûHY\ã€€ô][€ú»LåMõ›»⁄]›òZY⁄[ô\àHŸX]\ã[ôH€ôH[ô»[›H\ôH€‹ö⁄[ô»€à⁄]»ô[›»õ›[ôô\ô^»H€ÿX⁄[ô»]€Ÿ\»⁄]]â»HKà»éâ›çÃ…ÀâÃåçãLLÃ	À][\Œñ¬à	÷[›\à[ú»[›ôY»H‹Ÿà]ô\ûHXãXõ›ôHHXY€õ‹⁄\ÀàôXX⁄[ô»H€‹ö‹⁄‹Ÿ»YX[ùÿ‹õ€[ô»\›]ô\ûH‹[àò][[ô]ô\û][ô»]ÿ\»ôXYŸôàLåMŸ]ô\ò[ÿ‹ôY[ú»€à][ô»[ô›⁄[ôÀàHXàõ›»ôXYŒà⁄X⁄XãH⁄X]⁄Y]Hõ›][ôKH[úÀ[àHXY€õ‹⁄\»[ô\à[Kâ»HKà»éâ›çÃâÀâÃåçãLLÃ	À][\Œñ¬à	”€àHXú»XãHÿ^HSï»HXà[›HX⁄ŸYõ›»⁄]»\ôX›H[ô\àHõ›\à[\»[ú›XYŸà]Hô\ûHõ›€HŸàHYŸKàX⁄⁄[ô»][ô»[ôX›X[H‹[ö[ô»][ô»Ÿ\ôHŸ\\ò]YûHH[ù\ôHXY€õ‹⁄\»LåMŸ]ô\ò[ÿ‹ôY[ú»€à[ûHXà⁄]ò][»‹[ãàX⁄⁄[ô»HXà[ô€⁄[ô»[à\»€ôH[›[€ãâÀà	—]ô\ûHXàYŸHõ›»ÿ\úöY\»[õ›\àXú»X‹õ‹‹»H‹€»[›Hÿ[à€»›òZY⁄úõ€H][ô»»⁄‹ùÿ[YH⁄]›]€⁄[ô»òX⁄»»HXãàö^Y‹ô\ã[ÿ^\»LåM›⁄[ôÀ⁄‹ù][ôÀY[ù[LåM[ôH€ôH[›H\ôH[ôXYH[à\»H]€ôKâ»HKà»éâ›çÃIÀâÃåçãLLÃ	À][\Œñ¬à	’H\õ›»ŸY\»S’Tàÿ[[ô\à^Kõ›HŸ\ùô\óLåN\Àà]ÿ\»ôXY[ô»H€ÿ⁄»[àUÀ€»úõ€HHX\›\õà€ùÿ\ô»]ô[Y]ôY]ÿ\»[ôXYH€[‹úõ›»LåMHõ›[ôö[ö\⁄Y€àH›[ô^H]ô[ö[ô»ÿ]ôY]Ÿ[à\»[€ô^KHö[ŸŸŸY]ö[ôHŸ[ù€àH‹õ€ô»^HŸàH›ôXZÀ[ô⁄]LåN\»[ôY›‹Yÿ^Z[ô»ùŸ^Hà›\ú»ôYõ‹ôH[›\à^Hÿ\»›ô\ãâÀà	”õ›[ô»[ôXYHÿ]ôYÿ\»⁄[ôŸYàYàHÿ\ô‹àHö[\»⁄][ô»€àH‹õ€ô»]Húõ€H[à]ô[ö[ô»ôYõ‹ôH\À[YH⁄X⁄[ôH⁄[[›ôH]â»HKà»éâ›çÃ	ÀâÃåçãLLÃ	À][\Œñ¬à	’⁄]LåN\»[ôY€àŸ^H\»õ›»ù\›]LåM⁄][ôYà]⁄›‹»H]\›^H€õK⁄]Hù]€à»Hù[ŸÀà]Y‹õ›€à»H[ôôY[Ÿõ›‹À€»Hõÿ⁄»][ú›Ÿ\ú»ù⁄]\»Yôô\ô[ù⁄[òŸHY\›\ô^HàY\õôY[ù»[à\ò⁄]ôHŸà⁄[ôŸ\»[›HY[ôXYHôXYâÀà	’Hù[\›‹ûH[›ôY»]»›€àYŸK[ò⁄[ôŸY[ô€ôH\]ÿ^KàHìàô]»à€›[ù\»€ô\›Xõ›]H‹]àŸ^H€›[ù»⁄]]\»⁄›⁄[ô»[›K[ôHù]€àÿ^\»›»X[ûH[‹ôH\ôHÿZ][ô»[ô›»X[ûHŸà‹ŸH[›H]ôHõ›ŸY[ãâ»HKà»éâ›çéIÀâÃåçãLLÃ	À][\Œñ¬à	—]ô\ûH€ÿX⁄[ô»YŸHõ›»ÿ^\»⁄]\à[à[ú›ùX›[€à\»S’Tî»‹à›[ô\ôòX›XŸKà[›H\⁄ŸY»[ÿ^\»ŸYH⁄][›H\ôH[ö⁄[ô»[ôôY[[ô»Ÿ\\ò][Húõ€H⁄]ô\›òX›XŸH\Xÿ[H\À€»[›Hÿ[à[⁄[à[›H\ôHŸôàòX⁄»LåMH⁄‹ùYÿ[YH[à\»H€‹öŸY^[\K[ôH⁄€H\ÿ\»]Y]YYÿZ[ú›]âÀà	’H]Y]õ›[ôõ›\à[ô‹»]Ÿ\ôH‹õ€ô»ò]\à[àù\›[õXô[Yà[›\àŸYŸHõ›[òŸHÿ\»\›Y\»LÃLŒ[àH€ÿX⁄\‹€€é»HùZ[\»ÃLŒàH\‹€€àÿZYû[›\àõﬁ[Z]Húõ€HMLX\ô»\»J»ôY]àLåMõ›[ô»\ôH\»]ô\àYX\›\ôY[›\àõﬁ[Z]K]\»HXõ\⁄Y[X]]\à]ô\òYŸKàH›⁄[ô»‹⁄][€ú»YŸH›[ò[YYH\€YH\»[›\àZ\‹À⁄X⁄H]Y»åö[Hô]òX›Yà[ôHòY»›]YH⁄[›»›ŸY\[ô»]X⁄»[ô€H\»òX›€ôHÿ\ôXõ›ôHHÿ\ôYZ][ô»õÿõŸH\»ö[YY]âÀà	”€àH][ô»õ›][ôKòò\ô[H‹[à\»‹]X\ôHàõ›»ÿ^\»›]›Y]]\»[›\à›€àôXY[ô›[[ò€€ôö\õYYà]ÿ\»›]Yõ]€àH€€\ŸYÿ\ô⁄X⁄\»Hô\ú⁄[€à[›HX›X[HŸYHLåMH[ú›ùX›[€à\»õ›⁄[ôŸY€õH⁄]]YZ]Àâ»HKà»éâ›çé	ÀâÃåçãLLç…À][\Œñ¬à	÷[›\àö[H\›‹ûH\»X\⁄Y\à»ö[ôà]ô\ûHXàõ›»ÿ[»]Hÿ[YH[ô»LåMíSHì””Kà][ô»ÿ\»›[ÿ[[ô»]î›õ⁄ŸHŸ\‹⁄[€àŸ»à⁄[H›⁄[ô»[ô⁄‹ùÿ[YHÿ[Y]ö[Hõ€€K[ôHù[\ò\à]H‹ŸàHXà\»ùZ[úõ€H‹ŸHXY[ô‹À€»Hÿ[YHõÿ⁄»[õõ›[òŸY]Ÿ[à⁄]HYôô\ô[ù€‹ô\[ô[ô»€à⁄X⁄Xà[›HŸ\ôH[ãâÀà	“[à][ô»][€»[›ôYTXõ›ôHH›õ⁄ŸH]õ€][€à‹öYàH‹öY\»H›[[X\ûH—àHö[K€»Hö[H]Ÿ[à⁄›[õ›]ôHôY[àH[ô»[›Hÿ‹õ€\›H›[[X\ûH»ôXX⁄âÀà	”õ›[ô»ÿ\»]ô\à‹›à]ô\ûHŸ\‹⁄[€à\»›[\ôK[àX‹õ‹‹»HôYHXúÀ[ô\[ô»€ôH›[‹[ú»Hù[úôXZŸ›€ãà]ÿ\»ö[ôXõK[€õKZYã^[›KZ€ô]À]⁄\ôK⁄X⁄\»Hÿ[YH\»Z\‹⁄[ôÀâ»HKà»éâ›çç…ÀâÃåçãLLç…À][\Œñ¬à	’H⁄€H\\»ôY[àôYò]€ãàHXàò\à\»ö]ôHXú»⁄]HQHù]€à[àHZYHŸà[H8†%€ôH[Xã[ûHÿ‹ôY[ã[ô]›\ù»Hõ›[ô‹àX⁄‹»H€ôH[›H\ôH[àHZYHŸàòX⁄»\âÀà	–€›\úŸ\»[›ôY[ô\àõ›[ôÀ[ô[›\àõ›[ôô\[›ôY\ôH€Ààÿ\ô»0≠»õ›[ôô\0≠»€›\úŸ\»\ôHõ›»ôYHòXŸ\»Ÿà€ôHXã€»H[ú»⁄]ô^»Hÿ\ô»]ùYŸH[KàHÿ[YHXà\»Hõ›\àXú»[ôõ›[ô»[ŸKâÀà	’H]ôHŸŸŸ\à€õH\⁄‹»⁄]ÿ[à^\›à]»\X\à€òŸH\ôH\»Hÿ€‹ôN»Hö\ú›\]\›[òŸH€õH⁄[à[›HX›X[HY€»]Œ»ÿ^Hõ›Y⁄]»[ô]›‹»\⁄⁄[ô»Xõ›]][ô»][àHòZ\ùÿ^H]Y\›[€àÿZ]»[ù[[›H]ôHò[YYH€Xà[›H][ô€àH\à»]\⁄‹»õ‹àH‹ôY[àŸôàHYHò]\à[àô][ô[ô»\ôHÿ\»HŸX€€ô⁄›âÀà	÷[›\àõ›[ôÿ\ôõ›»ö[ù»HïSÿ€‹ôXÿ\ô8†%\ã›õ⁄ŸH[ô^ÿ€‹ôH[ô]»X‹õ‹‹»Hö[ôK⁄]⁄\ò€\»€àHö\ôY\»[ô‹]X\ô\»€àHõŸŸ^\À›XõYõ‹àXY€\»[ô›Xõ\Àà\HXY\à»õ€]]ÿ^KâÀà	’[ô\à]àHZ\‹»X\Ÿà⁄\ôHH‹ôY[ú»Ÿ[ùH\›[òŸ\»[›HX›X[H€Yúõ€K][ô»ûH\›[òŸK[ôHûKX€XàXõHõ‹à]õ›[ô[€ôKâÀà	—]ô\ûHö[ô[ô»ÿ\úöY\»H€€›\ôYòZ[[àHY\àŸà]»]öY[òŸK[ô\[ô»HòYŸHõ›»‹[ú»UíQSê—HT—Q8†%⁄]ÿ\»€›[ùY⁄]]ÿ\»ôXYŸôã[ô⁄]]€›\òŸHÿ[õõ›[[›Kàÿ[YH[ô[€àŸ^K€àHXú»[ô€àHõ›[ôÿ\ôâÀà	’HòY»XY»⁄]H€Xú»[ú›XYŸàHù[Xô\úŒà\KXZŸKŸù⁄]]YX\›\ô\»[ô⁄\ôH]›[ôÀà[àHŸX›[€à€à‹ö[ô»[ôõ›[òŸH8†%⁄][àã[à»[ô[àH€€HX›X[H»Yôô\ô[ùK⁄X⁄Ÿà[›\àôYH⁄]»[à⁄X⁄õ›[òŸHò[ô[ôHõ›\àõ⁄Ÿ^H‹ö[ô»[›H»õ›]ôH[ô⁄HXX⁄^\›ÀâÀà	’Hÿ\úûHY\à\»ò\ú»YÿZ[ú›HÃ^X\ôÿÿ[H⁄]Hù[Xô\à[à]»›€à€€[[ãÿ\»õYŸŸY⁄\ôH^H\ôH⁄YK[ôHK]€€Ÿ⁄›⁄[ô»SìQPT’TëQò]\à[àH›Y\‹Àà]ÿ^\»›]›Y]HY\àT»H€Xà\›HŸŸŸ\àŸôô\ú»[›KâÀà	’HXú»Xà\»õ›\àÿ\ôŒ»X⁄»€ôH[ô]»XY€õ‹⁄\»\»öY⁄\ôKHõ›»\à‹[àò][⁄]]»]öY[òŸHòZ[[ôHö[»]òZ[à]âÀà	—]ô\ûHŸX›[€à€à]ô\ûHXàõ€»]ÿ^K[ô⁄][›HYù‹[à›^\»‹[à⁄[àHYŸHôYò]‹Àâ»HKà»éâ›ççâÀâÃåçãLLç	À][\Œñ¬à	’H›õ⁄ŸH]õ€][€à‹öY›‹Yö[ù[ô»Ÿ]ô[à\òY‹ò\»[ô\àHXõKà]ô\ûHõ›»õ›»⁄›‹»]»X\ö‹»SëH€À]€‹ô›]HLåMŸ]Y€‹ŸY‹[ãô]ô\àYX\›\ôYLåM€»[›Hÿ[àôXY⁄\ôHH›õ⁄ŸH›[ô»⁄]›]ôXY[ô»[û][ôÀâÀà	’\[ûHõ›»õ‹àHù[ôX\€€ö[ô»ôZ[ô]àõ›[ô»ÿ\»›]»]ù\››‹YôZ[ô»ö[ùY€àHYŸH[›H\ŸH»ö[ô[ô‹ÀâÀà	’⁄]XX⁄€€[[àÿ\»\»õ›»ôZ[ô€ôH€€\ŸY[ôH[ú›XYŸàH\òY‹ò\ŸàYŸ[ôâÀà	’[ô\àH€ŸàH€€[[àõ\òú»[›ôY›]ŸàH\[ô[ù»H]K€»ôXùZ[[ô»H‹öY\»HôYY\⁄ò]\à[àH€ŸH⁄[ôŸKà]ÿ\»Hÿ›[Y[ùYò\LåMH€YŸ[ôÿ\»\ô€ŸY[ôY»ôHY]YûH[ô]ô\ûH[YHH€€[[àÿ\»YYâ»HKà»éâ›ççIÀâÃåçãLLç	À][\Œñ¬à	’Hö[Hõ€€HŸ»€à]ô\ûHXàLåM][ôÀ›⁄[ôÀ⁄‹ùÿ[YHLåM\»õ›»Hÿÿ[õòXõH\›[ú›XYŸàHôYKX€€[[àXõKàHõ›»\»H]K›»öY»Hò]⁄ÿ\À[ô”ëH[ôHÿ^Z[ô»⁄]]€€ò€YYâÀà	’Hù[úôXZŸ›€à\»[ò⁄[ôŸY[ô€ôH\]ÿ^Kÿ[YH\»ôYõ‹ôKàõ›[ô»ÿ\»õ›€à›]»]ù\››‹YôZ[ô»ö[ùY€àHYŸH[›H\ŸH»ö[ô[ô‹ÀâÀà	’HôX\€€à]ôYYY⁄[ôŒàHö[ô[ô‹»]ôH‹õ›€à»\òY‹ò\À[ôôYH€€[[ú»]€ôH⁄YYX[ù[›HY»ëPQHŸ»»ò]öYÿ]H]âÀà	‘][ô»õ›»\›»ô]Ÿ\›ö\ú›ZŸHH›\à€»Xú»[ôXYHYâ»HKà»éâ›çç	ÀâÃåçãLLç	À][\Œñ¬à	’HôYHò[ZZY⁄›õ⁄ŸH€\»€›ôXYõ‹\õK[ô^HŸ\ôH‹ö][àŸôà€»X\õHLåMHXYö[»åç»ÕçH^[»[à[K⁄X⁄\»H€‹Ÿ\›€⁄»]H€Xà[û]⁄\ôH[à\»õ⁄ôX›âÀà	‘U€Ÿ\»»HX⁄»€àH]Y»ç€€[[éà–î’€€ôö\õYYúõ€HHŸX€€ôÿ[Y\òKûHH\›]ôYY»õ»ÿÿ[H][àHXYò]ô[»H›òZY⁄[ôHòX⁄»[ôõ›Y⁄[ô\‹Ÿ[ùX[Hô]òXŸ\»]à€»[úô[]YY]Ÿ»Y‹ôYZ[ô»\»H›õ€ôŸ\›]öY[òŸH€à]YŸKâÀà	’ST»\»ù[õö[ô»]ZX⁄Àà⁄^›õ⁄Ÿ\»õ›ÀX‹õ‹‹»€»Ÿ\‹⁄[€ú»[ô€»X]»LåMYX[àXõ›]KçŒHYÿZ[ú›HéåH\ôŸ]ö]ôHŸà⁄^[ô\àãåàôXYH\ôX›[€à\»ôX[[ôHù[Xô\à\»õ›Y]ôXÿ]\ŸHHÿ^HòX⁄‹›⁄[ô»›\ù\»]X›Y⁄‹ù[ú»Hò][ÀâÀà	—PTìHQïÿ\»⁄[[ôŸYûH‹ŸH€\»[ôH⁄[[ôŸHYõ››\ùö]ôHLåM€»]›^\»€‹ŸYà€»ÿ^\»Ÿàö[ô[ô»HXYLåN\»YŸH⁄]ôH‘‘“UH[ú›Ÿ\ú»€àHÿ[YHõ€›YŸKôXÿ]\ŸHHXY\»[‹ôH[›[€ãXõ\úôY€€Z[ô»›€à[à€⁄[ô»òX⁄Àà]»‹öYX\ö»\»õ›»H]Y\›[€àX\öŒàH[ô€Hÿ\»öYY[ô€›[õ›Ÿ]H]âÀà	—ö\ú›[ô»[àHôX€‹ô]⁄[ù»]’íR—H––US”àò]\à[à[ôô\úö[ô»]à]Yô\‹»Hò[⁄]»›ÿ\ôHŸH⁄YHŸàHXYà^YXò[ôXY€»]õ›ô\»õ›[ô»LåMù]]ÿ[Y\òH\»[\X›\H€‹Ÿ\»Hò][[à€ôHŸ\‹⁄[€ãâ»HKà»éâ›çå…ÀâÃåçãLLç	À][\Œñ¬à	—õ›\à[‹ôH]»€àHZ\êúôXZ»[ôYÿ[YHX][ôÿ[YH[\»Hö\ú›ôYHLåM€»H›õ⁄ŸH]õ€][€à‹öYLåN\»]Y»ç€€[[àõ›»ôXY»Ÿôà—UëSà]À[ô€»Ÿà]»õ›‹»[›ôYŸôàH\⁄âÀà	‘’TïSëH\»YX\›\òXõH€à\»X]Yù\à[[ôHù[H]ÿ\»‹ö][à[ô\à\»[‹õö[ô»ÿ\»[à‹õ€ôÀàúôXZ»€õHô[ô»Hò[Xõ›]åà[à›ô\àHö\ú›[àŸàõ€€»H[ôHH]PUëT»€àôXY»»õ›Y⁄HH\ôŸàHY‹ôYKà⁄]HX]ÿ[õõ›[[›H\»⁄]\à[›HZ[YY]\ôHLåMHãéWLåöY⁄›\ù\»Z]\àH\ôôX›[›ÿ[òŸH‹àH⁄›ôK[ôõ»ÿ[Y\òHÿ[àŸ\\ò]H‹ŸKâÀà	’H€ôH]X]\úŒàHX]ÿ[ù»Xõ›]ãçWLåŸàöY⁄›\ù[ôK[ôH”ìHRT‘»SàUêU“T»H”ëHU’TïQUHTë—UàHôYH][›ŸYKçóLåLÃãéWLåöY⁄[Ÿ[ù[ãà]ô\ûHZ\‹»X‹õ‹‹»õ›ò]⁄\»Ÿ[ùYù[ô€àHX]ò[[ô»Yù]\»[à[ô\ã\ôXYúôXZÀõ›H€Z[Hò][âÀà	’ST»€›]»ö\ú›ôK[YX\›\ô[Y[ù⁄[òŸHù[ÃLåMKçç»ãåL»X‹õ‹‹»õ›\à]ÀYX[àXõ›]Kéãà€€ú⁄\›[ù⁄]HŸ]Yãå[ô€»€Ÿù»[›ôH]€»Hõ›»ôXY»\»€[ôÀàHö\õY\àù[Xô\à[ô\õôX]]\»H›€ã\›õ⁄ŸH\ò][€ã⁄X⁄ò\öYYÃâHX‹õ‹‹»õ›\à›õ⁄Ÿ\ÀâÀà	–Hô]»ÀYŒà⁄€›H’ëTíPQŸ]à]\»H€õH[ô€H]Ÿ\\ò]\»›õ⁄ŸH]úõ€HXYö\ŸH[ôH€õHõ›]H»òXŸH[ô€H][\X›LåM€»‹[àò][»õ‹à€ôH€\â»HKà»éâ›çåâÀâÃåçãLLç	À][\Œñ¬à	’H›õ⁄ŸH]õ€][€à‹öY\»Hõ›\ù€€[[àLåM]Y»çZ\êúôXZ»LåMõ‹àHôYH]»ö[YY€àHô]»X]]H]›]òZ[ô\ãâÀà	”€ôHõ›»[›ôYàP—Kàõ›[ô»ò[à€ô»8†%õ›Z\‹Ÿ\»ö[ö\⁄Yö]ôH»⁄^[ò⁄\»\›€àH⁄^Yõ€›]HZ[ô»XŸHò]\à[àHö\õH€ôK[ôH€Y€ôH›^YY[àH›\àÿ[YH[ú›Ÿ\àH]Y»L›]€‹àŸ\‹⁄[€àÿ]ôK[ôHö\ú›[YH[à[ô€‹àò]⁄\»⁄]ô[à]âÀà	‘›\ù[ôH€›HT“[ôHôX\€€à\»H\ŸYù[\ùà€àHX]]XZŸ\»Hò[›\ùôKZ[H[ôúôXZ»\ôHHÿ[YHù[Xô\à[ô\ôH\»õ»ÿ^H»[[H\\ùàHZ\êúôXZ»\»H‹õ€ô»X]õ‹àHZ[H]Y\›[€à[ôHöY⁄€ôHõ‹àXŸKàõ]X]⁄]H[ôHõ‹à›\ù[ôN»\»€ôHõ‹à‹YYâÀà	‘›öZŸHÿÿ][€à€⁄»Hõ›\ù€€[[àŸà]Y\›[€àX\ö‹Àà⁄^€\»€àH^H[ôõ›€ôH⁄›‹»HòXŸKâ»HKà»éâ›çåIÀâÃåçãLLç	À][\Œñ¬à	’⁄\ôH[›\àÿ[YH\»õ›»ôXY»X‹õ‹‹»ì’TàTëPT»LåMŸôàHYK\õ€úÀ⁄‹ùÿ[YK][ô»LåMXX⁄⁄]]»XY[ôHù[Xô\à[ôH€ôH[ô»]»Z\‹Ÿ\»ÿ^KâÀà	“]€€\]\»Ÿôà[›\àUëHõ›[ô»[€ôH\»€€€à\»^Hÿ\úûHHõ›[ôLåN\»€‹ùŸà€\À[ôH€\àÿ\ô»›[ô›€à[ô\ôH€›[ùY›]›Yà[ù[[à]ÿ^\»^X›H⁄X⁄ÿ\ô»]ôXY[ô⁄[ãâÀà	”õ»ô[ò⁄X\ö»€€[[ã€à[›\àÿ[LåMH€õH]Z[Yò\Ÿ[[ôH\»HYX\úÀ[€\ò⁄]ôK[ôH\ôŸ]ô\‹ŸY\›]Ÿà]\»€‹úŸH[àHò\ôHù[Xô\ãàH€€\\ö\€€à€€Y\»òX⁄»⁄[à\ôH\ôH[õ›Y⁄]ôHõ›[ô»»YX\›\ôHYÿZ[ú›XX⁄›\ãâÀà	’H][ô»[H›⁄]⁄\»]Ÿ[àúõ€H]ÀXKZ€H»[›\àPR—HêUHîì”HLåLÕàï\»€€€à\»[à]»ÿ\úûHH\›[òŸHLåMHù[Xô\à]\»\ôX›H€€\\òXõH»[›\àX]\›âÀà	”€ôH[H\»›][ôYàH\ôXHHõÿ›\»ô[€ô‹»Ààõ›[ô»[ŸH\»€€›\ôYôXÿ]\ŸH⁄]õ»ô[ò⁄X\ö»ôZ[ô]HôY[H€›[ôHHô\ôX›HYŸHÿ[õõ››\‹ùâ»HKà»éâ›çå	ÀâÃåçãLLç	À][\Œñ¬à	’HùZ[ù[Xô\àõ›»⁄]»[àH‹öY⁄Ÿà€YKà]\»ôXY›]ŸàH€ŸHX›X[Hù[õö[ô»€à[›\à€ôK€»]\»Hÿ^H»⁄X⁄»H⁄[ôŸHôX[H[ôYLåMYà]Ÿ\»õ›X]⁄⁄][›HŸ\ôH€⁄\Y]Yõ›⁄\à\]õ‹àH\]H⁄X⁄ÀâÀà	’€‹ù€õ›⁄[ô»⁄H]X\õú»H‹XŸNàçNHÿ\»\⁄Yù]ô]ô\àXõ\⁄YLåMHõÿà]€‹Y\»H⁄]HX‹õ‹‹»ÿ\»ÿ[òŸ[Y\ù]ÿ^K€»[›\à€ôH›^YY€àçN⁄[H]ô\û][ô»€⁄ŸYö[ôHúõ€H\»[ôâ»HKà»éâ›çNIÀâÃåçãLLç	À][\Œñ¬à	–€ÿX⁄‹[ú»⁄]€ôH[ô»õ›Œà⁄\ôH[›\àÿ[YH\À[ôH⁄[ô€H[ô»»õÿ›\»€ãà]ÿ^\»⁄]]ôXY»Ÿ]\ôHLåM[›\à\›õ›[ôH\›ö[KHö[»[›HŸŸŸY\»ŸYZ»LåM€»Hõÿ›\»ùZ[€àHÿ\ôúõ€HôYHŸYZ‹»Y€»ÿ[õõ›\‹»õ‹à€ôHùZ[€àÿ]\ô^KâÀà	’[ô\àHõÿ›\»\»H€‹öŒàHö[»]òZ[àUö[ô[ôÀ⁄]›»X[ûH\ôHYKàZ\‹»⁄‹ùŸôà	HŸà[›\à^XXõHZ\‹Ÿ\»[ô][ô»[›HHôYHö[»õ‹àZ\‹⁄[ô»⁄‹ùõ›HŸ[ô\ò[ùYŸH»€»[ôòX›\ŸKâÀà	’Hö[ô[ò⁄[ôHXúò\ûH\ôHõ›»ŸX€€ô[ô\ô€àHYŸKà^HŸ\ôH⁄^[ô\›[ô\àHÀY»\›[ôH[ö»»ÿ€‹ô\»LåMH€»YŸ\»€ÿX⁄^\›»»ôXX⁄Ÿ\ôHH€»ù\ù\›úõ€HH‹âÀà	’Hô\›ŸàHö[ô[ô‹»\ôH›[\ôKò[öŸYù\ù\à›€àLåM⁄]Hõÿ›\»Yù›]ò]\à[àô\X]YâÀà	–[à‹[àò][õ›»[ö‹»»U»’”àXãà]ô\ûH€ôHŸà[H⁄[ùY]H][ô»Xà⁄]]ô\à]ÿ\»Ÿã€»H›⁄[ô»ò][Ÿ[ù[›H»H‹õ€ô»YŸKâ»HKà»éâ›çN	ÀâÃåçãLLç	À][\Œñ¬à	’Hö[ô[ò⁄õ›»ôX€‹ô»“P“ö[[›HYõ›ù\›][›HY€ôKà]ô\ûHö[\»HY]LçÃL»ù]€à⁄]Hõﬁõ‹àHô\›[LåMÀÃLN⁄]]ô\à]ö[ÿ€‹ô\»[àLåM[ô]ŸY\»H\›ù[ãH⁄€H\›‹ûK[ôHô[ô[ôH€òŸH\ôH\ôHôYHù[Xô\úÀâÀà	‘ôXY[ô»H\‹€€àõ»€ôŸ\à€›[ù»\»⁄[ô»]»ö[à\[ô»LåX›⁄H\»ö[^\›◊LåY\ŸY»]ZY]Hõ‹Hö[Ÿôà[›\à⁄‹ù\›LåMH€ôH\HYŸH[ùö]\Ààõ›»Hö[X]ô\»H⁄‹ù\›⁄[à[›H—»][ô€€Y\»òX⁄»⁄[à]\»€€ôH[à^\»[úù[ãâÀà	—]ô\ûHXàõ›»ÿ^\»⁄]òZ[ú»]»ò][ÀàXX⁄‹[àò][€àHXY€õ‹⁄\»ÿ\ôÿ\úöY\»H[ôHLåM›»X[ûHö[»òZ[à]›»X[ûH\ôHYHLåM]‹[ú»Hô[ò⁄ö[\ôY»]ò][à⁄\ôHõ›[ô»òZ[ú»]]ÿ^\»€»ò]\à[à›^Z[ô»]ZY]âÀà	–[ô]YàôYH‹[àò][»Yì»ö[]X⁄Y»[H][LåMHòXŸK[€àö[HH][ô»Xà\»ÿZ][ô»€ãõ›Y⁄Yúõ€K]Ÿ[ôH\X[ôY›€úÀ[ô[›\àX‹õ‹‹À]K[[ôH‹⁄‹ŸH›€àö[ÿ\»õ›YŸŸY⁄]]à\ùY[à\‹€€ú»Ÿ\ôHôK]YŸŸY»]ô\ûH‹[àò][[à]ô\ûHXàõ›»ôXX⁄\»]X\›€ôHö[âÀà	”‹[ö[ô»HŸX›[€àõ»€ôŸ\à€ò\»⁄]⁄[àHYŸH\]\»[ô\õôX][›Kâ»HKà»éâ›çM…ÀâÃåçãLLç	À][\Œñ¬à	’HZ\êúôXZ»][ô»X]\»€àH⁄]\›[ôX\öŸY›€ôY8†%[›HÿZY[›H€›]€»Hö[ô[ò⁄€›[ù»]Hÿ[YH\»\[ô»H⁄\[›\úŸ[ãâÀà	—õ›\àô]»ö[»\ôHùZ[õ‹à]€àH]R€YH][ô»⁄[éà[à›€ô\∏†&\»X[ùX[õ‹àH[\ÀúôXZŸ\ú»[àõ›\ôX›[€ú»
+HZ\à]ÿ]⁄\»HYùZ[HôYõ‹ôHH‹ôY[àŸ\ KH\[8†$Ÿ›€ö[XŸHY\ã[ôHö[ôKZ€H[\ÿ[YH⁄\ôHõ»€»]»\ôH[ZŸKâÀà	—]ô\ûHÿ\ú]ö[[›H[ôXYHY8†%H€⁄[àÿ]KåZ[ãXK\õ›ÀH‹›õ⁄ŸH8†%ù[ú»€àHX][ò⁄[ôŸYõ›»⁄]€ôH€õ›€à‹YY[ôHôX[€H]ÿ[à\H]›]â»HKà»éâ›çMâÀâÃåçãLLåIÀ][\Œñ¬à	–€›\úŸ\»õ›»õY‹»”»ì’‘»ì‘à”ëH”’Tî—KàY[ô»[›\àõ›[ô\›‹ûHúõ›Y⁄[àò[Y\»]Yõ›[ÿ^\»X]⁄H€ô\»[›HY[ôXYH\Y[ôH\›]ZY]H‹ô]»HŸX€€ôõ›»õ‹àHÿ[YHXŸKâÀà	‘ÿ[ôò[^H€€àô\€‹ùLåMX[[[›[ô\»\»€€ôN»[›\à›€àX[[[›[ô\»õ›»›^\À⁄][›\àò][ô»[ô[›\àà€à][ô]õ›»\»Hÿÿ][€à€»]€‹ù»ûH\›[òŸHZŸHHô\›âÀà	–[û][ô»[ŸH]ö[ô»⁄]»[àH€»õ›‹À€ôH€›\úŸO»ÿ\ôXõ›ôHHò[ö⁄[ô‹Àà]ô]ô\àY\ôŸ\»‹à[]\»€à]»›€àLåM\Hõ›»[›Hÿ[ù»‹ŸH[ô[]H]à€»€›\úŸ\»]€ôH€Xà
+⁄\›[ô»›òZ]»LåM›òZ]»[ôLåM\ö\⁄
+H\ôHô]ô\àõYŸŸYYÿZ[ú›XX⁄›\ãâ»HKà»éâ›çMIÀâÃåçãLLåIÀ][\Œñ¬à	’H€›\úŸHò[ö⁄[ô‹»€‹ùôYHÿ^\»õ›»LåMò][ôÀà‹àôX\ô\›àò][ô»\»›[⁄]‹[úÀ[ôH€ôH[›HX⁄»›X⁄‹ÀâÀà	”ôX\ô\›€‹ö‹»ŸôàHÿ[YHÿÿ][€àHŸX]\àÿ\ô\⁄‹»õ‹ã[ôH\ö]Y]X»\[ú»€à\»€ôKàX⁄»]⁄]õ»ö^€àö[H[ô]\⁄‹»õ‹à€ôH\ôH[ô[é»ÿ^Hõ»[ôH\›⁄[\H›^\»[à]»ò][ô»‹ô\ãâÀà	—]ô\ûH€›\úŸH[›H]ôH^YYõ›»\»Hÿÿ][€à€àö[HLåMHŸà[KYYŸ^Kàö[ôH\ôHH€XóLåN\»›€à€€‹ô[ò]N»Hô\›\ôHH›€àŸ[ùôH›[ô[ô»[àõ‹à]⁄X⁄\»⁄]HLåçô\⁄YHHZ[XYŸHYX[úÀà›òZY⁄[[ôHZ[\Àõ›ö]ôH[YKâÀà	–H€›\úŸH⁄]õ»ò][ôÀõ»à‹àõ»ÿÿ][€à⁄]»]Hì’”HŸà⁄X⁄]ô\à€‹ù[›H\ôH[ãà]ô]ô\à€›[ù»\»Hô\õ»[ô]ô]ô\àõ‹»ŸôàHYŸKâ»HKà»éâ›çM	ÀâÃåçãLLåIÀ][\Œñ¬à	’H⁄€Hö[ô[ò⁄\»ò]€àõ›»LåM[å»ö[Àõ›ù\›Hô]»€ô\Àà]ô\ûH€ôH‹[ú»⁄]HXY‹ò[HŸàHŸ]\[àù[Xô\ôY›\À[àHT‘»PTí»ÿ^Z[ô»⁄]H€€ŸŸ\‹⁄[€à€⁄‹»ZŸKâÀà	‘€€YHŸà‹ŸHXY‹ò[\»[ú›Ÿ\àH]Y\›[€à€àZ\à›€ãàHŸYŸHX]ö^⁄›‹»]⁄^Ÿà[›\àö[ôH€ÿ⁄»ù[Xô\ú»]ôHô]ô\àôY[àYX\›\ôYàH‹ôY[ã\ôXY[ô»€ôH⁄›‹»Hÿ[YH]ôYY[ô»ôYHYôô\ô[ù[ô\»]ôYH‹YYÀàH‹õ€›ôH\›XZŸ\»HY[ŸàH€XàH€€ùõ€ÿ[\Hõ‹àH€‹õàZYKâÀà	“⁄[HZY[Ÿôà‹\»õ›»⁄[HP‘ì‘‘ÀUKSSëH‹àHö[ÿ\»[ÿ^\»HöY⁄€ôHLåMHò[YHÿ\»Yù›ô\àúõ€HôYõ‹ôHHò][ÿ\»ôK\ôXY€à]Y»å[ôH€»€‹ô»YX[à‹‹⁄]H[ô‹ÀâÀà	’Hõ›[òŸHö[[›ôYŸôàHò[ôŸHö[\à»HòX›XŸH‹ôY[ã⁄\ôH]\»X›X[H€ôKâ»HKà»éâ›çL…ÀâÃåçãLLåIÀ][\Œñ¬à	÷[›\à›[ô[ô»€›\úŸH[ú»õ›»€‹ùëPTëT’íTî’àõ›[ôô\]»H€‹Ÿ\›€ôH]H‹[ôö[ù»HZ[\»ô\⁄YHXX⁄ò[YK€»H[àõ‹àH€›\úŸH[›H\ôHX›X[Hö]ö[ô»»\»H€ôH[›H[ô€ãâÀà	“]\Ÿ\»Hÿÿ][€à[›\à€ôH[ôXYH⁄]ô\»HŸX]\àÿ\ôLåM]ö^\»õ›»Ÿ\[ú›XYŸàõ›€à]ÿ^K[ôH€‹ù[ô»\[ú»€àH€ôKàõ›[ô»Xõ›]⁄\ôH[›H\ôH\»Ÿ[ù[û]⁄\ôH»»]âÀà	“YàH\\»ô]ô\àYHö^õ›[ôô\⁄›‹»H€‹ùûH\›[òŸHù]€à[ú›XY[ôH\››^\»^X›H\»]ÿ\»[ù[[›H\]âÀà	’H\›[òŸ\»\ôH›òZY⁄[[ôHZ[\»»H€›\úŸKõ›ö]ôH[YKà›\õ[ô»ò\õ\»[ô⁄X[õõ»\ôH[õôY»H€Xà]Ÿ[é»›[ôöYŸH[ôZŸ\⁄YH\ôH[õôY»H›€ã⁄X⁄\»⁄H^H⁄›»HLåçLåM€€Ÿ»H€›\HŸàZ[\À⁄X⁄\»[ùH»‹ô\àH\›àH[à⁄]õ»ÿÿ][€à€àö[HŸY\»]»XŸH]Hõ›€Hò]\à[à\ÿ\X\ö[ôÀâ»HKà»éâ›çLâÀâÃåçãLLåIÀ][\Œñ¬à	—ö[»\ôHò]€àõ›Àà]ô\ûHô]»ò[ôŸH[ôòX›XŸKY‹ôY[àö[€€Y\»⁄]HXY‹ò[HLåM⁄\ôHHXY€›ô\à€Ÿ\À⁄\ôHH€ôH€Ÿ\À⁄X⁄ÿ^HH€Xàò]ô[À⁄]H]õ›\»»»LåM€»HŸ]\\»HX›\ôH[ú›XYŸàH\òY‹ò\âÀà	–[ô^HôXY\»[ú›ùX›[€úŒà€ôH[ôHŸàŸ]\ù[Xô\ôY›\À[àHT‘»PTí»ÿ^Z[ô»⁄]H€€ŸŸ\‹⁄[€àX›X[H€⁄‹»ZŸKàHôX\€€ö[ô»\»›[\ôK€ôH\]ÿ^H[ô\à⁄H\»ö[^\›ÀâÀà	–HŸYŸHö[õ⁄[ú»Hò[ôŸH⁄[éàH€Xà€àH‹õ›[ôHò[ù\›ZXYŸà][ôH]õ›\»»›\ù]‹àYù\àH[ôKà]ô\ûHù[Xô\à€à[›\àÿ\úûHY\à\‹›[Y\»H€€Ÿ›öZŸK[ôŸ]ô[àŸàHŸ[ôH‹ôY[ú»[›HZ\‹ŸY]›\õ[ô»ö[ö\⁄Y⁄‹ùâ»HKà»éâ›çLIÀâÃåçãLLå	À][\Œñ¬à	’H€›\úŸHõﬁ€à›\ùH]ôHõ›[ô‹[ú»]»›€à\›à\][ô]ô\ûH€›\úŸH[›H]ôHH[à‹ö][àõ‹à\»öY⁄\ôHLåMH\€€Z[ô»€ô\»ö\ú›⁄]Z\à]K[àH›[ô[ô»[úÀXX⁄€ôHÿ^Z[ô»›»X[ûH€Hõ›\»]ÿ\úöY\ÀâÀà	’[ô\õôX][H⁄]»]ô\û]⁄\ôH[ŸH[›H]ôH€àö[KX\öŸY⁄\ôHHÿ€‹ôXÿ\ô\»[ôXYH€àôX€‹ô€»H€›\úŸH⁄]õ»[à›[ö[»[à]»›€à‹[[ô»ò]\à[àôZ[ô»[XôY[àúõ€Hÿ‹ò]⁄âÀà	“]ö[\ú»\»[›H\H[ôH\ö[»HõﬁLåMõ»Ÿ^Xõÿ\ôôYYY»›\ùHõ›[ô]H€›\úŸH[›H]ôH^YY‹àô\Yâ»HKà»éâ›çL	ÀâÃåçãLLå	À][\Œñ¬à	’⁄]LåN\»ô]»Ÿ[ô»ö[H»HöY⁄Xãà]ô\ûHö[HŸ\‹⁄[€à[àHŸ»[öŸY»H][ô»Xà⁄]]ô\à]ÿ\»ŸàLåM€»Hö]ô\àúôXZŸ›€à]ù\›[ôY€›[]ôH‹[ôY[›\à][ô»YŸKà›⁄[ô»ö[Hõ›»€Ÿ\»»H›⁄[ô»Xã⁄‹ùYÿ[YHö[H»⁄‹ùÿ[YK][ô»ö[H»][ôÀàõ›‹»[ôXYH⁄][ô»[à[›\àŸ»ŸY\H[ö»^HŸ\ôHö[Y⁄]»]ô\û][ô»úõ€H\ôH[ô»öY⁄â»HKà»éâ›çIÀâÃåçãLLå	À][\Œñ¬à	”ZŸ\⁄YWLåN\»ôX[ÿ€‹ôXÿ\ô\»€àö[HLåM[›H›Ÿ‹ò\Y]€»\ã›õ⁄ŸH[ô^ò][ô»[ô€‹Hõ›»€€YHŸôàH€XóLåN\»›€àÿ\ô[ú›XYŸàH⁄[][]‹àXúò\ûKâÀà	÷[›\à›õ⁄ŸH[ô^\»\ôHŸ\ôH‘ì”ë»[ô\ôHõ›»ö^Yõ›€àHÿ\ô€àö[H[ô€à[›\à]Y»åõ›[ôà]ÿ\ôö[ù»ôYHYôô\ô[ù[ôXÿ\õ›‹»LåM€ôHõ‹àõYK’⁄]K€ôHõ‹à‹ôY[ã€ôHõ‹àHõ‹ùÿ\ôY\»LåM[ôH€€›\òŸHY€‹YYHõ‹ùÿ\ô€ôKàŸôàH⁄]\»H‹ô\»›õ⁄ŸH[ô^KHMù\»ã[ôH›]çÕHX\ô»\»MKõ›Kà[›\àÿ€‹ô\»Ÿ\ôHõ››X⁄YâÀà	’H]Y»åõ›[ôõ›»ÿ\úöY\»⁄]KÃçH[ôLéK€»]õŸXŸ\»H[ôXÿ\Yôô\ô[ùX[]\›âÀà	’HZŸ\⁄YH[à\»ôXùZ[\»H›[ô[ô»[à⁄][ZY⁄Y[à€\»€à]LåMX\ôYŸK\à[ô›õ⁄ŸH[ô^€à]ô\ûH€ôK[ôH€XàHù[Xô\à\⁄‹»õ‹ãà]\»ãNHX\ô»úõ€HH⁄]\ŒàZY⁄ŸàH[à\à»\ôH[ô\àõ»\à»\»›ô\àN[ô€õHHK^X\ôMùôX[HôYY»Hö]ô\ãâ»HKà»éâ›ç	ÀâÃåçãLLå	À][\Œñ¬à	’H]ôH€H⁄]ô\»[›HHÿ‹ôY[àòX⁄Àà]ô\û][ô»Xõ›ôHŸôàHYHÿ\»X][ô»H\ôŸàH€ôHôYõ‹ôHH⁄[ô€H⁄\\X\ôYLåMHÿ€‹ö[ô»õ›‹»õ›»›\ùXõ›]ååY⁄\ãâÀà	’HWLåLÃN›ö\õ€»]ÿ^Kà]›\ù»€€\ŸY[ô]ô\»ôZ[ôHWLåLÃN€€ùõ€[àH\àõ›À€»]€‹›»õ»õ€€H[ù[[›Hÿ[ù»ù[\»‹[ö[ô»][ô\[ô»H€H€‹Ÿ\»]YÿZ[ãâÀà	”€àH]ôH€HH\LåN\»›€àò[õô\à⁄ö[ö‹»»ù\›HöY⁄[[ŸHù]€àLåMH€H]K€›\úŸH[ô\àõ›»ÿ^H⁄\ôH[›H\ôK[ô^Hõ›»⁄]]H‹ŸàHÿ‹ôY[ãâ»HKà»éâ›ç…ÀâÃåçãLLå	À][\Œñ¬à	’Hÿ\ôŸ]»⁄X⁄ŸYôYõ‹ôH[›HYHŸôãà›\ù[ô»H]ôHõ›[ôõ›»‹[ú»H⁄€Hÿ€‹ôXÿ\ô8†%]ô\ûH\ãH›[[ô›][ô[à8†%€»H‹õ€ô»€ôHŸ]»ÿ]Y⁄€àHö\ú›YH[ú›XYŸà€àH\›à\[ûH€H»ﬁX€H]»\ãâÀà	”õ»[‹ôH⁄[[ù\àÀàH€›\úŸH⁄]õ»ÿ\ô€àö[H\ŸY»ôYö[ZY⁄Y[à\à»]€⁄ŸY^X›HZŸHHôX[ÿ€‹ôXÿ\ôà›Y\‹ŸY\ú»õ›»ô[ô\àT“Q€à]ÿ‹ôY[à[ô€àH€K€»HXŸZ€\àÿ[àô]ô\à\‹»õ‹àHÿ\ôâÀà	‘⁄^ÿ€‹ôXÿ\ô»\ôH€àö[H8†%ZŸ\⁄YK›[ôöYŸKò[à€‹ù[ôŸ‹»XYöX⁄\à\ö»[ôô\úûH⁄[ùàZŸ\⁄YHÿ\»ôXYŸôàHôX[ÿ\ôXõN»H›\àö]ôHŸ\ôHYXŸYŸŸ]\àúõ€HXõ\⁄Y]H[ô\ôHXô[Y]ÿ^K€»€[òŸH][HYÿZ[ú›Hÿ\ô[à[›\à[ôâÀà	÷[›\à]Y»åõ›[ô]ZŸ\⁄YH\»ôY[à€‹úôX›Y8†%HôX[\ú»[ô›õ⁄ŸH[ô^\»\ôH€à]õ›À[ô[›\àÿ€‹ô\»Ÿ\ôHõ››X⁄Yà]ÿ\»ŸŸŸYôYõ‹ôHHÿ\ôÿ\»€àö[K⁄X⁄\»⁄]]H\à€à]ô\ûH€KâÀà	”€àH€Hÿ‹ôY[ãHô^Z€Hù]€à[›ôY\Xõ›ôHHÿ€‹ö[ô»ÿ\ô[ôHô\õ›H[›ôY›€àô[›»]â»HKà»éâ›çâÀâÃåçãLLå	À][\Œñ¬à	‘]ZX⁄»öY]»€àH]ôHŸŸŸ\ãàHù[ÿ\ô»]ZX⁄»öY]»›⁄]⁄⁄]»[ô\àH€x†&\»ô\»õ\][ôH€HôX€€Y\»€ôK[[ôHõ›‹»8†%YH⁄›õ›Y⁄ÿ€‹ôH€à€ôHÿ‹ôY[ãõ»ÿ‹õ€[ôÀâÀà	”€ôHõ›»\»‹[à]H[YH⁄]ù[\⁄^ôH⁄\Àà[ú›Ÿ\à][ôHô^[ò[ú›Ÿ\ôYõ›»‹[ú»ûH]Ÿ[é»\[ûHõ›»»ö^][ôHõ›»[›H€∏†&]òX⁄»ù\››^\»õ[öÀÿ[YH\»Hù[ÿ\ôâÀà	’H›⁄]⁄ô[Y[Xô\ú»⁄X⁄öY]»[›H\ŸY\›Hù[ÿ\ô›^\»€ôH\]ÿ^K[ô]ô\ûH\›[ÿ]ô\»[ú›[ùKâ»HKà»éâ›çIÀâÃåçãLLå	À][\Œñ¬à	’H][ô»õ›‹»\ôHôXùZ[à]»\»H›[»]XYH\»›»€ô»H€ôH[›H€Yÿ\À⁄]⁄]ô[à\»€ôHŸà]»‹[€úŒ»[ôö\ú›]€õH\X\ú»€òŸHH›[ÿ^\»\ôHŸ\ôH€»‹à[‹ôK»ôX€‹ô⁄\ôH[›H›\ùYâÀà	’]⁄]ô\»HëPSXZŸHò]Hõ‹àHö\ú›[YH8†%úõ€HH€À\]€HH\õ›»€õ›‹»€ôH][›HZ\‹ŸY[ô€ôH[›H€Yõ›⁄]\›[òŸ\À€»HXõH€›[ù»]»›ùX⁄»ò]\à[à€\»^YYâÀà	’H€WLåN\»ô\õ›»›\ù»€€\ŸY⁄›⁄[ô»ù\›H€ôH[ôH»X›€ãà\]»XY\àõ‹àHôX\€€ö[ô»[ô\õôX]â»HKà»éâ›ç	ÀâÃåçãLLå	À][\Œñ¬à	–H⁄[[YH⁄\õ‹à⁄[à[›HY»]\[ô]Ÿ]»⁄]ô[ãâÀà	—⁄]ô[à]»\ôH[ôY€ô\›Kà€ôH⁄]ô[àúõ€H€‹ŸH\»HXZŸH[›Hô]ô\à]€»]›^\»›]Ÿà[›\àXZŸHò]Hò]\à[àY[ô»]à€ôH⁄]ô[àYù\àHY»\»H‹‹⁄]H8†%õ€ŸàHY»ö[ö\⁄Y[ú⁄YHH⁄\ò€K⁄X⁄\»H€õHõﬁ[Z]Hù[Xô\àHÿ€‹ôXÿ\ôÿ[àõŸXŸKâ»HKà»éâ›ç…ÀâÃåçãLLå	À][\Œñ¬à	’Hõ›[ôô\õ›»Ÿ]»X\öŸYà‹[àHõ›[ô^YY]H€›\úŸH⁄]H[à[ôHÿ\ô[ô»⁄]›»H[à[\8†%⁄]H[àÿ[Y€àXX⁄€K⁄][›H]⁄\ôHõ›⁄›»ö[ö\⁄Y⁄]]ÿ€‹ôYâÀà	’⁄\ôHH[àò[Y\»H€Xà‹àH\ôX›[€à»]õ⁄YHÿ\ô€›[ù»]à›»Ÿù[à[›H€⁄»Hÿ[[ô⁄]\àHZ\‹»]ÿ\õôYXõ›]\»H€ôH]\[ôYàH›\õ[ô»ò\õ\»[àÿ\úöY\»‹ŸH€àLHŸà]»€\»õ›ÀâÀà	–H[à\»€õHX\öŸYYÿZ[ú›Hõ›[ô]ÿ\»‹ö][àëQì‘ëKà⁄\ôH]ÿ\»ùZ[úõ€H]ÿ\ôHõÿ⁄»ÿ^\»€»[ú›XYŸàô][ô[ô»»]ôHôYX›Y]â»HKà»éâ›çâÀâÃåçãLLå	À][\Œñ¬à	’H]ôHŸŸŸ\à\⁄‹»›»ò\àHö\ú›]ÿ\»8†%⁄^ò[ôŸ\À€ôH\àLåççÀLåLÕã◊LåLÃLãL◊LåLÃååWLåLÃÃÃ
+ÀâÀà	’]\õú»[›\à]€›[ù[ù»H][ô»›]àô]»XõH€àÿ€‹ô\»[ô€à]ô\ûHÿ\ôàXZŸ\»[ôôYK\]»úõ€HXX⁄ò[ôŸK€»H€À\]úõ€Hõ‹ùHôY]›‹»€⁄⁄[ô»ZŸHH€À\]úõ€Hö]ôKâÀà	“][€»]»Hù[Xô\à€àH€»[ô‹»H[ú»\ôH€XŸYûH8†%€[ô»H€ô\»[ú⁄YH⁄^ôY][ôX]ö[ô»H€ô»€ô\»€‹ŸKà\›[òŸH€€ùõ€\»ôY[àH‹[àò][€àôY[[€ôN»\»\»Hö\ú›[ô»]ÿ[àYX\›\ôH]€àH‹ôY[ãâ»HKà»éâ›çIÀâÃåçãLLå	À][\Œñ¬à	’Hõ›\»[›H‹ö]H€àH€Hõ›»€€YHòX⁄»»[›Kà^H]€HYÿZ[à[ôHõ›H\»€àH€Hÿ\ô[àH]ôHŸŸŸ\ã[ô\à[›\àôX€‹ôõ‹à]âÀà	‘ÿ€‹ô\»\»H⁄][›H‹õ›H€àH€›\úŸHŸX›[€à8†%]ô\ûH€Hõ›H[›H]ôH‹ö][ãô]Ÿ\›ö\ú›\XõHõ›Y⁄»]»õ›[ôâÀà	–Hö[ô[ô»Xõ›]H€H]ŸY\»€‹›[ô»[›Hõ›»][›\»⁄][›H‹õ›H€à][ôHõ›[ôLåN\»õ›À]\\›⁄›‹»Hõ›HŸôàXX⁄€Kâ»HKà»éâ›ç	ÀâÃåçãLLå	À][\Œñ¬à	“€YHõ›»[ô»⁄]⁄]LåN\»ô]»8†%]ô\ûH⁄[ôŸKô]Ÿ\›ö\ú›⁄]H^H]ÿ\»XYKà\[ûHõ›»»‹[à⁄]]⁄[ôŸYâÀà	’HŸX\àŸX\à€›[ù\ú»[›ôY»HòYÀ⁄\ôHH€Xú»^H\ÿ‹öXôH\ôKâ»HKà»éâ›åŒIÀâÃåçãLLNIÀ][\Œñ¬à	‘õ›[ô»[›HŸ»]ôHõ›»›]ò[ö»]ô\û][ô»[ŸKà⁄\ôH[›\à]ôHÿ\ô»ÿ[à[ú›Ÿ\àH]Y\›[€à€àZ\à›€à^H[ú›Ÿ\à][€ôK[ôHö[ô[ô»ÿ^\»û[›HŸŸŸY\»]ôHãâÀà	”–à€àH]ôHŸŸŸ\à8†%€ôH⁄\€àòZ\ùÿ^H[ô€à‹ôY[ãà]Ÿ]»öXŸYò]\à[à€›[ùYà›õ⁄ŸH[ô\›[òŸH\»€»›õ⁄Ÿ\»]ô\ûH[YK[ô\ôH\»õ›»[à–à€€[[à[àHŸôã]K]YH€XàXõKâÀà	–Hõ›H€à[ûH€Kõ›ù\›]H[ôŸàHõ›[ôà€ôH\‹[ú»Hõﬁ»]ÿ]ô\»\»[›H\Kâ»HKà»éâ›åŒ	ÀâÃåçãLLM	À][\Œñ¬à	‘›\ù[ô»H]ôHõ›[ôõ»€ôŸ\àõ€€\»H€ôH[à[ôX]ô\»]\ôKâ»HKà»éâ›åÕ…ÀâÃåçãLLM	À][\Œñ¬à	’H€›\úŸH⁄X]⁄Y]\ÿ‹öXô\»H€›\úŸHò]\à[àô\X][ô»H€Hõ›\Àâ»HKà»éâ›åÕâÀâÃåçãLLM	À][\Œñ¬à	‘ôK\õ›[ô⁄X]⁄Y]ôXX⁄XõHúõ€H€YKâÀà	’H\⁄X⁄‹»õ‹àHô]»ùZ[]ô\ûH[YH[›H‹[à][ôôYúô\⁄\»]Ÿ[ãâ»HKóN¬Çò€€ú›‘ì”’ëW”QëHH»À»õ›[ô»[ù[HŸYŸHòXŸH\»€€ú⁄Y\ôY‹[ùò€€ú›‘íT”QëHH»À»õ›[ô»[ù[ôY‹ö\ÇãÀ»KKKKKKKKKHŸYYà]ô\û][ô»[ôXYH€õ›€àúõ€HòX⁄…‹»ö]ôHõ€\àKKKKKKKKKBôù[ò›[€àŸYY
+
+^¬àô]\õà¬àéàKàõŸö[Nà»ò[YNâ“òX⁄…À[ôXÿ\éçKZY⁄òIÃLò›õ⁄ŸNâ‘–î’	ÀZ\‹Œâ”Yù
+⁄‹ù] I»KàŸ][ô‹Œà»ô]\õëXY[ôNâÃåçãLLLMIÀXY[ôQ\›[X]YùùYK‹ö\õ›[ôŒåKà€XúŒà¬à»YâÿÃIÀò[YNâ‘ÿ€›H[ù€HÀçIÀÿ]â‹]\âÀ‹XŒâÃÕà0≠»ô]ôX⁄»0≠»X^ŸHõ›…Àà›]\ŒâŸÿ[Z[ô…Àõ›Œâ›ŸIÀõ›[ôŒåàõ›Nâ–\òÀ\›Z]YXYúÀà[›\à€€ôö\õYY–î’›õ⁄ŸH8†%õYŸŸY\»H\]Z\Y[ù[àŸàHYùZ\‹Àà[àô]\õà⁄[ô›Àâ»Kà»YâÿÃâÀò[YNâ‘ÿ€›Hô]‹‹ùâÀÿ]â‹]\âÀ‹XŒâ–õYH0≠»ŸH[ô…Àà›]\ŒâÿòX⁄›\	Àõ›Œâ›ŸIÀõ›[ôŒåàõ›Nâ–[€»\òÀ\›Z]Yà\›‹öXÿ[H]Y€‹õH⁄]]8†%H]\õàö]Àâ»Kà»YâÿÃ…Àò[YNâ’õ⁄Ÿ^H”LLHå0¨	Àÿ]â›ŸYŸIÀŸùçå‹XŒâŒ0¨õ›[òŸH0≠»H‹ö[ô	Àà›]\Œâ€‹ô\ôY	Àõ›[ôŒåàõ›Nâ’H‹ôX]]ôHŸYŸH8†%‹[ú»⁄YHõ‹àõ‹»	à‹\⁄à⁄[ôŸYúõ€HLŒàH‹ö[ô\»ùZ[õ‹àH‹[àòXŸKâ»Kà»YâÿÕ	Àò[YNâ’õ⁄Ÿ^H”LLHM∞¨	Àÿ]â›ŸYŸIÀŸùçMã‹XŒâÃL0¨õ›[òŸH0≠»»‹ö[ô	Àà›]\Œâ€‹ô\ôY	Àõ›[ôŒåàõ›Nâ’€‹ö⁄‹úŸH8†%ù[	à›ÿ⁄»⁄›À›[ô\ôù[öŸ\úÀà⁄[ôŸYúõ€HHõ‹àõ‹ô⁄]ô[ô\‹»€à‹]X\ôH[]ô\öY\Àâ»Kà»YâÿÕIÀò[YNâ’õ⁄Ÿ^H”LLHL0¨	Àÿ]â›ŸYŸIÀŸùçL‹XŒâÃL0¨õ›[òŸH0≠»»‹ö[ô	Àà›]\ŒâŸÿ[Z[ô…Àõ›[ôŒåàõ›Nâ—ù[\›⁄[ô»ÿ\ŸYŸH8†%[ôXYHöY⁄õ‹àH⁄[›»›ŸY\\ãâ»Kà»YâÿÕâÀò[YNâ–€ÿúòH⁄[ô»X»\õ€ú…Àÿ]â⁄\õ€âÀ‹XŒâ‘»0¨
+[ò⁄‹ú»HŸYŸHY\äIÀà›]\ŒâŸÿ[Z[ô…Àõ›[ôŒåõ›Nâ‘›õ€ôÀ[ŸùYŸ]à€€ôö\õHH»›[\â»KàKà”ŸùààòY“\›‹ûNà¬à»]NâÃåçãL…À^âÕM∞¨àH8°§àL»8†%][‹›Hù[	à‹]X\ôN»õ‹ô⁄]ö[ô»‹ö[ôö]»Hõÿãâ»Kà»]NâÃåçãL…À^âÕå0¨àL»8°§àH8†%H€Xà[›H‹[à\»H‹ö[ô\»ùZ[õ‹à]â»Kà»]NâÃåçâÀ^â–ÿ][[òH›Y[»›[Hô]\õôY8†%ù[ôYH[ù€HÀçKâ»KàKàX›[€úŒà¬à»YâÿLIÀ^â–\ò»úÀà›òZY⁄8†%Sî’—TëQà›ô\öXY€€ôö\õ\»–î’8°§àô\õÀ]‹ú]YH\»HX]⁄	À€ôNùùYKöNôò[ŸHKà»YâÿLâÀ^â—[[»ô\õÀ]‹ú]YH]\ú»]Õà
+êKêãàå»»Y^ûãåHX^Ÿ\‹Ÿ^HÃîÀ‹Y\àï
+IÀ€ôNôò[ŸKöNùùYHKà»YâÿL…À^â–õ€⁄»H]\àö][ô»[ú⁄YHHô]\õà⁄[ô›…À€ôNôò[ŸKöNùùYHKà»YâÿM	À^â–€€ôö\õHH^X›ô]\õàXY[ôIÀ€ôNôò[ŸKöNùùYHKà»YâÿMIÀ^â”õ‹ŸKYõ‹^Y[[ôH\›]ÕâÀ€ôNôò[ŸKöNôò[ŸHKà»YâÿMâÀ^â–Z[H⁄X⁄»€àH›òZY⁄ãYõ€›\âÀ€ôNôò[ŸKöNôò[ŸHKà»YâÿM…À^â—[[»H”LL\ŒàMãåL»ôY[0≠»ååH‹\⁄	À€ôNôò[ŸKöNôò[ŸHKàKàŸ\‹⁄[€úŒà¬à»]NâÃåçãLÀLM…ÀŸ]\âÃ»›õ⁄Ÿ\»0≠»‹õ›[ô[]ô[€‹ŸK]\	Àö[ô[ôŒâ’[\»åNåH0≠»òXŸH€‹Ÿ\»0≠»X\õHYùà€€ùX›Ÿ[ù\ôY8ß$…Àà]Z[à¬àY]öX‹Œà¬à»Œâ’[\…ÀéâﬂåNåIÀŒâ›ÿ\õâÀéâ›\ôŸ]éåI»Kà»Œâ–€€ùX›	Àéâ–Ÿ[ù\ôY	ÀŒâŸ€€Ÿ	Àéâ€ŸôàH›ŸY]‹›	»Kà»Œâ‘›\ù[ôIÀéâ’\HòX⁄…ÀŒâŸ€€Ÿ	ÀéâÿZ[H€€Y	»Kà»Œâ—òXŸIÀéâ–€‹Ÿ\…ÀŒâ›ÿ\õâÀéâ›ŸK[›ô\ãò\öY\»ô\]À\ô\	»Kà»Œâ”Yù	Àéâ”Yù»X\õIÀŒâ›ÿ\õâÀéâ›\	à›]Yù\à[\X›	»KàKà›‹ûNâ’Hò\Ÿ[[ôKàôYH›õ⁄Ÿ\»€àH[ô€‹àX]ö[YY\»HY⁄‹õ›[ô[]ô[€‹ŸK]\ŸàH€XöXYà€€ùX›ÿ\»€X[à[ôŸ[ù\ôY€à[ôYK[ôHò[›\ùY€àHôX\€€òXõH[ôH8†%Z[H[ô›öZŸHŸ\ôHô]ô\àHõÿõ[KàHò][ŒàH]ZX⁄À⁄‹ùXòX⁄‹›⁄[ô»›õ⁄ŸN»HXY‹[ô»\öY⁄Yù\à[\X›»[ôHŸHõ›][ô»›ô\àõ›Y⁄[\X›8†%€‹ú›€à›õ⁄ŸHãÿ[Y\à€à›õ⁄ŸHÀ⁄X⁄\»⁄]õYŸŸY]\»[Z[ôÀY\[ô[ùâÀà[Z]Œâ–€XöXY[€õH€‹ŸK]\à‹›\ôK^Y[[ôK›[òŸH[ôùYH]€›[õ›ôH\‹Ÿ\‹ŸYúõ€H\»[ô€KâÀàHKà»]NâÃåçãLÀLN	ÀŸ]\âÃà›õ⁄Ÿ\»0≠»òXŸK[€à»ôX\ãQ	Àö[ô[ôŒâ‘]ôX\ã[ô]]ò[0≠»›\ù[ôH›òZY⁄0≠»X\õHYùõ€õ›[òŸY	Àà]Z[à¬àY]öX‹Œà¬à»Œâ‘]	Àéâ”ôX\ã[ô]]ò[	ÀŒâŸ€€Ÿ	Àéâ€õ›HöY»\ò…»Kà»Œâ—òXŸHô[X\ŸIÀéâ”[Ÿ\ò]IÀŒâ€ZY	Àéâ€\‹»[àH€‹ŸK]\»⁄›ŸY	»Kà»Œâ”Yù	Àéâ‘õ€õ›[òŸY8ß%…ÀŒâ›ÿ\õâÀéâÿ€X\ô\›ò][€àö[I»Kà»Œâ‘›\ù[ôIÀéâ”€àŸ[ù\âÀŒâŸ€€Ÿ	Àéâ€õ»YùZ\‹»\ŸHô\…»Kà»Œâ’[\…Àéâ–úö\⁄…ÀŒâ›ÿ\õâÀéâ‹›[]ZX⁄…»KàKà›‹ûNâ’⁄Y\àúò[Z[ô»[õÿ⁄ŸYH]]Y\›[€à8†%[ôHôXYÿ\»Z[\ò»»ôX\õHô]]ò[€X\õHõ›HöYÀX\ò»›õ⁄ŸKàHX\õHYùôXÿ[YHHXY[ôNàHXY‹»ŸôàHX]öY⁄Yù\à[\X›[ú›XYŸà⁄\⁄[ô»›ÀH[‹›€€ú⁄\›[ùò][X‹õ‹‹»]ô\ûH›õ⁄ŸHö[YY»]⁄[ùàòXŸHõ›][€àÿ\»ô\Ÿ[ùù][Ÿ\ò]KâÀà[Z]Œâ‘⁄›úõ€HôZ[ôX[ô\€Y⁄KXXõ›ôHò]\à[à\ôHò[ZZY⁄›€ã]K[[ôK€»H\ò»ôXYÿ\»òô\›]òZ[XõKàõ›ö[ò[8†%Ÿ\‹⁄[€à»Ÿ]Y]âÀàHKà»]NâÃåçãLÀLN	ÀŸ]\âŒH€\»0≠»›ô\öXY
+»	Àö[ô[ôŒâ‘]€€ôö\õYY’êRQ“
+–î’
+H8°§àô\õÀ]‹ú]YH]\à\»HX]⁄	Àà]Z[à¬àY]öX‹Œà¬à»Œâ‘]	Àéâ‘’êRQ“0≠»–î’	ÀŒâŸ€€Ÿ	Àéâ€›ô\öXYH€€›[ô\ô	»Kà»Œâ—òXŸH]ZŸX]ÿ^IÀéâ‘‹]X\ôKZ\⁄	ÀŒâŸ€€Ÿ	Àéâ€õ»\ò»õ›][€â»Kà»Œâ‘›\ù[ôIÀéâ‘›òZY⁄	ÀŒâŸ€€Ÿ	ÀéâŸ€€Ÿô\»€àHX]	»KàKà›‹ûNâ’HöY»€ôKàH›ô\öXY[ô€H8†%H€€›[ô\ôõ‹à]8†%⁄›ŸYH€X\à›òZY⁄XòX⁄À\›òZY⁄]õ›Y⁄›õ⁄ŸHX‹õ‹‹»][\H[ù€HÀçHô\À›\\úŸY[ô»HX\õY\àõZ[\ò»à›Y\‹»úõ€H[ô€\»]€›[õ›X›X[HŸYH]àô\ôX›à[›H\ôHHô\õÀ]‹ú]YH»òXŸKXò[[òŸY^Y\ã[ôõ›]\ú»[›H›€à\ôH\òÀ\›Z]YàHZ\€X]⁄^Z[ú»HôX›\úö[ô»YùZ\‹ŒàH]\àÿ[ù»»€‹ŸHHòXŸH[ôH›òZY⁄›õ⁄ŸHŸ\»õ›[YH]õ›][€ãâÀà[Z]Œâ”›ô\öXYÿ[õõ›ŸYHô\ùXÿ[[›ô[Y[ù€»HYù]Y\›[€à›^YY‹[ãâÀàHKàKà]õ€][€éà¬à\]Yà	ÃåçãLÀLN	ÀàŸ\‹⁄[€úŒà…‘ÃIÀ	‘ÃâÀ	‘Ã…À	‘Õ	À	–ì	◊KàY]öX‹Œà¬à»ò[YNâ‘]	ÀX\ö‹Œñ…œ…À	ﬂâÀ	¯ß$…À	¯ß$…À	¯ß$…◊Kô\ôX›â‘—UQ8†%›òZY⁄
+–î’
+K€€ôö\õYYúõ€H›ô\öXYX‹õ‹‹»MJ»€\»[ôõ›]\úÀâÀŒâŸ€€Ÿ	»Kà»ò[YNâ’[\»»ÿY	ÀX\ö‹Œñ…¯ß%…À	¯ß%…À	¯†%	À	¯ß$…À	¯ß$…◊Kô\ôX›â—íVQ€àö[H8†%òX⁄‹›⁄[ô»ÿY‹ô]»çå	H
+ç»8°§àçç\ Kò][»8¢béåKàŸY\H€ôKU€»ö[âÀŒâŸ€€Ÿ	»Kà»ò[YNâ—òXŸH][\X›	ÀX\ö‹Œñ…¯ß%…À	ﬂâÀ	¯†%	À	¯ß$…À	œ…◊Kô\ôX›â‘‹]X\ôH€àHô]Ÿ\›ö[Kà\›‹öXÿ[H[Z[ôÀY\[ô[ù8†%ô\õÀ]‹ú]YHô[[›ô\»H[Z[ô»ô\]Z\ô[Y[ùâÀŒâ€ZY	»Kà»ò[YNâ—X\õHYù	ÀX\ö‹Œñ…¯ß%…À	¯ß%…À	¯†%	À	œ…À	¯ß%…◊Kô\ôX›â’H‘SàêUS8†%ÿ›[Y[ùYúõ€H»[ô€\»[àHò\Ÿ[[ôKàôYY»HòXŸK[€à€\»€€ôö\õHHö^âÀŒâ›ÿ\õâ»Kà»ò[YNâ‘›\ù[ôH»Z[IÀX\ö‹Œñ…¯ß$…À	¯ß$…À	¯ß$…À	¯ß$…À	¯ß$…◊Kô\ôX›â–H›ô[ô›[à]ô\ûHŸ\‹⁄[€à]ô\àö[YYàõ›X›]àX⁄»H]\à[›Hÿ[àZ[H⁄]€€ôöY[òŸKâÀŒâŸ€€Ÿ	»KàKàKàö]ôQùà◊KÀ»Ÿ]Kô\›[ŒñÀããååŸàXZŸK”‘ã‘À”◊_Bà›]Œà◊KÀ»›]€ò\⁄›»
+“Sà] K€\›ö\ú›8†%ŸYHH›]ÿôYY\Bàö[ŸŒà◊KÀ»Ÿ]Kö[Bà\›Œà◊KÀ»Ÿ]K]\ãXZŸ\Àõ›_H8†%LXò[[[»\›¬àÀ»][ò⁄[[€ö]‹àŸ\‹⁄[€ú»8†%Hù[Y\öX»⁄[àŸàŸ\‹⁄[€úÿà]»’”à\úò^Hò]\à[ÇàÀ»HõY»€àHö[HŸ\‹⁄[€úÀôXÿ]\ŸHH€»€›\òŸ\»]ôH‹‹⁄]Hõ[ô‹›Œàö[BàÀ»ŸY\»HõŸH[ôÿ[õõ›YX\›\ôHHò[òY\àYX\›\ô\»Hò[[ôô]ô\àŸY\»\¬àÀ»‹›\ôKà€ôH\úò^H€›[]ôH]HòX⁄€X[àÿ\úûHôH][›Y\»ö[YYàŸYHò^SŸ 
+KÇàò^\Œà◊KÀ»Ÿ]Kô[ùYK[ö]ò[õ‹õK‹[ã\ÿ⁄\[ôKŸ]\ö[ô[ôÀ]Z[ŸöYBàÀ»òX⁄€X[à€€Xö[ôHô\›[»8†%Hö^Yõ›ÿ€€ÿ€‹ôY8†$ÃL€»[õZŸH]ô\û][ô»[ŸBàÀ»Hò^HõŸXŸ\»]\»\ôX›H€€\\òXõHYÿZ[ú›U—Sà›ô\à[YKàÿ[YHõÿà\¬àÀ»\›ÿ€àH][ô»⁄YNàHô\X]XõHô[ò⁄X\öÀõ›HŸ\‹⁄[€ãÇà€€Xö[ô\Œà◊KÀ»⁄Y]Kô[ùYKÿ€‹ôK\ôŸ]ŒñﬁﬁYÀÿ€‹ôK]ô—\›WKõ›_Bà⁄‹ù\›à¬à»ò[YNâ”êKêãàå…À\Nâ÷ô\õÀ]‹ú]YH0≠»X[]	ÀöXŸNçŒK[[ŸYôò[ŸHKà»ò[YNâ”Ÿ\‹Ÿ^HZKS€ôHÃî»òZ[ö\ô	À\Nâ÷ô\õÀ]‹ú]YH0≠»Y⁄SS“IÀöXŸNåŒNK[[ŸYôò[ŸHKà»ò[YNâ”êKêãàY^ûãåHX^	À\Nâ÷ô\õÀ]‹ú]YH0≠»X^S“IÀöXŸNçK[[ŸYôò[ŸHKà»ò[YNâ’^[‹ìXYH‹Y\àï	À\Nâ÷ô\õÀ]‹ú]YH0≠»ù\›Y⁄\IÀöXŸNçK[[ŸYôò[ŸHKà»ò[YNâ”Ÿ\‹Ÿ^HZKS€ôHÃî»Õ…À\Nâ÷ô\õÀ]‹ú]YH0≠»ò[ô…ÀöXŸNåÕK[[ŸYôò[ŸHKà»ò[YNâ‘ÿ€›H[ù€H»âÀ\Nâ—òXŸKXò[[òŸY0≠»X\ﬁH›ÿ\	ÀöXŸNçK[[ŸYôò[ŸHKàKà€›\úŸ\Œà¬à»YâﬁIÀò[YNâ”€XY	À›â“\ô[[ô	Àò][ôŒõù[éõù[ùX⁄Ÿ]ôò[ŸKõ›\Œâ…»Kà»YâﬁâÀò[YNâ’ÿ]\ùö[IÀ›â“\ô[[ô	Àò][ôŒõù[éõù[ùX⁄Ÿ]ôò[ŸKõ›\Œâ…»Kà»Yâﬁ…Àò[YNâ“Ÿ‹»XY	À›â“\ô[[ô	Àò][ôŒõù[éõù[ùX⁄Ÿ]ôò[ŸKõ›\Œâ…»Kà»YâﬁIÀò[YNâ”Y]YX€€ö»ò][€ò[	À›â”íâÀò][ôŒõù[éõù[ùX⁄Ÿ]ôò[ŸKõ›\Œâ…»Kà»YâﬁâÀò[YNâ’ù[\[ö‹»]ô\úûH⁄[ù	À›â”ñIÀò][ôŒõù[éõù[ùX⁄Ÿ]ôò[ŸKõ›\Œâ…»Kà»Yâﬁ	Àò[YNâ‘ÿ[ôò[^IÀ›â’“IÀò][ôŒõù[éõù[ùX⁄Ÿ]ùùYKõ›\Œâ”ô^\â»KàKàõ›[ôŒà◊KÀ»Ÿ]K€›\úŸKÿ€‹ôK]Àõ›Xõ\Œñ◊Kõ›_BàY[ù[à◊KÀ»‹›\õ›[ôXúöYYú»8†%⁄Y]Kõ›[ôõÿ›\ÀöYŸŸ\úŒñ◊K⁄[éñ◊Kõ›Kô^BàX]ö^à»Lû⁄õù[õù[éõù[KMéû⁄õù[õù[éõù[Kåû⁄õù[õù[éõù[HKàÿ\úöY\Œà¬à»€Xéâ—ö]ô\âÀŸùâŒp¨	Àÿ\úûNååÕHKà»€Xéâ”Z[öHö]ô\âÀŸùâÃLÀçp¨	Àÿ\úûNåååKà»€XéâÃãZ\õ€à
+][]JIÀŸùâﬂåM¨	Àÿ\úûNååHKà»€XéâÕZ\õ€âÀŸùâÃåp¨	Àÿ\úûNåNLKà»€XéâÕKZ\õ€âÀŸùâÃå¨	Àÿ\úûNåNKà»€XéâÕãZ\õ€âÀŸùâÃç∞¨	Àÿ\úûNåMÃKà»€XéâÕÀZ\õ€âÀŸùâÃéKçp¨	Àÿ\úûNåMNKà»€XéâŒZ\õ€âÀŸùâÃÕ0¨	Àÿ\úûNåMàKà»€XéâŒKZ\õ€âÀŸùâÃŒp¨	Àÿ\úûNåLÕKà»€Xéâ‘…ÀŸùâÕ0¨	Àÿ\úûNåLåàKà»€XéâÕL0¨ŸYŸIÀŸùâÕL0¨	Àÿ\úûNåLKà»€XéâÕM∞¨ŸYŸIÀŸùâÕM∞¨	Àÿ\úûNéMHKà»€XéâÕå0¨ŸYŸIÀŸùâÕå0¨	Àÿ\úûNéKàKàÿ\úöY\–ÿ[Xúò]Yàò[ŸKà\‹€€ú‘ôXYà◊Kàö[^\Œà◊KÀ»T”»]\»Hö[ÿ\»X\öŸY€ôBàÀ»“P“ö[ÿ\»€ôK[ô⁄]]ÿ€‹ôYàö[^\ÿôX€‹ô»€õH]””QUSë¬àÀ»ÿ\»òX›\ŸY]^K€»]ÿ[àŸY\H›ôXZ»[]ôH[ôõ›[ô»[ŸH8†%]ÿ[õõ›àÀ»ÿ^HH\H\›\»ô]ô\àôY[àù[ã‹à]H€⁄[àÿ]H\»€[Xö[ôÀà]ô\ûHö[àÀ»õ›»ÿ\úöY\»H\‹»X\ö»]õŸXŸ\»Hù[Xô\ã[ôHù[Xô\à⁄]õ›⁄\ôH»€»\¬àÀ»H€ôH⁄[ôŸà]öY[òŸH\»\\»[ÿ^\»ôYù\ŸY»‹ŸKà⁄Y]KüH8†%ò\¬àÀ»Hô\›[\»H\Y]
+çÀÃLãåNäK‹[€ò[ôXÿ]\ŸH⁄[ô»Hö[\»€‹ùàÀ»ôX€‹ô[ô»]ô[à€àHöY⁄HYâ›€›[ùÇàö[ŸŒà◊KàúöYYö[ô‹Œà◊KÀ»⁄Y€›\úŸK]Kõÿ›\ÀŸX›[€úŒñﬁ›üW_H8†%\⁄YûH€]YHôK\õ›[ôàÀ»Xõ\⁄Yÿ€‹ôXÿ\ô»\⁄YûHôYY8†%ÿ€›\úŸK\éñ◊K⁄Nñ◊Kö[ôK‹òﬂKàò[ö‹¬àÀ»ô[›»òX⁄…‹»›€àÿ\ô»[ôXõ›ôHH€›\úŸKXÿ\ôÀöú»ò\Ÿ[[ôKàŸYH€S^[›]
+
+KÇà^[›]Œà◊KàÀ»\‹€€à^Y\ãà\‹€€úÀöúÿ\»Hîì÷ëSàêT—SSëK^X›HZŸHŸYY
+
+H\»õ‹ÇàÀ»]ô\û][ô»[ŸN»\ŸHôYHÿ\úûHH]ôHY]»€»H\‹€€à⁄[ôŸH\»Hÿ[YBàÀ»\[ô[€õHòZ[H[à⁄[ôŸHŸ\ÀàŸYH\‹€€ú 
+Hô[›ÀÇà\‹€€ëY]ŒàﬂKÀ»»\‹€€íYà¯†)ú]⁄YöY[ﬂHH8†%úõ€H\‹€€ã]\]Xà\‹€€êYŒà◊KÀ»⁄€H\‹€€ú»\⁄YûHôYY8†%úõ€H\‹€€ãXYà\‹€€íY[éà◊KÀ»Y»ô]\ôY8†%úõ€H\‹€€ã\ô[[›ôXàÀ»H⁄]€à[ô⁄X⁄\»⁄]Hö[ô[ò⁄ö[\ú»ûKà›€ö[ô»€€Y][ô»\»BàÀ»€Z[HXõ›]H€‹õ€»\»›\ù»\»”ìH⁄]HôX€‹ô\›Xõ\⁄\»8†%HòYÀàÀ»H€ôH]ô\ûHö[YYò][ÿ[YHŸôãHZ\òX€HåKHUVîà\Ÿ\àõ›Y⁄àÀ»]Y»L»åçã[ôHYK⁄X⁄[ûXõŸHÿ\úûZ[ô»]òY»\Àà]ô\û][ô»[ŸHÿZ]¬àÀ»õ‹àH\ò]\à[àôZ[ô»\‹›[YYÇà⁄]à…‹]\âÀ	‹€ôIÀ	€\Ÿ\âÀ	€LåIÀ	ÿ€⁄[ú…◊KàN¬üBÇãÀ»KKKKKKKKKH›]HKKKKKKKKKBõ]Œ¬ôù[ò›[€àZY‹ò]J ^¬àÀ»Y]]ôH\‹òY\»õ‹à›]\»ÿ]ôYûH€\à\ô\ú⁄[€úÀÇàYä\ÀôôYY\YY
+HÀôôYY\YYH◊N¬àYä\Àú›] HÀú›]»H◊N¬àYä\Àôò][ HÀôò][»H¬à»YŒâŸX\õK[Yù	À⁄NâŸò][ÃH[à[›\àö[YY›õ⁄ŸHŸ\‹⁄[€ú…»Kà»YŒâ›[\…À⁄Nâﬁ[›\àö[YY[\»ù[ú»åNåH
+\ôŸ]éåJI»KàN¬àYä\Àòÿ\úöY\ ^»€€ú›úô\⁄HŸYY
+
+N»Àòÿ\úöY\»Húô\⁄òÿ\úöY\Œ»Àòÿ\úöY\–ÿ[Xúò]YHò[ŸN»BàYä\ÀòúöYYö[ô‹ HÀòúöYYö[ô‹»H◊N¬àYä\Àõ^[›] HÀõ^[›]»H◊N»À»ÿ€‹ôXÿ\ô»\⁄YûHôYY8†%ŸYH€S^[›]
+
+BàYä\ÀôŸ[ HÀôŸ[»H◊N»À»€›\úŸHÿÿ][€ú»\⁄YûHôYY8†%ŸYH€›\úŸQŸ[ 
+BàYäÀö\ôHOOH[ôYö[ôY
+HÀö\ôHHù[»À»\»\›ÿÿ][€àö^8†%ŸYHô]⁄\ôJ
+BàYä\ÀõY[ù[
+HÀõY[ù[H◊N¬àYä\Àõ\‹€€ëY] HÀõ\‹€€ëY]»HﬂN¬àYä\Àõ\‹€€êY HÀõ\‹€€êY»H◊N¬àYä\Àõ\‹€€íY[äHÀõ\‹€€íY[àH◊N¬àYä\Àö⁄]
+HÀö⁄]HŸYY
+
+Kö⁄]¬àYä\Àôö[Ÿ HÀôö[Ÿ»H◊N»À»\ãYö[òX›XŸHôX€‹ô8†%ŸYHö[ù[ú 
+BàYä\Àòò^\ HÀòò^\»H◊N»À»][ò⁄[[€ö]‹àŸ\‹⁄[€ú»8†%ŸYHò^SŸ 
+BàYä\Àò€€Xö[ô\ HÀò€€Xö[ô\»H◊N»À»òX⁄€X[à€€Xö[ôHÿ€‹ô\»8†%ŸYH€€Xö[ôPÿ\ô
+
+BàYäÀõ]ôHOOH[ôYö[ôY
+HÀõ]ôHHù[»À»Hõ›[ôôZ[ô»ŸŸŸY€KXûKZ€BàYä\Àú[êÿ[ HÀú[êÿ[»HﬂN»À»\»›€à€Xàÿ[€àH[â‹»€H8†%ŸYH[êÿ[
+
+BàYä\Àù\]\ HÀù\]\»H◊N»À»H⁄]	‹»ô]»Ÿ»8†%ŸYHôX€‹ô\]J
+BàYäÀù\]\“[ö]OOH[ôYö[ôY
+HÀù\]\“[ö]Hò[ŸN¬àYäÀúŸ][ô‹ÀúŸY[êùZ[OOH[ôYö[ôY
+HÀúŸ][ô‹ÀúŸY[êùZ[Hù[¬àYä\ÀúŸ][ô‹ÀúŸY[ï\]\ HÀúŸ][ô‹ÀúŸY[ï\]\»H◊N¬àÀ»”ëH‘íQTàT–“TSëH
+Ÿ\LHåçäKà\ôHÿ\»H⁄[ô€HÀô]õ€][€ò[ô]ÿ\¬àÀ»][ô…‹À⁄X⁄\»⁄HHZY‹ò][€àS’ëT»]ò]\à[àX]ö[ô»]ô\⁄YHHô]¬àÀ»›‹ôNà€»€Y\»õ‹à€ôH⁄[ôŸàôX€‹ô\»›»^HöYù[ôHŸX€€ô€ôH\»[ÿ^\¬àÀ»H€ôHõÿõŸH\]\Àà]õ—õ‹ä
+X\»H€õHôXY\àúõ€H\ôH€ãÇàYä\Àô‹öY ^»Àô‹öY»H»][ôŒàÀô]õ€][€àŸYY
+
+Kô]õ€][€àN»[]HÀô]õ€][€é»BàYäÀúŸ\‹⁄[€úÀô]ô\ûJOà^ô]Z[
+J^¬à€€ú›úô\⁄HŸYY
+
+N¬àÀ»‹òYùŸYY]Z[»€ù»X]⁄[ô»ôKY]Z[Ÿ\‹⁄[€àõ›‹¬àÀúŸ\‹⁄[€úÀôõ‹ëXX⁄
+õ›»Oà¬àYäõ›Àô]Z[
+Hô]\õé¬à€€ú›X]⁄Húô\⁄úŸ\‹⁄[€úÀôö[ô
+àOàãúŸ]\OOHõ›ÀúŸ]\
+N¬àYäX]⁄
+Hõ›Àô]Z[HX]⁄ô]Z[¬àJN¬àBàô]\õàŒ¬üBôù[ò›[€àÿY
+
+^¬àûH»»HZY‹ò]Jî””ãú\úŸJÿÿ[›‹òYŸKôŸ]][J◊“—VJJHŸYY
+
+JN»Bàÿ]⁄
+J^»»HZY‹ò]JŸYY
+
+JN»BüBôù[ò›[€àÿ]ôJ
+^»ÿÿ[›‹òYŸKúŸ]][J◊“—VKî””ãú›ö[ô⁄YûJ JN»BÇãÀ»KKKKKKKKKH][»KKKKKKKKKBò€€ú›	HŸ[Oàÿ›[Y[ùú]Y\ûTŸ[X›‹äŸ[
+N¬ôù[ò›[€à\ÿ  ^»ô]\õà›ö[ô »œ»	… Kúô\XŸJ÷…èàâ◊KŸÀ»Oà
+……âŒâ…ò[\…À	œ	Œâ…õ…À	œâŒâ…ô›…À	»âŒâ…ú][›…Àâ»éâ…àÃŒN…ﬂVÿ◊JJN»BÇãÀ»KKKHôXY[ô»[\úŒà€ôÀYõ‹õH€ÿX⁄[ô»›^\»⁄€Kù]\úö]ô\»[à^Y\ú»KKKBãÀ»õŸY\»\ôH]]‹ôY⁄]õ[öÀ[[ôH\òY‹ò\úôXZ‹Œ»S€›[X][KÇôù[ò›[€àõ‹ŸJ€ ^¬àô]\õà›ö[ô œ»	… Kú‹]
+◊ûÃãK KõX\
+Oàùö[J
+JKôö[\äõ€€X[äBàõX\
+Oà€\‹œHâÿ€»	€\‹€€ãXõŸIﬂHèâŸ\ÿ 
+_O‹ò
+Köõ⁄[ä	… N¬üBãÀ»‹]ŸôàH‹[ö[ô»Ÿ[ù[òŸH€»]ÿ[à›[ô\»H›[[X\ûH[ôKÇãÀ»XY
+»ô\›[ÿ^\»ôX€€ú›ùX›H⁄€H^8†%õ›[ô»\»õ‹YÇôù[ò›[€à‹]XY
+
+^¬à€€ú›»H›ö[ô œ»	… Kùö[J
+N¬à€€ú›ôHH÷ÀàO◊JœWﬂ	
+KŸŒ¬à]N¬à⁄[J
+HHôKô^X  JJ^¬à€€ú›[ôHKö[ô^
+»N¬àYä[ô
+H€€ù[ùYN»À»€»⁄‹ù»›[ô[€ôBà€€ú›XYHÀú€XŸJ[ô
+N¬àYä ü V–KVóWâÀù\›
+XY
+JH€€ù[ùYN»À»[ö]X[ÀêKêãã]ÀÇàYä◊äúﬂ\õﬁü\ü\úﬂõﬂ›úü‹üWôﬂWôJWâ⁄Kù\›
+XY
+JH€€ù[ùYN¬àô]\õà€XYÀú€XŸJ[ô
+Kùö[J
+WN¬àBàô]\õà‹À	…◊N¬üBãÀ»€ôHÿÿ[õòXõH[ôHõ‹àHŸX›[€éà[à]]‹ôYÿ[ŸH]»‹[ö[ô»Ÿ[ù[òŸKÇôù[ò›[€à⁄\›
+ ^¬àYäÀö Hô]\õàÀöŒ¬à€€ú›XYH‹]XY
+ÀòäVÃN¬àô]\õàXYõ[ô›àNL»XYú€XŸJMÃ
+Kúô\XŸJ◊ ◊ âÀ	… H
+»	¯†)â»àXY¬üBãÀ»KKKKHH€€\⁄XõHŸX›[€à
+]Y»ç»åçäHKKKKBãÀ»€ôH]\õàõ‹à]ô\ûHõ€XõHŸX›[€à[àH\à]\»HZ[à]Z[œàÿ\úûZ[ô»[ÇãÀ»Q[Xô\ò][Nàô[ô\ä
+H[ôXYHô\›‹ô\»[ûH‹[à]Z[»Yx†)èàX‹õ‹‹»Hô\ô[ô\ä
+KãÀ»€»H‹[ãÿ€‹ŸY›]H€‹›»õ»›‹ôKõ»õ€⁄⁄ŸY\[ôÀ[ôÿ[õõ›öYù›]Ÿàﬁ[ò¬ãÀ»⁄]⁄]\»X›X[H€àÿ‹ôY[ãàô]ô\àùZ[H\ò[[‹[ãÿ€‹ŸYX\õ‹à\»8†%BãÀ»ö[Xô[ò⁄ùY»”UQKõYôX€‹ô»
+[à^[ôYŸX›[€à€ò\[ô»⁄]€à]ô\ûH[ã\XŸBãÀ»\]JH\»^X›H⁄]]XX⁄[ô\ûH^\›»»ô]ô[ùÇãÀ¬ãÀ»Y[ö\]YH[ô’PìH8†%]\»HŸ^HHô[‹[ãXYù\ã\ô\ô[ô\à€‹ö‹»ŸôÇãÀ»Xô[HŸX›[€àò[YK[àH[€õ»Xô[õ⁄XŸH
+ô[ô\ôY\\òÿ\ŸHûH‘‘ BãÀ»Y]HHöY⁄Z[ô[ôNàH€›[ùH]KH[ùà‹[€ò[ÇãÀ»õŸHHŸX›[€â‹»SãÀ»‹[àYò][›]H
+ùYH[õ\‹»[›H]ôHHôX\€€äBãÀ»€»^òH€\‹Ÿ\»8†%€òÿ\ôõ‹àH‹ôX[K[€ãY‹ôY[àò\öX[ùãÀ»H€ôHÿ‹ôY[à]Ÿ]»ì»õ€»\»H]ôHŸŸŸ\éà][ôXYHY\»⁄]ÿ[õõ›^\›ãÀ»Y][ô€»\ÿ€‹›\ôHﬁ\›[\»€àH›öX›\›ÿ‹ôY[à[àH\\»€ôH€»X[ûKÇôù[ò›[€àõ€
+YXô[Y]KõŸK‹[àHùYK€»H	… ^¬àô]\õà]Z[»€\‹œHôõ€	ÿ€ﬂHàYHâŸ\ÿ Y
+_Hâ€‹[à»	»‹[â»à	…ﬂOÇà›[[X\ûOè‹[à€\‹œHôõ€èâŸ\ÿ Xô[
+_O‹‹[èâ¬àY]H»‹[à€\‹œHôõ€HèâŸ\ÿ Y]J_O‹‹[èòà	œ‹[à€\‹œHôõ€Hèè‹‹[èâﬂO‹›[[X\ûOÇà]à€\‹œHôõ€àèâÿõŸ_OŸ]èÇàŸ]Z[œò¬üBãÀ»HòZ[›€àHYùŸàHÿ\ôÿ\úûZ[ô»Hö[ô[ôÀ[àHö[ô[ô…‹»›€à]öY[òŸBãÀ»Y\ãàZ\à]⁄]]ïY 
+Hõ‹àH⁄\8†%ÿ[YHö]ôHY\úÀ€ôHõÿÿXù[\ûKÇò€€ú›òZ[H]àOà]à»Y\úòZ[IŸ]üXà	…Œ¬ÇãÀ»XYŸ[ù[òŸH\úõ€ùHô\›€ôH\]ÿ^KÇôù[ò›[€à^[ôXõJ€ ^¬à€€ú›€XYô\›HH‹]XY
+
+N¬à€€ú›»H€»	‹€IŒ¬àô]\õàô\›»€\‹œHâÿﬂHèâŸ\ÿ XY
+_O‹Çà]Z[»€\‹œHõ[‹ôHèè›[[X\ûOîôXYHô\›‹›[[X\ûOâ‹õ‹ŸJô\› _OŸ]Z[œòàà€\‹œHâÿﬂHèâŸ\ÿ XY
+_O‹ò¬üBãÀ»Hò][	‹»⁄X‹[ú»⁄]]»›€à›]\»€‹ô8†%HôYY‹ö]\»”‘—Q‹à’”ë‘êQQ\¬ãÀ»Hö\ú›⁄Ÿ[à⁄[à€ôH\»Ÿ]Yà\ö]ö[ô»›]\»úõ€H]ŸY\»”ëH€›\òŸHŸàù]ãÀ»€»Hò][€‹⁄[ô»[àHôYYõ‹»ŸôàHXY€õ‹⁄\»ÿ\ô[ô›]Ÿà€ÿX⁄	‹»ÀY»\›ãÀ»€à]»›€ãàH€\ô€ŸYXY€õ‹⁄\»ÿ\ô\»^X›H⁄]\»ô\XŸ\ÀÇò€€ú›ò][›]HHàOà◊ó ê”‘—Qã⁄Kù\›
+ãù⁄H	… H»	ÿ€‹ŸY	¬àà◊ó ë’”ë‘êQQã⁄Kù\›
+ãù⁄H	… H»	Ÿ›€ô‹òYY	»à	€‹[âŒ¬ò€€ú›ò][Xô[HOà›ö[ô 
+Kúô\XŸJÀKŸÀ	»	 Kúô\XŸJ◊ããÀ»OàÀù’\\êÿ\ŸJ
+JN¬ãÀ»ò][»\ôH\ãY\ÿ⁄\[ôKà]ô\û][ô»ŸŸŸYôYõ‹ôH]Y»L»ÿ\»][ôÀ€»[à[ùûBãÀ»⁄]›]H\ÿ⁄\[ôX\»][ô»8†%]ŸY\»H⁄^^\›[ô»ò][»⁄\ôH^H\ôKÇò€€ú›ò][\ÿ»HàOàãô\ÿ⁄\[ôH	‹][ô…Œ¬ò€€ú›ò][—õ‹àH\ÿ»OàÀôò][Àôö[\äàOàò][\ÿ äHOOH\ÿ N¬ãÀ»H[ôH]ŸY\»HXà[ôHö[ô[ò⁄€ô\›⁄]XX⁄›\ãàHò][\»H[ô¬ãÀ»»íV€»HXY€õ‹⁄\»\»»ôHXõH»ÿ^H⁄]ö^\»]8†%ù]ö[»]ôH^X›H€ôBãÀ»€YK€»\»\»H⁄[ù\à»Hô[ò⁄ö[\ôY»]ò][ô]ô\àHö[ô[ô\ôYãÀ»\ôKà⁄[àH[ú›Ÿ\à\»õ›[ô»]ÿ^\»€»›]›Yà[à[ùòZ[ôY‹[àò][\»HôX[ãÀ»ÿ\[àHXúò\ûK[ôH⁄[[ù€ôH\»›»HXY€õ‹⁄\»€Ÿ\»€àôZ[ô»ô\›]Yõ‹àŸYZ‹¬ãÀ»⁄]õ»€‹ö»]X⁄Yàÿ[YHö[ò⁄\H\»H]õ€][€à‹öY	‹»õ›»Ÿà]Y\›[€àX\ö‹»8†%ãÀ»ò[Z[ô»⁄]\»Z\‹⁄[ô»\»H[‹›\ŸYù[[ô»HYŸHÿ[àÀÇôù[ò›[€àò][ö[õ› Y ^¬à€€ú›»Hö[—õ‹ïY Y N¬àYäYÀõ[ô›
+Hô]\õà€\‹œHú€HòZ[ùà›[OHõX\ô⁄[ã]‹çúèìõ»ö[òZ[ú»\»Y]8†%à]\»HXY€õ‹⁄\»⁄]›]Hö^⁄X⁄\»€‹ùÿ^Z[ô»›]›Yè‹ò¬à€€ú›YHHÀôö[\äOàôYJKõ[ô›¬àô]\õà]à€\‹œHõ[ö‹õ›»à]KXX›[€èHôö[ÀYõ‹àà]K]YœHâŸ\ÿ Y _HèÇà‹[à€\‹œHú€HèèèâŸÀõ[ô›Hö[	ŸÀõ[ô›OOHH»	…»à	‹…ﬂHòZ[âŸÀõ[ô›OOHH»	‹…»à	…ﬂH\œÿèâ¬àYH»0≠»à€\‹œHùÿ\õàèâŸY_HYOÿèòà	»0≠»[ù[àôXŸ[ùIﬂO‹‹[èè‹[à€\‹œHò\úàè∏°§è‹‹[èèŸ]èò¬üBãÀ»H⁄\ôYXY€õ‹⁄\»ÿ\ô\ŸYûH]ô\ûHXéà‹[àò][»⁄]Z\à]Z[Ÿ]YãÀ»€ô\»€€\ŸY»H[ôKà€ôHô[ô\ô\à€»Hô]»XàŸ]»HôX[XY€õ‹⁄\»õ‹àúôYKÇãÀ»€ôHõ›»\à‹[àò][XX⁄⁄]]»›€à]öY[òŸHòZ[8†%ŸYHò][õ›‹ 
+Hô[›À⁄X⁄ãÀ»\»Hô[ô\ô\àõ›\»[ôHXú»Xàò]À€»Hò][ÿ[àô]ô\àôHô\Ÿ[ùY€¬ãÀ»Yôô\ô[ùÿ^\»€à€»ÿ‹ôY[úÀà[\S\Ÿÿ\»HXâ‹»›€à€‹ô»õ‹àHŸ[ùZ[ô[H[\BãÀ»\›»]\»HêSêP“»õ‹àHXà⁄]õ»ò][»][ô]ô\à€‹H»XY⁄]Çôù[ò›[€àXY€õ‹⁄\–ÿ\ô
+\ÿÀ[\S\Ÿ ^¬à€€ú›[Hò][—õ‹ä\ÿ N¬à€€ú›‹[àH[ôö[\äàOàò][›]JäHOOH	€‹[â Kõ[ô›¬àô]\õà]à€\‹œHòÿ\ôèÇàèïHXY€õ‹⁄\œ⁄èÇà	ÿ[õ[ô›»ò][õ›‹ \ÿ Bàà€\‹œHú€HèâŸ\ÿ [\S\Ÿ»	”õ›[ô»YX\›\ôYY]õ‹à\»\ùŸàHÿ[YKâ _O‹òBà	€‹[à»€\‹œHú€HòZ[ùà›[OHõX\ô⁄[ã]‹éèï\HY\àòYŸH»ŸYH⁄]Hò][àÿ\»ôXYŸôà8†%[ô⁄]]€›\òŸHÿ[õõ›[[›Kè‹òà	…ﬂBàŸ]èò¬üBôù[ò›[€àôXYZ[ú ä^¬à€€ú›»H
+ãúŸX›[€ú»◊JKúôYXŸJ
+ã HOàà
+»›ö[ô Àòà	… Kú‹]
+◊ À Kõ[ô›
+N¬àô]\õàX]õX^
+KX]úõ›[ô
+»»åå
+JN¬üBãÀ»Hÿÿ[ÿ[[ô\à^Kô]ô\àHU»€ôKà“T”‘›ö[ô 
+H\»UÀ€»X\›Ÿà‹ôY[ù⁄X⁄ãÀ»\»ÿZY€[‹úõ›»úõ€HHX\›\õà€ùÿ\ô»
+‹H[à⁄[ù\äH8†%⁄X⁄\»ö[YH[YHõ‹ÇãÀ»\»\àHõ›[ôö[ö\⁄Y]åÃ€àH›[ô^H]ô[ö[ô»ÿ]ôY]Ÿ[à\»[€ô^KHö[ãÀ»ŸŸŸY]ö[ôHŸ[ù€àH‹õ€ô»^HŸàH›ôXZÀ[ô⁄]	‹»[ôY›‹Yÿ^Z[ô¬ãÀ»ùŸ^Hà›\ú»ôYõ‹ôHH^Hÿ\»›ô\ãà€€à\[ú»[àH]ô[ö[ôŒ»H€ÿ⁄»\»¬ãÀ»Y‹ôYH⁄]H^Y\ãõ›⁄]HŸ\ùô\ãÇôù[ò›[€à\€—^J
+^¬àô]\õà	ŸôŸ]ù[YX\ä
+_KI‘›ö[ô ôŸ][€ù
+
+H
+»JKúY›\ù
+ã	Ã	 _KI‘›ö[ô ôŸ]]J
+JKúY›\ù
+ã	Ã	 _X¬üBôù[ò›[€àŸ^J
+^»ô]\õà\€—^Jô]»]J
+JN»Bôù[ò›[€àõ]]J\€ ^¬àYäZ\€ Hô]\õà	¯†%	Œ¬à€€ú›Hô]»]J\€»
+»
+\€Àõ[ô›OOLL»	’Léåå	»à	… JN¬àô]\õà\”òSä
+H»\€»àù”ÿÿ[Q]T›ö[ô 	Ÿ[ãUT…À€[€ùâ‹⁄‹ù	À^Nâ€ù[Y\öX…ﬂJN¬üBôù[ò›[€à^\”Yù
+\€ ^¬àYäZ\€ Hô]\õàù[¬àô]\õàX]òŸZ[
+
+ô]»]J\€ …’åŒçNNçNI HHô]»]J
+JH»ç
+N¬üBôù[ò›[€àÿ\›
+\Ÿ ^¬à]H	
+	Àùÿ\›	 N¬àYä]
+^»Hÿ›[Y[ùò‹ôX]Q[[Y[ù
+	Ÿ]â N»ò€\‹”ò[YOI›ÿ\›	Œ»ÿ›[Y[ùòõŸKò\[ô⁄[
+
+N»Bàù^€€ù[ùH\ŸŒ»ò€\‹”\›òY
+	‹⁄›… N¬à€X\ï[Y[›]
+ó⁄
+N»ó⁄HŸ][Y[›]
+
+
+OOùò€\‹”\›úô[[›ôJ	‹⁄›… KN
+N¬üBôù[ò›[€àZY
+
+^»ô]\õà	⁄I»
+»X]úò[ô€J
+Kù‘›ö[ô ÕäKú€XŸJãJN»Bôù[ò›[€à‹\ö ò[ÀLÕ€€‹èIÿ›\úô[ù€€‹â ^¬àYäò[Àõ[ô›äHô]\õà	œ]à€\‹œHú›XàèõôYY»ä»[ùöY\œŸ]èâŒ¬à€€ú›»HLå[àHX]õZ[äããùò[ K^HX]õX^
+ããùò[ N¬à€€ú›»Hò[ÀõX\
+
+ãJHOÇà	 K ò[Àõ[ô›LJJù Kù—ö^Y
+J_K	 LÀJ^OO[[à»Ãàà
+ã[[äK ^[[äJäMäJJKù—ö^Y
+J_X
+Köõ⁄[ä	»	 N¬àô]\õà›ô»öY]–õﬁHå	›ﬂH	⁄Hàô\Ÿ\ùôP\‹X›ò][œHõõ€ôHà›[OHöZY⁄â⁄\èÇà€[[ôH⁄[ùœHâ‹ﬂHàö[Hõõ€ôHà›õ⁄ŸOHâÿ€€‹üHà›õ⁄ŸK]⁄YHåãçHÇà›õ⁄ŸK[[ôXÿ\Húõ›[ôà›õ⁄ŸK[[ôZõ⁄[èHúõ›[ôà‹X⁄]OHãéHãœè‹›ôœò¬üBãÀ»ŸX]\à8°§àú^\»ZŸHéà€€Z\à⁄‹ù[ú»ÿ\úûH8¢bIH\àL0¨àô[›»ÃÇôù[ò›[€à^\—òX›‹ä
+^¬à€€ú›ﬁHÀùŸX]\é¬àYä]ﬁ]Kõõ› 
+HHﬁù»à åÕå
+åL
+Hô]\õàù[¬àô]\õàH
+»
+ﬁùHÃ
+H
+àåN¬üBò€€ú›÷“P””àH»OàœOOL…¯¶ ;Ó#…ŒòœLœ…¯¶·{Ó#…ŒòœM…¸'„*…ŒòœMçœ…¸'„)âŒòœMÕœ…¸'„*	ŒòœNè…¸'„)…Œâ¯¶‚	Œ¬ÇãÀ»KKKKKKKKKH\ö]ôYKKKKKKKKKBôù[ò›[€à]\›ö]ôQù
+
+^»ô]\õàÀôö]ôQùõ[ô›»Àôö]ôQù‘Àôö]ôQùõ[ô›LWHàù[»Bôù[ò›[€àö]ôQùÿ€‹ôJ[ùûJ^¬à€€ú›ö[YH[ùûKúô\›[Àôö[\äàOàäN¬àô]\õà»XZŸ\Œàö[Yôö[\äàOàèOOI€XZŸI Kõ[ô››[àö[Yõ[ô›N¬üBôù[ò›[€àZ\‹–€›[ù 
+^¬à€€ú›»H”åéåŒåŒåN¬àÀôö]ôQùôõ‹ëXX⁄
+HOàKúô\›[Àôõ‹ëXX⁄
+àOà»Yä÷‹óHOO][ôYö[ôY
+H÷‹óJ Œ»JJN¬àô]\õàŒ¬üBôù[ò›[€à›ùYŸ€\ 
+^¬àÀ»›ùYŸ€HY‹»úõ€HH\›»õ›[ô»
+»›[ô[ô»›õ⁄ŸHò][¬à€€ú›Y‹»Hô]»X\
+
+N»À»Y»OàôX\€€ÇàÀ»õ›Xõ\ÿ\»Yò][Y€à]ô\ûH‹ö]H]ù][à[\‹ùYòX⁄›\‹àH[ôXùZ[àÀ»õ›[ôÿ[à\úö]ôH⁄]›]]8†%[ô\»ô[ô\ú»€à€YK€»[à[ôYö[ôY\ôH\»BàÀ»⁄]Hÿ‹ôY[à€à\‹[ãÇàôX[õ›[ô 
+Kú€XŸJL Kôõ‹ëXX⁄
+àOà
+ãùõ›Xõ\»◊JKôõ‹ëXX⁄
+OÇàY‹ÀúŸ]
+ŸŸŸY]	‹ãò€›\úŸH	ﬁ[›\àõ›[ô	ﬂH€à	Ÿõ]]Jãô]J_X
+JJN¬à€€ú›X»HZ\‹–€›[ù 
+N¬àYà
+XÀìàXÀîäHY‹ÀúŸ]
+	‹⁄‹ù\]…À	€XÀìHYùZ\‹Ÿ\»[à[›\àKYùŸ‹ÿ
+N¬àÀ»‘Sàò][»€õKàHò][⁄‹ŸH⁄X‹[ú»⁄]”‘—Q[ôXYHõ‹»ŸôàHXâ‹¬àÀ»XY€õ‹⁄\»ÿ\ô[ô›]Ÿà€ÿX⁄	‹»ÀY»\›€»][ô»]€»€àX]⁄[ô»\‹€€ú»ÿ\¬àÀ»H€ôHXŸHHŸ]Yò][€›[›[\⁄»õ‹à€‹ö»8†%[ô]⁄›ŸYàHö[ô[ò⁄àÀ»‹[ôYõYŸ⁄[ô»H[\»ö[ì‘àS’H[ô\õôX]H€‹ô»ê”‘—Qù[Ã8ß$»ãÇàÀôò][Àôö[\äàOàò][›]JäHOOH	€‹[â Kôõ‹ëXX⁄
+àOàY‹ÀúŸ]
+ãùYÀãù⁄JJN¬àô]\õàY‹Œ¬üBãÀ»H]ôH\‹€€à\›àHúõﬁô[à\‹€€úÀöúÿò\Ÿ[[ôH⁄]]ô\ûHôYYY]\YY€ÇãÀ»‹àõ›[ô»ôXY»T‘””î»\ôX›H8†%H\‹€€à⁄[ôŸH\»»X]ôHHÿ[YH\[ô[€õBãÀ»òZ[H[à⁄[ôŸHŸ\À‹àH›[H\‹€€àÿ[à⁄]€àH€ôH[õõ›XŸY
+⁄X⁄\¬ãÀ»^X›H›»Hô]\õôY]\à›^YYò[YY[àH\]Z\Y[ù⁄[àõ‹àôYHŸYZ‹ KÇôù[ò›[€à\‹€€ú 
+^¬à€€ú›ò\ŸHH\[ŸàT‘””î»OOH	›[ôYö[ôY	»»T‘””î»à◊N¬àÀ»€€òÿ]ëQì‘ëH]⁄[ôŒàHôYYXYY\‹€€à\»»ôH]⁄XõH€À[ô]\»BàÀ»€€[[€àÿ\ŸHúõ€H\ôH€ã⁄[òŸH]ô\ûHô]»\‹€€à\úö]ô\»õ›Y⁄HôYYÇàô]\õàò\ŸKò€€òÿ]
+Àõ\‹€€êY»◊JBàõX\
+OàÀõ\‹€€ëY]÷€öYH»»ããõããîÀõ\‹€€ëY]÷€öYHHà
+Bàôö[\äOàJÀõ\‹€€íY[à◊JKö[ò€Y\ öY
+JN¬üBôù[ò›[€àX⁄ŸY\‹€€ú 
+^¬à€€ú›Y‹»H›ùYŸ€\ 
+N¬àô]\õà\‹€€ú 
+BàõX\
+Oà¬à€€ú›]HùY‹Àôö[ô
+OàY‹Àö\ 
+JN¬àô]\õà]»»⁄NàY‹ÀôŸ]
+]
+HHàù[¬àJBàôö[\äõ€€X[äBàú€‹ù
+
+KäHOà
+Àõ\‹€€ú‘ôXYö[ò€Y\ KõöY
+OÃNå
+HH
+Àõ\‹€€ú‘ôXYö[ò€Y\ ãõöY
+OÃNå
+JBàú€XŸJäN¬üBôù[ò›[€à⁄[ê€›[ù 
+^¬à€€ú›Y‹»H›ùYŸ€\ 
+N¬à€€ú›ûHHﬂN¬à\‹€€ú 
+Kôõ‹ëXX⁄
+Oà¬àûV€ú⁄[óHHûV€ú⁄[óH»éåõ‹ñ[›NåN¬àûV€ú⁄[óKõä Œ¬àYà
+ùY‹Àú€€YJOàY‹Àö\ 
+JH	âàTÀõ\‹€€ú‘ôXYö[ò€Y\ öY
+JHûV€ú⁄[óKôõ‹ñ[›J Œ¬àJN¬àô]\õàûN¬üBÇãÀ»KKKKHHö[ô[ò⁄KKKKBãÀ»ï⁄]ÿ[àH»öY⁄õ›»à\»HYôô\ô[ù]Y\›[€àúõ€Hù⁄]⁄›[HX\õàã[ôBãÀ»Xúò\ûH€õH[ú›Ÿ\ú»HŸX€€ô€ôKà]ô\ûH\‹€€à[ôXYHÿ\úöY\»Hö[€»Hô[ò⁄ãÀ»\»Hÿ[YH€€ù[ù\⁄ŸYH›\àÿ^Hõ›[ô8†%€‹ùYûHH“U[àH›\ŸH[ôBãÀ»P—HI‹»›[ô[ôÀôXÿ]\ŸH‹ŸH\ôH⁄]X›X[HX⁄YH⁄]\àHö[\[úÀÇãÀ¬ãÀ»€»ù[\»\»\»ùZ[€ãàHö[ôYY[ô»⁄]H\€â›X\öŸY\»ô]ô\àY[éà]ãÀ»õ‹»»Hõ›€H⁄]HZ\‹⁄[ô»][Hò[YY⁄[òŸHH⁄[[ùH⁄‹ù[ôY\›ôXY»\¬ãÀ»ù]	‹»]ô\û][ô»à8†%Hÿ[YHòZ[\ôHHõ›[ô\ô\ù[\»ÿ\õàXõ›]à[ô⁄]\»\»¬ãÀ»X€\ôKô]ô\à[ôô\úôYàôXY[ô»H\‹€€àXõ›]HX\ô›X⁄»\»õ›]öY[òŸHH›€ú»€ôKÇò€€ú›“UH¬à»Œâ‹]\âÀXéâ‘]\à
+»ÿ\ú]	Àéâ‘⁄^ôY]Ÿàõ€‹à\»H][ô»Xâ»Kà»ŒâÿZ\òúôXZ…ÀXéâ–Z\êúôXZ»][ô»X]	Àéâ‘]›]Z\êúôXZ»0≠»[\»]úôXZ»[ô€‹H[ô\àùŸàX]0≠»]Y»çåçâ»Kà»Œâ‹€ôIÀXéâ‘€ôH
+»Hõ‹	Àéâ—]ô\ûHò][[à\»\ÿ[YHŸôà]	»Kà»Œâ€\Ÿ\âÀXéâ‘UVîà\Ÿ\âÀéâ‘⁄YùX€[\Z[H\Ÿ\à0≠»õ›Y⁄]Y»L»åçâ»Kà»Œâ€LåIÀXéâ”Z\òX€HåIÀéâ’H›⁄[ô»òZ[ô\à]€X⁄‹…»Kà»Œâÿ€⁄[ú…ÀXéâ–€⁄[ú»‹àY\…Àéâ—ÿ]\»[ô\ôŸ]À€à[ûH›\ôòXŸI»Kà»Œâ‹ù[\âÀXéâ”Y][X\ô›X⁄…Àéâ’H	»›\ù[[ôHXX⁄[ôI»Kà»Œâ€Y]õ…ÀXéâ”Y]õ€õ€YH\	Àéâ—úôYH8†%H[\»⁄X⁄‹»ôYY]	»Kà»Œâ‹›Ÿ\âÀXéâ—õ€››Ÿ\à‹à[\X›\IÀéâ’H\H\›ôYY»]	»Kà»Œâ€Z\úõ‹âÀXéâ‘][ô»Z\úõ‹âÀéâ—^YH[ôH[ô⁄›[\ú…»Kà»Œâ‹›X⁄‹…ÀXéâ–[Y€õY[ù›X⁄‹…Àéâ…»KóN¬ò€€ú›“U”PàHÿöôX›ôúõ€Q[ùöY\ “UõX\
+»OàŸÀöÀÀõXóJJN¬ò€€ú›P—T»H»€YNâ–]€YIÀ‹ôY[éâ‘òX›XŸH‹ôY[âÀò[ôŸNâ‘ò[ôŸIÀàù[öŸ\éâ‘òX›XŸHù[öŸ\âÀ€›\úŸNâ”€àH€›\úŸI»N¬ÇãÀ»⁄\ôHXX⁄ò\Ÿ[[ôHö[\[ú»[ô⁄]]ôYYÀà\»]ô\»[à\öú»ò]\à[à[ÇãÀ»\‹€€úÀöú»ôXÿ]\ŸH]\»ô\Ÿ[ù][€àY]Y]Kõ›\‹€€à€€ù[ù8†%[ô\‹€€úÀöú»\»BãÀ»úõﬁô[àò\Ÿ[[ôKàH\‹€€à\úö]ö[ô»õ›Y⁄HôYYÿ[àÿ\úûH]»›€à⁄\ôX»⁄]ãÀ»[ú›XY⁄X⁄\»Hõ›]H]ô\ûHô]»\‹€€àZŸ\»úõ€H\ôH€ãà[àY[àôZ]\àXŸBãÀ»\»ö[ôNà]ôXY»\»ò[û]⁄\ôKõ›[ô»ôYYYà[ô⁄›‹»[ô\à]ô\ûHö[\ã€»Hô]¬ãÀ»\‹€€àÿ[àô]ô\àò[Ÿôà\»YŸHõ‹àÿ[ùŸàHXõH[ùûKÇò€€ú›íS““UH¬àNû»⁄\ôNâŸ‹ôY[â»Kéû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\âÀ	€Y]õ…◊HKàŒû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\âÀ	ÿ€⁄[ú…◊HKû»⁄\ôNâŸ‹ôY[âÀ⁄]ñ…‹]\â◊HKàNû»⁄\ôNâŸ‹ôY[âÀ⁄]ñ…‹]\â◊HKàNû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\âÀ	ÿ€⁄[ú…◊HKéû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\âÀ	‹ù[\â◊HKàŒû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\â◊HKû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\âÀ	‹€ôI◊HKàNû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\âÀ	€Y]õ…◊HKéû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\â◊HKàŒû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\âÀ	ÿ€⁄[ú…◊HKû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\âÀ	ÿ€⁄[ú…◊HKàNû»⁄\ôNâ⁄€YIÀ⁄]ñ…‹]\â◊HKà›ÃNû»⁄\ôNâ⁄€YIÀ⁄]ñ…€LåI◊HK›Ãéû»⁄\ôNâ⁄€YIÀ⁄]ñ…€LåI◊HKà›ÃŒû»⁄\ôNâ⁄€YIÀ⁄]ñ…€LåI◊HK›Õû»⁄\ôNâ⁄€YIÀ⁄]ñ…€LåI◊HKà›ÕNû»⁄\ôNâ⁄€YIÀ⁄]ñ…€LåI◊HK›Õéû»⁄\ôNâ⁄€YIÀ⁄]ñ…€LåIÀ	‹€ôI◊HKà›ÕŒû»⁄\ôNâ⁄€YIÀ⁄]ñ…€LåI◊HKàÃNû»⁄\ôNâŸ‹ôY[â»KÃéû»⁄\ôNâŸ‹ôY[â»KÃŒû»⁄\ôNâÿ€›\úŸI»KàÕû»⁄\ôNâŸ‹ôY[â»KÕNû»⁄\ôNâŸ‹ôY[â»KàÃNû»⁄\ôNâ‹ò[ôŸI»KÃéû»⁄\ôNâ‹ò[ôŸI»KÃŒû»⁄\ôNâŸ‹ôY[â»KÕû»⁄\ôNâŸ‹ôY[â»KàÃNû»⁄\ôNâÿ€›\úŸI»KÃéû»⁄\ôNâÿ€›\úŸI»KÃŒû»⁄\ôNâÿ€›\úŸI»KÕû»⁄\ôNâÿ€›\úŸI»KàLNû»⁄\ôNâ‹ò[ôŸI»KLéû»⁄\ôNâÿ€›\úŸI»KLŒû»⁄\ôNâŸ‹ôY[â»KàåNû»⁄\ôNâÿù[öŸ\â»Kåéû»⁄\ôNâÿù[öŸ\â»KåŒû»⁄\ôNâÿù[öŸ\â»KàLNû»⁄\ôNâŸ‹ôY[â»KLéû»⁄\ôNâ⁄€YI»KLŒû»⁄\ôNâ⁄€YI»KMû»⁄\ôNâÿ€›\úŸI»KüN¬ò€€ú›]ôR⁄]H»Oà
+Àö⁄]◊JKö[ò€Y\  N¬ÇãÀ»KKKKHHòX›XŸHôX€‹ôKKKKBãÀ»⁄]ÿ\»X›X[H”ëK\àö[àH›ôXZ»[ú›Ÿ\ú»ôYHòX›\ŸH€àY\Ÿ^Hé»\¬ãÀ»[ú›Ÿ\ú»ù⁄[àYH\›ù[àH\H\›[ô\»H€⁄[àÿ]H€[Xö[ô»à8†%⁄X⁄\»BãÀ»]Y\›[€àH\‹»X\ö‹»Ÿ\ôH‹ö][àõ‹ãàô\›[»\ôH›‹ôY\»\YôXÿ]\ŸHHö[ãÀ»ÿ€‹ô\»[à⁄]]ô\à[ö]]ÿ€‹ô\»[à
+ÀÃLNH›ôXZ»[ô›
+N»ö[ù[J
+X[»BãÀ»XY[ô»ù[Xô\à›]õ‹àHô[ô[ô⁄]ô\»\]ZY]H⁄[à\ôH\€â›€ôKò]\à[ÇãÀ»õ‹ò⁄[ô»]ô\ûHö[€ù»€ôHÿÿ[KÇò€€ú›ö[ù[ú»HYOà
+Àôö[Ÿ»◊JKôö[\äàOàãöYOOHY
+N¬ò€€ú›\›ù[àHYOà»€€ú›àHö[ù[ú Y
+N»ô]\õàãõ[ô›»ñ‹ãõ[ô›HWHàù[»N¬ò€€ú›ö[ù[HHàOà»€€ú›HHÀO◊
+ ó
+ OÀÀô^X ›ö[ô à	… JN»ô]\õàH»
+€VÃHàù[»N¬ò€€ú›^\‘⁄[òŸHH\€»Oà\€»OHù[»ù[ààX]õX^
+X]úõ›[ô
+
+ô]»]JŸ^J
+H
+»	’Léåå	 HHô]»]J\€»
+»	’Léåå	 JH»ç
+JN¬ãÀ»Hö[ù[à[ú⁄YH\»⁄[ô›»€›[ù»\»›\úô[ù€‹öÀ€»]›‹»‹õ›Ÿ[ô»BãÀ»⁄‹ù\›⁄[HH€ô\»€⁄[ô»›[H[›ôH\à[à^\»\»Hõ‹ùöY⁄⁄]HòYŸYZ»[ÇãÀ»]8†%€ô»[õ›Y⁄]Hö[€ôHõ‹\õH\€â›òYŸ⁄[ô»ûHHŸYZŸ[ô⁄‹ù[õ›Y⁄ãÀ»]õ›[ô»⁄]»]H‹ŸàHYŸHõ‹àH[€ù[ò][ôYÇò€€ú›’SW—VT»HL¬Çôù[ò›[€àö[\›
+
+^¬à€€ú›Y‹»H›ùYŸ€\ 
+N¬àÀ»H›ùYŸ€HY»\úö]ô\»úõ€H€ôHŸà€»XŸ\»[ô^H\ôHõ›\]X[]öY[òŸNàBàÀ»›[ô[ô»êUSÿ\»YX\›\ôYŸôàö[K⁄[HHõ›[ôY»\»Hõ›XõH⁄\H\YàÀ»Yù\à^Z[ôÀàõ›\ôH€‹ù›\ôòX⁄[ôŒ»Hö[YY€ôH€Ÿ\»ö\ú›Çà€€ú›ò][Y‹»Hô]»Ÿ]
+Àôò][Àôö[\äàOàò][›]JäHOOH	€‹[â KõX\
+àOàãùY JN¬àô]\õà\‹€€ú 
+Kôö[\äOàôö[
+KõX\
+Oà¬à€€ú›HHíS““U€öYHﬂN¬à€€ú›⁄]Hö⁄]Kö⁄]◊N¬à€€ú›]HùY‹Àôö[ô
+OàY‹Àö\ 
+JN¬à€€ú›ù[ú»Hö[ù[ú öY
+K\›Hù[úÀõ[ô›»ù[ú÷‹ù[úÀõ[ô›HWHàù[¬à€€ú›⁄[òŸHH\›»^\‘⁄[òŸJ\›ô]JHàù[¬àô]\õà»⁄]⁄\ôNàù⁄\ôHKù⁄\ôHù[àZ\‹⁄[ôŒà⁄]ôö[\ä»OàZ]ôR⁄]
+ JKàYŒà]ù[à⁄Nà]»Y‹ÀôŸ]
+]
+Hàù[ö[YYà]»ò][Y‹Àö\ ]
+Hàò[ŸKàù[úÀ\›⁄[òŸKàÀ»QKõ›[úôXYàôXY[ô»H\‹€€à\»õ›⁄[ô»]»ö[[ôŸ^Z[ô»\»ŸôÇàÀ»\‹€€ú‘ôXYYX[ù\[ô»ù⁄H\»ö[^\›»à]ZY]Hõ‹YHö[àÀ»ŸôàH⁄‹ù\›8†%H€ôH\HYŸH[ùö]\»[›H»XZŸKÇàYNà[\›⁄[òŸHèH’SW—VT»N¬àJN¬üBãÀ»⁄X⁄ö[»òZ[àH⁄]ô[àò][àHXú»XY€õ‹ŸH[ô€ÿX⁄òZ[úÀ€»\»\»BãÀ»õ⁄[àô]ŸY[à[NàHXàò[Y\»]»‹[àò][À[ô\»ÿ^\»⁄]Hô[ò⁄\»õ‹ÇãÀ»XX⁄€ôH8†%[ò€Y[ôÀ€ô\›K⁄[àH[ú›Ÿ\à\»õ›[ôÀÇò€€ú›ö[—õ‹ïY»HY»Oàö[\›
+
+Kôö[\äOàõùY‹Àö[ò€Y\ Y JN¬ãÀ»KKKKHö[XY‹ò[\»KKKKBãÀ»Hö[\»[ú›ùX›[€úÀ[ô[ú›ùX›[€ú»Xõ›]⁄\ôH»›[ô⁄]€Ÿ\»€àH‹õ›[ôãÀ»[ô⁄X⁄ÿ^HH€Xàò]ô[»\ôHôXYŸôàHX›\ôH[àHŸX€€ô[ô›]ŸàH\òY‹ò\ãÀ»[à\ùKàö^ò\»H[ûHÿŸ[ôH8†%H\›Ÿàö[Z]]ô\»€àHL]⁄YH‹öY‹Y›€à‹ÇãÀ»⁄YK[€à8†%]]‹ôY\àö[SàHëQQ€»HXY‹ò[H\úö]ô\»ûHHÿ[YH\[ô[€õBãÀ»õ›]HH\‹€€àõŸHŸ\»[ôôYY»õ»\ô[X\ŸKà€€›\ú»\ôH[YHò\öXXõ\À€»öY⁄ãÀ»[ŸHôYY»õ»ŸX€€ôò]⁄[ôÀ[ô\úõ›⁄XY»\ôH€€\]Y\»€Y€€ú»ò]\à[à’ë¬ãÀ»X\öŸ\ú»ôXÿ]\ŸHX\öŸ\àY»€›[€€YHX‹õ‹‹»Hﬁô[àXY‹ò[\»€àHô[ò⁄Çò€€ú›íVó–»H»Nâ›ò\äKZ[ö IÀŒâ›ò\äKY›^
+IÀéâ›ò\äKXù^
+IÀéâ›ò\äKYòZ[ù
+IÀŒâ›ò\äK\€Ÿù
+I»N¬ò€€ú›ö^ê»H»OàíVó–÷⁄◊HíVó–ÀöN¬ôù[ò›[€àö^íXY
+KLKãLãÀ ^¬àHãéN»»H»KçŒ¬à€€ú›HàHKHHLàHLKHHX]ö\›
+JHN¬à€€ú›^H€K^HHK€KûHàH^
+ìûHHLàH^JìH]^JïÀHH^
+ïŒ¬àô]\õà€Y€€à⁄[ùœHâﬁüK	ﬁLüH	ÿû
+‹K	ÿûJ‹_H	ÿû\K	ÿûK\_Hàö[HâÿﬂHãœò¬üBôù[ò›[€àö[ö^ää^¬àYä]àP\úò^Kö\–\úò^Jãú\ù H]ãú\ùÀõ[ô›
+Hô]\õà	…Œ¬à€€ú›H
+›ãöåé¬à€€ú››]Hãú\ùÀõX\
+Oà¬à€€ú›»Hö^ê ò K»Hù»çÀ\⁄Hô»	»›õ⁄ŸKY\⁄\úò^OHåãåàKéâ»à	…Œ¬à›⁄]⁄
+ö ^¬àÿ\ŸH	ÿò[ô	ŒÇàô]\õàôX›HåàOHâ‹û_Hà⁄YHåLàZY⁄Hâ‹öHàö[HâÿﬂHà‹X⁄]OHãåLàãœòà
+»[ôHOHåàLOHâ‹û_HàèHåLàLèHâ‹û_Hà›õ⁄ŸOHâÿﬂHà›õ⁄ŸK]⁄YHãçàãœò¬àÿ\ŸH	ÿõﬁ	ŒÇàô]\õàôX›Hâ‹ûHàOHâ‹û_Hà⁄YHâ‹òùﬂHàZY⁄Hâ‹òöHàûHâ‹úà_Hòà
+»ö[Hâ‹ôà»ö^ê ôäHà	€õ€ôIﬂHàö[[‹X⁄]OHâ‹ôà»
+õ»åLäHàHòà
+»›õ⁄ŸOHâÿﬂHà›õ⁄ŸK]⁄YHâ›ﬂHâŸ\⁄Kœò¬àÿ\ŸH	€[ôIŒÇàô]\õà[ôHOHâ‹û_HàLOHâ‹ûL_HàèHâ‹ûüHàLèHâ‹ûLüHà›õ⁄ŸOHâÿﬂHòà
+»›õ⁄ŸK]⁄YHâ›ﬂHâŸ\⁄H›õ⁄ŸK[[ôXÿ\Húõ›[ôãœò¬àÿ\ŸH	ÿ€XâŒÇàô]\õà[ôHOHâ‹û_HàLOHâ‹ûL_HàèHâ‹ûüHàLèHâ‹ûLüHà›õ⁄ŸOHâÿﬂHòà
+»›õ⁄ŸK]⁄YHâ‹ù»Kç_Hà›õ⁄ŸK[[ôXÿ\Húõ›[ôãœò¬àÿ\ŸH	ÿ\úõ›…ŒÇàô]\õà[ôHOHâ‹û_HàLOHâ‹ûL_HàèHâ‹ûüHàLèHâ‹ûLüHà›õ⁄ŸOHâÿﬂHòà
+»›õ⁄ŸK]⁄YHâ›ﬂHâŸ\⁄H›õ⁄ŸK[[ôXÿ\Húõ›[ôãœò
+»ö^íXY
+ûKûLKûãûLã N¬àÿ\ŸH	ÿ›\ùôIŒÇàô]\õà]HìI‹û_H	‹ûL_HI‹òﬁH	‹òﬁ_H	‹ûüH	‹ûLüHàö[Hõõ€ôHà›õ⁄ŸOHâÿﬂHòà
+»›õ⁄ŸK]⁄YHâ›ﬂHâŸ\⁄H›õ⁄ŸK[[ôXÿ\Húõ›[ôãœò
+»ö^íXY
+òﬁòﬁKûãûLã N¬àÿ\ŸH	ÿò[	ŒÇàô]\õà⁄\ò€HﬁHâ‹ûHàﬁOHâ‹û_HàèHâ‹úàKé_Hàö[Hùò\äKXÿ\ô
+Hòà
+»›õ⁄ŸOHâ›ö^ê 	⁄I _Hà›õ⁄ŸK]⁄YHãçàãœò¬àÿ\ŸH	Ÿ›	Œàô]\õà⁄\ò€HﬁHâ‹ûHàﬁOHâ‹û_HàèHâ‹úàKåüHàö[HâÿﬂHãœò¬àÿ\ŸH	⁄€IŒàô]\õà⁄\ò€HﬁHâ‹ûHàﬁOHâ‹û_HàèHâ‹úàãå_Hàö[HâÿﬂHãœò¬àÿ\ŸH	‹ö[ô…ŒÇàô]\õà⁄\ò€HﬁHâ‹ûHàﬁOHâ‹û_HàèHâ‹úàüHàö[Hõõ€ôHà›õ⁄ŸOHâÿﬂHòà
+»›õ⁄ŸK]⁄YHãçàà›õ⁄ŸKY\⁄\úò^OHåKéKçàãœò¬àÿ\ŸH	€ÿöâŒàÀ»HXY€›ô\ãHõ›KHò[ôŸHX\öŸ\à8†%€€Y][ô»[àHÿ^Bàô]\õàôX›Hâ‹ûHãçüHàOHâ‹ûHHKçüHà⁄YHçKåààZY⁄HåÀåààûHåKçHòà
+»ö[HâÿﬂHàö[[‹X⁄]OHãååàà›õ⁄ŸOHâÿﬂHà›õ⁄ŸK]⁄YHãçàãœò¬àÿ\ŸH	ÿÿ[IŒÇàô]\õàôX›Hâ‹ûHÀåüHàOHâ‹ûHHãåüHà⁄YHçãçàZY⁄HççàûHåHòà
+»ö[HâÿﬂHàö[[‹X⁄]OHãåMàà›õ⁄ŸOHâÿﬂHà›õ⁄ŸK]⁄YHãç»ãœòà
+»⁄\ò€HﬁHâ‹ûHàﬁOHâ‹û_HàèHåKåààö[Hõõ€ôHà›õ⁄ŸOHâÿﬂHà›õ⁄ŸK]⁄YHãç»ãœò¬àÿ\ŸH	ŸõY…ŒÇàô]\õà[ôHOHâ‹ûHàLOHâ‹û_HàèHâ‹ûHàLèHâ‹ûHHHà›õ⁄ŸOHâÿﬂHà›õ⁄ŸK]⁄YHãç»ãœòà
+»€Y€€à⁄[ùœHâ‹ûK	‹ûKNH	‹û
+Õ_K	‹ûKMãåﬂH	‹ûK	‹ûKMçüHàö[HâÿﬂHãœò¬àÿ\ŸH	›^	ŒÇàô]\õà^Hâ‹ûHàOHâ‹û_Hàõ€ù\⁄^ôOHâ‹úﬁàÀå_Hàõ€ù]ŸZY⁄Hâ‹òõ€»àåHòà
+»^X[ò⁄‹èHâ‹òH	€ZYIﬂHàö[HâÿﬂHòà
+»]\ã\‹X⁄[ôœHâ‹õ»å_HèâŸ\ÿ ù
+_O›^ò¬àYò][àô]\õà	…Œ¬àBàJKöõ⁄[ä	… N¬àô]\õàöY›\ôH€\‹œHôö^àèè›ô»öY]–õﬁHåL	“Hàõ€OHö[Y»à\öXK[Xô[HâŸ\ÿ ãòÿ\	—ö[Ÿ]\	 _Hèòà
+»	€›]O‹›ôœâ›ãòÿ\»öYÿÿ\[€èâŸ\ÿ ãòÿ\
+_OŸöYÿÿ\[€èòà	…ﬂOŸöY›\ôOò¬üBãÀ»Hö[ô[ô\ú»Hÿ[YHÿ^H€àHô[ò⁄[ô[ú⁄YH]»\‹€€ãà›\ÿ\»BãÀ»[ú›ùX›[€é»ö[\»H€ôK[[ôHŸ]\Xõ›ôH]àH\‹€€à⁄]õ»›\ÿ\»BãÀ»ò\Ÿ[[ôH€ôH⁄‹ŸH⁄€Hö[\»H\òY‹ò\€»]›[ô[ô\ú»\»õ‹ŸH8†%H€¬ãÀ»⁄\\»€Ÿ^\›ò]\à[à€ôHôYY[ô»HZY‹ò][€ãÇôù[ò›[€àö[õŸJ
+^¬à€€ú››\»H
+\úò^Kö\–\úò^Jú›\ H»ú›\»à◊JKôö[\äõ€€X[äN¬àô]\õà	‹›\Àõ[ô›»€\‹œHôXYèâŸ\ÿ ôö[
+_O‹òàõ‹ŸJôö[	€\‹€€ãXõŸI _Bà	Ÿö[ö^äùö^ä_Bà	‹›\Àõ[ô›»€€\‹œHô›\»èâ‹›\ÀõX\
+»OàOâŸ\ÿ  _O€Oò
+Köõ⁄[ä	… _O€€òà	…ﬂBà	€úÿ€‹ôH»€\‹œHôÿ€‹ôHèèèî\‹»X\öœÿèà	Ÿ\ÿ úÿ€‹ôJ_O‹òà	…ﬂX¬üBÇãÀ»KKKKHH^XXõH€Xà\›KKKKBãÀ»\»€€Y\»úõ€HH–TîñHQTãõ›Àò€XúŒàHòY»€»H\õ€ú»\»H⁄[ô€BãÀ»í“Së»P»8†$‘»à[ùûK€»]ÿ[â›ò[YHH€Xà]X›X[H]H⁄›àHY\ÇãÀ»\»HôX[LÀX€Xà\›[ô\»[ôXYH‹ô\ôY€ôŸ\›»⁄‹ù\›àH€H›‹ô\»BãÀ»Ÿ^Kô]ô\àHXô[€»ô[ò[Z[ô»HY\àõ›»ÿ[â›‹ú[à€ÿ\ô»8†%[à[ö€õ›€àŸ^BãÀ»ò[»òX⁄»»ö[ù[ô»]Ÿ[ãÇãÀ»€ôH€YŸŸ\ã\ŸYõ‹à€XàŸ^\»[ôõ‹àH”HY»]]H]Z[œà›\ùö]ôHBãÀ»ô\ô[ô\ä
+KàúòX⁄Ÿ]»[ôHY‹ôYH⁄Y€à€»ö\ú›€»ê€ÿúòH“Së»P»
+Mãçp¨
+Hà[ôãÀ»î›\ù[ôH»Z[Hàõ›€€YH›]\»€€Y][ô»›XõH[ôôXYXõKÇôù[ò›[€à€Y ò[YJ^¬àô]\õà›ö[ô ò[YJKù”›Ÿ\êÿ\ŸJ
+Kúô\XŸJ◊
+äè◊
+KŸÀ	… Kúô\XŸJ¨ŸÀ	… Bàùö[J
+Kúô\XŸJ÷◊òK^åNWJÀŸÀ	ÀI Kúô\XŸJ◊ã_IŸÀ	… N¬üBò€€ú›€XíŸ^HH€YŒ¬ôù[ò›[€à€XêXòúäò[YJ^¬à€€ú›àH›ö[ô ò[YH	… N¬àYä€Z[öK⁄Kù\›
+äJHô]\õà	”Z[öIŒ¬àYäŸö]ô\ã⁄Kù\›
+äJHô]\õà	—âŒ¬à€€ú›\õ€àHãõX]⁄
+ 
+ W ãO◊ ö\õ€ã⁄JN¬àYä\õ€äHô]\õà\õ€ñÃWH
+»	⁄IŒ¬à€€ú›ŸYŸHHãõX]⁄
+ ÃüJW ∞¨◊ ùŸYŸK⁄JN¬àYäŸYŸJHô]\õàŸYŸVÃWH
+»	¨	Œ¬à€€ú›€€ŸHãõX]⁄
+ 
+ W ù€€Ÿ⁄JN¬àYä€€Ÿ
+Hô]\õà€€ŸÃWH
+»	’…Œ»À»çH€€Ÿà‹ò\»[àH⁄\»çU»à\»⁄]IŸ‹ö]BàYä◊úÀ⁄Kù\›
+äJHô]\õà	‘…Œ¬àô]\õàãõ[ô›àà»ãú€XŸJäHàé¬üBôù[ò›[€àòY–€Xú 
+^¬àô]\õàÀòÿ\úöY\ÀõX\
+»Oà
+»Ÿ^Nò€XíŸ^JÀò€XäKò[YNòÀò€XãXòúéò€XêXòúäÀò€XäKàŸYŸNà›ŸYŸK⁄Kù\›
+Àò€XäHJJN¬üBôù[ò›[€à€XêûJŸ^J^»ô]\õàòY–€Xú 
+Kôö[ô
+»OàÀöŸ^HOOHŸ^JHù[»BãÀ»H€Xà]\»YùHY\à›[\»»ô[ô\à€à]ô\ûH€ÿ\ô]]H⁄›€ããÀ»€»[à[ö€õ›€àŸ^HŸ]»\õôYòX⁄»[ù»€€Y][ô»ôXYXõHò]\à[àö[ù[ô»H€YÀÇôù[ò›[€à€Xëò[òX⁄ Ÿ^J^¬àô]\õà›ö[ô Ÿ^H	… Kúô\XŸJÀKŸÀ	»	 Bàúô\XŸJ◊ä
+ W äŸYŸJWã⁄K	…p¨	 Bàúô\XŸJ◊äﬂ›ﬂ Wã⁄KHOàKù’\\êÿ\ŸJ
+JBàúô\XŸJ◊ñÿK^óKŸÀ»OàÀù’\\êÿ\ŸJ
+JN¬üBôù[ò›[€à€Xìò[YJŸ^J^»€€ú›»H€XêûJŸ^JN»ô]\õà»»Àõò[YHà€Xëò[òX⁄ Ÿ^JN»Bôù[ò›[€à€XïY Ÿ^J^¬à€€ú›ò]»H›ö[ô Ÿ^H	… N¬à€€ú›\ŸHBàÿYù\à€›⁄Kù\›
+ò] H»	»0≠»€›	»ÇàÿôYõ‹ôH€›⁄Kù\›
+ò] H»	»0≠»ôI»Çà≠»‹[ã⁄Kù\›
+ò] H»	»0≠»‹[â»Çà≠»⁄[ô›À⁄Kù\›
+ò] H»	»0≠»ù[â»Çà≠»ô\›⁄Kù\›
+ò] H»	»0≠»ô\›	»à	…Œ¬à€€ú›ò\ŸHHò]Àúô\XŸJ◊ ∞≠◊ ãäã⁄K	… Kùö[J
+Hò]Œ¬à€€ú›»H€XêûJò\ŸJH€XêûJò] N¬à€€ú›XòúàH»»ÀòXòúàà€XêXòúä€Xëò[òX⁄ ò\ŸJJN¬àô]\õàXòúà
+»\ŸN¬üBÇôù[ò›[€à‹õ€›ôT›
+€Xä^»ô]\õàX]õX^
+X]úõ›[ô
+LH
+€Xãúõ›[ôﬂ
+K—‘ì”’ëW”QëJåL
+JN»Bôù[ò›[€àŸYZ‘›ôXZ 
+^¬àÀ»[€ããî›[àŸà›\úô[ùŸYZ¬à€€ú›õ›»Hô]»]J
+N»€€ú››»H
+õ›ÀôŸ]^J
+JÕäIMŒ¬à€€ú›[€àHô]»]Jõ› N»[€ãúŸ]]Jõ›ÀôŸ]]J
+KY› N¬àô]\õà…”IÀ	’	À	’…À	’	À	—âÀ	‘…À	‘…◊KõX\
+
+XãJHOà¬à€€ú›Hô]»]J[€äN»úŸ]]J[€ãôŸ]]J
+J⁄JN¬àô]\õà»Xã]àÀôö[^\Àö[ò€Y\ \€—^J
+JHN¬àJN¬üBÇãÀ»KKKKKKKKKHô[ô\ô\ú»KKKKKKKKKBò€€ú›UT»H¬à€YNñ…–ÿYYHIÀ	÷[›\àòYÀ[›\à›õ⁄ŸK[›\àÿ[YH8†%€ôHõ€⁄Àâ◊KàòYŒñ…”^HòY…À	—]ô\ûH€Xã]ô\ûH‹XÀ[ôH›‹ûHŸà]ô\ûH⁄[ôŸKâ◊Kà›⁄[ôŒñ…‘›⁄[ô»XâÀ	—ö]ô\à»ŸYŸH8†%ö[K[úÀ[ô‹YY€‹öÀâ◊Kà‹⁄][€úŒñ…‘›⁄[ô»‹⁄][€ú…À	’⁄\ôHHõŸH€Ÿ\ÀYô\‹»»ö[ö\⁄â◊Kàÿ[YNñ…’HXú…À	—õ›\à\ù»ŸàHÿ[YKXX⁄⁄]]»›€à€‹öÿô[ò⁄â◊Kà⁄‹ùÿ[YNñ…‘⁄‹ùÿ[YIÀ	–\õ›[ôH‹ôY[à8†%⁄\ôHH›õ⁄Ÿ\»YKâ◊Kà][ôŒñ…‘][ô»XâÀ	‘›õ⁄ŸKXŸK[ôH⁄‹ù€ô\Àâ◊KàY[ù[ñ…”Y[ù[ÿ[YIÀ	‘›^Z[ô»ÿ⁄ŸY[àõ‹àZY⁄Y[à8†%X⁄YYŸôàH€›\úŸKâ◊Kà€ÿX⁄ñ…–€ÿX⁄	À	”\‹€€ú»]õ€›»[›\àÿ[YH8†%õ›Ÿ[ô\öX»\Àâ◊Kàö[Œñ…—ö[…À	’⁄][›Hÿ[àX›X[H»8†%⁄]H⁄][›H›€ãâ◊Kàõ›[ôŒñ…‘õ›[ô…À	÷[›\àÿ\ôÀH[ú»ôZ[ô[K[ôH€›\úŸ\Àâ◊KàX⁄\⁄[€úŒñ…—X⁄\⁄[€ú…À	—\]Z\Y[ùÿ[»XYH⁄]]Kõ›öXô\Àâ◊Kà]Nñ…—]H	àòX⁄›\	À	÷[›\à]H]ô\»€à\»]öXŸH8†%^‹ù][û]⁄\ôKâ◊KàŸ\‹⁄[€éñ…—ö[HúôXZŸ›€âÀ	—úò[YKXûKYúò[YHö[ô[ô‹»úõ€H\»Ÿ\‹⁄[€ãâ◊Kàò^Nñ…–ò^HŸ\‹⁄[€âÀ	—]ô\ûHù[Xô\àH][ò⁄[€ö]‹àõŸXŸYâ◊KàŸ\‹⁄[€úŒñ…—^\…À	—]ô\ûHÿ\\ôKô]Ÿ\›ö\ú›8†%õ›‹]ûH\Kâ◊KàúöYYö[ôŒñ…‘õ›[ôô\	À	–€›\úŸH€õ›€YŸK[ôY»[›\àÿ[YKâ◊Kà⁄[éñ…–€ÿX⁄	À	”€ôH⁄[àŸàHXúò\ûKâ◊Kà\‹€€éñ…–€ÿX⁄	À	”€ôH\‹€€ã[ôHö[]òZ[ú»]â◊Kàõ›[ôñ…‘õ›[ô]Z[	À	”€ôHÿ\ô€HûH€K[ô⁄]]€‹›[›Kâ◊Kà]ôNñ…”]ôHõ›[ô	À	’\][à\»[›H^H8†%]ÿ€‹ô\»]Ÿ[ãâ◊Kà[ôYñ…’⁄]8†&\»[ôY	À	—]ô\ûH⁄[ôŸH»[›\à\ô]Ÿ\›ö\ú›â◊Kàù[Xô\úŒñ…”ù[Xô\ú…À	—]ô\ûHöY›\ôH\»\⁄[][›K€›\òŸY[ô^Z[ôYâ◊Kà[Y[[ôNñ…—]öY[òŸIÀ	‘õ›[ôÀò^Kö[H[ôôYY8†%ô]Ÿ\›ö\ú›â◊KüN¬ÇãÀ»KKKKHö[ôXö[]H
+åLMäHKKKKBãÀ»ù[Xô\ú»]ÿ[õõ›ôHõ›[ô€›\òŸY‹à^Z[ôY\ôHù\›X€‹ò][€ãà\»\‹¬ãÀ»Y»€ôHõÿÿXù[\ûHŸàõ›ô[ò[òŸH⁄\ÀH€‹‹ÿ\ûHŸ^YYûHY]öX»YHù[Xô\ú¬ãÀ»[ô^ùZ[úõ€HH⁄[ô€Hÿ][ŸÀŸ^HŸX\ò⁄›ô\à]ÿ[YHÿ][Ÿ»\»ò]ÇãÀ»\ôŸ]À[ô[à]öY[òŸH[Y[[ôH]›]⁄\»õ›[ô»»ò^H»ö[H»ôYYò]\ÇãÀ»[à[ùô[ù[ô»]ô[ùÀàŸ^H]Ÿ[à\»ö]ôHX⁄\⁄[€àõÿ⁄‹ÀàŸYH”UQKõYÇò€€ú›ì’àH¬à	€€ãX€›\úŸIŒà»Xéâ””ãP”’Tî—IÀ€Œâ‹[]ôIÀ]Nâ”ŸŸŸY]ôHõ›[ô»“Sã\›[H€›\úŸHòX›…»Kàò^Nà»Xéâ–êVIÀ€Œâ‹Xò^IÀ]Nâ”][ò⁄[[€ö]‹à»X\^HòY»Ÿ\‹⁄[€à8†%[õX\öŸYò[À[ô€‹àZ\â»Kà⁄[Nà»Xéâ‘“SIÀ€Œâ‹Xò^IÀ]Nâ‘⁄[][]‹àõ›[ô8†%Ÿ\\ò]Húõ€H›]€‹àÿ€‹ö[ô»[ô[ôXÿ\	»KàòX⁄€X[éà»Xéâ’êP“”PSâÀ€Œâ‹]IÀ]Nâ–€€Xö[ôH‹à[à^X⁄]òX⁄€X[àöY[à€€ú⁄\›[òﬁH\»õ›—â»KàYX\›\ôYà»Xéâ”QPT’TëQ	À€Œâ‹[YX\…À]Nâ–[à^X⁄]YX\›\ô[Y[ù8†%‹Ÿ[›[\ö[HY]öXÀÿ€‹ôY\›	»Kà\›[X]Yà»Xéâ—T’SPUQ	À€Œâ‹Y\›	À]Nâ–H›Y\‹ÀH[HŸù[à[ùô\öYöYYÿ\úûI»KàŸôô\éà»Xéâ”—ëëTâÀ€Œâ‹[ŸôâÀ]Nâ–HYX\Àòÿ\úûH\öŸYô\⁄YHH]ôHY\ãõ›Y]XÿŸ\Y	»KàôYà»Xéâ—ëQ	À€Œâ‹YôY	À]Nâ–ÿ[YHúõ€HH€ÿX⁄YôYYöú€€à\I»KàŸ[éà»Xéâ‘—SâÀ€Œâ‹\Ÿ[âÀ]Nâ”Y[ù[XúöYYà»òX⁄À\ô\‹ùY	»KüN¬ôù[ò›[€àõ›êòYŸJ⁄[ô
+^¬à€€ú›Hì’ñ⁄⁄[ôN¬àYä\
+Hô]\õà	…Œ¬àô]\õà‹[à€\‹œHúõ›à	‹ò€ﬂHà]OHâŸ\ÿ ù]J_HèâŸ\ÿ õXä_O‹‹[èò¬üBôù[ò›[€àYX[ö[ô–ùäY]öX ^¬àYäSQPSíSë÷€Y]öX◊JHô]\õà	…Œ¬àô]\õàù]€à\OHòù]€àà€\‹œHõYX[òùàà]KXX›[€èHõYX[ö[ô»à]K[Y]öXœHâŸ\ÿ Y]öX _HÇà\öXK[Xô[Hï⁄]	Ÿ\ÿ QPSíSë÷€Y]öX◊Kù]J_HYX[ú»à]OHï⁄]\»YX[ú»è∏§Êÿù]€èò¬üBôù[ò›[€àõ›ìŸêÿ\úûJõ› ^¬àYä\õ› Hô]\õà	Ÿ\›[X]Y	Œ¬à€€ú›HHõ›ÀõYX\Œ¬àYäH	âàKòÿ\úûHOHù[	âàõ›Àòÿ\úûHOHù[	âàKòÿ\úûHOOHõ›Àòÿ\úûJHô]\õà	€Ÿôô\âŒ¬àYäJ^¬à€€ú›‹ò»H›ö[ô Kú‹ò»Kù[ö]	… Kù”›Ÿ\êÿ\ŸJ
+N¬àYä›òX⁄€X[üùWü€€Xö[ôKÀù\›
+‹ò JHô]\õà	›òX⁄€X[âŒ¬àô]\õà	ÿò^IŒ¬àBàYäõ›Àòÿ\úûHOHù[
+Hô]\õà	…Œ¬àô]\õàÀòÿ\úöY\–ÿ[Xúò]Y»	€€ãX€›\úŸI»à	Ÿ\›[X]Y	Œ¬üBôù[ò›[€àõ›ìŸîõŸö[J
+^¬àô]\õà	€€ãX€›\úŸIŒ¬üBôù[ò›[€à‹[ìYX[ö[ô Y]öXÀ^òJ^¬à€€ú›HHQPSíSë÷€Y]öX◊N¬àYä[J^»ÿ\›
+	”õ»õ›H€àö[Hõ‹à]ù[Xô\â N»ô]\õé»Bà]àHÿ›[Y[ùôŸ][[Y[ùûRY
+	‹⁄Y]ôZ[	 N¬àYä]ä^¬ààHÿ›[Y[ùò‹ôX]Q[[Y[ù
+	Ÿ]â N¬àãò€\‹”ò[YHH	‹⁄Y]ôZ[	Œ»ãöYH	‹⁄Y]ôZ[	Œ¬àãòY]ô[ù\›[ô\ä	ÿ€X⁄…ÀHOà»YäKù\ôŸ]OOHäH€‹ŸP⁄X]
+
+N»JN¬àÿ›[Y[ùòõŸKò\[ô⁄[
+äN¬àBà€€ú›Y\H^òH	âà^òKùöY]»OOH	ÿò^I»	âà^òKöHOHù[	âà^òKöHOOH	…¬à»]à€\‹œHõ[ö‹õ›»à›[OHòõ‹ô\ãXõ›€Nõõ€ôN€X\ô⁄[ã]‹åLà]KXX›[€èHõ‹[ãXò^Hà]KZOHâŸ\ÿ ›ö[ô ^òKöJJ_HèÇà‹[èèèì‹[à[à\ÿèèúèè‹[à€\‹œHú€HèïHYŸH]›€ú»\»ù[Xô\è‹‹[èè‹‹[èè‹[à€\‹œHò\úàè∏°§è‹‹[èèŸ]èòàà^òH	âà^òKùöY]¬à»]à€\‹œHõ[ö‹õ›»à›[OHòõ‹ô\ãXõ›€Nõõ€ôN€X\ô⁄[ã]‹åLà]KXX›[€èHô€»à]K]öY]œHâŸ\ÿ ^òKùöY] _Hâ¬à^òKúŸY»»]K\ŸYœHâŸ\ÿ ^òKúŸY _Hòà	…ﬂI¬à^òKöY»]KZYHâŸ\ÿ ^òKöY
+_Hòà	…ﬂOÇà‹[èèèì‹[à[à\ÿèèúèè‹[à€\‹œHú€HèïHYŸH]›€ú»\»ù[Xô\è‹‹[èè‹‹[èè‹[à€\‹œHò\úàè∏°§è‹‹[èèŸ]èòàà	…Œ¬à€€ú›⁄\H^òH	âà^òKúõ›à»õ›êòYŸJ^òKúõ›äHà	…Œ¬àãö[õô\íSH]à€\‹œHú⁄Y]ÿ\ôYX[ú⁄Y]èÇà]à€\‹œHú⁄Y]XYèèèâŸ\ÿ Kù]J_O⁄èÇàù]€à€\‹œHòùà⁄‹›[ûHà]KXX›[€èHò⁄X]X€‹ŸHèê€‹ŸOÿù]€èèŸ]èÇà]à€\‹œHõYX[õY]Hèâÿ⁄\IŸ^òH	âà^òKùò[YHOHù[	âà^òKùò[YHOOH	…¬à»‹[à€\‹œHõYX[ùò[èâŸ\ÿ ›ö[ô ^òKùò[YJJ_IŸ^òKù[ö]»	Ÿ\ÿ ^òKù[ö]
+_Xà	…ﬂO‹‹[èòà	…ﬂOŸ]èÇà€\‹œHú€Hèèèï⁄]]\Àèÿèà	Ÿ\ÿ Kù⁄]
+_O‹Çà€\‹œHú€Hèèèï⁄H]X]\ú»õ‹à[›Kèÿèà	Ÿ\ÿ Kù⁄J_O‹Çà€\‹œHú€Hèèèï⁄[àõ›»ù\›]èÿèà	Ÿ\ÿ Kòÿ]][€ä_O‹Çà	ŸY\BàŸ]èò¬à€€ú›»Hãú]Y\ûTŸ[X›‹ä	Àú⁄Y]	 N¬àYä HÀúÿ‹õ€‹H¬üBÇò€€ú›QPSíSë»H¬à[ôXÿ\à¬à]Nâ“[ôXÿ\	Àà⁄]â’H[ô^[›Hô\‹ù8†%“Sã\›[K\⁄Y€ù»HõŸö[HZŸH]ô\ûH›\àù[Xô\àŸ^H][›\ÀâÀà⁄Nâ“]\»Hù[Xô\àHúõ€ùYŸH\ŸY»Ÿ]›X⁄»€ã[ôH€ôHHõ›[ô\»»ôHXõH»[›ôKàH€X[\›[X]H[ô\à]\»\»\8†&\»›€àôXY[ô»Ÿà[›\àò]Yÿ\ôÀâÀàÿ]][€éâ“]\»T»ù[Xô\ãô[^YYà[à\›[X]HŸôàôYHò]Yõ›[ô»\»õ›H“Sã[ôH⁄[Hÿ\ôô]ô\àôXX⁄\»]â¬àKàÿ\úûNà¬à]Nâ‘^Z[ô»ÿ\úûIÀà⁄]â’HX\ôYŸHH]ôHŸŸŸ\àŸôô\ú»ŸôàHYH[ô[ù»H‹ôY[ãàHY\àT»Hõ‹›\ãâÀà⁄Nâ–€Xà⁄⁄XŸH€àH€H\»\»ù[Xô\ãõ›HòY\àö[ù›]àHÿ\ŸàMJ»\»H€H[àHòYŒ»H‹à\‹»\»€»€Xú»öY⁄[ôÀâÀàÿ]][€éâ’[ù[[›Hÿ[Xúò]K]ô\ûHõ›»\»H›\ù[ô»⁄[ùàHYX\›\ôYò^HöY›\ôH⁄][ô»ô\⁄YH]\»[àŸôô\ãõ›H€‹úôX›[€ã[ù[[›H\\ŸKâ¬àKà	€YX\Àòÿ\úûIŒà¬à]Nâ–ò^Hÿ\úûH
+Ÿôô\äIÀà⁄]â–H][ò⁄[[€ö]‹àÿ\úûH\öŸY€àHõ›»\»YX\Àòÿ\úûH8†%⁄›€àô\⁄YH[›\à]ôHù[Xô\à[ù[[›HXÿŸ\]âÀà⁄Nâ‘€»HòY\àŸ\‹⁄[€àÿ[à\úö]ôH⁄]›]⁄[[ùHô]‹ö][ô»Hù[Xô\à[›H^HŸôãà[›HZŸH]⁄]H\âÀàÿ]][€éâ“[ô€‹ãŸôàHX]Ÿù[à[à[õX\öŸYò[[ôHÿ\úûH\»HõY⁄S—Súõ€HYX\›\ôY][ò⁄8†%õ›Hò[[û[€ôHÿ]⁄Y[ôàò^Hù[Xô\ú»\ôHõ›[ôXÿ\]]‹ö]Kâ¬àKà€€úŒà¬à]Nâ’òX⁄€X[à€€ú⁄\›[òﬁIÀà⁄]â’òX⁄€X[∏†&\»›€à€€ú⁄\›[òﬁHöY[úõ€HX\^HòYÀà]\»Hò[YYõŸX›öY›\ôKõ›H›]\›X»ŸH\ö]ôYâÀà⁄Nâ“]\»H€õH‹ôXYù[Xô\àHÿ‹ôY[àX›X[Hö[ùYàH›⁄[ô»Xà\õú»][ù»H‹ôXY[ô^
+€€ú»»ÿ\úûJH€»€Xú»ÿ[àôH€€\\ôYâÀàÿ]][€éâ–€€ú⁄\›[òﬁH\»ì’›[ô\ô]öX][€à[ô]\›ô]ô\àôHXô[Y0¨H‹à—àHŸ\\ò]HŸöY[⁄[àô\Ÿ[ù\»HX›X[›[ô\ôY]öX][€àõ›Àâ¬àKàŸà¬à]Nâ‘›[ô\ô]öX][€âÀà⁄]â’HX›X[›[ô\ôY]öX][€àŸàHYX\›\ôYÿ[\K[àX\ôÀ⁄[àHŸ\‹⁄[€àõŸXŸY€ôKâÀà⁄Nâ“]\»H›]\›Xÿ[‹ôXYŸàUÿ[\H8†%\ŸYù[ô^»èH€»[›Hÿ[àŸYH›»X[ûH⁄›»HöY›\ôHô\›»€ãâÀàÿ]][€éâ—»õ›ôXY]\»òX⁄€X[à€€ú⁄\›[òﬁKà^H\ôHYôô\ô[ùöY[ÀàH€ôK\Ÿ\‹⁄[€à—\»õ›HŸX\€€ã[€ô»\‹\ú⁄[€ãâ¬àKàö]ôQõ€›XZŸNà¬à]NâÕKYùXZŸHò]IÀà⁄]â”XZŸ\»›]Ÿàåúõ€Hö]ôHôY]€àHX]⁄]Z\‹»\ôX›[€à
+»à»⁄‹ù»€ô H€àH€ô\»]Z\‹ŸYâÀà⁄Nâ’\»\»H⁄‹ù\]ù[Xô\àYÿZ[ãà€ãX€›\úŸHXZŸK\ò]KXûKY\›[òŸHÿ\»ô]\ôYôu„œy“⁄$z{-ÆÈ‹j◊ùs="si"> ${h.si}</span>` : ''}${
       h.note ? '<span class="nmark" title="You left a note on this hole">‚úé</span>' : ''}</td>
       <td class="sm">${h.par}</td><td>${mark(h)}</td>
       ${(() => {
@@ -10679,7 +2932,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline ‚Äî try again next open
 }
 

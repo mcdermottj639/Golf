@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "updated": "2026-09-22",
+  "entries": [
+    {
+      "id": "club-3wood-futurefit-a3-20260922-v1",
+      "type": "club-update",
+      "target": "Cobra DS-ADAPT X 3-wood",
+      "club": {
+        "futureFit": {
+          "hand": "RH",
+          "baseLoft": 15,
+          "current": "A3",
+          "loft": -1,
+          "lie": -1,
+          "reported": "2026-09-22",
+          "target": {
+            "code": "B7",
+            "loft": 1.7,
+            "lie": -0.7,
+            "purpose": "Higher-launch test while remaining slightly flat"
+          }
+        }
+      }
+    }
+  ]
+}
