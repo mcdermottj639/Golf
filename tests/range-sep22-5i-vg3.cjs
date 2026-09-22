@@ -1,0 +1,22 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const entry = require('../data/range-2026-09-22-5i-vg3.json');
+const feed = JSON.parse(fs.readFileSync(path.join(__dirname, '../coach-feed.json'), 'utf8'));
+const morning = require('../data/range-2026-09-22.json');
+
+assert.equal(entry.type, 'bay');
+assert.equal(entry.bay.date, '2026-09-22');
+const shots = entry.bay.detail.rangeShots[0].shots;
+assert.equal(shots.length, 17);
+assert.equal(shots.filter(s => s.mishit).length, 0);
+assert.equal(entry.bay.detail.clubs[0].n, 17);
+assert.equal(entry.bay.detail.clubs[0].dynLoft, 23.4);
+assert.equal(entry.bay.detail.clubs[0].path, -1.1);
+assert.equal(entry.bay.detail.clubs[0].smash, 1.33);
+assert.ok(entry.bay.detail.clubs[0].carry >= 150 && entry.bay.detail.clubs[0].carry <= 151);
+assert.equal(morning.id, 'bay-20260922-range-8i-5i');
+assert.notEqual(morning.id, entry.id);
+assert.equal(feed.entries.filter(e => e.id === entry.id).length, 1);
+assert.deepEqual(feed.entries.find(e => e.id === entry.id), entry);
+console.log('PASS: afternoon 5-iron 17 remaining, own bay, not the morning table.');

@@ -99,13 +99,17 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v150';
+const BUILD = 'v151';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v151', d:'2026-09-22', items:[
+    'SPYGLASS 85 IS ON THE CARD. TrackMan Golf, 9/15. 56 shots stored with carry, path, face-to-path, smash, spin, dynamic loft and remaining-to-hole. Simulator card — it does not change THE NUMBERS or rolling bay averages.',
+    'HAZELTINE 80 IS PARKED TOO. Recap tiles from the scorecard (FIR 11/14, GIR 5/18, scramble 23%, 1.6 putts/hole, driving 228/245) plus the back nine scores. Front nine hole scores were not on that card and are not invented. Play date unknown — import day is labelled as such.',
+    'AFTERNOON 5-IRON IS A NEW BAY. VG3 table, 17 shots, remaining 150 n=17, dyn loft 23.4°, path −1.1°. No mishits. Not mixed into the morning 8-iron/5-iron table.' ] },
   { b:'v150', d:'2026-09-22', items:[
     'THE JUMP BAR IS ONE ROW. Swipe sideways for Round prep, Coach, The record. It used to wrap onto a second line over the weather.' ] },
   { b:'v149', d:'2026-09-22', items:[

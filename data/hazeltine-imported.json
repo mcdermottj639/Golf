@@ -1,0 +1,52 @@
+{
+  "id": "round-tm-hazeltine-imported-v1",
+  "type": "round",
+  "src": "tm:hazeltine-screen-2026-09-22",
+  "round": {
+    "date": "2026-09-22",
+    "course": "Hazeltine National",
+    "sim": true,
+    "venue": "TrackMan Golf",
+    "par": 72,
+    "score": 80,
+    "note": "Imported from the Sep 22 screen recording of a stored TrackMan round. Play date was not on the scorecard \u2014 2026-09-22 is the import day, not claimed as the day it was played. Recap tiles: +8, FIR 11/14 (79%), GIR 5/18 (28%), scramble 3/13 (23%), 1.6 putts/hole, driving 228 avg / 245 long. Back nine scores from the visible scorecard (IN 40). Front nine hole scores and a shot ledger were not on that card and are not invented. Total putt count was never shown as an integer (only 1.6/hole), so putts is omitted. Does not change THE NUMBERS or rolling bay averages.",
+    "holes": [
+      {
+        "n": 10,
+        "s": 5
+      },
+      {
+        "n": 11,
+        "s": 5
+      },
+      {
+        "n": 12,
+        "s": 3
+      },
+      {
+        "n": 13,
+        "s": 4
+      },
+      {
+        "n": 14,
+        "s": 5
+      },
+      {
+        "n": 15,
+        "s": 5
+      },
+      {
+        "n": 16,
+        "s": 5
+      },
+      {
+        "n": 17,
+        "s": 3
+      },
+      {
+        "n": 18,
+        "s": 5
+      }
+    ]
+  }
+}

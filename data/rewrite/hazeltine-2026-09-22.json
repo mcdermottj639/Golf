@@ -1,0 +1,198 @@
+{
+  "course": "Hazeltine National",
+  "location": "Chaska, MN",
+  "sim": true,
+  "date": "2026-09-22",
+  "source": {
+    "scorecard": "ScreenRecording 13-43-38 / vg-spy/43",
+    "holes": "ScreenRecording 13-44-18 / vg-spy/44 + vg3-extract/13-44-18 + holes-dense",
+    "metrics": "ScreenRecording 13-47-19 / vg-spy/47 (H1 delivery columns; later frames stay on H1 3-wood)"
+  },
+  "score": 80,
+  "par": 72,
+  "out": 40,
+  "in": 40,
+  "firHit": 9,
+  "firOf": 14,
+  "girHit": 7,
+  "girOf": 18,
+  "scramblingPct": 64,
+  "putts": 29,
+  "puttsPerHole": 1.6,
+  "drivingAvg": 223,
+  "drivingLong": 257,
+  "approachFt": 32,
+  "holes": [
+    { "hole": 1, "par": 4, "hcp": 7, "yards": 400, "score": 5, "putts": 2, "fir": false, "gir": false },
+    { "hole": 2, "par": 4, "hcp": 13, "yards": 388, "score": 3, "putts": 1, "fir": true, "gir": true },
+    { "hole": 3, "par": 4, "hcp": 3, "yards": 452, "score": 3, "putts": 1, "fir": true, "gir": true },
+    { "hole": 4, "par": 4, "hcp": 11, "yards": 419, "score": 4, "putts": 2, "fir": true, "gir": false },
+    { "hole": 5, "par": 3, "hcp": 17, "yards": 155, "score": 5, "putts": 2, "fir": null, "gir": false },
+    { "hole": 6, "par": 5, "hcp": 1, "yards": 572, "score": 6, "putts": 1, "fir": false, "gir": false },
+    { "hole": 7, "par": 4, "hcp": 9, "yards": 394, "score": 5, "putts": 2, "fir": true, "gir": false },
+    { "hole": 8, "par": 3, "hcp": 15, "yards": 176, "score": 3, "putts": 1, "fir": null, "gir": true },
+    { "hole": 9, "par": 5, "hcp": 5, "yards": 556, "score": 6, "putts": 2, "fir": true, "gir": false },
+    { "hole": 10, "par": 4, "hcp": 12, "yards": 410, "score": 4, "putts": 1, "fir": false, "gir": false },
+    { "hole": 11, "par": 4, "hcp": 4, "yards": 384, "score": 5, "putts": 2, "fir": false, "gir": false },
+    { "hole": 12, "par": 3, "hcp": 18, "yards": 168, "score": 4, "putts": 2, "fir": null, "gir": false },
+    { "hole": 13, "par": 5, "hcp": 10, "yards": 542, "score": 6, "putts": 2, "fir": true, "gir": false },
+    { "hole": 14, "par": 4, "hcp": 2, "yards": 452, "score": 5, "putts": 2, "fir": false, "gir": false },
+    { "hole": 15, "par": 4, "hcp": 14, "yards": 388, "score": 3, "putts": 1, "fir": true, "gir": true },
+    { "hole": 16, "par": 4, "hcp": 8, "yards": 419, "score": 4, "putts": 1, "fir": true, "gir": true },
+    { "hole": 17, "par": 3, "hcp": 16, "score": 4, "putts": 1, "fir": null, "gir": true },
+    { "hole": 18, "par": 5, "hcp": 6, "yards": 572, "score": 5, "putts": 3, "fir": true, "gir": true }
+  ],
+  "shots": [
+    {
+      "hole": 1, "shot": 1, "club": "3-wood", "displayed": "237 yards", "distYds": 237, "lie": "Tee", "dest": "rough",
+      "carry": 237.0, "path": -4.9, "ftp": 2.3, "face": -2.6, "smash": 1.36, "cs": 91.7, "bs": 124.9, "spin": 2328,
+      "dynLoft": 17.3, "impactH": -4.0
+    },
+    {
+      "hole": 1, "shot": 2, "club": "7-iron", "displayed": "163 yards", "distYds": 163, "lie": "Rough", "dest": "rough",
+      "carry": 163.0, "path": -8.6, "ftp": 5.4, "face": -3.2, "smash": 1.36, "cs": 78.5, "bs": 106.8, "spin": 6396
+    },
+    {
+      "hole": 1, "shot": 3, "club": "56°", "displayed": "32 yards", "distYds": 32, "lie": "Rough", "dest": "green",
+      "carry": 32.4, "path": -3.5, "ftp": 3.4, "face": -0.1, "smash": 1.12, "cs": 68.1, "bs": 76.5, "spin": 1945
+    },
+    { "hole": 1, "shot": 4, "club": "Putter", "displayed": "25.9 ft", "distFt": 25.9, "lie": "Green" },
+    { "hole": 1, "shot": 5, "club": "Putter", "displayed": "2.4 ft", "distFt": 2.4, "lie": "Green", "auto": true },
+
+    { "hole": 2, "shot": 1, "club": "3-wood", "displayed": "216 yards", "distYds": 216, "lie": "Tee", "dest": "fairway", "carry": 216.2 },
+    { "hole": 2, "shot": 2, "club": "7-iron", "displayed": "167 yards", "distYds": 167, "lie": "Fairway", "dest": "green", "carry": 167.4 },
+    { "hole": 2, "shot": 3, "club": "Putter", "displayed": "11.9 ft", "distFt": 11.9, "lie": "Green" },
+
+    { "hole": 3, "shot": 1, "club": "3-wood", "displayed": "257 yards", "distYds": 257, "lie": "Tee", "dest": "fairway", "carry": 257.0 },
+    { "hole": 3, "shot": 2, "club": "5-wood", "displayed": "187 yards", "distYds": 187, "lie": "Fairway", "dest": "green", "carry": 187.2 },
+    { "hole": 3, "shot": 3, "club": "Putter", "displayed": "5.5 ft", "distFt": 5.5, "lie": "Green", "auto": true },
+
+    { "hole": 4, "shot": 1, "club": "3-wood", "displayed": "237 yards", "distYds": 237, "lie": "Tee", "dest": "fairway", "carry": 237.3 },
+    { "hole": 4, "shot": 2, "club": "9-iron", "displayed": "135 yards", "distYds": 135, "lie": "Fairway", "carry": 135.2 },
+    { "hole": 4, "shot": 3, "club": "Putter", "displayed": "16.1 ft", "distFt": 16.1, "lie": "Green" },
+    { "hole": 4, "shot": 4, "club": "Putter", "displayed": "6.1 ft", "distFt": 6.1, "lie": "Green", "auto": true },
+
+    { "hole": 5, "shot": 1, "club": "9-iron", "displayed": "144 yards", "distYds": 144, "lie": "Tee", "dest": "semi rough", "carry": 144.2 },
+    { "hole": 5, "shot": 2, "club": "56°", "displayed": "21 yards", "distYds": 21, "lie": "Semi Rough" },
+    { "hole": 5, "shot": 3, "club": "56°", "displayed": "12 yards", "distYds": 12, "lie": "Green", "carry": 12.2 },
+    { "hole": 5, "shot": 4, "club": "Putter", "displayed": "7.3 ft", "distFt": 7.3, "lie": "Green", "auto": true },
+
+    { "hole": 6, "shot": 1, "club": "3-wood", "displayed": "201 yards", "distYds": 201, "lie": "Tee", "carry": 201.4 },
+    { "hole": 6, "shot": 2, "club": "3-wood", "displayed": "184 yards", "distYds": 184, "lie": "Rough", "dest": "fairway", "carry": 184.0 },
+    { "hole": 6, "shot": 3, "club": "7-iron", "displayed": "152 yards", "distYds": 152, "lie": "Fairway", "dest": "rough", "carry": 152.5 },
+    { "hole": 6, "shot": 4, "club": "56°", "displayed": "54 yards", "distYds": 54, "lie": "Rough", "carry": 54.2 },
+    { "hole": 6, "shot": 5, "club": "56°", "displayed": "23 yards", "distYds": 23, "lie": "Rough", "dest": "green", "carry": 23.0 },
+    { "hole": 6, "shot": 6, "club": "Putter", "displayed": "6.1 ft", "distFt": 6.1, "lie": "Green", "auto": true },
+
+    { "hole": 7, "shot": 1, "club": "3-wood", "displayed": "229 yards", "distYds": 229, "lie": "Tee", "dest": "fairway" },
+    { "hole": 7, "shot": 2, "club": "7-iron", "displayed": "158 yards", "distYds": 158, "lie": "Fairway", "dest": "rough" },
+    { "hole": 7, "shot": 3, "club": "56°", "displayed": "32 yards", "distYds": 32, "lie": "Rough", "dest": "green" },
+    { "hole": 7, "shot": 4, "club": "Putter", "displayed": "13.2 ft", "distFt": 13.2, "lie": "Green" },
+    { "hole": 7, "shot": 5, "club": "Putter", "displayed": "2.0 ft", "distFt": 2.0, "lie": "Green", "auto": true },
+
+    { "hole": 8, "shot": 1, "club": "7-iron", "displayed": "167 yards", "distYds": 167, "lie": "Tee", "dest": "green" },
+    { "hole": 8, "shot": 2, "club": "Putter", "displayed": "8.5 ft", "distFt": 8.5, "lie": "Green", "auto": true },
+
+    { "hole": 9, "shot": 1, "club": "3-wood", "displayed": "219 yards", "distYds": 219, "lie": "Tee", "dest": "fairway", "carry": 219.4 },
+    { "hole": 9, "shot": 2, "club": "3-wood", "displayed": "201 yards", "distYds": 201, "lie": "Fairway", "dest": "fairway", "carry": 201.4 },
+    { "hole": 9, "shot": 3, "club": "7-iron", "displayed": "152 yards", "distYds": 152, "lie": "Fairway", "dest": "rough" },
+    { "hole": 9, "shot": 4, "club": "56°", "displayed": "32 yards", "distYds": 32, "lie": "Rough", "dest": "green" },
+    { "hole": 9, "shot": 5, "club": "Putter", "displayed": "16.1 ft", "distFt": 16.1, "lie": "Green" },
+    { "hole": 9, "shot": 6, "club": "Putter", "displayed": "2.4 ft", "distFt": 2.4, "lie": "Green", "auto": true },
+
+    { "hole": 10, "shot": 1, "club": "3-wood", "displayed": "219 yards", "distYds": 219, "lie": "Tee", "dest": "rough" },
+    { "hole": 10, "shot": 2, "club": "7-iron", "displayed": "163 yards", "distYds": 163, "lie": "Rough", "dest": "rough" },
+    { "hole": 10, "shot": 3, "club": "56°", "displayed": "32 yards", "distYds": 32, "lie": "Rough", "dest": "green" },
+    { "hole": 10, "shot": 4, "club": "Putter", "displayed": "8.1 ft", "distFt": 8.1, "lie": "Green", "auto": true },
+
+    { "hole": 11, "shot": 1, "club": "3-wood", "displayed": "237 yards", "distYds": 237, "lie": "Tee", "dest": "rough" },
+    { "hole": 11, "shot": 2, "club": "7-iron", "displayed": "163 yards", "distYds": 163, "lie": "Rough", "dest": "rough" },
+    { "hole": 11, "shot": 3, "club": "56°", "displayed": "32 yards", "distYds": 32, "lie": "Rough", "dest": "green" },
+    { "hole": 11, "shot": 4, "club": "Putter", "displayed": "16.1 ft", "distFt": 16.1, "lie": "Green" },
+    { "hole": 11, "shot": 5, "club": "Putter", "displayed": "2.4 ft", "distFt": 2.4, "lie": "Green", "auto": true },
+
+    { "hole": 12, "shot": 1, "club": "7-iron", "displayed": "167 yards", "distYds": 167, "lie": "Tee", "dest": "semi rough" },
+    { "hole": 12, "shot": 2, "club": "56°", "displayed": "21 yards", "distYds": 21, "lie": "Semi Rough", "dest": "green" },
+    { "hole": 12, "shot": 3, "club": "Putter", "displayed": "8.1 ft", "distFt": 8.1, "lie": "Green" },
+    { "hole": 12, "shot": 4, "club": "Putter", "displayed": "2.4 ft", "distFt": 2.4, "lie": "Green", "auto": true },
+
+    { "hole": 13, "shot": 1, "club": "3-wood", "displayed": "219 yards", "distYds": 219, "lie": "Tee", "dest": "fairway" },
+    { "hole": 13, "shot": 2, "club": "3-wood", "displayed": "201 yards", "distYds": 201, "lie": "Fairway", "dest": "fairway" },
+    { "hole": 13, "shot": 3, "club": "7-iron", "displayed": "152 yards", "distYds": 152, "lie": "Fairway" },
+    { "hole": 13, "shot": 4, "club": "56°", "displayed": "54 yards", "distYds": 54, "lie": "Rough", "carry": 54.2 },
+    { "hole": 13, "shot": 5, "club": "Putter", "lie": "Green" },
+    { "hole": 13, "shot": 6, "club": "Putter", "lie": "Green", "auto": true },
+
+    { "hole": 14, "shot": 1, "club": "3-wood", "displayed": "237 yards", "distYds": 237, "lie": "Tee", "dest": "rough" },
+    { "hole": 14, "shot": 2, "club": "7-iron", "displayed": "163 yards", "distYds": 163, "lie": "Rough", "dest": "rough" },
+    { "hole": 14, "shot": 3, "club": "56°", "displayed": "32 yards", "distYds": 32, "lie": "Rough", "dest": "green" },
+    { "hole": 14, "shot": 4, "club": "Putter", "displayed": "16.1 ft", "distFt": 16.1, "lie": "Green" },
+    { "hole": 14, "shot": 5, "club": "Putter", "displayed": "2.4 ft", "distFt": 2.4, "lie": "Green", "auto": true },
+
+    { "hole": 15, "shot": 1, "club": "3-wood", "displayed": "216 yards", "distYds": 216, "lie": "Tee", "dest": "fairway", "carry": 216.2 },
+    { "hole": 15, "shot": 2, "club": "7-iron", "displayed": "167 yards", "distYds": 167, "lie": "Fairway", "dest": "green", "carry": 167.4 },
+    { "hole": 15, "shot": 3, "club": "Putter", "displayed": "8.5 ft", "distFt": 8.5, "lie": "Green", "auto": true },
+
+    { "hole": 16, "shot": 1, "club": "3-wood", "displayed": "237 yards", "distYds": 237, "lie": "Tee", "dest": "fairway", "carry": 237.3 },
+    { "hole": 16, "shot": 2, "club": "9-iron", "displayed": "135 yards", "distYds": 135, "lie": "Fairway", "dest": "green", "carry": 135.2 },
+    { "hole": 16, "shot": 3, "club": "Putter", "displayed": "16.1 ft", "distFt": 16.1, "lie": "Green", "auto": true }
+  ],
+  "h18FilmedUnreconciled": [
+    { "hole": 18, "club": "3-wood", "displayed": "219 yards", "distYds": 219, "lie": "Tee", "carry": 219.4, "note": "Visible at t_90.0; FIR hit on scorecard." },
+    { "hole": 18, "club": "3-wood", "displayed": "201 yards", "distYds": 201, "lie": "Fairway", "note": "Visible on dense H18 frames. Not confirmed as counted vs 7-iron overlay at t_93.0." },
+    { "hole": 18, "club": "7-iron", "displayed": "152 yards", "distYds": 152, "lie": "Fairway", "carry": 152.5, "note": "Overlay t_93.0 = 152.5 yds. May still be H18 or leftover." },
+    { "hole": 18, "club": "56°", "displayed": "32 yards", "distYds": 32, "lie": "Rough", "carry": 32.4, "note": "Overlay t_95.5 = 32.4 yds." },
+    { "hole": 18, "club": "Putter", "displayed": "8.1 ft", "distFt": 8.1, "lie": "Green", "note": "Overlay t_97.8 = 8.1 ft. Scorecard has 3 putts; remaining putt lines not cleanly filmed." }
+  ],
+  "mulligans": [
+    {
+      "hole": 2,
+      "club": "3-wood",
+      "displayed": "248 yards",
+      "distYds": 248,
+      "lie": "Tee",
+      "marker": "M",
+      "note": "Mulligan. Stroke cancelled; does not count. Counted tee shot is the 216-yard 3-wood below it."
+    }
+  ],
+  "verification": {
+    "scoreSum": 80,
+    "scorecardScore": 80,
+    "out": 40,
+    "in": 40,
+    "parSum": 72,
+    "puttsSum": 29,
+    "puttsPerHole": 1.6,
+    "firHit": 9,
+    "firOf": 14,
+    "girHit": 7,
+    "girOf": 18,
+    "firMissHoles": [1, 6, 10, 11, 14],
+    "girHitHoles": [2, 3, 8, 15, 16, 17, 18],
+    "listedShotsVsScore": {
+      "match": [1, 2, 3, 4, 6, 7, 9, 10, 11, 12, 13, 14, 15],
+      "listShort": { "5": "4 listed vs score 5", "8": "2 listed vs score 3", "16": "3 listed vs score 4" },
+      "unfilmed": [17],
+      "unreconciled": [18]
+    }
+  },
+  "notes": [
+    "Simulator round (TrackMan Virtual Golf 3). sim:true. Quarantine from live outdoor ladder.",
+    "3-wood stored as labeled 3-wood — UI never said Mini Driver.",
+    "Chips/pitches (56°) stay on this ROUND only, never as bag rolling stock.",
+    "Mulligans (M) do not count. Only H2 tee 3-wood 248 yards had an M marker in the filmed hole views.",
+    "Auto-finish putts (A marker) are TrackMan-assigned and count on the scorecard.",
+    "Missing delivery metrics left absent — never filled with 0. Only H1 shots 1–3 had readable unique path/ftp/smash/cs/bs/spin (vg-spy/47). H1 3-wood also had Dynamic Loft 17.3° and Impact Height -4.0 mm after the metrics columns were scrolled. Later 47 frames remain on that same H1 3-wood.",
+    "H5 hole view lists 4 strokes (9-iron 144 Tee, 56° 21 Semi Rough, 56° 12 Green, Putter 7.3 ft A) but scorecard is 5 with 2 putts. Second putt / extra stroke not visible as its own line. Scorecard 5 / 2 putts used for scoring.",
+    "H6 tee shot FIR is a miss on the scorecard. Shot 2 listed from Rough (some frames also read Fairway). Overlay carries 201.4 / 184.0 / 152.5 / 54.2 / 23.0 / 6.1 ft.",
+    "H8 hole view lists 7-iron 167 Tee + Putter 8.5 ft A (2 strokes, GIR look) but scorecard is par 3 / score 3 / 1 putt / GIR hit. Extra stroke not invented.",
+    "H13 putt distances not clearly readable. Overlay 54.2 yds confirms the 56° approach. A 23.0 yds overlay at ~65s may be another chip; omitted because scorecard 6 / 2 putts only allows four non-putt shots (3w, 3w, 7i, 56).",
+    "H15 putt 8.5 ft: several H8/H15 frames also flashed 5.5 ft (H3's auto-putt). 8.5 ft is the better H15 read; treat as slightly soft.",
+    "H16 hole view lists 3-wood 237 + 9-iron 135 + Putter 16.1 ft A (3 strokes, GIR look) but scorecard is par 4 / score 4 / 1 putt / GIR hit. Extra stroke not invented.",
+    "H17 unfilmed. Review jumps H16 → H18 around 13-44-18 t≈86.5–90s. Scorecard only: par 3, hcp 16, score 4, 1 putt, GIR hit. No shot list invented.",
+    "H18 filmed lines are in h18FilmedUnreconciled, not shots[]. Scorecard 5 / 3 putts / FIR hit / GIR hit (implies two shots to green + 3 putts). Dense frames also showed 7-iron 152 and 56° 32. Not force-fit. Overlay sequence t_90.0=219.4 yds, t_93.0=152.5 yds, t_95.5=32.4 yds, t_97.8=8.1 ft.",
+    "H18 yards 572 read on some hole-title frames (same number as H6); included as shown.",
+    "Displayed yardages are the hole-view list values (club, distance, lie). Overlay carry copied only when the selected-shot Carry number was unique and stable.",
+    "Face on H1 shots 1–3 computed as path + ftp from the readable TrackMan pair."
+  ]
+}
