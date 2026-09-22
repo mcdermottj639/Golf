@@ -2376,6 +2376,40 @@ The fixed 20-ball approach test is a feed-added Coach lesson; its two integer co
 completing it. Simulator history does not imply a trend or comparable conditions.
 Auto-putting is assigned scoring, not putting skill; approximately 12-ft gimme is unconfirmed.
 
+**Spyglass Hill 85 (v151 · Sep 22 2026 ingest of a 9/15 overlay).** Source:
+`data/spyglass-2026-09-15.json`, feed id `round-tm-spyglass-20260915-review-v1`.
+`sim:true`, venue TrackMan Golf — same calendar day as Ballybunion, so it is quarantined
+out of THE NUMBERS, handicap, miss maps and rolling bay remaining. 56 captured non-putt
+shots (carry, path, F–P, smash, spin, dynamic loft, remaining-to-hole). Hole-list putts
+sum to 29, which matches 85 − 56; the recap tile printed 28 and 1.6/hole — 29 is stored
+on the card, 28 stays on `review.trackman.putts`. Dest-fairway tee shots are 7/14;
+TrackMan counted 8 — both kept. GIR is hole 1 only (3 shots to the green on a par 5).
+Hole 5 56° dashes were left blank. Spin loft was a dash. Club speed / ball speed from
+a driving overlay are not attached to a hole. `review.noBay` is true so a Mini labelled
+3w cannot land on this card's 3-wood row. `review.bagLine` / `bagConfirmed` keep
+Ballybunion's unconfirmed-label copy off this card. Corrections: new
+`round-review-update`, never edit the applied feed id.
+
+**Hazeltine National 80 (v151).** Source: `data/hazeltine-imported.json`. Recap tiles
+from the visible scorecard (FIR 11/14, GIR 5/18, scramble 3/13 23%, 1.6 putts/hole,
+driving 228/245) plus IN 40 hole scores 10–18. Front nine hole scores and a shot ledger
+were not on that card and are **not invented**. Play date was not on screen —
+`date: 2026-09-22` is the import day, stated in the note. No `review` object, so the
+simulator hole-evidence UI stays off rather than drawing an empty ledger.
+
+A rewrite-store snapshot of the same numbers (plus every bay session) lives in
+`data/rewrite/` so a sandbox wipe does not lose them. The PWA does not read that folder.
+
+**Sep 22 afternoon 5-iron (v151).** `bay-20260922-range-5i-vg3`, source
+`data/range-2026-09-22-5i-vg3.json` plus `data/rewrite/vg3-5i-afternoon.json`.
+VG3 table, 17 shots to 153, remaining mean 150.4 (screen AVG row 150 — TrackMan
+averages raw then rounds). Dyn loft 23.4°, path −1.1°, smash 1.33. No mishits
+under the 2/3-median rule. **A new bay**, not a patch on the morning 8-iron/5-iron
+table — that day's 5-iron remaining 123.2 n=9 stays on that card. Rolling
+cumulative weights both.
+
+
+
 The earlier v104 cache explanation was incorrect: the published feed contained a literal
 omitted-bytes marker and was invalid JSON. The complete file was repaired and verified
 byte-for-byte. Always upload complete bytes and verify SHA/JSON; never publish truncated
