@@ -2625,6 +2625,11 @@ dump; placeholder is the hint) · `wxCard` · `theNumbers` · `startRound` · Ro
 if any · Numbers / Evidence / Decisions / Data. Search, Numbers Index and Evidence
 are extra doors, not replacements.
 
+**v148 — every club is Cumulative, not Today.** The remaining/best-5 table and the every-club
+path + face lanes were on Today after v143/v145. They belong on `cumulativeView()` only.
+Today is the morning door (Days / Cumulative tiles, weather, the numbers, round prep).
+Do not put the bag table back on `home()`. Days stay days.
+
 ### Findability — provenance, meaning, Numbers, search, Evidence (Sep 18 2026)
 
 The job is to make a number **findable, sourced and understandable**. No new capture
