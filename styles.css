@@ -1008,12 +1008,23 @@ body.night table{font-family:var(--sans)}
 .mixbar .double{background:var(--burg)}
 
 /* ---- In-page section jump bar ---- */
-/* Wraps rather than scrolls sideways: every section on a page has to be reachable
-   without hunting for a chip that's parked off the right edge. */
-.jumpbar{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 2px;padding:9px 0 4px}
+/* One row. Swipe sideways for the rest — wrapping ate a second line on Today. */
+.jumpbar{
+  display:flex;flex-wrap:nowrap;gap:5px;align-items:center;
+  margin:0 0 2px;padding:9px 0 4px;
+  width:100%;max-width:100%;
+  overflow-x:auto;overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  scrollbar-width:none;
+  scroll-snap-type:x proximity;
+  mask-image:linear-gradient(to right,#000 0,#000 calc(100% - 22px),transparent);
+  -webkit-mask-image:linear-gradient(to right,#000 0,#000 calc(100% - 22px),transparent);
+}
+.jumpbar::-webkit-scrollbar{display:none;height:0}
 .jump{flex:0 0 auto;font-family:var(--sans);font-size:10.5px;font-weight:700;white-space:nowrap;
   padding:5px 10px;border-radius:20px;background:var(--card2);color:var(--gtext);
-  border:1px solid var(--line)}
+  border:1px solid var(--line);scroll-snap-align:start}
 .jump:active{background:var(--green);color:var(--green-ink);border-color:var(--green)}
 h2{scroll-margin-top:14px}
 
