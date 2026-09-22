@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v141';
+const BUILD = 'v142';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v142', d:'2026-09-22', items:[
+    'IN TO OUT. Path is the job. Face is already near square — closing it would hook. Target 0° to +2°. 3-wood already proved it: −6.1° → −2.0° after the slot, and it held.',
+    '7-IRON IS THE TRAINING CLUB. Path never to −2°. Woods hold what they won. Wedges already sit near zero — leave them. Next bay: remaining path is the scoreboard, not best 5.' ] },
   { b:'v141', d:'2026-09-19', items:[
     '2-IRON ~215. Working rule: inside 360, 2-iron; past 360, 3-wood or 5-wood. Still figuring it out. Van Cortlandt: woods on 1 / 4 / 9 / 14. 7 is 222 — 3-wood, 2-iron is close.' ] },
   { b:'v140', d:'2026-09-18', items:[
@@ -10068,7 +10071,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 

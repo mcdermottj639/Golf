@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "updated": "2026-09-22",
+  "note": "In-to-out path plan. lessons.js is frozen — these lesson-adds and the standing briefing are the live layer. Do not replace swing faults from here.",
+  "entries": [
+    {
+      "id": "plan-in-to-out-20260922-v1",
+      "type": "briefing",
+      "briefing": {
+        "course": "In to out — path",
+        "discipline": "swing",
+        "focus": "Move the path. Leave the face. Target 0° to +2°. Closing a square face into a left path is a hook.",
+        "rules": [
+          "Move PATH, not face — yours is already near square.",
+          "Target 0° to +2° path. More in-to-out than that, with this face, hooks.",
+          "7-iron is the training club. Woods hold. Wedges already sit at zero — leave them.",
+          "Remaining path is the scoreboard. Best 5 is carry, not this job."
+        ],
+        "steps": [
+          "Log into TrackMan before the first ball. A bay that resets is a session that never happened.",
+          "70°F · sea level. Same as every other day on file.",
+          "7-iron only for the path block. Not the driver, not the 5-iron.",
+          "Outside gate: a headcover or bottle just outside and a few inches ahead of the ball. Out-to-in hits it. In-to-out misses it inside.",
+          "Twenty remaining balls. Mishits out. Remaining path is the number.",
+          "Pass: remaining path ≥ −4° (from −7.6° rest). Stretch: ≥ −2°, face still inside −2° to +2°.",
+          "If the face goes more closed than −2°, you cheated the fade with the face. Stop. Open it back. Path only.",
+          "Hold check: eight 3-woods with the slot thought. Remaining path should stay ≥ −3°. Then stop."
+        ],
+        "sections": [
+          {
+            "t": "The diagnosis, off the bag",
+            "k": "Every measured path is still left of the target. The fade is the path.",
+            "b": "Latest remaining means: Driver −3.7° path / +0.1° face / +3.8° F–P. Mini −2.8° / −1.4° / +1.4°. 3-wood after slot −2.0° / −0.6° / +1.4°. 5-wood after slot −2.1° / −0.2° / +1.9°. 2-iron −9.8° / −0.6° / +9.2°. 5-iron −11.0° / −2.8° / +8.1°. 6-iron −9.3° / −4.1° / +5.2°. 7-iron rest −7.6° / −1.0° / +6.5°. 8-iron −7.6° / +0.6° / +8.2°. 9-iron −5.3° / −1.1° / +4.2°. PW −2.9° / +0.8° / +3.7°. 50° −0.3°. 56° +0.4° / −0.9° / −1.3°. 60° +0.4°.\n\nRead that as one sentence: the face is already near square, and the path is left. That is a fade. It is not a slice you fix by closing the face. Close the driver face from +0.1° into a −3.7° path and the ball starts left and hooks.\n\nRadar measures delivery, not the body. “Over the top” is the explanation for a negative path, not a measurement. Indoor unmarked balls: path and face are still measured. Carry is a model. This job does not need spin."
+          },
+          {
+            "t": "Proof — the 3-wood already did it",
+            "k": "After-slot 3-wood: path −6.1° → −2.0°, and it held.",
+            "b": "Sep 18, first 3-wood block remaining path −6.1°. After the slot thought: −2.0°, face −0.6°, F–P +1.4°, carry 188.4 n=7 / best 5 192.7. That is a baseline, not a window. It held.\n\n5-wood the same day after slot: −2.1° / −0.2° / +1.9°. Same shape.\n\nThe 7-iron that day was the other story. Path barely moved (−8.2° open → −7.3° then −7.6° rest). Face-to-path did (8.9 → 3.1 in the window → 6.5 rest). Same thought as the 3-wood; the 3-wood changed path, the 7-iron changed strike. Path is still the job on the iron. Do not copy the wood’s result onto the 7-iron and call it done."
+          },
+          {
+            "t": "Who trains, who holds, who sits",
+            "k": "7-iron trains. Woods hold. Long irons are too steep. Wedges already sit at zero.",
+            "b": "TRAINING CLUB is the 7-iron. Enough speed to show path, not so much that you steer. Pass next bay: remaining path ≥ −4°. Stretch −2°, face still inside −2° to +2°.\n\nHOLD: 3-wood and 5-wood after slot. They already moved. A hold check is eight balls, not a rebuild.\n\nNOT TODAY: 2-iron, 5-iron, 6-iron. −9° to −11°. You will aim away from the miss and make a worse swing. Leave them until the 7-iron has actually moved.\n\nLEAVE: 50° / 56° / 60°. They are already around zero. Hunting in-to-out on a wedge is how a short shot hooks.\n\nDriver and mini still sit left of the woods. They get the same thought after the 7-iron has earned it, not before."
+          },
+          {
+            "t": "The ways this goes wrong",
+            "k": "Do not close the face. Do not train this on a 5-iron. Do not chase +4° in-to-out.",
+            "b": "Do not close the face to kill the fade. Driver face is already +0.1°. Close it into a −3.7° path and you start it left and hook it.\n\nDo not train this on 2-iron / 5-iron / 6-iron. They are −9° to −11°. You will steer.\n\nDo not mess with 50° / 56° / 60°. They already sit near zero.\n\nDo not chase +4° in-to-out. You do not have an open face to absorb it. Target is 0° to +2°.\n\nDo not use best-5 carry as the pass mark for a path session. Best 5 is the ceiling of that day. Remaining path is this job."
+          }
+        ]
+      }
+    },
+    {
+      "id": "lesson-ito1-20260922-v1",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "ito1",
+        "shelf": "At the Range",
+        "title": "The outside gate, scored as path",
+        "min": 8,
+        "tags": ["off-tee", "approach"],
+        "where": "range",
+        "kit": ["sticks"],
+        "body": "The gate outside the ball is already on the shelf. This is the same drill with a scoreboard, because a gate without a number is a feel, and the feel is how the 7-iron stayed at −7.6° while you thought the slot had landed.\n\nFor a right-hander: a headcover or bottle just OUTSIDE the ball and a few inches AHEAD of it. An out-to-in path — your measured path — hits the cover. An in-to-out or square path misses it on the inside and still finds the ball. That is the whole picture.\n\nPath before face. Yours is the reason that order matters: 7-iron rest is −7.6° path and −1.0° face. The face is already the quiet one. If you start steering the face shut to make the ball fly straighter, you will hook it the first time the path actually moves. Leave the face. Miss the cover. Then look at remaining path, not at the shot that felt good.",
+        "drill": "7-iron, outside gate, 20 remaining balls. Pass: remaining path ≥ −4°. Stretch −2°, face still inside −2° to +2°. Log the remaining path — a session without that number did not count.",
+        "steps": [
+          "7-iron. Headcover or bottle just outside and a few inches ahead of the ball.",
+          "Ten balls at half speed that miss the cover. If you clip it, the next one is slower, not harder.",
+          "Ten more at full speed. Mishits out.",
+          "Read remaining path. Pass ≥ −4°. Stretch ≥ −2° with face inside −2° to +2°.",
+          "If the face goes more closed than −2°, stop. You cheated the fade with the face. Open it back."
+        ],
+        "viz": {
+          "h": 68,
+          "cap": "Outside gate ahead of the ball. Out-to-in hits it. In-to-out misses inside.",
+          "parts": [
+            { "k": "line", "x1": 50, "y1": 6, "x2": 50, "y2": 62, "c": "f", "d": true, "w": 0.6 },
+            { "k": "ball", "x": 50, "y": 46 },
+            { "k": "box", "x": 61, "y": 26, "bw": 11, "bh": 16, "c": "b", "r": 1.2 },
+            { "k": "curve", "x1": 30, "y1": 60, "cx": 42, "cy": 38, "x2": 58, "y2": 14, "c": "g", "w": 1.3 },
+            { "k": "curve", "x1": 74, "y1": 60, "cx": 64, "cy": 36, "x2": 44, "y2": 14, "c": "b", "w": 0.8, "d": true },
+            { "k": "text", "x": 22, "y": 12, "t": "in to out", "c": "g", "sz": 3.2 },
+            { "k": "text", "x": 78, "y": 12, "t": "hits cover", "c": "b", "sz": 3.2 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "lesson-ito2-20260922-v1",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "ito2",
+        "shelf": "At-Home Swing",
+        "title": "One-handed 201 — now scored as path",
+        "min": 4,
+        "tags": ["off-tee", "tempo"],
+        "where": "home",
+        "kit": ["m201"],
+        "body": "The one-handed trail-arm drop on the Miracle 201 is already the most valuable thing you do with the tool. Jul 27 confirmed it; the 3-wood on Sep 18 proved it transferred: path −6.1° → −2.0° after the slot, and it held.\n\nThis is not a second drill. It is the same drop, named for the number it is supposed to move. Feel is allowed. Feel is not the pass mark. The pass mark is remaining path on the 7-iron the next time you are in the bay.\n\nTrail hand only, slow. The heavy head on one hand exaggerates the shallow. You cannot throw it from the top and still hold the click. Hips start down, head lags. Click at or past the bottom. An early click is a cast, and a cast is how an out-to-in path is born.\n\nThen two-handed, dial low, same drop. One thought: trail elbow down and in front at the top. That is the laid-off / across-the-line kill. Path is what tells you it worked.",
+        "drill": "Every home session: 6–8 slow one-handed trail-arm swings, then 2×10 two-handed dial-low. Click at or past the bottom. The next bay’s remaining 7-iron path is the exam.",
+        "steps": [
+          "6–8 slow one-handed trail-arm swings to open. Drop, do not throw.",
+          "Two-handed, dial low: 2 sets of 10. Hips first, head lags.",
+          "Listen: click at or past the bottom. Early click = cast. Slow the transition, not the backswing.",
+          "One thought only: trail elbow down and in front at the top."
+        ]
+      }
+    },
+    {
+      "id": "lesson-ito3-20260922-v1",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "ito3",
+        "shelf": "At the Range",
+        "title": "7-iron path block — twenty remaining",
+        "min": 12,
+        "tags": ["approach", "off-tee"],
+        "where": "range",
+        "kit": ["sticks"],
+        "body": "The 7-iron is the training club because it is the one that did not move. Rest −7.6° path / −1.0° face / +6.5° F–P. The window squeezed F–P to +3.1° and never took path to −2°. That is why this session exists, and why it is not a mixed bag night.\n\nOne club. One thought (the slot — trail elbow in front, drop, miss the outside cover). Twenty remaining balls. Mishits out. Remaining path is the number you write down. Best 5 is carry, and carry is not this job.\n\nFace stays inside −2° to +2°. If it drifts more closed than −2°, you are using the face to hide a still-left path. That will hook the first time the path actually comes with you. Stop. Open it back.\n\nDo not add the 5-iron because you want to “see if it transferred.” It is −11.0°. You will steer. Woods get an eight-ball hold check at the end, then you are done.",
+        "drill": "Bay or range: 7-iron only, outside gate, 20 remaining. Pass remaining path ≥ −4°. Stretch −2° with face inside −2° to +2°. Then eight 3-woods as a hold check (≥ −3°). Log remaining path.",
+        "steps": [
+          "Warm with the one-handed 201 drop, or ten slow 7-irons with no ball.",
+          "Outside gate on. 7-iron, twenty remaining balls. Mishits out.",
+          "Write remaining path, face, F–P. Pass ≥ −4°. Stretch ≥ −2°, face −2° to +2°.",
+          "Hold check: eight 3-woods, slot thought, no gate required. Path should stay ≥ −3°.",
+          "Stop. No 5-iron, no driver block, no “one more mixed bag.”"
+        ]
+      }
+    },
+    {
+      "id": "lesson-ito4-20260922-v1",
+      "type": "lesson-add",
+      "lesson": {
+        "id": "ito4",
+        "shelf": "At the Range",
+        "title": "Closed-face cheat — how to catch it",
+        "min": 5,
+        "tags": ["off-tee", "approach"],
+        "where": "range",
+        "body": "The miss you are training out is a left path with a near-square face, which is a fade. The cheat is obvious on TrackMan and invisible in the air if you only watch curve: the face shuts, F–P shrinks, the ball flies straighter, and you think the path moved.\n\nThat is exactly what must not happen. Driver face is +0.1°. 7-iron rest face is −1.0°. There is no spare close. A session that “fixes” the fade by taking face from −1° to −4° has not moved path. It has built a hook for the day the path finally does.\n\nSo every path block has two numbers, not one. Path has to move right (less negative). Face has to stay inside −2° to +2°. If path improves and face dives, throw the block out. It does not count.\n\nThis is also why wedges are off limits. 56° is already +0.4° path. There is nothing to train, and a closed face there is a left miss from 75 yards.",
+        "drill": "On any path block: if remaining face is more closed than −2°, the block is void. Open the face back to square and start the count again. Path only.",
+        "steps": [
+          "After every 5 balls, glance at face as well as path.",
+          "Face more closed than −2°: stop the block. It does not count.",
+          "Set the face back near square. Restart. Path is the only thing allowed to move."
+        ]
+      }
+    },
+    {
+      "id": "action-path-next-bay-20260922-v1",
+      "type": "action",
+      "pri": true,
+      "text": "NEXT BAY is a 7-iron path block. Outside gate. 20 remaining. Pass: remaining path ≥ −4° (from −7.6° rest), face still inside −2° to +2°. Then eight 3-woods as a hold check (≥ −3°). Log remaining path — best 5 is not this job. No 5-iron, no mixed bag."
+    },
+    {
+      "id": "action-path-201-daily-20260922-v1",
+      "type": "action",
+      "text": "Home, every session: 6–8 one-handed Miracle 201 drops, then 2×10 two-handed dial-low. Click at or past the bottom. That drop is how the 3-wood went −6.1° → −2.0°. The next 7-iron remaining path is the exam."
+    }
+  ]
+}
