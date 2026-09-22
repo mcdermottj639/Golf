@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v157';
+const BUILD = 'v158';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v158', d:'2026-09-22', items:[
+    'CARRY AND TOTAL ARE SEPARATE. Spyglass Hole 1 3-wood carried 189.4 yd, went 248 yd in total to the rough, and left 300 yd to the hole. Spyglass shot-list distances now use their recorded total, Hazeltine keeps its separate measurements, and virtual front-nine carry-only tiles no longer claim to be total distance. Existing installs receive the corrections.' ] },
   { b:'v157', d:'2026-09-22', items:[
     'CLEAR MISHITS OUT OF CLUB COMPARISONS. Simulator club profiles exclude confirmed mishits and extreme short full-shot carry outliers. Distance and path use the same remaining shots, with counts shown. Every shot stays in the history and the round score.' ] },
   { b:'v156', d:'2026-09-22', items:[
@@ -10436,6 +10438,20 @@ function applyFeed(feed){
       const r = targetedRound(S.rounds, e, e.round);
       if(!r || !r.sim || !r.review) return;
       Object.assign(r.review, e.review);
+    }
+    else if(e.type === 'round-shot-distance-update' && e.round && e.shotDistances){
+      const r = targetedRound(S.rounds, e, e.round);
+      if(!r || !r.sim || !Array.isArray(r.review?.shots)) return;
+      // Update the displayed shot-list distance by stable source-row ID. Do not replace
+      // the shot ledger or touch flat carry, remaining yards, score or local identities.
+      r.review.shots.forEach(s => {
+        const distance=e.shotDistances[s.id];
+        if(typeof distance==='number' && Number.isFinite(distance) && distance>=0)
+          s.distance=distance;
+        else if(distance===null && Object.prototype.hasOwnProperty.call(e.shotDistances,s.id))
+          s.distance=null; // the source shows carry only; total was never captured
+      });
+      if(e.distanceMeaning) r.review.distanceMeaning=e.distanceMeaning;
     }
     else if(e.type === 'test' && e.test) S.tests.push({ date:e.test.date || null, putter:e.test.putter, makes:e.test.makes, note:e.test.note || '' });
     else if(e.type === 'briefing' && e.briefing){

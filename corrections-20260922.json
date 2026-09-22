@@ -3254,6 +3254,110 @@
         },
         "coverage": "57 counted non-putt rows; 55 readable metric panels and two rows with unreadable metrics. Original source filenames and timestamps are preserved. 28 auto-finish strokes reconcile to 85. Jack confirmed September 22 as the play date. Range comparisons identify their own source date and block; same-day session order is not recorded."
       }
+    },
+    {
+      "id": "round-spyglass-shot-list-distance-20260922-v1",
+      "type": "round-shot-distance-update",
+      "target": "round-tm-spyglass-20260915-review-v1",
+      "src": "Jack clarified TrackMan shot-list labels with Hole 1 screenshot C1199034-A364-4C8E-BDE8-33C109386A01.png; 248 yds to rough is shot-list distance, 189.4 yd is flat carry, 300 yds to hole is remaining distance. The 57 shot-list values were transcribed in the original source as planYds; only distance is corrected.",
+      "round": {
+        "date": "2026-09-22",
+        "course": "Spyglass Hill",
+        "sim": true
+      },
+      "shotDistances": {
+        "h1-a": 248,
+        "h1-b": 182,
+        "h1-c": 75,
+        "h2-a": 181,
+        "h2-b": 95,
+        "h2-c": 29,
+        "h3-a": 147,
+        "h3-b": 17,
+        "h4-a": 215,
+        "h4-b": 150,
+        "h4-c": 18,
+        "h5-a": 164,
+        "h5-b": 18,
+        "h6-a": 203,
+        "h6-b": 185,
+        "h6-c": 21,
+        "h7-video-tee-3w-20260915": 75,
+        "h7-a": 166,
+        "h7-b": 187,
+        "h7-d": 75,
+        "h8-a": 219,
+        "h8-b": 33,
+        "h8-c": 117,
+        "h9-a": 204,
+        "h9-b": 218,
+        "h9-c": 14,
+        "h10-video-tee-3w-20260915": 167,
+        "h10-a": 235,
+        "h10-b": 21,
+        "h10-c": 14,
+        "h11-a": 251,
+        "h11-b": 211,
+        "h11-c": 19,
+        "h11-d": 16,
+        "h12-a": 153,
+        "h12-b": 34,
+        "h12-c": 11,
+        "h13-a": 165,
+        "h13-b": 217,
+        "h13-c": 28,
+        "h14-a": 214,
+        "h14-b": 150,
+        "h14-c": 157,
+        "h14-d": 7,
+        "h15-a": 110,
+        "h15-b": 6,
+        "h16-a": 257,
+        "h16-b": 166,
+        "h16-c": 24,
+        "h16-d": 26,
+        "h17-a": 225,
+        "h17-b": 86,
+        "h17-c": 9,
+        "h18-a": 218,
+        "h18-b": 139,
+        "h18-c": 15,
+        "h18-d": 15
+      },
+      "distanceMeaning": "total"
+    },
+    {
+      "id": "round-virtual-front9-carry-only-20260922-v1",
+      "type": "round-shot-distance-update",
+      "target": "round-tm-virtual-front9-20260916-v1",
+      "src": "September 16 source has seven readable flat-carry panels but no independently verified total/shot-list distance; previous import copied carry into distance.",
+      "round": {
+        "sim": true,
+        "date": "2026-09-16"
+      },
+      "distanceMeaning": "carry-only",
+      "shotDistances": {
+        "h1-m3": null,
+        "h2-m2": null,
+        "h4-m1": null,
+        "h5-m1": null,
+        "h6-m1": null,
+        "h7-m1": null,
+        "h7-m2": null
+      }
+    },
+    {
+      "id": "round-hazeltine-distance-label-20260922-v1",
+      "type": "round-shot-distance-update",
+      "target": "round-tm-hazeltine-imported-v1",
+      "src": "Hazeltine source review already preserved destination shot-list distance apart from measured flat carry; label verified distances as total without changing values.",
+      "round": {
+        "sim": true,
+        "course": "Hazeltine National",
+        "date": "2026-09-22"
+      },
+      "distanceMeaning": "total",
+      "shotDistances": {}
     }
   ]
 }

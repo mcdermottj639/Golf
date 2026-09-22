@@ -5,7 +5,7 @@ const original=JSON.stringify(r);
 const ps=R.profiles(r,[]), wood=ps.find(p=>p.club==='3-wood');
 assert.deepEqual(wood.excluded.map(s=>s.id),['h7-video-tee-3w-20260915','h10-video-tee-3w-20260915']);
 assert.equal(wood.n,14);assert.equal(wood.fullN,16);assert.equal(wood.pathN,14);
-assert.equal(wood.distance.toFixed(1),'186.0');assert.equal(wood.path.toFixed(1),'-1.2');
+assert.equal(wood.distance.toFixed(1),'210.1');assert.equal(wood.path.toFixed(1),'-1.2');
 assert.ok(wood.full.some(s=>s.id==='h13-a'),'ordinary 137.8-yard miss stays');
 assert.ok(ps.filter(p=>p.club!=='3-wood').every(p=>p.excluded.length===0));
 assert.equal(JSON.stringify(r),original,'source data, score, HCP and all observations unchanged');
