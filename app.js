@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v145';
+const BUILD = 'v146';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v146', d:'2026-09-22', items:[
+    'EVERY CLUB HAS FACE-TO-PATH ON CUMULATIVE. Same axis as the day cards: small dots are remaining shots (path green, face gold), rings are the rolling remaining mean, numbers are PATH / FACE / F–P. One row per club — no slot, no window, no rest.',
+    'THE TABLE IS ROLLING REMAINING, NOT THE LAST BLOCK. Weighted by remaining n across days. After-slot stays on the day it happened. The bag is what the days add up to.' ] },
   { b:'v145', d:'2026-09-22', items:[
     'EVERY CLUB NOW HAS THE NUMBERS THAT MEASURE. Smash, club speed, ball speed, launch, spin, attack, path, face, face-to-path, launch direction — and dynamic loft / spin loft when a capture includes them. Best 5 stays burgundy. These bay screenshots did not have dynamic loft, so that column is a dash until the next one does.',
     'SMASH IS BALL ÷ CLUB when smash is missing. Nothing invented. Indoor unmarked balls: path, face, speeds, launch are measured; spin and carry are still a model.' ] },
@@ -2671,6 +2674,7 @@ function home(){
   return `
   ${sessionShortcuts()}
   ${cumulativeBagCard(true)}
+  ${cumulativeClubFaceCard()}
   <div class="home-quicklinks" role="group" aria-label="Quick navigation">
     <button class="btn ghost" data-action="go" data-view="bag">My Bag</button>
     <button class="btn ghost" data-action="go" data-view="drills">Practice Drills</button>
@@ -3828,30 +3832,97 @@ function fillMetrics(c){
   };
 }
 const BAG_CANON = ['Dr','Mini','3W','5W','2i','5i','6i','7i','8i','9i','PW','50°','56°','60°'];
+function deliveryMatch(dels, club){
+  const k = clubCanon(club), phase = clubPhaseOf(club);
+  return (dels || []).find(d => d.club === club)
+    || (dels || []).find(d => clubCanon(d.club) === k && clubPhaseOf(d.club) === phase)
+    || null;
+}
+function shotAngles(del, key){
+  return (del && del[key] ? del[key] : []).filter(v => v != null && Number.isFinite(+v)).map(Number);
+}
+function rollRemaining(pts){
+  const w = key => {
+    let sum = 0, wt = 0;
+    (pts || []).forEach(p => {
+      const v = p[key], n = p.n;
+      if(v == null || !Number.isFinite(+v)) return;
+      if(n == null || !Number.isFinite(+n) || !(+n > 0)) return;
+      sum += +v * +n;
+      wt += +n;
+    });
+    return wt ? sum / wt : null;
+  };
+  const n = (pts || []).reduce((s, p) => s + (p.n != null && Number.isFinite(+p.n) ? +p.n : 0), 0);
+  const raw = {
+    n: n || null,
+    carry: w('carry'), best: w('best'), total: w('total'),
+    smash: w('smash'), cs: w('cs'), bs: w('bs'), la: w('la'), spin: w('spin'),
+    aoa: w('aoa'), dynLoft: w('dynLoft'), spinLoft: w('spinLoft'), ld: w('ld'),
+    path: w('path'), face: w('face'), ftp: w('ftp')
+  };
+  const d = fillDelivery(raw);
+  return {
+    ...raw, ...d,
+    smash: raw.smash != null ? +(+raw.smash).toFixed(2) : null,
+    spin: raw.spin != null ? Math.round(+raw.spin) : null
+  };
+}
 function cumulativeClubSeries(){
   const by = new Map();
   baysFor('swing').slice().sort((a,b) => (a.b.date || '').localeCompare(b.b.date || '')).forEach(({ b, i }) => {
-    primaryClubsForDay(analysisClubs(b.detail || {})).forEach(c => {
+    const detail = b.detail || {};
+    const dels = analysisDelivery(detail);
+    primaryClubsForDay(analysisClubs(detail)).forEach(c => {
       const k = clubCanon(c.club);
       if(!k) return;
       const d = fillMetrics(c);
       if(d.path == null && d.face == null && c.carry == null && c.best == null) return;
+      const del = deliveryMatch(dels, c.club);
       if(!by.has(k)) by.set(k, []);
       by.get(k).push({
         date: b.date, i, phase: clubPhaseOf(c.club),
         n: c.n, carry: c.carry, best: c.best, bestN: c.bestN, total: d.total,
         smash: d.smash, cs: d.cs, bs: d.bs, la: d.la, spin: d.spin,
         aoa: d.aoa, dynLoft: d.dynLoft, spinLoft: d.spinLoft, ld: d.ld,
-        path: d.path, face: d.face, ftp: d.ftp
+        path: d.path, face: d.face, ftp: d.ftp,
+        paths: shotAngles(del, 'paths'),
+        faces: shotAngles(del, 'faces')
       });
     });
   });
   return by;
 }
+function cumulativeClubKeys(by){
+  return BAG_CANON.filter(k => by.has(k)).concat([...by.keys()].filter(k => !BAG_CANON.includes(k)));
+}
+function cumulativeClubDelivery(){
+  const by = cumulativeClubSeries();
+  if(!by.size) return [];
+  return cumulativeClubKeys(by).map(k => {
+    const pts = by.get(k);
+    const roll = rollRemaining(pts);
+    return {
+      club: clubCanonLabel(k),
+      path: roll.path, face: roll.face, ftp: roll.ftp, n: roll.n,
+      paths: pts.flatMap(p => p.paths || []),
+      faces: pts.flatMap(p => p.faces || [])
+    };
+  }).filter(d => (d.path != null && Number.isFinite(+d.path)) || (d.face != null && Number.isFinite(+d.face)));
+}
+function cumulativeClubFaceCard(){
+  const viz = bayDeliveryVisual(cumulativeClubDelivery());
+  if(!viz) return '';
+  return `<div class="card">
+    <h2>Every club · path + face ${provBadge('bay')}</h2>
+    <p class="sm">Every remaining shot on file, one row per club. Small dots are the shots; rings are the rolling remaining mean. No slot, no window — after-slot stays on the day it happened.</p>
+    ${viz}
+  </div>`;
+}
 function cumulativeBagTable(){
   const by = cumulativeClubSeries();
   if(!by.size) return '';
-  const keys = BAG_CANON.filter(k => by.has(k)).concat([...by.keys()].filter(k => !BAG_CANON.includes(k)));
+  const keys = cumulativeClubKeys(by);
   const yd = v => v == null || !Number.isFinite(+v) ? '·' : Number(v).toFixed(1);
   const deg = v => v == null || !Number.isFinite(+v) ? '·' : baySgn(v) + '°';
   const smash = v => v == null || !Number.isFinite(+v) ? '·' : Number(v).toFixed(2);
@@ -3866,32 +3937,32 @@ function cumulativeBagTable(){
     <tbody>${keys.map(k => {
       const pts = by.get(k);
       const last = pts[pts.length - 1];
+      const roll = rollRemaining(pts);
       const firstBest = pts.find(p => p.best != null);
-      const delta = firstBest && last.best != null && pts.length > 1
-        ? +(last.best - firstBest.best).toFixed(1) : null;
-      const phase = last.phase && last.phase !== 'stock'
-        ? ` · ${last.phase === 'after slot' ? 'slot' : last.phase}` : '';
+      const lastBest = [...pts].reverse().find(p => p.best != null);
+      const delta = firstBest && lastBest && pts.length > 1 && firstBest !== lastBest
+        ? +(lastBest.best - firstBest.best).toFixed(1) : null;
       return `<tr data-action="open-bay" data-i="${last.i}" style="cursor:pointer">
-        <td><b>${esc(clubCanonLabel(k))}</b>${phase ? `<span class="sm faint">${esc(phase)}</span>` : ''}</td>
-        <td><b class="cum-best">${yd(last.best)}</b>${delta != null ? `<div class="sm faint">${delta > 0 ? '+' : ''}${delta}</div>` : ''}</td>
-        <td>${yd(last.carry)}</td>
-        <td>${smash(last.smash)}</td>
-        <td>${mph(last.cs)}</td>
-        <td>${mph(last.bs)}</td>
-        <td>${yd(last.la)}</td>
-        <td>${spin(last.spin)}</td>
-        <td>${deg(last.aoa)}</td>
-        <td>${deg(last.dynLoft)}</td>
-        <td>${deg(last.path)}</td>
-        <td>${deg(last.face)}</td>
-        <td>${deg(last.ftp)}</td>
-        <td>${deg(last.ld)}</td>
-        <td>${last.n == null ? '·' : last.n}</td>
+        <td><b>${esc(clubCanonLabel(k))}</b></td>
+        <td><b class="cum-best">${yd(lastBest ? lastBest.best : roll.best)}</b>${delta != null ? `<div class="sm faint">${delta > 0 ? '+' : ''}${delta}</div>` : ''}</td>
+        <td>${yd(roll.carry)}</td>
+        <td>${smash(roll.smash)}</td>
+        <td>${mph(roll.cs)}</td>
+        <td>${mph(roll.bs)}</td>
+        <td>${yd(roll.la)}</td>
+        <td>${spin(roll.spin)}</td>
+        <td>${deg(roll.aoa)}</td>
+        <td>${deg(roll.dynLoft)}</td>
+        <td>${deg(roll.path)}</td>
+        <td>${deg(roll.face)}</td>
+        <td>${deg(roll.ftp)}</td>
+        <td>${deg(roll.ld)}</td>
+        <td>${roll.n == null ? '·' : roll.n}</td>
         <td>${esc(fmtDate(last.date))}</td>
       </tr>`;
     }).join('')}</tbody>
   </table></div>
-  <p class="sm faint" style="margin-top:8px">Latest remaining mean of every club on file. Best 5 is burgundy. Smash is ball ÷ club when the speeds are there. Dynamic loft is a dash until a capture includes it. Indoor unmarked balls: path, face, speeds, launch are measured; spin and carry are a model.</p>`;
+  <p class="sm faint" style="margin-top:8px">Rolling remaining mean of every club on file, weighted by remaining n across days. One row per club — slot and window stay on the day they happened. Best 5 is the latest batch ceiling, in burgundy. Smash is ball ÷ club when the speeds are there. Dynamic loft is a dash until a capture includes it. Indoor unmarked balls: path, face, speeds, launch are measured; spin and carry are a model.</p>`;
 }
 function cumulativeBagCard(fromHome){
   const table = cumulativeBagTable();
@@ -4004,6 +4075,7 @@ function cumulativeView(){
   </div>
 
   ${cumulativeBagCard(false)}
+  ${cumulativeClubFaceCard()}
 
   ${f ? `<div class="card">
     <h2>The one thing</h2>
@@ -4043,8 +4115,7 @@ function cumulativeView(){
     <p class="sm">Over the top throws the club out, then across. An open face turns that into start-left, curve-right. The pictures are the diagnosis; the dots below are the measurements.</p>
     <div class="hipcompare">${pathDiagram()}</div>
     ${latest ? `<p class="sm faint" style="margin-top:10px">Latest measured day · ${esc(fmtDate(latest.b.date))} · ${esc(latest.b.mode || latest.b.setup || 'bay')}. ${provBadge('trackman')}</p>
-      ${cumulativeFlightRead(delivery)}
-      ${bayDeliveryVisual(delivery)}` : '<p class="sm">No bay session has a path reading yet.</p>'}
+      ${cumulativeFlightRead(delivery)}` : '<p class="sm">No bay session has a path reading yet.</p>'}
     ${cumulativePathHistory()}
   </div>
 
