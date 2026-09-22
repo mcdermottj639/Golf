@@ -2279,6 +2279,18 @@ exactly that rather than guessing 70°F or the 77°F default. The session is sti
 confirm out-to-in delivery: all six driver paths were leftward (mean −6.6°), as were all six 6i
 (−8.2°) and 8i (−7.6°) paths. That advances the DELIVERY evidence, not the body-mechanics cause.
 
+**DYNAMIC LOFT WAS ON THE SCROLLED COLUMNS (v147).** v145 left the column as a dash and said
+the bay screenshots did not include it. They did, one swipe past launch direction: PW remaining
+36.9°, 50° 35.8°, Sep 22 8-iron remaining 23.5° (the 22.8° average still had the worm in it),
+5-iron 19.4°. Spin loft was a dash — do not invent it from missing attack. Impact height is
+signed millimetres on the shot (down negative). Store the shot, then the remaining mean of
+pure hits. A displayed average that still has the mishit in it is not the live number.
+
+**SEP 22 RANGE is a new bay** (`bay-20260922-range-8i-5i`, `data/range-2026-09-22.json`).
+8-iron 4 shots, target 131, shot 2 worm held out, remaining 102.3 n=3. 5-iron 9 of 10 visible,
+target 153, remaining 123.2. The PW/50° clips on the same phone dump are the Sep 14 Map My Bag
+(113.2 / 99.1) — do not mint a second day for those six-shot groups.
+
 **The ladder says where each number came from, and `meas` is never the authority.** The
 captions render only once SOMETHING on the ladder is measured — before that the gold note
 already says every row is an estimate, and thirteen rows each repeating it is a page of
