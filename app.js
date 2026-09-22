@@ -99,13 +99,16 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v147';
+const BUILD = 'v148';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v148', d:'2026-09-22', items:[
+    'EVERY CLUB IS CUMULATIVE, NOT TODAY. The remaining/best-5 table and the path + face lanes live on Cumulative. Today is the door — Days and Cumulative tiles, then the rest of the morning.',
+    'DAYS STAY DAYS. Tap a capture for that day’s numbers. The bag you come back to is Cumulative.' ] },
   { b:'v147', d:'2026-09-22', items:[
     'DYNAMIC LOFT WAS ON THE SCREENS. PW 36.9°, 50° 35.8°, 8-iron remaining 23.5° (the 22.8° avg included the worm), 5-iron 19.4°. Stored on every shot plus impact height. Spin loft was a dash — not invented.',
     'SEP 22 RANGE IS ON THE BAG. 8-iron remaining 102.3 n=3 after the worm. 5-iron remaining 123.2 n=9 of 10 visible. Rolling remaining, not the last day. Clubs without a loft column still dash.' ] },
@@ -2671,13 +2674,12 @@ function startRound(){
 function home(){
   // Aug 30 running order (Jack's swap), restored in v117 after v116 replaced it.
   // Findability is additive: search + Numbers/Evidence links. Do not gut this page.
+  // v148: every-club remaining/best-5 and path+face lanes are Cumulative, not Today.
   const dl = daysLeft(S.settings.returnDeadline);
   const pending = pendingReturn();
   const picks = pickedLessons().slice(0,1);
   return `
   ${sessionShortcuts()}
-  ${cumulativeBagCard(true)}
-  ${cumulativeClubFaceCard()}
   <div class="home-quicklinks" role="group" aria-label="Quick navigation">
     <button class="btn ghost" data-action="go" data-view="bag">My Bag</button>
     <button class="btn ghost" data-action="go" data-view="drills">Practice Drills</button>
