@@ -38,11 +38,17 @@
       // not silently change the round's baseline or mix two range dates in one table.
       // noBay: this card's clubs are not the same heads as the latest bay of the same name
       // (Spyglass 3-wood vs a Mini labelled 3w, etc.) — leave the bay column blank.
-      const latest=r.review?.noBay ? undefined
+      const links=r.review?.bayClubLinks;
+      const link=links?.[club];
+      const latest=link
+        ? (bays||[]).find(b=>b._fid===link.bayId && b.date<=r.date)
+        : links || r.review?.noBay ? undefined
         : r.review?.bayId ? (bays||[]).find(b=>b._fid===r.review.bayId)
         : (bays||[]).filter(b=>b.date<=r.date && b.detail?.clubs?.some(c=>bayKey(c.club)===club)).sort((a,b)=>b.date.localeCompare(a.date))[0];
-      const bay=latest?.detail.clubs.find(c=>bayKey(c.club)===club);
-      return {club,ss,full,n:full.length,path:mean(path),pathN:path.length,bay,bayDate:latest?.date,
+      const bay=link
+        ? latest?.detail?.clubs?.find(c=>c.club===link.club)
+        : latest?.detail?.clubs?.find(c=>bayKey(c.club)===club);
+      return {club,ss,full,n:full.length,path:mean(path),pathN:path.length,bay,bayDate:latest?.date,bayLabel:link?.label,bayIndex:latest?(bays||[]).indexOf(latest):-1,
         distance:mean(full.map(s=>s.distance).filter(finite))};
     });
   }
@@ -91,7 +97,9 @@
     const holeIntro = q.bagConfirmed
       ? 'Club names below are the shot-list labels. Distance follows each source record; the carry tile is shown separately where available. Missing tiles stay blank. A flag excludes a reading from club summaries.'
       : 'Club names below are selected TrackMan labels, NOT confirmed actual clubs. Distance is the displayed shot distance, not confirmed carry. Face-to-path is calculated as face minus path when both are present. Source times are approximate positions in supplied recordings. A flag excludes a reading from club summaries.';
-    const bayFoot = q.noBay
+    const bayFoot = q.bayClubLinks
+      ? 'Each bay row uses the dated range block shown under its club. Bay values use remaining range shots; round values use identified full shots, including poor strikes. Same-day order is not recorded. Missing source data stays blank until that session downloads.'
+      : q.noBay
       ? 'Bay comparison is off for this card so a Mini labelled 3w cannot land on a 3-wood row. Full-shot n is this round only.'
       : 'Bay: latest matching club on or before this round. Round profiles require confirmed actual club and full-swing intent. Zero means no eligible identified shots—not no shots hit. TrackMan 3w is not automatically mapped to Mini Driver because labels were sometimes stale.';
     return `<section class="rr" aria-label="Simulator Round Review">
@@ -106,7 +114,7 @@
       <button class="btn" data-action="go" data-view="bag">Open Bag & playing carries</button></div>
       <h2>Three takeaways · evidence first</h2>${f.map(x=>`<div class="card"><h3>${esc(x.title)}</h3><p class="sm">${esc(x.body)}</p></div>`).join('')}
       <h2>Club profiles · range versus round</h2><div class="card"><p class="sm">Range carry and round shot distance are different fields. No carry-gap arithmetic or playing-yardage updates are made from this comparison. Only explicitly identified full shots enter the round summary; unknown-intent and short shots stay in the ledger.</p>
-      <div class="tscroll"><table><thead><tr><th>Club</th><th>Bay carry yd</th><th>Bay path °</th><th>Round distance yd</th><th>Round path °</th><th>Full-shot n</th></tr></thead><tbody>${ps.map(p=>`<tr><td>${esc(label(p.club))}</td><td>${num(p.bay?.carry)}</td><td>${num(p.bay?.path)}</td><td>${num(p.distance)}</td><td>${num(p.path)} <small>(n=${p.pathN})</small></td><td>${p.n}</td></tr>`).join('')}</tbody></table></div>
+      <div class="tscroll"><table><thead><tr><th>Club</th><th>Bay carry yd</th><th>Bay path °</th><th>Round distance yd</th><th>Round path °</th><th>Full-shot n</th></tr></thead><tbody>${ps.map(p=>`<tr><td>${esc(label(p.club))}${p.bayLabel ? `<div class="sm faint">${esc(p.bayLabel)}${p.bay ? ` · n=${p.bay.n}` : " · source pending"}</div>` : ""}</td><td>${num(p.bay?.carry)}</td><td>${num(p.bay?.path)}</td><td>${num(p.distance)}</td><td>${num(p.path)} <small>(n=${p.pathN})</small></td><td>${p.n}</td></tr>`).join('')}</tbody></table></div>
       <p class="sm faint">${esc(bayFoot)}</p></div>
       ${q.bagConfirmed?'':`<details class="card"><summary>Optional · identify a shot's actual club</summary><p class="sm">Only correct shots you remember. Your correction is saved separately from the imported label and survives feed updates. Leave the rest unknown.</p><div class="rr-form"><label>Shot<select id="rrshot">${shots.map(s=>`<option value="${esc(s.id)}">H${s.hole} · ${esc(s.club)} label · ${metric(s.distance)} yd · actual ${esc(s.actualClub||'unknown')}</option>`).join('')}</select></label><label>Actual club<select id="rrclub"><option value="">Unknown / clear correction</option>${(q.availableClubs||[]).map(c=>`<option value="${esc(c)}">${esc(label(c))}</option>`).join('')}</select></label><label>Swing intent<select id="rrintent"><option value="unknown">Unknown</option><option value="full">Full swing</option><option value="partial">Partial / chip</option><option value="recovery">Recovery</option></select></label><button class="btn" data-action="save-review-identity" data-round="${esc(r.feedId)}">Save shot identity</button></div></details>`}
       <h2>Hole evidence · inspect the shots</h2><div class="card"><p class="sm faint">${esc(holeIntro)}</p>

@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v155';
+const BUILD = 'v156';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v156', d:'2026-09-22', items:[
+    'SPYGLASS CLUB COMPARISONS ARE CONNECTED. All six clubs now show their recorded bay carry and path with the source date and block. The current 3-wood uses its own September 18 range shots. September 22 irons and September 15 short clubs have their own links.' ] },
   { b:'v155', d:'2026-09-22', items:[
     'SPYGLASS IS SEPTEMBER 22. Jack confirmed the play date and that it was his first TrackMan HCP round. The TrackMan profile screenshot shows HCP 7.4 with one round. Spyglass 85 now sits beside Hazeltine 80 in Indoor with an HCP label; outdoor handicap stays separate. Previously imported phones receive the correction.' ] },
   { b:'v154', d:'2026-09-22', items:[
@@ -3738,6 +3740,12 @@ function bayVisualMarkup(d){
     ${d.rangeShots?'':bayConsistencyVisual(d.clubs)}
     ${deliveryNote?`<p class="sm">${esc(deliveryNote)}</p>`:''}
     ${bayDeliveryVisual(delivery.length ? delivery : d.clubs)}`;
+}
+function roundReviewBays(){
+  return (S.bays || []).map(b => ({
+    ...b,
+    detail:{ ...(b.detail || {}), clubs:analysisClubs(b.detail || {}) }
+  }));
 }
 function roundBayVisuals(r){
   const i = (S.bays || []).findIndex(b => b._fid === r.review?.bayId);
@@ -8133,7 +8141,7 @@ function roundView(i){
       <span class="arr">→</span></div>`)(courseRecord(r.course)) : ''}
   </div>
 
-  ${window.CaddieReview ? window.CaddieReview.render(r, { bays:S.bays, rounds:S.rounds, tests:S.reviewTests, identities:S.reviewClubOverrides, bayVisuals:roundBayVisuals(r) }) : ''}
+  ${window.CaddieReview ? window.CaddieReview.render(r, { bays:roundReviewBays(), rounds:S.rounds, tests:S.reviewTests, identities:S.reviewClubOverrides, bayVisuals:roundBayVisuals(r) }) : ''}
   ${a.holes.length ? `
   <div class="card">
     ${fold(`rd-card-${i}`, 'Full scorecard',
