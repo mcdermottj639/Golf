@@ -3,9 +3,12 @@
 const fs = require('fs');
 const src = fs.readFileSync(require('path').join(__dirname, '..', 'app.js'), 'utf8');
 const must = [
-  "const BUILD = 'v144'",
+  "const BUILD = 'v146'",
   "function isClearMishit(shot, group)",
   "function analysisDelivery(detail)",
+  "function cumulativeClubDelivery()",
+  "function cumulativeClubFaceCard()",
+  "function rollRemaining(pts)",
   "function cumulativeView()",
   "function cumulativePathHistory()",
   "function allDayRows()",
@@ -36,6 +39,14 @@ for (const k of kinds) {
 }
 if (!src.includes("'on-course':")) {
   console.error('missing on-course kind');
+  process.exit(1);
+}
+if (src.includes("last.phase && last.phase !== 'stock'")) {
+  console.error('cumulative bag table still suffixes slot/window on the club name');
+  process.exit(1);
+}
+if (!src.includes('function cumulativeClubDelivery()') || !src.includes('bayDeliveryVisual(cumulativeClubDelivery())')) {
+  console.error('cumulative face-to-path visual is not wired to every club');
   process.exit(1);
 }
 console.log('findability static checks ok');
