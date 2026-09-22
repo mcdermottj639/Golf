@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v166';
+const BUILD = 'v167';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v167', d:'2026-09-22', items:['SIM PLANS NOW SCAN FAST: each block leads with club, shot count, a short instruction and a clear result to record. Why/details are optional expanders; baseline and exclusions no longer crowd the plan.'] },
   { b:'v166', d:'2026-09-22', items:['COACH NOW BUILDS YOUR SIM PRACTICE PLAN: a warm-up, up to three data-backed priorities and a transfer challenge, with clear targets and a saved checklist. Rebuild when new bay data arrives. Repairs the damaged app script while preserving the 3W A3 setting and adjustment chart.'] },
   { b:'v165', d:'2026-09-22', items:['Saved the 3-wood FutureFit A3 setting, proposed B7 comparison and official RH adjustment chart in Bag.'] },
   { b:'v164', d:'2026-09-22', items:['ONE FULL-DAY SET PER CLUB: bay takeaways, charts and tables combine retained shots across same-club blocks. Takeaways explain what the numbers mean and give measurable next steps. Distance-dash rows and clear mishits stay out; original block details remain expandable.'] },
@@ -5961,7 +5962,7 @@ function generateSimPracticePlan(){
     why:'Preparation, not a diagnosis from your data.',meaning:'Consistent balls, lie and monitor settings make the next test easier to compare.',
     task:'At Golf Lounge 18 Stamford, ask for TrackMan range / Shot Analysis. Hit 8 comfortable wedge and mid-iron shots from the bay mat. Confirm target alignment, supplied balls, normalization and spin setup with staff. Note your current club settings; do not assume older shots used today’s setting. Use only balls and equipment the venue permits.',
     target:'Finish comfortable and record the setup before scoring the tests.'}];
-  for(const c of selected)blocks.push({title:c.title,minutes:10,shots:10,why:c.evidence,meaning:c.meaning,task:simBayTask(c),
+  for(const c of selected)blocks.push({kind:c.kind,title:c.title,minutes:10,shots:10,why:c.evidence,meaning:c.meaning,task:simBayTask(c),
     target:'Record all 10 attempts and the result requested above. Compare with this dated baseline; no promised distance gain.',sourceIndex:c.blocks[0].index,sourceClub:c.blocks[0].club});
   if(!selected.length)blocks.push({title:'Build a reliable baseline',minutes:20,shots:20,why:'No usable shot-level bay day has enough readings for a personal priority yet.',
     meaning:'Summary averages cannot show your shot-to-shot variation.',task:'Use TrackMan range / Shot Analysis from the bay mat. Hit 10 shots with your 7i and 10 with your 5W at one screen target per club. Capture carry, total, face, path and smash readings when available.',target:'Save the shot table, including misses. Missing-distance rows and clear mishits will be excluded from analysis, not silently counted as good attempts.'});
@@ -5984,7 +5985,22 @@ function simBayTask(c){
 }
 function simPracticePlanCard(){
   const p=S.simPracticePlan,valid=p?.version===1&&Array.isArray(p.blocks),done=valid&&Array.isArray(p.done)?p.done:[];
-  return `<section class="card sim-practice" aria-label="Sim practice planner"><h2>Your next sim session</h2><p class="sm">Build a focused session from your latest usable bay day. Same-club shots are combined; this is a data-driven practice test, not a swing diagnosis.</p><button class="btn" data-action="build-sim-practice">${valid?'Rebuild from latest data':'Build my sim practice plan'}</button>${valid?`<p class="sm">Saved on this device · ${p.minutes} minutes · ${p.shots} planned shots · ${done.length}/${p.blocks.length} blocks complete.</p><p class="sm faint">${p.date?`Baseline ${esc(p.date)}: ${p.usable} usable shots; ${p.missing} distance-dash rows and ${p.held} clear mishits excluded. This is the latest day with enough evidence, not necessarily today.`:'Baseline collection plan — more shot-level evidence needed.'} Rebuild replaces this checklist with a fresh plan.</p><div id="sim-practice-blocks" tabindex="-1">${p.blocks.map((b,i)=>`<article class="sim-practice-block" style="border-top:1px solid var(--line);padding:14px 0"><div class="sm faint">${i+1} · ${b.minutes} MIN · ${b.shots} SHOTS</div><h3>${esc(b.title)}</h3><p class="sm"><b>Why this:</b> ${esc(b.why)}</p><details><summary>What the numbers mean</summary><p class="sm">${esc(b.meaning)}</p></details><p class="sm"><b>Do this:</b> ${esc(b.task)}</p><p class="sm"><b>Success measure:</b> ${esc(b.target)}</p>${Number.isInteger(b.sourceIndex)?`<button class="btn" data-action="bay-takeaway-source" data-i="${b.sourceIndex}" data-club="${esc(b.sourceClub)}">See source data</button>`:''}<button class="btn" data-action="toggle-sim-practice" data-i="${i}" aria-pressed="${done.includes(i)}">${done.includes(i)?'✓ Completed':'Mark block complete'}</button></article>`).join('')}</div>`:''}</section>`;
+  const quick=b=>{
+    if(b.title.startsWith('Warm up'))return ['8 easy shots from the bay mat.','Get comfortable; no score yet.'];
+    if(b.title.includes('simulated course'))return ['9 approach shots in TrackMan Target Practice; change the on-screen target.','Log safe landing-area hits out of 9 and each miss direction.'];
+    if(b.title.includes('reliable baseline'))return ['10 shots each with 7i and 5W in TrackMan Shot Analysis.','Save the readings; this becomes your first baseline.'];
+    const club=esc(b.sourceClub||'practice club');
+    const map={
+      'Landing vs finish':[`${club} · 10 shots at the recorded target.`,`Count carry hits out of 10; baseline: ${b.why.match(/\d+\/\d+ finish hits, \d+\/\d+ carry hits/)?.[0]||'see source data'}.`],
+      'Face & path':[`${club} · 10 shots at one screen target.`,`Record face, path and face-to-path; count repeatable start/curve.`],
+      'Strike efficiency':[`${club} · 10 shots at repeatable effort.`,`Record smash factor; compare its range with the baseline.`],
+      'Flight window':[`${club} · 10 shots from the same mat position.`,`Record launch and carry; compare their spread with baseline.`],
+      'Spin consistency':[`${club} · 10 shots; confirm if spin is measured or estimated.`,`Record spin, launch and carry; compare the ranges.`],
+      'Carry control':[`${club} · 10 shots into a chosen on-screen landing window.`,`Count carries within ±10 yd of the window.`]
+    };
+    return map[b.kind]||[`${club} · 10 shots at one screen target.`,`Record the displayed result and compare it with baseline.`];
+  };
+  return `<section class="card sim-practice" aria-label="Sim practice planner"><h2>Your next sim session</h2><p class="sm" style="font:15px/1.45 var(--sans)">A simple session built from your bay data. Same club = one combined baseline.</p><button class="btn" data-action="build-sim-practice">${valid?'Rebuild my plan':'Build my sim practice plan'}</button>${valid?`<p class="sm" style="font:14px/1.45 var(--sans)"><b>${p.minutes} min · ${p.shots} shots</b> · ${done.length}/${p.blocks.length} complete · baseline ${esc(p.date||'collection plan')}</p><details><summary>How this plan was built</summary><p class="sm" style="font:14px/1.45 var(--sans)">${p.date?`${p.usable} usable shots; ${p.missing} dash-only rows and ${p.held} clear mishits excluded. This is the latest day with enough data.`:'Not enough shot data yet; first session builds a baseline.'} Rebuilding replaces this checklist with a fresh plan. No stored shots or carry numbers are changed.</p></details><div id="sim-practice-blocks" tabindex="-1">${p.blocks.map((b,i)=>{const [action,result]=quick(b);return `<article class="sim-practice-block" style="border-top:1px solid var(--line);padding:12px 0;font:15px/1.45 var(--sans)"><div class="sm faint" style="font:12px/1.3 var(--sans)">STEP ${i+1} · ${b.minutes} MIN · ${b.shots} SHOTS</div><h3 style="font:700 20px/1.25 var(--sans);margin:5px 0">${esc(b.title)}</h3><p style="margin:5px 0"><b>Do:</b> ${action}</p><p style="margin:5px 0"><b>Track:</b> ${result}</p><details><summary>Why this · instructions</summary><p class="sm" style="font:14px/1.45 var(--sans)">${esc(b.why)} ${esc(b.meaning)}</p><p class="sm" style="font:14px/1.45 var(--sans)">${esc(b.task)} ${esc(b.target)}</p></details><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${Number.isInteger(b.sourceIndex)?`<button class="btn" data-action="bay-takeaway-source" data-i="${b.sourceIndex}" data-club="${esc(b.sourceClub)}">See baseline</button>`:''}<button class="btn" data-action="toggle-sim-practice" data-i="${i}" aria-pressed="${done.includes(i)}">${done.includes(i)?'✓ Done':'Mark done'}</button></div></article>`;}).join('')}</div>`:''}</section>`;
 }
 function coach(){
   const st = scoreStats();

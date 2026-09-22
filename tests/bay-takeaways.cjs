@@ -61,6 +61,7 @@ assert.equal(plan.blocks.length,5);assert.equal(plan.date,'2026-09-22');
 assert.match(plan.venue,/Stamford/);assert.match(plan.blocks[0].task,/Shot Analysis/);
 assert.equal(new Set(plan.blocks.filter(b=>b.sourceClub).map(b=>b.sourceClub)).size,3);
 assert.ok(plan.blocks.every(b=>b.task&&b.target&&b.meaning&&b.why));
+assert.ok(plan.blocks.find(b=>b.kind==='Face & path').task.includes('face angle, club path and face-to-path'));
 assert.equal(JSON.stringify(T.get()),stateBefore,'generating a plan never mutates source data');
 const savedBays=T.get().bays;T.get().bays=[];
 assert.equal(T.generateSimPracticePlan().date,null);

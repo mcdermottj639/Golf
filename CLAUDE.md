@@ -3041,7 +3041,7 @@ Target-hit numerator/denominator now use the same retained shot IDs as the chart
 
 Validation: importer/arithmetic tests passed, including 80→68→63 count reconciliation and target-hit cohorts; real browser checked at 320/390px with six blocks, correct wedge 6/6 total hits, no horizontal overflow or JS errors. Prior v160 round takeaways regression passed.
 
-## Coach sim practice generator (v166)
+## Coach sim practice generator (v167)
 
 Coach now has a front-facing Build my sim practice plan button, after its hero.
 This generated session is the explicit exception to keeping standing plans in labs.
@@ -3052,6 +3052,9 @@ engine. Show the baseline date and exclusion counts; rebuilding replaces only
 `S.simPracticePlan`, never shots, carries, equipment settings or round data.
 The generated plan and completed-block checklist persist locally and survive navigation.
 Sparse/empty records receive a labelled baseline-collection session.
+Keep the default view scannable: time/shot count, one short "Do" line, one "Track"
+line and a completion action. Put the data interpretation and full TrackMan setup
+instructions in optional expanders; never make Jack read a paragraph to find the drill.
 
 Venue constraint: Golf Lounge 18 Stamford TrackMan indoor bay. Default to range /
 Shot Analysis and on-screen targets from the mat, using permitted balls. No physical
