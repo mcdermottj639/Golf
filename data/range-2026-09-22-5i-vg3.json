@@ -407,5 +407,7 @@
         }
       ]
     }
-  }
+  },
+  "archived": true,
+  "note": "Source table only. These 17 shots are already inside bay-20260922-range-8i-5i. Do not append this file as its own bay."
 }

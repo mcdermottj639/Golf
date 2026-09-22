@@ -2287,10 +2287,15 @@ the bay screenshots did not include it. They did, one swipe past launch directio
 signed millimetres on the shot (down negative). Store the shot, then the remaining mean of
 pure hits. A displayed average that still has the mishit in it is not the live number.
 
-**SEP 22 RANGE is a new bay** (`bay-20260922-range-8i-5i`, `data/range-2026-09-22.json`).
-8-iron 4 shots, target 131, shot 2 worm held out, remaining 102.3 n=3. 5-iron 9 of 10 visible,
-target 153, remaining 123.2. The PW/50° clips on the same phone dump are the Sep 14 Map My Bag
-(113.2 / 99.1) — do not mint a second day for those six-shot groups.
+**SEP 22 RANGE is one bay** (`bay-20260922-range-8i-5i`, `data/range-2026-09-22.json`).
+One visit, about two hours — do not split it into morning and afternoon cards.
+8-iron 4 shots, target 131, shot 2 worm held out, remaining 102.3 n=3.
+5-iron is both tables from that visit (9 on the first, shot 10 off-screen and not invented,
+plus the 17-shot table). Live remaining is the mean of those 26: carry 141.0, dyn loft 22.1°,
+path −3.2°, smash 1.33. The 17-shot table's own screen AVG was 150 / dyn loft 23.4° / path −1.1°;
+that row is stored inside the same 5-iron, not a second day.
+The PW/50° clips on the same phone dump match the Sep 14 Map My Bag six-shot groups
+(113.2 / 99.1) — do not mint a second day for those.
 
 **The ladder says where each number came from, and `meas` is never the authority.** The
 captions render only once SOMETHING on the ladder is measured — before that the gold note
@@ -2399,14 +2404,8 @@ simulator hole-evidence UI stays off rather than drawing an empty ledger.
 
 A rewrite-store snapshot of the same numbers (plus every bay session) lives in
 `data/rewrite/` so a sandbox wipe does not lose them. The PWA does not read that folder.
-
-**Sep 22 afternoon 5-iron (v151).** `bay-20260922-range-5i-vg3`, source
-`data/range-2026-09-22-5i-vg3.json` plus `data/rewrite/vg3-5i-afternoon.json`.
-VG3 table, 17 shots to 153, remaining mean 150.4 (screen AVG row 150 — TrackMan
-averages raw then rounds). Dyn loft 23.4°, path −1.1°, smash 1.33. No mishits
-under the 2/3-median rule. **A new bay**, not a patch on the morning 8-iron/5-iron
-table — that day's 5-iron remaining 123.2 n=9 stays on that card. Rolling
-cumulative weights both.
+The 17-shot 5-iron table is archived at `data/range-2026-09-22-5i-vg3.json` and
+`data/rewrite/vg3-5i-afternoon.json`. It is not its own bay.
 
 
 
