@@ -13,3 +13,35 @@
 .rr-vizlead span{font-family:var(--sans);font-size:9px;font-weight:800;letter-spacing:.13em;color:var(--gtext)}
 .rr-vizlead h3{font-size:19px;margin:5px 0 0}.rr-vizlead p{margin:6px 0 0}
 .rr-frontviz>.btn{width:100%;margin-top:16px}
+
+/* Shared by outdoor scorecards and simulator reviews. */
+.round-takeaways{min-width:0}
+.round-takeaways .rt-card{border-top:3px solid var(--green);padding:15px;margin:12px 0;overflow-wrap:anywhere}
+.rt-kind{font:800 10px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--btext)}
+.rt-card h3{font-size:19px;line-height:1.22;margin:6px 0 9px}
+.rt-card p{font:13px/1.45 var(--sans);margin:9px 0;color:var(--soft)}
+.rt-action{display:grid;gap:4px;padding:10px 12px;border-left:3px solid var(--green);background:var(--bg);margin-top:12px;font:13px/1.4 var(--sans)}
+.rt-action>b{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--gtext)}
+.rt-scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(44px,1fr));gap:4px}
+.rt-hole{display:grid;gap:3px;min-height:44px;align-content:center;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--gtext);font:12px var(--sans);cursor:pointer}
+.rt-hole small{font-size:9px;color:var(--soft)}
+.rt-under{border-bottom:3px solid var(--green)}.rt-bogey{border-bottom:3px solid #bd934a}.rt-double{border-bottom:3px solid var(--burg)}
+.rt-positions{display:flex;flex-wrap:wrap;gap:6px}
+.rt-positions>span{display:grid;gap:3px;flex:1 1 100px;border:1px solid var(--line);border-radius:7px;padding:9px;font:11px var(--sans)}
+.rt-positions small{font-size:10px;color:var(--soft)}
+.rt-plots{padding:8px 10px;border:1px solid var(--line);border-radius:9px;margin-top:10px}
+.rt-plotlabel{display:flex;align-items:baseline;justify-content:space-between;font:11px var(--sans);gap:5px}
+.rt-plotlabel span{font-variant-numeric:tabular-nums;color:var(--soft)}
+.rt-plots svg{width:100%;height:auto;display:block;overflow:visible}
+.rt-plots text{font:9px var(--sans);fill:var(--soft)}
+.rt-axis{stroke:var(--line);stroke-width:2}.rt-zero{stroke:var(--soft);stroke-dasharray:2 3}
+.rt-dot{fill:var(--green);opacity:.7}.rt-mean{fill:var(--burg)}.rt-ref{fill:var(--card);stroke:var(--btext);stroke-width:1.5}
+.rt-key{font:10px/1.3 var(--sans);color:var(--soft);margin-top:5px}
+.rt-links{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.rt-links button{min-height:44px;padding:6px 9px;background:none;border:1px solid var(--line);border-radius:8px;color:var(--gtext);font:700 11px var(--sans);cursor:pointer}
+.rt-source{border-top:1px solid var(--line);margin-top:8px}
+.rt-source summary{min-height:36px;display:flex;align-items:center;font:11px var(--sans);color:var(--soft)}
+.rt-source summary::before{content:'▸';margin-right:6px}.rt-source[open] summary::before{content:'▾'}
+.rt-source p{font-size:11px}
+[data-review-hole]{scroll-margin-top:18px}
+.rt-links button:focus-visible,.rt-hole:focus-visible{outline:2px solid var(--green);outline-offset:2px}

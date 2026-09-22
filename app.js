@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v159';
+const BUILD = 'v160';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v160', d:'2026-09-22', items:[
+    'TAKEAWAYS NOW COME FROM EACH ROUND. Scoring opportunities and club-level face/path, carry, strike, speed, spin and launch readings compete for the strongest cards. Each shows evidence, a visual, a next-session action and links to its holes. Outdoor scorecards get the same scoring engine; sparse records show fewer cards.' ] },
   { b:'v159', d:'2026-09-22', items:[
     'HAZELTINE CLUB PROFILES NOW SHOW THE RECORDED NUMBERS. Each selected club has its own dated range reference, measured round carry, total and path with sample counts. TrackMan club selections are provisional, and mixed-intent shots are not presented as full-swing club distances. Other indoor cards keep their separate evidence rules.',
     'TODAY SHOWS A SIM SCORE beside the outdoor round score: the most recently added complete simulator card and number of full indoor rounds. The nine-hole virtual round stays in Days but does not enter that score line or outdoor metrics.' ] },
@@ -8065,7 +8067,7 @@ function roundView(i){
     <td>${n.putts ?? ''}</td><td>${n.girN ? n.gir : ''}</td><td>${n.fwN ? n.fw : ''}</td></tr>`;
   const rows = [];
   a.holes.forEach((h, idx) => {
-    rows.push(`<tr><td><b>${h.n ?? idx + 1}</b>${h.si ? `<span class="si"> ${h.si}</span>` : ''}${
+    rows.push(`<tr data-review-hole="${h.n ?? idx + 1}"><td><b>${h.n ?? idx + 1}</b>${h.si ? `<span class="si"> ${h.si}</span>` : ''}${
       h.note ? '<span class="nmark" title="You left a note on this hole">✎</span>' : ''}</td>
       <td class="sm">${h.par}</td><td>${mark(h)}</td>
       ${(() => {
@@ -9388,6 +9390,18 @@ const ACTIONS = {
   // which is a navigation and goes through `go`.
   'game-lab': el => { gameLab = el.dataset.disc; rerender(); },
   'open-round': el => render('round', +el.dataset.i),
+  'review-hole': el => {
+    const n=Number(el.dataset.hole);
+    if(!Number.isInteger(n)||n<1||n>18)return;
+    const target=document.querySelector(`details[data-review-hole="${n}"]`)||document.querySelector(`tr[data-review-hole="${n}"]`);
+    if(!target)return;
+    if(target.matches('details'))target.open=true;
+    let parent=target.parentElement;
+    while(parent){if(parent.matches('details'))parent.open=true;parent=parent.parentElement;}
+    const focus=target.querySelector('summary')||target;
+    focus.setAttribute('tabindex','-1');focus.focus({preventScroll:true});
+    target.scrollIntoView({behavior:'smooth',block:'start'});
+  },
   'save-review-identity': el => {
     const shot = document.getElementById('rrshot').value;
     const actualClub = document.getElementById('rrclub').value || null;

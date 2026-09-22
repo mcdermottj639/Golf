@@ -1,7 +1,7 @@
 // Caddie HQ service worker — offline-first cache of the app shell.
-const CACHE = 'caddiehq-v159';  // bump `BUILD` in app.js to match
+const CACHE = 'caddiehq-v160';  // bump `BUILD` in app.js to match
 const ASSETS = ['./', './index.html', './styles.css', './app.js', './lessons.js', './courses-db.js',
-  './course-cards.js', './manifest.webmanifest', './icon.svg', './coach-feed.json', './front9-feed.json', './path-feed.json', './corrections-20260922.json', './round-review.js', './round-review.css'];
+  './course-cards.js', './manifest.webmanifest', './icon.svg', './coach-feed.json', './front9-feed.json', './path-feed.json', './corrections-20260922.json', './round-takeaways.js', './round-review.js', './round-review.css'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

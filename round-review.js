@@ -1,6 +1,7 @@
 /* Simulator review: source-labelled observations, never outdoor statistics or carry authority. */
 (function(root){
   'use strict';
+  const Takeaways=root.CaddieTakeaways||(typeof module!=='undefined'?require('./round-takeaways.js'):null);
   const finite = x => typeof x === 'number' && Number.isFinite(x);
   function esc(x){
     return String(x == null ? '' : x)
@@ -26,6 +27,13 @@
   }[k] || k);
   const bayKey = k => ({'Driver':'driver','5 wood':'5-wood','56° wedge':'56-wedge'}[k] || k);
   function observations(r){ return Array.isArray(r?.review?.shots) ? r.review.shots : []; }
+  function resolvedShots(r,identities={}){
+    const clubMap=r.review?.clubMap||{},intentByShot=r.review?.intentByShot||{};
+    return observations(r).map(s=>s._resolved?s:({...s,
+      actualClub:s.actualClub||clubMap[s.club]||null,
+      intent:s.intent||intentByShot[s.id]||'unknown',
+      ...identities[`${r.feedId}:${s.id}`],_resolved:true}));
+  }
   // Comparison-only filter: never remove observations or change the scorecard.
   // Use recorded carry within this club/round, never planYds or a range baseline.
   function comparisonExclusions(full){
@@ -37,11 +45,8 @@
     return full.filter(s=>s.mishit===true || (cutoff>0 && finite(s.carry) && s.carry>=0 && s.carry<cutoff));
   }
   function profiles(r,bays){
-    const clubMap=r.review?.clubMap||{}, intentByShot=r.review?.intentByShot||{};
     const labelOnly=r.review?.profileMode==='selected-label';
-    const shots=observations(r).map(s=>({...s,
-      actualClub:s.actualClub||clubMap[s.club]||null,
-      intent:s.intent||intentByShot[s.id]||'unknown'}));
+    const shots=resolvedShots(r);
     return (r.review?.availableClubs || [...new Set(shots.map(s=>s.actualClub).filter(Boolean))]).map(club=>{
       // Some older reviews only establish the on-screen club selection. Display those
       // observations as such, without pretending their actual club or intent is known.
@@ -69,17 +74,8 @@
         distance:mean(full.map(s=>s.distance).filter(finite))};
     });
   }
-  function findings(r){
-    const holes=Array.isArray(r.holes)?r.holes:[], doubles=holes.filter(h=>finite(h.s)&&finite(h.par)&&h.s-h.par>=2);
-    const shots=observations(r), paths=shots.filter(s=>!s.flag&&finite(s.path));
-    const neg=paths.filter(s=>s.path<0).length, pos=paths.filter(s=>s.path>0).length;
-    const gir=r.review?.trackman?.gir;
-    const unconfirmed = !r.review?.bagConfirmed;
-    return [
-      {title:`${doubles.length} double-bogey-or-worse holes`,body:`Review holes ${doubles.map(h=>h.n).join(', ') || 'not recorded'}. These identify where scoring became expensive; the card alone cannot tell us whether the cause was contact, strategy or recovery.`,holes:doubles.map(h=>h.n)},
-      {title:gir?`${gir[0]}/${gir[1]} greens in regulation`:'Approach evidence is incomplete',body:'Compare the tee result with the next shot before blaming iron play. A shot from deep rough is not a fair comparison with a range shot. No shot-by-shot strokes-gained estimate is invented.',holes:[]},
-      {title:'Delivery is not one fixed pattern',body:`Among ${paths.length} unflagged captured path readings: ${neg} negative, ${pos} positive, ${paths.length-neg-pos} neutral. This mixes short and long shots and is not a full-swing diagnosis.${unconfirmed ? ' Actual clubs and swing intent remain unconfirmed.' : ''} Judge delivery alongside the result; these readings cannot establish a body-mechanics cause.`,holes:[...new Set(paths.map(s=>s.hole))]}
-    ];
+  function findings(r,bays=[]){
+    return Takeaways?Takeaways.build(r,profiles(r,bays)):[];
   }
   function hub(rounds){
     const rr=(rounds||[]).map((r,i)=>({r,i})).filter(x=>x.r.sim&&x.r.review).sort((a,b)=>b.r.date.localeCompare(a.r.date));
@@ -87,18 +83,13 @@
     return `<h2>Simulator Round Review</h2><div class="card"><p class="sm">Your scoring, shot evidence and next-session test. Separate from outdoor records.</p>${rr.map(({r,i})=>`<button class="linkrow rr-link" data-action="open-round" data-i="${i}"><span><b>${esc(r.course)} · ${esc(r.score)}</b><br><span class="sm faint">${esc(r.date)} · Round Review → club profiles → practice</span></span><span>→</span></button>`).join('')}</div>`;
   }
   function render(r,ctx){
-    if(!r.sim||!r.review)return '';
-    const clubMap=r.review.clubMap||{}, intentByShot=r.review.intentByShot||{};
-    r={...r,review:{...r.review,shots:observations(r).map(s=>({
-      ...s,
-      actualClub:s.actualClub||clubMap[s.club]||null,
-      intent:s.intent||intentByShot[s.id]||'unknown',
-      ...(ctx.identities||{})[`${r.feedId}:${s.id}`]
-    }))}};
+    ctx=ctx||{};
+    r={...r,...(r.review?{review:{...r.review,shots:resolvedShots(r,ctx.identities)}}:{})};
+    if(!r.sim||!r.review)return Takeaways?.render(findings(r,ctx.bays))||'';
     const q=r.review, shots=observations(r), ps=profiles(r,ctx.bays), tm=q.trackman||{};
     const excludedIds=new Set(ps.flatMap(p=>p.excluded.map(s=>s.id)));
     const metric=(v,unit='')=>finite(v)?esc(v)+unit:'—';
-    const f=findings(r);
+    const f=findings(r,ctx.bays);
     const fmtPair=x=>Array.isArray(x)?`${x[0]}/${x[1]}`:'—';
     const key=q.testId||'sim-approach-20';
     const tests=(ctx.tests||[]).filter(t=>t.testId===key);
@@ -134,13 +125,13 @@
       ${puttP}
       ${bayIndex>=0&&!ctx.bayVisuals&&!q.noBay?`<button class="btn" data-action="open-bay" data-i="${bayIndex}">Compare with Sep 14 Bay session</button>`:''}
       <button class="btn" data-action="go" data-view="bag">Open Bag & playing carries</button></div>
-      <h2>Three takeaways · evidence first</h2>${f.map(x=>`<div class="card"><h3>${esc(x.title)}</h3><p class="sm">${esc(x.body)}</p></div>`).join('')}
+      ${Takeaways?.render(f)||''}
       <h2>Club profiles · range versus round</h2><div class="card"><p class="sm">Carry measures the ball in the air. Total distance measures where it finished after rolling. ${r.course==='Spyglass Hill'?'Spyglass Hole 1: 189.4 yd carry, 248 yd total to rough, 300 yd remaining to the hole. ':''}Numbers with no independently captured total stay blank. No carry-gap arithmetic or playing-yardage updates are made from this comparison. ${q.profileMode==='selected-label'?'Hazeltine includes all readable, unflagged shots grouped by the displayed club selection. Club identity and full-swing intent remain unconfirmed; do not treat these as stock distances.':'Comparison averages exclude confirmed mishits and extreme short full shots: carry below two-thirds of the usual cluster for that club in this round, with at least three readings in the cluster. Ordinary misses remain. Partial and unknown-intent shots stay out.'} Every shot still counts toward the score and stays in the history.</p>
       <div class="tscroll"><table><thead><tr><th>Club${q.profileMode==='selected-label'?' selected':''}</th><th>Bay carry yd</th><th>Round carry yd</th><th>${q.distanceMeaning==='total'?'Round total yd':'Shot-list distance yd'}</th><th>Bay path °</th><th>Round path °</th><th>${q.profileMode==='selected-label'?'Observed shots':'Full shots used'}</th></tr></thead><tbody>${ps.map(p=>`<tr><td>${esc(label(p.club))}${p.bayLabel ? `<div class="sm faint">${esc(p.bayLabel)}${p.bay ? ` · n=${p.bay.n}` : " · source pending"}</div>` : ""}</td><td>${num(p.bay?.carry)}</td><td>${num(p.carry)} <small>(n=${p.carryN})</small></td><td>${num(p.distance)} <small>(n=${p.distanceN})</small></td><td>${num(p.bay?.path)}</td><td>${num(p.path)} <small>(n=${p.pathN})</small></td><td>${p.n} / ${p.fullN}${p.excluded.length?`<div class="sm faint">${p.excluded.length} excluded</div>`:''}</td></tr>`).join('')}</tbody></table></div>
       <p class="sm faint">${esc(bayFoot)}</p></div>
       ${q.bagConfirmed?'':`<details class="card"><summary>Optional · identify a shot's actual club</summary><p class="sm">Only correct shots you remember. Your correction is saved separately from the imported label and survives feed updates. Leave the rest unknown.</p><div class="rr-form"><label>Shot<select id="rrshot">${shots.map(s=>`<option value="${esc(s.id)}">H${s.hole} · ${esc(s.club)} label · ${finite(s.distance)?metric(s.distance)+' yd':'total unverified'} · actual ${esc(s.actualClub||'unknown')}</option>`).join('')}</select></label><label>Actual club<select id="rrclub"><option value="">Unknown / clear correction</option>${(q.availableClubs||[]).map(c=>`<option value="${esc(c)}">${esc(label(c))}</option>`).join('')}</select></label><label>Swing intent<select id="rrintent"><option value="unknown">Unknown</option><option value="full">Full swing</option><option value="partial">Partial / chip</option><option value="recovery">Recovery</option></select></label><button class="btn" data-action="save-review-identity" data-round="${esc(r.feedId)}">Save shot identity</button></div></details>`}
       <h2>Hole evidence · inspect the shots</h2><div class="card"><p class="sm faint">${esc(holeIntro)}</p>
-      ${(r.holes||[]).map(h=>`<details class="sect"><summary><b>Hole ${h.n} · ${h.s} on par ${h.par ?? '—'}</b><span class="gist">${shots.filter(s=>s.hole===h.n).length} captured observations</span></summary>${shots.filter(s=>s.hole===h.n).map(s=>`<article class="rr-shot"><h3>${esc(label(s.club))} · ${finite(s.distance)?metric(s.distance, q.distanceMeaning==='total'?' yd total':' yd')+' → ':''}${esc(s.lie||'lie not shown')}</h3><p class="sm">${esc(s.intent||'unknown')} swing intent${s.proximity?` · finishes ${esc(s.proximity)} from hole`:''}${s.restYds!=null?` · ${esc(s.restYds)} yds to hole`:''}</p>${[s.spin,s.carry,s.ftp,s.smash,s.face,s.bs].some(finite)?`<div class="tscroll"><table><thead><tr><th>Spin rpm</th><th>Carry yd</th><th>Face–path °</th><th>Smash</th><th>Face °</th><th>Ball mph</th></tr></thead><tbody><tr>${[s.spin,s.carry,s.ftp,s.smash,s.face,s.bs].map(x=>`<td>${num(x)}</td>`).join('')}</tr></tbody></table></div>`:''}<div class="tscroll"><table><thead><tr><th>Club mph</th><th>Attack °</th><th>Path °</th><th>Face °</th><th>F–P °</th><th>Dynamic loft °</th><th>Spin loft °</th></tr></thead><tbody><tr>${[s.cs,s.aoa,s.path,s.face,finite(s.face)&&finite(s.path)?s.face-s.path:null,s.loft,s.spinLoft].map(x=>`<td>${num(x)}</td>`).join('')}</tr></tbody></table></div>${excludedIds.has(s.id)?`<p class="sm"><b>Excluded from club comparison:</b> ${s.mishit===true?'Confirmed mishit':'Very short full shot'}. Retained in shot history and score.</p>`:''}${s.flag?`<p class="sm"><b>Check reading:</b> ${esc(s.flag)}</p>`:''}<p class="sm faint">${esc(s.source)}</p></article>`).join('')||'<p class="sm">Score captured; no verified shot observation imported for this hole yet.</p>'}</details>`).join('')}</div>
+      ${(r.holes||[]).map(h=>`<details class="sect" data-review-hole="${h.n}"><summary><b>Hole ${h.n} · ${h.s} on par ${h.par ?? '—'}</b><span class="gist">${shots.filter(s=>s.hole===h.n).length} captured observations</span></summary>${shots.filter(s=>s.hole===h.n).map(s=>`<article class="rr-shot"><h3>${esc(label(s.club))} · ${finite(s.distance)?metric(s.distance, q.distanceMeaning==='total'?' yd total':' yd')+' → ':''}${esc(s.lie||'lie not shown')}</h3><p class="sm">${esc(s.intent||'unknown')} swing intent${s.proximity?` · finishes ${esc(s.proximity)} from hole`:''}${s.restYds!=null?` · ${esc(s.restYds)} yds to hole`:''}</p>${[s.spin,s.carry,s.ftp,s.smash,s.face,s.bs].some(finite)?`<div class="tscroll"><table><thead><tr><th>Spin rpm</th><th>Carry yd</th><th>Face–path °</th><th>Smash</th><th>Face °</th><th>Ball mph</th></tr></thead><tbody><tr>${[s.spin,s.carry,s.ftp,s.smash,s.face,s.bs].map(x=>`<td>${num(x)}</td>`).join('')}</tr></tbody></table></div>`:''}<div class="tscroll"><table><thead><tr><th>Club mph</th><th>Attack °</th><th>Path °</th><th>Face °</th><th>F–P °</th><th>Dynamic loft °</th><th>Spin loft °</th></tr></thead><tbody><tr>${[s.cs,s.aoa,s.path,s.face,finite(s.face)&&finite(s.path)?s.face-s.path:null,s.loft,s.spinLoft].map(x=>`<td>${num(x)}</td>`).join('')}</tr></tbody></table></div>${excludedIds.has(s.id)?`<p class="sm"><b>Excluded from club comparison:</b> ${s.mishit===true?'Confirmed mishit':'Very short full shot'}. Retained in shot history and score.</p>`:''}${s.flag?`<p class="sm"><b>Check reading:</b> ${esc(s.flag)}</p>`:''}<p class="sm faint">${esc(s.source)}</p></article>`).join('')||'<p class="sm">Score captured; no verified shot observation imported for this hole yet.</p>'}</details>`).join('')}</div>
       <h2>Next-session test · establish a baseline</h2><div class="card"><h3>20 balls · approach repeatability</h3><p class="sm">10 shots to a 125-yard target and 10 to a 150-yard target. Keep the ball, normalization, target, lie and chosen club for each target the same when repeating. Count shots finishing within 15 yards of each target. Record every attempt; this is a new baseline, not a promised score improvement.</p><button class="btn" data-action="open-lesson" data-id="sim-approach-repeatability">Open practice lesson</button>
       <div class="rr-form"><label>125 yd · successes / 10<input id="rr125" type="number" min="0" max="10" step="1" inputmode="numeric"></label><label>150 yd · successes / 10<input id="rr150" type="number" min="0" max="10" step="1" inputmode="numeric"></label><label>Clubs & conditions<input id="rrconditions" maxlength="200" placeholder="Clubs, ball, normalization, lie"></label><button class="btn" data-action="save-review-test" data-test="${esc(key)}">Save test result</button></div><p class="sm" id="rr-error" role="status"></p>
       ${tests.length?`<div class="tscroll"><table><thead><tr><th>Date</th><th>125 yd</th><th>150 yd</th><th>Conditions</th></tr></thead><tbody>${tests.map(t=>`<tr><td>${esc(t.date)}</td><td>${t.a}/10</td><td>${t.b}/10</td><td>${esc(t.conditions)}</td></tr>`).join('')}</tbody></table></div>`:'<p class="sm faint">No tests logged yet. Repeated tests belong here; reading the lesson is not completing the test.</p>'}</div>

@@ -22,6 +22,7 @@ styles.css            "Scorecard Heritage" theme (cream paper, Masters green, bu
                       chip sheet in its place and Today rendered as unstyled HTML.
 lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
+round-takeaways.js    Shared scoring and club-data insight selection + compact visual cards
 coach-feed.json       One-way "coach inbox" — see Data model below  ← updates land here
 sw.js                 Service worker (offline cache of the shell)
 manifest.webmanifest  PWA manifest;  icon.svg — app icon
@@ -2380,8 +2381,9 @@ unknown because the recording does not establish swing length. User corrections 
 
 Round distance is displayed shot distance, not verified carry. Bay and round distance
 columns stay separate; no carry-gap arithmetic. Face-to-path is derived as face minus path
-only when both are numeric. Path findings describe a mixed-shot subset, not a full-swing
-or body-mechanics diagnosis. Conflicting TrackMan and companion statistics remain separate.
+only when both are numeric. Delivery takeaways now use paired readings within a club,
+with explicitly full shots separated from provisional selected-club observations. Unknown-intent
+wedges and unidentified club labels cannot enter a swing insight. Conflicting TrackMan and companion statistics remain separate.
 The fixed 20-ball approach test is a feed-added Coach lesson; its two integer counts
 (0–10) and required conditions are stored in `S.reviewTests`. Reading the lesson is not
 completing it. Simulator history does not imply a trend or comparable conditions.
@@ -2991,3 +2993,13 @@ Range sessions now show individual measured-shot dots and means for path, face, 
 **v159 Hazeltine and all indoor cards.** The v156 Spyglass repair did not include Hazeltine. Its `noBay:true` blanked every range column, and its source shots have no confirmed actual club or full-swing intent, blanking round columns too. Hazeltine now has `profileMode:'selected-label'`: group the filmed shot observations by their on-screen selected club, retain all unflagged shots without applying the confirmed-full-shot outlier rule, show independent measured carry/total/path averages and per-metric counts. These are descriptive mixed-intent observations, not stock distances or evidence of actual club identity. Explicit per-club `bayClubLinks` point only to the identified dated range blocks; the historical round-wide guard is retired with a new `round-review-update` feed entry for already imported phones. Two-iron has no matching verified bay source and stays blank. Sep22 range timing relative to the round is unknown. The shared renderer no longer places a Spyglass Hole 1 example on other rounds. Spyglass retains verified full-shot comparisons, Ballybunion preserves its historical Mini mapping without borrowing current 3-wood data, and virtual front nine stays carry-only with no invented club baseline. `tests/all-indoor-profiles.cjs` covers all four imported indoor reviews and runs before publication.
 
 Today's Round scores tile now labels its primary score On-course and has a compact Sim figure beside the large score for the most recently added complete 18-hole simulator card (currently Hazeltine 80), with the count of full indoor rounds. The nine-hole virtual front nine remains in Days but is excluded from this figure; none of these sim results alter outdoor metrics. This is insertion order, not a claim about a round's play date (Hazeltine's date is import day). The figure uses the existing score band so the tile does not grow vertically; keep it short at 320px and visually check the full Today block if changing it again.
+
+## Round takeaways (v160)
+
+Jack rejected the three fixed disclaimer cards and asked for scoring AND meaningful face/path and other measured statistics, different for every round. `round-takeaways.js` now derives up to six cards on render: two scoring cards, two delivery cards, and two distinct performance metrics. `round-review.js` passes the current corrected round and `profiles()` output; there is no saved narrative to become stale and no feed migration. Outdoor rounds use the same scoring engine even without simulator review data. Missing score/par data yields fewer cards, never a claim of zero doubles. Do not imply a full card when holes are missing.
+
+Scoring uses known scores and pars, plus recorded adjacent fairway-to-approach observations where available. Double-to-bogey and bogey-to-par savings are labeled scenarios, not predictions or strokes gained. Paired delivery charts use the same path, face and face-to-path readings for one club; if fewer than three pairs exist, an available angular metric with at least three readings can stand alone. Positive means right. Zero for path/face is the target; zero face-to-path is the path. Unknown selected-club records are visibly provisional and have no range delta. Unknown-intent wedges, generic unidentified clubs, partial/recovery shots, and flagged panels stay out. Confirmed full-shot cohorts retain the existing comparison exclusions. User identity overrides are resolved before insights, including explicitly clearing a club.
+
+Carry, smash, club speed, ball speed, launch and spin candidates require at least three readings. Display-selection spread thresholds are 10 yd, .08 smash, 5/8 mph club/ball speed, 3 degrees launch and 1000 rpm spin; these are editorial rules for choosing a notable card, never ideal swing ranges or grades. Dated exact range links can add a reference mean only for confirmed groups; never borrow a later session or mix carry with total. Missing values stay absent. Source/sample details are expandable; each card gives evidence, a plot, a concrete next-session test and buttons that open the actual hole evidence or outdoor scorecard row. `review-hole` opens ancestor details, scrolls and focuses the relevant element without modifying data. The old generic 20-ball test remains available below the new cards.
+
+`tests/round-takeaways.cjs` checks distinct results for all four indoor rounds, outdoor scoring, paired counts, missing/zero/partial data, exclusions, all six metric types, linked source safeguards and no record mutation. The module is loaded before round-review and cached with the PWA. Run that test in the publish workflow and verify the real hole buttons and 320/390 layouts in Chromium.

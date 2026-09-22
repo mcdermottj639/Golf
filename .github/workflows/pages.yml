@@ -28,6 +28,7 @@ jobs:
         run: |
           node --check app.js
           node --check round-review.js
+          node --check round-takeaways.js
           node -e "for (const f of ['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"
           node tests/findability.cjs
           node tests/sep22-migration.cjs
@@ -39,6 +40,7 @@ jobs:
           node tests/round-comparison-mishits.cjs
           node tests/spyglass-shot-distance.cjs
           node tests/all-indoor-profiles.cjs
+          node tests/round-takeaways.cjs
           node tests/round-identity.cjs
           node tests/round-review-import.cjs
       - name: Mirror main to gh-pages
