@@ -3025,6 +3025,23 @@ Carry, smash, club speed, ball speed, launch and spin candidates require at leas
 
 ## September 22 complete range session (v161)
 
+### Wood peak heights added September 23 (v171)
+
+`range-20260922-feed.json` appends `bay-shot-heights` to the original bay ID.
+It patches the imported shot rows on existing phones and fresh installs, by
+club + target + shot number; retry if the original day has not arrived yet.
+3W at 206 yd: #1–7 heights 31′, 44′10″, 41′11″, 32′4″, 29′9″, 33′8″,
+63′11″. Live apex 39.6 ft, n=7. 5W at 202 yd: retained #1 56′11″,
+#2 17′6″, #4 51′4″, #6 57′10″, #7 37′7″. Live apex 44.2 ft, n=5
+(not the n=7 carry sample). The photographed 5W #3,5,8,9 have height but
+no carry or total; preserve the screenshot readings in the correction audit,
+do not add them to live shot data. #10–12 heights were outside the supplied
+crop: blank, including the excluded #10 carry mishit. Neither screenshot
+establishes the woods' sleeve settings for this session. Do not label the
+measured apex as an A3-versus-B7 or 5W-loft result. `tests/range-apex.cjs`
+checks old-device migration, counts and exact values; browser check verifies
+the combined day Exact Club Data at 320/390 px.
+
 Two recordings `18-46-05` and `18-50-03` for Sep22 reconcile to 80 source
 shots: 56° n6, 7i n15, 5i target165 n14, 3W n7, 5W n12, 5i target170 n26.
 Audited transcripts: `data/range-2026-09-22-184605.json` and

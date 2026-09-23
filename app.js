@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v170';
+const BUILD = 'v171';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v171', d:'2026-09-23', items:['SEP 22 WOOD HEIGHTS: Exact Club Data now carries each visible 3W and retained 5W peak-height reading. The APEX FT column shows the measured average and its own sample count; distance-dash rows and unshown 5W shots stay blank.'] },
   { b:'v170', d:'2026-09-23', items:['BAY STATS NOW LIVE INSIDE THE NUMBERS: the latest reviewed range day shows usable shots, club coverage, mean path and mean face-to-path without entering outdoor scoring. Tap the strip for the full cumulative plan, club histories and evidence.'] },
   { b:'v169', d:'2026-09-23', items:['COACH PRACTICE NOW CONNECTS YOUR NUMBERS TO THE DRILL: plain-English evidence, an exact TrackMan test and a place to save its outcome. Existing saved plans get the right club-specific instructions without rebuilding. Repeated dated bay signals and scored simulator-round context guide priorities without inventing a swing cause.'] },
   { b:'v168', d:'2026-09-23', items:['BOTTOM NAV SIMPLIFIED: Tee was removed. Today, Bag, Game, Rounds and Coach now share the bar evenly; start or resume a round from Today or Round Prep.'] },
@@ -10622,6 +10623,21 @@ function applyFeed(feed){
         const detail = e.bay.detail ? { ...(b.detail || {}), ...e.bay.detail } : b.detail;
         Object.assign(b, e.bay);
         if(e.bay.detail) b.detail = detail;
+      }
+    }
+    // Add newly photographed shot-height columns to an already-imported range day.
+    // Match both the club and target, and never give a distance-dash row a live height.
+    else if(e.type === 'bay-shot-heights'){
+      const b = S.bays.find(x => x._fid === e.target);
+      if(!b || !Array.isArray(b.detail?.rangeShots)) return;
+      for(const patch of e.groups || []){
+        const group = b.detail.rangeShots.find(g => g.club === patch.club && g.target === patch.target);
+        if(!group) continue;
+        for(const [number, height] of patch.readings || []){
+          const shot = group.shots?.find(s => s.shot === number);
+          if(shot && (shot.carry != null || shot.total != null) && apexFeet(height) != null)
+            shot.height = height;
+        }
       }
     }
     else if(e.type === 'bay-remove') S.bays = S.bays.filter(x => !(e.target && x._fid === e.target));

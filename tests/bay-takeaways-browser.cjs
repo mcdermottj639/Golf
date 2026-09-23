@@ -8,7 +8,7 @@ const server=http.createServer((q,r)=>{const file=path.join(root,q.url.split('?'
  try{
   const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
-  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').bays?.some(b=>b._fid==='bay-20260922-range-184605-batch1'));
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('bay-20260922-wood-peak-heights-20260923'));
   const idx=await page.evaluate(()=>JSON.parse(localStorage.getItem('caddiehq_v1')).bays.findIndex(b=>b._fid==='bay-20260922-range-184605-batch1'));
   await page.locator('[data-action="session-category"][data-kind="days"]').first().click();
   await page.locator(`[data-action="open-bay"][data-i="${idx}"]`).first().click();
@@ -17,6 +17,16 @@ const server=http.createServer((q,r)=>{const file=path.join(root,q.url.split('?'
   assert.equal(await page.locator('.range-evidence-club[data-club="5-iron"]').count(),1);
   assert.equal(await page.locator('.range-evidence-club[data-club="7-iron"]').count(),1);
   assert.equal(await page.locator('.range-evidence-club').count(),5);
+  const exact=await page.locator('.bay-clubs').innerText();
+  assert.match(exact,/APEX FT/);
+  assert.match(exact,/39\.6 n=7/);
+  assert.match(exact,/44\.2 n=5/);
+  const three=page.locator('.sect').filter({has:page.locator('summary b', {hasText:'3-wood · 7'})}).last();
+  await three.locator('summary').click();
+  assert.match(await three.innerText(),/63'11"/);
+  const five=page.locator('.sect').filter({has:page.locator('summary b', {hasText:'5-wood · 7'})}).last();
+  await five.locator('summary').click();
+  assert.match(await five.innerText(),/56'11"/);
   for(const width of [320,390]){
     await page.setViewportSize({width,height:844});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
