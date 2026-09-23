@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v168';
+const BUILD = 'v169';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v169', d:'2026-09-23', items:['COACH PRACTICE NOW CONNECTS YOUR NUMBERS TO THE DRILL: plain-English evidence, an exact TrackMan test and a place to save its outcome. Existing saved plans get the right club-specific instructions without rebuilding. Repeated dated bay signals and scored simulator-round context guide priorities without inventing a swing cause.'] },
   { b:'v168', d:'2026-09-23', items:['BOTTOM NAV SIMPLIFIED: Tee was removed. Today, Bag, Game, Rounds and Coach now share the bar evenly; start or resume a round from Today or Round Prep.'] },
   { b:'v167', d:'2026-09-22', items:['SIM PLANS NOW SCAN FAST: each block leads with club, shot count, a short instruction and a clear result to record. Why/details are optional expanders; baseline and exclusions no longer crowd the plan.'] },
   { b:'v166', d:'2026-09-22', items:['COACH NOW BUILDS YOUR SIM PRACTICE PLAN: a warm-up, up to three data-backed priorities and a transfer challenge, with clear targets and a saved checklist. Rebuild when new bay data arrives. Repairs the damaged app script while preserving the 3W A3 setting and adjustment chart.'] },
@@ -5947,12 +5948,13 @@ function futureFitReference(f){
 function generateSimPracticePlan(){
   const api=window.CaddieBayTakeaways;
   const dates=[...new Set((S.bays||[]).filter(b=>BAY_DISC(b)==='swing'&&b.date).map(b=>b.date))].sort().reverse();
-  let day=null,cards=[];
-  if(api)for(const date of dates){
-    const candidate=bayDayData((S.bays||[]).find(b=>b.date===date&&BAY_DISC(b)==='swing'));
-    const found=api.build(candidate);
-    if(found.length){day=candidate;cards=found;break;}
-  }
+  const dayCards=[];
+  if(api)for(const date of dates){const candidate=bayDayData((S.bays||[]).find(b=>b.date===date&&BAY_DISC(b)==='swing'));
+    const found=api.build(candidate);if(found.length)dayCards.push({day:candidate,cards:found});}
+  const day=dayCards[0]?.day||null;
+  const cards=(dayCards[0]?.cards||[]).map(c=>({...c,
+    earlier:dayCards.slice(1).filter(d=>d.cards.some(x=>x.kind===c.kind&&x.blocks[0].canon===c.blocks[0].canon)).map(d=>d.day.date)}))
+    .sort((a,b)=>(b.earlier.length?1:0)-(a.earlier.length?1:0)||b.score-a.score);
   const selected=[],clubs=new Set();
   for(const c of cards){const club=c.blocks[0].canon;if(clubs.has(club))continue;clubs.add(club);selected.push(c);if(selected.length===3)break;}
   const blocks=[{title:'Warm up and confirm the setup',minutes:5,shots:8,
@@ -5960,10 +5962,17 @@ function generateSimPracticePlan(){
     task:'At Golf Lounge 18 Stamford, ask for TrackMan range / Shot Analysis. Hit 8 comfortable wedge and mid-iron shots from the bay mat. Confirm target alignment, supplied balls, normalization and spin setup with staff. Note your current club settings; do not assume older shots used today’s setting. Use only balls and equipment the venue permits.',
     target:'Finish comfortable and record the setup before scoring the tests.'}];
   for(const c of selected)blocks.push({kind:c.kind,title:c.title,minutes:10,shots:10,why:c.evidence,meaning:c.meaning,task:simBayTask(c),
-    target:'Record all 10 attempts and the result requested above. Compare with this dated baseline; no promised distance gain.',sourceIndex:c.blocks[0].index,sourceClub:c.blocks[0].club});
+    target:'Record all 10 attempts and the result requested above. Compare with this dated baseline; no promised distance gain.',sourceIndex:c.blocks[0].index,sourceClub:c.blocks[0].club,
+    targetYds:c.blocks[0].target,earlier:c.earlier,baseline:{shots:c.blocks[0].shots.length,
+      carryHits:c.blocks[0].carryHits?.length??null,totalHits:c.blocks[0].totalHits?.length??null,
+      smash:c.rows.find(r=>r.label==='Smash factor')?.values||null,
+      ftp:c.rows.find(r=>r.label==='Face–path')?.values||null}});
   if(!selected.length)blocks.push({title:'Build a reliable baseline',minutes:20,shots:20,why:'No usable shot-level bay day has enough readings for a personal priority yet.',
     meaning:'Summary averages cannot show your shot-to-shot variation.',task:'Use TrackMan range / Shot Analysis from the bay mat. Hit 10 shots with your 7i and 10 with your 5W at one screen target per club. Capture carry, total, face, path and smash readings when available.',target:'Save the shot table, including misses. Missing-distance rows and clear mishits will be excluded from analysis, not silently counted as good attempts.'});
-  blocks.push({title:'Take it onto the simulated course',minutes:10,shots:9,why:'Transfer test: can you repeat the practice result when the target changes?',
+  const lastSim=(S.rounds||[]).filter(r=>r.sim&&Array.isArray(r.holes)&&r.holes.some(h=>Number.isFinite(h.s)&&Number.isFinite(h.par))).sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];
+  const scored=lastSim?.holes.filter(h=>Number.isFinite(h.s)&&Number.isFinite(h.par))||[];
+  const doubles=scored.filter(h=>h.s-h.par>=2).length;
+  blocks.push({title:'Take it onto the simulated course',minutes:10,shots:9,why:scored.length?`Last scored simulator round (${lastSim.date||'date unrecorded'}): ${doubles} double-or-worse holes out of ${scored.length} scored. This does not identify a club or swing cause.`:'Transfer test: can you repeat the practice result when the target changes?',
     meaning:'A predictable landing result matters more than a finish rescued by roll. This is a practice score, not your handicap.',
     task:'In TrackMan Target Practice, change the screen target between 9 approach attempts, rotating the clubs you just practised. If that mode is unavailable, stay in range / Shot Analysis and change the target distance there. If staff confirm Performance Center is enabled, its randomized approach targets are an optional substitute. Choose the landing area first. Use the mat, one ball and your full routine; count every attempt, including mishits. No physical bunker, rough, putting green or special training aids required.',
     target:'Record safe landing-area hits out of 9, plus short / long / left / right misses. Use this first score as the baseline to beat next time.'});
@@ -5980,7 +5989,7 @@ function simBayTask(c){
   };
   return 'TrackMan range / Shot Analysis: '+(tasks[c.kind]||c.action)+' Keep missing tiles blank. If a required metric is unavailable, score carry within ±10 yd of your chosen target instead and label it a carry test.';
 }
-function simPracticePlanCard(){
+function simPracticePlanCardLegacy(){
   const p=S.simPracticePlan,valid=p?.version===1&&Array.isArray(p.blocks),done=valid&&Array.isArray(p.done)?p.done:[];
   const quick=b=>{
     if(b.title.startsWith('Warm up'))return ['8 easy shots from the bay mat.','Get comfortable; no score yet.'];
@@ -5998,6 +6007,59 @@ function simPracticePlanCard(){
     return map[b.kind]||[`${club} · 10 shots at one screen target.`,`Record the displayed result and compare it with baseline.`];
   };
   return `<section class="card sim-practice" aria-label="Sim practice planner"><h2>Your next sim session</h2><p class="sm" style="font:15px/1.45 var(--sans)">A simple session built from your bay data. Same club = one combined baseline.</p><button class="btn" data-action="build-sim-practice">${valid?'Rebuild my plan':'Build my sim practice plan'}</button>${valid?`<p class="sm" style="font:14px/1.45 var(--sans)"><b>${p.minutes} min · ${p.shots} shots</b> · ${done.length}/${p.blocks.length} complete · baseline ${esc(p.date||'collection plan')}</p><details><summary>How this plan was built</summary><p class="sm" style="font:14px/1.45 var(--sans)">${p.date?`${p.usable} usable shots; ${p.missing} dash-only rows and ${p.held} clear mishits excluded. This is the latest day with enough data.`:'Not enough shot data yet; first session builds a baseline.'} Rebuilding replaces this checklist with a fresh plan. No stored shots or carry numbers are changed.</p></details><div id="sim-practice-blocks" tabindex="-1">${p.blocks.map((b,i)=>{const [action,result]=quick(b);return `<article class="sim-practice-block" style="border-top:1px solid var(--line);padding:12px 0;font:15px/1.45 var(--sans)"><div class="sm faint" style="font:12px/1.3 var(--sans)">STEP ${i+1} · ${b.minutes} MIN · ${b.shots} SHOTS</div><h3 style="font:700 20px/1.25 var(--sans);margin:5px 0">${esc(b.title)}</h3><p style="margin:5px 0"><b>Do:</b> ${action}</p><p style="margin:5px 0"><b>Track:</b> ${result}</p><details><summary>Why this · instructions</summary><p class="sm" style="font:14px/1.45 var(--sans)">${esc(b.why)} ${esc(b.meaning)}</p><p class="sm" style="font:14px/1.45 var(--sans)">${esc(b.task)} ${esc(b.target)}</p></details><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${Number.isInteger(b.sourceIndex)?`<button class="btn" data-action="bay-takeaway-source" data-i="${b.sourceIndex}" data-club="${esc(b.sourceClub)}">See baseline</button>`:''}<button class="btn" data-action="toggle-sim-practice" data-i="${i}" aria-pressed="${done.includes(i)}">${done.includes(i)?'✓ Done':'Mark done'}</button></div></article>`;}).join('')}</div>`:''}</section>`;
+}
+function simPracticeKind(b){
+  if(b.kind)return b.kind;
+  const title=String(b.title||'');
+  if(/finish hits.*carry hits/i.test(title))return 'Landing vs finish';
+  if(/face.to.path|open to path|closed to path/i.test(title))return 'Face & path';
+  if(/smash/i.test(title))return 'Strike efficiency';
+  if(/launch/i.test(title))return 'Flight window';
+  if(/spin/i.test(title))return 'Spin consistency';
+  if(/carry.*(spread|yd)/i.test(title))return 'Carry control';
+  return '';
+}
+function simPracticeFocus(b){
+  const kind=simPracticeKind(b),club=b.sourceClub||String(b.title||'').split(':')[0],title=String(b.title||'');
+  if(title.startsWith('Warm up'))return {heading:'Get loose and set the bay',evidence:'This is a warm-up, not a scored result.',test:'8 easy shots from the mat; confirm target and ball/monitor setup.',track:'Ready to start the three scored tests.'};
+  if(title.includes('simulated course'))return {heading:'Take it onto the simulator',evidence:b.why||'This tests whether practice transfers when targets change.',test:'9 approaches at changing on-screen targets; count every attempt.',track:'Safe landing-area hits out of 9.',input:'count',max:9};
+  if(title.includes('reliable baseline'))return {heading:'Build a shot-level baseline',evidence:'There are not enough usable shots to choose a personal priority.',test:'10 shots each with 7i and 5W in Shot Analysis.',track:'Save the shot table; record misses too.'};
+  const target=b.targetYds??Number(b.why?.match(/target (\d+) yd/i)?.[1]);
+  const hits=b.baseline?.carryHits!=null?b.baseline.carryHits:Number(title.match(/(\d+)\/\d+ carry hits/i)?.[1]);
+  const n=b.baseline?.shots||Number(title.match(/\d+\/(\d+) carry hits/i)?.[1]);
+  const finished=b.baseline?.totalHits!=null?b.baseline.totalHits:Number(title.match(/(\d+)\/\d+ finish hits/i)?.[1]);
+  if(kind==='Landing vs finish')return {heading:`${club} · Practise the landing`,evidence:Number.isFinite(hits)&&Number.isFinite(n)&&Number.isFinite(finished)?`${hits}/${n} landed in the target zone; ${finished}/${n} finished there after roll. The finish can hide a short landing.`:title,
+    test:`Hit 10 ${club} shots at the ${Number.isFinite(target)?target+' yd':'recorded'} on-screen target. Score where each ball lands, not where it rolls.`,track:'Carry-zone landings out of 10.',input:'count',max:10,baseline:Number.isFinite(hits)&&Number.isFinite(n)?`${hits}/${n} before`:''};
+  if(kind==='Face & path'){
+    const xs=b.baseline?.ftp,open=xs?.filter(x=>x>.05).length,nPairs=xs?.length;
+    const match=title.match(/open to path on (\d+)\/(\d+)/i);
+    const face=b.why?.match(/face-to-path ([+−-]?\d+(?:\.\d+)?)°/i)?.[1];
+    return {heading:`${club} · Repeat your start line`,evidence:`${open??match?.[1]??'Some'} of ${nPairs??match?.[2]??'the'} paired shots had the face open to the club path${face?` (average ${face}°)`:''}. This describes face versus path, not the number of bad shots.`,
+      test:`Hit 10 ${club} shots at one on-screen target with one intended start and curve. Display face, path and face-to-path.`,track:'Count shots that repeat your intended start and curve; do not chase zero face-to-path.',input:'count',max:10};
+  }
+  if(kind==='Strike efficiency'){
+    const xs=b.baseline?.smash,lo=xs?.length?Math.min(...xs):Number(title.match(/smash (\d+\.\d+)/i)?.[1]),hi=xs?.length?Math.max(...xs):Number(title.match(/smash \d+\.\d+[–-](\d+\.\d+)/i)?.[1]);
+    return {heading:`${club} · Make contact repeatable`,evidence:Number.isFinite(lo)&&Number.isFinite(hi)?`Smash factor ranged ${lo.toFixed(2)}–${hi.toFixed(2)}. That is ball speed divided by club speed; the spread shows variable speed transfer, not where the face was struck.`:title,
+      test:`Hit 10 ${club} shots at steady effort. Display club speed, ball speed and smash.`,track:'Enter your lowest and highest smash readings to compare the range.',input:'range',baseline:Number.isFinite(lo)&&Number.isFinite(hi)?`${(hi-lo).toFixed(2)} prior spread`:''};
+  }
+  const other={
+    'Carry control':[` ${club} · Tighten the landing distance`,'Carry is flight through the air; the reported spread describes front-to-back variation.',`Hit 10 ${club} shots at one on-screen distance.`,`Count carries within ±10 yd of that distance.`,'count'],
+    'Flight window':[` ${club} · Repeat your flight window`,'Launch variation can change carry; no ideal launch is established from this data.',`Hit 10 ${club} shots from the same mat position. Display launch and carry.`,`Enter the lowest and highest launch angles; compare the spread.`,'range'],
+    'Spin consistency':[` ${club} · Check spin consistency`,'Spin spread affects flight alongside speed and launch; measurement may be estimated.',`Hit 10 ${club} shots with one ball/setup. Display spin and launch.`,`Enter your lowest and highest rpm; compare the spread.`,'range']};
+  const item=other[kind];
+  return item?{heading:item[0].trim(),evidence:`${b.why||title} ${item[1]}`,test:item[2],track:item[3],input:item[4],max:10}:{heading:title,evidence:b.why||'Record more shot data to refine this focus.',test:b.task||'Hit 10 shots at one on-screen target.',track:b.target||'Record the result.'};
+}
+function simPracticePlanCard(){
+  const p=S.simPracticePlan,valid=p?.version===1&&Array.isArray(p.blocks),done=valid&&Array.isArray(p.done)?p.done:[];
+  const renderResult=(b,f)=>{
+    const r=b.result;if(!r)return '';
+    if(f.input==='range'){
+      const diff=Number(r.high)-Number(r.low),base=f.baseline?` · ${f.baseline}`:'';
+      return `<p class="sm" style="font:14px/1.45 var(--sans)"><b>Saved:</b> ${esc(r.low)}–${esc(r.high)} · ${Number.isFinite(diff)?diff.toFixed(2):'—'} spread${esc(base)}. Different setups or small samples can change this.</p>`;
+    }
+    return `<p class="sm" style="font:14px/1.45 var(--sans)"><b>Saved:</b> ${esc(r.count)}/${f.max}${f.baseline?` · ${esc(f.baseline)}`:''}. A single short test is not proof of improvement.</p>`;
+  };
+  return `<section class="card sim-practice" aria-label="Sim practice planner"><h2>Your next sim session</h2><p class="sm">Your recorded numbers → one TrackMan test → a result you can save.</p><button class="btn" data-action="build-sim-practice">${valid?'Build a new plan':'Build my sim practice plan'}</button>${valid?`<p class="sm"><b>${p.minutes} min · ${p.shots} shots</b> · ${done.length}/${p.blocks.length} steps done · baseline ${esc(p.date||'collection day')}</p><details><summary>Data and exclusions</summary><p class="sm">${p.date?`${p.usable} usable shots; ${p.missing} dash-only rows and ${p.held} clear mishits excluded from analysis.`:'Not enough usable shots; first collect a baseline.'} Scored practice still counts all attempts. Building a new plan archives this one if you recorded work.</p></details><div id="sim-practice-blocks" tabindex="-1">${p.blocks.map((b,i)=>{const f=simPracticeFocus(b),completed=done.includes(i);return `<article class="sim-practice-block" id="sim-practice-${i}" style="border-top:1px solid var(--line);padding:14px 0;font:15px/1.45 var(--sans)"><div class="sm faint" style="font:12px/1.3 var(--sans)">STEP ${i+1} · ${b.minutes} MIN · ${b.shots} SHOTS</div><h3 style="font:700 20px/1.25 var(--sans);margin:5px 0">${esc(f.heading)}</h3><p style="margin:8px 0"><b>Your numbers:</b> ${esc(f.evidence)}${b.earlier?.length?` <span class="sm">Also flagged on ${esc(b.earlier.join(', '))}; setups may differ.</span>`:''}</p><p style="margin:8px 0"><b>Try:</b> ${esc(f.test)}</p><p style="margin:8px 0"><b>Record:</b> ${esc(f.track)}</p>${renderResult(b,f)}${f.input?`<div class="sim-practice-entry" style="display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin:9px 0">${f.input==='count'?`<label style="font:14px var(--sans)">Hits out of ${f.max}<br><input data-sim-field="count" type="number" inputmode="numeric" min="0" max="${f.max}" step="1" value="${b.result?.count??''}" style="width:90px"></label>`:`<label style="font:14px var(--sans)">Low<br><input data-sim-field="low" type="number" inputmode="decimal" step="any" value="${b.result?.low??''}" style="width:90px"></label><label style="font:14px var(--sans)">High<br><input data-sim-field="high" type="number" inputmode="decimal" step="any" value="${b.result?.high??''}" style="width:90px"></label>`}<button class="btn" data-action="save-sim-practice" data-i="${i}">Save result</button></div>`:''}<details><summary>Full instructions & limits</summary><p class="sm">${esc(b.task)} ${esc(b.meaning)} ${esc(b.target)}</p></details><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${Number.isInteger(b.sourceIndex)?`<button class="btn" data-action="bay-takeaway-source" data-i="${b.sourceIndex}" data-club="${esc(b.sourceClub)}">See original shots</button>`:''}<button class="btn" data-action="toggle-sim-practice" data-i="${i}" aria-pressed="${completed}">${completed?'✓ Done':'Mark done'}</button></div></article>`;}).join('')}</div><details><summary>Previous saved sessions</summary>${(S.simPracticeHistory||[]).slice(-5).reverse().map(h=>`<p class="sm">${esc(h.date||'Baseline')} · ${(h.blocks||[]).filter(b=>b.result).length} test results · ${(h.done||[]).length} steps completed</p>`).join('')||'<p class="sm">None yet.</p>'}</details>`:''}</section>`;
 }
 function coach(){
   const st = scoreStats();
@@ -9993,8 +10055,30 @@ const ACTIONS = {
   'open-session': el => render('session', el.dataset.i),
   'open-bay': el => render('bay', el.dataset.i),
   'build-sim-practice': () => {
+    if(S.simPracticePlan?.blocks?.some(b=>b.result)||S.simPracticePlan?.done?.length){
+      S.simPracticeHistory=[...(S.simPracticeHistory||[]),S.simPracticePlan].slice(-20);
+    }
     S.simPracticePlan=generateSimPracticePlan();save();render('coach');
     document.getElementById('sim-practice-blocks')?.focus();
+  },
+  'save-sim-practice': el => {
+    const p=S.simPracticePlan,i=Number(el.dataset.i),b=p?.blocks?.[i];
+    if(!Number.isInteger(i)||!b)return;
+    const f=simPracticeFocus(b),box=el.closest('.sim-practice-block');
+    if(f.input==='count'){
+      const input=box?.querySelector('[data-sim-field="count"]'),raw=input?.value.trim(),n=Number(raw);
+      if(!raw||!Number.isInteger(n)||n<0||n>f.max){toast(`Enter a whole number from 0 to ${f.max}`);input?.focus();return;}
+      b.result={count:n,savedAt:new Date().toISOString()};
+    }else if(f.input==='range'){
+      const lowEl=box?.querySelector('[data-sim-field="low"]'),highEl=box?.querySelector('[data-sim-field="high"]');
+      const lo=lowEl?.value.trim(),hi=highEl?.value.trim(),low=Number(lo),high=Number(hi);
+      const limits=simPracticeKind(b)==='Strike efficiency'?[0,2.5]:simPracticeKind(b)==='Spin consistency'?[0,20000]:[-20,90];
+      if(!lo||!hi||!Number.isFinite(low)||!Number.isFinite(high)||low<limits[0]||high>limits[1]||high<low){toast('Enter the recorded low and high, in order');lowEl?.focus();return;}
+      b.result={low,high,savedAt:new Date().toISOString()};
+    }else return;
+    const done=new Set(p.done||[]);done.add(i);p.done=[...done];save();render('coach');
+    document.getElementById(`sim-practice-${i}`)?.scrollIntoView({block:'center'});
+    toast('Result saved on this device');
   },
   'toggle-sim-practice': el => {
     const p=S.simPracticePlan,i=Number(el.dataset.i);

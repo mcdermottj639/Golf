@@ -3045,7 +3045,7 @@ Target-hit numerator/denominator now use the same retained shot IDs as the chart
 
 Validation: importer/arithmetic tests passed, including 80→68→63 count reconciliation and target-hit cohorts; real browser checked at 320/390px with six blocks, correct wedge 6/6 total hits, no horizontal overflow or JS errors. Prior v160 round takeaways regression passed.
 
-## Coach sim practice generator (v167)
+## Coach sim practice generator (v169)
 
 Coach now has a front-facing Build my sim practice plan button, after its hero.
 This generated session is the explicit exception to keeping standing plans in labs.
@@ -3060,6 +3060,21 @@ Keep the default view scannable: time/shot count, one short "Do" line, one "Trac
 line and a completion action. Put the data interpretation and full TrackMan setup
 instructions in optional expanders; never make Jack read a paragraph to find the drill.
 
+v169 uses the same recent dated bay cohort but connects each priority to a clear
+plain-English metric, a club-specific TrackMan test, and a validated outcome input.
+Previously saved v166/v167 plans lacked `kind`; `simPracticeKind` recovers it from
+the evidence title without discarding their checklist. Landing checkmarks count
+carry-versus-finish at the recorded target; face-to-path open frequency is not a
+count of bad shots, and smash spread is not a diagnosis of impact location.
+Numeric outcomes (0–10 or 0–9 hits; observed low/high readings) persist in the
+plan and remain editable. A rebuilt plan archives completed work locally (up to
+20 prior sessions), preserving original shots. Earlier dated bay flags boost a
+priority only if the same canonical club and insight type recur; they do not
+imply matching conditions or an improvement trend. A latest scored simulator
+round supplies transfer context only from known score/par hole pairs, never
+attributes a miss to an unconfirmed club. No on-course and simulator scores are
+mixed into the range averages. Do not use a scored short test as proof of a
+swing fix. Full instructions remain expandable and screen-reader-labelled.
 Venue constraint: Golf Lounge 18 Stamford TrackMan indoor bay. Default to range /
 Shot Analysis and on-screen targets from the mat, using permitted balls. No physical
 gates, bunker/rough practice, putting green, impact camera or extra aids required.
