@@ -18,7 +18,15 @@ const server=http.createServer((q,r)=>{
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').rounds?.some(r=>r.course==='Hazeltine National'&&r.review?.profileMode==='selected-label'));
 
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('bay-20260922-range-184605-batch1'));
-  await page.locator('[data-action="session-category"][data-kind="cumulative"]').first().click();
+  const bay=page.locator('.baynums');
+  await bay.waitFor();
+  assert.match(await bay.innerText(),/THE BAY[\s\S]*USABLE SHOTS[\s\S]*MEAN PATH[\s\S]*FACE.PATH/i);
+  for(const width of [320,390]){
+    await page.setViewportSize({width,height:844});
+    assert.ok(await bay.evaluate(x=>x.scrollWidth<=x.clientWidth),'Today bay strip overflow '+width);
+    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Today page overflow '+width);
+  }
+  await bay.click();
   await page.locator('#cum-plan').waitFor();
   assert.ok(await page.locator('.cum-club').count()>5);
   for(const width of [320,390]){

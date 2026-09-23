@@ -87,6 +87,24 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 .nums h2{margin:5px 0 2px}
 .nums .rowgrid{margin:2px 0}
 .nums .charttile{padding-top:5px;padding-bottom:4px}
+.baynums{display:block;width:100%;margin:8px 0 0;padding:9px 11px 8px;text-align:left;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:4px solid var(--burg);
+  border-radius:var(--r);box-shadow:var(--shadow);font:inherit;cursor:pointer}
+.baynums-head{display:flex;align-items:center;gap:7px;font-family:var(--sans);font-size:10px;
+  line-height:1;text-transform:uppercase;letter-spacing:.1em;color:var(--btext)}
+.baynums-head b{display:flex;align-items:center;gap:5px}
+.baynums-head em{margin-left:auto;font-style:normal;color:var(--faint);letter-spacing:.05em}
+.baynums-head i{font:normal 15px/1 var(--serif);color:var(--gtext)}
+.baynums-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:7px}
+.baynums-grid>span{min-width:0;border-right:1px solid var(--line);padding-right:5px}
+.baynums-grid>span:last-child{border-right:none;padding-right:0}
+.baynums-grid b{display:block;font-family:var(--serif);font-size:18px;line-height:1;color:var(--gtext);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.baynums-grid small{display:block;min-height:19px;margin-top:3px;font-family:var(--mono);font-size:8.5px;line-height:1.1;
+  text-transform:uppercase;letter-spacing:.03em;color:var(--faint);overflow-wrap:anywhere}
+.baynums-foot{display:block;margin-top:7px;padding-top:6px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:8px;line-height:1.25;color:var(--ink36)}
+body.night .baynums{background:var(--card);border-color:var(--line);border-left-color:var(--burg)}
 .rowgrid.g3{grid-template-columns:1fr 1fr 1fr}
 .rowgrid.g2{grid-template-columns:1fr 1fr}
 /* THREE BANDS THAT LINE UP ACROSS THE WHOLE ROW, whether or not a tile has a second number.

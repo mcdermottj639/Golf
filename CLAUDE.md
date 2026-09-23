@@ -1219,6 +1219,19 @@ They were three separate blocks with the start-round button between them until J
 for one. Between the row and the tiles all four parts of the game are covered: the tiles
 carry off-the-tee, irons and putting, and `up & down` is the short game.
 
+**v170 adds the Bay window Jack expected here.** Under the outdoor tiles, a compact full-width
+strip reads the latest reviewed full-day range cohort: usable shots, distinct club coverage,
+shot-weighted mean path and shot-weighted mean face-to-path. It uses `bayDayData()` — the same
+cohort as the full-day Bay review — so missing-distance rows and clear mishits stay excluded
+and same-club blocks stay combined. Its date is the latest Swing bay date, and the whole strip
+opens Game → Sessions → Cumulative for the planning view, club histories and exact evidence.
+This is an indoor evidence window, never another source for `areaCards()`, handicap, outdoor
+percentages or playing carries. If the latest record predates full-day review support, the
+fallback reads only that record's retained shot rows and says no more than they supply.
+The v170 browser test now asserts the strip and its tap-through at 320/390px, but Chromium
+was not installed in the Sep 23 workspace, so the automated visual run remained unavailable;
+the Node render test covers populated markup, no `NaN`, and the Cumulative target meanwhile.
+
 **The block says WHICH CARDS it read, and that line is not decoration.** `areaCards()` flips
 the whole sample from every card to the **live cards only** the moment 18 live holes exist,
 so finishing one round he logged himself moves every number here at once — by design, and

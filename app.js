@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v169';
+const BUILD = 'v170';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v170', d:'2026-09-23', items:['BAY STATS NOW LIVE INSIDE THE NUMBERS: the latest reviewed range day shows usable shots, club coverage, mean path and mean face-to-path without entering outdoor scoring. Tap the strip for the full cumulative plan, club histories and evidence.'] },
   { b:'v169', d:'2026-09-23', items:['COACH PRACTICE NOW CONNECTS YOUR NUMBERS TO THE DRILL: plain-English evidence, an exact TrackMan test and a place to save its outcome. Existing saved plans get the right club-specific instructions without rebuilding. Repeated dated bay signals and scored simulator-round context guide priorities without inventing a swing cause.'] },
   { b:'v168', d:'2026-09-23', items:['BOTTOM NAV SIMPLIFIED: Tee was removed. Today, Bag, Game, Rounds and Coach now share the bar evenly; start or resume a round from Today or Round Prep.'] },
   { b:'v167', d:'2026-09-22', items:['SIM PLANS NOW SCAN FAST: each block leads with club, shot count, a short instruction and a clear result to record. Why/details are optional expanders; baseline and exclusions no longer crowd the plan.'] },
@@ -2632,6 +2633,45 @@ function teeClubRows(st){
     <span class="tcv">${Math.round(e.fwHit / e.fwN * 100)}%</span>
     <span class="tcf">${e.fwHit}/${e.fwN}</span></div>`).join('')}</div>`;
 }
+// A compact window into the bay record on Today. The full analysis belongs to Cumulative;
+// this is its front-door summary, not another tally. It reads the same reviewed full-day
+// cohort as bayView(), so missing-distance rows and clear mishits stay excluded and
+// same-club blocks stay combined. Nothing here enters outdoor scoring or the bag ladder.
+function bayNumbersStrip(){
+  const latest = baysFor('swing')[0];
+  if(!latest) return '';
+  const day = bayDayData(latest.b);
+  let groups = [];
+  let usable = 0;
+  if(day && day.usable){
+    groups = day.clubs || [];
+    usable = day.usable;
+  }else{
+    groups = ((latest.b.detail || {}).rangeShots || []).map(g => ({ ...g, shots:struckShots(g) }));
+    usable = groups.reduce((n,g) => n + (g.shots || []).length, 0);
+  }
+  const shots = groups.flatMap(g => g.shots || []);
+  const vals = key => shots.map(s => s[key]).filter(v => v != null && Number.isFinite(+v)).map(Number);
+  const avg = xs => xs.length ? xs.reduce((a,b) => a+b, 0) / xs.length : null;
+  const paths = vals('path');
+  const ftps = shots.map(s => s.ftp != null && Number.isFinite(+s.ftp) ? +s.ftp
+    : (s.face != null && Number.isFinite(+s.face) && s.path != null && Number.isFinite(+s.path) ? +s.face - +s.path : null))
+    .filter(v => v != null && Number.isFinite(v));
+  const path = avg(paths);
+  const ftp = avg(ftps);
+  const clubs = new Set(groups.map(g => clubCanon(g.club)).filter(Boolean)).size;
+  const deg = v => v == null ? '—' : `${v >= 0 ? '+' : ''}${v.toFixed(1)}°`;
+  return `<button class="baynums" data-action="session-category" data-kind="cumulative" aria-label="Open cumulative bay statistics">
+    <span class="baynums-head"><b>The Bay ${provBadge('bay')}</b><em>${esc(fmtDate(latest.b.date))}</em><i>→</i></span>
+    <span class="baynums-grid">
+      <span><b>${usable || '—'}</b><small>usable shots</small></span>
+      <span><b>${clubs || '—'}</b><small>clubs</small></span>
+      <span><b>${deg(path)}</b><small>mean path · n=${paths.length}</small></span>
+      <span><b>${deg(ftp)}</b><small>face–path · n=${ftps.length}</small></span>
+    </span>
+    <span class="baynums-foot">Latest reviewed range day · indoor evidence only · never changes outdoor stats</span>
+  </button>`;
+}
 function theNumbers(){
   const C = areaCards();
   const { areas: A, st, sg } = gameAreas(C.cards);
@@ -2678,6 +2718,7 @@ function theNumbers(){
     ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet', greenClubRows(st))}
     ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet', puttMadeRows(st), puttMadeAside(st))}
   </div>
+  ${bayNumbersStrip()}
   <p class="sm faint" style="margin-top:8px">${C.cards.length ? `<b>Read off ${
     C.ev === 'live'
       ? `your ${C.liveCards.length} live round${C.liveCards.length === 1 ? '' : 's'} — ${C.liveHoles} holes you tapped in standing on them${
