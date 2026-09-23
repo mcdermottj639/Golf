@@ -830,11 +830,10 @@ Three things about it worth keeping:
   keyboard does not shrink, so the bar goes behind the keyboard rather than over the field.
 
 **And the diagnosis is worth more than the fix, because this will be reported again as "the
-app lost my round".** It never has. Two things say so without touching the phone: the middle
-nav tab reads **RESUME** rather than TEE, which `render()` only does while `S.live` exists,
-and `coachSince()` names his last round off EVERY card in `S.rounds`, hole array or not — so
-a saved round always appears there. Read those two before touching any counting code; the
-count was right both times.
+app lost my round".** It never has. Two things say so without touching the phone: Today's
+round button reads **Resume round** while `S.live` exists, and `coachSince()` names his last
+round off EVERY card in `S.rounds`, hole array or not — so a saved round always appears
+there. Read those two before touching any counting code; the count was right both times.
 
 ### A note on any hole (Aug 19 2026)
 
@@ -1712,15 +1711,14 @@ makes a hub worth having. Don't reintroduce recency sorting here, and add a new 
 of `LABS` rather than reordering it. **The hub is the four labs and nothing else** since
 Aug 27 2026 — Round Prep used to sit under them and now lives in Rounds (see below).
 
-### The nav is five tabs and a tee button (Aug 27 2026 — Jack's redesign)
+### The nav is five tabs (Sep 23 2026)
 
-Jack commissioned a redesign; this supersedes the six-tab bar described above. The nav is
-**TODAY · BAG · [TEE] · GAME · ROUNDS · COACH** — five tabs and a burgundy centre button.
+The nav is **TODAY · BAG · GAME · ROUNDS · COACH** — five equal tabs. Jack removed the
+centre Tee shortcut on Sep 23 because it was unnecessary.
 
-- **TEE** goes to the live logger from any screen (`data-view="live"`). It is both *start* and
-  *resume*, because from the player's side that is one intention and `live()` already knows
-  which it is; `render()` relabels it `RESUME` while `S.live` exists. It is the only thing in
-  the app that has to be one thumb away everywhere, which is why it gets the middle.
+- Starting or resuming a live round remains available from Today's primary round button and
+  from Round Prep. The `live` view and all existing links to it remain valid; only the bottom
+  navigation shortcut was removed.
 - **Courses is no longer a tab** and **Round Prep is no longer in the Game hub.** Both are
   segments of **Rounds**, whose three faces are `Cards · Round prep · Courses` — a card, the
   plan written for it, and the course it was played on are three views of one subject, and
@@ -1740,6 +1738,11 @@ Jack commissioned a redesign; this supersedes the six-tab bar described above. T
 
 The tab glyphs are **CSS shapes** — a 19px bordered box, round or square, filled when active.
 No SVG, no icon font, no emoji: nothing to load, and legible at label size.
+
+v168 validation: the shipped HTML has exactly five nav buttons and none targets `live`;
+`startRound()` remains on Today and Round Prep retains its live-round link. Parser/import
+regressions pass. Chromium layout QA could not run in this workspace because the runtime
+denied Chrome's process-singleton socket; do not claim a browser screenshot for this change.
 
 **Every lab shares one diagnosis renderer.** `diagnosisCard(discipline)` draws open faults with
 their detail and collapses settled ones to a line; `faultState()` reads the first word of a
@@ -2626,7 +2629,8 @@ computed, `playsFactor()` unchanged and temperature-only, which the card says ou
 **The one thing** (`oneThing()` — `coachFocus()` over `coachSignals()`, i.e. the same pick
 Coach leads with, so the top of Today can never quietly outrank the page below it), and the
 **start/resume round button**, which absorbed the old round-in-progress banner: one
-affordance for one intention, matching the TEE tab.
+affordance for one intention. It is now the primary start/resume route after the Tee nav
+shortcut was removed on Sep 23.
 
 **Aug 30 2026 — Today carries the LATEST DAY only, and the whole log moved to its own page**
 (`landed`, reached from the button under the rows and mapped to the Today nav button).

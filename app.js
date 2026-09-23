@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v167';
+const BUILD = 'v168';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v168', d:'2026-09-23', items:['BOTTOM NAV SIMPLIFIED: Tee was removed. Today, Bag, Game, Rounds and Coach now share the bar evenly; start or resume a round from Today or Round Prep.'] },
   { b:'v167', d:'2026-09-22', items:['SIM PLANS NOW SCAN FAST: each block leads with club, shot count, a short instruction and a clear result to record. Why/details are optional expanders; baseline and exclusions no longer crowd the plan.'] },
   { b:'v166', d:'2026-09-22', items:['COACH NOW BUILDS YOUR SIM PRACTICE PLAN: a warm-up, up to three data-backed priorities and a transfer challenge, with clear targets and a saved checklist. Rebuild when new bay data arrives. Repairs the damaged app script while preserving the 3W A3 setting and adjustment chart.'] },
   { b:'v165', d:'2026-09-22', items:['Saved the 3-wood FutureFit A3 setting, proposed B7 comparison and official RH adjustment chart in Bag.'] },
@@ -1960,10 +1961,6 @@ function render(view, arg, keepScroll){
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === navView));
-  // The tee button is both "start" and "resume" — the same tap, because from the player's
-  // side it is the same intention and live() already knows which one it is.
-  const teeLab = $('#navTeeLab');
-  if(teeLab) teeLab.textContent = S.live ? 'RESUME' : 'TEE';
   const R = { home, bag, game, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging

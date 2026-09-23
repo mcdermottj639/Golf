@@ -668,16 +668,13 @@ body.night .bayc{background:#7a2334;color:#f6efe6}
 .poslegend i{width:14px;height:5px;border-radius:3px;display:inline-block}
 .poslegend i.arc{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--burg);border-left-color:transparent;border-bottom-color:transparent;transform:rotate(45deg)}
 
-/* ---- The tab bar: five tabs and a tee button (Aug 27 2026, Jack's redesign) ----
-   TODAY · BAG · [TEE] · GAME · ROUNDS · COACH. The tee button is burgundy and sits in the
-   middle because starting or resuming a live round is the one thing that has to be one
-   thumb away from every screen — it goes to the logger, which resumes a round in progress
-   rather than starting a second one.
+/* ---- The tab bar: five equal tabs (Sep 23 2026) ----
+   TODAY · BAG · GAME · ROUNDS · COACH. The old centre TEE shortcut is gone; Today and
+   Round Prep retain the start/resume controls.
 
    The glyphs are CSS shapes, not icons: a 19px box with a 2px border, round or square,
    filled when the tab is active. No SVG, no emoji, nothing to load — and they stay legible
-   at the size a label sits under. Items are 52px tall (the tee 58px), well clear of the
-   44px tap-target floor. */
+   at the size a label sits under. Items are 52px tall, clear of the 44px tap-target floor. */
 nav{position:fixed;bottom:0;left:50%;transform:translate(-50%,0);width:100%;max-width:520px;z-index:30;
   will-change:transform;backface-visibility:hidden;
   display:flex;align-items:flex-end;gap:2px;
@@ -693,24 +690,14 @@ nav button .nl{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-sp
   line-height:1;white-space:nowrap}
 nav button.on{color:var(--green)}
 nav button.on .ic{background:currentColor}
-/* The tee button. Filled glyph always — it is not a place you are, it is a thing you do. */
-nav button.navtee{flex:0 0 auto;min-width:66px;min-height:58px;background:var(--burg);
-  color:var(--burg-ink);box-shadow:0 2px 0 var(--burg-deep)}
-nav button.navtee .ic{border-radius:50%;background:currentColor}
-nav button.navtee:active{transform:translateY(1px);box-shadow:0 1px 0 var(--burg-deep)}
 body.night nav button{color:rgba(255,255,255,.42)}
 body.night nav button.on{color:var(--gtext)}
-body.night nav button.navtee{color:var(--burg-ink)}
-/* 320px is the narrowest phone and ROUNDS is the longest label: five 45px tabs beside a
-   66px tee button leave it about a pixel of room at 9.5px, so the tracking goes first.
-   After the .navtee rules on purpose — a media query adds no specificity, so an earlier
-   block would simply lose to them. */
+/* 320px is the narrowest phone and ROUNDS is the longest label. */
 @media (max-width:360px){
   .stat{padding-left:3px;padding-right:3px}
   .stat .l{letter-spacing:.02em}
   nav{padding-left:5px;padding-right:5px}
   nav button .nl{font-size:9px;letter-spacing:.01em}
-  nav button.navtee{min-width:60px}
 }
 
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--green);
