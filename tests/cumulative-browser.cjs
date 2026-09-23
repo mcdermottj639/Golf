@@ -17,12 +17,17 @@ const server=http.createServer((q,r)=>{
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').rounds?.some(r=>r.course==='Hazeltine National'&&r.review?.profileMode==='selected-label'));
 
-  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('bay-20260922-range-184605-batch1'));
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('round-hazeltine-trackman-recap-20260923-v1'));
+  const indoor=page.locator('.indoornums');
+  await indoor.waitFor();
+  assert.equal(await indoor.locator('.indoor-row').count(),3);
+  assert.match(await indoor.innerText(),/HAZELTINE NATIONAL[\s\S]*79%[\s\S]*28%[\s\S]*23%/i);
   const bay=page.locator('.baynums');
   await bay.waitFor();
   assert.match(await bay.innerText(),/THE BAY[\s\S]*USABLE SHOTS[\s\S]*MEAN PATH[\s\S]*FACE.PATH/i);
   for(const width of [320,390]){
     await page.setViewportSize({width,height:844});
+    assert.ok(await indoor.evaluate(x=>x.scrollWidth<=x.clientWidth),'Today indoor stats overflow '+width);
     assert.ok(await bay.evaluate(x=>x.scrollWidth<=x.clientWidth),'Today bay strip overflow '+width);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Today page overflow '+width);
   }

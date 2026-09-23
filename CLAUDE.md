@@ -1219,6 +1219,19 @@ They were three separate blocks with the start-round button between them until J
 for one. Between the row and the tiles all four parts of the game are covered: the tiles
 carry off-the-tee, irons and putting, and `up & down` is the short game.
 
+**v172 adds the indoor GAME record Jack meant by Bay stats.** `indoorGameStrip()` sits after
+the outdoor provenance and before the Bay delivery strip. It prints one sourced row per full
+simulator recap rather than pooling them: course + score, TrackMan FIR as **Off tee**, GIR as
+**Into green**, TrackMan scrambling as **Up & down**, and recap putts per hole. Ballybunion,
+Spyglass and Hazeltine are the three populated rows. Scramble here is TrackMan's standard
+missed-green save measure, not Jack's custom outdoor missed-fairway `scramble`; auto-finished
+putting is scoring context, never putting-skill evidence. A round missing a structured recap
+field stays out rather than having one inferred from its shot list. Hazeltine's already
+transcribed 11/14 FIR, 5/18 GIR, 3/13 scramble and 1.6 putts/hole are structured by the new
+append-only correction entry so existing phones receive them. Rows stay separate because
+Ballybunion's TrackMan and companion scrambling sources conflict. The strip opens Indoor
+Days; it never enters `areaCards()`, handicap, outdoor percentages or playing carries.
+
 **v170 adds the Bay window Jack expected here.** Under the outdoor tiles, a compact full-width
 strip reads the latest reviewed full-day range cohort: usable shots, distinct club coverage,
 shot-weighted mean path and shot-weighted mean face-to-path. It uses `bayDayData()` — the same
@@ -1228,9 +1241,10 @@ opens Game → Sessions → Cumulative for the planning view, club histories and
 This is an indoor evidence window, never another source for `areaCards()`, handicap, outdoor
 percentages or playing carries. If the latest record predates full-day review support, the
 fallback reads only that record's retained shot rows and says no more than they supply.
-The v170 browser test now asserts the strip and its tap-through at 320/390px, but Chromium
-was not installed in the Sep 23 workspace, so the automated visual run remained unavailable;
-the Node render test covers populated markup, no `NaN`, and the Cumulative target meanwhile.
+The v170/v172 browser test now asserts both strips, their 320/390px width and the Bay
+tap-through, but Chromium was not installed in the Sep 23 workspace, so the automated visual
+run remained unavailable; the Node render test covers all three indoor rows, exact sourced
+figures, populated Bay markup, no `NaN`, and both navigation targets meanwhile.
 
 **The block says WHICH CARDS it read, and that line is not decoration.** `areaCards()` flips
 the whole sample from every card to the **live cards only** the moment 18 live holes exist,

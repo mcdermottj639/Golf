@@ -3406,6 +3406,28 @@
         "noBay": false,
         "coverage": "51 visible non-canceled shot rows; partial shot ledger. All18 hole headers were read. Play date is not shown; Sep22 is the capture/import date. Do not infer putts or FIR/GIR from missing rows. Club profiles show selected TrackMan labels only; actual club and swing intent remain unconfirmed. They show the separate bay baseline and sample counts without borrowing missing round values."
       }
+    },
+    {
+      "id": "round-hazeltine-trackman-recap-20260923-v1",
+      "type": "round-review-update",
+      "target": "round-tm-hazeltine-imported-v1",
+      "src": "TrackMan recap tiles transcribed in the existing Hazeltine source review",
+      "round": {
+        "sim": true,
+        "course": "Hazeltine National",
+        "date": "2026-09-22"
+      },
+      "review": {
+        "trackman": {
+          "fairways": [11, 14],
+          "gir": [5, 18],
+          "scrambling": 23,
+          "scramblingCount": [3, 13],
+          "puttsPerHole": 1.6,
+          "averageDrive": 228,
+          "longestDrive": 245
+        }
+      }
     }
   ]
 }

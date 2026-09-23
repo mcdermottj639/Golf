@@ -87,6 +87,24 @@ h3{font-size:16px;color:var(--gtext);margin-bottom:4px}
 .nums h2{margin:5px 0 2px}
 .nums .rowgrid{margin:2px 0}
 .nums .charttile{padding-top:5px;padding-bottom:4px}
+.indoornums{display:block;width:100%;margin:10px 0 0;padding:10px 11px 8px;text-align:left;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:4px solid var(--green);
+  border-radius:var(--r);box-shadow:var(--shadow);font:inherit;cursor:pointer}
+.indoor-head{display:flex;align-items:center;gap:7px;font-family:var(--sans);font-size:10px;
+  line-height:1;text-transform:uppercase;letter-spacing:.1em;color:var(--gtext)}
+.indoor-head b{display:flex;align-items:center;gap:5px}.indoor-head em{margin-left:auto;font-style:normal;color:var(--faint);letter-spacing:.04em}
+.indoor-head i{font:normal 15px/1 var(--serif);color:var(--gtext)}
+.indoor-row{display:block;padding:8px 0 7px;border-bottom:1px solid var(--line)}
+.indoor-course{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+.indoor-course b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--sans);font-size:11px;color:var(--ink)}
+.indoor-course em{margin-left:auto;font:normal 700 18px/1 var(--serif);color:var(--gtext)}
+.indoor-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.indoor-grid>span{min-width:0;border-right:1px solid var(--line);padding-right:5px}.indoor-grid>span:last-child{border-right:none;padding-right:0}
+.indoor-grid b{display:block;font-family:var(--serif);font-size:17px;line-height:1;color:var(--gtext);white-space:nowrap}
+.indoor-grid small{display:block;min-height:20px;margin-top:3px;font-family:var(--mono);font-size:9px;line-height:1.12;
+  text-transform:uppercase;letter-spacing:.01em;color:var(--faint);overflow-wrap:anywhere}
+.indoor-foot{display:block;padding-top:7px;font-family:var(--mono);font-size:8.5px;line-height:1.3;color:var(--ink36)}
+body.night .indoornums{background:var(--card);border-color:var(--line);border-left-color:var(--green)}
 .baynums{display:block;width:100%;margin:8px 0 0;padding:9px 11px 8px;text-align:left;
   background:var(--card);color:var(--ink);border:1px solid var(--line);border-left:4px solid var(--burg);
   border-radius:var(--r);box-shadow:var(--shadow);font:inherit;cursor:pointer}

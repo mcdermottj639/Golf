@@ -10,7 +10,7 @@ for(const f of ['lessons.js','courses-db.js','course-cards.js'])vm.runInContext(
 let src=fs.readFileSync(path.join(root,'app.js'),'utf8');
 src=src.slice(0,src.indexOf('// ---------- Boot ----------'))+`
 rerender=()=>{};toast=()=>{};load();
-window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView,bayNumbersStrip};
+window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView,bayNumbersStrip,indoorGameStrip};
 })();`;
 vm.runInContext(src,ctx);
 const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'coach-feed.json'),'utf8'));
@@ -58,7 +58,13 @@ assert.ok(html.includes('carry hits <b>2/7</b> · total hits <b>0/7</b>'));
 assert.ok(html.includes('5i target 165: 14') && html.includes('5i target 170: 15'));
 console.log('PASS: 80 source shots, 12 dash rows excluded entirely, 5 clear mishits, 63 usable, source arithmetic, per-metric counts and existing-phone idempotence.');
 
+T.applyFeed(require('../corrections-20260922.json'));
 const before=JSON.stringify(T.get());
+const indoor=T.indoorGameStrip();
+for(const phrase of ['indoornums','Ballybunion','Spyglass Hill','Hazeltine National','Off tee','Into green','Up &amp; down','Putts / hole','79%','28%','23%'])assert.ok(indoor.includes(phrase),phrase);
+for(const sequence of [/Ballybunion[\s\S]*46%[\s\S]*17%[\s\S]*13%[\s\S]*1\.6/,/Spyglass Hill[\s\S]*57%[\s\S]*6%[\s\S]*35%[\s\S]*1\.6/])assert.match(indoor,sequence);
+assert.equal((indoor.match(/class="indoor-row"/g)||[]).length,3);
+assert.ok(!indoor.includes('NaN'));
 vm.runInContext(fs.readFileSync(path.join(root,'bay-takeaways.js'),'utf8'),ctx);
 const bayStrip=T.bayNumbersStrip();
 for(const phrase of ['baynums','The Bay','usable shots','mean path','face–path','data-kind="cumulative"'])assert.ok(bayStrip.includes(phrase),phrase);

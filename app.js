@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v171';
+const BUILD = 'v172';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v172', d:'2026-09-23', items:['INDOOR GAME NUMBERS NOW SIT ON TODAY: Ballybunion, Spyglass and Hazeltine each show their sourced off-the-tee/FIR, into-the-green/GIR, TrackMan scramble and auto-finish putting recap. They stay separate by round and never enter the outdoor record. The Bay delivery strip remains below them.'] },
   { b:'v171', d:'2026-09-23', items:['SEP 22 WOOD HEIGHTS: Exact Club Data now carries each visible 3W and retained 5W peak-height reading. The APEX FT column shows the measured average and its own sample count; distance-dash rows and unshown 5W shots stay blank.'] },
   { b:'v170', d:'2026-09-23', items:['BAY STATS NOW LIVE INSIDE THE NUMBERS: the latest reviewed range day shows usable shots, club coverage, mean path and mean face-to-path without entering outdoor scoring. Tap the strip for the full cumulative plan, club histories and evidence.'] },
   { b:'v169', d:'2026-09-23', items:['COACH PRACTICE NOW CONNECTS YOUR NUMBERS TO THE DRILL: plain-English evidence, an exact TrackMan test and a place to save its outcome. Existing saved plans get the right club-specific instructions without rebuilding. Repeated dated bay signals and scored simulator-round context guide priorities without inventing a swing cause.'] },
@@ -2634,6 +2635,39 @@ function teeClubRows(st){
     <span class="tcv">${Math.round(e.fwHit / e.fwN * 100)}%</span>
     <span class="tcf">${e.fwHit}/${e.fwN}</span></div>`).join('')}</div>`;
 }
+// The indoor rounds already carry TrackMan's own recap tiles. Keep them round by round:
+// Ballybunion's two captured scrambling sources conflict, and pooling unlike sources would
+// turn that conflict into a confident-looking cumulative percentage. FIR/GIR are shown as
+// TrackMan reported them, scramble is TrackMan's standard up-and-down measure, and putting
+// is auto-finished — none of the four enters areaCards() or the outdoor record.
+function indoorGameStrip(){
+  const rows = (S.rounds || []).filter(r => r.sim && r.holes?.length === 18 && Number.isFinite(r.score))
+    .map(r => ({ r, t:r.review && r.review.trackman }))
+    .filter(x => x.t && Array.isArray(x.t.fairways) && Array.isArray(x.t.gir))
+    .sort((a,b) => (b.r.date || '').localeCompare(a.r.date || '') || a.r.score - b.r.score);
+  if(!rows.length) return '';
+  const pct = pair => pair && pair[1] ? Math.round(pair[0] / pair[1] * 100) + '%' : '—';
+  const raw = pair => pair && pair[1] ? `${pair[0]}/${pair[1]}` : '';
+  const scramble = t => Array.isArray(t.scramblingCount) && t.scramblingCount[1]
+    ? { v:pct(t.scramblingCount), raw:raw(t.scramblingCount) }
+    : { v:Number.isFinite(+t.scrambling) ? `${Math.round(+t.scrambling)}%` : '—', raw:'' };
+  const pph = (r,t) => Number.isFinite(+t.puttsPerHole) ? (+t.puttsPerHole).toFixed(1)
+    : (Number.isFinite(+t.putts) && r.holes.length ? (+t.putts / r.holes.length).toFixed(1) : '—');
+  return `<button class="indoornums" data-action="session-category" data-kind="sim" aria-label="Open indoor round statistics">
+    <span class="indoor-head"><b>Indoor game ${provBadge('sim')}</b><em>${rows.length} full round${rows.length===1?'':'s'}</em><i>→</i></span>
+    ${rows.map(({r,t}) => {
+      const sc = scramble(t);
+      return `<span class="indoor-row"><span class="indoor-course"><b>${esc(r.course)}</b><em>${esc(r.score)}</em></span>
+        <span class="indoor-grid">
+          <span><b>${pct(t.fairways)}</b><small>Off tee · ${raw(t.fairways)}</small></span>
+          <span><b>${pct(t.gir)}</b><small>Into green · ${raw(t.gir)}</small></span>
+          <span><b>${sc.v}</b><small>Up &amp; down${sc.raw ? ` · ${sc.raw}` : ''}</small></span>
+          <span><b>${pph(r,t)}</b><small>Putts / hole</small></span>
+        </span></span>`;
+    }).join('')}
+    <span class="indoor-foot">TrackMan round recaps · scramble is its up-and-down measure · putting was auto-finished</span>
+  </button>`;
+}
 // A compact window into the bay record on Today. The full analysis belongs to Cumulative;
 // this is its front-door summary, not another tally. It reads the same reviewed full-day
 // cohort as bayView(), so missing-distance rows and clear mishits stay excluded and
@@ -2719,7 +2753,6 @@ function theNumbers(){
     ${numTile(AREA_LAB.app, 'rounds', A.app, 'no greens logged yet', greenClubRows(st))}
     ${numTile(AREA_LAB.putt, 'putting', A.putt, 'no putts logged yet', puttMadeRows(st), puttMadeAside(st))}
   </div>
-  ${bayNumbersStrip()}
   <p class="sm faint" style="margin-top:8px">${C.cards.length ? `<b>Read off ${
     C.ev === 'live'
       ? `your ${C.liveCards.length} live round${C.liveCards.length === 1 ? '' : 's'} — ${C.liveHoles} holes you tapped in standing on them${
@@ -2727,6 +2760,8 @@ function theNumbers(){
       : `${C.cards.length} card${C.cards.length === 1 ? '' : 's'} on record — ${C.allHoles} holes`}.</b> ` : ''}${miss
     ? `<b>Scramble</b> is par or better after a missed fairway (${st.fw.saved} of ${miss}); <b>up &amp; down</b> is the same question off a missed green. The small figure under each is the tier below \u2014 par or bogey. `
     : 'Scramble fills in once a card records a missed fairway. '}Off the same cards Coach reads — tap any tile for the detail behind it.</p>
+  ${indoorGameStrip()}
+  ${bayNumbersStrip()}
   </section>`;
 }
 
