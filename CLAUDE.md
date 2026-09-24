@@ -3245,3 +3245,10 @@ entries, and the bag header expands 4–PW to seven when counting physical clubs
 The carry ladder preserves individually calibrated yardages while `carry-move`
 places the existing 5 wood after 3 wood. This yields 3W, 5W, utility 2i, 4i,
 then 5i onward; never rewrite the whole ladder to change display order.
+
+## Stable iron set identity (v175)
+
+v174 targeted the old 4–PW display name, but the Sep 8 feed renamed that record
+to 5–PW. Its correction silently missed. Always target permanent ID `c6` for
+the KING TEC set. The fresh v175 entry restores name, specs, gaming status and
+note to the complete seven-club 4–PW set. Never modify/reuse applied entry IDs.

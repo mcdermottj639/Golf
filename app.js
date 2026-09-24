@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v174';
+const BUILD = 'v175';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v175', d:'2026-09-24', items:['BAG FIX: Restored the complete 4–PW iron set using its permanent ID, including its name, specs and current note.'] },
   { b:'v174', d:'2026-09-24', items:['BAG: The returning 4-iron is part of your existing KING TEC 4–PW set. The KING TEC Utility 2-iron remains separate. Bag count includes all seven irons in the set, and the carry ladder follows 3W → 5W → utility 2i → 4i.'] },
   { b:'v173', d:'2026-09-24', items:['BAG: Hi-Toe 5 58.10 ATS and 4-iron join the 14; Vokey 56° and 60° move to the bench. The 58° carry stays unmeasured until the next sim session.'] },
   { b:'v172', d:'2026-09-23', items:['INDOOR GAME NUMBERS NOW SIT ON TODAY: Ballybunion, Spyglass and Hazeltine each show their sourced off-the-tee/FIR, into-the-green/GIR, TrackMan scramble and auto-finish putting recap. They stay separate by round and never enter the outdoor record. The Bay delivery strip remains below them.'] },

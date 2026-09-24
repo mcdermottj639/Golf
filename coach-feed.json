@@ -50183,6 +50183,17 @@
       "type": "carry-move",
       "target": "5 wood",
       "after": "3 wood"
+    },
+    {
+      "id": "bag-restore-full-set-by-id-20260924",
+      "type": "club-update",
+      "target": "c6",
+      "club": {
+        "name": "Cobra KING TEC Irons · 4–PW",
+        "spec": "4–PW · Right · Steel Regular · official lofts 21–44°",
+        "status": "gaming",
+        "note": "Complete seven-club set: 4i, 5i, 6i, 7i, 8i, 9i and PW. The 4-iron returned Sep 24 with the move to 50° and 58° wedges. The KING TEC Utility 2-iron is a separate club. Standard KING TEC; PW 44°."
+      }
     }
   ]
 }
