@@ -1877,3 +1877,15 @@ body.night .meanbtn{color:var(--green-ink)}
 .ff33-current{background:#fff0dc;color:#633c16}
 .ff33-target{background:#e7f0e7;color:#173f2d}
 .ff33-card p{padding:0 11px 11px;margin:10px 0 0}
+
+/* Live Swing Evolution: readable numeric cards at narrow phone widths. */
+.swing-evo-club { border-top:1px solid var(--line); padding:14px 0; }
+.swing-evo-club > summary { cursor:pointer; }
+.swing-evo-club > summary > b { font-size:20px; }
+.swing-evo-club > summary > span { display:block; font-size:14px; margin-top:5px; }
+.swing-evo-record { margin:14px 0; overflow-wrap:anywhere; }
+.swing-evo-metrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:12px 0; }
+.swing-evo-metrics > div { padding:9px; background:var(--paper); border:1px solid var(--line); border-radius:8px; }
+.swing-evo-metrics span,.swing-evo-metrics small { display:block; font-size:13px; }
+.swing-evo-metrics b { display:block; font-size:21px; margin:3px 0; color:var(--green); }
+.swing-evo-archive { overflow:auto; }

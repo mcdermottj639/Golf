@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v175';
+const BUILD = 'v176';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v176', d:'2026-09-24', items:['SWING EVOLUTION NOW READS YOUR RANGE DATA: actual per-club numbers, dated batches, metric sample counts and source-day links update with new imports. The old symbol grid is clearly labelled as a historical assessment.'] },
   { b:'v175', d:'2026-09-24', items:['BAG FIX: Restored the complete 4–PW iron set using its permanent ID, including its name, specs and current note.'] },
   { b:'v174', d:'2026-09-24', items:['BAG: The returning 4-iron is part of your existing KING TEC 4–PW set. The KING TEC Utility 2-iron remains separate. Bag count includes all seven irons in the set, and the carry ladder follows 3W → 5W → utility 2i → 4i.'] },
   { b:'v173', d:'2026-09-24', items:['BAG: Hi-Toe 5 58.10 ATS and 4-iron join the 14; Vokey 56° and 60° move to the bench. The 58° carry stays unmeasured until the next sim session.'] },
@@ -3326,6 +3327,64 @@ function evolutionCard(disc){
   </div>`;
 }
 
+// Live swing evidence: use the same retained shot cohorts as the full-day bay review.
+function swingEvolutionRows(){
+  const by = new Map(), finite = v => typeof v === 'number' && Number.isFinite(v);
+  const dates = [...new Set(baysFor('swing').map(({b}) => b.date).filter(Boolean))].sort().reverse();
+  const add = row => { if(!by.has(row.club)) by.set(row.club, []); by.get(row.club).push(row); };
+  for(const date of dates){
+    const b = baysFor('swing').find(x => x.b.date === date).b;
+    const day = bayDayData(b);
+    for(const block of day?.blocks || []){
+      if(!block.shots.length) continue;
+      const values = {};
+      for(const [key] of SWING_EVOLUTION_METRICS){
+        const xs = block.shots.map(s => key === 'apex' ? apexFeet(s.height) : s[key]).filter(finite);
+        if(xs.length) values[key] = {value:xs.reduce((a,b)=>a+b,0)/xs.length,n:xs.length};
+      }
+      if(Object.keys(values).length) add({club:block.canon,date,label:block.label,setup:block.setup,index:block.index,values,summary:false});
+    }
+    // Historical summary-only records remain labelled; never borrow their AVG into a shot block.
+    for(const {b:source,i} of baysFor('swing').filter(x => x.b.date === date && !x.b.detail?.rangeShots?.length)){
+      for(const c of source.detail?.clubs || []){
+        const values = {};
+        for(const [key] of SWING_EVOLUTION_METRICS){
+          if(finite(c[key])) values[key] = {value:c[key],n:c.metricCounts?.[key] ?? c.n ?? null};
+        }
+        if(Object.keys(values).length) add({club:clubCanon(c.club),date,label:c.club,setup:source.setup||'',index:i,values,summary:true});
+      }
+    }
+  }
+  return by;
+}
+const SWING_EVOLUTION_METRICS = [
+  ['carry','Carry','yd',1],['total','Total','yd',1],['path','Club path','°',1],
+  ['face','Face angle','°',1],['ftp','Face to path','°',1],['smash','Smash','',2],
+  ['la','Launch','°',1],['apex','Peak height','ft',1],['aoa','Attack angle','°',1],
+  ['cs','Club speed','mph',1],['bs','Ball speed','mph',1],['spin','Spin','rpm',0],
+  ['impactO','Impact offset','mm',1],['impactH','Impact height','mm',1]
+];
+function swingEvolutionCard(){
+  const by = swingEvolutionRows();
+  const format = (key,reading,unit,dec) => `${['path','face','ftp','aoa','impactO','impactH'].includes(key) && reading.value>0?'+':''}${reading.value.toFixed(dec)}${unit?' '+unit:''}`;
+  const metrics = row => `<div class="swing-evo-metrics">${SWING_EVOLUTION_METRICS.filter(([key])=>row.values[key]).map(([key,label,unit,dec])=>{
+    const reading=row.values[key];
+    return `<div data-metric="${key}"><span>${esc(label)}</span><b>${format(key,reading,unit,dec)}</b><small>${reading.n!=null?'n='+esc(reading.n):'Count not recorded'}</small></div>`;
+  }).join('')}</div>`;
+  const record = row => `<section class="swing-evo-record" data-date="${esc(row.date)}"><p><b>${esc(fmtDate(row.date))} · ${esc(row.label)}</b></p><p class="sm">${row.summary?'Recorded summary · not cleaned from individual shots':'Retained shot averages'}${row.setup?' · '+esc(row.setup):''}</p>${metrics(row)}<button class="btn" data-action="open-bay" data-i="${row.index}">Open source day →</button></section>`;
+  const archive = evoFor('swing');
+  return `<div class="card swing-evolution"><p><b>Connected to your range sessions</b></p>
+    <p class="sm">Actual readings by club, newest date first. Open a club for its numbers and earlier batches. New imports appear automatically.</p>
+    ${by.size?cumulativeClubKeys(by).map((club,i)=>{
+      const rows=by.get(club),latest=rows[0];
+      const preview=['carry','path','ftp'].filter(k=>latest.values[k]).map(k=>{const m=SWING_EVOLUTION_METRICS.find(x=>x[0]===k);return `${m[1]} ${format(k,latest.values[k],m[2],m[3])}`;}).join(' · ');
+      return `<details class="swing-evo-club" data-club="${esc(club)}" ${i===0?'open':''}><summary><b>${esc(clubCanonLabel(club))}</b><span>${esc(fmtDate(latest.date))} · ${rows.length} batches</span><span>${esc(preview||'Recorded readings available')}</span></summary>${record(latest)}${rows.length>1?`<details class="more"><summary>Earlier / other batches (${rows.length-1})</summary>${rows.slice(1).map(record).join('')}</details>`:''}</details>`;
+    }).join(''):'<p>No numeric range readings recorded yet.</p>'}
+    <details class="more"><summary>What these numbers mean</summary><p class="sm">Carry is flight distance; total includes the simulated finish. Path and face angle are relative to the target: positive is right, negative left. Face-to-path compares the face with its travel direction; it is derived from paired face/path readings when needed. Smash is ball speed divided by club speed. Peak height is in feet; attack angle is upward (+) or downward (−). Impact offsets are recorded monitor coordinates, not a diagnosis.</p><p class="sm">Counts belong to each metric. Missing readings are omitted, never zero. Clear mishits and rows missing both carry and total stay out of shot averages. Older summary-only records are labelled separately. Different clubs, targets, settings and conditions are not proof of improvement. Indoor spin may be estimated.</p></details>
+    <details class="more swing-evo-archive"><summary>Earlier coaching assessment · historical</summary><p class="sm">This saved assessment includes video observations. It does not update with range numbers. Backswing, posture and shaft lean require appropriate evidence; numeric imports do not establish them.</p>${archive?evolutionCard('swing'):''}</details>
+  </div>`;
+}
+
 // ----- The film room log -----
 // The lab pages get a SCANNABLE list, not the full text. Findings here run to
 // paragraphs, and three table columns at phone width turned the log into a wall of
@@ -5109,7 +5168,7 @@ function swing(){
 
   ${bayBlock('swing', 'No bay sessions yet. Log in at the bay with the Trackman app, hit the gapping order \u2014 driver, mini, 2-iron, 5-wood first \u2014 and send the club summary. Club path, face-to-path and attack angle are measured on any ball; spin needs a marked one.')}
 
-  ${evoFor('swing') ? `<h2>Swing evolution · batch by batch</h2>${evolutionCard('swing')}` : ''}
+  <h2>Swing evolution · your recorded numbers</h2>${swingEvolutionCard()}
 
   ${combineCard()}
 

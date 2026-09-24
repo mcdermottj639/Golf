@@ -3252,3 +3252,26 @@ v174 targeted the old 4–PW display name, but the Sep 8 feed renamed that recor
 to 5–PW. Its correction silently missed. Always target permanent ID `c6` for
 the KING TEC set. The fresh v175 entry restores name, specs, gaming status and
 note to the complete seven-club 4–PW set. Never modify/reuse applied entry IDs.
+
+## Live Swing Evolution (v176)
+
+The Swing lab now renders `swingEvolutionCard()` from the current `S.bays`, not
+from the saved September 17 symbol grid. `swingEvolutionRows()` reuses
+`bayDayData()` retained blocks: both-distance-missing rows and clear mishits are
+excluded, every metric has its own count, and face-to-path can come from paired
+face minus path. Keep dated target/setup blocks separate; no mean across clubs
+or inferred improvement. Summary-only historical club readings are labelled and
+never used to fill missing shot-level metrics. Missing metrics are omitted.
+Each club shows its newest block and expandable batch history with source-day
+buttons. Heights convert original feet/inches to feet. The old authored grid is
+preserved under an explicitly historical assessment expander; it cannot diagnose
+current mechanics. Video assessments still require reviewed video evidence.
+No feed migration or source edits: new bay imports appear on render, including
+existing installs. Putting and short-game grids keep their existing behavior.
+BUILD/CACHE v176 are paired. Run swing-evolution data and phone browser tests.
+
+Validation: live-evolution cohort/count/automatic-import tests, bay takeaways,
+round review and importer regressions passed, plus JS/JSON syntax checks.
+The 320/390 browser test is provided but has not run: the available browser
+was unusable and Playwright browser installation returned truncated downloads.
+Visual QA remains outstanding. Jack explicitly authorized merge after this limitation was disclosed; publication proceeds under that instruction.
