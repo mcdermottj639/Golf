@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v173';
+const BUILD = 'v174';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v174', d:'2026-09-24', items:['BAG: The returning 4-iron is part of your existing KING TEC 4–PW set. The KING TEC Utility 2-iron remains separate. Bag count includes all seven irons in the set, and the carry ladder follows 3W → 5W → utility 2i → 4i.'] },
   { b:'v173', d:'2026-09-24', items:['BAG: Hi-Toe 5 58.10 ATS and 4-iron join the 14; Vokey 56° and 60° move to the bench. The 58° carry stays unmeasured until the next sim session.'] },
   { b:'v172', d:'2026-09-23', items:['INDOOR GAME NUMBERS NOW SIT ON TODAY: Ballybunion, Spyglass and Hazeltine each show their sourced off-the-tee/FIR, into-the-green/GIR, TrackMan scramble and auto-finish putting recap. They stay separate by round and never enter the outdoor record. The Bay delivery strip remains below them.'] },
   { b:'v171', d:'2026-09-23', items:['SEP 22 WOOD HEIGHTS: Exact Club Data now carries each visible 3W and retained 5W peak-height reading. The APEX FT column shows the measured average and its own sample count; distance-dash rows and unshown 5W shots stay blank.'] },
@@ -3162,6 +3163,8 @@ function ladderCard(){
 }
 function bag(){
   const lineup = S.clubs.filter(c => c.status === 'gaming' || c.status === 'ordered').sort(bagSort);
+  // The KING TEC set is one record but seven physical clubs (4–9, PW). The utility 2-iron is separate.
+  const clubCount = lineup.reduce((n, c) => n + (/\b4\s*[–-]\s*PW\b/i.test(c.name || '') ? 7 : 1), 0);
   const bullpen = S.clubs.filter(c => c.status === 'backup').sort(bagSort);
   const wishlist = S.clubs.filter(c => c.status === 'wishlist').sort(bagSort);
   const wedges = S.clubs.filter(c => c.cat === 'wedge' && c.loft && (c.status === 'gaming' || c.status === 'ordered')).sort((a, b) => a.loft - b.loft);
@@ -3175,7 +3178,7 @@ function bag(){
   return `
   ${sessionShortcuts()}
   <div class="card">
-    ${fold('bag-roster', 'In the bag', `${lineup.length} CLUB${lineup.length === 1 ? '' : 'S'}`,
+    ${fold('bag-roster', 'In the bag', `${clubCount} CLUB${clubCount === 1 ? '' : 'S'}`,
       groups.length ? groups.map(([lab, cs]) => `<div class="cgrp">${lab}</div>
         ${cs.map(clubRow).join('')}`).join('')
         : '<p class="sm faint">Nothing gaming yet.</p>')}
@@ -10683,6 +10686,7 @@ function applyFeed(feed){
       S.grids[e.discipline || 'putting'] = e.evolution;
     }
     else if(e.type === 'club-add' && e.club) S.clubs.push({ id:e.id, rounds:0, ...e.club });
+    else if(e.type === 'club-remove') S.clubs = S.clubs.filter(x => x.id !== e.target);
     else if(e.type === 'club-update'){
       const c = S.clubs.find(x => x.id === e.target || x.name === e.target);
       if(c) Object.assign(c, e.club || {});
@@ -10693,6 +10697,15 @@ function applyFeed(feed){
       if(h && e.text) h.text = e.text;
     }
     else if(e.type === 'carries' && Array.isArray(e.carries) && !S.carriesCalibrated) S.carries = e.carries;
+    else if(e.type === 'carry-move' && e.target && e.after && e.target !== e.after){
+      // Move the existing row without replacing a carry Jack may have calibrated.
+      const from = S.carries.findIndex(c => c.club === e.target);
+      if(from >= 0){
+        const [row] = S.carries.splice(from, 1);
+        const after = S.carries.findIndex(c => c.club === e.after);
+        S.carries.splice(after >= 0 ? after + 1 : from, 0, row);
+      }
+    }
     else if(e.type === 'carry-update' && e.target){
       // Row-level, and deliberately NOT gated on carriesCalibrated. The ladder doubles as
       // the club ROSTER — it is what the live logger offers off the tee — so which clubs

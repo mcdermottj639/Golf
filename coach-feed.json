@@ -50157,6 +50157,32 @@
       "type": "history",
       "date": "2026-09-24",
       "text": "TaylorMade Hi-Toe 5 58.10 ATS enters as the only lofted wedge; Vokey SM11 56.10S and 60.08M move to bench. Cobra KING TEC 4-iron returns. 58° carry pending sim test."
+    },
+    {
+      "id": "bag-correct-set-4iron-20260924",
+      "type": "club-remove",
+      "target": "bag-kingtec-4iron-20260924"
+    },
+    {
+      "id": "bag-correct-set-note-20260924",
+      "type": "club-update",
+      "target": "Cobra KING TEC Irons · 4–PW",
+      "club": {
+        "status": "gaming",
+        "note": "Delivered Jun 12 (receipt label said X — standard KING TEC). Complete 4–PW set; 4-iron back in play Sep 24. PW is 44° and anchors the wedge ladder. The separately purchased KING TEC Utility 2-iron is outside this set."
+      }
+    },
+    {
+      "id": "bag-correct-history-20260924",
+      "type": "history-edit",
+      "match": "Cobra KING TEC 4-iron returns.",
+      "text": "TaylorMade Hi-Toe 5 58.10 ATS enters as the only lofted wedge; Vokey SM11 56.10S and 60.08M move to bench. The 4-iron from the existing Cobra KING TEC 4–PW set returns to play; the KING TEC Utility 2-iron is a separate club. 58° carry pending sim test."
+    },
+    {
+      "id": "bag-order-5wood-after-3wood-20260924",
+      "type": "carry-move",
+      "target": "5 wood",
+      "after": "3 wood"
     }
   ]
 }

@@ -3231,3 +3231,17 @@ Do not turn the estimated 4-iron or unmeasured 58° into measured yardages.
 `wedgeSpec()` and `grindsCard()` accept multi-letter grinds such as ATS, and
 Bag grind guidance includes active wedges only. BUILD and service-worker CACHE
 are both v173. Keep feed updates idempotent for existing phones.
+
+## Iron set correction (v174)
+
+The Cobra KING TEC irons are one roster record representing the complete 4–PW
+set (seven physical clubs). The KING TEC Utility 2-iron is separately purchased
+and separately recorded. v173 incorrectly added a standalone 4-iron roster
+record, which double-counted that iron. An append-only `club-remove` correction
+removes that duplicate on phones that already imported v173; the 4-iron carry
+ladder row remains. The set note and bag history are corrected through feed
+entries, and the bag header expands 4–PW to seven when counting physical clubs.
+
+The carry ladder preserves individually calibrated yardages while `carry-move`
+places the existing 5 wood after 3 wood. This yields 3W, 5W, utility 2i, 4i,
+then 5i onward; never rewrite the whole ladder to change display order.
