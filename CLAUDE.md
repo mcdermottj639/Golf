@@ -3219,3 +3219,15 @@ tests/cumulative-browser.cjs, but could not run here: Chromium process_singleton
 creation was denied by the runtime. Do not claim visual QA. Jack explicitly requested merge to main after being informed
 of this limitation; publication proceeds under that instruction. The browser check
 remains outstanding.
+
+## Active wedge and 4-iron bag change (v173)
+
+The Sep 24 append-only `coach-feed.json` entries add TaylorMade Hi-Toe 5 58° ATS
+(10° bounce) and Cobra KING TEC 4-iron as gaming clubs. Vokey 56° and 60° are
+backup clubs; their old measurements and shot history remain intact. The active
+carry ladder drops the two Vokeys, includes the 4-iron at its prior 190-yard
+**estimate**, and leaves the 58° carry unknown until a measured sim session.
+Do not turn the estimated 4-iron or unmeasured 58° into measured yardages.
+`wedgeSpec()` and `grindsCard()` accept multi-letter grinds such as ATS, and
+Bag grind guidance includes active wedges only. BUILD and service-worker CACHE
+are both v173. Keep feed updates idempotent for existing phones.

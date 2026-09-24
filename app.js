@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v172';
+const BUILD = 'v173';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v173', d:'2026-09-24', items:['BAG: Hi-Toe 5 58.10 ATS and 4-iron join the 14; Vokey 56° and 60° move to the bench. The 58° carry stays unmeasured until the next sim session.'] },
   { b:'v172', d:'2026-09-23', items:['INDOOR GAME NUMBERS NOW SIT ON TODAY: Ballybunion, Spyglass and Hazeltine each show their sourced off-the-tee/FIR, into-the-green/GIR, TrackMan scramble and auto-finish putting recap. They stay separate by round and never enter the outdoor record. The Bay delivery strip remains below them.'] },
   { b:'v171', d:'2026-09-23', items:['SEP 22 WOOD HEIGHTS: Exact Club Data now carries each visible 3W and retained 5W peak-height reading. The APEX FT column shows the measured average and its own sample count; distance-dash rows and unshown 5W shots stay blank.'] },
   { b:'v170', d:'2026-09-23', items:['BAY STATS NOW LIVE INSIDE THE NUMBERS: the latest reviewed range day shows usable shots, club coverage, mean path and mean face-to-path without entering outdoor scoring. Tap the strip for the full cumulative plan, club histories and evidence.'] },
@@ -2905,7 +2906,7 @@ function clubType(c){
 // the spec doesn't carry a bounce and a grind (every club that isn't a wedge), this is
 // simply the loft, and where there is no loft either it is the spec as written.
 function wedgeSpec(c){
-  const m = /(\d+(?:\.\d+)?)\s*°?\s*bounce\s*·?\s*([A-Z])\s*grind/i.exec(c.spec || '');
+  const m = /(\d+(?:\.\d+)?)\s*°?\s*bounce\s*·?\s*([A-Z]+)\s*grind/i.exec(c.spec || '');
   return m && c.loft ? `${c.loft}.${String(Math.round(+m[1])).padStart(2, '0')}${m[2].toUpperCase()}` : null;
 }
 // The loft line, and it will only print a loft it can actually SOURCE. `clubLoft()` guesses
@@ -3018,6 +3019,7 @@ function clubRow(c){
 // mean, which is knowledge about wedges rather than a claim about his game. The one claim
 // about his game is the closing note, and it says it is UNMEASURED, because it is.
 const GRIND_LORE = {
+  ATS:['All-Terrain Standard', 'TaylorMade’s four-way camber handles square and open-face shots across a range of lies. The slightly wider sole adds forgiveness. Your 58° is the sole high-loft wedge in this bag; test its bunker and partial-shot carry before assigning distances.', 'CHIPS · PITCHES · BUNKERS'],
   F:['Full sole', 'The sweeper. A full, unrelieved sole with the most material behind the leading edge — it resists digging on a square face and a shallow strike. Built for full swings, which is what this club mostly gets.', 'FULL SWINGS · SQUARE FACE'],
   S:['Sole grind, trailing-edge relief', 'The workhorse. Heel and trailing edge trimmed just enough to sit down on a slightly open face without the leading edge lifting. Mid bounce, so it works on firm and normal turf alike — the reason it can take full shots, half shots and bunker shots all day.', 'DO-EVERYTHING · FULL TO OPEN'],
   M:['Crescent, heel-toe-trailing relief', 'The creative one. Material removed from heel, toe and trailing edge so the face can open wide, lie flat, and slide under the ball without the leading edge rising. Low bounce, so it wants a shallow attack and firm-to-normal turf — it punishes a steep, digging strike.', 'FLOPS · SPLASH · OPEN FACE'],
@@ -3035,16 +3037,14 @@ const BOUNCE_BANDS = [
 ];
 function grindsCard(wedges){
   const mine = wedges.map(w => {
-    const m = /(\d+(?:\.\d+)?)\s*°?\s*bounce\s*·?\s*([A-Z])\s*grind/i.exec(w.spec || '');
+    const m = /(\d+(?:\.\d+)?)\s*°?\s*bounce\s*·?\s*([A-Z]+)\s*grind/i.exec(w.spec || '');
     return m ? { w, bounce:+m[1], g:m[2].toUpperCase() } : null;
   }).filter(Boolean);
   if(!mine.length) return '';
   const band = b => BOUNCE_BANDS.findIndex(([, , lo, hi]) => b >= lo && b <= hi);
-  const absent = ['K', 'D', 'L', 'T'].filter(k => !mine.some(x => x.g === k));
   return `
-  <p class="sm"><b>Bounce</b> is the angle between the leading edge and the sole — how hard the
-    club resists digging. <b>Grind</b> is what has been shaved off that sole, which decides how
-    the club sits when you open the face. Your three are deliberately different tools.</p>
+  <p class="sm"><b>Bounce</b> describes how the sole resists digging. <b>Grind</b> describes its shape
+    and how it plays when the face opens. Your active wedges are 50° and 58°.</p>
   ${mine.map(x => `<div class="grind">
     <div class="gl">${esc(x.g)}</div>
     <div class="gm">
@@ -3063,16 +3063,11 @@ function grindsCard(wedges){
       <div class="bm ${here.length ? '' : 'none'}">${here.length
         ? esc(here.map(x => `your ${x.w.loft}°`).join(' · ')) : 'nothing of yours here'}</div>
     </div>`; }).join('')}
-  ${absent.length ? `<p class="sm" style="margin-top:10px"><b>The grinds you don't have</b>, and why
-    each exists — so the three above read as choices rather than as what came in the box.</p>
-  ${absent.map(k => `<div class="gabs"><span class="gk">${esc(k)}</span>
-    <span class="sm"><b>${esc(GRIND_LORE[k][0])}.</b> ${esc(GRIND_LORE[k][1])}</span></div>`).join('')}` : ''}
   <div class="goldnote">
     <div class="gnl">What this cannot tell you</div>
-    <p class="sm">Whether the M grind on the 60° suits your attack angle is a <b>measurement</b>
-      question, and no film of your pitching motion exists. A low-bounce crescent is the least
-      forgiving choice there is for a steep, digging strike — and nothing on file says which kind
-      of strike you have. Until there is film, this section describes the tools, not the fit.</p>
+    <p class="sm">The 58° ATS replaces the 56° and 60° for play. Its fit from grass and sand,
+      and its carry on full and partial shots, still need to be tested. The old Vokeys and
+      their measured sessions remain in your history.</p>
   </div>`;
 }
 // ----- The carry ladder -----
@@ -3169,7 +3164,7 @@ function bag(){
   const lineup = S.clubs.filter(c => c.status === 'gaming' || c.status === 'ordered').sort(bagSort);
   const bullpen = S.clubs.filter(c => c.status === 'backup').sort(bagSort);
   const wishlist = S.clubs.filter(c => c.status === 'wishlist').sort(bagSort);
-  const wedges = S.clubs.filter(c => c.cat === 'wedge' && c.loft).sort((a, b) => a.loft - b.loft);
+  const wedges = S.clubs.filter(c => c.cat === 'wedge' && c.loft && (c.status === 'gaming' || c.status === 'ordered')).sort((a, b) => a.loft - b.loft);
   // Grouped the way the bag is carried: the long clubs, the irons, the wedges, the putter.
   // Every group is drawn from `S.clubs` by CATEGORY, so a club can only appear where its own
   // record puts it, and an empty group doesn't render.

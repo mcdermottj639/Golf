@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-09-22",
+  "updated": "2026-09-24",
   "entries": [
     {
       "id": "s4-session",
@@ -50077,7 +50077,86 @@
           }
         ]
       }
+    },
+    {
+      "id": "bag-hitoe5-58-20260924",
+      "type": "club-add",
+      "club": {
+        "name": "TaylorMade Hi-Toe 5 58°",
+        "cat": "wedge",
+        "loft": 58,
+        "spec": "10° bounce · ATS grind · Copper · True Temper Dynamic Gold Tour Issue 115g wedge steel · RH",
+        "status": "gaming",
+        "note": "Ordered Sep 23; expected Sep 24. Main greenside, bunker and lofted wedge replacing the two benched Vokeys. Carry and partial-shot distances awaiting simulator testing."
+      }
+    },
+{
+      "id": "bag-vokey56-bench-20260924",
+      "type": "club-update",
+      "target": "c4",
+      "club": {
+        "status": "backup",
+        "note": "Benched Sep 24 for Hi-Toe 5 58° ATS. Prior 56° shot and carry history retained."
+      }
+    },
+{
+      "id": "bag-vokey60-bench-20260924",
+      "type": "club-update",
+      "target": "c3",
+      "club": {
+        "status": "backup",
+        "note": "Benched Sep 24 for Hi-Toe 5 58° ATS. Prior 60° shot and carry history retained."
+      }
+    },
+{
+      "id": "bag-kingtec-4iron-20260924",
+      "type": "club-add",
+      "club": {
+        "name": "Cobra KING TEC 4-iron",
+        "cat": "iron",
+        "spec": "21° · Cobra KING TEC iron set",
+        "status": "gaming",
+        "note": "Back in the bag Sep 24 to bridge the long-iron gap. Use the existing 4-iron carry as an estimate pending fresh sim testing."
+      }
+    },
+{
+      "id": "bag-carry-4iron-20260924",
+      "type": "carry-update",
+      "target": "4-iron",
+      "after": "2-iron (utility)",
+      "club": {
+        "loft": "21°",
+        "carry": 190,
+        "source": "estimated"
+      }
+    },
+{
+      "id": "bag-carry-vokey56-out-20260924",
+      "type": "carry-update",
+      "target": "56° wedge",
+      "remove": true
+    },
+{
+      "id": "bag-carry-vokey60-out-20260924",
+      "type": "carry-update",
+      "target": "60° wedge",
+      "remove": true
+    },
+{
+      "id": "bag-carry-hitoe58-20260924",
+      "type": "carry-update",
+      "target": "58° wedge",
+      "after": "50° wedge",
+      "club": {
+        "loft": "58°",
+        "carry": null
+      }
+    },
+{
+      "id": "bag-switch-hitoe5-history-20260924",
+      "type": "history",
+      "date": "2026-09-24",
+      "text": "TaylorMade Hi-Toe 5 58.10 ATS enters as the only lofted wedge; Vokey SM11 56.10S and 60.08M move to bench. Cobra KING TEC 4-iron returns. 58° carry pending sim test."
     }
-    
   ]
 }
