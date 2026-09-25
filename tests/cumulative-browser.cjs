@@ -17,7 +17,7 @@ const server=http.createServer((q,r)=>{
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
   await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').rounds?.some(r=>r.course==='Hazeltine National'&&r.review?.profileMode==='selected-label'));
 
-  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('round-hazeltine-trackman-recap-20260923-v1'));
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('bay-20260925-4i-visible-v1'));
   const indoor=page.locator('.indoornums');
   await indoor.waitFor();
   assert.equal(await indoor.locator('.indoor-row').count(),3);
@@ -34,6 +34,13 @@ const server=http.createServer((q,r)=>{
   await bay.click();
   await page.locator('#cum-plan').waitFor();
   assert.ok(await page.locator('.cum-club').count()>5);
+  const labels=await page.locator('.cum-club-name').allTextContents();
+  const four=labels.indexOf('4-iron'),five=labels.indexOf('5-iron');
+  assert.ok(four>=0 && four<five,'4i precedes 5i');
+  const wedge=labels.findIndex(x=>x.includes('58°')),sixty=labels.findIndex(x=>x.includes('60°'));
+  assert.ok(wedge>=0 && (sixty<0 || wedge<sixty),'58 before 60');
+  assert.match(await page.locator('.cum-club').nth(four).locator('summary').innerText(),/147\.2/);
+
   for(const width of [320,390]){
     await page.setViewportSize({width,height:844});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'page overflow '+width);

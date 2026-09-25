@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v177';
+const BUILD = 'v178';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v178', d:'2026-09-25', items:['BAG AT A GLANCE: the returned 4-iron and new 58° now appear in club order instead of being appended below the old club list.'] },
   { b:'v177', d:'2026-09-25', items:['SEP 25 SIM: 3W at B6, new Hi-Toe 58° and returned 4-iron shot data, height and delivery, with reviewed exclusions. The 3W capture is partial: 9 of 14 rows visible. B6 is now the reported Bag setting.'] },
   { b:'v176', d:'2026-09-24', items:['SWING EVOLUTION NOW READS YOUR RANGE DATA: actual per-club numbers, dated batches, metric sample counts and source-day links update with new imports. The old symbol grid is clearly labelled as a historical assessment.'] },
   { b:'v175', d:'2026-09-24', items:['BAG FIX: Restored the complete 4–PW iron set using its permanent ID, including its name, specs and current note.'] },
@@ -4039,8 +4040,8 @@ function clubCanonLabel(canon){
   const fromBag = (S.carries || []).find(c => clubCanon(c.club) === canon);
   if(fromBag) return fromBag.club;
   const map = { Dr:'Driver', Mini:'Mini Driver', '3W':'3-wood', '5W':'5-wood',
-    '2i':'2-iron', '5i':'5-iron', '6i':'6-iron', '7i':'7-iron', '8i':'8-iron', '9i':'9-iron',
-    PW:'PW', '50°':'50°', '56°':'56°', '60°':'60°' };
+    '2i':'2-iron', '4i':'4-iron', '5i':'5-iron', '6i':'6-iron', '7i':'7-iron', '8i':'8-iron', '9i':'9-iron',
+    PW:'PW', '50°':'50°', '56°':'56°', '58°':'58°', '60°':'60°' };
   return map[canon] || canon;
 }
 function primaryClubsForDay(clubs){
@@ -4082,7 +4083,7 @@ function fillMetrics(c){
     total: num1(c && c.total, 1)
   };
 }
-const BAG_CANON = ['Dr','Mini','3W','5W','2i','5i','6i','7i','8i','9i','PW','50°','56°','60°'];
+const BAG_CANON = ['Dr','Mini','3W','5W','2i','4i','5i','6i','7i','8i','9i','PW','50°','56°','58°','60°'];
 function deliveryMatch(dels, club){
   const k = clubCanon(club), phase = clubPhaseOf(club);
   return (dels || []).find(d => d.club === club)
