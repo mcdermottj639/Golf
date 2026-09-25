@@ -3141,11 +3141,11 @@ Validate importer FutureFit assertions, bay/planner tests and Coach browser flow
 The Bag row for the current 3-wood renders `futureFit` data delivered through an
 append-only `club-update` in `futurefit-feed.json`. It is separate from the multi-megabyte
 historical coach feed so a small equipment change never requires replacing that archive.
-The currently reported physical setting is A3: on Cobra's
+The Sep 22 reported physical setting was A3: on Cobra's
 official right-handed chart that is −1.0° loft and 1.0° flat, producing 14.0° effective
 loft on the 15.0° head. It is not the higher-loft setting previously claimed in chat.
 The proposed higher-launch comparison is B7: +1.7° loft and 0.7° flat, 16.7° effective.
-It remains a target until Jack confirms moving the sleeve; never silently relabel it current.
+It was a proposed test only. Jack has now confirmed B6; see the Sep 25 update below.
 `futurefit33-rh.jpg` is the downloaded official RH chart, cached by the service worker and
 shown inside the 3-wood row, so the reference survives offline. The app decodes both the
 current and target settings beside the image because the letter-number code alone is easy
@@ -3275,3 +3275,17 @@ round review and importer regressions passed, plus JS/JSON syntax checks.
 The 320/390 browser test is provided but has not run: the available browser
 was unusable and Playwright browser installation returned truncated downloads.
 Visual QA remains outstanding. Jack explicitly authorized merge after this limitation was disclosed; publication proceeds under that instruction.
+
+
+## Sep 25 B6 and Hi-Toe 58° import (v177)
+
+`range-20260925-feed.json` follows futurefit-feed on import and adds one idempotent bay plus the current B6 equipment update. B6 is +1.4° loft / 1.4° flat on the saved official RH chart (16.4° effective on the 15° head). A3 is historical; B7 was proposed, not used.
+
+The source transcript `data/range-2026-09-25.json` contains 16 visible rows: 3W 1–9 of 14 and all seven 58° rows. Never fabricate 3W 10–14 or use the 14-shot header average as a visible-sample mean. 3W 5/6 lack both distances and are excluded entirely; 7 fails the established carry filter. Wedge 5/7 are explicitly reviewed thin/skull mishits (11.8°/4.1° launch, 22/27 mm down impact), held out with reasons; raw transcript is unaltered. Eleven usable shots remain (6+5). Carry, total, height and delivery retain per-metric counts. No outdoor carry changes. Missing AoA and spin loft remain null. New shots flow through existing full-day, cumulative, evolution and practice-plan readers.
+
+User confirms bowed-wrist experimentation and wants clear mishits excluded. The first 58° sim baseline is added to its Bag note, but the outdoor carry ladder stays uncalibrated. Validation: Sep25 importer/arithmetic/idempotence test and bay-takeaways regression pass. Browser QA attempted but blocked: Playwright Chromium executable unavailable in this workspace.
+
+### Added Sep 25 4i capture
+`data/range-2026-09-25-4i.json` preserves 11 ordinal rows and explicit Normalize ON. A second unique bay entry in the same new feed groups with Sep25 full-day/cumulative readers. Ten remain after reviewed low-flight row 10 is held out (104.5 carry, 5.6° launch, 13 ft 2 in apex); other short rows remain. Mean carry/total 147.2/181.2; best-five carry 159.2. Face angle is absent; launch direction is not face. Twenty-one usable day shots across three clubs, with four mishits and two distance-dash exclusions; five 3W rows unseen. Preserve KING TEC set identity; do not add another standalone 4i. More uploads use new unique entries or bay-update targeting the existing batch to avoid duplicates.
+
+Sep25 final verification supersedes the earlier browser limitation: located an existing Chromium executable. `tests/range-sep25-browser.cjs` passes the actual three-club day, exact carry/total and apex display at 320/390px with no page errors or horizontal overflow; cumulative browser regression also passes. Import arithmetic/idempotence and bay-takeaways regressions pass. User explicitly authorized merging all three club imports to the Caddie HQ repository.

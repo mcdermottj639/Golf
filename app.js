@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v176';
+const BUILD = 'v177';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v177', d:'2026-09-25', items:['SEP 25 SIM: 3W at B6, new Hi-Toe 58° and returned 4-iron shot data, height and delivery, with reviewed exclusions. The 3W capture is partial: 9 of 14 rows visible. B6 is now the reported Bag setting.'] },
   { b:'v176', d:'2026-09-24', items:['SWING EVOLUTION NOW READS YOUR RANGE DATA: actual per-club numbers, dated batches, metric sample counts and source-day links update with new imports. The old symbol grid is clearly labelled as a historical assessment.'] },
   { b:'v175', d:'2026-09-24', items:['BAG FIX: Restored the complete 4–PW iron set using its permanent ID, including its name, specs and current note.'] },
   { b:'v174', d:'2026-09-24', items:['BAG: The returning 4-iron is part of your existing KING TEC 4–PW set. The KING TEC Utility 2-iron remains separate. Bag count includes all seven irons in the set, and the carry ladder follows 3W → 5W → utility 2i → 4i.'] },
@@ -10975,7 +10976,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 
