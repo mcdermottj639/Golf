@@ -3187,8 +3187,7 @@ they are not ideal ranges or statistical-significance tests. Paired delivery
 uses only complete path/face/F-P rows. F-P may be derived from measured face
 minus path; other absent fields are never inferred. Zero is valid.
 
-Each card has recorded evidence, a measured-shot plot, a separate **What it
-means** explanation, a measurable **Next session** task, and expandable retained
+Each card has recorded evidence, a measured-shot plot, a club-specific **Reference** and **What your numbers mean** interpretation, a measurable **Next session** task, and expandable retained
 shot IDs/conditions plus source buttons. `bay-takeaway-source` opens the actual
 bay record and focuses its exact `data-club` delivery chart. New code is cached
 by v164. `tests/bay-takeaways.cjs` exercises actual full feed imports, day scopes,
@@ -3292,3 +3291,10 @@ Sep25 final verification supersedes the earlier browser limitation: located an e
 
 ## Bag at a glance club ordering (v178)
 The fixed BAG_CANON list omitted 4i and 58°, causing the cumulative overview and table to append both below the historic club list. Add both in numerical bag order and provide fallback labels. Existing records, averages and roster are unchanged. Test the actual overview club labels/order, not only the Sep25 day view.
+
+## Personal bay benchmark interpretations (v179)
+Bay takeaway cards compare the actual club/metric against the cited Trackman 2023 PGA table (published May 2024), with numeric deltas and a short personal interpretation. Driver launch/spin/smash also cite male 10-handicap Combine averages from the respective Trackman metric articles. No amateur percentile or ideal target is inferred. Tour speed is shown so users can see the population difference. Mini, 2i and loft-specific wedges have no matching row; explicitly label that absence and use the measured personal baseline, never PW as a 58° proxy. Face/path uses an explicitly labelled straight-shot reference, not a population average. Target hits use the actual recorded zone. References link inside Shots & sources.
+
+The original v164 generic definitions were insufficient: Jack wants what HIS stats mean. Interpretations retain per-metric counts, distinguish a one-shot AoA from a tendency, and do not imply extra carry is all recoverable technique. A best-five of five is not a separate ceiling. Selection/cohorts, exclusions, raw data and outdoor carries are unchanged. BUILD/CACHE v179 are paired.
+
+Validation: bay-takeaway regressions and new reference checks pass; Sep25 real-browser checks verify the actual 58° reference and personal text at 320/390px with no overflow/errors. Inspected the rendered wedge card.

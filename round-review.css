@@ -46,6 +46,9 @@
 [data-review-hole]{scroll-margin-top:18px}
 .bay-takeaways .bt-meaning{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
 .bt-meaning>b{font:800 10px var(--sans);letter-spacing:.07em;text-transform:uppercase;color:var(--gtext)}
+.bt-reference{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:10px}
+.bt-reference>b{font:800 12px var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--gtext)}
+.bt-reference p{margin:8px 0 0}
 .bay-takeaways .rt-plotlabel{flex-wrap:wrap}
 .bay-takeaways .rt-source p{overflow-wrap:anywhere}
 .range-evidence-club[data-club]{scroll-margin-top:18px}

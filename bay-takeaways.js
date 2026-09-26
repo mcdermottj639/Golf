@@ -130,7 +130,72 @@
       if(selected.filter(x=>x.blocks[0].canon===c.blocks[0].canon).length>=2)continue;
       selected.push(c);
     }
-    return selected;
+    return selected.map(personalize);
+  }
+  // Trackman 2023 PGA table, published May 2 2024; yard column (not meters).
+  // No extrapolation to Mini, 2i or loft-specific wedges. Averages are context, not targets.
+  const tourSource='https://www.trackman.com/blog/introducing-updated-tour-averages';
+  const tour={
+    Dr:[115,282,1.49,10.4,2545], '3W':[110,249,1.47,9.3,3663],
+    '5W':[106,236,1.47,9.7,4322], '3i':[100,218,1.46,10.3,4404],
+    '4i':[98,209,1.44,10.8,4782], '5i':[96,199,1.41,11.9,5280],
+    '6i':[94,188,1.39,14.0,6204], '7i':[92,176,1.34,16.1,7124],
+    '8i':[89,164,1.33,17.8,8078], '9i':[87,152,1.29,20.0,8793],
+    PW:[84,142,1.24,23.7,9316]
+  };
+  function personalize(c){
+    const b=c.blocks[0],ss=b.shots,t=tour[b.canon];
+    const key={'Carry control':'carry','Strike efficiency':'smash','Flight window':'la','Spin consistency':'spin'}[c.kind];
+    const metric={carry:['carry',1,'yd',1],smash:['smash',2,'',2],la:['launch',3,'°',1],spin:['spin',4,'rpm',0]}[key];
+    const xs=key?values(ss,key):[],avg=mean(xs);
+    let gap='';
+    if(metric){
+      const [name,i,unit,dec]=metric;
+      c.reference=t?`PGA Tour · ${b.club}: ${fmt(t[i],dec)} ${unit} ${name} at ${t[0]} mph club speed (2023).`:
+        `No matching ${b.club} ${name} average in the cited Tour table. Your baseline: ${fmt(avg,dec)} ${unit} across ${xs.length} shots.`;
+      c.referenceSource=tourSource;
+      if(t){
+        const d=avg-t[i];gap=`Your ${fmt(avg,dec)} ${unit} is ${fmt(Math.abs(d),dec)} ${unit} ${Math.abs(d)<Math.pow(10,-dec)/2?'from':d>0?'above':'below'} that Tour average. `;
+        if(b.canon==='Dr'&&['smash','la','spin'].includes(key)){
+          const amateur={smash:1.45,la:11.9,spin:3192}[key];
+          c.reference+=` Male 10-handicap amateur: ${fmt(amateur,dec)} ${unit}.`;
+          c.amateurSource=`https://www.trackman.com/blog/${{smash:'smash-factor',la:'launch-angle',spin:'spin-rate'}[key]}`;
+        }
+      }
+    }
+    if(c.kind==='Carry control'){
+      const count=Math.min(xs.length,xs.length>=5?5:3),best=mean(xs.slice().sort((a,b)=>b-a).slice(0,count));
+      c.meaning=gap+`Your retained shots covered ${fmt(spread(xs))} yd front to back. `+
+        (count<xs.length?`Your best ${count} averaged ${fmt(best)} yd, ${fmt(best-avg)} yd beyond your overall mean; that is a repeatability opportunity, not extra distance already in the bag.`:
+          `The best-${count} figure uses every retained shot, so it does not establish a separate distance ceiling.`)+
+        (t?' Speed, loft and effort differ from the Tour sample; the distance gap is not all lost strike efficiency.':' This describes today’s effort, not a calibrated outdoor carry.');
+    }else if(c.kind==='Flight window'){
+      const carries=values(ss,'carry'),aoa=values(ss,'aoa');
+      c.meaning=gap+`Your ${fmt(mean(xs))}° launch moved through ${fmt(spread(xs))}° across ${xs.length} shots`+
+        (carries.length?`, alongside ${fmt(spread(carries))} yd of carry variation`:'')+`. `+
+        (aoa.length===1?`Attack angle ${signed(aoa[0])}° is only one shot, not your typical delivery. `:'')+
+        `${t?'The Tour gap alone does not mean your launch needs changing.':'Focus on repeating the landing distance; there is no matched benchmark to call this launch too high or low.'}`;
+    }else if(c.kind==='Strike efficiency'){
+      c.meaning=gap+`Your ${fmt(Math.min(...xs),2)}–${fmt(Math.max(...xs),2)} range shows uneven speed transfer even after clear mishits were removed. `+
+        `Repeat the stronger strikes at the same effort and check impact location; ${t&&avg<t[2]?'the lower mean makes strike and delivered loft worth checking':'a higher smash number alone does not prove a better shot'}.`;
+    }else if(c.kind==='Spin consistency'){
+      c.meaning=gap+`Your retained shots varied by ${Math.round(spread(xs))} rpm. That makes one average a weak description of your spin control today. `+
+        `Check whether the monitor measured spin, then compare the high- and low-spin shots’ launch and strike before changing the club setting.`;
+    }else if(c.kind==='Face & path'){
+      const paired=ss.filter(s=>finite(s.path)&&finite(s.face)&&finite(s.ftp)),ftp=mean(values(paired,'ftp')),face=mean(values(paired,'face'));
+      const open=paired.filter(s=>s.ftp>.05).length,closed=paired.filter(s=>s.ftp<-.05).length;
+      c.reference='Straight-shot reference for this club: face and path near 0° to the target, with face-to-path near 0°. This is a ball-flight reference, not a Tour or amateur average; an intentional draw or fade needs a different relationship.';
+      c.referenceSource='https://www.trackman.com/blog/face-to-path';
+      c.meaning=`Your face averaged ${signed(face)}° (${Math.abs(face)<.05?'square to':face>0?'right of':'left of'} the target), and face-to-path averaged ${signed(ftp)}°. `+
+        (open&&closed?`You had ${open} open-to-path and ${closed} closed-to-path shots, so the average hides opposite curve tendencies. `:
+        `With centered contact, that suggests ${Math.abs(ftp)<.05?'little face-to-path-driven curve':ftp>0?'a right-curving tendency':'a left-curving tendency'} for your right-handed swing. `)+
+        'Work on repeating one start line and curve; these numbers do not identify a wrist or body fault.';
+    }else if(c.kind==='Landing vs finish'){
+      const ids=new Set(ss.map(s=>s.shot)),ch=b.carryHits.filter(x=>ids.has(x)).length,th=b.totalHits.filter(x=>ids.has(x)).length;
+      c.reference=`Your recorded ${b.target} yd target zone is the reference. There is no comparable Tour/amateur hit rate without the same zone size and test.`;
+      c.meaning=`Only ${ch}/${ss.length} of your shots landed in the target zone, while ${th}/${ss.length} finished there. Your finish count was ${th-ch} higher, so it overstates your landing precision. For a forced carry, judge this club by its landing results.`;
+    }
+    return c;
   }
   function plot(row){
     if(!row.values.length)return '';
@@ -141,7 +206,7 @@
   function render(day,cards){
     const source=b=>Number.isInteger(b.index)?`<button data-action="bay-takeaway-source" data-i="${b.index}" data-club="${esc(b.club||'')}">${esc(b.club||b.label)} ↗</button>`:'';
     const sources=c=>c.blocks.flatMap(b=>b.sourceBlocks||[b]);
-    return `<section class="round-takeaways bay-takeaways" aria-label="Bay day takeaways"><h2>Your bay day · ${esc(day.date)}</h2><p class="sm">${day.usable} usable shots · ${day.clubs.length} clubs combined from ${day.blocks.length} source blocks. ${day.missing} distance-dash rows excluded; ${day.held} clear mishits held out. One full-day set of numbers per club.</p>${cards.length?`<p class="sm faint">${cards.length} priorities from the full day. Dots = retained readings; diamond = mean. Different targets and effort may contribute to the spread; these are not outdoor stock yardages.</p>`:'<p class="sm">Not enough usable shot-level readings for a reliable takeaway yet. Record at least three distance-bearing shots with the metric you want to compare; summary-only averages cannot establish shot variation.</p>'}${cards.map(c=>`<article class="card rt-card" data-bay-insight="${esc(c.id)}"><div class="rt-kind">${esc(c.kind)}</div><h3>${esc(c.title)}</h3><p>${esc(c.evidence)}</p><div class="rt-plots">${c.rows.map(plot).join('')}</div><div class="bt-meaning"><b>What it means</b><p>${esc(c.meaning)}</p></div><div class="rt-action"><b>Next session</b><span>${esc(c.action)}</span></div><details class="rt-source"><summary>Shots & source blocks</summary>${sources(c).map(b=>`<p>Record ${b.record}: ${esc(b.label||b.club)} · ${esc(b.setup)}. ${b.shots.length} usable / ${b.sourceCount} source rows; ${b.missing} missing-distance, ${b.held} clear-mishit exclusions. Retained source shot IDs: ${b.shots.map(s=>esc(s.shot??'?')).join(', ')}. Conditions: ${esc(b.context)}.</p>`).join('')}<div class="rt-links">${c.blocks.map(source).join('')}</div></details></article>`).join('')}${day.summaryOnly.length?`<details class="rt-source"><summary>${day.summaryOnly.length} summary-only day records</summary><p>Reviewed for coverage but not pooled into shot-level takeaways: no individual carry/total rows were available to apply your exclusions.</p><div class="rt-links">${day.summaryOnly.map(source).join('')}</div></details>`:''}</section>`;
+    return `<section class="round-takeaways bay-takeaways" aria-label="Bay day takeaways"><h2>Your bay day · ${esc(day.date)}</h2><p class="sm">${day.usable} usable shots · ${day.clubs.length} clubs combined from ${day.blocks.length} source blocks. ${day.missing} distance-dash rows excluded; ${day.held} clear mishits held out. One full-day set of numbers per club.</p>${cards.length?`<p class="sm faint">${cards.length} priorities from the full day. Dots = retained readings; diamond = mean. Different targets and effort may contribute to the spread; these are not outdoor stock yardages.</p>`:'<p class="sm">Not enough usable shot-level readings for a reliable takeaway yet. Record at least three distance-bearing shots with the metric you want to compare; summary-only averages cannot establish shot variation.</p>'}${cards.map(c=>`<article class="card rt-card" data-bay-insight="${esc(c.id)}"><div class="rt-kind">${esc(c.kind)}</div><h3>${esc(c.title)}</h3><p>${esc(c.evidence)}</p><div class="rt-plots">${c.rows.map(plot).join('')}</div><div class="bt-reference"><b>Reference · ${esc(c.blocks[0].club)}</b><p>${esc(c.reference)}</p></div><div class="bt-meaning"><b>What your numbers mean</b><p>${esc(c.meaning)}</p></div><div class="rt-action"><b>Next session</b><span>${esc(c.action)}</span></div><details class="rt-source"><summary>Shots & sources</summary>${c.referenceSource?`<p><a href="${esc(c.referenceSource)}" target="_blank" rel="noopener noreferrer">Trackman reference ↗</a>${c.amateurSource?` · <a href="${esc(c.amateurSource)}" target="_blank" rel="noopener noreferrer">Amateur reference ↗</a>`:''}. Tour averages describe a different speed/loft population; they are not personal targets.</p>`:''}${sources(c).map(b=>`<p>Record ${b.record}: ${esc(b.label||b.club)} · ${esc(b.setup)}. ${b.shots.length} usable / ${b.sourceCount} source rows; ${b.missing} missing-distance, ${b.held} clear-mishit exclusions. Retained source shot IDs: ${b.shots.map(s=>esc(s.shot??'?')).join(', ')}. Conditions: ${esc(b.context)}.</p>`).join('')}<div class="rt-links">${c.blocks.map(source).join('')}</div></details></article>`).join('')}${day.summaryOnly.length?`<details class="rt-source"><summary>${day.summaryOnly.length} summary-only day records</summary><p>Reviewed for coverage but not pooled into shot-level takeaways: no individual carry/total rows were available to apply your exclusions.</p><div class="rt-links">${day.summaryOnly.map(source).join('')}</div></details>`:''}</section>`;
   }
   root.CaddieBayTakeaways={prepare,combine,build,render,mishit};
   if(typeof module!=='undefined')module.exports=root.CaddieBayTakeaways;

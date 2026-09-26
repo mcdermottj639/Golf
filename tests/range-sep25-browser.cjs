@@ -13,12 +13,17 @@ const server=http.createServer((q,r)=>{const file=path.join(root,q.url.split('?'
   await page.locator('[data-action="session-category"][data-kind="days"]').first().click();
   await page.locator(`[data-action="open-bay"][data-i="${idx}"]`).first().click();
   assert.equal(await page.locator('.range-evidence-club').count(),3);
+  const flight=page.locator('[data-bay-insight="Flight window-club-58°"]');
+  assert.match(await flight.locator('.bt-reference').innerText(),/No matching/);
+  assert.match(await flight.locator('.bt-meaning').innerText(),/34.4°/);
+  assert.match(await flight.locator('.bt-meaning').innerText(),/one shot/);
   const exact=await page.locator('.bay-clubs').innerText();
   for(const value of ['147.2','181.2','185.1','75.2','APEX FT'])assert.ok(exact.includes(value),value);
   for(const width of [320,390]){
     await page.setViewportSize({width,height:844});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'page overflow '+width);
   }
+  await flight.screenshot({path:'/tmp/caddie-v179-wedge.png'});
   await page.screenshot({path:'/tmp/caddie-sep25.png',fullPage:true});
   assert.deepEqual(errors,[]);console.log('PASS Sep25 real browser: three-club day, exact values, heights, 320/390 no overflow/errors.');
  }finally{await browser.close();server.close();}

@@ -30,7 +30,7 @@ assert.equal(day.clubs.length,1);assert.equal(day.clubs[0].shots.length,6);
 assert.equal(day.clubs[0].sourceBlocks.length,2);
 assert.equal(new Set(day.clubs[0].shots.map(s=>s.shot)).size,6);
 assert.equal(B.build(day).find(c=>c.kind==='Face & path').rows[0].values.length,6);
-assert.match(B.render(day,B.build(day)),/What it means/);
+assert.match(B.render(day,B.build(day)),/What your numbers mean/);
 assert.match(B.render(day,B.build(day)),/bay-takeaway-source/);
 const missing=fixture('m','2026-09-22',[shot(1,{carry:null,total:null}),shot(2,{carry:null,total:null})]);
 assert.equal(B.prepare('2026-09-22',[missing]).usable,0);
@@ -95,3 +95,13 @@ assert.equal((html.match(/class="range-evidence-club" data-club="5-iron"/g)||[])
 assert.doesNotMatch(html,/<h3[^>]*>5-iron · target/);
 for(const group of source.bay.detail.rangeShots)for(const s of group.shots)assert.equal(B.mishit(s,group.shots),T.isClearMishit(s,group.shots),'same clear-mishit algorithm');
 console.log('PASS bay takeaways: full-day imports, combined clubs, exclusion parity, missing/zero/paired data, source links, no mutations, and plain-language explanations.');
+
+// Benchmarks must match the actual club; no PW proxy for the new 58°.
+const sep25=require('../range-20260925-feed.json').entries.filter(e=>e.type==='bay').map((e,i)=>({...e.bay,_fid:e.id,index:i}));
+const actual=B.build(B.prepare('2026-09-25',sep25));
+const wedge=actual.find(c=>c.kind==='Flight window'&&c.blocks[0].canon==='58°');
+assert.ok(wedge);assert.match(wedge.reference,/No matching/);assert.match(wedge.meaning,/34.4°/);assert.match(wedge.meaning,/one shot/);
+const wood=actual.find(c=>c.kind==='Spin consistency'&&c.blocks[0].canon==='3W');
+assert.ok(wood);assert.match(wood.reference,/3663 rpm/);assert.match(wood.reference,/110 mph/);
+assert.ok(actual.every(c=>c.reference&&c.meaning));
+console.log('PASS matched references, missing wedge reference and one-shot delivery guard.');

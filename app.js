@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v178';
+const BUILD = 'v179';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v179', d:'2026-09-25', items:['BAY TAKEAWAYS: club-specific Tour references and personal interpretations replace generic stat definitions. Driver cards also include a 10-handicap amateur reference where available; unmatched wedges use an explicit personal baseline.'] },
   { b:'v178', d:'2026-09-25', items:['BAG AT A GLANCE: the returned 4-iron and new 58° now appear in club order instead of being appended below the old club list.'] },
   { b:'v177', d:'2026-09-25', items:['SEP 25 SIM: 3W at B6, new Hi-Toe 58° and returned 4-iron shot data, height and delivery, with reviewed exclusions. The 3W capture is partial: 9 of 14 rows visible. B6 is now the reported Bag setting.'] },
   { b:'v176', d:'2026-09-24', items:['SWING EVOLUTION NOW READS YOUR RANGE DATA: actual per-club numbers, dated batches, metric sample counts and source-day links update with new imports. The old symbol grid is clearly labelled as a historical assessment.'] },
