@@ -9,7 +9,7 @@ assert.deepEqual(day.blocks.map(b=>b.shots.length),[6,14,14,7,7,15]);
 assert.equal(day.clubs.length,5);assert.equal(day.clubs.find(c=>c.canon==='5i').shots.length,29);
 assert.equal(day.clubs.find(c=>c.canon==='5i').target,null);
 B.build(day);assert.equal(JSON.stringify(bay),before);
-const sep25=require('../range-20260925-feed.json').entries.filter(e=>e.type==='bay').map((e,i)=>({...e.bay,_fid:e.id,index:i}));
+const sep25=require('../range-20260925-feed.json').entries.filter(e=>e.type==='bay').slice(0,2).map((e,i)=>({...e.bay,_fid:e.id,index:i}));
 const day25=B.prepare('2026-09-25',sep25),actual=B.build(day25),main=actual.filter(c=>!c.secondary);
 assert.equal(day25.usable,21);assert.deepEqual(main.map(c=>c.kind),['Delivery consistency','Speed group','Target fit']);
 assert.equal(new Set(main.map(c=>c.blocks[0].canon)).size,3);
@@ -67,7 +67,7 @@ assert.match(T.simPracticeFocus(legacy).test,/98 yd/);
 const stateAfterOld=JSON.stringify(T.get());assert.equal(stateAfterOld,stateBefore);
 const previous=today.map((b,i)=>({...b,_fid:'previous-'+i,date:'2026-09-21'}));T.get().bays.push(...previous);
 assert.ok(T.generateSimPracticePlan().blocks.some(b=>b.earlier?.includes('2026-09-21')));T.get().bays.splice(-previous.length);
-T.applyFeed(require('../range-20260925-feed.json'));
+T.applyFeed({...require('../range-20260925-feed.json'),entries:require('../range-20260925-feed.json').entries.filter(e=>e.id!=='bay-20260925-late-four-clubs-v1')});
 const latest=T.generateSimPracticePlan(),latestSteps=latest.blocks.filter(b=>b.insight);
 assert.equal(latestSteps.length,3);assert.equal(latest.usable,21);
 for(const step of latestSteps){const c=main.find(c=>c.kind===step.kind);assert.ok(c);assert.equal(T.simPracticeFocus(step).test,c.action);}

@@ -3336,3 +3336,13 @@ source-block scope, deterministic output, exclusions, Coach parity and saved-pla
 preservation. Real browser tests cover Sep22/Sep25, source navigation, exact data,
 three primary cards, the 75-yard Coach action and 320/390px with no overflow/errors.
 Rendered 4i and 58-degree cards inspected. No source/feed or outdoor carry migration.
+
+## Additional Sep25 batch and missing-distance contact review (v181)
+
+Append-only feed id `bay-20260925-late-four-clubs-v1` imports 4i/7i/58°/Driver from four later uploads. Raw source is `data/range-2026-09-25-late.json`; `scripts/import-sep25-late.py` records the transcription and regenerates it, adding the unique feed entry only if absent. Original entries remain unchanged. There are 32 new visible rows, five distance-missing exclusions and seven additional distance-bearing mishits, leaving 20 retained (5/5/6/4). The full day has 41 retained shots across five clubs. Tests distinguish the earlier 21-shot fixture from the complete day.
+
+Do not fabricate missing distances from delivery or launch readings. Carry reconstruction needs an aerodynamic/environment model; total additionally needs landing/ground assumptions. Contact-plausible is a review label, not a distance or a clean-swing certification. Four missing rows have plausible readings (4i 5; 7i 2/5/7); 4i 6 is a reviewed low-flight mishit. They are archived with null distances and kept OUT of `rangeShots.shots`, with archived counts and separate `distanceMissingReview` metadata. The day expander displays that metadata without feeding it into calculations. Missing-distance and held-out counts are disjoint; the missing 4i mishit is counted only once.
+
+4i 1/2/7 are clear low-flight carry outliers; 58° 1/5/6/8 have reviewed thin/skull evidence (low launch/apex and impact 15–19 mm down). Raw values remain available; no feed history or outdoor carry is rewritten. Per-shot height is captured, including the 4i 7 apex of ten INCHES, stored as 0 ft 10 in. Obscured 4i 6 landing angle is null. All inspected numbers remain source readings, not estimated distances. Standing instruction: always exclude clear mishits from bay analysis.
+
+Validation: prior feed entries deep-equal original main; new entry is idempotent. Arithmetic/exclusion and reusable insight tests pass. Actual combined five-club day, 41 usable count, separate missing-distance expander and Coach pass at 320/390px with no page errors or overflow.

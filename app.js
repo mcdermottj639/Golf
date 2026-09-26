@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v180';
+const BUILD = 'v181';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v181', d:'2026-09-25', items:['ADDITIONAL SEP25 RANGE DATA: 20 usable shots added across 4i, 7i, 58° and Driver. Clear mishits excluded. Five distance-missing rows get a separate contact review, with no guessed yardages entering your averages.'] },
   { b:'v180', d:'2026-09-25', items:['PERSONAL BAY INSIGHTS: related shot measurements now drive three concise practice priorities. New sessions and late uploads recalculate automatically; Coach uses the same finding and next test. Full data, benchmarks and secondary findings remain expandable.'] },
   { b:'v179', d:'2026-09-25', items:['BAY TAKEAWAYS: club-specific Tour references and personal interpretations replace generic stat definitions. Driver cards also include a 10-handicap amateur reference where available; unmatched wedges use an explicit personal baseline.'] },
   { b:'v178', d:'2026-09-25', items:['BAG AT A GLANCE: the returned 4-iron and new 58° now appear in club order instead of being appended below the old club list.'] },

@@ -8,11 +8,11 @@ const server=http.createServer((q,r)=>{const file=path.join(root,q.url.split('?'
  try{
   const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
-  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('bay-20260925-4i-visible-v1'));
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('bay-20260925-late-four-clubs-v1'));
   const idx=await page.evaluate(()=>JSON.parse(localStorage.getItem('caddiehq_v1')).bays.findIndex(b=>b._fid==='bay-20260925-4i-visible-v1'));
   await page.locator('[data-action="session-category"][data-kind="days"]').first().click();
   await page.locator(`[data-action="open-bay"][data-i="${idx}"]`).first().click();
-  assert.equal(await page.locator('.range-evidence-club').count(),3);
+  assert.equal(await page.locator('.range-evidence-club').count(),5);
   const primary=page.locator('.bay-takeaways > [data-bay-insight]');
   assert.equal(await primary.count(),3);
   const flight=primary.filter({hasText:'58°:'});
@@ -21,8 +21,14 @@ const server=http.createServer((q,r)=>{const file=path.join(root,q.url.split('?'
   assert.doesNotMatch(await flight.locator('.rt-action').innerText(),/98 yd/);
   assert.match(await primary.filter({hasText:'4-iron:'}).locator('.bt-meaning').innerText(),/79.7 mph/);
   assert.match(await primary.filter({hasText:'3-wood:'}).locator('.bt-meaning').innerText(),/191.2/);
+  const missing=page.locator('.bt-missing');
+  assert.match(await missing.locator('summary').innerText(),/5/);
+  await missing.locator('summary').click();
+  assert.match(await missing.innerText(),/clear mishit/);
+  assert.match(await missing.innerText(),/7-iron · source shot 2/);
+  assert.match(await page.locator('.bay-takeaways>p').first().innerText(),/41 usable shots/);
   const exact=await page.locator('.bay-clubs').innerText();
-  for(const value of ['147.2','181.2','185.1','75.2','APEX FT'])assert.ok(exact.includes(value),value);
+  for(const value of ['149.7','185.1','75.4','128.7','214.1','APEX FT'])assert.ok(exact.includes(value),value);
   for(const width of [320,390]){
     await page.setViewportSize({width,height:844});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'page overflow '+width);
@@ -35,6 +41,6 @@ const server=http.createServer((q,r)=>{const file=path.join(root,q.url.split('?'
   const practice=page.locator('.sim-practice-block').filter({hasText:'58°:'});
   assert.match(await practice.innerText(),/75 yd/);
   assert.doesNotMatch(await practice.innerText(),/Hit 10.*98 yd/);
-  assert.deepEqual(errors,[]);console.log('PASS Sep25 real browser: three-club day, exact values, heights, 320/390 no overflow/errors.');
+  assert.deepEqual(errors,[]);console.log('PASS Sep25 real browser: five-club day, 41 shots, missing-distance review, exact values, Coach and 320/390 no overflow/errors.');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exit(1);});
