@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v179';
+const BUILD = 'v180';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v180', d:'2026-09-25', items:['PERSONAL BAY INSIGHTS: related shot measurements now drive three concise practice priorities. New sessions and late uploads recalculate automatically; Coach uses the same finding and next test. Full data, benchmarks and secondary findings remain expandable.'] },
   { b:'v179', d:'2026-09-25', items:['BAY TAKEAWAYS: club-specific Tour references and personal interpretations replace generic stat definitions. Driver cards also include a 10-handicap amateur reference where available; unmatched wedges use an explicit personal baseline.'] },
   { b:'v178', d:'2026-09-25', items:['BAG AT A GLANCE: the returned 4-iron and new 58° now appear in club order instead of being appended below the old club list.'] },
   { b:'v177', d:'2026-09-25', items:['SEP 25 SIM: 3W at B6, new Hi-Toe 58° and returned 4-iron shot data, height and delivery, with reviewed exclusions. The 3W capture is partial: 9 of 14 rows visible. B6 is now the reported Bag setting.'] },
@@ -6090,18 +6091,18 @@ function generateSimPracticePlan(){
   if(api)for(const date of dates){const candidate=bayDayData((S.bays||[]).find(b=>b.date===date&&BAY_DISC(b)==='swing'));
     const found=api.build(candidate);if(found.length)dayCards.push({day:candidate,cards:found});}
   const day=dayCards[0]?.day||null;
-  const cards=(dayCards[0]?.cards||[]).map(c=>({...c,
+  const cards=(dayCards[0]?.cards||[]).filter(c=>!c.secondary).map(c=>({...c,
     earlier:dayCards.slice(1).filter(d=>d.cards.some(x=>x.kind===c.kind&&x.blocks[0].canon===c.blocks[0].canon)).map(d=>d.day.date)}))
-    .sort((a,b)=>(b.earlier.length?1:0)-(a.earlier.length?1:0)||b.score-a.score);
+    .sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));
   const selected=[],clubs=new Set();
   for(const c of cards){const club=c.blocks[0].canon;if(clubs.has(club))continue;clubs.add(club);selected.push(c);if(selected.length===3)break;}
   const blocks=[{title:'Warm up and confirm the setup',minutes:5,shots:8,
     why:'Preparation, not a diagnosis from your data.',meaning:'Consistent balls, lie and monitor settings make the next test easier to compare.',
     task:'At Golf Lounge 18 Stamford, ask for TrackMan range / Shot Analysis. Hit 8 comfortable wedge and mid-iron shots from the bay mat. Confirm target alignment, supplied balls, normalization and spin setup with staff. Note your current club settings; do not assume older shots used today’s setting. Use only balls and equipment the venue permits.',
     target:'Finish comfortable and record the setup before scoring the tests.'}];
-  for(const c of selected)blocks.push({kind:c.kind,title:c.title,minutes:10,shots:10,why:c.evidence,meaning:c.meaning,task:simBayTask(c),
+  for(const c of selected)blocks.push({kind:c.kind,insight:{...c.practice,heading:c.title,evidence:c.evidence+' '+c.meaning,test:c.action},title:c.title,minutes:10,shots:10,why:c.evidence,meaning:c.meaning,task:simBayTask(c),
     target:'Record all 10 attempts and the result requested above. Compare with this dated baseline; no promised distance gain.',sourceIndex:c.blocks[0].index,sourceClub:c.blocks[0].club,
-    targetYds:c.blocks[0].target,earlier:c.earlier,baseline:{shots:c.blocks[0].shots.length,
+    targetYds:c.targetYds??c.blocks[0].target,earlier:c.earlier,baseline:{shots:c.blocks[0].shots.length,
       carryHits:c.blocks[0].carryHits?.length??null,totalHits:c.blocks[0].totalHits?.length??null,
       smash:c.rows.find(r=>r.label==='Smash factor')?.values||null,
       ftp:c.rows.find(r=>r.label==='Face–path')?.values||null}});
@@ -6118,6 +6119,7 @@ function generateSimPracticePlan(){
     venue:'Golf Lounge 18 Stamford · TrackMan bay',minutes:blocks.reduce((n,b)=>n+b.minutes,0),shots:blocks.reduce((n,b)=>n+b.shots,0),blocks,done:[]};
 }
 function simBayTask(c){
+  if(c.practice)return 'TrackMan range / Shot Analysis: '+c.action+' Save every attempt and keep missing readings blank.';
   const club=c.blocks[0].club;
   const tasks={
     'Face & path':`Hit 10 ${club} shots toward one on-screen target. Use the displayed start line and curve, not a physical gate. Record face angle, club path and face-to-path when readable. Count how often your intended start and curve repeat; compare their ranges with the dated source.`,
@@ -6158,6 +6160,7 @@ function simPracticeKind(b){
   return '';
 }
 function simPracticeFocus(b){
+  if(b.insight)return {...b.insight};
   const kind=simPracticeKind(b),club=b.sourceClub||String(b.title||'').split(':')[0],title=String(b.title||'');
   if(title.startsWith('Warm up'))return {heading:'Get loose and set the bay',evidence:'This is a warm-up, not a scored result.',test:'8 easy shots from the mat; confirm target and ball/monitor setup.',track:'Ready to start the three scored tests.'};
   if(title.includes('simulated course'))return {heading:'Take it onto the simulator',evidence:b.why||'This tests whether practice transfers when targets change.',test:'9 approaches at changing on-screen targets; count every attempt.',track:'Safe landing-area hits out of 9.',input:'count',max:9};

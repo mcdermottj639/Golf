@@ -53,3 +53,12 @@
 .bay-takeaways .rt-source p{overflow-wrap:anywhere}
 .range-evidence-club[data-club]{scroll-margin-top:18px}
 .rt-links button:focus-visible,.rt-hole:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+/* v180: conclusions first; dense evidence remains available on demand. */
+.bay-takeaways .rt-card h3{font-size:23px;line-height:1.2}
+.bay-takeaways .rt-card p,.bay-takeaways .rt-action{font-size:15px;line-height:1.5;color:var(--ink)}
+.bay-takeaways .bt-meaning{border-top:0;padding-top:0}
+.bay-takeaways .bt-meaning>b,.bay-takeaways .rt-action>b{font-size:12px}
+.bay-takeaways .rt-source summary,.bt-more>summary{min-height:44px;font:700 14px var(--sans);cursor:pointer}
+.bay-takeaways .rt-source p,.bay-takeaways .bt-scope{font-size:13px;color:var(--soft)}
+.bay-takeaways .bt-reference{padding:10px}

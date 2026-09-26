@@ -13,18 +13,28 @@ const server=http.createServer((q,r)=>{const file=path.join(root,q.url.split('?'
   await page.locator('[data-action="session-category"][data-kind="days"]').first().click();
   await page.locator(`[data-action="open-bay"][data-i="${idx}"]`).first().click();
   assert.equal(await page.locator('.range-evidence-club').count(),3);
-  const flight=page.locator('[data-bay-insight="Flight window-club-58°"]');
-  assert.match(await flight.locator('.bt-reference').innerText(),/No matching/);
-  assert.match(await flight.locator('.bt-meaning').innerText(),/34.4°/);
-  assert.match(await flight.locator('.bt-meaning').innerText(),/one shot/);
+  const primary=page.locator('.bay-takeaways > [data-bay-insight]');
+  assert.equal(await primary.count(),3);
+  const flight=primary.filter({hasText:'58°:'});
+  assert.match(await flight.locator('.bt-meaning').innerText(),/72.3/);
+  assert.match(await flight.locator('.rt-action').innerText(),/75 yd/);
+  assert.doesNotMatch(await flight.locator('.rt-action').innerText(),/98 yd/);
+  assert.match(await primary.filter({hasText:'4-iron:'}).locator('.bt-meaning').innerText(),/79.7 mph/);
+  assert.match(await primary.filter({hasText:'3-wood:'}).locator('.bt-meaning').innerText(),/191.2/);
   const exact=await page.locator('.bay-clubs').innerText();
   for(const value of ['147.2','181.2','185.1','75.2','APEX FT'])assert.ok(exact.includes(value),value);
   for(const width of [320,390]){
     await page.setViewportSize({width,height:844});
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'page overflow '+width);
   }
-  await flight.screenshot({path:'/tmp/caddie-v179-wedge.png'});
+  await flight.screenshot({path:'/tmp/caddie-v180-wedge.png'});
+  await primary.first().screenshot({path:'/tmp/caddie-v180-iron.png'});
   await page.screenshot({path:'/tmp/caddie-sep25.png',fullPage:true});
+  await page.locator('#nav [data-view="coach"]').click();
+  await page.locator('[data-action="build-sim-practice"]').click();
+  const practice=page.locator('.sim-practice-block').filter({hasText:'58°:'});
+  assert.match(await practice.innerText(),/75 yd/);
+  assert.doesNotMatch(await practice.innerText(),/Hit 10.*98 yd/);
   assert.deepEqual(errors,[]);console.log('PASS Sep25 real browser: three-club day, exact values, heights, 320/390 no overflow/errors.');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exit(1);});

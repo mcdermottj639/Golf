@@ -3174,23 +3174,19 @@ not silently invented into shot-level results. No stored data or playing carry
 is changed. Day charts use the same retained-only projection without filtering twice; sources
 list the retained shot IDs and exclusions so their precise cohort is inspectable.
 
-The engine combines retained individual shots by club, then selects up to six diverse cards
-from paired face/path, carry control, landing-versus-finish target hits, smash
-variation, launch window and spin variation. Averages and best-five values use
-individual shots, never averages of block means. Mixed targets suppress target-hit
-cards. Takeaways never imply chronology, improvement, a causal swing
-fault or comparable conditions. Record numbers are identifiers in the day view,
-not timestamps. Target labels and full source setup disambiguate repeated clubs.
-Editorial selection thresholds (3 readings minimum, .08 smash spread, 3° launch,
-1000 rpm spin) decide which facts get a card;
-they are not ideal ranges or statistical-significance tests. Paired delivery
-uses only complete path/face/F-P rows. F-P may be derived from measured face
-minus path; other absent fields are never inferred. Zero is valid.
+Full-day charts still combine retained individual shots by club. As of v180, relationship
+findings stay inside one source block so unknown or mixed setup/intent cannot become a
+pooled diagnosis. The engine chooses at most three primary decisions, one per club,
+and up to three distinct supporting findings under More findings. No forced filler.
+Paired delivery/efficiency, similar-speed groups, target fit, compact carry groups,
+measured curve and carry-versus-roll drive the rules. Editorial thresholds are documented
+below; they are not ideal ranges or significance tests. Face-to-path can be derived
+from measured face minus path; missing metrics stay missing and zero remains valid.
 
-Each card has recorded evidence, a measured-shot plot, a club-specific **Reference** and **What your numbers mean** interpretation, a measurable **Next session** task, and expandable retained
-shot IDs/conditions plus source buttons. `bay-takeaway-source` opens the actual
-bay record and focuses its exact `data-club` delivery chart. New code is cached
-by v164. `tests/bay-takeaways.cjs` exercises actual full feed imports, day scopes,
+Each card leads with a conclusion, Why this matters and a measurable Next test.
+Plots, source shot IDs, conditions and Tour reference move into Numbers, reference &
+sources. `bay-takeaway-source` still opens the actual bay and focuses its delivery chart.
+BUILD/CACHE v180 are paired.  `tests/bay-takeaways.cjs` exercises actual full feed imports, day scopes,
 paired counts, filter parity, missing/zero data and no mutation. The browser
 test checks 320/390 widths, above-the-fold placement, explanation/action cards,
 and actual source-link focus. Sep22 currently covers 93 usable shots over eight
@@ -3292,9 +3288,51 @@ Sep25 final verification supersedes the earlier browser limitation: located an e
 ## Bag at a glance club ordering (v178)
 The fixed BAG_CANON list omitted 4i and 58°, causing the cumulative overview and table to append both below the historic club list. Add both in numerical bag order and provide fallback labels. Existing records, averages and roster are unchanged. Test the actual overview club labels/order, not only the Sep25 day view.
 
-## Personal bay benchmark interpretations (v179)
-Bay takeaway cards compare the actual club/metric against the cited Trackman 2023 PGA table (published May 2024), with numeric deltas and a short personal interpretation. Driver launch/spin/smash also cite male 10-handicap Combine averages from the respective Trackman metric articles. No amateur percentile or ideal target is inferred. Tour speed is shown so users can see the population difference. Mini, 2i and loft-specific wedges have no matching row; explicitly label that absence and use the measured personal baseline, never PW as a 58° proxy. Face/path uses an explicitly labelled straight-shot reference, not a population average. Target hits use the actual recorded zone. References link inside Shots & sources.
+## Reusable personal bay insights (v180; supersedes v179 descriptions)
 
-The original v164 generic definitions were insufficient: Jack wants what HIS stats mean. Interpretations retain per-metric counts, distinguish a one-shot AoA from a tendency, and do not imply extra carry is all recoverable technique. A best-five of five is not a separate ceiling. Selection/cohorts, exclusions, raw data and outdoor carries are unchanged. BUILD/CACHE v179 are paired.
+v179 added benchmark deltas but still repeated numbers instead of connecting them.
+Jack authorized the reusable insight build: every viewed day and late upload is
+recomputed deterministically, without model calls, new storage or modified shot data.
+The Sep25 examples are test fixtures, never hardcoded conclusions.
 
-Validation: bay-takeaway regressions and new reference checks pass; Sep25 real-browser checks verify the actual 58° reference and personal text at 320/390px with no overflow/errors. Inspected the rendered wedge card.
+`bay-takeaways.js` now selects source-block-scoped findings. Full-day summaries and
+exact-data charts keep the original combined cohorts; a card says when its block is
+only part of that club's day. Unknown block compatibility is never assumed. Club
+aliases include every numbered iron, using the app's canonical labels when supplied.
+
+Rule gates (editorial, not statistical): stable speed requires >=5 complete
+carry/club-speed/ball-speed/smash rows, speed range <=5% median and carry range >=15%
+median. An illustrative pair is within 0.5 mph with >=15% median carry difference and
+at least 3 mph more ball speed on the longer shot. Similar-speed groups use the largest
+3 mph window selected by speed alone, >=4 rows and >=70% of paired rows, with remaining
+shots slower and group carry at least 3 yd above the retained mean. Neither rule removes
+valid shots. Compact carry groups use a 5 yd window, >=4 rows and >=75% of carries.
+Target-fit activates when all retained carries are below the screen target and its gap
+to the mean is >=10 yd. A proposed drill rounds the compact-group mean UP to the next
+5 yd (72.25 -> 75), or the overall mean to nearest 5 yd if no compact group exists.
+This reconciles the brief's 75-yard example with its ambiguous rounding instruction.
+
+Measured curve, not landing side or a face-to-path prediction, drives flight wording.
+Require >=3 curves of at least 10 ft before selecting a directional priority; tiny
+wedge curves must not become a swing problem. Opposite predicted/measured curve is
+an observation requiring strike/measurement review, not a proven gear-effect diagnosis.
+Paired total-minus-carry >=15 yd supports a carry/roll decision. Zero remains valid;
+missing metrics do not cause invented mechanics or synthetic reference averages.
+
+Reference details retain the verified 2023 PGA table, carry and smash at Tour club
+speed, with explicit absence for unmatched clubs. No PW proxy for 58 degrees. No
+Tour deficit is labelled recoverable distance. The old per-metric benchmark lectures
+are removed along with unused generation code. More findings gives observed flight
+precedence as a supporting decision; exact club data remains available below.
+
+Coach takes the same primary finding/action via a serialized `insight` object, preserving
+legacy version-1 saved plans and existing result entry types. Generating a plan cannot
+rewrite an existing saved plan. Recurrence dates are descriptive only and no longer
+reorder the day's priorities. All practice scores include every attempt.
+
+Validation: reusable-insight unit/integration tests cover actual Sep25, a future date/new
+club, late-shot invalidation, duplicate imports, changed speed, absent ball speed,
+source-block scope, deterministic output, exclusions, Coach parity and saved-plan
+preservation. Real browser tests cover Sep22/Sep25, source navigation, exact data,
+three primary cards, the 75-yard Coach action and 320/390px with no overflow/errors.
+Rendered 4i and 58-degree cards inspected. No source/feed or outdoor carry migration.
