@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "updated": "2026-10-01",
   "entries": [
     {
@@ -66,6 +66,59 @@
         "nameIncludes": "DS-ADAPT",
         "cat": "hybrid"
       }
+    },
+    {
+      "id": "bag-ping-g440-4h-replacement-20261001",
+      "type": "club-update",
+      "target": "bag-ds-adapt-4h-20261001",
+      "club": {
+        "name": "PING G440 4H Hybrid",
+        "cat": "hybrid",
+        "status": "ordered",
+        "playingClub": "4-hybrid",
+        "loft": 23,
+        "spec": "4H · 23° · Regular Flex · Right Hand · ALTA CB Blue 70 Graphite",
+        "note": "Ordered October 1, 2026; expected today per Jack. Replaces the canceled Golf Galaxy Cobra DS-ADAPT 4H order and fills the benched KING TEC 4-iron slot. Start at standard 23°; ALTA CB Blue 70 Regular (73g). Simulator carry, total and delivery data pending; no previous-club distances transferred."
+      }
+    },
+    {
+      "id": "bag-kingtec-ping-note-20261001",
+      "type": "club-update",
+      "target": "c6",
+      "club": {
+        "note": "Owned as the complete 4–PW set. 4-iron benched October 1 for the PING G440 4H; 5i–PW remain active. KING TEC Utility 2-iron is separate."
+      }
+    },
+    {
+      "id": "bag-kingtec-4i-ping-note-20261001",
+      "type": "club-update",
+      "target": "bag-kingtec-4i-bench-20261001",
+      "club": {
+        "note": "Benched October 1, 2026 for PING G440 4H (23°). Historical 4-iron sessions remain 4-iron data."
+      }
+    },
+    {
+      "id": "bag-carry-ping-4h-20261001",
+      "type": "carry-update",
+      "target": "4-hybrid",
+      "force": true,
+      "club": {
+        "loft": "23°",
+        "carry": null,
+        "meas": null
+      }
+    },
+    {
+      "id": "bag-canceled-cobra-history-correction-20261001",
+      "type": "history-edit",
+      "match": "Cobra DS-ADAPT 4H Hybrid (Regular, KBS PGH 75",
+      "text": "The planned Cobra DS-ADAPT 4H order was canceled by Golf Galaxy before delivery. PING G440 4H replaces that order; no Cobra hybrid was played or measured."
+    },
+    {
+      "id": "bag-ping-g440-history-20261001",
+      "type": "history",
+      "date": "2026-10-01",
+      "text": "Ordered PING G440 4H Hybrid: 23°, right hand, ALTA CB Blue 70 Graphite Regular (73g), expected today. Replaces the canceled Cobra hybrid order in the KING TEC 4-iron slot. 4i remains benched; 5–PW stay active. Hybrid distances await sim data."
     }
   ]
 }

@@ -2980,7 +2980,7 @@ re-sends the COMPLETE detail object under a new id. Never edit or remove that re
 the recovery path for existing installs, while the deep merger protects later updates.
 
 **Always merge to `main` when the work is done** (standing instruction, Aug 1 2026): Jack
-doesn't review PRs on this repo — GitHub Pages serves from `main`, so work that stops on a
+doesn't review PRs on this repo — Actions mirrors `main` to the served `gh-pages` branch, so work that stops on a
 feature branch never reaches his phone. Develop on the assigned branch, then fast-forward
 `main` and push it. No PR needed unless he asks for one.
 
@@ -3347,7 +3347,7 @@ Do not fabricate missing distances from delivery or launch readings. Carry recon
 
 Validation: prior feed entries deep-equal original main; new entry is idempotent. Arithmetic/exclusion and reusable insight tests pass. Actual combined five-club day, 41 usable count, separate missing-distance expander and Coach pass at 320/390px with no page errors or overflow.
 
-## DS-ADAPT 4H replaces 4i (v182)
+## Original DS-ADAPT 4H plan (v182; canceled and superseded by PING in v186)
 
 October 1, 2026: new append-only bag-20261001-feed.json entries bench the owned KING TEC 4i,
 set permanent ID c6 to active 5–PW (six clubs), add Cobra DS-ADAPT 4H Hybrid
@@ -3413,3 +3413,16 @@ Validation: bag-management checks one row per physical club, thirteen unique car
 inputs, descending display, per-member removal, preserved chart, and no duplicate
 ladder. Browser layout verification is still blocked by the corrupted Chromium download;
 Jack explicitly approved merging with that visual check unverified on Oct 1, 2026.
+
+
+## PING G440 replaces canceled hybrid order (v186)
+October 1: Golf Galaxy canceled the Cobra DS-ADAPT 4H order. Jack ordered PING
+G440 4H, 23°, right hand, ALTA CB Blue 70 Graphite Regular (73g), expected today.
+New apply-once entries in bag-20261001-feed.json patch the existing hybrid slot
+(permanent legacy ID bag-ds-adapt-4h-20261001) to the PING with ordered status.
+Keep that internal ID for existing-install continuity; it is not the equipment name.
+Set current 4H loft to 23°, clear unverified carry/provenance, update both iron
+notes, correct the canceled-order history and add the actual PING purchase history.
+The original feed entries and release history remain archival, not current gear.
+4i sessions stay 4i; DS-ADAPT woods stay unchanged. One 4H slot, 14 physical clubs
+including putter, no invented PING measurements. BUILD/cache v186.

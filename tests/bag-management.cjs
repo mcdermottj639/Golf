@@ -26,11 +26,14 @@ T.get().clubs.push(
  {id:'manual-duplicate-label',name:'DS-ADAPT 4H',cat:'other',status:'backup'},
  {id:'keep-wood',name:'Cobra DS-ADAPT X 3-wood',cat:'wood',status:'backup'},
  {id:'keep-other-hybrid',name:'Other Hybrid',cat:'hybrid',status:'backup'});
-T.applyFeed(feed);T.applyFeed(require('../bag-20261001-feed.json'));
+const bagFeed=require('../bag-20261001-feed.json');
+T.applyFeed(feed);T.applyFeed({...bagFeed,entries:bagFeed.entries.slice(0,7)});
+assert.equal(T.get().clubs.find(c=>c.id==='bag-ds-adapt-4h-20261001').name,'Cobra DS-ADAPT 4H Hybrid');
+T.applyFeed(bagFeed);
 assert.ok(!T.get().clubs.some(c=>c.id==='manual-duplicate' || c.id==='manual-duplicate-label'));
 assert.ok(T.get().clubs.some(c=>c.id==='keep-wood'));
 assert.ok(T.get().clubs.some(c=>c.id==='keep-other-hybrid'));
-assert.equal(T.get().clubs.find(c=>c.id==='bag-ds-adapt-4h-20261001').status,'gaming');
+assert.equal(T.get().clubs.find(c=>c.id==='bag-ds-adapt-4h-20261001').status,'ordered');
 
 assert.equal(T.get().carries.find(c=>c.club==='5-iron').carry,177);
 T.applyFeed(require('../range-20260922-feed.json'));T.applyFeed(require('../futurefit-feed.json'));T.applyFeed(require('../range-20260925-feed.json'));
@@ -38,6 +41,9 @@ assert.equal(T.activeBagCount(),14);
 assert.equal(T.get().clubs.find(c=>c.id==='c6').name,'Cobra KING TEC Irons · 5–PW');
 assert.equal(T.get().carries.some(c=>c.club==='4-iron'),false);
 assert.equal(T.get().carries.find(c=>c.club==='4-hybrid').carry,null);
+assert.equal(T.get().carries.find(c=>c.club==='4-hybrid').loft,'23°');
+assert.equal(T.get().clubs.find(c=>c.id==='bag-ds-adapt-4h-20261001').name,'PING G440 4H Hybrid');
+assert.equal(T.get().clubs.filter(c=>c.cat==='hybrid' && ['gaming','ordered'].includes(c.status)).length,1);
 assert.equal(T.clubCanon('Cobra DS-ADAPT 4H Hybrid'),'4H');
 assert.equal(T.clubCanon('4-hybrid'),'4H');
 assert.equal(T.bagClubs().find(c=>c.name==='4-hybrid').abbr,'4H');
