@@ -3229,8 +3229,8 @@ are both v173. Keep feed updates idempotent for existing phones.
 
 ## Iron set correction (v174)
 
-The Cobra KING TEC irons are one roster record representing the complete 4–PW
-set (seven physical clubs). The KING TEC Utility 2-iron is separately purchased
+At v174, the Cobra KING TEC irons became one roster record representing the complete 4–PW
+set (seven physical clubs). The current active subset is 5–PW; see v182 below. The KING TEC Utility 2-iron is separately purchased
 and separately recorded. v173 incorrectly added a standalone 4-iron roster
 record, which double-counted that iron. An append-only `club-remove` correction
 removes that duplicate on phones that already imported v173; the 4-iron carry
@@ -3346,3 +3346,34 @@ Do not fabricate missing distances from delivery or launch readings. Carry recon
 4i 1/2/7 are clear low-flight carry outliers; 58° 1/5/6/8 have reviewed thin/skull evidence (low launch/apex and impact 15–19 mm down). Raw values remain available; no feed history or outdoor carry is rewritten. Per-shot height is captured, including the 4i 7 apex of ten INCHES, stored as 0 ft 10 in. Obscured 4i 6 landing angle is null. All inspected numbers remain source readings, not estimated distances. Standing instruction: always exclude clear mishits from bay analysis.
 
 Validation: prior feed entries deep-equal original main; new entry is idempotent. Arithmetic/exclusion and reusable insight tests pass. Actual combined five-club day, 41 usable count, separate missing-distance expander and Coach pass at 320/390px with no page errors or overflow.
+
+## DS-ADAPT 4H replaces 4i (v182)
+
+October 1, 2026: new append-only bag-20261001-feed.json entries bench the owned KING TEC 4i,
+set permanent ID c6 to active 5–PW (six clubs), add Cobra DS-ADAPT 4H Hybrid
+(Regular Flex, right hand, KBS PGH 75 Graphite), and replace only the active
+4-iron carry row with an unmeasured 4-hybrid row. Do not rename historical 4i
+shots or transfer their yardages to 4H. Loft degrees/adapter setting are unknown.
+The separate utility 2i stays active. Physical bag count reads the active iron range.
+Hybrid aliases (4H / 4-hybrid) stay distinct from irons and have their own cumulative
+order, roster-to-ladder match, and future session identity. Historical 4i remains visible.
+
+Manual Add previously wrote only S.clubs, so shot logging never received a new club.
+addManualClub now adds an unmeasured playing row for active/ordered clubs when a
+label is supplied or recognized from name/specs; existing calibrated carries survive.
+An optional playing label handles names with no club number. Sets are not inferred
+as one playing club; bench/scouting entries do not enter the playing ladder.
+BUILD and service-worker cache are v182.
+
+Bag management: Remove from bag benches equipment and removes its playing rows,
+retaining rounds and saved carry provenance. Iron sets expose individual members;
+activeMembers tracks a partial set without pretending it is one club. Add a club
+can replace one active member atomically. Reject changes exceeding 14 active/ordered
+physical clubs including putter; balls/accessories count zero. Rejection must not
+mutate either store. Backup/wishlist additions remain allowed at capacity.
+
+Validation: bag-management integration tests cover an existing calibrated install,
+append-only history, idempotence, 4H/4i separation, 14-club rejection without mutation,
+replacement, individual iron removal and preserved bay history. Round review/import
+regressions pass. Browser visual QA could not run: no Chromium is installed and the
+Playwright browser download is truncated; package installation is also unavailable.

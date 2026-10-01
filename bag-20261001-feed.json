@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "updated": "2026-10-01",
+  "entries": [
+    {
+      "id": "bag-kingtec-active-5pw-20261001",
+      "type": "club-update",
+      "target": "c6",
+      "club": {
+        "name": "Cobra KING TEC Irons · 5–PW",
+        "spec": "5–PW active · Right · Steel Regular · PW 44°",
+        "note": "Owned as the complete 4–PW set. 4-iron benched October 1 for the DS-ADAPT 4H; 5i–PW remain active. KING TEC Utility 2-iron is separate."
+      }
+    },
+    {
+      "id": "bag-kingtec-4i-bench-20261001",
+      "type": "club-add",
+      "club": {
+        "name": "Cobra KING TEC 4-iron",
+        "cat": "iron",
+        "status": "backup",
+        "spec": "21° · Right · Steel Regular · Part of the 4–PW set",
+        "loft": 21,
+        "note": "Benched October 1, 2026 for Cobra DS-ADAPT 4H. Historical 4-iron sessions remain 4-iron data."
+      }
+    },
+    {
+      "id": "bag-ds-adapt-4h-20261001",
+      "type": "club-add",
+      "club": {
+        "name": "Cobra DS-ADAPT 4H Hybrid",
+        "cat": "hybrid",
+        "status": "gaming",
+        "playingClub": "4-hybrid",
+        "spec": "4H · Regular Flex · Right Hand · KBS PGH 75 Graphite",
+        "note": "Replaces the KING TEC 4-iron October 1, 2026. Simulator carry, total and delivery data pending. Loft degrees and adapter setting not yet recorded."
+      }
+    },
+    {
+      "id": "bag-carry-4i-out-20261001",
+      "type": "carry-update",
+      "target": "4-iron",
+      "remove": true
+    },
+    {
+      "id": "bag-carry-4h-in-20261001",
+      "type": "carry-update",
+      "target": "4-hybrid",
+      "after": "2-iron",
+      "club": {
+        "loft": "",
+        "carry": null
+      }
+    },
+    {
+      "id": "bag-switch-4h-history-20261001",
+      "type": "history",
+      "date": "2026-10-01",
+      "text": "Cobra DS-ADAPT 4H Hybrid (Regular, KBS PGH 75 Graphite, right hand) replaces the KING TEC 4-iron. 4i moves to the bench; active iron set is 5–PW. Hybrid sim numbers pending; no 4i distances transferred."
+    }
+  ]
+}

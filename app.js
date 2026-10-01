@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v181';
+const BUILD = 'v182';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v182', d:'2026-10-01', items:['BAG: Cobra DS-ADAPT 4H replaces the 4-iron. Regular flex, KBS PGH 75 graphite, right hand. Hybrid distances await sim data; the 4-iron and its history stay on the bench. Add or remove clubs with a 14-club limit including putter; replacements move to the bench. Manual additions now connect to the playing-club list.'] },
   { b:'v181', d:'2026-09-25', items:['ADDITIONAL SEP25 RANGE DATA: 20 usable shots added across 4i, 7i, 58° and Driver. Clear mishits excluded. Five distance-missing rows get a separate contact review, with no guessed yardages entering your averages.'] },
   { b:'v180', d:'2026-09-25', items:['PERSONAL BAY INSIGHTS: related shot measurements now drive three concise practice priorities. New sessions and late uploads recalculate automatically; Coach uses the same finding and next test. Full data, benchmarks and secondary findings remain expandable.'] },
   { b:'v179', d:'2026-09-25', items:['BAY TAKEAWAYS: club-specific Tour references and personal interpretations replace generic stat definitions. Driver cards also include a 10-handicap amateur reference where available; unmatched wedges use an explicit personal baseline.'] },
@@ -1239,6 +1240,8 @@ function clubAbbr(name){
   const n = String(name || '');
   if(/mini/i.test(n)) return 'Mini';
   if(/driver/i.test(n)) return 'Dr';
+  const hybrid = n.match(/\b(\d+)\s*-?\s*(?:hybrid|h)\b/i);
+  if(hybrid) return hybrid[1] + 'H';
   const iron = n.match(/(\d+)\s*-?\s*iron/i);
   if(iron) return iron[1] + 'i';
   const wedge = n.match(/(\d{2})\s*°?\s*wedge/i);
@@ -2904,6 +2907,8 @@ function clubType(c){
   const wood = n.match(/(\d+)\s*-?\s*wood/i);
   if(wood) return `${wood[1]}-WOOD`;
   if(/utility/i.test(n)) return 'UTILITY';
+  const hybrid = n.match(/\b(\d+)\s*-?\s*(?:hybrid|h)\b/i);
+  if(hybrid) return hybrid[1] + 'H';
   const iron = n.match(/(\d+)\s*-?\s*iron/i);
   if(iron) return `${iron[1]}-IRON`;
   if(c.cat === 'iron') return 'IRONS';
@@ -2941,14 +2946,14 @@ function clubSpecLine(c){
 // and it is deliberately strict: an abbreviation that fell through to the name-slice
 // fallback is not a match, and the iron SET matches nothing, which is right, because it
 // spans seven ladder rows and no single one of them is "the irons".
-const ABBR_OK = /^(Mini|Dr|PW|\d+i|\d+°|\d+W)$/;
+const ABBR_OK = /^(Mini|Dr|PW|\d+i|\d+°|\d+W|\d+H)$/;
 // Hyphens are spelling, not meaning: the bag says "5-wood" and the ladder says "5 wood".
 // Normalised here rather than in clubAbbr(), which is what every saved card's club chip
 // renders through and is not worth disturbing for a join.
 const abbrOf = n => clubAbbr(String(n || '').replace(/[-–—]/g, ' '));
 function carryRow(c){
   if(c.cat === 'wedge' && c.loft) return S.carries.find(x => x.club === `${c.loft}° wedge`) || null;
-  const k = abbrOf(c.name);
+  const k = abbrOf(c.playingClub || c.name);
   if(!ABBR_OK.test(k)) return null;
   return S.carries.find(x => abbrOf(x.club) === k) || null;
 }
@@ -3005,7 +3010,9 @@ function clubRow(c){
       <div class="cn">${esc(c.name)}</div>
       <div class="cs">${esc(clubSpecLine(c))}${row && row.carry != null ? ` · carries ${row.carry}` : ''}${
         row && row.carry == null ? ' · carry unmeasured' : ''}</div>
+      ${Array.isArray(c.activeMembers) ? `<p class="sm">Active: ${c.activeMembers.map(esc).join(', ')}</p>` : ''}
       ${c.note ? expandable(c.note) : ''}
+      ${['gaming','ordered'].includes(c.status) && physicalClubCount(c)>0 ? `<div class="formrow" style="margin-top:8px">${rosterMembers(c) ? `<select aria-label="Iron to remove" id="bench-${esc(c.id)}">${rosterMembers(c).map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select>` : ''}<button class="btn" data-action="bench-club" data-id="${esc(c.id)}">Remove from bag</button></div>` : ''}
       ${c.futureFit ? futureFitReference(c.futureFit) : ''}
       ${mismatch ? `<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>` : ''}
       ${ov ? `<p class="sm faint">Sits ${Math.abs(ladderLoft(ov) - ladderLoft(row)).toFixed(1)}° off the
@@ -3168,10 +3175,77 @@ function ladderCard(){
       the check on it.</p>
   </div>`;
 }
+function rosterMembers(c){
+  if(Array.isArray(c.activeMembers)) return c.activeMembers;
+  const set = (c.name || '').match(/\b([3-9])\s*[–-]\s*PW\b/i);
+  return set ? [...Array.from({length:10-Number(set[1])},(_,i)=>(Number(set[1])+i)+'-iron'),'PW'] : null;
+}
+function physicalClubCount(c){
+  if(['ball','other'].includes(c.cat)) return 0;
+  const members = rosterMembers(c);
+  return members ? members.length : 1;
+}
+function activeBagCount(){
+  return S.clubs.filter(c=>['gaming','ordered'].includes(c.status)).reduce((n,c)=>n+physicalClubCount(c),0);
+}
+function replacementOptions(){
+  return S.clubs.filter(c=>['gaming','ordered'].includes(c.status) && physicalClubCount(c)>0).flatMap(c=>{
+    const members=rosterMembers(c);
+    return members ? members.map(m=>({value:c.id+'|'+m,label:m+' · '+c.name})) : [{value:c.id,label:c.name}];
+  });
+}
+function benchClub(id, member){
+  const c=S.clubs.find(c=>c.id===id && ['gaming','ordered'].includes(c.status));
+  if(!c) return false;
+  const members=rosterMembers(c);
+  if(member && (!members || !members.includes(member))) return false;
+  const rows=member ? S.carries.filter(row=>clubCanon(row.club)===clubCanon(member)) :
+    members ? S.carries.filter(row=>members.some(m=>clubCanon(m)===clubCanon(row.club))) : [carryRow(c)].filter(Boolean);
+  if(member){
+    c.activeMembers=members.filter(m=>m!==member);
+    if(!c.activeMembers.length) c.status='backup';
+    S.clubs.push({id:uid(),name:c.name.split(' · ')[0]+' '+member,cat:c.cat,status:'backup',rounds:0,
+      spec:'From '+c.name,note:'Removed from the active bag. Previous shot history is retained.',savedCarries:rows});
+  }else{c.status='backup';c.savedCarries=rows;}
+  S.carries=S.carries.filter(row=>!rows.includes(row));
+  return true;
+}
+// Roster and playable ladder are separate stores: manual additions must populate both.
+function addManualClub(club, label = '', replacement = ''){
+  const [id,member]=replacement.split('|');
+  const outgoing=id ? S.clubs.find(c=>c.id===id && ['gaming','ordered'].includes(c.status)) : null;
+  if(id && (!outgoing || (member && !rosterMembers(outgoing)?.includes(member)))) return 'Choose an active club to replace';
+  const active=['gaming','ordered'].includes(club.status);
+  const removed=outgoing ? (member ? 1 : physicalClubCount(outgoing)) : 0;
+  if(active && activeBagCount()-removed+physicalClubCount(club)>14) return '14 clubs maximum, including putter. Choose a club to replace or save this one to the bench.';
+
+  const raw = club.name + ' ' + (club.spec || '');
+  const canon = clubCanon(raw);
+  const inferred = /\b[3-9]\s*[–-]\s*PW\b/i.test(raw) ? '' :
+    (/^\d+H$/.test(canon) ? canon.replace('H', '-hybrid') :
+    /^\d+i$/.test(canon) ? canon.replace('i', '-iron') :
+    /^\d+W$/.test(canon) ? canon.replace('W', ' wood') :
+    /^\d+°$/.test(canon) ? canon + ' wedge' :
+    canon === 'Dr' ? 'Driver' : canon === 'Mini' ? 'Mini Driver' : canon === 'PW' ? 'PW' : '');
+  const playing = label ? (/^\d+H$/i.test(label) ? label.slice(0,-1) + '-hybrid' : label) : inferred;
+  const members = rosterMembers(club);
+  if(active && ['wood','hybrid','iron','wedge'].includes(club.cat) && !playing && !members) return 'Add a playing label, such as 4H or 7-iron, so this club appears in shot logging.';
+  if(outgoing && active) benchClub(id,member);
+  if(active && members) members.forEach(m=>{
+    if(!S.carries.some(c=>clubCanon(c.club)===clubCanon(m))) S.carries.push({club:m,loft:'',carry:null});
+  });
+  if(playing && ['wood','hybrid','iron','wedge'].includes(club.cat)){
+    club.playingClub = playing;
+    if(['gaming','ordered'].includes(club.status) && !S.carries.some(c => clubCanon(c.club) === clubCanon(playing))){
+      S.carries.push({club:playing, loft:club.loft ? club.loft + '°' : '', carry:null});
+    }
+  }
+  S.clubs.push(club);
+  return null;
+}
 function bag(){
   const lineup = S.clubs.filter(c => c.status === 'gaming' || c.status === 'ordered').sort(bagSort);
-  // The KING TEC set is one record but seven physical clubs (4–9, PW). The utility 2-iron is separate.
-  const clubCount = lineup.reduce((n, c) => n + (/\b4\s*[–-]\s*PW\b/i.test(c.name || '') ? 7 : 1), 0);
+  const clubCount = activeBagCount();
   const bullpen = S.clubs.filter(c => c.status === 'backup').sort(bagSort);
   const wishlist = S.clubs.filter(c => c.status === 'wishlist').sort(bagSort);
   const wedges = S.clubs.filter(c => c.cat === 'wedge' && c.loft && (c.status === 'gaming' || c.status === 'ordered')).sort((a, b) => a.loft - b.loft);
@@ -3185,7 +3259,7 @@ function bag(){
   return `
   ${sessionShortcuts()}
   <div class="card">
-    ${fold('bag-roster', 'In the bag', `${clubCount} CLUB${clubCount === 1 ? '' : 'S'}`,
+    ${fold('bag-roster', 'In the bag', `${clubCount}/14 CLUBS`,
       groups.length ? groups.map(([lab, cs]) => `<div class="cgrp">${lab}</div>
         ${cs.map(clubRow).join('')}`).join('')
         : '<p class="sm faint">Nothing gaming yet.</p>')}
@@ -3214,7 +3288,11 @@ function bag(){
       <div><label>Status</label><select id="clSt"><option value="gaming">Starting lineup</option><option value="ordered">On order</option><option value="backup">Bullpen</option><option value="wishlist">Scouting list</option></select></div>
     </div>
     <label>Specs (loft, shaft, flex…)</label><input id="clSp" placeholder="e.g. 9° · Ventus Blue 6S">
+    <label>Replace an active club</label><select id="clReplace"><option value="">Keep all current clubs</option>${replacementOptions().map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('')}</select>
+    <p class="sm faint">${clubCount}/14 clubs including putter. Replaced clubs move to the bench; history stays.</p>
+    <label>Playing label (optional; e.g. 4H or 7-iron)</label><input id="clPlay" placeholder="Auto-detected from name and specs">
     <label>Notes</label><input id="clNo" placeholder="Why it's in the bag">
+    <p id="clError" class="sm warn" role="alert"></p>
     <div style="margin-top:10px"><button class="btn" data-action="add-club">Save club</button></div>
   </div>
 
@@ -4043,7 +4121,7 @@ function clubCanonLabel(canon){
   const fromBag = (S.carries || []).find(c => clubCanon(c.club) === canon);
   if(fromBag) return fromBag.club;
   const map = { Dr:'Driver', Mini:'Mini Driver', '3W':'3-wood', '5W':'5-wood',
-    '2i':'2-iron', '4i':'4-iron', '5i':'5-iron', '6i':'6-iron', '7i':'7-iron', '8i':'8-iron', '9i':'9-iron',
+    '2i':'2-iron', '4H':'4-hybrid', '4i':'4-iron', '5i':'5-iron', '6i':'6-iron', '7i':'7-iron', '8i':'8-iron', '9i':'9-iron',
     PW:'PW', '50°':'50°', '56°':'56°', '58°':'58°', '60°':'60°' };
   return map[canon] || canon;
 }
@@ -4086,7 +4164,7 @@ function fillMetrics(c){
     total: num1(c && c.total, 1)
   };
 }
-const BAG_CANON = ['Dr','Mini','3W','5W','2i','4i','5i','6i','7i','8i','9i','PW','50°','56°','58°','60°'];
+const BAG_CANON = ['Dr','Mini','3W','5W','2i','4H','4i','5i','6i','7i','8i','9i','PW','50°','56°','58°','60°'];
 function deliveryMatch(dels, club){
   const k = clubCanon(club), phase = clubPhaseOf(club);
   return (dels || []).find(d => d.club === club)
@@ -10061,12 +10139,18 @@ const ACTIONS = {
     const v = $('#newAction').value.trim(); if(!v) return;
     S.actions.push({ id:uid(), text:v, done:false, pri:false }); save(); rerender(); toast('Added');
   },
+  'bench-club': el => {
+    const select = document.getElementById('bench-' + el.dataset.id);
+    if(benchClub(el.dataset.id, select?.value)){ save(); rerender(); toast('Moved to bench · history kept'); }
+  },
   'show-add-club': () => { $('#addClubForm').style.display='block'; $('#clNa').focus(); },
   'add-club': () => {
     const name = $('#clNa').value.trim(); if(!name) return toast('Name it first');
-    S.clubs.push({ id:uid(), name, cat:$('#clCat').value, status:$('#clSt').value,
+    const club = { id:uid(), name, cat:$('#clCat').value, status:$('#clSt').value,
       spec:$('#clSp').value.trim(), note:$('#clNo').value.trim(), rounds:0,
-      loft: $('#clCat').value==='wedge' ? parseInt(($('#clSp').value.match(/\d{2}/)||[])[0]) || undefined : undefined });
+      loft: $('#clCat').value==='wedge' ? parseInt(($('#clSp').value.match(/\d{2}/)||[])[0]) || undefined : undefined };
+    const error = addManualClub(club, $('#clPlay').value.trim(), $('#clReplace').value);
+    if(error){ $('#clError').textContent = error; return; }
     save(); rerender(); toast('Club added');
   },
   'save-carries': () => {
@@ -10982,7 +11066,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 
