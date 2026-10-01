@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v188';
+const BUILD = 'v189';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v189', d:'2026-10-01', items:['BAG: G440 hybrid received. Expand its adjustment chart for all eight adapter settings, effective lofts and neutral/flat lie.'] },
   { b:'v188', d:'2026-10-01', items:['CLUB HISTORY: Open any club from Bag at a glance for every recorded range batch, metric trends, setup notes and a next-session measurement focus.'] },
   { b:'v187', d:'2026-10-01', items:['DESKTOP: Wide-screen workspace with side navigation, side-by-side planning and club visuals, larger charts and readable data tables. Phone layout stays compact.'] },
   { b:'v186', d:'2026-10-01', items:['BAG: PING G440 4H replaces the canceled Cobra hybrid order. 23°, right hand, ALTA CB Blue 70 Regular. On order; hybrid yardages pending.'] },
@@ -3028,6 +3029,7 @@ function clubRow(c){
       ${c.note ? expandable(c.note) : ''}
       ${['gaming','ordered'].includes(c.status) && physicalClubCount(c)>0 ? `<div class="formrow" style="margin-top:8px">${rosterMembers(c) ? `<select aria-label="Iron to remove" id="bench-${esc(c.id)}">${rosterMembers(c).map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select>` : ''}<button class="btn" data-action="bench-club" data-id="${esc(c.id)}">Remove from bag</button></div>` : ''}
       ${c.futureFit ? futureFitReference(c.futureFit) : ''}
+          ${c.pingAdapter ? pingHybridReference(c.pingAdapter) : ''}
       ${mismatch ? `<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>` : ''}
       ${ov ? `<p class="sm faint">Sits ${Math.abs(ladderLoft(ov) - ladderLoft(row)).toFixed(1)}° off the
         ${esc(ov.club)} on the ladder.${(() => { const g = ladderGapYds(row, ov);
@@ -3289,6 +3291,7 @@ function compactBag(lineup){
           <p class="sm">${esc(c.spec || '')}</p>
           ${c.note ? `<p class="sm">${esc(c.note)}</p>` : ''}
           ${c.futureFit ? futureFitReference(c.futureFit) : ''}
+          ${c.pingAdapter ? pingHybridReference(c.pingAdapter) : ''}
           ${c.cat==='putter' && c.flow==='toe' && S.profile.stroke==='SBST' ? '<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>' : ''}
           ${c.cat==='wedge' ? `<p class="sm">Groove life ${groovePct(c)}% · ${c.rounds || 0} rounds</p>` : ''}
           ${physicalClubCount(c)>0 ? `<button class="btn ghost tiny" data-action="bench-club" data-id="${esc(c.id)}" ${member ? `data-member="${esc(member)}"` : ''}>Remove ${esc(label)} from bag</button>` : ''}
@@ -6223,6 +6226,12 @@ function coachHero(sig, dr){
     ${up ? `<div class="linkrow" data-action="open-briefing" data-id="${esc(up.id)}">
       <span class="sm"><b>Next up: ${esc(up.course || 'your round')}</b> · ${fmtDate(up.date)} — the plan is written</span><span class="arr">→</span></div>` : ''}
   </div>`;
+}
+
+function pingHybridReference(f){
+  const settings=[['O',0,'Neutral'],['Small +',1,'Neutral'],['Large +',1.5,'Neutral'],['Small −',-1,'Neutral'],['Large −',-1.5,'Neutral'],['F',0,'Flat'],['F−',-1,'Flat'],['F+',1,'Flat']];
+  const base=Number(f.baseLoft);
+  return `<details class="sect"><summary>G440 hybrid adjustment chart · ${base}° base loft</summary><p class="sm">Eight adapter settings, transcribed from Jack’s supplied chart October 1, 2026. Current adapter setting has not been confirmed.</p><div style="overflow-x:auto"><table style="width:100%"><thead><tr><th scope="col">Setting</th><th scope="col">Loft change</th><th scope="col">Playing loft</th><th scope="col">Lie</th></tr></thead><tbody>${settings.map(([code,delta,lie])=>`<tr><th scope="row">${code}</th><td>${delta>0?'+':''}${delta}°</td><td>${base+delta}°</td><td>${lie}</td></tr>`).join('')}</tbody></table></div><p class="sm">Small and large symbols distinguish the 1° and 1.5° settings. O is standard; F keeps standard loft with a flat lie.</p></details>`;
 }
 
 function futureFitReference(f){
