@@ -3414,7 +3414,10 @@ adjustment chart and removal. Individual iron removal uses data-member; do not r
 the whole set when a member row is selected. Save carries uses the same original rows
 and wedge synchronization. Existing notes and historical data are not rewritten.
 Persistent details IDs preserve expanded rows through a rerender. Bench and specialty
-wedge tools remain separate. BUILD/cache v185.
+wedge tools remain separate. Expanded playing-club rows also link to Full club history
+using the individual iron member or carry-row canonical label. This opens the shared
+history view and returns to My Bag; cumulative entry still returns to Bag at a glance.
+Unmeasured playing clubs show the existing empty history state. BUILD/cache v189.
 Validation: bag-management checks one row per physical club, thirteen unique carry
 inputs, descending display, per-member removal, preserved chart, and no duplicate
 ladder. Browser layout verification is still blocked by the corrupted Chromium download;

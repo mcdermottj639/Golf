@@ -42,6 +42,21 @@ const server=http.createServer((q,r)=>{
   assert.equal(await page.locator('.swing-evo-club').getAttribute('data-club'),'Dr');
   await page.locator('.club-trend-row').first().click();
   assert.equal(await page.locator('.swing-evolution').count(),0);
+  await page.locator('#nav [data-view="bag"]').click();
+  for(const canon of ['5W','7i','4H']){
+    const item=page.locator('.bag-item').filter({has:page.locator(`[data-action="club-history"][data-club="${canon}"]`)});
+    await item.locator(':scope > summary').click();
+    await item.locator('[data-action="club-history"]').click();
+    assert.equal(await page.locator('.backlink').innerText(),'← My Bag');
+    if(canon==='4H') assert.match(await page.locator('#view').innerText(),/No readings yet/);
+    else assert.equal(await page.locator('.swing-evo-club').getAttribute('data-club'),canon);
+    for(const width of [320,1440]){
+      await page.setViewportSize({width,height:900});
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'bag history overflow '+width);
+    }
+    await page.locator('.backlink').click();
+    await page.locator('.bag-scan').waitFor();
+  }
   assert.deepEqual(errors,[]);
   console.log('PASS club history: 320/390/1440, isolated club, complete batches, metric trends, back and source navigation, no page errors.');
  }finally{await browser.close();server.close();}
