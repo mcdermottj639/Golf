@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v187';
+const BUILD = 'v188';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v188', d:'2026-10-01', items:['CLUB HISTORY: Open any club from Bag at a glance for every recorded range batch, metric trends, setup notes and a next-session measurement focus.'] },
   { b:'v187', d:'2026-10-01', items:['DESKTOP: Wide-screen workspace with side navigation, side-by-side planning and club visuals, larger charts and readable data tables. Phone layout stays compact.'] },
   { b:'v186', d:'2026-10-01', items:['BAG: PING G440 4H replaces the canceled Cobra hybrid order. 23°, right hand, ALTA CB Blue 70 Regular. On order; hybrid yardages pending.'] },
   { b:'v185', d:'2026-10-01', items:['BAG: Clubs and playing carries share one compact list, longest first. Tap any club for carry editing, notes, adjustment charts and removal. Each iron has its own row; putter is included.'] },
@@ -1316,6 +1317,7 @@ const TITLES = {
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
+  clubhistory:['Club history','Every recorded range day, one club at a time.'],
   bay:['Bay Session','Every number the launch monitor produced.'],
   sessions:['Days','Every capture, newest first — not split by type.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
@@ -1981,13 +1983,13 @@ function render(view, arg, keepScroll){
   if(bt){ bt.textContent = BUILD; bt.hidden = view !== 'home'; }
   // The four labs live behind one nav button, so they all light it — and so does every
   // view that hangs off Rounds: a round card, and a course plan you opened from one.
-  const NAV_OF = { sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
+  const NAV_OF = { clubhistory:'game', sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
                    drills:'coach', shelf:'coach', lesson:'coach', landed:'home', numbers:'home', timeline:'home',
                    round:'rounds', rounds:'rounds' };
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === navView));
-  const R = { home, bag, game, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
+  const R = { home, bag, game, clubhistory:clubHistoryView, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
@@ -3464,8 +3466,9 @@ function swingEvolutionRows(){
       if(Object.keys(values).length) add({club:block.canon,date,label:block.label,setup:block.setup,index:block.index,values,summary:false});
     }
     // Historical summary-only records remain labelled; never borrow their AVG into a shot block.
-    for(const {b:source,i} of baysFor('swing').filter(x => x.b.date === date && !x.b.detail?.rangeShots?.length)){
-      for(const c of source.detail?.clubs || []){
+    for(const {b:source,i} of baysFor('swing').filter(x => x.b.date === date)){
+      for(const c of primaryClubsForDay(source.detail?.clubs || [])){
+        if((source.detail?.rangeShots || []).some(g => clubCanon(g.club) === clubCanon(c.club) && clubPhaseOf(g.club) === clubPhaseOf(c.club))) continue;
         const values = {};
         for(const [key] of SWING_EVOLUTION_METRICS){
           if(finite(c[key])) values[key] = {value:c[key],n:c.metricCounts?.[key] ?? c.n ?? null};
@@ -3481,10 +3484,12 @@ const SWING_EVOLUTION_METRICS = [
   ['face','Face angle','°',1],['ftp','Face to path','°',1],['smash','Smash','',2],
   ['la','Launch','°',1],['apex','Peak height','ft',1],['aoa','Attack angle','°',1],
   ['cs','Club speed','mph',1],['bs','Ball speed','mph',1],['spin','Spin','rpm',0],
+  ['dynLoft','Dynamic loft','°',1],['spinLoft','Spin loft','°',1],['ld','Launch direction','°',1],
   ['impactO','Impact offset','mm',1],['impactH','Impact height','mm',1]
 ];
-function swingEvolutionCard(){
-  const by = swingEvolutionRows();
+function swingEvolutionCard(selectedClub){
+  const all = swingEvolutionRows();
+  const by = selectedClub ? new Map(all.has(selectedClub) ? [[selectedClub, all.get(selectedClub)]] : []) : all;
   const format = (key,reading,unit,dec) => `${['path','face','ftp','aoa','impactO','impactH'].includes(key) && reading.value>0?'+':''}${reading.value.toFixed(dec)}${unit?' '+unit:''}`;
   const metrics = row => `<div class="swing-evo-metrics">${SWING_EVOLUTION_METRICS.filter(([key])=>row.values[key]).map(([key,label,unit,dec])=>{
     const reading=row.values[key];
@@ -3497,11 +3502,36 @@ function swingEvolutionCard(){
     ${by.size?cumulativeClubKeys(by).map((club,i)=>{
       const rows=by.get(club),latest=rows[0];
       const preview=['carry','path','ftp'].filter(k=>latest.values[k]).map(k=>{const m=SWING_EVOLUTION_METRICS.find(x=>x[0]===k);return `${m[1]} ${format(k,latest.values[k],m[2],m[3])}`;}).join(' · ');
-      return `<details class="swing-evo-club" data-club="${esc(club)}" ${i===0?'open':''}><summary><b>${esc(clubCanonLabel(club))}</b><span>${esc(fmtDate(latest.date))} · ${rows.length} batches</span><span>${esc(preview||'Recorded readings available')}</span></summary>${record(latest)}${rows.length>1?`<details class="more"><summary>Earlier / other batches (${rows.length-1})</summary>${rows.slice(1).map(record).join('')}</details>`:''}</details>`;
+      return `<details class="swing-evo-club" data-club="${esc(club)}" ${i===0?'open':''}><summary><b>${esc(clubCanonLabel(club))}</b><span>${esc(fmtDate(latest.date))} · ${rows.length} batches</span><span>${esc(preview||'Recorded readings available')}</span></summary>${record(latest)}${rows.length>1?`<details class="more" ${selectedClub?'open':''}><summary>Earlier / other batches (${rows.length-1})</summary>${rows.slice(1).map(record).join('')}</details>`:''}</details>`;
     }).join(''):'<p>No numeric range readings recorded yet.</p>'}
     <details class="more"><summary>What these numbers mean</summary><p class="sm">Carry is flight distance; total includes the simulated finish. Path and face angle are relative to the target: positive is right, negative left. Face-to-path compares the face with its travel direction; it is derived from paired face/path readings when needed. Smash is ball speed divided by club speed. Peak height is in feet; attack angle is upward (+) or downward (−). Impact offsets are recorded monitor coordinates, not a diagnosis.</p><p class="sm">Counts belong to each metric. Missing readings are omitted, never zero. Clear mishits and rows missing both carry and total stay out of shot averages. Older summary-only records are labelled separately. Different clubs, targets, settings and conditions are not proof of improvement. Indoor spin may be estimated.</p></details>
-    <details class="more swing-evo-archive"><summary>Earlier coaching assessment · historical</summary><p class="sm">This saved assessment includes video observations. It does not update with range numbers. Backswing, posture and shaft lean require appropriate evidence; numeric imports do not establish them.</p>${archive?evolutionCard('swing'):''}</details>
+    ${selectedClub?'':`<details class="more swing-evo-archive"><summary>Earlier coaching assessment · historical</summary><p class="sm">This saved assessment includes video observations. It does not update with range numbers. Backswing, posture and shaft lean require appropriate evidence; numeric imports do not establish them.</p>${archive?evolutionCard('swing'):''}</details>`}
   </div>`;
+}
+
+// Club history uses the same retained cohorts as Swing evolution; no new stored data.
+function clubHistoryView(club){
+  const rows = swingEvolutionRows().get(club) || [];
+  const days = new Set(rows.map(r=>r.date)).size;
+  const format = (v,unit,dec) => `${Number(v).toFixed(dec)}${unit?' '+unit:''}`;
+  const trends = SWING_EVOLUTION_METRICS.map(([key,label,unit,dec])=>{
+    const points = rows.filter(r=>r.values[key]).slice().reverse();
+    if(!points.length) return '';
+    const first=points[0],last=points[points.length-1];
+    const min=Math.min(0,...points.map(r=>r.values[key].value));
+    const max=Math.max(0,...points.map(r=>r.values[key].value));
+    const span=max-min||1,zero=(0-min)/span*100;
+    const delta=last.values[key].value-first.values[key].value;
+    return `<details class="club-trend" ${key==='carry'?'open':''}><summary><b>${esc(label)}</b><span>${format(last.values[key].value,unit,dec)} latest${points.length>1?` · ${delta>0?'+':''}${format(delta,unit,dec)} from first block`:''}</span></summary>
+      ${points.map(r=>{const value=r.values[key].value,end=(value-min)/span*100;return `<button class="club-trend-row" data-action="open-bay" data-i="${r.index}"><span>${esc(fmtDate(r.date))}<small>${esc(r.label)} · ${r.summary?'summary':'retained'} · n=${r.values[key].n??'—'}</small></span><span class="club-trend-track"><i style="left:${Math.min(zero,end)}%;width:${Math.abs(end-zero)}%"></i></span><b>${format(value,unit,dec)}</b></button>`;}).join('')}</details>`;
+  }).join('');
+  const latest=rows.find(r=>!r.summary)||rows[0];
+  const ftp=latest?.values.ftp,smash=latest?.values.smash,carry=latest?.values.carry;
+  return `<button class="backlink" data-action="session-category" data-kind="cumulative">← Bag at a glance</button>
+    <section class="card"><span class="eyebrow">Full club history</span><h2>${esc(clubCanonLabel(club))}</h2><p>${days} recorded days · ${rows.length} batches · range data</p><p class="sm">Every available batch, including earlier setups. New imported sessions appear automatically. Historical club models sharing this playing label remain identified by their recorded setup.</p></section>
+    <section class="card"><h2>What to work on next</h2>${latest?`<p><b>Repeat a controlled baseline</b> · ${esc(fmtDate(latest.date))}</p><p>${carry?`Carry averaged ${format(carry.value,'yd',1)}. `:''}${ftp?`Face-to-path averaged ${format(ftp.value,'°',1)} (${ftp.value>0?'face right of its path':ftp.value<0?'face left of its path':'face aligned with its path'}). `:''}${smash?`Smash averaged ${format(smash.value,'',2)} — ball speed relative to club speed. `:''}</p><p><b>Next session:</b> Record 10 shots with the same club setting and target. Compare carry spread, face-to-path and smash with this baseline. Look for a tighter distance pattern while maintaining contact quality; the longest shot alone does not establish progress.</p><p class="sm">This focus uses the latest retained batch when available. Review the timeline below for repeated patterns; changes in setup or sample size can explain differences.</p>`:'<p>Add a recorded range session to establish a baseline.</p>'}</section>
+    <section class="card"><h2>Evolution by metric</h2><p class="sm">Open a metric for every reading, oldest first. Tap a reading for its source day. Differences describe recorded batches, not proven improvement; same-day blocks are not separate days.</p>${trends||'<p>No readings yet.</p>'}</section>
+    <h2>All session numbers</h2>${swingEvolutionCard(club)}`;
 }
 
 // ----- The film room log -----
@@ -4443,7 +4473,7 @@ function cumulativeOverview(){
         <h3>Recent carry readings</h3>
         ${history.map(p=>`<button class="cum-history" data-action="open-bay" data-i="${p.i}"><span>${esc(fmtDate(p.date))}<small>${esc(p.phase)} · n=${p.metricCounts?.carry ?? p.n ?? '—'}</small></span><span class="cum-bar"><i style="width:${Math.max(0,p.carry/max*100)}%"></i></span><b>${num(p.carry)}</b></button>`).join('') || '<p class="sm">No readable carry history yet.</p>'}
         <p class="sm faint">Up to six recorded blocks; same-day blocks are not separate days. Setup, intent and conditions can differ, so movement alone does not prove improvement.</p>
-        <button class="btn" data-action="open-bay" data-i="${last.i}">Latest source · ${esc(fmtDate(last.date))}</button></div></details>`;
+        <div class="club-history-actions"><button class="btn" data-action="club-history" data-club="${esc(k)}">Full club history →</button><button class="btn ghost" data-action="open-bay" data-i="${last.i}">Latest source · ${esc(fmtDate(last.date))}</button></div></div></details>`;
     }).join('') || '<p>No reviewed range clubs yet. Open Days to check your sessions.</p>'}</div>
   </section>`;
 }
@@ -10315,6 +10345,7 @@ const ACTIONS = {
     el.textContent = opening ? 'Collapse all' : 'Expand all';
   },
   'open-session': el => render('session', el.dataset.i),
+  'club-history': el => render('clubhistory', el.dataset.club),
   'open-bay': el => render('bay', el.dataset.i),
   'build-sim-practice': () => {
     if(S.simPracticePlan?.blocks?.some(b=>b.result)||S.simPracticePlan?.done?.length){

@@ -3197,7 +3197,13 @@ that count includes earlier Sep22 shots, not only the last 80-shot upload.
 Cumulative uses the existing cumulativeClubSeries/rollRemaining reviewed cohorts; it does
 not create a second data store. It leads with section links, a next-session measurement
 plan, and a carry-bar bag overview. Expand each club for per-metric counts and up to six
-source-linked carry blocks. Same-day blocks and differing setups are labelled; changes
+source-linked carry blocks. Full club history opens a dedicated club page backed by
+swingEvolutionRows: all dates and batches, expandable per-metric timelines, recorded
+setup labels, per-metric counts, and all session metrics. New imports appear automatically.
+The next-session focus quotes the latest retained batch (summary fallback is labelled in
+the record) and suggests a controlled repeat; it does not claim statistical improvement.
+Historical models sharing a canonical playing label remain in the history. No new data
+store or guessed missing readings. BUILD/CACHE v188 are paired. Same-day blocks and differing setups are labelled; changes
 are observations, not proven improvement. Full tables and delivery lanes remain expandable.
 The plan selects the largest nonnegative latest eligible block best-minus-retained carry
 gap (at least five retained shots), labels its source date, and suggests a repeatable

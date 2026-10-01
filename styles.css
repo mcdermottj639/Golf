@@ -1970,3 +1970,14 @@ body.night .meanbtn{color:var(--green-ink)}
 
 /* Keep wide round tables inside their card at the narrowest phone size. */
 #view[data-page="rounds"]>.card:has(>table){overflow-x:auto}
+
+/* Full club history: metric timelines stay readable on phone and desktop. */
+.club-trend {border-top:1px solid var(--line);padding:12px 0}
+.club-trend summary {cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+.club-trend-row {display:grid;grid-template-columns:minmax(100px,1fr) minmax(40px,2fr) auto;gap:12px;align-items:center;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);color:inherit;padding:14px 0;cursor:pointer;font:inherit}
+.club-trend-row small {display:block;font-size:12px;color:var(--faint);overflow-wrap:anywhere}
+.club-trend-track {height:10px;position:relative;background:rgba(30,90,60,.10);border-radius:8px}
+.club-trend-track i {position:absolute;height:100%;background:var(--green);border-radius:8px;min-width:2px}
+@media(max-width:480px){.club-trend-row{grid-template-columns:minmax(0,1fr) auto}.club-trend-track{grid-row:2;grid-column:1/-1}.club-trend-row b{font-size:14px}}
+
+.club-history-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
