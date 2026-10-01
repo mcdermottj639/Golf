@@ -3386,3 +3386,12 @@ still address the original row, so saving an edited sorted view cannot put yarda
 on another club. Gaps compare adjacent displayed rows. Adding, saving, accepting
 a bay offer and loading an existing device all render in distance order. Equal
 distances retain their existing relative order. BUILD/cache are v183.
+
+## Duplicate benched hybrid cleanup (v184)
+Jack reported the DS-ADAPT hybrid appears twice and explicitly requested removal
+of the bench entry. A new apply-once bag feed entry removes matching backup hybrid
+roster entries, including device-generated manual IDs. Hyphen/space/case variants
+of DS-ADAPT are normalized. Only backup hybrids match; active 4H, DS-ADAPT woods,
+other bench clubs, carries, round and bay history are untouched. club-remove's
+original target-ID behavior remains supported. The optional match is restricted
+to backup hybrids and requires a model substring. BUILD/cache v184.

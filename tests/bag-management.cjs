@@ -21,7 +21,17 @@ const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'co
 const oldFeed=feed;
 T.applyFeed(oldFeed);T.get().carriesCalibrated=true;
 T.get().carries.find(c=>c.club==='5-iron').carry=177;
+T.get().clubs.push(
+ {id:'manual-duplicate',name:'Cobra DS Adapt Hybrid',cat:'hybrid',status:'backup'},
+ {id:'manual-duplicate-label',name:'DS-ADAPT 4H',cat:'other',status:'backup'},
+ {id:'keep-wood',name:'Cobra DS-ADAPT X 3-wood',cat:'wood',status:'backup'},
+ {id:'keep-other-hybrid',name:'Other Hybrid',cat:'hybrid',status:'backup'});
 T.applyFeed(feed);T.applyFeed(require('../bag-20261001-feed.json'));
+assert.ok(!T.get().clubs.some(c=>c.id==='manual-duplicate' || c.id==='manual-duplicate-label'));
+assert.ok(T.get().clubs.some(c=>c.id==='keep-wood'));
+assert.ok(T.get().clubs.some(c=>c.id==='keep-other-hybrid'));
+assert.equal(T.get().clubs.find(c=>c.id==='bag-ds-adapt-4h-20261001').status,'gaming');
+
 assert.equal(T.get().carries.find(c=>c.club==='5-iron').carry,177);
 T.applyFeed(require('../range-20260922-feed.json'));T.applyFeed(require('../futurefit-feed.json'));T.applyFeed(require('../range-20260925-feed.json'));
 assert.equal(T.activeBagCount(),14);

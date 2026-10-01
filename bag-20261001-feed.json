@@ -57,6 +57,15 @@
       "type": "history",
       "date": "2026-10-01",
       "text": "Cobra DS-ADAPT 4H Hybrid (Regular, KBS PGH 75 Graphite, right hand) replaces the KING TEC 4-iron. 4i moves to the bench; active iron set is 5–PW. Hybrid sim numbers pending; no 4i distances transferred."
+    },
+    {
+      "id": "bag-remove-benched-dsadapt-hybrid-duplicate-20261001",
+      "type": "club-remove",
+      "match": {
+        "status": "backup",
+        "nameIncludes": "DS-ADAPT",
+        "cat": "hybrid"
+      }
     }
   ]
 }

@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v183';
+const BUILD = 'v184';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v184', d:'2026-10-01', items:['BAG: Removed the duplicate benched DS-ADAPT hybrid. Active 4H and saved carries are preserved.'] },
   { b:'v183', d:'2026-10-01', items:['CARRIES: Automatically ordered longest to shortest after adding or saving distances. Unmeasured clubs stay last; gaps and shot-logging choices follow the same order.'] },
   { b:'v182', d:'2026-10-01', items:['BAG: Cobra DS-ADAPT 4H replaces the 4-iron. Regular flex, KBS PGH 75 graphite, right hand. Hybrid distances await sim data; the 4-iron and its history stay on the bench. Add or remove clubs with a 14-club limit including putter; replacements move to the bench. Manual additions now connect to the playing-club list.'] },
   { b:'v181', d:'2026-09-25', items:['ADDITIONAL SEP25 RANGE DATA: 20 usable shots added across 4i, 7i, 58° and Driver. Clear mishits excluded. Five distance-missing rows get a separate contact review, with no guessed yardages entering your averages.'] },
@@ -10845,7 +10846,19 @@ function applyFeed(feed){
       S.grids[e.discipline || 'putting'] = e.evolution;
     }
     else if(e.type === 'club-add' && e.club) S.clubs.push({ id:e.id, rounds:0, ...e.club });
-    else if(e.type === 'club-remove') S.clubs = S.clubs.filter(x => x.id !== e.target);
+    else if(e.type === 'club-remove'){
+      // Manual clubs have device-generated IDs. A scoped match can remove a reported
+      // duplicate without touching active equipment or the separate carry/history stores.
+      const m = e.match;
+      const normalized = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      S.clubs = S.clubs.filter(x => {
+        if(e.target && x.id === e.target) return false;
+        if(!m || m.status !== 'backup' || !m.nameIncludes || m.cat !== 'hybrid') return true;
+        const hybrid = x.cat === 'hybrid' || /hybrid|\b[1-9]\s*h\b/i.test(x.name || '');
+        const duplicate = x.status === m.status && hybrid && normalized(x.name).includes(normalized(m.nameIncludes));
+        return !duplicate;
+      });
+    }
     else if(e.type === 'club-update'){
       const c = S.clubs.find(x => x.id === e.target || x.name === e.target);
       if(c) Object.assign(c, e.club || {});
