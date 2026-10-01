@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v184';
+const BUILD = 'v185';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v185', d:'2026-10-01', items:['BAG: Clubs and playing carries share one compact list, longest first. Tap any club for carry editing, notes, adjustment charts and removal. Each iron has its own row; putter is included.'] },
   { b:'v184', d:'2026-10-01', items:['BAG: Removed the duplicate benched DS-ADAPT hybrid. Active 4H and saved carries are preserved.'] },
   { b:'v183', d:'2026-10-01', items:['CARRIES: Automatically ordered longest to shortest after adding or saving distances. Unmeasured clubs stay last; gaps and shot-logging choices follow the same order.'] },
   { b:'v182', d:'2026-10-01', items:['BAG: Cobra DS-ADAPT 4H replaces the 4-iron. Regular flex, KBS PGH 75 graphite, right hand. Hybrid distances await sim data; the 4-iron and its history stay on the bench. Add or remove clubs with a 14-club limit including putter; replacements move to the bench. Manual additions now connect to the playing-club list.'] },
@@ -3252,26 +3253,53 @@ function addManualClub(club, label = '', replacement = ''){
   S.clubs.push(club);
   return null;
 }
+// One physical club per scan row, joined to the existing saved carry (never a copy).
+function compactBag(lineup){
+  const entries = lineup.flatMap(c => {
+    const members = rosterMembers(c);
+    return (members || [null]).map(member => ({c, member,
+      row: member ? S.carries.find(r => clubCanon(r.club) === clubCanon(member)) : carryRow(c)}));
+  }).sort((a,b) => {
+    const rank = e => e.c.cat === 'putter' ? 2 : physicalClubCount(e.c) === 0 ? 3 : e.row?.carry == null ? 1 : 0;
+    return rank(a)-rank(b) || (b.row?.carry ?? 0)-(a.row?.carry ?? 0);
+  });
+  const pf=playsFactor();
+  return `<p class="sm faint bag-hint">Carry · yards · longest first. Tap a club to edit or see details.</p>
+    <div class="bag-scan">${entries.map(({c,member,row},position)=>{
+      const i=row ? S.carries.indexOf(row) : -1;
+      const next=entries[position+1]?.row;
+      const gap=row?.carry != null && next?.carry != null ? row.carry-next.carry : null;
+      const label=member ? clubAbbr(member) : c.cat==='putter' ? 'Putter' : row ? clubAbbr(row.club) : clubType(c);
+      const name=member ? c.name.split(' · ')[0] : c.name;
+      const spec=member ? row?.loft || '' : clubSpecLine(c);
+      return `<details class="bag-item" id="bag-club-${esc(c.id)}-${esc(member || '')}">
+        <summary><span class="bag-key">${esc(label)}</span><span class="bag-model"><b>${esc(name)}</b><small>${esc(spec)}${c.status==='ordered' ? ' · On order' : ''}</small></span>
+        <span class="bag-distance"><b>${row?.carry ?? '—'}</b><small>${row ? row.carry == null ? 'pending' : 'yd carry' : c.cat==='putter' ? 'putter' : ''}</small></span><span class="bag-chevron" aria-hidden="true">⌄</span></summary>
+        <div class="bag-detail">
+          ${row ? `<label for="bag-carry-${i}">Playing carry · yards</label><div class="formrow"><input id="bag-carry-${i}" aria-label="${esc(label)} carry in yards" data-carry="${i}" inputmode="numeric" value="${row.carry ?? ''}" placeholder="Unmeasured"><button class="btn ghost tiny" data-action="save-carries">Save carry</button></div>
+          ${gap != null ? `<p class="sm">${gap} yd to ${esc(clubAbbr(next.club))}${gap>=15 ? ' · wide gap' : gap<=5 ? ' · similar distance' : ''}</p>` : ''}
+          ${pf && row.carry ? `<p class="sm">${Math.round(row.carry*pf)} yd today · adjusted for air temperature</p>` : ''}
+          ${ladderBadge(row)}${ladderOffer(row,i)}` : ''}
+          <p class="sm">${esc(c.spec || '')}</p>
+          ${c.note ? `<p class="sm">${esc(c.note)}</p>` : ''}
+          ${c.futureFit ? futureFitReference(c.futureFit) : ''}
+          ${c.cat==='putter' && c.flow==='toe' && S.profile.stroke==='SBST' ? '<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>' : ''}
+          ${c.cat==='wedge' ? `<p class="sm">Groove life ${groovePct(c)}% · ${c.rounds || 0} rounds</p>` : ''}
+          ${physicalClubCount(c)>0 ? `<button class="btn ghost tiny" data-action="bench-club" data-id="${esc(c.id)}" ${member ? `data-member="${esc(member)}"` : ''}>Remove ${esc(label)} from bag</button>` : ''}
+        </div>
+      </details>`;
+    }).join('')}</div>`;
+}
 function bag(){
   const lineup = S.clubs.filter(c => c.status === 'gaming' || c.status === 'ordered').sort(bagSort);
   const clubCount = activeBagCount();
   const bullpen = S.clubs.filter(c => c.status === 'backup').sort(bagSort);
   const wishlist = S.clubs.filter(c => c.status === 'wishlist').sort(bagSort);
   const wedges = S.clubs.filter(c => c.cat === 'wedge' && c.loft && (c.status === 'gaming' || c.status === 'ordered')).sort((a, b) => a.loft - b.loft);
-  // Grouped the way the bag is carried: the long clubs, the irons, the wedges, the putter.
-  // Every group is drawn from `S.clubs` by CATEGORY, so a club can only appear where its own
-  // record puts it, and an empty group doesn't render.
-  const GROUPS = [['Woods &amp; long clubs', ['wood', 'hybrid']], ['Irons', ['iron']],
-    ['Wedges', ['wedge']], ['Putter', ['putter']], ['Everything else', ['ball', 'other']]];
-  const groups = GROUPS.map(([lab, cats]) => [lab, lineup.filter(c => cats.includes(c.cat))])
-    .filter(([, cs]) => cs.length);
   return `
   ${sessionShortcuts()}
   <div class="card">
-    ${fold('bag-roster', 'In the bag', `${clubCount}/14 CLUBS`,
-      groups.length ? groups.map(([lab, cs]) => `<div class="cgrp">${lab}</div>
-        ${cs.map(clubRow).join('')}`).join('')
-        : '<p class="sm faint">Nothing gaming yet.</p>')}
+    ${fold('bag-roster', 'In the bag', `${clubCount}/14 CLUBS`, compactBag(lineup))}
   </div>
 
   ${wedges.length ? `<div class="card">
@@ -3319,11 +3347,6 @@ function bag(){
       <p class="sm faint" style="margin-top:8px">Both counters advance automatically every time you log a round, however you logged it.</p>
     </div>`;
   })()}
-
-  <div class="card">
-    ${fold('bag-ladder', 'Carry ladder',
-      S.carriesCalibrated ? `${S.carries.length} CLUBS` : 'ESTIMATED · NOT CALIBRATED', ladderCard())}
-  </div>
 
   ${wedges.length ? `<h2>Wedge gapping ladder</h2>
   <div class="card">${ladderHTML(wedges)}</div>` : ''}
@@ -10150,7 +10173,7 @@ const ACTIONS = {
   },
   'bench-club': el => {
     const select = document.getElementById('bench-' + el.dataset.id);
-    if(benchClub(el.dataset.id, select?.value)){ save(); rerender(); toast('Moved to bench · history kept'); }
+    if(benchClub(el.dataset.id, el.dataset.member || select?.value)){ save(); rerender(); toast('Moved to bench · history kept'); }
   },
   'show-add-club': () => { $('#addClubForm').style.display='block'; $('#clNa').focus(); },
   'add-club': () => {

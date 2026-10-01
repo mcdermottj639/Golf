@@ -41,6 +41,23 @@ assert.equal(T.get().carries.find(c=>c.club==='4-hybrid').carry,null);
 assert.equal(T.clubCanon('Cobra DS-ADAPT 4H Hybrid'),'4H');
 assert.equal(T.clubCanon('4-hybrid'),'4H');
 assert.equal(T.bagClubs().find(c=>c.name==='4-hybrid').abbr,'4H');
+// Unified equipment/carry view: physical irons, original edit indices, no second ladder.
+const unified=T.bag();
+assert.equal((unified.match(/class="bag-item"/g)||[]).length,14);
+assert.ok(!unified.includes('id="bag-ladder"'));
+assert.equal((unified.match(/data-carry="/g)||[]).length,13);
+assert.match(unified,/data-member="5-iron"/);
+assert.match(unified,/data-member="PW"/);
+assert.ok(!unified.includes('data-member="4-iron"'));
+assert.match(unified,/3W adjustment chart/);
+const scan=unified.slice(unified.indexOf('class="bag-scan"'),unified.indexOf('id="bag-grinds"'));
+const carryIndices=Array.from(scan.matchAll(/data-carry="(\d+)"/g),m=>+m[1]);
+const scanCarries=carryIndices.map(i=>T.get().carries[i].carry).filter(v=>v!=null);
+assert.deepEqual(scanCarries,[...scanCarries].sort((a,b)=>b-a));
+assert.equal(new Set(carryIndices).size,13);
+assert.match(scan,/class="bag-key">Putter/);
+assert.ok(scan.indexOf('class="bag-key">4H') < scan.indexOf('class="bag-key">Putter'));
+console.log('PASS unified 14-club rows, per-iron controls, sorted original carry indices and adjustment chart retained.');
 const baseline=JSON.stringify(T.get());T.applyFeed(feed);T.applyFeed(require('../bag-20261001-feed.json'));assert.equal(JSON.stringify(T.get()),baseline);
 const history=JSON.stringify(T.get().bays);
 let before=JSON.stringify(T.get());
@@ -79,3 +96,9 @@ assert.deepEqual(Array.from(T.orderedCarries(),c=>c.club),['Driver','5 wood','4-
 T.ACTIONS['use-bay-carry']({dataset:{i:'1'}});assert.equal(T.get().carries[1].carry,202);
 assert.equal(T.get().carries[4].carry,210);
 console.log('PASS carry descending display, stable ties, unknowns last, correct edit/offer indices and gaps.');
+
+const memberCount=T.rosterMembers(T.get().clubs.find(c=>c.id==='c6')).length;
+T.ACTIONS['bench-club']({dataset:{id:'c6',member:'6-iron'}});
+assert.equal(T.rosterMembers(T.get().clubs.find(c=>c.id==='c6')).length,memberCount-1);
+assert.ok(T.rosterMembers(T.get().clubs.find(c=>c.id==='c6')).includes('7-iron'));
+console.log('PASS compact row removes only the selected iron.');

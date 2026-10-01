@@ -3395,3 +3395,21 @@ of DS-ADAPT are normalized. Only backup hybrids match; active 4H, DS-ADAPT woods
 other bench clubs, carries, round and bay history are untouched. club-remove's
 original target-ID behavior remains supported. The optional match is restricted
 to backup hybrids and requires a model substring. BUILD/cache v184.
+
+
+## Unified bag scan list (v185)
+Bag now renders compactBag(lineup) inside In the bag, combining active equipment
+and saved playing carries in one expandable row per physical club. Iron sets expand
+into their active members; putter appears after unmeasured clubs, accessories last.
+Rows sort by saved carry descending; missing carries remain pending. There is no
+second Carry ladder card. Each row expands for original-index carry editing, measured
+provenance/offers, gap to the next displayed carry, temperature adjustment, full notes,
+adjustment chart and removal. Individual iron removal uses data-member; do not remove
+the whole set when a member row is selected. Save carries uses the same original rows
+and wedge synchronization. Existing notes and historical data are not rewritten.
+Persistent details IDs preserve expanded rows through a rerender. Bench and specialty
+wedge tools remain separate. BUILD/cache v185.
+Validation: bag-management checks one row per physical club, thirteen unique carry
+inputs, descending display, per-member removal, preserved chart, and no duplicate
+ladder. Browser layout verification is still blocked by the corrupted Chromium download;
+Jack explicitly approved merging with that visual check unverified on Oct 1, 2026.

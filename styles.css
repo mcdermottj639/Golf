@@ -1889,3 +1889,25 @@ body.night .meanbtn{color:var(--green-ink)}
 .swing-evo-metrics span,.swing-evo-metrics small { display:block; font-size:13px; }
 .swing-evo-metrics b { display:block; font-size:21px; margin:3px 0; color:var(--green); }
 .swing-evo-archive { overflow:auto; }
+
+/* Unified club/carry list: keep all equipment detail behind a thumb-sized summary. */
+.bag-hint{margin:6px 0 10px}
+.bag-item{border-top:1px solid var(--line)}
+.bag-item>summary{display:grid;grid-template-columns:40px minmax(0,1fr) 57px 12px;gap:8px;align-items:center;min-height:64px;padding:9px 0;cursor:pointer;list-style:none}
+.bag-item>summary::-webkit-details-marker{display:none}
+.bag-key{font:600 12px var(--mono);color:var(--green);overflow-wrap:anywhere}
+.bag-model{min-width:0}
+.bag-model b{display:block;font:600 13px/1.25 var(--sans);overflow-wrap:anywhere}
+.bag-model small{display:block;font:10px/1.4 var(--mono);color:var(--ink62);margin-top:3px}
+.bag-distance{text-align:right}
+.bag-distance b{display:block;font:600 23px/1 var(--mono);color:var(--burg)}
+.bag-distance small{display:block;font:9px/1.5 var(--mono);color:var(--ink62);white-space:nowrap}
+.bag-chevron{color:var(--ink62)}
+.bag-item[open] .bag-chevron{transform:rotate(180deg)}
+.bag-detail{padding:5px 0 14px;overflow-wrap:anywhere}
+.bag-detail .formrow{align-items:center}
+.bag-detail input{width:95px;flex:0 1 95px;min-width:0}
+.bag-detail .sm{margin:9px 0}
+.bag-detail .lmeas{padding-left:0}
+.bag-item>summary:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+@media(max-width:350px){.bag-item>summary{grid-template-columns:32px minmax(0,1fr) 50px 10px;gap:5px}.bag-model b{font-size:12px}.bag-distance b{font-size:21px}}
