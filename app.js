@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v188';
+const BUILD = 'v189';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v189', d:'2026-10-01', items:['BAG: Full club history is now available from each playing club’s expanded details, with a direct return to My Bag.'] },
   { b:'v188', d:'2026-10-01', items:['CLUB HISTORY: Open any club from Bag at a glance for every recorded range batch, metric trends, setup notes and a next-session measurement focus.'] },
   { b:'v187', d:'2026-10-01', items:['DESKTOP: Wide-screen workspace with side navigation, side-by-side planning and club visuals, larger charts and readable data tables. Phone layout stays compact.'] },
   { b:'v186', d:'2026-10-01', items:['BAG: PING G440 4H replaces the canceled Cobra hybrid order. 23°, right hand, ALTA CB Blue 70 Regular. On order; hybrid yardages pending.'] },
@@ -3282,6 +3283,7 @@ function compactBag(lineup){
         <summary><span class="bag-key">${esc(label)}</span><span class="bag-model"><b>${esc(name)}</b><small>${esc(spec)}${c.status==='ordered' ? ' · On order' : ''}</small></span>
         <span class="bag-distance"><b>${row?.carry ?? '—'}</b><small>${row ? row.carry == null ? 'pending' : 'yd carry' : c.cat==='putter' ? 'putter' : ''}</small></span><span class="bag-chevron" aria-hidden="true">⌄</span></summary>
         <div class="bag-detail">
+          ${row || member ? `<div class="club-history-actions"><button class="btn" data-action="club-history" data-club="${esc(clubCanon(member || row.club))}" data-from="bag">Full club history →</button></div>` : ''}
           ${row ? `<label for="bag-carry-${i}">Playing carry · yards</label><div class="formrow"><input id="bag-carry-${i}" aria-label="${esc(label)} carry in yards" data-carry="${i}" inputmode="numeric" value="${row.carry ?? ''}" placeholder="Unmeasured"><button class="btn ghost tiny" data-action="save-carries">Save carry</button></div>
           ${gap != null ? `<p class="sm">${gap} yd to ${esc(clubAbbr(next.club))}${gap>=15 ? ' · wide gap' : gap<=5 ? ' · similar distance' : ''}</p>` : ''}
           ${pf && row.carry ? `<p class="sm">${Math.round(row.carry*pf)} yd today · adjusted for air temperature</p>` : ''}
@@ -3510,7 +3512,9 @@ function swingEvolutionCard(selectedClub){
 }
 
 // Club history uses the same retained cohorts as Swing evolution; no new stored data.
-function clubHistoryView(club){
+function clubHistoryView(arg){
+  const club = typeof arg === 'object' ? arg.club : arg;
+  const fromBag = typeof arg === 'object' && arg.from === 'bag';
   const rows = swingEvolutionRows().get(club) || [];
   const days = new Set(rows.map(r=>r.date)).size;
   const format = (v,unit,dec) => `${Number(v).toFixed(dec)}${unit?' '+unit:''}`;
@@ -3527,7 +3531,7 @@ function clubHistoryView(club){
   }).join('');
   const latest=rows.find(r=>!r.summary)||rows[0];
   const ftp=latest?.values.ftp,smash=latest?.values.smash,carry=latest?.values.carry;
-  return `<button class="backlink" data-action="session-category" data-kind="cumulative">← Bag at a glance</button>
+  return `<button class="backlink" data-action="club-history-back" data-from="${fromBag?'bag':'cumulative'}">← ${fromBag?'My Bag':'Bag at a glance'}</button>
     <section class="card"><span class="eyebrow">Full club history</span><h2>${esc(clubCanonLabel(club))}</h2><p>${days} recorded days · ${rows.length} batches · range data</p><p class="sm">Every available batch, including earlier setups. New imported sessions appear automatically. Historical club models sharing this playing label remain identified by their recorded setup.</p></section>
     <section class="card"><h2>What to work on next</h2>${latest?`<p><b>Repeat a controlled baseline</b> · ${esc(fmtDate(latest.date))}</p><p>${carry?`Carry averaged ${format(carry.value,'yd',1)}. `:''}${ftp?`Face-to-path averaged ${format(ftp.value,'°',1)} (${ftp.value>0?'face right of its path':ftp.value<0?'face left of its path':'face aligned with its path'}). `:''}${smash?`Smash averaged ${format(smash.value,'',2)} — ball speed relative to club speed. `:''}</p><p><b>Next session:</b> Record 10 shots with the same club setting and target. Compare carry spread, face-to-path and smash with this baseline. Look for a tighter distance pattern while maintaining contact quality; the longest shot alone does not establish progress.</p><p class="sm">This focus uses the latest retained batch when available. Review the timeline below for repeated patterns; changes in setup or sample size can explain differences.</p>`:'<p>Add a recorded range session to establish a baseline.</p>'}</section>
     <section class="card"><h2>Evolution by metric</h2><p class="sm">Open a metric for every reading, oldest first. Tap a reading for its source day. Differences describe recorded batches, not proven improvement; same-day blocks are not separate days.</p>${trends||'<p>No readings yet.</p>'}</section>
@@ -10345,7 +10349,8 @@ const ACTIONS = {
     el.textContent = opening ? 'Collapse all' : 'Expand all';
   },
   'open-session': el => render('session', el.dataset.i),
-  'club-history': el => render('clubhistory', el.dataset.club),
+  'club-history': el => render('clubhistory', {club:el.dataset.club, from:el.dataset.from}),
+  'club-history-back': el => el.dataset.from === 'bag' ? render('bag') : render('sessions', 'cumulative'),
   'open-bay': el => render('bay', el.dataset.i),
   'build-sim-practice': () => {
     if(S.simPracticePlan?.blocks?.some(b=>b.result)||S.simPracticePlan?.done?.length){
