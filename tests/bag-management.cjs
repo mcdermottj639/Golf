@@ -10,7 +10,7 @@ for(const f of ['lessons.js','courses-db.js','course-cards.js'])vm.runInContext(
 let src=fs.readFileSync(path.join(root,'app.js'),'utf8');
 src=src.slice(0,src.indexOf('// ---------- Boot ----------'))+`
 rerender=()=>{};toast=()=>{};load();
-window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView,addManualClub,benchClub,activeBagCount,rosterMembers,clubCanon,bagClubs};
+window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView,addManualClub,benchClub,activeBagCount,rosterMembers,clubCanon,bagClubs,orderedCarries,ladderCard,ACTIONS};
 })();`;
 vm.runInContext(src,ctx);
 const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'coach-feed.json'),'utf8'));
@@ -51,3 +51,21 @@ assert.equal(T.addManualClub({id:'ball',name:'Ball',cat:'ball',status:'gaming'})
 assert.equal(JSON.stringify(T.get().bays),history);
 assert.match(T.bag(),/14\/14 CLUBS/);
 console.log('PASS bag migration, hybrid identity, 14-club limit, atomic replacement, individual iron removal, bench/accessories and preserved history.');
+
+T.get().carries=[{club:'58° wedge',carry:75},{club:'4-hybrid',carry:200,meas:{carry:202}},{club:'Driver',carry:240},{club:'Unknown',carry:null},{club:'5 wood',carry:200}];
+const original=JSON.stringify(T.get().carries);
+assert.deepEqual(Array.from(T.orderedCarries(),c=>c.club),['Driver','4-hybrid','5 wood','58° wedge','Unknown']);
+assert.equal(JSON.stringify(T.get().carries),original);
+let ladder=T.ladderCard();
+const labels=Array.from(ladder.matchAll(/class="lc">([^<]+)/g),m=>m[1]);
+assert.deepEqual(labels,['Dr','4H','5W','58°','Unknow']);
+assert.deepEqual(Array.from(ladder.matchAll(/data-carry="(\d+)"/g),m=>Number(m[1])),[2,1,4,0,3]);
+assert.match(ladder,/data-action="use-bay-carry" data-i="1"/);
+assert.ok(!ladder.includes('−125') && !ladder.includes('>-125<'));
+ctx.document.querySelectorAll=()=>[{dataset:{carry:'2'},value:'230'},{dataset:{carry:'1'},value:'180'},{dataset:{carry:'4'},value:'210'},{dataset:{carry:'0'},value:'75'},{dataset:{carry:'3'},value:''}];
+T.ACTIONS['save-carries']();
+assert.equal(T.get().carries[1].carry,180);assert.equal(T.get().carries[4].carry,210);
+assert.deepEqual(Array.from(T.orderedCarries(),c=>c.club),['Driver','5 wood','4-hybrid','58° wedge','Unknown']);
+T.ACTIONS['use-bay-carry']({dataset:{i:'1'}});assert.equal(T.get().carries[1].carry,202);
+assert.equal(T.get().carries[4].carry,210);
+console.log('PASS carry descending display, stable ties, unknowns last, correct edit/offer indices and gaps.');

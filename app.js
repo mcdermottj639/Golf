@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v182';
+const BUILD = 'v183';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v183', d:'2026-10-01', items:['CARRIES: Automatically ordered longest to shortest after adding or saving distances. Unmeasured clubs stay last; gaps and shot-logging choices follow the same order.'] },
   { b:'v182', d:'2026-10-01', items:['BAG: Cobra DS-ADAPT 4H replaces the 4-iron. Regular flex, KBS PGH 75 graphite, right hand. Hybrid distances await sim data; the 4-iron and its history stay on the bench. Add or remove clubs with a 14-club limit including putter; replacements move to the bench. Manual additions now connect to the playing-club list.'] },
   { b:'v181', d:'2026-09-25', items:['ADDITIONAL SEP25 RANGE DATA: 20 usable shots added across 4i, 7i, 58° and Driver. Clear mishits excluded. Five distance-missing rows get a separate contact review, with no guessed yardages entering your averages.'] },
   { b:'v180', d:'2026-09-25', items:['PERSONAL BAY INSIGHTS: related shot measurements now drive three concise practice priorities. New sessions and late uploads recalculate automatically; Coach uses the same finding and next test. Full data, benchmarks and secondary findings remain expandable.'] },
@@ -1251,8 +1252,13 @@ function clubAbbr(name){
   if(/^pw/i.test(n)) return 'PW';
   return n.length > 6 ? n.slice(0, 6) : n;
 }
+function orderedCarries(){
+  // Sort a copy: edit/offer controls retain their original state indices.
+  const distance = c => c.carry != null && c.carry !== '' && Number.isFinite(Number(c.carry)) ? Number(c.carry) : -Infinity;
+  return S.carries.slice().sort((a,b) => distance(b) - distance(a));
+}
 function bagClubs(){
-  return S.carries.map(c => ({ key:clubKey(c.club), name:c.club, abbr:clubAbbr(c.club),
+  return orderedCarries().map(c => ({ key:clubKey(c.club), name:c.club, abbr:clubAbbr(c.club),
     wedge: /wedge/i.test(c.club) }));
 }
 function clubBy(key){ return bagClubs().find(c => c.key === key) || null; }
@@ -3133,6 +3139,7 @@ function ladderOffer(row, i){
     <button class="btn ghost tiny" data-action="use-bay-carry" data-i="${i}">use ${m.carry}</button></span>`;
 }
 function ladderCard(){
+  const rows = orderedCarries();
   const pf = playsFactor();
   const anyMeas = S.carries.some(c => c.meas);
   return `
@@ -3144,8 +3151,9 @@ function ladderCard(){
   ${anyMeas ? `<p class="sm faint" style="margin-top:6px">Every row now says where its number
     came from. A measured one carries the date, how many shots it averages, the spread, and
     the ball it was hit with — which is what decides whether it transfers to the course.</p>` : ''}
-  <div class="ladr">${S.carries.map((c, i) => {
-    const next = S.carries[i + 1];
+  <div class="ladr">${rows.map((c, position) => {
+    const i = S.carries.indexOf(c);
+    const next = rows[position + 1];
     const gap = next && c.carry && next.carry ? c.carry - next.carry : null;
     const badge = ladderBadge(c);
     const offer = ladderOffer(c, i);

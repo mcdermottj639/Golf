@@ -3377,3 +3377,12 @@ append-only history, idempotence, 4H/4i separation, 14-club rejection without mu
 replacement, individual iron removal and preserved bay history. Round review/import
 regressions pass. Browser visual QA could not run: no Chromium is installed and the
 Playwright browser download is truncated; package installation is also unavailable.
+
+## Carry ordering (v183)
+Carry ladder and playable club choices use orderedCarries(): a stable descending
+view of the saved carry, with unmeasured values last. No estimates fill missing
+yardages. The underlying array is not reordered: data-carry and bay-offer indices
+still address the original row, so saving an edited sorted view cannot put yardages
+on another club. Gaps compare adjacent displayed rows. Adding, saving, accepting
+a bay offer and loading an existing device all render in distance order. Equal
+distances retain their existing relative order. BUILD/cache are v183.
