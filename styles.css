@@ -1911,3 +1911,62 @@ body.night .meanbtn{color:var(--green-ink)}
 .bag-detail .lmeas{padding-left:0}
 .bag-item>summary:focus-visible{outline:2px solid var(--green);outline-offset:2px}
 @media(max-width:350px){.bag-item>summary{grid-template-columns:32px minmax(0,1fr) 50px 10px;gap:5px}.bag-model b{font-size:12px}.bag-distance b{font-size:21px}}
+/* Desktop workspace. Keep all phone rules above intact; no device detection or
+   separate state. Explicit scopes prevent drill/live-round forms becoming columns. */
+@media (min-width:1000px){
+  body{max-width:1600px;margin:0 auto;padding:0 36px 48px 232px}
+  .hero{padding:28px 0 20px;border-bottom:1px solid var(--line);margin-bottom:20px}
+  .hero h1{font-size:36px;margin-top:10px}
+  .hero .tag{font-size:15px}
+  #nav{left:max(20px,calc((100vw - 1600px)/2 + 20px));top:24px;bottom:24px;
+    transform:none;width:184px;max-width:none;flex-direction:column;align-items:stretch;
+    justify-content:flex-start;gap:8px;padding:22px 12px;border:1px solid var(--line);
+    border-radius:20px;box-shadow:var(--shadow)}
+  #nav::before{content:'CADDIE HQ';font:800 15px var(--sans);letter-spacing:.1em;
+    color:var(--gtext);padding:4px 4px 24px;text-align:left}
+  #nav button{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:14px;
+    padding:14px 16px;min-height:54px;color:var(--soft);border-radius:12px}
+  #nav button .nl{font:700 12px var(--sans);letter-spacing:.06em}
+  #nav button.on{background:var(--green);color:var(--green-ink)}
+  #nav button:hover:not(.on){background:var(--sunk);color:var(--gtext)}
+  #view{min-width:0}
+  #view>.card{padding:22px}
+  #view .sm{font-size:14px}
+  #view .jumpbar{flex-wrap:wrap;overflow:visible;mask-image:none;-webkit-mask-image:none;
+    gap:8px;padding:0 0 14px}
+  #view .jump{font-size:12px;padding:8px 12px}
+  #view .session-shortcuts .session-tile{padding:16px}
+  #view:is([data-layout="home"],[data-layout="game"],[data-layout="coach"],[data-layout="cumulative"]){
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+  #view:is([data-layout="home"],[data-layout="game"],[data-layout="coach"],[data-layout="cumulative"])>*{
+    grid-column:1/-1;min-width:0;margin-top:0;margin-bottom:0}
+  #view:is([data-layout="home"],[data-layout="game"],[data-layout="coach"])>.card:not(.session-shortcuts){grid-column:auto}
+  #view[data-layout="cumulative"]>.card:not(.cum-intro):not(.cum-detail){grid-column:auto}
+  #view[data-layout="cumulative"]>.cum-intro{padding:18px 22px}
+  #view[data-layout="cumulative"]>.cum-plan{grid-column:1;align-self:stretch}
+  #view[data-layout="cumulative"]>#cum-bag{grid-column:2;align-self:stretch}
+  #view[data-layout="cumulative"] .cum-jumps{position:static;transform:none;width:auto;
+    max-width:none;display:none;justify-content:flex-start;align-items:center;padding:0;
+    background:none;border:0;z-index:auto;will-change:auto;margin:0}
+  .cum-n span{font-size:11px;padding:9px 12px}
+  .cum-steps{grid-template-columns:1fr;gap:16px}
+  .cum-steps>div{border-left:3px solid var(--line);padding-left:14px}
+  .cum-steps p{font-size:14px}
+  .cum-bar{height:12px}
+  .cum-club summary{padding:13px 0}
+  .cum-club small{font-size:11px}
+  .cum-club-body .cum-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tscroll th,.tscroll td{padding:12px 14px;font-size:13px}
+  .bag-item>summary{padding-top:16px;padding-bottom:16px}
+  .bag-detail{max-width:850px}
+  .bag-distance b{font-size:24px}
+  .hipcompare svg{max-height:340px}
+  button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+}
+@media (min-width:1400px){
+  #view[data-layout="cumulative"]{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+  #view[data-layout="cumulative"] .cum-plan>p{font-size:18px}
+}
+
+/* Keep wide round tables inside their card at the narrowest phone size. */
+#view[data-page="rounds"]>.card:has(>table){overflow-x:auto}

@@ -32,7 +32,7 @@ design-options/       Pre-approval design candidates (historical snapshots — d
 mockup/               Original pre-approval mockup (historical snapshot — don't edit)
 ```
 
-There is **no bundler.** "Build" = the files as-is. The simulator tests live in `tests/`.
+There is **no bundler.** "Build" = the files as-is. The simulator and browser layout tests live in `tests/`.
 Run `node tests/round-review.cjs` and `node tests/round-review-import.cjs`. Validate before
 committing:
 
@@ -58,7 +58,7 @@ the next person will otherwise try again. Bump `BUILD`, add a `RELEASES` block, 
 this file — three things, one commit.
 
 **For a LAYOUT or ORDER change, drive it in a real browser before pushing** — `node --check`
-proves the file parses and nothing else, and the app has no tests, so a section that landed
+proves the file parses and nothing else, and data tests do not verify layout, so a section that landed
 in the wrong place or a row of chips that wraps off a 320px phone reaches Jack's phone
 unless somebody looked. Serve the folder and drive it with Playwright against the Chromium
 already on the machine; `app.js` is an IIFE, so its functions are NOT global — navigate by
@@ -3426,3 +3426,28 @@ notes, correct the canceled-order history and add the actual PING purchase histo
 The original feed entries and release history remain archival, not current gear.
 4i sessions stay 4i; DS-ADAPT woods stay unchanged. One 4H slot, 14 physical clubs
 including putter, no invented PING measurements. BUILD/cache v186.
+
+
+## Responsive desktop workspace (v187)
+At 1000px and wider, appended styles.css rules expand the shared app shell to
+1600px, move the existing #nav to a fixed left rail, and wrap section shortcuts.
+render() sets #view data-page/data-layout after route resolution; cumulative is
+explicitly scoped to sessions + cumulative. Today, Game and Coach pair direct
+cards; other direct children span both columns. Cumulative pairs its practice
+plan with its rolling indoor carry visualization and retains full-width intro,
+section navigation and detailed tables. Bag remains one distance-sorted roster.
+No duplicate DOM, viewport-dependent storage, feed changes or separate desktop app.
+The 1000px breakpoint leaves phone and tablet layouts intact; narrow forms and
+live scoring do not inherit dashboard grids. Retain these scopes when adding views.
+Build and service-worker cache are v187.
+
+Validation: tests/desktop-browser.cjs drives all five main tabs and Cumulative
+at 320/390/1000/1440/1920px, checks page overflow, desktop rail, paired plan/chart,
+mobile stacking, expandable club and runtime errors. Run with CADDIE_CHROMIUM
+when using a supplied Chromium binary. Round tables now scroll inside their card
+at narrow widths rather than pushing the whole page sideways. The desktop hides
+the redundant Cumulative quick links because the complete section jump bar is visible.
+
+Verified in Chromium: the five-width desktop suite and all four relevant data/
+render suites pass. The older cumulative-browser.cjs has a pre-existing stale
+147.2-yard expectation (current feed renders 149.7); reproduced on untouched v186.

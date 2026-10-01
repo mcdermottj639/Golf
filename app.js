@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v186';
+const BUILD = 'v187';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v187', d:'2026-10-01', items:['DESKTOP: Wide-screen workspace with side navigation, side-by-side planning and club visuals, larger charts and readable data tables. Phone layout stays compact.'] },
   { b:'v186', d:'2026-10-01', items:['BAG: PING G440 4H replaces the canceled Cobra hybrid order. 23°, right hand, ALTA CB Blue 70 Regular. On order; hybrid yardages pending.'] },
   { b:'v185', d:'2026-10-01', items:['BAG: Clubs and playing carries share one compact list, longest first. Tap any club for carry editing, notes, adjustment charts and removal. Each iron has its own row; putter is included.'] },
   { b:'v184', d:'2026-10-01', items:['BAG: Removed the duplicate benched DS-ADAPT hybrid. Active 4H and saved carries are preserved.'] },
@@ -1999,6 +2000,8 @@ function render(view, arg, keepScroll){
   // puts it back — which is the whole reason this pattern needs no bookkeeping.
   const was = keepScroll
     ? [...$('#view').querySelectorAll('details[id]')].map(d => [d.id, d.open]) : [];
+  $('#view').dataset.page = view;
+  $('#view').dataset.layout = view === 'sessions' && arg === 'cumulative' ? 'cumulative' : view;
   $('#view').innerHTML = R(arg);
   was.forEach(([id, open]) => { const d = document.getElementById(id); if(d) d.open = open; });
   buildJumpBar();
@@ -4487,7 +4490,7 @@ function cumulativeView(){
   };
   return `
   <h2>Cumulative</h2>
-  <div class="card">
+  <div class="card cum-intro">
     <p class="sm">Days stay days. This is what they add up to — the analysis, the pictures, and what to do next. It updates when reviewed data is imported. Sample counts show coverage, not measurement accuracy.</p>
     <div class="cum-n">
       <span>${C.liveHoles} live holes</span>
