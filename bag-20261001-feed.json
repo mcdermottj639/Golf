@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "updated": "2026-10-01",
   "entries": [
     {
@@ -119,6 +119,20 @@
       "type": "history",
       "date": "2026-10-01",
       "text": "Ordered PING G440 4H Hybrid: 23°, right hand, ALTA CB Blue 70 Graphite Regular (73g), expected today. Replaces the canceled Cobra hybrid order in the KING TEC 4-iron slot. 4i remains benched; 5–PW stay active. Hybrid distances await sim data."
+    },
+    {
+      "id": "bag-ping-g440-received-chart-20261001",
+      "type": "club-update",
+      "target": "bag-ds-adapt-4h-20261001",
+      "club": {
+        "status": "gaming",
+        "pingAdapter": {
+          "baseLoft": 23,
+          "source": "Jack's supplied adjustment chart",
+          "reported": "2026-10-01"
+        },
+        "note": "Received October 1, 2026. PING G440 4H, 23° base loft, ALTA CB Blue 70 Regular. Adapter setting not yet confirmed. Expand the adjustment chart for all eight settings. Simulator carry, total and delivery data pending; no previous-club distances transferred."
+      }
     }
   ]
 }
