@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v189';
+const BUILD = 'v190';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v190', d:'2026-10-01', items:['OCT 1 SIM: Both TrackMan PDFs imported. 80 usable shots across six clubs, including the G440 hybrid. Carry, total, height, speeds, launch, spin and face-to-path converted from metric units; source exclusions and invalid smash readings handled.'] },
   { b:'v189', d:'2026-10-01', items:['BAG: G440 hybrid received. Expand its adjustment chart for all eight adapter settings, effective lofts and neutral/flat lie.'] },
   { b:'v188', d:'2026-10-01', items:['CLUB HISTORY: Open any club from Bag at a glance for every recorded range batch, metric trends, setup notes and a next-session measurement focus.'] },
   { b:'v187', d:'2026-10-01', items:['DESKTOP: Wide-screen workspace with side navigation, side-by-side planning and club visuals, larger charts and readable data tables. Phone layout stays compact.'] },
@@ -11154,7 +11155,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 

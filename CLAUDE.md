@@ -3457,3 +3457,23 @@ the redundant Cumulative quick links because the complete section jump bar is vi
 Verified in Chromium: the five-width desktop suite and all four relevant data/
 render suites pass. The older cumulative-browser.cjs has a pre-existing stale
 147.2-yard expectation (current feed renders 149.7); reproduced on untouched v186.
+
+
+## October 1 TrackMan PDF ingestion
+
+`range-20261001-feed.json` loads after the October 1 bag feed. Two independently identified
+bay records preserve the PDF source blocks; a new club-update replaces the G440
+"sim data pending" note without touching its specifications or outdoor ladder. `scripts/import-oct01-pdfs.py` reproduces
+`data/range-2026-10-01.json` and the feed from the two source PDFs. PDF units are meters
+and m/s: divide distances by 0.9144, speeds by 0.44704 and height by 0.3048 before
+analysis. Numeric shot height is feet, as expected by `apexFeet()`. Preserve source tokens
+and page/shot numbers. Crossed-out source rows carry explicit exclusions; the existing
+two-thirds airborne-cluster rule additionally catches uncrossed clear tops. 96 source
+rows, 16 held out, 80 usable across six clubs. A −1 smash value means unavailable, not
+a numeric observation; missing club speed does not invalidate measured carry. Per-metric
+sample counts use valid rows only. Source Side has unspecified endpoint and is kept as
+`sideYards`, without inventing carrySide/totalSide. Face-to-path is measured, but path,
+face angle and attack angle are absent and stay null. Different PDF blocks remain
+separate for diagnoses; full-day means are descriptive only. No outdoor carry ladder
+updates, sleeve-setting inference or ball/normalization assumptions. First October 1
+4H data belongs to the active PING G440; the canceled Cobra hybrid has no session here.
