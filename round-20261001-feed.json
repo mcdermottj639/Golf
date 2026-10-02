@@ -1055,5 +1055,36 @@
         "verificationNote": "Jack confirmed Granite Links, Massachusetts — Granite/Quincy routing. Course confirmation supersedes the original capture's unknown-course note; all scores and shot readings are unchanged."
       }
     }
+    ,{
+      "id": "round-tm-20261001-performance-v1",
+      "type": "round-review-update",
+      "target": "round-tm-20261001-v1",
+      "round": {"date": "2026-10-01"},
+      "review": {
+        "trackman": {"fairways": [4,13], "gir": [7,18], "averageDrive": 211, "longestDrive": 277, "scrambling": 55, "putts": 28, "puttsPerHole": 1.6},
+        "performanceAverageColumn": {"fairwaysPercent":54,"averageDrive":214,"longestDrive":277,"girPercent":28,"scrambling":28,"puttsPerHole":1.6,"scope":"Source Avg. column; reference population and window unconfirmed"},
+        "companion": {
+          "source": "ScreenRecording_10-02-2026 01-07-27_1.mp4, 01-07-50_1.mp4 and 01-08-42_1.mp4; supplied as October 1 Granite Links analytics, not a new October 2 round",
+          "benchmark": null,
+          "strokesGained": -16.45,
+          "strokesGainedByArea": {"tee":-4.98,"approach":-8.14,"shortGame":-1.52,"putting":-1.81},
+          "tee": {"shots":13,"drivingDistance":245.78,"drivingUnit":null,"driverUsagePercent":85},
+          "approach": {"shots":19,"averageRemainingFeet":99.21,"greenHits":[8,19],"averageLength":134.91,"averageLengthUnit":null},
+          "shortGame": {"shots":10,"averageRemainingFeet":10.63,"inside6Feet":[3,10],"outside15Feet":[2,10]},
+          "traditional": {"fairways":[4,13],"gir":[7,18],"scrambling":[9,11],"fairwayScrambling":[3,3],"semiRoughScrambling":[0,0],"roughScrambling":[3,4],"sandScrambling":[3,3],"otherScrambling":[0,1],"averagePuttsPerGir":1.14},
+          "summary": {"rounds":1,"par":71,"courseLengthYards":6247,"scoreVsPar":9,"birdiesOrBetter":2,"bogeysOrWorse":7,"doubleOrWorse":2,"par3VsParAverage":1.4,"par4VsParAverage":0.11,"par5VsParAverage":0.25,"drivingDistanceYards":211.07,"teeInPlay":[13,13],"teeMajorPenalty":[0,13],"green200Plus":[0,3],"green150To200":[0,3],"green50To150":[8,12],"scrambling":[9,11],"shortGameInside3Feet":[6,10],"shortGameInside6Feet":[6,10],"shortGameInside9Feet":[6,10],"shortGameInside15Feet":[6,10],"sgTotal":null,"sgTee":null,"sgApproach":null,"sgShortGame":null,"sgPutting":null,"puttingConversions":{"0to3":[0,0],"3to5":[0,0],"5to10":[0,0],"10to15":[0,0],"15to25":[0,0],"25plus":[0,0]},"puttsPerGirSourceReading":"3/3 (100%)","recoveryMajorPenaltyPercent":0}
+        },
+        "puttingNote": "Round-performance screen reports 28 simulator putts (1.6 per hole). Putting/gimme configuration remains unconfirmed; do not evaluate real putting skill. Analytics' 0/0 conversion buckets mean no observations, not a measured 0% ability.",
+        "sources": "Round performance screenshot 19F89A90-3B86-4341-B3BB-1784AC50594A.png: fairways 4/13 (31%), GIR 7/18 (39%), average drive 211 yd, longest 277 yd, scrambling 55%, putts 28. Scorecard screenshot 8683FB93-67AB-4CF5-82E6-ACE11CD94EB6.png confirms 80 on par 71, 39/41, two birdies, nine pars and five bogeys. Analytics videos: 01-07-27 approach, 01-07-50 tee/short-game/SG/traditional, 01-08-42 summary pages. These are summaries of the existing round, not additional shots.",
+        "verificationNote": "Granite Links — Granite/Quincy, confirmed by Jack and screenshots. Round performance: 4/13 fairways, 7/18 GIR, 211 yd average drive, 277 yd longest, 55% scrambling, 28 putts. Analytics disagreements are preserved separately: tee driving distance 245.78 (unit not visible), versus summary 211.07 yd; scrambling 9/11 (82%), versus round performance 55%; short-game inside 6 ft 3/10, versus summary 6/10. SG total -16.45 = tee -4.98 + approach -8.14 + short game -1.52 + putting -1.81; benchmark unconfirmed. Approach green hits 8/19 are shot-based, not 7/18 hole-based GIR. No new carry readings supplied.",
+        "coverage": "All 18 scores and the original 51 non-putting observations preserved. New uploads add round-level summaries only. 80 score minus 28 source-reported putts leaves 52 non-putting/penalty strokes versus 51 captured observations: one-stroke accounting difference remains unresolved, possibly related to H17's flagged zero-distance row; do not invent a penalty or shot. Analytics tee penalty 0/13 covers its tee population, not proof of no par-3 penalty. Different screens disagree on scrambling, drive distance and short-game proximity counts; definitions/filter scope unconfirmed, so no combined metric or synthetic reconciliation. Charts without numeric labels are not digitized as exact values. Capture date October 2; play date October 1. Non-tee identities remain unconfirmed; carry remains absent."
+      }
+    },
+    {
+      "id": "round-tm-20261001-putts-v1",
+      "type": "round-update",
+      "target": "round-tm-20261001-v1",
+      "round": {"putts":28}
+    }
   ]
 }
