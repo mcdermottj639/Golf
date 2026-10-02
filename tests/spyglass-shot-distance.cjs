@@ -49,11 +49,11 @@ assert.equal(old.trackmanHcpSnapshot,7.4);
 const html=R.render(old,{bays:[],rounds:[old]});
 assert.match(html,/Round total yd/);
 assert.match(html,/248 yd total/);
-assert.match(html,/248\.0/);
+assert.doesNotMatch(html,/248\.0/); // whole-unit display; 248 yd total and raw precision checked separately
 assert.match(html,/300 yds to hole/);
 assert.match(html,/189\.4/);
-assert.match(html,/210\.1/);
-assert.match(html,/186\.0/);
+assert.match(html,/>210<\/td>/);
+assert.match(html,/>186<\/td>/);
 // Carry-only virtual front nine must never show an invented shot total.
 const front=require('../front9-feed.json').entries.find(e=>e.id==='round-tm-virtual-front9-20260916-v1');
 const frontPatch=feed.entries.find(e=>e.id==='round-virtual-front9-carry-only-20260922-v1');
@@ -66,7 +66,7 @@ assert.equal(virtual.review.distanceMeaning,'carry-only');
 assert.ok(virtual.review.shots.every(s=>s.distance===null && Number.isFinite(s.carry)));
 const virtualHtml=R.render(virtual,{bays:[],rounds:[virtual]});
 assert.match(virtualHtml,/Total distance was not captured/);
-assert.match(virtualHtml,/178\.2/);
+assert.match(virtualHtml,/>178<\/td>/);
 assert.doesNotMatch(virtualHtml,/178\.2 yd total/);
 // Hazeltine already had independent total and carry; its label update changes no values.
 const hazEntry=require('../data/hazeltine-verified-2026-09-22.json');

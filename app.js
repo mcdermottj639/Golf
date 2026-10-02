@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v196';
+const BUILD = 'v197';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v197', d:'2026-10-02', items:['Deployment repair: updated the legacy distance-display test for whole numbers so the Granite Links stats and compact round view can reach the live app.'] },
   { b:'v196', d:'2026-10-02', items:['GRANITE LINKS STATS: Added 4/13 fairways, 7/18 GIR, 211-yard average drive and 28 simulator putts. Additional analytics retained with source disagreements clearly labelled; no duplicate round or shots.'] },
   { b:'v195', d:'2026-10-02', items:['OCT 1 COURSE CONFIRMED: Granite Links, Massachusetts — Granite/Quincy. Existing round renamed without duplicating or changing scores or shots.'] },
   { b:'v194', d:'2026-10-02', items:['OCT 1 ROUND: 80 on par 71 (39 out / 41 in), all 18 holes and 51 non-putting observations. H5 tee corrected from 5i to 4H. Course name unconfirmed; shot totals never substituted for missing carry.'] },
