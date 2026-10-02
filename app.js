@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v197';
+const BUILD = 'v198';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v198', d:'2026-10-02', items:['ONE RANGE DAY: Range and Map My Bag uploads on the same date share one daily entry and combined club totals. Original sources remain available.', 'FOLD SECTIONS: Collapse or expand page sections; choices are remembered on this device.'] },
   { b:'v197', d:'2026-10-02', items:['Deployment repair: updated the legacy distance-display test for whole numbers so the Granite Links stats and compact round view can reach the live app.'] },
   { b:'v196', d:'2026-10-02', items:['GRANITE LINKS STATS: Added 4/13 fairways, 7/18 GIR, 211-yard average drive and 28 simulator putts. Additional analytics retained with source disagreements clearly labelled; no duplicate round or shots.'] },
   { b:'v195', d:'2026-10-02', items:['OCT 1 COURSE CONFIRMED: Granite Links, Massachusetts — Granite/Quincy. Existing round renamed without duplicating or changing scores or shots.'] },
@@ -1738,9 +1739,10 @@ function evidenceEvents(){
       prov: r.sim ? 'sim' : 'on-course',
       act:{ a:'open-round', i } });
   });
-  (S.bays || []).forEach((b, i) => {
-    ev.push({ d:b.date || '', title:b.setup || b.mode || 'Bay session',
-      gist:bayGist(b), prov:'bay', act:{ a:'open-bay', i } });
+  groupedBayDays((S.bays||[]).map((b,i)=>({b,i}))).forEach(({b,i,day,members}) => {
+    ev.push({ d:b.date || '', title:day ? 'Range day' : b.setup || b.mode || 'Bay session',
+      gist:day ? `${day.usable} usable shots · ${day.clubs.length} clubs · ${members.length} source sessions` : bayGist(b),
+      prov:'bay', act:{ a:'open-bay', i } });
   });
   (S.combines || []).forEach(c => {
     ev.push({ d:c.date || '', title:'Combine' + (c.score != null ? ' · '+c.score : ''),
@@ -1973,7 +1975,7 @@ function render(view, arg, keepScroll){
       tag = 'The running picture. It moves when a day lands.';
     } else {
       title = 'Days';
-      tag = 'Every capture, newest first — not split by type.';
+      tag = 'One range entry per day, with rounds and film alongside.';
     }
   }
   $('#pageTitle').textContent = title;
@@ -2014,9 +2016,60 @@ function render(view, arg, keepScroll){
   $('#view').dataset.page = view;
   $('#view').dataset.layout = view === 'sessions' && arg === 'cumulative' ? 'cumulative' : view;
   $('#view').innerHTML = R(arg);
+  buildSectionFolds();
   was.forEach(([id, open]) => { const d = document.getElementById(id); if(d) d.open = open; });
   buildJumpBar();
   if(!keepScroll) window.scrollTo(0,0);
+}
+
+// Fold existing sections in place so desktop grids and existing details keep their layout.
+const FOLD_KEY = 'caddiehq_section_folds_v1';
+function sectionFolds(){try{return JSON.parse(localStorage.getItem(FOLD_KEY)||'{}')||{};}catch{return {};}}
+function setSectionFold(button, closed, persist=true){
+  button.setAttribute('aria-expanded',String(!closed));
+  const ids=(button.getAttribute('aria-controls')||'').split(' ');
+  ids.forEach(id=>document.getElementById(id)?.classList.toggle('section-fold-hidden',closed));
+  if(persist){const states=sectionFolds();states[button.dataset.foldKey]=closed;
+    try{localStorage.setItem(FOLD_KEY,JSON.stringify(states));}catch{}}
+}
+function buildSectionFolds(){
+  const root=$('#view'),states=sectionFolds(),counts=new Map();
+  const scope=[current.view,current.arg??'',current.view==='rounds'?roundsSeg:''].join(':');
+  [...root.querySelectorAll('h2')].forEach((heading,index)=>{
+    if(heading.closest('summary,button,a')||heading.querySelector('button,a,input,select'))return;
+    const nodes=[];
+    for(let node=heading.nextElementSibling;node&&node.tagName!=='H2';node=node.nextElementSibling){
+      if(node.querySelector('h2'))break;
+      nodes.push(node);
+    }
+    if(!nodes.length)return;
+    const label=heading.textContent.trim(),occurrence=counts.get(label)||0;counts.set(label,occurrence+1);
+    const button=document.createElement('button');button.type='button';button.className='section-fold-toggle';
+    button.dataset.foldKey=scope+':'+label+':'+occurrence;
+    const text=document.createElement('span');
+    while(heading.firstChild)text.appendChild(heading.firstChild);
+    button.append(text);heading.appendChild(button);
+    button.setAttribute('aria-controls',nodes.map((node,n)=>node.id||(node.id=`fold-body-${index}-${n}`)).join(' '));
+    button.addEventListener('click',event=>{event.stopPropagation();setSectionFold(button,button.getAttribute('aria-expanded')==='true');});
+    setSectionFold(button,states[button.dataset.foldKey]===true,false);
+  });
+  if(!root.querySelector('.section-fold-toggle'))return;
+  const toolbar=document.createElement('div');toolbar.className='section-fold-tools';
+  for(const [label,closed] of [['Expand sections',false],['Collapse sections',true]]){
+    const b=document.createElement('button');b.type='button';b.textContent=label;
+    b.addEventListener('click',()=>root.querySelectorAll('.section-fold-toggle').forEach(toggle=>setSectionFold(toggle,closed)));
+    toolbar.appendChild(b);
+  }
+  root.prepend(toolbar);
+}
+function revealSection(target){
+  if(!target)return;
+  $('#view').querySelectorAll('.section-fold-toggle').forEach(button=>{
+    const contains=(button.getAttribute('aria-controls')||'').split(' ').some(id=>{
+      const node=document.getElementById(id);return node&&(node===target||node.contains(target));});
+    if(contains||button.parentElement===target)setSectionFold(button,false);
+  });
+  for(let node=target.parentElement;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
 }
 
 // Every view is a stack of <h2> sections, so the in-page nav is built from the
@@ -4115,11 +4168,22 @@ const DAY_FILTERS = [
   ['film','Film'],
 ];
 // Captures, mixed. Four types used to be four homes; they are filters on one list now.
+function groupedBayDays(list){
+  const groups=new Map();
+  for(const item of list){
+    const {b,i}=item;
+    const key=b.date&&BAY_DISC(b)==='swing'?'range:'+b.date:'source:'+i;
+    if(!groups.has(key))groups.set(key,{...item,members:[],day:key.startsWith('range:')?bayDayData(b):null});
+    groups.get(key).members.push(item);
+  }
+  return [...groups.values()];
+}
 function allDayRows(){
   const rows = [];
-  (S.bays || []).forEach((b, i) => rows.push({
-    date:b.date, kind:'range', title:b.mode || b.setup || 'Bay session',
-    sub:[b.venue, bayLiveSetup(b) || b.setup].filter(Boolean).join(' · '),
+  groupedBayDays((S.bays||[]).map((b,i)=>({b,i}))).forEach(({b,i,day,members}) => rows.push({
+    date:b.date, kind:'range', title:day ? 'Range day' : b.mode || b.setup || 'Bay session',
+    sub:day ? `${day.usable} usable shots · ${day.clubs.length} clubs · ${members.length} source sessions` :
+      [b.venue, bayLiveSetup(b) || b.setup].filter(Boolean).join(' · '),
     action:'open-bay', i, prov:'bay'
   }));
   (S.sessions || []).forEach((s, i) => rows.push({
@@ -4638,10 +4702,10 @@ function cumulativeView(){
 // has been captured, with the BAY chip saying which kind of capture a row was.
 function bayLog(list){
   return `<p class="sm faint" style="margin-bottom:2px">Tap a session for every number it produced.</p>
-  ${list.map(({ b, i }) => `<div class="seslog" data-action="open-bay" data-i="${i}">
+  ${groupedBayDays(list).map(({ b, i, day }) => `<div class="seslog" data-action="open-bay" data-i="${i}">
     <div class="sesh"><b>${fmtDate(b.date)}</b><span class="sesm"><span class="bayc">BAY</span>${
-      esc(baySize(b))}${b.detail ? ' ▸' : ''}</span></div>
-    <div class="sesg">${esc(bayGist(b))}</div>
+      esc(day ? `${day.usable} usable shots · ${day.clubs.length} clubs` : baySize(b))}${b.detail ? ' ▸' : ''}</span></div>
+    <div class="sesg">${esc(day ? 'Full range day · all source sessions combined' : bayGist(b))}</div>
   </div>`).join('')}`;
 }
 // ----- The Combine (Sep 11 2026) -----
@@ -4720,12 +4784,15 @@ function bayDayTakeaways(b,day=bayDayData(b)){
   return api.render(day,api.build(day));
 }
 function bayView(i){
-  let b = (S.bays || [])[+i];
+  const sourceOnly=String(i).startsWith('source:');
+  i=sourceOnly?Number(String(i).slice(7)):+i;
+  let b = (S.bays || [])[i];
   if(!b) return game();
-  const day=b.sessionKind==='map-my-bag' ? null : bayDayData(b);
+  const day=sourceOnly ? null : bayDayData(b);
+  const sources=day ? (S.bays||[]).map((x,index)=>({b:x,i:index})).filter(x=>x.b.date===b.date&&BAY_DISC(x.b)==='swing') : [];
   const d = day?.usable ? {combinedDay:true,clubs:day.clubs.map(g=>({club:g.club,n:g.shots.length})),rangeShots:day.clubs,
     rangeCaption:'One combined full-day set per club. Missing-distance rows and clear mishits excluded in their original source blocks.'} : b.detail || {};
-  if(day?.usable)b={...b,detail:d,venue:'Full-day range review',ball:'See source notes',norm:'See source notes',spin:'See source notes',
+  if(day?.usable)b={...b,detail:d,mode:'Range day',setup:'All range and Map My Bag sessions combined',sessionKind:'range-day',venue:'Full-day range review',ball:'See source notes',norm:'See source notes',spin:'See source notes',
     finding:`${day.usable} usable shots across ${day.clubs.length} clubs. All same-club blocks combined; averages are calculated from individual retained readings, not averages of block averages.`};
   const analyzed = analysisClubs(d);
   const delivery = analysisDelivery(d);
@@ -4746,6 +4813,8 @@ function bayView(i){
   <button class="backlink" data-action="session-category" data-kind="days">← Days</button>
   <h2>${esc(fmtDate(b.date))} · ${esc(b.mode || 'Range practice')}</h2>
   <p class="sm">${esc(b.venue || '')} · ${esc(bayLiveSetup(b) || b.setup || '')}</p>
+  ${sourceOnly ? `<button class="btn" data-action="open-bay" data-i="${i}">Open full range day →</button>` : ''}
+  ${day ? `<details class="sect day-sources" id="day-sources"><summary>Original sessions · ${sources.length}</summary><p class="sm">Daily averages use individual retained shots with a separate sample count for each metric. Summary-only readings stay in their source and are not counted as extra shots.</p>${sources.map(x=>`<button class="btn" data-action="open-bay-source" data-i="${x.i}">${esc(x.b.mode||'Range')} · ${esc(bayLiveSetup(x.b)||x.b.setup||'Source details')} →</button>`).join('')}</details>` : ''}
   ${bayDayTakeaways(b,day)}
   ${d.clubs && d.clubs.length ? `<div class="card bayvisuals">${bayVisualMarkup(d)}</div>` : ''}
   <div class="card">
@@ -10380,6 +10449,7 @@ const ACTIONS = {
   'open-session': el => render('session', el.dataset.i),
   'club-history': el => render('clubhistory', el.dataset.club),
   'open-bay': el => render('bay', el.dataset.i),
+  'open-bay-source': el => render('bay', 'source:'+el.dataset.i),
   'build-sim-practice': () => {
     if(S.simPracticePlan?.blocks?.some(b=>b.result)||S.simPracticePlan?.done?.length){
       S.simPracticeHistory=[...(S.simPracticeHistory||[]),S.simPracticePlan].slice(-20);
@@ -10414,10 +10484,10 @@ const ACTIONS = {
   'bay-takeaway-source': el => {
     const i=Number(el.dataset.i),club=el.dataset.club;
     if(!Number.isInteger(i)||!S.bays?.[i])return;
-    render('bay',i);
+    render('bay','source:'+i);
     const target=[...document.querySelectorAll('.range-evidence-club')].find(x=>x.dataset.club===club)
       ||document.querySelector('.bayvisuals');
-    if(target){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});target.scrollIntoView({behavior:'smooth',block:'start'});}
+    if(target){revealSection(target);target.setAttribute('tabindex','-1');target.focus({preventScroll:true});target.scrollIntoView({behavior:'smooth',block:'start'});}
   },
   // Taking the bay's number is HIS decision, made once, with both figures on screen — which
   // is the whole reason a measured push does not just overwrite the row. It does not set
@@ -10595,8 +10665,9 @@ document.addEventListener('click', e => {
   // in-page section jump
   const jump = e.target.closest('[data-jump]');
   if(jump){
-    document.getElementById(jump.dataset.jump)
-      ?.scrollIntoView({ behavior:'smooth', block:'start' });
+    const target=document.getElementById(jump.dataset.jump);
+    revealSection(target);
+    target?.scrollIntoView({ behavior:'smooth', block:'start' });
     return;
   }
   // 5-ft tap grid

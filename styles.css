@@ -1981,3 +1981,13 @@ body.night .meanbtn{color:var(--green-ink)}
 @media(max-width:480px){.club-trend-row{grid-template-columns:minmax(0,1fr) auto}.club-trend-track{grid-row:2;grid-column:1/-1}.club-trend-row b{font-size:14px}}
 
 .club-history-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+
+/* Optional section folding; preserve existing cards/grids and nested disclosures. */
+.section-fold-hidden { display:none !important; }
+.section-fold-toggle { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:4px 0; border:0; background:transparent; color:inherit; font:inherit; text-align:left; cursor:pointer; min-height:44px; }
+.section-fold-toggle::after { content:'−'; flex:none; font:20px var(--sans); }
+.section-fold-toggle[aria-expanded="false"]::after { content:'+'; }
+.section-fold-toggle:focus-visible { outline:2px solid var(--green); outline-offset:3px; }
+.section-fold-tools { display:flex; flex-wrap:wrap; gap:12px; justify-content:flex-end; grid-column:1/-1; margin:8px 0; }
+.section-fold-tools button { font:12px var(--sans); background:none; border:0; padding:8px 0; color:var(--green); text-decoration:underline; cursor:pointer; min-height:44px; }
+.day-sources .btn { display:block; margin:8px 0; white-space:normal; text-align:left; }

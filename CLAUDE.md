@@ -2899,7 +2899,7 @@ Outdoor / Film). That made the days findable and also **split a week of work int
 lists**. v118 keeps the days and stops splitting them.
 
 `sessionShortcuts()` is now two tiles: **Days** and **Cumulative**. Days is one newest-first
-list of every capture (bay, outdoor, indoor, film, Combine) with filter chips if you want
+list of daily range groups, outdoor rounds, indoor rounds and film with filter chips if you want
 one kind — Range sessions is a filter, not a home. **Cumulative is the analysis page (v121–v122):** working vs needs work (settled faults /
 open faults, evolution marks), the over-the-top path diagram, path+face from the latest
 bay day, path-across-days (each dot is one club average; the ring is that day's shape,
@@ -3537,8 +3537,8 @@ unknown. Source Consistency is not sample SD; visible rounded rows can re-averag
 0.1 yd differently from the source header. No 80% exclusion or arbitrary outlier
 trim: all 66 complete map rows pass the standing clear-mishit rule.
 
-Opening this map uses its own source cohort; normal range opening still reviews
-the whole day. The Swing Lab selects the newest explicitly identified Map My Bag
+Opening any range or Map My Bag entry reviews the whole day (v198). The Original
+sessions disclosure opens an explicit source-only view with its own cohort. The Swing Lab selects the newest explicitly identified Map My Bag
 instead of an older map with one more club. Existing chart/table layout is reused.
 Keep historical and playing carries intact. Current source-map evidence:
 4H 174.9 / 5i 163.5 / 6i 156.6; 50° 113.1 / 58° 97.0. Pause the proposed 5H and
@@ -3561,3 +3561,19 @@ Display carry, total, apex, distance gaps and consistency in whole yards/feet ac
 **v196 summary enrichment:** Two screenshots and three Oct2 capture-time recordings supplement the Oct1 round, not a new round/session. Append-only performance/review and putt corrections retain all 51 shots and 18 scores. TrackMan performance: FW4/13, GIR7/18, average drive211yd, longest277yd, scrambling55%, putts28. Analytics stored separately in review.companion: tee245.78 unit unshown vs summary211.07yd; scrambling9/11 vs55%; inside6ft3/10 vs6/10. Preserve these definition/scope conflicts rather than choosing by convenience. SG-16.45 sums from -4.98/-8.14/-1.52/-1.81 but benchmark unknown; no handicap-loss claim. Approach8/19 greens is shot-level, not GIR7/18. Zero-denominator putting buckets are missing evidence. 80-28=52 vs51 captured nonputt observations leaves one unresolved accounting stroke; H17 association is a possibility, not an invented penalty. No new carry evidence. Exact chart bins not transcribed from unlabeled bars. Existing source-notes UI exposes conflicts; no layout changes.
 **v195 course confirmation:** Jack identified Granite Links, Massachusetts, Granite/Quincy routing. Append-only targeted corrections rename the existing round and add a verification note; retain the original extraction as historical evidence. Do not rebuild the feed from the original transcript generator without preserving subsequent corrections. No score/shot changes or duplicate round.
 `round-20261001-feed.json` is fetched and cached separately from Map My Bag. Stable apply-once round ID: `round-tm-20261001-v1`. All 18 headers sum to 80 on par 71 (39/41). `scripts/import-oct01-round.py` preserves the 51 non-putting observations with frame references and six visible metric columns. Course identity is unconfirmed, not guessed. H5 selected 5i is confirmed 4-hybrid at 24.5°; only tee identities are confirmed. Non-tee clubs/intent stay unknown. H17 zero-total row remains flagged; no invented penalty or putt count. Carry F is flat carry and is valid carry evidence when visible; these recordings instead show height/spin/launch/delivery, so no carry is synthesized from shot-list total. No range, outdoor-statistics or playing-yardage mutation. Repeat import must remain idempotent.
+
+## Daily range entries and optional section folding (v198)
+
+`groupedBayDays()` groups dated swing bay records for Days and lab bay logs. One date
+means one Range day including Map My Bag. Unknown dates and other disciplines stay
+separate. The full-day reader pools retained individual readings through the existing
+`bayDayData()` API, with per-metric sample counts; summary-only readings are not
+fabricated into shots. Source records and round/film identities remain intact.
+`bayView('source:N')` is the explicit original-source view; source insight links use it.
+
+`buildSectionFolds()` enhances h2 sections in every render, hiding following sibling
+elements until the next h2 without reparenting cards or changing desktop grids.
+Existing native details remain available. Sections default expanded; optional folds
+persist in a separate localStorage key scoped to view, argument, segment and heading.
+Expand/Collapse sections controls apply to the enhanced sections. Jump links reveal
+the destination and ancestor folds. No golf data changes when a section is folded.

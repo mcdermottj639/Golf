@@ -10,7 +10,7 @@ for(const f of ['lessons.js','courses-db.js','course-cards.js'])vm.runInContext(
 let src=fs.readFileSync(path.join(root,'app.js'),'utf8');
 src=src.slice(0,src.indexOf('// ---------- Boot ----------'))+`
 rerender=()=>{};toast=()=>{};load();
-window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView,bagMapBay,bayDayData};
+window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView,bagMapBay,bayDayData,allDayRows,groupedBayDays};
 })();`;
 vm.runInContext(src,ctx);
 const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'coach-feed.json'),'utf8'));
@@ -48,7 +48,7 @@ const B=require('../bay-takeaways.js');const day=B.prepare('2026-10-01',bays);
 assert.equal(day.usable,80);assert.equal(day.held,16);assert.equal(day.clubs.length,6);
 assert.equal(JSON.stringify(T.get().carries),carries);
 assert.ok(T.bayView(T.get().bays.indexOf(bays[0])).includes('Oct 1'));
-assert.ok(fs.readFileSync(path.join(root,'app.js'),'utf8').includes("'range-20261001-feed.json'].map"));
+assert.ok(fs.readFileSync(path.join(root,'app.js'),'utf8').includes("'range-20261001-feed.json'"));
 assert.ok(fs.readFileSync(path.join(root,'sw.js'),'utf8').includes("'./range-20261001-feed.json'"));
 console.log('PASS Oct1: 96 source rows, 80 retained, metric conversion, source exclusions, sentinel handling, per-metric counts, day aggregation, idempotence, outdoor carries preserved.');
 
@@ -132,7 +132,8 @@ assert.equal(mapDay.clubs.find(c=>c.club==='3-wood').shots.length,24);
 assert.equal(mapDay.clubs.find(c=>c.club==='5-wood').shots.length,22);
 assert.equal(mapDay.clubs.find(c=>c.club==='2-iron').shots.length,7,'summary-only map rows do not contaminate complete-distance averages');
 assert.equal(T.bagMapBay()._fid,map._fid,'new 12-club map beats old 13-club map');
-const mapHTML=T.bayView(T.get().bays.indexOf(map));
+assert.match(T.bayView(T.get().bays.indexOf(map)),/146 usable shots/);
+const mapHTML=T.bayView('source:'+T.get().bays.indexOf(map));
 assert.match(mapHTML,/Map My Bag/);assert.match(mapHTML,/72 reported shots/);
 assert.match(mapHTML,/164.1/);assert.match(mapHTML,/individual carry\/total readings not captured|individual carry\/total\/side\/curve/);
 assert.doesNotMatch(mapHTML,/Full-day range review|146 usable shots|NaN|undefined/);
@@ -147,3 +148,13 @@ T.get().feedApplied=T.get().feedApplied.filter(id=>!mapIds.has(id));
 T.applyFeed(mapFeed);
 assert.equal(JSON.stringify(T.get().bays.filter(b=>b.date==='2026-10-01')),upgraded);
 console.log('PASS Map My Bag: one 12-club/72-source-shot session; 66 distance rows + 6 summary-only; woods moved exactly; no duplicates; full day 162/146; isolated map rendering, newest-map selection, unchanged rounds/carries, fresh/upgrade parity.');
+
+// One visible daily entry, no source mutation, and safe grouping for future dates.
+const dailyRows=T.allDayRows().filter(r=>r.date==='2026-10-01'&&r.kind==='range');
+assert.equal(dailyRows.length,1);assert.match(dailyRows[0].sub,/146 usable shots · 13 clubs · 3 source sessions/);
+const groupBefore=JSON.stringify(T.get());T.allDayRows();assert.equal(JSON.stringify(T.get()),groupBefore);
+const synthetic=[{date:'2030-05-01'},{date:'2030-05-01',sessionKind:'map-my-bag'},{date:'2030-05-02'},{date:'2030-05-01',discipline:'putting'},{},{}];
+const grouped=T.groupedBayDays(synthetic.map((b,i)=>({b,i})));
+assert.equal(grouped.length,5);assert.equal(grouped[0].members.length,2);
+assert.ok(grouped.some(g=>g.b.discipline==='putting'&&g.members.length===1));
+console.log('PASS daily entries: one Oct1 card, future date grouping, unknown-date separation, discipline separation and no source mutation.');
