@@ -1037,5 +1037,23 @@
         }
       }
     }
+    ,{
+      "id": "round-tm-20261001-course-confirmed-v1",
+      "type": "round-update",
+      "target": "round-tm-20261001-v1",
+      "round": {
+        "course": "Granite Links · Granite/Quincy",
+        "note": "October 1 simulator round at Granite Links, Massachusetts: Granite/Quincy routing confirmed by Jack. 39 out / 41 in, 80 (+9). Tee labels confirmed, with H5 5i corrected to 4H; approach identities unconfirmed. Carry not captured. Separate from Map My Bag and outdoor statistics."
+      }
+    },
+    {
+      "id": "round-tm-20261001-course-review-v1",
+      "type": "round-review-update",
+      "target": "round-tm-20261001-v1",
+      "round": {"date": "2026-10-01"},
+      "review": {
+        "verificationNote": "Jack confirmed Granite Links, Massachusetts — Granite/Quincy routing. Course confirmation supersedes the original capture's unknown-course note; all scores and shot readings are unchanged."
+      }
+    }
   ]
 }

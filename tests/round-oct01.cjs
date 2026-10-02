@@ -8,6 +8,7 @@ const outdoor=JSON.stringify(T.realRounds()),carries=JSON.stringify(T.get().carr
 T.applyFeed(feed);T.applyFeed(feed);
 const rs=T.get().rounds.filter(r=>r.feedId==='round-tm-20261001-v1');
 assert.equal(rs.length,1);const r=rs[0];
+assert.equal(r.course,'Granite Links · Granite/Quincy');
 assert.equal(r.score,80);assert.equal(r.par,71);assert.equal(r.holes.length,18);
 assert.equal(r.holes.slice(0,9).reduce((s,h)=>s+h.s,0),39);
 assert.equal(r.holes.slice(9).reduce((s,h)=>s+h.s,0),41);

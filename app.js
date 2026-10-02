@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v194';
+const BUILD = 'v195';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v195', d:'2026-10-02', items:['OCT 1 COURSE CONFIRMED: Granite Links, Massachusetts — Granite/Quincy. Existing round renamed without duplicating or changing scores or shots.'] },
   { b:'v194', d:'2026-10-02', items:['OCT 1 ROUND: 80 on par 71 (39 out / 41 in), all 18 holes and 51 non-putting observations. H5 tee corrected from 5i to 4H. Course name unconfirmed; shot totals never substituted for missing carry.'] },
   { b:'v193', d:'2026-10-01', items:['Whole-number distance displays across shot tables, club summaries, charts and history. Original measurements stay precise for analysis.'] },
   { b:'v192', d:'2026-10-01', items:['OCT 1 MAP MY BAG: One 12-club / 72-shot source session, including the existing six-shot 3W and 5W batches without duplication. 66 complete distance rows; 2i distance summary clearly separated. Opening this map keeps it separate from the earlier range tests and simulator rounds.'] },
