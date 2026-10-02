@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v191';
+const BUILD = 'v192';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v192', d:'2026-10-01', items:['OCT 1 MAP MY BAG: One 12-club / 72-shot source session, including the existing six-shot 3W and 5W batches without duplication. 66 complete distance rows; 2i distance summary clearly separated. Opening this map keeps it separate from the earlier range tests and simulator rounds.'] },
   { b:'v191', d:'2026-10-01', items:['OCT 1 WOOD VIDEOS: 12 additional shots and 15 existing shots enriched without duplicates. Full day now 92 usable shots. Path, attack angle, carry side, curve and source index columns captured; PDF/video distance differences preserved.'] },
   { b:'v190', d:'2026-10-01', items:['OCT 1 SIM: Both TrackMan PDFs imported. 80 usable shots across six clubs, including the G440 hybrid. Carry, total, height, speeds, launch, spin and face-to-path converted from metric units; source exclusions and invalid smash readings handled.'] },
   { b:'v189', d:'2026-10-01', items:['BAG: G440 hybrid received. Expand its adjustment chart for all eight adapter settings, effective lofts and neutral/flat lie.'] },
@@ -3590,6 +3591,7 @@ function bayGist(b){
 }
 const baySize = b => {
   const d = (b && b.detail) || {};
+  if(d.mapMyBag) return `${d.mapMyBag.reportedShots} reported shots · ${d.mapMyBag.completeDistanceShots} complete distance rows`;
   if(Array.isArray(d.rangeShots) && d.rangeShots.length){
     const n = analysisClubs(d).reduce((s,c)=>s+(+c.n||0),0);
     if(n) return n + ' shots';
@@ -3599,6 +3601,7 @@ const baySize = b => {
 };
 function bayLiveSetup(b){
   const d = (b && b.detail) || {};
+  if(b?.sessionKind==='map-my-bag') return b.setup || 'Map My Bag';
   if(!Array.isArray(d.rangeShots) || !d.rangeShots.length) return (b && b.setup) || '';
   const clubs = analysisClubs(d);
   const n = clubs.reduce((s,c)=>s+(+c.n||0),0);
@@ -4702,7 +4705,7 @@ function bayDayTakeaways(b,day=bayDayData(b)){
 function bayView(i){
   let b = (S.bays || [])[+i];
   if(!b) return game();
-  const day=bayDayData(b);
+  const day=b.sessionKind==='map-my-bag' ? null : bayDayData(b);
   const d = day?.usable ? {combinedDay:true,clubs:day.clubs.map(g=>({club:g.club,n:g.shots.length})),rangeShots:day.clubs,
     rangeCaption:'One combined full-day set per club. Missing-distance rows and clear mishits excluded in their original source blocks.'} : b.detail || {};
   if(day?.usable)b={...b,detail:d,venue:'Full-day range review',ball:'See source notes',norm:'See source notes',spin:'See source notes',
@@ -5065,11 +5068,13 @@ function closeCheat(){
 const SPREAD_BANDS = [[7, 'good', 'tight'], [9, 'mid', 'marginal'], [Infinity, 'warn', 'loose']];
 const spreadBand = pct => SPREAD_BANDS.find(b => pct < b[0]);
 const hasCarry = b => ((b.detail || {}).clubs || []).filter(c => c.carry != null).length;
-// The fullest bag map wins, newest breaking a tie: a six-club range session is a practice
-// set, a thirteen-club map is the bag. A session with fewer than six carries is neither.
+// Explicit Map My Bag sessions use the newest date, even if an older map included
+// one more club. Other range sessions retain the historical fullest-set fallback.
 function bagMapBay(){
-  return baysFor('swing').map(o => o.b).filter(b => hasCarry(b) >= 6)
-    .sort((a, b) => hasCarry(b) - hasCarry(a) || (b.date || '').localeCompare(a.date || ''))[0] || null;
+  const candidates=baysFor('swing').map(o => o.b).filter(b => hasCarry(b) >= 6);
+  const maps=candidates.filter(b=>b.sessionKind==='map-my-bag'||/map my bag/i.test(b.mode||''));
+  return maps.sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0] || candidates
+    .sort((a,b)=>hasCarry(b)-hasCarry(a)||(b.date||'').localeCompare(a.date||''))[0] || null;
 }
 function strikeBay(){
   return baysFor('swing').map(o => o.b).find(b => Array.isArray((b.detail || {}).strike)) || null;

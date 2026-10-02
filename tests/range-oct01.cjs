@@ -10,7 +10,7 @@ for(const f of ['lessons.js','courses-db.js','course-cards.js'])vm.runInContext(
 let src=fs.readFileSync(path.join(root,'app.js'),'utf8');
 src=src.slice(0,src.indexOf('// ---------- Boot ----------'))+`
 rerender=()=>{};toast=()=>{};load();
-window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView};
+window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView,bagMapBay,bayDayData};
 })();`;
 vm.runInContext(src,ctx);
 const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'coach-feed.json'),'utf8'));
@@ -18,7 +18,8 @@ const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'co
 
 
 // Preserve the original PDF-only regression; supplement coverage follows below.
-const completeFeed=require('../range-20261001-feed.json');
+const mapFeed=require('../range-20261001-feed.json');
+const completeFeed={...mapFeed,entries:mapFeed.entries.filter(e=>!e.id.startsWith('oct01-map-'))};
 const fresh={...completeFeed,entries:completeFeed.entries.slice(0,3)};
 T.applyFeed(feed);T.applyFeed(require('../range-20260922-feed.json'));T.applyFeed(require('../futurefit-feed.json'));T.applyFeed(require('../range-20260925-feed.json'));T.applyFeed(require('../bag-20261001-feed.json'));
 const carries=JSON.stringify(T.get().carries);
@@ -101,3 +102,48 @@ T.get().feedApplied=T.get().feedApplied.filter(id=>!ids.has(id));
 T.applyFeed(completeFeed);
 assert.equal(JSON.stringify(T.get().bays.filter(b=>b.date==='2026-10-01')),JSON.stringify(updated));
 console.log('PASS Oct1 video supplement: 15 enriched, 12 new, 108 unique / 92 retained, reordered matching, original totals preserved, per-metric counts, rendered source columns, upgrade/fresh-client parity.');
+
+// Consolidation updates a consumed ID and retires only the duplicate split 5W card.
+ctx.window.CaddieBayTakeaways=B;
+const roundsBefore=JSON.stringify(T.get().rounds);
+T.applyFeed(mapFeed);
+const mapped=T.get().bays.filter(b=>b.date==='2026-10-01');
+assert.equal(mapped.length,3);
+const map=mapped.find(b=>b.sessionKind==='map-my-bag');
+assert.ok(map);assert.equal(map.mode,'Map My Bag');
+assert.equal(map.detail.clubs.length,12);
+assert.equal(map.detail.mapMyBag.reportedShots,72);
+assert.equal(map.detail.rangeShots.reduce((n,g)=>n+g.shots.length,0),66);
+assert.equal(map.detail.distanceMissingEvidence[0].shots.length,6);
+assert.ok(map.detail.distanceMissingEvidence[0].shots.every(s=>s.carry===null&&s.total===null));
+assert.equal(map.detail.clubs.find(c=>c.club==='2-iron').summaryOnly,true);
+assert.equal(map.detail.clubs.find(c=>c.club==='2-iron').metricCounts.carry,0);
+assert.equal(T.analysisClubs(map.detail).find(c=>c.club==='5-iron').carry,163.5);
+assert.equal(T.analysisClubs(map.detail).find(c=>c.club==='5-iron').ftp,6.2);
+assert.equal(T.analysisClubs(map.detail).find(c=>c.club==='50°').metricCounts.cs,2);
+for(const club of ['3-wood','5-wood']){
+ const before=(club==='3-wood'?new3:new5).detail.rangeShots[0].shots;
+ const now=map.detail.rangeShots.find(g=>g.club===club).shots;
+ assert.deepEqual(JSON.parse(JSON.stringify(now)),JSON.parse(JSON.stringify(before)));
+}
+const mapDay=B.prepare('2026-10-01',mapped);
+assert.equal(mapDay.raw,162);assert.equal(mapDay.usable,146);assert.equal(mapDay.held,16);
+assert.equal(mapDay.clubs.find(c=>c.club==='3-wood').shots.length,24);
+assert.equal(mapDay.clubs.find(c=>c.club==='5-wood').shots.length,22);
+assert.equal(mapDay.clubs.find(c=>c.club==='2-iron').shots.length,7,'summary-only map rows do not contaminate complete-distance averages');
+assert.equal(T.bagMapBay()._fid,map._fid,'new 12-club map beats old 13-club map');
+const mapHTML=T.bayView(T.get().bays.indexOf(map));
+assert.match(mapHTML,/Map My Bag/);assert.match(mapHTML,/72 reported shots/);
+assert.match(mapHTML,/164.1/);assert.match(mapHTML,/individual carry\/total readings not captured|individual carry\/total\/side\/curve/);
+assert.doesNotMatch(mapHTML,/Full-day range review|146 usable shots|NaN|undefined/);
+assert.match(T.bayView(T.get().bays.indexOf(mapped[0])),/146 usable shots/);
+assert.equal(JSON.stringify(T.get().carries),carries);
+assert.equal(JSON.stringify(T.get().rounds),roundsBefore);
+const stable=JSON.stringify(T.get());T.applyFeed(mapFeed);assert.equal(JSON.stringify(T.get()),stable);
+const upgraded=JSON.stringify(mapped);
+T.get().bays=T.get().bays.filter(b=>b.date!=='2026-10-01');
+const mapIds=new Set(mapFeed.entries.map(e=>e.id));
+T.get().feedApplied=T.get().feedApplied.filter(id=>!mapIds.has(id));
+T.applyFeed(mapFeed);
+assert.equal(JSON.stringify(T.get().bays.filter(b=>b.date==='2026-10-01')),upgraded);
+console.log('PASS Map My Bag: one 12-club/72-source-shot session; 66 distance rows + 6 summary-only; woods moved exactly; no duplicates; full day 162/146; isolated map rendering, newest-map selection, unchanged rounds/carries, fresh/upgrade parity.');

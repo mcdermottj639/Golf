@@ -15,9 +15,10 @@ const server=http.createServer((q,r)=>{
   const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];
   page.on('pageerror',e=>{errors.push(e.message);console.error(e.message)});
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
-  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('oct01-video-20261001-5w-new-six-v1'));
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('oct01-map-20261001-retire-split-5w-v1'));
   const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('caddiehq_v1')));
-  assert.equal(stored.bays.filter(b=>b.date==='2026-10-01').length,4);
+  assert.equal(stored.bays.filter(b=>b.date==='2026-10-01').length,3);
+  assert.equal(stored.bays.filter(b=>b.sessionKind==='map-my-bag').length,1);
   assert.match(stored.clubs.find(c=>c.name==='PING G440 4H Hybrid').note,/21 usable/);
   await page.locator('.baynums').click();
   const hybrid=page.locator('.cum-club').filter({has:page.locator('[data-action="club-history"][data-club="4H"]')});
@@ -25,7 +26,7 @@ const server=http.createServer((q,r)=>{
   await hybrid.locator('[data-action="club-history"]').click();
   await page.locator('#pageTitle').filter({hasText:'Club history'}).waitFor();
   assert.equal(await page.locator('.swing-evo-club').getAttribute('data-club'),'4H');
-  assert.equal(await page.locator('.swing-evo-record').count(),2);
+  assert.equal(await page.locator('.swing-evo-record').count(),3);
   assert.ok(await page.locator('.swing-evo-club').innerText().then(x=>x.includes('179.5')));
   for(const width of [320,390,1440]){
     await page.setViewportSize({width,height:900});
@@ -34,6 +35,6 @@ const server=http.createServer((q,r)=>{
     await page.screenshot({path:'/tmp/oct01-history-'+width+'.png'});
   }
   assert.deepEqual(errors,[]);
-  console.log('PASS Oct1 browser: feed loaded, G440 note and two source records, 320/390/1440 widths, no overflow or page errors.');
+  console.log('PASS Oct1 browser: map consolidation loaded, G440 note and three source records, 320/390/1440 widths, no overflow or page errors.');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exit(1);});

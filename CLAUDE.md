@@ -3486,9 +3486,10 @@ Four uploaded screen recordings are transcribed in `data/range-2026-10-01-videos
 feed: enrich PDF2's existing eight 3W and seven 5W rows (reordered in the videos),
 then add one six-shot 3W bay and one six-shot 5W bay. Original three PDF feed entries
 and original PDF transcript are immutable. Existing-install and fresh-install results
-must agree; reapplying feed must be idempotent. Full day is now 108 captured, 16
-held, 92 retained; 3W n24, 5W n22, G440 n21. Run PDF import first, then video import
-when reproducing from original PDFs, so both stages are present.
+must agree; reapplying feed must be idempotent. The v191 checkpoint was 108 captured,
+16 held, 92 retained; it is superseded by the v192 Map My Bag reconciliation below.
+Do not rerun legacy generators on a published feed: a full rebuild requires PDF,
+video, then Map My Bag stages in that order, preserving all apply-once IDs.
 
 Normalize ON applies to the videos; PDF normalization remains unknown. Carry/spin/
 ball-speed matching plus bounded total differences prove the existing shot identity,
@@ -3504,9 +3505,9 @@ exact-data table; they are not evidence of recoverable performance.
 `data/SWING_RECORD-2026-10-01.md` contains the complete-day evidence and bag decision.
 Equipment advice must begin from current source rows, dated club/settings identity,
 deduplication, common exclusion policy, per-block results and metric counts. Do not
-answer from a stale memory or loft spacing alone. Recommendation is keep 5W, consider
-returning 3W, keep 4H without another wood between, and demo 54° for the measured
-cross-date wedge opening. No return, club purchase or outdoor carry update is implied.
+answer from a stale memory or loft spacing alone. The v191 wedge/5i recommendations
+were provisional and are superseded by the same-session v192 evidence below.
+No return, club purchase or outdoor carry update is implied.
 The current 3W is last-reported B6, not A3; the current wedges are 50°/58°.
 
 Validation: Oct1 importer, source matching, missing-field/exclusion preservation,
@@ -3514,4 +3515,39 @@ Validation: Oct1 importer, source matching, missing-field/exclusion preservation
 column render checks; reusable bay-insight and round-review/import regressions.
 Browser QA attempted but unavailable: no Chromium binary; browser download blocked
 by environment network policy. This is a data/table-column update, with existing
-scroll container retained. BUILD/CACHE v191 are paired.
+scroll container retained. The v191 checkpoint has its own regression assertions.
+
+## October 1 Map My Bag consolidation (v192)
+
+Jack explicitly identifies the earlier six-shot 3W and 5W clips as part of this
+one 12-club / 72-shot Map My Bag. `data/map-my-bag-2026-10-01-transcript.json`
+contains 60 additional source rows, source timestamps and missing cells;
+`scripts/import-oct01-map.py` validates and emits an append-only feed patch.
+It updates the former six-shot 3W bay into one `sessionKind: map-my-bag` session,
+and retires the split 5W card only after preserving all six wood rows verbatim.
+Historical feed entries and transcripts remain recoverable and immutable.
+
+66 map shots have complete carry/total. All six 2i rows lack individual distance
+columns in the recording: archive delivery evidence outside `rangeShots`, show
+164.1 yd / consistency 9.1 as a clearly qualified source summary only, and never
+create six fabricated 164.1-yard readings. Full day: 162 distance-bearing source
+rows, 16 held, 146 retained, plus six distance-missing map rows. 3W n24 and 5W n22
+are unchanged; 4H gains six unique map shots. Normalize ON in the map, environment
+unknown. Source Consistency is not sample SD; visible rounded rows can re-average
+0.1 yd differently from the source header. No 80% exclusion or arbitrary outlier
+trim: all 66 complete map rows pass the standing clear-mishit rule.
+
+Opening this map uses its own source cohort; normal range opening still reviews
+the whole day. The Swing Lab selects the newest explicitly identified Map My Bag
+instead of an older map with one more club. Existing chart/table layout is reused.
+Keep historical and playing carries intact. Current source-map evidence:
+4H 174.9 / 5i 163.5 / 6i 156.6; 50° 113.1 / 58° 97.0. Pause the proposed 5H and
+54° purchases; test repeatability and directional control. 3W/5W carry still
+overlaps (197.2/192.4). Six-shot evidence is not a proven long-term improvement.
+
+The separate round recordings remain separate pending a verified round import;
+Jack's 5i-labelled tee shots are 4H, but this is not a global Map My Bag relabel.
+Do not guess other round club identities from distance or treat round total as carry.
+BUILD/CACHE v192 match. Tests cover 72/66 source coverage, distance-only exclusion,
+verbatim wood preservation, map/day scopes, newest-map selection, unchanged rounds
+and playing carries, append-only history and fresh/existing-client idempotence.
