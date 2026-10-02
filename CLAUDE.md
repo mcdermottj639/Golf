@@ -3545,7 +3545,7 @@ Keep historical and playing carries intact. Current source-map evidence:
 54° purchases; test repeatability and directional control. 3W/5W carry still
 overlaps (197.2/192.4). Six-shot evidence is not a proven long-term improvement.
 
-The separate round recordings remain separate pending a verified round import;
+The separate round recordings were imported in v194 as `round-tm-20261001-v1`;
 Jack's 5i-labelled tee shots are 4H, but this is not a global Map My Bag relabel.
 Do not guess other round club identities from distance or treat round total as carry.
 BUILD/CACHE v192 match. Tests cover 72/66 source coverage, distance-only exclusion,
@@ -3554,3 +3554,6 @@ and playing carries, append-only history and fresh/existing-client idempotence.
 
 ### Distance display precision (v193)
 Display carry, total, apex, distance gaps and consistency in whole yards/feet across range tables, charts, cumulative summaries and club history. Preserve raw imports and calculation precision. `shotDisplayValue` formats all range shot tables; missing values remain dashes, source side/curve feet-and-inches strings retain their direction. Angle, speed and smash precision are unchanged.
+
+### October 1 simulator round (v194)
+`round-20261001-feed.json` is fetched and cached separately from Map My Bag. Stable apply-once round ID: `round-tm-20261001-v1`. All 18 headers sum to 80 on par 71 (39/41). `scripts/import-oct01-round.py` preserves the 51 non-putting observations with frame references and six visible metric columns. Course identity is unconfirmed, not guessed. H5 selected 5i is confirmed 4-hybrid at 24.5°; only tee identities are confirmed. Non-tee clubs/intent stay unknown. H17 zero-total row remains flagged; no invented penalty or putt count. Carry F is flat carry and is valid carry evidence when visible; these recordings instead show height/spin/launch/delivery, so no carry is synthesized from shot-list total. No range, outdoor-statistics or playing-yardage mutation. Repeat import must remain idempotent.

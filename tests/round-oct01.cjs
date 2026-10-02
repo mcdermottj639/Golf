@@ -1,0 +1,27 @@
+const fs=require('node:fs'),path=require('node:path');
+// Reuse the real-app VM harness, not a duplicate importer implementation.
+const harness=fs.readFileSync(path.join(__dirname,'round-review-import.cjs'),'utf8').split('const T=ctx.window.reviewTest,feed=')[0];
+const checks=`
+const T=ctx.window.reviewTest;
+const feed=JSON.parse(fs.readFileSync(path.join(root,'round-20261001-feed.json'),'utf8'));
+const outdoor=JSON.stringify(T.realRounds()),carries=JSON.stringify(T.get().carries);
+T.applyFeed(feed);T.applyFeed(feed);
+const rs=T.get().rounds.filter(r=>r.feedId==='round-tm-20261001-v1');
+assert.equal(rs.length,1);const r=rs[0];
+assert.equal(r.score,80);assert.equal(r.par,71);assert.equal(r.holes.length,18);
+assert.equal(r.holes.slice(0,9).reduce((s,h)=>s+h.s,0),39);
+assert.equal(r.holes.slice(9).reduce((s,h)=>s+h.s,0),41);
+assert.equal(r.review.shots.length,51);
+assert.equal(new Set(r.review.shots.map(s=>s.id)).size,51);
+assert.equal(r.review.shots.find(s=>s.id==='h5-s1').actualClub,'4-hybrid');
+assert.equal(r.review.shots.find(s=>s.id==='h5-s1').club,'5-iron');
+assert.ok(r.review.shots.find(s=>s.id==='h17-s1').flag);
+assert.ok(r.review.shots.every(s=>s.carry==null));
+assert.ok(r.review.shots.filter(s=>s.id.endsWith('-s1')).every(s=>s.actualClub));
+assert.equal(JSON.stringify(T.realRounds()),outdoor);assert.equal(JSON.stringify(T.get().carries),carries);
+assert.equal(T.roundDiff(r),null);
+const html=T.roundView(T.get().rounds.indexOf(r));
+assert.ok(html.includes('51 shot observations'));assert.ok(html.includes('246'));
+console.log('PASS Oct1 round: 80/par71, 39/41, 51 unique observations, tee correction, missing carry, zero-distance flag, real importer/render, idempotence and outdoor/range separation.');
+`;
+new Function('require','__dirname',harness+checks)(require,__dirname);
