@@ -259,11 +259,11 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
 | Slot | Club | Notes |
 |------|------|-------|
 | Driver | **TaylorMade Stealth 2 Plus · 9°** | **Model corrected Aug 31 2026** — logged as a standard Stealth 2 since Jun 15, but the sole carries the heel-to-toe **FADE/DRAW sliding weight**, which only the *Plus* has (the standard head has 25g fixed in the Inertia Generator, no track; the HD is heel-shifted). The slider is stamped **10g** and a Stealth 2 Plus ships 15g, so either the optional lighter weight is fitted or the head is an original Stealth Plus — unresolved, and it only changes how much bias is on tap. **Shaft: Project X LZ 5.5 · REGULAR**, on an SLDR-era adapter, bought Jun 2 2026, replacing a stiff one. Jack's read, *unmeasured*: ~15 yds longer, much less curve, a straight ball that now **misses both ways**. Four build facts still unknown and all readable off the club: the **sleeve's current setting** (rebuilt with an aftermarket adapter, so 9° square is an assumption), playing **length**, and the shaft's **weight/torque** (printed on the band). Ladder still reads **235** — predates the shaft, left alone on purpose. The fade lever here is the **slider, never the loft**: see *Swing — The Workshop Log*, Aug 31 |
-| 3-wood | **Cobra DS-ADAPT X · 15° stock · A3 currently reported** | **IN Sep 18 2026.** Golf Galaxy same-day, SKU 26808014, $199. Right hand, Regular, **Project X Denali Blue 60** graphite (Cobra's chart: 64g, mid launch). Replaced the mini in the 14. Jack, Sep 18 night: the **2-iron is the fairway finder**; **3-wood or 5-wood if it needs to be high or draw**. Sep 19 morning: 2-iron ~215; **past 360, 3-wood or 5-wood** — working rule, still figuring it out. Stock head is **15.0°**, not the 16.5° 3-HL. Jack reported the sleeve at **A3 on Sep 22**. The official RH chart makes A3 **−1.0° loft / 1.0° flat = 14.0° effective**, not a loft increase. Higher-launch test is **B7: +1.7° / 0.7° flat = 16.7° effective**; do not call B7 current until Jack confirms the physical change. `futurefit33-rh.jpg` is stored offline and rendered on this club's Bag row. Playing length unmeasured (stock 43.25"). First look the same day at Golf Lounge 18: analysis **176.5 n=9 struck**. TrackMan's screen 150.0 n=11 had two tops in it (26.4, 34.9) — those shots stay on the day, held out of the average. **150 is not on the row.** Bay offer is 176.5, not 150. Jack: *felt amazing*. **After slot (trail hand, later the same day):** struck **188.4 n=7** (screen 150.3 n=9 had tops 21.5 and 12.6 in it). Path **−6.1° → −2.0°**. Do not park the Sep 14 TrackMan `3w` 182.4 (that was the mini) |
+| 3-wood | **Cobra DS-ADAPT X · 15° stock · B6 last reported Sep 25** | **IN Sep 18 2026.** Golf Galaxy same-day, SKU 26808014, $199. Right hand, Regular, **Project X Denali Blue 60** graphite (Cobra's chart: 64g, mid launch). Replaced the mini in the 14. Jack, Sep 18 night: the **2-iron is the fairway finder**; **3-wood or 5-wood if it needs to be high or draw**. Sep 19 morning: 2-iron ~215; **past 360, 3-wood or 5-wood** — working rule, still figuring it out. Stock head is **15.0°**, not the 16.5° 3-HL. Jack reported **A3 on Sep 22**, then **B6 on Sep 25 (+1.4° loft / 1.4° flat, 16.4° effective)**. B6 is the latest reported setting; October 1 captures do not independently confirm it. The official RH chart makes A3 **−1.0° loft / 1.0° flat = 14.0° effective**, not a loft increase. Higher-launch test is **B7: +1.7° / 0.7° flat = 16.7° effective**; do not call B7 current until Jack confirms the physical change. `futurefit33-rh.jpg` is stored offline and rendered on this club's Bag row. Playing length unmeasured (stock 43.25"). First look the same day at Golf Lounge 18: analysis **176.5 n=9 struck**. TrackMan's screen 150.0 n=11 had two tops in it (26.4, 34.9) — those shots stay on the day, held out of the average. **150 is not on the row.** Bay offer is 176.5, not 150. Jack: *felt amazing*. **After slot (trail hand, later the same day):** struck **188.4 n=7** (screen 150.3 n=9 had tops 21.5 and 12.6 in it). Path **−6.1° → −2.0°**. Do not park the Sep 14 TrackMan `3w` 182.4 (that was the mini) |
 | Utility | Cobra KING TEC 2-iron · ~17° | **unchanged Sep 18 2026.** **Fairway finder as of Sep 18 night** (Jack). Jack said "17 degree 2 iron" describing the new build; the ladder still reads **~17°** because repeating a number the app already showed him is not the same as reading the stamp, and quietly dropping the tilde would promote an estimate to a measurement. Jack, Sep 19 morning: **~215**, *or so*, still figuring it out — his number, unmeasured, replaces the old 205 estimate on the ladder. Bay struck remains **152.3** (sim, Sep 18). It no longer pairs with the mini |
 | 5-wood | **Cobra Darkspeed X · 19.5°** | **re-lofted Sep 8 2026** from 16.5°, still the green-holding club in the slot the 4-iron vacated. The fairway-finder job moved off it on Sep 8 (to the mini), off the mini on Sep 18 (to the new 3-wood), then to the **2-iron the same night**. With the 3-wood, it is the high-or-draw option off the tee. This head did not change on Sep 18. **Carry still unmeasured.** **Sep 18 after slot:** path **−4.7° → −2.1°** n=8; struck carry 167.4 (first block 179.1) — path improved, distance did not. Open: 16.5 → 19.5 is a 3° move, the full sweep of a typical fairway sleeve, so **read the hosel stamp** |
 | Irons | Cobra KING TEC **5–PW** | **the 4-iron came out Sep 8 2026** to hold the bag at 14 when the mini went back in, and **stays out Sep 18** now the 3-wood is in — kept with the set, not sold. **44° PW** anchors the wedge ladder. **Sep 18 bay:** first-block 7-iron **131.7 n=11** cons 12.4, best 5 **141.8**, path −6.9°, face-to-path **+6.4°**. Later 7-iron (30-shot table) is a window, not a slot baseline: open **113.5 n=2**; run **138.2 n=5** in an 11-yard band, F–P **+3.1°**; rest **128.9 n=20** / best 5 **146.6**, F–P back to **+6.5°**. Path never to −2°. Sep 14 was 135.9 / 12.5. |
-| Wedges | **Vokey 50.08F · 56.10S · 60.08M** | 50 = F/8° sweeper · 56 = S/10° workhorse · 60 = M/8° creative |
+| Wedges | **Vokey 50.08F · TaylorMade Hi-Toe 5 58.10 ATS** | 58° replaced 56° and 60° Sep24; both Vokeys are benched. Sep25 retained 58° batches carry 75.2/75.5 yd. A 54° is only a proposed demo, not owned or added. |
 | Putter | **L.A.B. Golf LINK.2.1** | the only zero-torque head left. Narrow blade, gamed Jul 30 – Aug 1 and again from **Aug 10, 2026**. **KEPT for good Aug 12, 2026** — Jack closed the return window by decision, so `returnWindow:false` and `pendingReturn()` is empty: the Home return-window card is gone and Decisions reads DECIDED. The putter search is over; every remaining explanation for the left miss is aim or stroke, not gear. Carries a **Lamkin Deep Etched** grip (the app said *Pistol 0* Jul 30 – Aug 14; corrected by looking at it — both are 0° lean, so no cue changed): zero built-in lean, shaft vertical, hands ~1.35" behind the ball — that's the live cue. **Loft confirmed 2° effective** (Aug 14, L.A.B.'s spec panel on the *custom* build page — the stock page and every retailer omit it). Still unknown: **as-built length** (34" targeted, never confirmed) and **head weight** (never known on any putter Jack has owned) — both build-order facts, so they need L.A.B., not a website. Its column holds the only two reds on the evolution grid (face at impact, 1.5–1.7° left start line, both measured Jul 30) |
 | Bullpen | Titleist TSR2 7-wood | used demo · HZRDUS Red CB regular · picked up Aug 12 2026, **owned not gamed**. Stock is around 21°, which since Sep 8 sits just behind the re-lofted 5-wood (19.5°) rather than the 4-iron that has left the bag — so it is still not in the 14 and still not on the carry ladder |
 | Backup | **TaylorMade r7 Quad Mini Driver · 15.5°** | **OUT of the 14 Sep 18 2026**, replaced by the DS-ADAPT X 3-wood. Kept, not sold. Was back in Sep 8 at 15.5° (up 2° from the 13.5° it played until Aug 12). Its Off-the-tee record stays as history. **The Sep 14 TrackMan `3w` 182.4 and the Sep 15 3w groups belong to this club, not the new 3-wood** |
@@ -3477,3 +3477,41 @@ face angle and attack angle are absent and stay null. Different PDF blocks remai
 separate for diagnoses; full-day means are descriptive only. No outdoor carry ladder
 updates, sleeve-setting inference or ball/normalization assumptions. First October 1
 4H data belongs to the active PING G440; the canceled Cobra hybrid has no session here.
+
+
+## October 1 supplementary videos (v191)
+
+Four uploaded screen recordings are transcribed in `data/range-2026-10-01-videos.json`.
+`scripts/import-oct01-videos.py` appends unique correction/new-bay IDs to the Oct1
+feed: enrich PDF2's existing eight 3W and seven 5W rows (reordered in the videos),
+then add one six-shot 3W bay and one six-shot 5W bay. Original three PDF feed entries
+and original PDF transcript are immutable. Existing-install and fresh-install results
+must agree; reapplying feed must be idempotent. Full day is now 108 captured, 16
+held, 92 retained; 3W n24, 5W n22, G440 n21. Run PDF import first, then video import
+when reproducing from original PDFs, so both stages are present.
+
+Normalize ON applies to the videos; PDF normalization remains unknown. Carry/spin/
+ball-speed matching plus bounded total differences prove the existing shot identity,
+not their row ordinal. A few totals differ by ~2 yd between views: preserve PDF
+values in summaries and show differing `videoTotal` separately in exact shot data.
+All video readings are archived, including 1.51 smash for the excluded 5W with
+missing PDF smash. Do not overwrite original missing sentinel, carry, total, height,
+source exclusions or other original readings. Add only visible path, attack, launch
+direction, curve and carry-side fields. Face angle remains null. Source comparison
+indexes and differences appear only when present in the horizontally scrollable
+exact-data table; they are not evidence of recoverable performance.
+
+`data/SWING_RECORD-2026-10-01.md` contains the complete-day evidence and bag decision.
+Equipment advice must begin from current source rows, dated club/settings identity,
+deduplication, common exclusion policy, per-block results and metric counts. Do not
+answer from a stale memory or loft spacing alone. Recommendation is keep 5W, consider
+returning 3W, keep 4H without another wood between, and demo 54° for the measured
+cross-date wedge opening. No return, club purchase or outdoor carry update is implied.
+The current 3W is last-reported B6, not A3; the current wedges are 50°/58°.
+
+Validation: Oct1 importer, source matching, missing-field/exclusion preservation,
+108/92 reconciliation, repeated import and existing/fresh-install parity; exact
+column render checks; reusable bay-insight and round-review/import regressions.
+Browser QA attempted but unavailable: no Chromium binary; browser download blocked
+by environment network policy. This is a data/table-column update, with existing
+scroll container retained. BUILD/CACHE v191 are paired.

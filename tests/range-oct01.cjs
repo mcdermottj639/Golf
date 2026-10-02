@@ -17,7 +17,9 @@ const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'co
 
 
 
-const fresh=require('../range-20261001-feed.json');
+// Preserve the original PDF-only regression; supplement coverage follows below.
+const completeFeed=require('../range-20261001-feed.json');
+const fresh={...completeFeed,entries:completeFeed.entries.slice(0,3)};
 T.applyFeed(feed);T.applyFeed(require('../range-20260922-feed.json'));T.applyFeed(require('../futurefit-feed.json'));T.applyFeed(require('../range-20260925-feed.json'));T.applyFeed(require('../bag-20261001-feed.json'));
 const carries=JSON.stringify(T.get().carries);
 T.applyFeed(fresh);T.applyFeed(fresh);
@@ -48,3 +50,54 @@ assert.ok(T.bayView(T.get().bays.indexOf(bays[0])).includes('Oct 1'));
 assert.ok(fs.readFileSync(path.join(root,'app.js'),'utf8').includes("'range-20261001-feed.json'].map"));
 assert.ok(fs.readFileSync(path.join(root,'sw.js'),'utf8').includes("'./range-20261001-feed.json'"));
 console.log('PASS Oct1: 96 source rows, 80 retained, metric conversion, source exclusions, sentinel handling, per-metric counts, day aggregation, idempotence, outdoor carries preserved.');
+
+// Existing installations have already consumed the PDF IDs. New IDs must enrich
+// those same shots and add only twelve unique shots. Reapplying must be a no-op.
+T.applyFeed(completeFeed);
+const after=JSON.stringify(T.get());T.applyFeed(completeFeed);assert.equal(JSON.stringify(T.get()),after);
+const updated=T.get().bays.filter(b=>b.date==='2026-10-01');
+assert.equal(updated.length,4);
+const completeDay=B.prepare('2026-10-01',updated);
+assert.equal(completeDay.raw,108);assert.equal(completeDay.usable,92);assert.equal(completeDay.held,16);
+const combined=club=>completeDay.clubs.find(c=>c.club===club);
+assert.equal(combined('3-wood').shots.length,24);assert.equal(combined('5-wood').shots.length,22);
+assert.equal(combined('4-hybrid').shots.length,21);
+const pdf2=updated.find(b=>b._fid==='bay-20261001-pdf-block2-v1');
+for(const club of ['3-wood','5-wood']){
+ const old=fresh.entries[1].bay.detail.rangeShots.find(g=>g.club===club);
+ const now=pdf2.detail.rangeShots.find(g=>g.club===club);
+ assert.equal(now.shots.length,old.shots.length);
+ assert.equal(JSON.stringify(now.excludedShotNumbers),JSON.stringify(old.excludedShotNumbers));
+ for(const row of now.shots){
+  const original=old.shots.find(s=>s.shot===row.shot);
+  for(const key of ['carry','total','height','bs','cs','smash','spin','ftp','mishit','face'])assert.equal(row[key],original[key],club+' '+row.shot+' '+key);
+  assert.ok(row.videoSource);assert.ok(row.carrySide);assert.ok(Number.isFinite(row.path));
+ }
+}
+const w3=pdf2.detail.rangeShots.find(g=>g.club==='3-wood');
+assert.equal(w3.shots.find(s=>s.shot===7).path,.5); // reordered video first row maps to PDF #7
+assert.equal(w3.shots.find(s=>s.shot===6).videoTotal,214.5);
+assert.ok(Math.abs(w3.shots.find(s=>s.shot===6).total-216.535433)<.00001);
+const w5=pdf2.detail.rangeShots.find(g=>g.club==='5-wood');
+assert.deepEqual(Array.from(T.struckShots(w5),s=>s.shot),[2,4,5,6,7]);
+assert.equal(w5.shots.find(s=>s.shot===3).smash,null); // original missing sentinel remains null
+assert.equal(w5.shots.find(s=>s.shot===3).videoDisplayedValues.smash,1.51);
+assert.equal(pdf2.detail.rangeShots.find(g=>g.club==='4-hybrid').shots[0].path,null);
+const new3=updated.find(b=>b._fid==='oct01-video-20261001-3w-new-six-v1');
+const new5=updated.find(b=>b._fid==='oct01-video-20261001-5w-new-six-v1');
+assert.equal(T.analysisClubs(new3.detail)[0].carry,197.2);
+assert.equal(T.analysisClubs(new5.detail)[0].carry,192.4);
+assert.equal(T.analysisClubs(new3.detail)[0].metricCounts.path,6);
+assert.equal(T.analysisClubs(new5.detail)[0].metricCounts.apex,6);
+assert.equal(JSON.stringify(T.get().carries),carries);
+const html=T.bayView(T.get().bays.indexOf(new5));
+assert.ok(html.includes('Spin index %'));assert.ok(html.includes('Smash index %'));assert.ok(html.includes('Ball speed diff mph'));
+assert.ok(html.includes('Carry side'));assert.ok(html.includes('Attack°'));assert.ok(html.includes('Path°'));
+assert.ok(!html.includes('NaN'));assert.ok(!html.includes('undefined'));
+// A fresh client arrives at exactly the same Oct 1 state as an upgraded client.
+T.get().bays=T.get().bays.filter(b=>b.date!=='2026-10-01');
+const ids=new Set(completeFeed.entries.map(e=>e.id));
+T.get().feedApplied=T.get().feedApplied.filter(id=>!ids.has(id));
+T.applyFeed(completeFeed);
+assert.equal(JSON.stringify(T.get().bays.filter(b=>b.date==='2026-10-01')),JSON.stringify(updated));
+console.log('PASS Oct1 video supplement: 15 enriched, 12 new, 108 unique / 92 retained, reordered matching, original totals preserved, per-metric counts, rendered source columns, upgrade/fresh-client parity.');

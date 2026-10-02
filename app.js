@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v190';
+const BUILD = 'v191';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v191', d:'2026-10-01', items:['OCT 1 WOOD VIDEOS: 12 additional shots and 15 existing shots enriched without duplicates. Full day now 92 usable shots. Path, attack angle, carry side, curve and source index columns captured; PDF/video distance differences preserved.'] },
   { b:'v190', d:'2026-10-01', items:['OCT 1 SIM: Both TrackMan PDFs imported. 80 usable shots across six clubs, including the G440 hybrid. Carry, total, height, speeds, launch, spin and face-to-path converted from metric units; source exclusions and invalid smash readings handled.'] },
   { b:'v189', d:'2026-10-01', items:['BAG: G440 hybrid received. Expand its adjustment chart for all eight adapter settings, effective lofts and neutral/flat lie.'] },
   { b:'v188', d:'2026-10-01', items:['CLUB HISTORY: Open any club from Bag at a glance for every recorded range batch, metric trends, setup notes and a next-session measurement focus.'] },
@@ -4049,9 +4050,9 @@ function rangeShotTables(d){
   const groups=d.rangeShots.map(c=>({club:c.club, shots:struckShots(c), distanceSeconds:c.distanceSeconds, metricSeconds:c.metricSeconds}));
   const n=groups.reduce((s,c)=>s+c.shots.length,0);
   if(!n) return '';
-  const all=[['shot','#'],['carry','Carry yd'],['total','Total yd'],['carryHit','Carry hit'],['totalHit','Total hit'],['side','Carry side'],['curve','Curve'],['height','Apex'],['cs','Club mph'],['bs','Ball mph'],['smash','Smash'],['la','Launch°'],['ld','Launch dir°'],['spin','Spin rpm'],['aoa','Attack°'],['path','Path°'],['face','Face°'],['ftp','F–P°']];
+  const all=[['shot','#'],['carry','Carry yd'],['total','Total yd'],['carryHit','Carry hit'],['totalHit','Total hit'],['side','Carry side'],['curve','Curve'],['height','Apex'],['cs','Club mph'],['bs','Ball mph'],['smash','Smash'],['la','Launch°'],['ld','Launch dir°'],['spin','Spin rpm'],['aoa','Attack°'],['path','Path°'],['face','Face°'],['ftp','F–P°'],['spinIndex','Spin index %'],['smashIndex','Smash index %'],['ballSpeedDiff','Ball speed diff mph'],['spinRateDiff','Spin rate diff rpm'],['videoTotal','Video total yd']];
   const cols=all.filter(([k])=>k==='shot'||groups.some(c=>c.shots.some(s=>s[k]!=null)));
-  return `<h2>${n} shots · exact data</h2><div class="card"><p class="sm">Open a club below; swipe its table sideways for speed, spin and delivery. A dash means unavailable or not transcribed—not zero.</p>
+  return `<h2>${n} shots · exact data</h2><div class="card"><p class="sm">Open a club below; swipe its table sideways for speed, spin and delivery. A dash means unavailable or not transcribed—not zero. ${groups.some(c=>c.shots.some(s=>s.videoTotal!=null))?'Video total preserves a differing screen reading; the original PDF total remains the summary input. ':''}${groups.some(c=>c.shots.some(s=>s.spinIndex!=null||s.smashIndex!=null))?'Index and difference columns are TrackMan source comparisons, not extra measured distance.':''}</p>
     ${groups.map(c=>`<details class="sect"><summary><b>${esc(c.club)} · ${c.shots.length}</b></summary>
       <div class="tscroll" tabindex="0" role="region" aria-label="${esc(c.club)} shot data"><table><thead><tr>${cols.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>
       ${c.shots.map(s=>`<tr>${cols.map(([k])=>`<td>${s[k]==null?'—':typeof s[k]==='boolean'?(s[k]?'Yes':'No'):esc(String(s[k]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>

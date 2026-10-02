@@ -15,9 +15,9 @@ const server=http.createServer((q,r)=>{
   const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];
   page.on('pageerror',e=>{errors.push(e.message);console.error(e.message)});
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
-  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('g440-first-sim-note-20261001-v1'));
+  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('oct01-video-20261001-5w-new-six-v1'));
   const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('caddiehq_v1')));
-  assert.equal(stored.bays.filter(b=>b.date==='2026-10-01').length,2);
+  assert.equal(stored.bays.filter(b=>b.date==='2026-10-01').length,4);
   assert.match(stored.clubs.find(c=>c.name==='PING G440 4H Hybrid').note,/21 usable/);
   await page.locator('.baynums').click();
   const hybrid=page.locator('.cum-club').filter({has:page.locator('[data-action="club-history"][data-club="4H"]')});
