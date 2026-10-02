@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v192';
+const BUILD = 'v193';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v193', d:'2026-10-01', items:['Whole-number distance displays across shot tables, club summaries, charts and history. Original measurements stay precise for analysis.'] },
   { b:'v192', d:'2026-10-01', items:['OCT 1 MAP MY BAG: One 12-club / 72-shot source session, including the existing six-shot 3W and 5W batches without duplication. 66 complete distance rows; 2i distance summary clearly separated. Opening this map keeps it separate from the earlier range tests and simulator rounds.'] },
   { b:'v191', d:'2026-10-01', items:['OCT 1 WOOD VIDEOS: 12 additional shots and 15 existing shots enriched without duplicates. Full day now 92 usable shots. Path, attack angle, carry side, curve and source index columns captured; PDF/video distance differences preserved.'] },
   { b:'v190', d:'2026-10-01', items:['OCT 1 SIM: Both TrackMan PDFs imported. 80 usable shots across six clubs, including the G440 hybrid. Carry, total, height, speeds, launch, spin and face-to-path converted from metric units; source exclusions and invalid smash readings handled.'] },
@@ -3486,9 +3487,9 @@ function swingEvolutionRows(){
   return by;
 }
 const SWING_EVOLUTION_METRICS = [
-  ['carry','Carry','yd',1],['total','Total','yd',1],['path','Club path','°',1],
+  ['carry','Carry','yd',0],['total','Total','yd',0],['path','Club path','°',1],
   ['face','Face angle','°',1],['ftp','Face to path','°',1],['smash','Smash','',2],
-  ['la','Launch','°',1],['apex','Peak height','ft',1],['aoa','Attack angle','°',1],
+  ['la','Launch','°',1],['apex','Peak height','ft',0],['aoa','Attack angle','°',1],
   ['cs','Club speed','mph',1],['bs','Ball speed','mph',1],['spin','Spin','rpm',0],
   ['dynLoft','Dynamic loft','°',1],['spinLoft','Spin loft','°',1],['ld','Launch direction','°',1],
   ['impactO','Impact offset','mm',1],['impactH','Impact height','mm',1]
@@ -3657,17 +3658,17 @@ const baySgn = v => {
 };
 const BAY_COLS = [
   ['n',     'N',       v => v],
-  ['carry', 'CARRY',   v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
-  ['best',  'BEST 5',  v => Number(v).toFixed(1)],
-  ['cons',  'CONSIST.',v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
+  ['carry', 'CARRY',   v => Math.round(v)],
+  ['best',  'BEST 5',  v => Math.round(v)],
+  ['cons',  'CONSIST.',v => Math.round(v)],
   ['sd',    '±',       v => Math.round(v)],
-  ['total', 'TOTAL',   v => Number.isInteger(v) ? v : Number(v).toFixed(1)],
+  ['total', 'TOTAL',   v => Math.round(v)],
   ['curve', 'CURVE yd', baySgn],
   ['cs',    'CLUB MPH', v => Number(v).toFixed(1).replace(/\.0$/, '')],
   ['bs',    'BALL MPH', v => Number(v).toFixed(1).replace(/\.0$/, '')],
   ['smash', 'SMASH',   v => Number(v).toFixed(2)],
   ['la',    'LAUNCH°', v => Number(v).toFixed(1)],
-  ['apex',  'APEX FT', v => Number(v).toFixed(1)],
+  ['apex',  'APEX FT', v => Math.round(v)],
   ['spin',  'SPIN',    v => String(Math.round(v))],
   ['aoa',   'ATTACK°', baySgn],
   ['ld',    'DIR°',    baySgn],
@@ -3711,8 +3712,8 @@ function bayCarryVisual(clubs){
       return `<div class="bvitem">
         <div class="bvrow"><span class="bvname">${esc(c.club ? clubTag(c.club) : '—')}</span>
           <span class="bvtrack"><i class="bvbar" style="width:${Math.max(3, carry / max * 100).toFixed(1)}%"></i></span>
-          <b class="bvnum">${carry.toFixed(1)}</b></div>
-        ${gap == null ? '' : `<div class="bvgap ${kind}"><span>${esc(label)}</span><b>${gap > 0 ? '+' : ''}${gap.toFixed(1)} yd</b></div>`}
+          <b class="bvnum">${carry.toFixed(0)}</b></div>
+        ${gap == null ? '' : `<div class="bvgap ${kind}"><span>${esc(label)}</span><b>${gap > 0 ? '+' : ''}${gap.toFixed(0)} yd</b></div>`}
       </div>`;
     }).join('')}
     <p class="bvcap">TrackMan carry, in yards—not automatic replacements for playing yardages. Normalization and measurement limitations are recorded with each session.</p>
@@ -3726,7 +3727,7 @@ function bayConsistencyVisual(clubs){
     <div class="bvtitle"><b>Consistency shape</b><span>shorter reported value = shorter bar</span></div>
     ${rows.map(c => `<div class="bvrow"><span class="bvname">${esc(c.club ? clubTag(c.club) : '—')}</span>
       <span class="bvtrack"><i class="bvbar" style="width:${Math.max(3, (+c.cons) / max * 100).toFixed(1)}%"></i></span>
-      <b class="bvnum">${(+c.cons).toFixed(1)}</b></div>`).join('')}
+      <b class="bvnum">${(+c.cons).toFixed(0)}</b></div>`).join('')}
     <p class="bvcap">TrackMan's displayed “Consistency” value. Its formula and unit were not shown, so this compares the screen values without relabelling them as standard deviation.</p>
   </div>`;
 }
@@ -3823,8 +3824,8 @@ function premierMeans(group){
 function premierLine(p){
   if(!p) return '';
   const bits = ['Best ' + p.n + ' of ' + p.of];
-  if(p.carry != null) bits.push('carry ' + Number(p.carry).toFixed(1));
-  if(p.total != null) bits.push('total ' + Number(p.total).toFixed(1));
+  if(p.carry != null) bits.push('carry ' + Number(p.carry).toFixed(0));
+  if(p.total != null) bits.push('total ' + Number(p.total).toFixed(0));
   if(p.path != null) bits.push('path ' + baySgn(+Number(p.path).toFixed(1)) + '°');
   if(p.ftp != null) bits.push('face-to-path ' + baySgn(+Number(p.ftp).toFixed(1)) + '°');
   if(p.smash != null) bits.push('smash ' + (+p.smash).toFixed(2));
@@ -3986,8 +3987,8 @@ function rangeShotVisuals(d){
     const prem=premierMeans(c);
     const screen=avg.displayedCarry != null ? +avg.displayedCarry : null;
     const bestBar = prem && prem.carry != null
-      ? `<div class="range-bar-row best"><span>Best ${prem.n}</span><span class="range-track"><i style="width:${prem.carry/max*100}%"></i></span><b>${prem.carry.toFixed(1)}</b></div>
-      ${prem.total!=null?`<div class="range-bar-row total best-tot"><span>Best tot</span><span class="range-track"><i style="width:${prem.total/max*100}%"></i></span><b>${Number(prem.total).toFixed(1)}</b></div>`:''}`
+      ? `<div class="range-bar-row best"><span>Best ${prem.n}</span><span class="range-track"><i style="width:${prem.carry/max*100}%"></i></span><b>${prem.carry.toFixed(0)}</b></div>
+      ${prem.total!=null?`<div class="range-bar-row total best-tot"><span>Best tot</span><span class="range-track"><i style="width:${prem.total/max*100}%"></i></span><b>${Number(prem.total).toFixed(0)}</b></div>`:''}`
       : '';
     const bestLine = prem ? `<p class="sm faint">${esc(premierLine(prem))}</p>` : '';
     const retainedIds = new Set(struckShots(c).map(s => s.shot));
@@ -3995,8 +3996,8 @@ function rangeShotVisuals(d){
     if(avg.carry != null){
       return `<div class="range-club">
       <h4>${esc(c.club)} · ${avg.n} shots</h4>
-      <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(1)}</b></div>
-      ${avg.total!=null?`<div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${(+avg.total).toFixed(1)}</b></div>`:''}
+      <div class="range-bar-row"><span>Carry</span><span class="range-track"><i style="width:${avg.carry/max*100}%"></i></span><b>${(+avg.carry).toFixed(0)}</b></div>
+      ${avg.total!=null?`<div class="range-bar-row total"><span>Total</span><span class="range-track"><i style="width:${avg.total/max*100}%"></i></span><b>${(+avg.total).toFixed(0)}</b></div>`:''}
       ${bestBar}
       ${c.target!=null?`<p class="sm">Target ${c.target} yd · carry hits <b>${targetHits(c.carryHits)}/${retainedIds.size}</b> · total hits <b>${targetHits(c.totalHits)}/${retainedIds.size}</b></p>`:''}
       ${del?`<p class="sm faint">${esc(del)}</p>`:''}
@@ -4006,7 +4007,7 @@ function rangeShotVisuals(d){
     if(screen != null){
       return `<div class="range-club">
       <h4>${esc(c.club)} · screen · n=${avg.displayedN || (c.shots||[]).length}</h4>
-      <div class="range-bar-row"><span>Screen</span><span class="range-track"><i class="range-screen" style="width:${screen/max*100}%"></i></span><b>${screen.toFixed(1)}</b></div>
+      <div class="range-bar-row"><span>Screen</span><span class="range-track"><i class="range-screen" style="width:${screen/max*100}%"></i></span><b>${screen.toFixed(0)}</b></div>
       <p class="sm faint">Per-shot carries were off-screen, so this cannot be cleaned.${del ? ' '+esc(del)+'.' : ''}</p>
       ${bestLine}
     </div>`;
@@ -4034,9 +4035,9 @@ function rangeShotVisuals(d){
       <svg viewBox="0 0 300 84" role="img" aria-label="${esc(c.club)} carry spread: ${carries.join(', ')} yards.${c.target!=null?` Target ${c.target} yards.`:''}">
       <line x1="10" x2="290" y1="62" y2="62" stroke="currentColor" opacity=".35"/>
       ${c.target!=null?`<line x1="${x(c.target)}" x2="${x(c.target)}" y1="8" y2="65" stroke="var(--burg)" stroke-dasharray="4 3"/>`:''}
-      ${struck.map((s,i)=>`<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="${top.has(s)?'#aa842c':'var(--green)'}"><title>${top.has(s)?'Best · ':''}Shot ${s.shot}: ${s.carry} yd carry${s.total!=null?`, ${s.total} yd total`:''}</title></circle>`).join('')}
+      ${struck.map((s,i)=>`<circle cx="${x(s.carry)}" cy="${18+(i%3)*15}" r="4" fill="${top.has(s)?'#aa842c':'var(--green)'}"><title>${top.has(s)?'Best · ':''}Shot ${s.shot}: ${Math.round(s.carry)} yd carry${s.total!=null?`, ${Math.round(s.total)} yd total`:''}</title></circle>`).join('')}
       <text x="10" y="80" fill="currentColor" font-size="10">0 yd</text><text x="290" y="80" text-anchor="end" fill="currentColor" font-size="10">${Math.round(max)} yd</text></svg>
-      <p class="sm faint">Carry range ${Math.min(...carries).toFixed(1)}–${Math.max(...carries).toFixed(1)} yd${top.size?` · gold = best ${top.size}`:''}</p></div>`;
+      <p class="sm faint">Carry range ${Math.min(...carries).toFixed(0)}–${Math.max(...carries).toFixed(0)} yd${top.size?` · gold = best ${top.size}`:''}</p></div>`;
   };
   return `<section class="range-analysis" aria-label="Range shot analysis">
     <h3>Carry vs total</h3><p class="sm">Green = carry. Gold = total. Best 5 is the longest 5 carries of that batch (best 3 if fewer than 5) — still carry, not total. Distances in yards.</p>
@@ -4048,17 +4049,29 @@ function rangeShotVisuals(d){
     ${groups.map(evidenceBlock).join('')}
   </section>`;
 }
+// Presentation only: never round stored source measurements or analysis inputs.
+function shotDisplayValue(key,value){
+  if(value == null) return '—';
+  if(typeof value === 'boolean') return value ? 'Yes' : 'No';
+  if(key === 'height'){
+    const feet = apexFeet(value);
+    return feet == null ? String(value) : String(Math.round(feet));
+  }
+  if(['carry','total','videoTotal','side','curve'].includes(key) && value !== '' && Number.isFinite(Number(value)))
+    return String(Math.round(Number(value)));
+  return String(value);
+}
 function rangeShotTables(d){
   if(!Array.isArray(d.rangeShots)) return '';
   const groups=d.rangeShots.map(c=>({club:c.club, shots:struckShots(c), distanceSeconds:c.distanceSeconds, metricSeconds:c.metricSeconds}));
   const n=groups.reduce((s,c)=>s+c.shots.length,0);
   if(!n) return '';
-  const all=[['shot','#'],['carry','Carry yd'],['total','Total yd'],['carryHit','Carry hit'],['totalHit','Total hit'],['side','Carry side'],['curve','Curve'],['height','Apex'],['cs','Club mph'],['bs','Ball mph'],['smash','Smash'],['la','Launch°'],['ld','Launch dir°'],['spin','Spin rpm'],['aoa','Attack°'],['path','Path°'],['face','Face°'],['ftp','F–P°'],['spinIndex','Spin index %'],['smashIndex','Smash index %'],['ballSpeedDiff','Ball speed diff mph'],['spinRateDiff','Spin rate diff rpm'],['videoTotal','Video total yd']];
+  const all=[['shot','#'],['carry','Carry yd'],['total','Total yd'],['carryHit','Carry hit'],['totalHit','Total hit'],['side','Carry side'],['curve','Curve'],['height','Apex ft'],['cs','Club mph'],['bs','Ball mph'],['smash','Smash'],['la','Launch°'],['ld','Launch dir°'],['spin','Spin rpm'],['aoa','Attack°'],['path','Path°'],['face','Face°'],['ftp','F–P°'],['spinIndex','Spin index %'],['smashIndex','Smash index %'],['ballSpeedDiff','Ball speed diff mph'],['spinRateDiff','Spin rate diff rpm'],['videoTotal','Video total yd']];
   const cols=all.filter(([k])=>k==='shot'||groups.some(c=>c.shots.some(s=>s[k]!=null)));
   return `<h2>${n} shots · exact data</h2><div class="card"><p class="sm">Open a club below; swipe its table sideways for speed, spin and delivery. A dash means unavailable or not transcribed—not zero. ${groups.some(c=>c.shots.some(s=>s.videoTotal!=null))?'Video total preserves a differing screen reading; the original PDF total remains the summary input. ':''}${groups.some(c=>c.shots.some(s=>s.spinIndex!=null||s.smashIndex!=null))?'Index and difference columns are TrackMan source comparisons, not extra measured distance.':''}</p>
     ${groups.map(c=>`<details class="sect"><summary><b>${esc(c.club)} · ${c.shots.length}</b></summary>
       <div class="tscroll" tabindex="0" role="region" aria-label="${esc(c.club)} shot data"><table><thead><tr>${cols.map(([,l])=>`<th>${l}</th>`).join('')}</tr></thead><tbody>
-      ${c.shots.map(s=>`<tr>${cols.map(([k])=>`<td>${s[k]==null?'—':typeof s[k]==='boolean'?(s[k]?'Yes':'No'):esc(String(s[k]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+      ${c.shots.map(s=>`<tr>${cols.map(([k])=>`<td>${esc(shotDisplayValue(k,s[k]))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
       ${c.distanceSeconds?`<p class="sm faint">Video reference: distance rows around ${c.distanceSeconds.join(', ')} seconds; supplementary columns around ${c.metricSeconds.join(', ')} seconds.</p>`:''}</details>`).join('')}
     ${d.rangeSource?`<details class="sect"><summary>Source & coverage</summary><p class="sm">${esc(d.rangeSource.source)} · ${esc(d.rangeSource.alias)}. ${esc(d.rangeSource.dateEvidence)} ${esc(d.rangeSource.coverage)}</p></details>`:''}</div>`;
 }
@@ -4335,7 +4348,7 @@ function cumulativeBagTable(){
   const by = cumulativeClubSeries();
   if(!by.size) return '';
   const keys = cumulativeClubKeys(by);
-  const yd = v => v == null || !Number.isFinite(+v) ? '·' : Number(v).toFixed(1);
+  const yd = v => v == null || !Number.isFinite(+v) ? '·' : String(Math.round(v));
   const deg = v => v == null || !Number.isFinite(+v) ? '·' : baySgn(v) + '°';
   const smash = v => v == null || !Number.isFinite(+v) ? '·' : Number(v).toFixed(2);
   const mph = v => v == null || !Number.isFinite(+v) ? '·' : Number(v).toFixed(1).replace(/\.0$/, '');
@@ -4454,8 +4467,8 @@ function cumulativeOverview(){
   <section class="card cum-plan" id="cum-plan">
     <span class="eyebrow">Your next session</span><h2>Turn the record into a test</h2>
     ${focus ? `<p><b>${esc(clubCanonLabel(focus.k))}: make the usual shot more like your better ones.</b>
-    In the ${esc(fmtDate(focus.p.date))} block, retained carry averaged ${num(focus.p.carry)} yd; best ${focus.p.bestN || 5} averaged ${num(focus.p.best)} yd.
-    That ${num(focus.gap)} yd gap is a consistency question, not promised distance.</p>
+    In the ${esc(fmtDate(focus.p.date))} block, retained carry averaged ${num(focus.p.carry,0)} yd; best ${focus.p.bestN || 5} averaged ${num(focus.p.best,0)} yd.
+    That ${num(focus.gap,0)} yd gap is a consistency question, not promised distance.</p>
     <div class="cum-steps"><div><b>01 · Establish</b><p>Warm up, then record 10 shots with this club and one target. Keep the same setup and ball conditions.</p></div>
     <div><b>02 · Compare</b><p>Compare retained carry and its spread with this block. Track path and face-to-path alongside it; chasing the longest shot alone will miss the pattern.</p></div>
     <div><b>03 · Decide</b><p>Look for a smaller gap to your best shots without a wider miss. Repeat on another day before changing a playing yardage.</p></div></div>
@@ -4471,15 +4484,15 @@ function cumulativeOverview(){
       const max = Math.max(1,...history.map(p=>p.carry));
       return `<details class="cum-club"><summary><span class="cum-club-name">${esc(clubCanonLabel(k))}</span>
         <span class="cum-bar"><i style="width:${Math.max(0,(roll.carry || 0)/scale*100)}%"></i></span>
-        <span><b>${num(roll.carry)}</b><small>yd carry · n=${roll.metricCounts.carry || 0}</small></span></summary>
+        <span><b>${num(roll.carry,0)}</b><small>yd carry · n=${roll.metricCounts.carry || 0}</small></span></summary>
         <div class="cum-club-body"><div class="cum-metrics">
-          <span><b>${num(roll.total)}</b>Total yd · n=${roll.metricCounts.total || 0}</span>
+          <span><b>${num(roll.total,0)}</b>Total yd · n=${roll.metricCounts.total || 0}</span>
           <span><b>${num(roll.smash,2)}</b>Smash · n=${roll.metricCounts.smash || 0}</span>
           <span><b>${num(roll.path)}°</b>Path · n=${roll.metricCounts.path || 0}</span>
           <span><b>${num(roll.ftp)}°</b>Face–path · n=${roll.metricCounts.ftp || 0}</span>
         </div><p class="sm">Smash is ball speed ÷ club speed. Path is club travel relative to target; face–path is where the face points relative to that travel. Positive angles point right, negative left.</p>
         <h3>Recent carry readings</h3>
-        ${history.map(p=>`<button class="cum-history" data-action="open-bay" data-i="${p.i}"><span>${esc(fmtDate(p.date))}<small>${esc(p.phase)} · n=${p.metricCounts?.carry ?? p.n ?? '—'}</small></span><span class="cum-bar"><i style="width:${Math.max(0,p.carry/max*100)}%"></i></span><b>${num(p.carry)}</b></button>`).join('') || '<p class="sm">No readable carry history yet.</p>'}
+        ${history.map(p=>`<button class="cum-history" data-action="open-bay" data-i="${p.i}"><span>${esc(fmtDate(p.date))}<small>${esc(p.phase)} · n=${p.metricCounts?.carry ?? p.n ?? '—'}</small></span><span class="cum-bar"><i style="width:${Math.max(0,p.carry/max*100)}%"></i></span><b>${num(p.carry,0)}</b></button>`).join('') || '<p class="sm">No readable carry history yet.</p>'}
         <p class="sm faint">Up to six recorded blocks; same-day blocks are not separate days. Setup, intent and conditions can differ, so movement alone does not prove improvement.</p>
         <div class="club-history-actions"><button class="btn" data-action="club-history" data-club="${esc(k)}">Full club history →</button><button class="btn ghost" data-action="open-bay" data-i="${last.i}">Latest source · ${esc(fmtDate(last.date))}</button></div></div></details>`;
     }).join('') || '<p>No reviewed range clubs yet. Open Days to check your sessions.</p>'}</div>
@@ -5207,8 +5220,8 @@ function swingLadder(rows){
       const [kind, label] = gap == null ? ['', ''] : bayGapKind(gap);
       return `<div class="bvitem"><div class="bvrow"><span class="bvname">${esc(clubTag(c.club))}</span>
         <span class="bvtrack"><i class="bvbar" style="width:${Math.max(4, c.carry / max * 100).toFixed(1)}%"></i></span>
-        <b class="bvnum">${Number(c.carry).toFixed(1)}</b></div>
-        ${gap == null ? '' : `<div class="bvgap ${kind}"><span>${esc(label)}</span><b>${gap.toFixed(1)} yd</b></div>`}</div>`;
+        <b class="bvnum">${Number(c.carry).toFixed(0)}</b></div>
+        ${gap == null ? '' : `<div class="bvgap ${kind}"><span>${esc(label)}</span><b>${gap.toFixed(0)} yd</b></div>`}</div>`;
     }).join('')}
     <p class="bvcap">A band is a run of clubs inside 6 yards of each other — clubs that do one job between
       them. Bag order and carry order disagree in this sample, which is what an inversion is. Six shots a

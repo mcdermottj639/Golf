@@ -3551,3 +3551,6 @@ Do not guess other round club identities from distance or treat round total as c
 BUILD/CACHE v192 match. Tests cover 72/66 source coverage, distance-only exclusion,
 verbatim wood preservation, map/day scopes, newest-map selection, unchanged rounds
 and playing carries, append-only history and fresh/existing-client idempotence.
+
+### Distance display precision (v193)
+Display carry, total, apex, distance gaps and consistency in whole yards/feet across range tables, charts, cumulative summaries and club history. Preserve raw imports and calculation precision. `shotDisplayValue` formats all range shot tables; missing values remain dashes, source side/curve feet-and-inches strings retain their direction. Angle, speed and smash precision are unchanged.
