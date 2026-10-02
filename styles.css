@@ -1991,3 +1991,57 @@ body.night .meanbtn{color:var(--green-ink)}
 .section-fold-tools { display:flex; flex-wrap:wrap; gap:12px; justify-content:flex-end; grid-column:1/-1; margin:8px 0; }
 .section-fold-tools button { font:12px var(--sans); background:none; border:0; padding:8px 0; color:var(--green); text-decoration:underline; cursor:pointer; min-height:44px; }
 .day-sources .btn { display:block; margin:8px 0; white-space:normal; text-align:left; }
+
+/* v199: one compact navigation row; bulk actions are available when requested. */
+.page-sections{display:flex;align-items:center;gap:8px;min-width:0;grid-column:1/-1;margin:0 0 8px;position:relative;z-index:5}
+.page-sections .jumpbar{flex:1;min-width:0;width:auto;margin:0;padding:4px 0;min-height:44px}
+.page-sections .jump{min-height:34px}
+.section-menu{position:relative;flex:none;margin-left:auto;font-family:var(--sans);color:var(--gtext)}
+.section-menu>summary{display:flex;align-items:center;gap:5px;min-height:44px;padding:0 8px;list-style:none;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap;border-radius:10px}
+.section-menu>summary::-webkit-details-marker{display:none}
+.section-menu>summary svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.section-menu[open]>summary,.section-menu>summary:hover{background:var(--card2)}
+.section-menu-panel{position:absolute;top:calc(100% + 3px);right:0;width:212px;max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 28px #0002;padding:6px;z-index:40}
+.section-menu-status{padding:8px 10px 6px;font:11px/1.4 var(--sans);color:var(--soft)}
+.section-menu-panel button{display:block;width:100%;min-height:44px;text-align:left;border:0;border-radius:7px;padding:10px;background:transparent;color:var(--gtext);font:600 13px var(--sans)}
+.section-menu-panel button:hover,.section-menu-panel button:focus-visible{background:var(--card2)}
+.section-menu summary:focus-visible{outline:2px solid var(--gtext);outline-offset:2px}
+.section-heading{margin:16px 0 4px}
+.card>.section-heading{margin:-6px 0 2px}
+.nums>.section-heading{margin:0}
+.section-fold-toggle{text-transform:inherit;letter-spacing:inherit;line-height:1.45;padding:8px 0;min-height:44px}
+.section-fold-label{min-width:0;overflow-wrap:anywhere}
+.section-fold-toggle::after,
+#view details[data-section-key]>summary::after{content:'';display:block;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);flex:none;margin:0 4px 3px 8px;opacity:.65;transition:transform .15s ease}
+.section-fold-toggle[aria-expanded="false"]::after,
+#view details[data-section-key]:not([open])>summary::after{content:'';transform:rotate(-45deg);margin-bottom:0}
+#view details[data-section-key]>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;list-style:none;cursor:pointer}
+#view details[data-section-key]>summary::-webkit-details-marker{display:none}
+#view details[data-section-key]>summary .foldl{font-family:var(--sans);font-size:11.5px;letter-spacing:.1em}
+#view details[data-section-key]>summary:focus-visible{outline:2px solid var(--gtext);outline-offset:3px}
+/* Distinct local SVGs stay legible offline, on phone and on the desktop rail. */
+#nav button .ic{width:22px;height:22px;border:0;border-radius:0;background:none}
+#nav button .ic svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(min-width:1000px){
+  #view .page-sections .jumpbar{padding:0;flex-wrap:nowrap;overflow-x:auto;mask-image:linear-gradient(to right,#000 calc(100% - 20px),transparent);-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 20px),transparent)}
+  .section-menu>summary{font-size:12px}
+  .card>.section-heading{margin-top:-8px}
+}
+@media(prefers-reduced-motion:reduce){.section-fold-toggle::after,#view details[data-section-key]>summary::after{transition:none}}
+
+/* Conditions retain the useful read in one strip; freshness and actions unfold below. */
+.wx-panel{background:var(--green);color:var(--green-ink);border-radius:14px;padding:6px 14px;margin:10px 0}
+#view .wx-panel>summary{gap:10px;min-height:56px;color:var(--green-ink)}
+.wx-overview{min-width:0;flex:1}
+.wx-overview b{display:block;font:600 22px/1.2 var(--serif)}
+.wx-overview small,.wx-playing small{display:block;font:10px/1.4 var(--sans);opacity:.8;margin-top:3px}
+.wx-playing{text-align:right;flex:none}
+.wx-playing b{font:600 14px/1.4 var(--mono)}
+.wx-panel-body{border-top:1px solid #ffffff35;padding:10px 0 4px;font:12px/1.5 var(--sans)}
+.wx-panel-body p+p{margin-top:6px}
+.wx-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.wx-actions button{background:transparent;color:inherit;border:1px solid #ffffff55;border-radius:8px;min-height:44px;padding:8px 10px;font:600 11px var(--sans)}
+.wx-actions button:hover{background:#ffffff15}
+.wx-panel>summary:focus-visible,.wx-actions button:focus-visible{outline:2px solid var(--green-ink)!important;outline-offset:2px}
+body.night .wx-panel{border:1px solid var(--line)}
+@media(max-width:350px){.wx-panel{padding-left:11px;padding-right:11px}.wx-playing b{font-size:12px}.wx-overview b{font-size:20px}}

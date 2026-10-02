@@ -1135,9 +1135,10 @@ drill collapsed the drill he was reading. A `rerender()` now restores the open/c
 of any `<details>` that carries an **`id`** — **both ways** as of Aug 27 2026, because a
 section that defaults open (every `fold()`) would otherwise spring back open on the next
 in-place update, so folding the scorecard away and then tapping anything else undid the
-fold. A `render()` deliberately restores nothing. Give a section an `id` if it should
-survive an update, and nothing else has to change. The DOM stays the only store for this —
-never build a parallel open/closed map.
+fold. Give an item disclosure an `id` if it should survive an update. As of v199,
+page-level sections also persist across navigation and reload in the separate
+`caddiehq_section_folds_v1` UI key. This covers enhanced h2 sections and native section
+panels, while individual club/shot rows and "read more" text retain the DOM-only rule.
 
 ### The page paints under the notch, so every edge claims its own inset (Aug 30 2026)
 
@@ -1763,8 +1764,9 @@ centre Tee shortcut on Sep 23 because it was unnecessary.
   and `landed`, `numbers` and `timeline` — the changelog, the Numbers Index and Evidence,
   all hanging off Today — back to the Today button.
 
-The tab glyphs are **CSS shapes** — a 19px bordered box, round or square, filled when active.
-No SVG, no icon font, no emoji: nothing to load, and legible at label size.
+The tab glyphs are **inline SVGs** (v199): home, golf bag, progress chart, flag and target.
+They use the active tab color and load offline without an icon font or external request.
+Icons share one stroke style and remain legible beside their text labels.
 
 v168 validation: the shipped HTML has exactly five nav buttons and none targets `live`;
 `startRound()` remains on Today and Round Prep retains its live-round link. Parser/import
@@ -3562,7 +3564,7 @@ Display carry, total, apex, distance gaps and consistency in whole yards/feet ac
 **v195 course confirmation:** Jack identified Granite Links, Massachusetts, Granite/Quincy routing. Append-only targeted corrections rename the existing round and add a verification note; retain the original extraction as historical evidence. Do not rebuild the feed from the original transcript generator without preserving subsequent corrections. No score/shot changes or duplicate round.
 `round-20261001-feed.json` is fetched and cached separately from Map My Bag. Stable apply-once round ID: `round-tm-20261001-v1`. All 18 headers sum to 80 on par 71 (39/41). `scripts/import-oct01-round.py` preserves the 51 non-putting observations with frame references and six visible metric columns. Course identity is unconfirmed, not guessed. H5 selected 5i is confirmed 4-hybrid at 24.5°; only tee identities are confirmed. Non-tee clubs/intent stay unknown. H17 zero-total row remains flagged; no invented penalty or putt count. Carry F is flat carry and is valid carry evidence when visible; these recordings instead show height/spin/launch/delivery, so no carry is synthesized from shot-list total. No range, outdoor-statistics or playing-yardage mutation. Repeat import must remain idempotent.
 
-## Daily range entries and optional section folding (v198)
+## Daily range entries and optional section folding (v198–v199)
 
 `groupedBayDays()` groups dated swing bay records for Days and lab bay logs. One date
 means one Range day including Map My Bag. Unknown dates and other disciplines stay
@@ -3571,9 +3573,28 @@ separate. The full-day reader pools retained individual readings through the exi
 fabricated into shots. Source records and round/film identities remain intact.
 `bayView('source:N')` is the explicit original-source view; source insight links use it.
 
-`buildSectionFolds()` enhances h2 sections in every render, hiding following sibling
-elements until the next h2 without reparenting cards or changing desktop grids.
-Existing native details remain available. Sections default expanded; optional folds
-persist in a separate localStorage key scoped to view, argument, segment and heading.
-Expand/Collapse sections controls apply to the enhanced sections. Jump links reveal
-the destination and ancestor folds. No golf data changes when a section is folded.
+`buildSectionFolds()` enhances h2 sections without reparenting cards or changing desktop
+grids. Stop at independent native panels and navigation, as well as other headings:
+v198 mistakenly included Bag history in the preceding Wedge yardage matrix fold.
+Enhanced headings default expanded. Existing native section panels keep their authored
+default until the user chooses otherwise. Both remember choices in the separate UI key
+scoped to view, argument, segment and section identity. Round segments use one stable
+scope whether opened from the main nav or a deep link. Preserve existing v198 choices.
+
+One compact Sections menu shares the horizontal shortcut row. Collapse all/Expand all
+cover both kinds of section. The menu closes after an action, on an outside tap, or on
+Escape; it shows how many sections are collapsed. Bulk controls must not add a full row
+above the useful page content. Shortcuts include native section panels and reveal their
+destination and ancestor folds. Headings retain uppercase lettering and use chevrons.
+Individual club rows, shot rows, evidence footnotes and read-more text are not bulk
+section controls. No golf data changes when a section is folded. Browser regressions
+cover 320/390/1440 widths, isolated boundaries, native/enhanced persistence, menu keyboard
+behavior, all-panel controls, shortcut recovery, and the original daily range grouping.
+
+Today's Conditions panel starts compact, retaining temperature, wind and the existing
+temperature-only playing-distance read. Expand for freshness/location provenance and
+Refresh weather/Change location actions. Stale weather still suppresses the playing
+adjustment; no calculation or location-permission behavior changes. The focus card uses
+the same page-level fold pattern, with its evidence disclosure kept inside. Neither
+panel stays fully expanded after Collapse all; primary navigation and Play/Resume stay
+accessible. Conditions and the focus card participate in section shortcuts and memory.

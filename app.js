@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v198';
+const BUILD = 'v199';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v199', d:'2026-10-02', items:['CLEANER SECTIONS: Compact Sections menu beside the page shortcuts; clear chevrons and remembered folding for existing panels too.', 'MORE ROOM FOR YOUR NUMBERS: Compact expandable conditions and a foldable Today focus card.', 'BETTER NAVIGATION: Distinct tab icons, shortcuts to existing foldable panels, and section boundaries that keep neighboring cards accessible.'] },
   { b:'v198', d:'2026-10-02', items:['ONE RANGE DAY: Range and Map My Bag uploads on the same date share one daily entry and combined club totals. Original sources remain available.', 'FOLD SECTIONS: Collapse or expand page sections; choices are remembered on this device.'] },
   { b:'v197', d:'2026-10-02', items:['Deployment repair: updated the legacy distance-display test for whole numbers so the Granite Links stats and compact round view can reach the live app.'] },
   { b:'v196', d:'2026-10-02', items:['GRANITE LINKS STATS: Added 4/13 fairways, 7/18 GIR, 211-yard average drive and 28 simulator putts. Additional analytics retained with source disagreements clearly labelled; no duplicate round or shots.'] },
@@ -870,11 +871,9 @@ function gist(s){
 }
 // ----- A collapsible section (Aug 27 2026) -----
 // One pattern for every foldable section in the app. It is a plain <details> carrying an
-// ID, deliberately: render() already restores any open <details id=…> across a rerender(),
-// so the open/closed state costs no store, no bookkeeping, and cannot drift out of sync
-// with what is actually on screen. Never build a parallel open/closed map for this — the
-// drill-bench bug CLAUDE.md records (an expanded section snapping shut on every in-place
-// update) is exactly what that machinery exists to prevent.
+// ID, deliberately: render() restores any open <details id=…> across an in-place update.
+// The shared section controls also remember page-level panels across navigation/reload;
+// nested item disclosures continue to use the DOM restoration, not page-level defaults.
 //
 //   id    unique and STABLE — it is the key the reopen-after-rerender works off
 //   label the section name, in the mono label voice (rendered uppercase by CSS)
@@ -2008,9 +2007,9 @@ function render(view, arg, keepScroll){
   // carrying an id take part, so nothing else has to change.
   // BOTH states are restored, not just the open ones (Aug 27 2026): a section that defaults
   // open would otherwise spring back open on the next in-place update, so folding the
-  // scorecard away and then tapping anything else would undo the fold. The DOM is still the
-  // only store — this reads the state off the elements that were on screen a moment ago and
-  // puts it back — which is the whole reason this pattern needs no bookkeeping.
+  // scorecard away and then tapping anything else would undo the fold. This DOM snapshot
+  // preserves item-level details during updates; page-section preferences below also
+  // survive navigation and reload in their own UI-only storage key.
   const was = keepScroll
     ? [...$('#view').querySelectorAll('details[id]')].map(d => [d.id, d.open]) : [];
   $('#view').dataset.page = view;
@@ -2024,22 +2023,55 @@ function render(view, arg, keepScroll){
 
 // Fold existing sections in place so desktop grids and existing details keep their layout.
 const FOLD_KEY = 'caddiehq_section_folds_v1';
-function sectionFolds(){try{return JSON.parse(localStorage.getItem(FOLD_KEY)||'{}')||{};}catch{return {};}}
+function sectionFolds(){
+  try{const states=JSON.parse(localStorage.getItem(FOLD_KEY)||'{}');
+    return states&&typeof states==='object'&&!Array.isArray(states)?states:{};
+  }catch{return {};}
+}
+function saveSectionFold(key,closed){
+  const states=sectionFolds();states[key]=closed;
+  try{localStorage.setItem(FOLD_KEY,JSON.stringify(states));}catch{}
+}
+function updateSectionMenu(){
+  const root=$('#view'),summary=root.querySelector('.section-menu-status');
+  if(!summary)return;
+  const controls=[...root.querySelectorAll('.section-fold-toggle,details[data-section-key]')];
+  const closed=controls.filter(c=>c.tagName==='DETAILS'?!c.open:c.getAttribute('aria-expanded')==='false').length;
+  summary.textContent=closed?`${closed} of ${controls.length} sections collapsed`:'All sections expanded';
+}
 function setSectionFold(button, closed, persist=true){
   button.setAttribute('aria-expanded',String(!closed));
   const ids=(button.getAttribute('aria-controls')||'').split(' ');
   ids.forEach(id=>document.getElementById(id)?.classList.toggle('section-fold-hidden',closed));
-  if(persist){const states=sectionFolds();states[button.dataset.foldKey]=closed;
-    try{localStorage.setItem(FOLD_KEY,JSON.stringify(states));}catch{}}
+  if(persist)saveSectionFold(button.dataset.foldKey,closed);
+  updateSectionMenu();
 }
 function buildSectionFolds(){
   const root=$('#view'),states=sectionFolds(),counts=new Map();
-  const scope=[current.view,current.arg??'',current.view==='rounds'?roundsSeg:''].join(':');
+  const scope=[current.view,current.view==='rounds'?'':current.arg??'',current.view==='rounds'?roundsSeg:''].join(':');
+  // Only section disclosures join the page controls. Keep individual clubs, shot rows,
+  // evidence footnotes and "read more" text at their existing level of detail.
+  [...root.querySelectorAll('details')].forEach(detail=>{
+    if(detail.parentElement.closest('details')||detail.matches('.more,.evdis,.actd,.bag-item,.cum-club'))return;
+    if(!detail.matches('.fold,.sect,.cum-detail')&&detail.parentElement!==root)return;
+    const summary=detail.querySelector(':scope > summary');if(!summary)return;
+    const label=summary.dataset.sectionLabel||(summary.querySelector('.foldl')||summary).textContent.trim();
+    const occurrence=counts.get('native:'+label)||0;counts.set('native:'+label,occurrence+1);
+    const key=scope+':native:'+(detail.id||label+':'+occurrence);
+    detail.dataset.sectionKey=key;summary.dataset.sectionLabel=label;
+    if(typeof states[key]==='boolean')detail.open=!states[key];
+    let wasOpen=detail.open;
+    detail.addEventListener('toggle',()=>{
+      if(detail.open!==wasOpen){wasOpen=detail.open;saveSectionFold(key,!detail.open);}
+      updateSectionMenu();
+    });
+  });
   [...root.querySelectorAll('h2')].forEach((heading,index)=>{
     if(heading.closest('summary,button,a')||heading.querySelector('button,a,input,select'))return;
     const nodes=[];
     for(let node=heading.nextElementSibling;node&&node.tagName!=='H2';node=node.nextElementSibling){
-      if(node.querySelector('h2'))break;
+      if(node.matches('nav,.segbar,.labgrid,.backlink,details[data-section-key]')||node.querySelector('h2')||
+        node.firstElementChild?.matches('details[data-section-key]'))break;
       nodes.push(node);
     }
     if(!nodes.length)return;
@@ -2048,19 +2080,15 @@ function buildSectionFolds(){
     button.dataset.foldKey=scope+':'+label+':'+occurrence;
     const text=document.createElement('span');
     while(heading.firstChild)text.appendChild(heading.firstChild);
-    button.append(text);heading.appendChild(button);
+    text.className='section-fold-label';
+    button.append(text);heading.appendChild(button);heading.classList.add('section-heading');
+    heading.dataset.sectionLabel=label;
     button.setAttribute('aria-controls',nodes.map((node,n)=>node.id||(node.id=`fold-body-${index}-${n}`)).join(' '));
     button.addEventListener('click',event=>{event.stopPropagation();setSectionFold(button,button.getAttribute('aria-expanded')==='true');});
-    setSectionFold(button,states[button.dataset.foldKey]===true,false);
+    const legacyScope=[current.view,current.view==='rounds'?roundsSeg:current.arg??'',current.view==='rounds'?roundsSeg:''].join(':');
+    const saved=states[button.dataset.foldKey]??states[legacyScope+':'+label+':'+occurrence];
+    setSectionFold(button,saved===true,false);
   });
-  if(!root.querySelector('.section-fold-toggle'))return;
-  const toolbar=document.createElement('div');toolbar.className='section-fold-tools';
-  for(const [label,closed] of [['Expand sections',false],['Collapse sections',true]]){
-    const b=document.createElement('button');b.type='button';b.textContent=label;
-    b.addEventListener('click',()=>root.querySelectorAll('.section-fold-toggle').forEach(toggle=>setSectionFold(toggle,closed)));
-    toolbar.appendChild(b);
-  }
-  root.prepend(toolbar);
 }
 function revealSection(target){
   if(!target)return;
@@ -2069,7 +2097,10 @@ function revealSection(target){
       const node=document.getElementById(id);return node&&(node===target||node.contains(target));});
     if(contains||button.parentElement===target)setSectionFold(button,false);
   });
-  for(let node=target.parentElement;node;node=node.parentElement)if(node.tagName==='DETAILS')node.open=true;
+  for(let node=target;node;node=node.parentElement)if(node.tagName==='DETAILS'){
+    node.open=true;if(node.dataset.sectionKey)saveSectionFold(node.dataset.sectionKey,false);
+  }
+  updateSectionMenu();
 }
 
 // Every view is a stack of <h2> sections, so the in-page nav is built from the
@@ -2078,8 +2109,10 @@ function revealSection(target){
 function buildJumpBar(){
   const view = $('#view');
   if(!view) return;
-  const hs = [...view.querySelectorAll('h2')];
-  if(hs.length < 2) return;
+  const hs = [...view.querySelectorAll('h2,details[data-section-key] > summary')];
+  const hasFolds=!!view.querySelector('.section-fold-toggle,details[data-section-key]');
+  if(hs.length < 2&&!hasFolds) return;
+  const row=document.createElement('div');row.className='page-sections';
   const bar = document.createElement('div');
   bar.className = 'jumpbar';
   bar.setAttribute('role', 'navigation');
@@ -2091,13 +2124,34 @@ function buildJumpBar(){
     b.dataset.jump = h.id;
     // Headings read "Scoring mix · 45 holes" or "Shaft at the top (down-the-line)".
     // Keep the half before the dot, drop a trailing parenthetical.
-    b.textContent = h.textContent.split('·')[0].replace(/\s*\([^)]*\)\s*$/, '').trim();
+    b.textContent = (h.dataset.sectionLabel||h.textContent).split('·')[0].replace(/\s*\([^)]*\)\s*$/, '').trim();
     bar.appendChild(b);
   });
   // Below the segmented control where there is one: the segments say WHICH LIST you are
   // looking at and the jump bar says where you are in it, so they can't be reordered.
+  if(hs.length>1)row.appendChild(bar);
+  if(hasFolds){
+    const menu=document.createElement('details');menu.className='section-menu';
+    menu.innerHTML='<summary aria-label="Section options"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M3 4h14M3 10h8M3 16h14M14 8l3 2-3 2"/></svg><span>Sections</span></summary><div class="section-menu-panel"><p class="section-menu-status"></p></div>';
+    menu.addEventListener('keydown',event=>{if(event.key==='Escape'){
+      menu.open=false;menu.querySelector('summary').focus({preventScroll:true});event.stopPropagation();
+    }});
+    for(const [label,closed] of [['Collapse all',true],['Expand all',false]]){
+      const button=document.createElement('button');button.type='button';button.textContent=label;
+      button.addEventListener('click',()=>{
+        view.querySelectorAll('.section-fold-toggle').forEach(toggle=>setSectionFold(toggle,closed));
+        view.querySelectorAll('details[data-section-key]').forEach(detail=>{
+          detail.open=!closed;saveSectionFold(detail.dataset.sectionKey,closed);
+        });
+        updateSectionMenu();menu.open=false;menu.querySelector('summary').focus({preventScroll:true});
+      });
+      menu.querySelector('.section-menu-panel').appendChild(button);
+    }
+    row.appendChild(menu);
+  }
   const seg = view.querySelector('.segbar');
-  if(seg) seg.after(bar); else view.prepend(bar);
+  if(seg) seg.after(row); else view.prepend(row);
+  updateSectionMenu();
 }
 let current = { view:'home' };
 // Redrawing the view you're already on is an UPDATE, not a navigation — jumping to the
@@ -2482,27 +2536,19 @@ function wxCard(){
   const mins = wx ? Math.round((Date.now() - wx.ts) / 60000) : null;
   const ago = mins == null ? '' : mins < 60 ? `${mins} min ago`
     : `${Math.round(mins / 60)}h ago`;
-  if(!wx) return `<div class="wx" data-action="get-weather">
-    <div><div class="wxt">—°</div><div class="wxc">Tap to load the conditions where you are</div></div>
-    <div class="wxr"><b>Plays like</b><span>needs a location fix</span></div></div>`;
   const p150 = f ? Math.round(150 / f) : null;
   const d = p150 == null ? null : p150 - 150;
-  return `<div class="wx" data-action="get-weather">
-    <div><div class="wxt">${WX_ICON(wx.code)} ${Math.round(wx.t)}°</div>
-      <div class="wxc">Wind ${Math.round(wx.wind)} mph · ${esc(ago)} · ${
-        // ONE HINT, NOT TWO. Naming the fix's day AND keeping "tap to refresh" ran the line
-        // to three lines on a 13 mini and put the block 2px past the tab bar — the tightest
-        // viewport has 3px of headroom, so this caption has no room to grow. They are also
-        // the wrong pair: once the fix is yesterday's, re-reading the weather at yesterday's
-        // spot is not the useful tap, and `moved?` is. So the slot swaps rather than adding.
-        hereOld() ? `${esc(fmtDate(isoDay(new Date(S.here.ts))))} fix` : 'tap to refresh'
-      } · <span class="wxgo" data-action="relocate">moved?</span></div></div>
-    <div class="wxr"><b>Plays like</b>${f
-      ? `<span>150 → <i>${p150}</i></span>
-         <span>${d === 0 ? 'no change at 150' : `${d > 0 ? '+' : ''}${d} yds · ${Math.round(wx.t)}°F air`}</span>
-         <span class="wxn">Temperature only — the wind is not in this number.</span>`
-      : `<span>reading is over 3h old</span><span class="wxn">Tap to refresh and the carry effect comes back.</span>`}</div>
-  </div>`;
+  return `<details class="wx-panel" id="home-conditions">
+    <summary data-section-label="Conditions">
+      <span class="wx-overview">${wx?`<b>${WX_ICON(wx.code)} ${Math.round(wx.t)}°</b><small>Wind ${Math.round(wx.wind)} mph${f?'':' · stale'}</small>`:'<b>Conditions</b><small>Local weather &amp; playing distance</small>'}</span>
+      ${wx?`<span class="wx-playing"><small>${f?'Plays like · temp only':'Update needed'}</small><b>${f?`150 → ${p150} yd`:'Refresh weather'}</b></span>`:''}
+    </summary>
+    <div class="wx-panel-body">
+      <p>${wx?`Updated ${esc(ago)}${hereOld()?` · Location from ${esc(fmtDate(isoDay(new Date(S.here.ts))))}`:''}.`:'Load conditions for your location.'}</p>
+      ${wx?`<p>${f?`${d===0?'No distance adjustment at 150 yards':`${d>0?'+':''}${d} yards at 150`} · ${Math.round(wx.t)}°F air. Temperature only; wind is not included.`:'This reading is over 3 hours old. Refresh for a current playing-distance adjustment.'}</p>`:''}
+      <div class="wx-actions"><button type="button" data-action="get-weather">${wx?'Refresh weather':'Load weather'}</button>${wx?'<button type="button" data-action="relocate">Change location</button>':''}</div>
+    </div>
+  </details>`;
 }
 
 // The one thing. Not a list — the single finding the ranked board leads with, which is the
@@ -2514,11 +2560,12 @@ function oneThing(){
   if(!f) return '';
   const L = f.link;
   return `<div class="card one${rail(f.ev)}">
-    ${evDrawer('ev-onething', 'The one thing', f.ev, f.src)}
+    ${fold('today-focus','The one thing','',`
+    ${evDrawer('ev-onething', 'Evidence', f.ev, f.src)}
     <div class="oneh">${f.h}</div>
     ${expandable(f.b)}
     ${L ? `<div class="linkrow" data-action="${L.a}"${L.view ? ` data-view="${L.view}"` : ''}${
-      L.id ? ` data-id="${esc(L.id)}"` : ''}><span class="sm"><b>${esc(L.lab)}</b></span><span class="arr">→</span></div>` : ''}
+      L.id ? ` data-id="${esc(L.id)}"` : ''}><span class="sm"><b>${esc(L.lab)}</b></span><span class="arr">→</span></div>` : ''}`)}
   </div>`;
 }
 
@@ -10659,6 +10706,8 @@ function askHere(manual, then){
 }
 
 document.addEventListener('click', e => {
+  const sectionMenu=$('#view .section-menu');
+  if(sectionMenu?.open&&!sectionMenu.contains(e.target))sectionMenu.open=false;
   // The course picker on "Start a live round" closes on a tap anywhere outside it. A tap
   // in the box itself re-opens it, so closing it by mistake costs one tap, not a re-entry.
   if(!e.target.closest('#lvPick')) showPicks(e.target.id === 'lvCourse');
