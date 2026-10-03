@@ -3,40 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#14512E">
+<meta name="theme-color" content="#123E31">
 <title>Caddie HQ</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon-192.png">
 <link rel="stylesheet" href="./styles.css">
 <link rel="stylesheet" href="./round-review.css">
+<link rel="stylesheet" href="./revamp.css">
 </head>
 <body>
 
-<header class="hero">
-  <button class="themebtn" data-action="toggle-theme" title="Toggle night mode">☾</button>
-  <!-- The running build, top right of Home. It is filled in by render() from BUILD in
-       app.js, so it is proof of what is ACTUALLY on the phone rather than what was
-       published: if a deploy fails or an installed PWA is serving stale code, this is the
-       number that disagrees. Tap it for the Data tab's update check. -->
-  <button class="buildtag" id="buildTag" data-action="go" data-view="data" hidden
-          title="The build running on this phone — tap to check for a new one"></button>
-  <div class="badge">Caddie HQ · Jack McDermott</div>
-  <h1 id="pageTitle">Caddie HQ</h1>
-  <div class="tag" id="pageTag">Your bag, your stroke, your game — one book.</div>
+<a class="hq-skip" href="#view">Skip to content</a>
+<header class="hero hq-shell">
+  <div class="hq-brand"><span class="hq-brand-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21V3l13 4-13 5M3 21h10"/><circle cx="18" cy="19" r="2"/></svg></span><span>CADDIE <b>HQ</b><small>JACK'S GOLF WORKSPACE</small></span></div>
+  <div class="hq-shell-actions">
+    <button class="hq-search-trigger" data-action="hq-explore" aria-label="Find anything in Caddie HQ"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span>Find anything</span><kbd>⌘ K</kbd></button>
+    <button class="themebtn" data-action="toggle-theme" title="Change color theme" aria-label="Change color theme">☾</button>
+    <button class="buildtag" id="buildTag" data-action="go" data-view="data" hidden title="Running version and update checks"></button>
+  </div>
+  <div class="hq-page-heading"><button id="hqBack" class="hq-back" data-action="hq-back" aria-label="Go back" hidden>←</button><div><h1 id="pageTitle">Overview</h1><div class="tag" id="pageTag">Your game, connected.</div></div></div>
+  <div id="hqBreadcrumb" class="hq-breadcrumb" role="navigation" aria-label="Page location"></div>
 </header>
 
 <main id="view" class="wrap"></main>
 
-<!-- Five bottom tabs (Sep 23 2026).
-     TODAY · BAG · GAME · ROUNDS · COACH. The old centre TEE shortcut was removed at
-     Jack's request; starting or resuming a round remains on Today and in Round Prep.
-     Courses and Round Prep are segments inside Rounds, next to the cards they describe.
-     Distinct inline SVGs need no icon font or network request. -->
+<!-- Five stable route IDs; the v200 workspace keeps every old deep link and action. -->
 <nav id="nav" aria-label="Main navigation">
-  <button data-view="home" class="rnd"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg></span><span class="nl">TODAY</span></button>
+  <button data-view="home" class="rnd"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg></span><span class="nl">OVERVIEW</span></button>
   <button data-view="bag"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 9h10l-1 12H8L7 9ZM9 9V3H6M13 9V2h4M16 12h3v6h-3M11 12v6"/></svg></span><span class="nl">BAG</span></button>
-  <button data-view="game"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 3v17h17M7 15l5-5 4 3 5-7M17 6h4v4"/></svg></span><span class="nl">GAME</span></button>
+  <button data-view="game"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 3v17h17M7 15l5-5 4 3 5-7M17 6h4v4"/></svg></span><span class="nl">PROGRESS</span></button>
   <button data-view="rounds"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 21V3l12 4-12 4M4 21h9"/><circle cx="17" cy="19" r="2"/></svg></span><span class="nl">ROUNDS</span></button>
   <button data-view="coach" class="rnd"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="m9 12 2 2 4-4"/></svg></span><span class="nl">COACH</span></button>
 </nav>
@@ -48,6 +44,7 @@
 <script src="./bay-takeaways.js"></script>
 <script src="./round-review.js"></script>
 <script src="./app.js"></script>
+<script src="./explorer.js"></script>
 <script>
 // Keeping the installed app up to date.
 // Registering once on load is NOT enough: an installed PWA can sit suspended for days

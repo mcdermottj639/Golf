@@ -17,9 +17,12 @@ app.js                The whole app: seed data, state, all views, render logic
                        app's own changelog — see "Home ends with What's new",
                        and Findability — Numbers Index, Today search, Evidence,
                        provenance chips and meaning sheets)
-styles.css            "Scorecard Heritage" theme (cream paper, Masters green, burgundy).
+styles.css            Preserved base layout and legacy component rules.
                       APPEND to this file. Never replace it. v116 shipped a 43-line
                       chip sheet in its place and Today rendered as unstyled HTML.
+revamp.css            v200 design layer: pine/lime/off-white, system type, responsive
+                      shell, all legacy components, desktop rail and dark mode.
+explorer.js           Global read-only directory/search; existing actions open records.
 lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
 round-takeaways.js    Shared scoring and club-data insight selection + compact visual cards
@@ -38,6 +41,7 @@ committing:
 
 ```
 node --check app.js
+node --check explorer.js
 python3 -c "import json; json.load(open('coach-feed.json'))"
 ```
 
@@ -76,6 +80,41 @@ is about *somewhere specific*. Read the header node, or assert on a value the re
 page cannot contain. **Check 320px as well as 390px** — that is the
 narrowest phone and the width the form-control rule below was set at. This proves layout,
 not correctness: a number can be confidently wrong in a page that renders perfectly.
+
+## Current experience: Caddie HQ reimagined (v200, October 2 2026)
+
+Jack authorized a full visual/navigation redesign, superseding earlier color, type and
+layout restrictions. This does **not** relax any data/provenance rule below. All imported
+data, golf state, lessons, takeaways, original source records and existing action aliases
+remain intact. The remote rollback branch is `backup/caddie-hq-v199-2026-10-02` at
+`e6b3f1c00cef2b7c097801ac325e3d4bf717ed43` (tree
+`8934e202bfdb8d9fa61ede53428588ead65c04ee`). Restoring code never means clearing localStorage.
+
+Five primary destinations: Overview (`home`), Bag (`bag`), Progress (`game`), Rounds and
+Coach. Retain these internal route IDs and all legacy aliases because saved updates and
+deep links use them. Activity is the day-by-day log; Progress & trends is the existing
+cumulative analysis. Four labs open in one tap. Overview adds a sourced digest and recent
+activity, followed by the **complete** original home content inside `.hq-legacy`.
+Bag presents the roster first; each carry-bearing club has a full-history link using its
+canonical club key. Latest rounds and start/resume/log actions lead the Rounds scorecards.
+Lab routines belong to Progress; dated/course briefings belong to Rounds.
+
+`window.CaddieHQ` exposes only `search` and `explore`, not mutable player state. Explorer
+opens from the global search button or Cmd/Ctrl+K, supports keyboard navigation and uses
+the original action/index. Numeric tokens, club names and ISO dates match deliberately;
+explicit source records open `open-bay-source`, while Range day opens the whole day.
+Concise search labels never alter source text. Meaningful zero and numeric precision
+survive action attributes. The in-memory back trail restores prior view and scroll;
+section choices remain in `caddiehq_section_folds_v1`, never in golf data. Hero headings
+with `data-no-fold` are excluded from bulk disclosure controls. Practice/log shortcuts
+reveal their target folds before scrolling. All new shell assets are service-worker cached.
+
+Release gates: `tests/revamp-preservation.cjs` compares every source/archive byte and full
+fresh/personalized state against the frozen v199 tree (requires that Git tree locally;
+not a shallow-checkout CI test). `tests/revamp-browser.cjs` verifies 320–1920px navigation,
+search, full day/source/round/history paths, live-round resumption, zero-valued practice
+results, fold persistence, exact export/import/reload and real offline reload. Neither
+test operates on the user's browser. Run the existing publish workflow suite as well.
 
 ## Review process — every bay day, every analysis pass (v122)
 

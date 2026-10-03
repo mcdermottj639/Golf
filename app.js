@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v199';
+const BUILD = 'v200';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v200', d:'2026-10-02', items:['CADDIE HQ, REIMAGINED: A new visual system across the entire app, with Overview, Bag, Progress, Rounds and Coach.', 'FIND ANYTHING: Global search and a complete workspace directory, plus clear page context and back navigation.', 'YOUR NEXT MOVE: Recent sessions, direct lab access, club-history shortcuts and evidence-led summaries. Every existing number, source, insight and tracking tool is preserved.', 'RESTORABLE: The complete v199 app is saved as backup/caddie-hq-v199-2026-10-02.'] },
   { b:'v199', d:'2026-10-02', items:['CLEANER SECTIONS: Compact Sections menu beside the page shortcuts; clear chevrons and remembered folding for existing panels too.', 'MORE ROOM FOR YOUR NUMBERS: Compact expandable conditions and a foldable Today focus card.', 'BETTER NAVIGATION: Distinct tab icons, shortcuts to existing foldable panels, and section boundaries that keep neighboring cards accessible.'] },
   { b:'v198', d:'2026-10-02', items:['ONE RANGE DAY: Range and Map My Bag uploads on the same date share one daily entry and combined club totals. Original sources remain available.', 'FOLD SECTIONS: Collapse or expand page sections; choices are remembered on this device.'] },
   { b:'v197', d:'2026-10-02', items:['Deployment repair: updated the legacy distance-display test for whole numbers so the Granite Links stats and compact round view can reach the live app.'] },
@@ -1312,11 +1313,11 @@ function weekStreak(){
 
 // ---------- Renderers ----------
 const TITLES = {
-  home:['Caddie HQ','Your bag, your stroke, your game — one book.'],
+  home:['Overview','Your game, connected.'],
   bag:['My Bag','Every club, every spec, and the story of every change.'],
   swing:['Swing Lab','Driver to wedge — film, plans, and speed work.'],
   positions:['Swing Positions','Where the body goes, address to finish.'],
-  game:['The Labs','Four parts of the game, each with its own workbench.'],
+  game:['Progress','Every session. Every club. Your next breakthrough.'],
   shortgame:['Short Game','Around the green — where the strokes hide.'],
   putting:['Putting Lab','Stroke, pace, and the short ones.'],
   mental:['Mental Game','Staying locked in for eighteen — decided off the course.'],
@@ -1328,7 +1329,7 @@ const TITLES = {
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
   clubhistory:['Club history','Every recorded range day, one club at a time.'],
   bay:['Bay Session','Every number the launch monitor produced.'],
-  sessions:['Days','Every capture, newest first — not split by type.'],
+  sessions:['Activity','Every range day, round and film session.'],
   briefing:['Round Prep','Course knowledge, tuned to your game.'],
   shelf:['Coach','One shelf of the library.'],
   lesson:['Coach','One lesson, and the drill that trains it.'],
@@ -1651,7 +1652,7 @@ function searchIndex(state){
     `${c.name} ${c.spec||''} ${c.note||''} ${c.cat||''} club`,
     { a:'go', v:'bag' }));
   (state.carries || []).forEach(c => add('Bag', c.club + ' (ladder)',
-    `${c.club} carry ladder 5-wood 5 wood`,
+    `${c.club} carry ladder yardage distance`,
     { a:'go', v:'bag' }));
   (state.courses || []).forEach(c => add('Courses', c.name,
     `${c.name} ${c.st||''} ${c.notes||''} course`,
@@ -1669,10 +1670,10 @@ function searchIndex(state){
     `${d.l.title} ${d.l.shelf||''} drill`,
     { a:'go', v:'drills' }));
   (state.bays || []).forEach((b,i) => add('Labs', b.setup || b.mode || 'Bay session',
-    `${b.setup||''} ${b.venue||''} ${b.mode||''} trackman bay range`,
+    `${b.date||''} ${b.setup||''} ${b.venue||''} ${b.mode||''} trackman bay range`,
     { a:'open-bay', i }));
   (state.sessions || []).forEach((s,i) => add('Labs', s.setup || 'Film',
-    `${s.setup||''} ${s.finding||''} film session`,
+    `${s.date||''} ${s.setup||''} ${s.finding||''} film session`,
     { a:'open-session', i }));
   (state.combines || []).forEach(c => add('Numbers', 'Combine '+ (c.score != null ? c.score : ''),
     `combine trackman ${c.note||''} ${c.venue||''}`,
@@ -1940,7 +1941,7 @@ function rounds(seg){
     `<button class="seg ${s.k === cur.k ? 'on' : ''}" data-action="rounds-seg" data-k="${s.k}">${s.lab}</button>`).join('')}</div>
   <div class="card flat"><div class="linkrow" data-action="go" data-view="timeline" style="border-bottom:none">
     <span><b>Evidence →</b><span class="sm"> Rounds, bay and film mixed by date</span></span><span class="arr">→</span></div></div>
-  ${body()}`;
+  ${cur.k==='cards'?hqRoundIntro():''}${body()}`;
 }
 
 // Which fault the bench is filtered to, set by a lab's diagnosis card. Deliberately a
@@ -1953,6 +1954,8 @@ let drillTag = null;
 // moment he navigates anywhere else. Nothing about an open picker belongs in the record.
 let planPick = null;
 function render(view, arg, keepScroll){
+  window.CaddieExplorer?.close();
+  hqSearchCache=null;
   closeCheat();  // the cheat sheet overlay lives on <body>, so navigation must clear it
   if(view !== 'drills') drillTag = null;
   if(view !== 'briefing') planPick = null;
@@ -1960,6 +1963,9 @@ function render(view, arg, keepScroll){
   // here rather than at every call site is the whole reason nothing dead-ended when the
   // nav changed shape: a link written a month ago still lands where it always meant to.
   if(SEG_OF[view]){ arg = SEG_OF[view]; view = 'rounds'; }
+  if(hqHasRendered&&!keepScroll&&!hqGoingBack&&(view!==current.view||String(arg??'')!==String(current.arg??''))){
+    hqTrail.push({...current,y:window.scrollY});if(hqTrail.length>40)hqTrail.shift();
+  }
   current = { view, arg };
   let [title, tag] = TITLES[view] || TITLES.home;
   // The Rounds masthead says which face you're on — the tab is one place, the segments
@@ -1970,10 +1976,10 @@ function render(view, arg, keepScroll){
   }
   if(view === 'sessions'){
     if(arg === 'cumulative'){
-      title = 'Cumulative';
-      tag = 'The running picture. It moves when a day lands.';
+      title = 'Progress & trends';
+      tag = 'All your measured days, connected by club and by pattern.';
     } else {
-      title = 'Days';
+      title = 'Activity';
       tag = 'One range entry per day, with rounds and film alongside.';
     }
   }
@@ -2015,9 +2021,11 @@ function render(view, arg, keepScroll){
   $('#view').dataset.page = view;
   $('#view').dataset.layout = view === 'sessions' && arg === 'cumulative' ? 'cumulative' : view;
   $('#view').innerHTML = R(arg);
+  const practice=$('#view .sim-practice');if(practice&&!practice.id)practice.id='sim-practice';
   buildSectionFolds();
   was.forEach(([id, open]) => { const d = document.getElementById(id); if(d) d.open = open; });
   buildJumpBar();
+  hqUpdateShell();hqHasRendered=true;
   if(!keepScroll) window.scrollTo(0,0);
 }
 
@@ -2053,7 +2061,7 @@ function buildSectionFolds(){
   // evidence footnotes and "read more" text at their existing level of detail.
   [...root.querySelectorAll('details')].forEach(detail=>{
     if(detail.parentElement.closest('details')||detail.matches('.more,.evdis,.actd,.bag-item,.cum-club'))return;
-    if(!detail.matches('.fold,.sect,.cum-detail')&&detail.parentElement!==root)return;
+    if(!detail.matches('.fold,.sect,.cum-detail')&&detail.parentElement!==root&&!detail.parentElement.classList.contains('hq-legacy'))return;
     const summary=detail.querySelector(':scope > summary');if(!summary)return;
     const label=summary.dataset.sectionLabel||(summary.querySelector('.foldl')||summary).textContent.trim();
     const occurrence=counts.get('native:'+label)||0;counts.set('native:'+label,occurrence+1);
@@ -2067,7 +2075,7 @@ function buildSectionFolds(){
     });
   });
   [...root.querySelectorAll('h2')].forEach((heading,index)=>{
-    if(heading.closest('summary,button,a')||heading.querySelector('button,a,input,select'))return;
+    if(heading.hasAttribute('data-no-fold')||heading.closest('summary,button,a')||heading.querySelector('button,a,input,select'))return;
     const nodes=[];
     for(let node=heading.nextElementSibling;node&&node.tagName!=='H2';node=node.nextElementSibling){
       if(node.matches('nav,.segbar,.labgrid,.backlink,details[data-section-key]')||node.querySelector('h2')||
@@ -2109,7 +2117,7 @@ function revealSection(target){
 function buildJumpBar(){
   const view = $('#view');
   if(!view) return;
-  const hs = [...view.querySelectorAll('h2,details[data-section-key] > summary')];
+  const hs = [...view.querySelectorAll('h2:not([data-no-fold]),details[data-section-key] > summary')];
   const hasFolds=!!view.querySelector('.section-fold-toggle,details[data-section-key]');
   if(hs.length < 2&&!hasFolds) return;
   const row=document.createElement('div');row.className='page-sections';
@@ -2922,8 +2930,172 @@ function startRound(){
     <span class="bb-r">${ready ? 'CARD READY ›' : 'NEW CARD ›'}</span></button>`;
 }
 
-// ----- Home -----
-function home(){
+// ----- Caddie HQ workspace (v200): navigation and presentation only -----
+// All figures below read the same underlying helpers as their complete detail views.
+// Never write back a summary, a range carry, or a UI preference to the golf record.
+let hqSearchCache=null;
+const hqTrail=[];
+let hqHasRendered=false,hqGoingBack=false;
+function hqIcon(name){
+  const paths={
+    arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>',
+    range:'<path d="M4 20h16M6 17V5l12 4-12 4"/><circle cx="16" cy="18" r="2"/>',
+    trend:'<path d="M4 4v16h16M7 15l5-5 4 3 5-7M17 6h4v4"/>',
+    bag:'<path d="M7 9h10l-1 12H8L7 9ZM9 9V3H6M13 9V2h4M16 12h3v6h-3"/>',
+    round:'<rect x="4" y="4" width="16" height="17" rx="3"/><path d="M8 2v4m8-4v4M4 10h16M8 14h3m3 0h2M8 17h3"/>',
+    focus:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="m10 12 2 2 4-5"/>',
+    film:'<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m10 8 6 4-6 4V8Z"/>',
+    book:'<path d="M12 5v16M3 3l9 2 9-2v16l-9 2-9-2V3Z"/>',
+    search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+  };
+  return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${paths[name]||paths.arrow}</svg>`;
+}
+function hqAttrs(act){
+  const fields={action:act.a,view:act.v??act.view,seg:act.seg,id:act.id,i:act.i,kind:act.kind,
+    club:act.club,metric:act.metric,prov:act.prov,value:act.value,unit:act.unit,target:act.target};
+  return Object.entries(fields).filter(([,v])=>v!=null).map(([k,v])=>`data-${k}="${esc(String(v))}"`).join(' ');
+}
+function hqFeature(icon,title,copy,act){
+  return `<button type="button" class="hq-feature" ${hqAttrs(act)}><span class="hq-feature-icon">${hqIcon(icon)}</span><span><b>${esc(title)}</b><small>${esc(copy)}</small></span><span class="hq-feature-arrow">${hqIcon('arrow')}</span></button>`;
+}
+function hqActivityRows(rows){
+  const labels={range:'Range day',sim:'Simulator round',outdoor:'Course round',film:'Swing film'};
+  return `<div class="hq-activity-list">${rows.map(x=>`<button type="button" class="hq-activity" data-action="${esc(x.action)}" data-i="${x.i}">
+    <span class="hq-activity-icon hq-kind-${x.kind}">${hqIcon(x.kind==='range'?'range':x.kind==='film'?'film':'round')}</span>
+    <span class="hq-activity-body"><span class="hq-activity-meta">${esc(labels[x.kind]||x.kind)} · ${esc(x.date?fmtDate(x.date):'Date not recorded')}</span><b class="hq-activity-title">${esc(x.title)}</b><span class="hq-activity-meta">${esc(x.sub||'Open the complete record')}</span></span>
+    <span class="hq-activity-stat">${hqIcon('arrow')}</span></button>`).join('')}</div>`;
+}
+function hqOverview(){
+  const rows=allDayRows(),range=rows.find(r=>r.kind==='range'),latest=rows.find(r=>r.kind==='sim'||r.kind==='outdoor');
+  const rangeDay=range?bayDayData(S.bays[range.i]):null,round=latest?S.rounds[latest.i]:null;
+  const outdoor=realRounds().length,indoor=(S.rounds||[]).filter(r=>r.sim).length;
+  const metric=(value,label,note,act)=>`<button type="button" class="hq-metric" ${hqAttrs(act)}><span class="hq-metric-label">${esc(label)}</span><b class="hq-metric-value">${esc(String(value))}</b><span class="hq-metric-note">${esc(note)}</span></button>`;
+  return `<div class="hq-dashboard">
+    <section class="hq-hero" aria-label="Your golf overview">
+      <div class="hq-kicker">JACK'S GOLF WORKSPACE <span class="hq-badge">PERSONAL</span></div>
+      <h2 class="hq-title" data-no-fold>Your game.<br>A clearer picture.</h2>
+      <p class="hq-subtitle">See what changed. Know what to practice. Take it to the course.</p>
+      <div class="hq-hero-actions"><button class="hq-btn" data-action="live-new">${hqIcon('range')}${S.live?'Resume your round':'Start a round'}</button><button class="hq-btn hq-btn-secondary" data-action="hq-route" data-view="coach" data-target="sim-practice">${hqIcon('focus')}Plan my practice</button></div>
+      <div class="hq-metrics">
+        ${metric(S.profile.handicap??'—','Profile handicap',PROV[provOfProfile()]?.lab||'Profile record',{a:'go',v:'numbers'})}
+        ${metric(rangeDay?.usable??'—','Usable range shots',range?`Latest: ${fmtDate(range.date)} · ${rangeDay?.clubs.length??0} clubs`:'No range day recorded',range?{a:'open-bay',i:range.i}:{a:'session-category',kind:'range'})}
+        ${metric(round?.score??'—','Latest round',latest?`${latest.kind==='sim'?'Simulator':'On course'} · ${latest.date?fmtDate(latest.date):'date unknown'}`:'No score recorded',latest?{a:'open-round',i:latest.i}:{a:'go',v:'rounds'})}
+        ${metric(activeBagCount(),'Clubs in play','14-club limit · equipment & history',{a:'go',v:'bag'})}
+      </div>
+      <p class="hq-hero-record">Your record: ${outdoor} course rounds · ${indoor} simulator rounds · ${(S.sessions||[]).length} film sessions</p>
+    </section>
+    <div class="hq-overview-grid">
+      <section class="hq-panel"><h2>Your latest activity</h2><div>${rows.length?hqActivityRows(rows.slice(0,4)):'<p class="hq-section-note">Your range days, rounds and film will appear here as you add them.</p>'}<button class="hq-text-link" data-action="session-category" data-kind="days">Open the full activity log ${hqIcon('arrow')}</button></div></section>
+      <section class="hq-panel hq-progress"><h2>Make the next session count</h2><div><p class="hq-section-note">Follow the evidence from your last session into your next one.</p><div class="hq-feature-grid">
+        ${hqFeature('trend','Progress & trends','Carry, delivery and every club over time',{a:'session-category',kind:'cumulative'})}
+        ${hqFeature('bag','Know your bag','Playing distances, setups and club history',{a:'go',v:'bag'})}
+        ${hqFeature('focus','Your coaching plan','What to work on and how to measure it',{a:'hq-route',v:'coach',target:'sim-practice'})}
+      </div></div></section>
+    </div>
+    <div class="hq-section-intro"><span class="hq-kicker">THE COMPLETE PICTURE</span><p>Your numbers, conditions, insights and tools—every detail is still here.</p></div>
+  </div>`;
+}
+function hqProgressIntro(){
+  const rows=allDayRows(),range=rows.filter(r=>r.kind==='range'),films=rows.filter(r=>r.kind==='film');
+  return `<section class="hq-dashboard hq-workspace-intro"><div class="hq-kicker">TURN REPS INTO PROGRESS</div><h2 class="hq-title" data-no-fold>Every session builds the picture.</h2><p class="hq-subtitle">Start with a day. Follow a club over time. Take a focused test into your next practice.</p>
+    <div class="hq-feature-grid hq-feature-grid-three">
+      ${hqFeature('round','Activity log',`${range.length} range entries · ${films.length} film sessions · all your rounds`,{a:'session-category',kind:'days'})}
+      ${hqFeature('trend','Progress & trends','Your complete history, patterns and next steps',{a:'session-category',kind:'cumulative'})}
+      ${hqFeature('focus','Build a practice plan','A measured TrackMan session from your own data',{a:'hq-route',v:'coach',target:'sim-practice'})}
+    </div><div class="hq-lab-intro"><h3>Explore your game</h3><p>Open any lab in one tap. All film, plans, tests and takeaways stay together.</p></div>
+  </section>`;
+}
+function hqBagIntro(){
+  const gaming=S.clubs.filter(c=>c.status==='gaming'||c.status==='ordered');
+  const setupCount=gaming.length;
+  return `<section class="hq-dashboard hq-workspace-intro"><div class="hq-kicker">EQUIPMENT WITH EVIDENCE</div><h2 class="hq-title" data-no-fold>Your bag, connected.</h2><p class="hq-subtitle">${activeBagCount()} of 14 clubs in play · ${setupCount} equipment entries. Open a club for its setup, playing distance and full history.</p></section>`;
+}
+function hqBagLinks(){
+  return `<section class="hq-dashboard hq-bag-links"><div class="hq-feature-grid">
+    ${hqFeature('trend','Every club over time','Compare full-day measurements and source sessions',{a:'session-category',kind:'cumulative'})}
+    ${hqFeature('bag','Equipment decisions','Your tests, comparisons and outstanding calls',{a:'go',v:'decisions'})}
+  </div></section>`;
+}
+function hqRoundIntro(){
+  const recent=allDayRows().filter(r=>r.kind==='outdoor'||r.kind==='sim').slice(0,3);
+  return `<section class="hq-panel hq-round-latest"><h2>Pick up where you left off</h2><div>${hqActivityRows(recent)}<div class="hq-hero-actions"><button class="hq-btn" data-action="live-new">${S.live?'Resume your round':'Start a live round'} ${hqIcon('arrow')}</button><button class="hq-btn hq-btn-secondary" data-action="hq-route" data-view="rounds" data-seg="cards" data-target="round-log">Log a completed round</button></div></div></section>`;
+}
+function hqExplore(){
+  const item=(kind,label,description,act)=>({kind,label,description,act});
+  return [
+    item('Your workspace','Overview','Latest activity, key numbers and your next move',{a:'go',v:'home'}),
+    item('Your workspace','My bag','Clubs, carries, settings, bench and full club history',{a:'go',v:'bag'}),
+    item('Your workspace','Progress & trends','Cumulative measurements, delivery patterns and next steps',{a:'session-category',kind:'cumulative'}),
+    item('Your workspace','Activity log','Every range day, simulator round, course round and film',{a:'session-category',kind:'days'}),
+    item('Play & improve','Start or resume a round','Live hole-by-hole logging and scoring',{a:'live-new'}),
+    item('Play & improve','Rounds & scorecards','Your complete scoring record and analytics',{a:'go',v:'rounds',seg:'cards'}),
+    item('Play & improve','Course plans','Personal tee strategy, holes and preparation',{a:'go',v:'rounds',seg:'prep'}),
+    item('Play & improve','Courses','Every course, rating, record and bucket-list stop',{a:'go',v:'rounds',seg:'courses'}),
+    item('Play & improve','Practice planner','Generate and track a Golf Lounge TrackMan session',{a:'hq-route',v:'coach',target:'sim-practice'}),
+    item('Play & improve','Drill bench','Practice you can do with your equipment',{a:'go',v:'drills'}),
+    item('Your labs','Swing lab','Film, launch-monitor data, faults, plans and speed',{a:'go',v:'swing'}),
+    item('Your labs','Short-game lab','Wedges, chipping, bunkers and scoring shots',{a:'go',v:'shortgame'}),
+    item('Your labs','Putting lab','Stroke, pace, short-putt tests and routines',{a:'go',v:'putting'}),
+    item('Your labs','Mental game','Focus, routines, round debriefs and triggers',{a:'go',v:'mental'}),
+    item('Your labs','Swing positions','Body checkpoints from address through finish',{a:'go',v:'positions'}),
+    item('Your record & tools','Coaching library','Lessons, saved progress, streaks and action list',{a:'hq-route',v:'coach',target:'coach-library'}),
+    item('Your record & tools','Numbers & definitions','Every metric, its source and what it means',{a:'go',v:'numbers'}),
+    item('Your record & tools','Evidence timeline','Trace a finding back to its original record',{a:'go',v:'timeline'}),
+    item('Your record & tools','Equipment decisions','Comparisons, tests and buying decisions',{a:'go',v:'decisions'}),
+    item('Your record & tools','Data & backup','Export, import, settings and update checks',{a:'go',v:'data'}),
+    item('Your record & tools','What’s new','Every published app change and data update',{a:'go',v:'landed'}),
+  ];
+}
+function hqSearch(query){
+  const normalize=s=>String(s||'').toLowerCase().replace(/\b(\d)\s*w\b/g,'$1 wood').replace(/\b(\d)\s*i\b/g,'$1 iron').replace(/\b(\d)\s*h\b/g,'$1 hybrid').replace(/[^a-z0-9]+/g,' ').trim();
+  const concise=s=>{const text=String(s||'');return text.length>100?text.slice(0,97).replace(/\s+\S*$/,'')+'…':text;};
+  if(!hqSearchCache){
+    const historyKeys=[...new Set((S.carries||[]).map(c=>clubCanon(c.club)).concat((S.bays||[]).flatMap(b=>(b.detail?.rangeShots||[]).map(g=>clubCanon(g.club)))))] .filter(Boolean);
+    const activity=allDayRows().map(r=>({kind:'Activity',label:`${concise(r.title)} · ${r.date?fmtDate(r.date):'date unknown'}`,description:r.sub,haystack:`${r.title} ${r.date||''} ${r.kind} ${r.sub||''}`,act:{a:r.action,i:r.i}}));
+    const index=searchIndex(S).map(row=>{
+      if(row.act.a==='open-bay'){
+        const source=S.bays[row.act.i];
+        return {...row,kind:'Source sessions',label:concise(row.label),description:`${source.date?fmtDate(source.date):'Date unknown'} · original source only`,act:{...row.act,a:'open-bay-source'}};
+      }
+      return {...row,label:concise(row.label)};
+    });
+    hqSearchCache=[...hqExplore(),...activity,...index,
+      ...historyKeys.map(club=>({kind:'Club history',label:clubCanonLabel(club)+' · full history',description:'Every captured metric, source session and recorded day',haystack:club+' '+clubCanonLabel(club)+' carry total speed launch apex spin face path smash history',act:{a:'club-history',club}}))];
+  }
+  const normalized=normalize(query),words=normalized.split(' ').filter(Boolean),seen=new Set();
+  const dates=String(query||'').match(/\b\d{4}-\d{2}-\d{2}\b/g)||[];
+  const clubs=normalized.match(/\b\d+ (?:wood|iron|hybrid)\b/g)||[];
+  const hasWord=(hay,word)=>/^\d+$/.test(word)?(' '+hay+' ').includes(' '+word+' '):hay.includes(word);
+  if(!words.length)return hqExplore();
+  return hqSearchCache.map(row=>{
+    const raw=row.label+' '+(row.description||'')+' '+(row.haystack||''),label=normalize(row.label),hay=normalize(raw);
+    const match=dates.every(date=>raw.includes(date))&&clubs.every(club=>(' '+hay+' ').includes(' '+club+' '))&&words.every(w=>hasWord(hay,w));
+    return {...row,_score:match?words.reduce((n,w)=>n+(hasWord(label,w)?3:1),0)+(row.kind==='Club history'?3:0):0};
+  }).filter(row=>{
+    if(!row._score)return false;
+    const act=row.act,key=['open-round','open-session','open-bay','open-bay-source'].includes(act.a)?act.a+':'+act.i:row.label+'|'+JSON.stringify(act);
+    if(seen.has(key))return false;seen.add(key);return true;
+  }).sort((a,b)=>b._score-a._score).map(({_score,...row})=>({...row,description:row.description||(row.act?.value!=null?`${row.act.value}${row.act.unit?' '+row.act.unit:''} · ${row.act.prov||row.kind}`:row.kind+' · open the complete record')}));
+}
+function hqUpdateShell(){
+  let parent={home:'home',bag:'bag',clubhistory:'bag',game:'game',sessions:'game',bay:'game',swing:'game',shortgame:'game',putting:'game',mental:'game',positions:'game',session:'game',rounds:'rounds',round:'rounds',briefing:'rounds',live:'rounds',coach:'coach',drills:'coach',shelf:'coach',lesson:'coach'}[current.view]||'home';
+  if(current.view==='briefing'){
+    const plan=S.briefings.find(b=>b.id===current.arg);
+    const course=plan&&(S.courses.some(c=>c.name.toLowerCase()===String(plan.course||'').toLowerCase())||S.rounds.some(r=>courseMatches(r.course,plan.course)));
+    if(plan&&!plan.date&&!course){parent='game';$('#pageTitle').textContent='Game plan';$('#pageTag').textContent=plan.course||'Your standing practice plan.';}
+  }
+  const labels={home:'Overview',bag:'Bag',game:'Progress',rounds:'Rounds',coach:'Coach'};
+  const breadcrumb=$('#hqBreadcrumb');
+  if(breadcrumb)breadcrumb.innerHTML=`<button type="button" data-action="go" data-view="${parent}">${labels[parent]}</button>${current.view!==parent?`<span aria-hidden="true">/</span><span aria-current="page">${esc($('#pageTitle').textContent)}</span>`:''}`;
+  const back=$('#hqBack');if(back)back.hidden=!hqTrail.length;
+  document.querySelectorAll('#nav button[data-view]').forEach(button=>{
+    const active=button.dataset.view===parent;button.classList.toggle('on',active);
+    if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
+  });
+}
+function home(){return hqOverview()+`<div class="hq-legacy">${homeDetail()}</div>`;}
+// The original overview remains intact below the new digest, with all values and actions.
+function homeDetail(){
   // Aug 30 running order (Jack's swap), restored in v117 after v116 replaced it.
   // v149: weather + The numbers lead. Shortcuts / search sit below, not above.
   // v148: every-club remaining/best-5 and path+face lanes are Cumulative, not Today.
@@ -3395,7 +3567,8 @@ function compactBag(lineup){
           ${row ? `<label for="bag-carry-${i}">Playing carry · yards</label><div class="formrow"><input id="bag-carry-${i}" aria-label="${esc(label)} carry in yards" data-carry="${i}" inputmode="numeric" value="${row.carry ?? ''}" placeholder="Unmeasured"><button class="btn ghost tiny" data-action="save-carries">Save carry</button></div>
           ${gap != null ? `<p class="sm">${gap} yd to ${esc(clubAbbr(next.club))}${gap>=15 ? ' · wide gap' : gap<=5 ? ' · similar distance' : ''}</p>` : ''}
           ${pf && row.carry ? `<p class="sm">${Math.round(row.carry*pf)} yd today · adjusted for air temperature</p>` : ''}
-          ${ladderBadge(row)}${ladderOffer(row,i)}` : ''}
+          ${ladderBadge(row)}${ladderOffer(row,i)}
+          <button class="btn ghost tiny" data-action="club-history" data-club="${esc(clubCanon(row.club))}">Full ${esc(label)} history →</button>` : ''}
           <p class="sm">${esc(c.spec || '')}</p>
           ${c.note ? `<p class="sm">${esc(c.note)}</p>` : ''}
           ${c.futureFit ? futureFitReference(c.futureFit) : ''}
@@ -3414,10 +3587,12 @@ function bag(){
   const wishlist = S.clubs.filter(c => c.status === 'wishlist').sort(bagSort);
   const wedges = S.clubs.filter(c => c.cat === 'wedge' && c.loft && (c.status === 'gaming' || c.status === 'ordered')).sort((a, b) => a.loft - b.loft);
   return `
-  ${sessionShortcuts()}
+  ${hqBagIntro()}
   <div class="card">
     ${fold('bag-roster', 'In the bag', `${clubCount}/14 CLUBS`, compactBag(lineup))}
   </div>
+  ${hqBagLinks()}
+  ${sessionShortcuts()}
 
   ${wedges.length ? `<div class="card">
     ${fold('bag-grinds', 'Grinds & bounce', `${wedges.length} WEDGES`, grindsCard(wedges), false)}
@@ -4249,19 +4424,19 @@ function allDayRows(){
   return rows;
 }
 function sessionShortcuts(){
-  return `<section class="card session-shortcuts" aria-label="Days and cumulative"><h2>The record</h2>
-    <p class="sm">Days stay days. Cumulative is the analysis they add up to — path, face, what is working, what to do.</p>
+  return `<section class="card session-shortcuts" aria-label="Activity and progress"><h2>The record</h2>
+    <p class="sm">Activity keeps every day intact. Trends connect those days — path, face, what is working, what to do.</p>
     <div class="session-grid">
-      <button class="session-tile" data-action="session-category" data-kind="days"><b>Days</b><span>Every capture, newest first →</span></button>
-      <button class="session-tile" data-action="session-category" data-kind="cumulative"><b>Cumulative</b><span>Every club — remaining, best 5, path, face →</span></button>
+      <button class="session-tile" data-action="session-category" data-kind="days"><b>Activity</b><span>Every day and capture, newest first →</span></button>
+      <button class="session-tile" data-action="session-category" data-kind="cumulative"><b>Progress & trends</b><span>Every club — remaining, best 5, path, face →</span></button>
     </div></section>`;
 }
 function sessionLibrary(kind='days'){
   const kinds = new Set(['days','cumulative','range','sim','outdoor','film']);
   if(!kinds.has(kind)) kind = 'days';
   const segs = `<div class="segbar" role="tablist" aria-label="Record">
-    <button class="seg ${kind!=='cumulative'?'on':''}" data-action="session-category" data-kind="days">Days</button>
-    <button class="seg ${kind==='cumulative'?'on':''}" data-action="session-category" data-kind="cumulative">Cumulative</button>
+    <button class="seg ${kind!=='cumulative'?'on':''}" data-action="session-category" data-kind="days">Activity</button>
+    <button class="seg ${kind==='cumulative'?'on':''}" data-action="session-category" data-kind="cumulative">Trends</button>
   </div>`;
   if(kind === 'cumulative') return segs + cumulativeView();
   const filter = (kind === 'days' || !kind) ? 'days' : kind;
@@ -4271,7 +4446,7 @@ function sessionLibrary(kind='days'){
   return `${segs}
   <div class="session-filters" role="group" aria-label="Filter days">${DAY_FILTERS.map(([k,lab]) =>
     `<button class="btn ${filter===k?'':'ghost'}" data-action="session-category" data-kind="${k}" aria-pressed="${filter===k}">${lab}</button>`).join('')}</div>
-  <h2>Days</h2>
+  <h2>Activity by day</h2>
   <p class="sm faint">Newest first · ${rows.length} on file. A chip says what kind of day it was — it is not a second list.</p>
   ${pending}${rows.length ? rows.map(x => `<button class="card session-row" data-action="${esc(x.action)}"${
       x.i != null ? ` data-i="${x.i}"` : ''}${x.view ? ` data-view="${esc(x.view)}"` : ''}>
@@ -7063,11 +7238,11 @@ function game(){
   const plans = plansFor(cur.disc).length;
   const open = faultsFor(cur.disc).filter(f => faultState(f) === 'open').length;
   return `
-  ${sessionShortcuts()}
+  ${hqProgressIntro()}
   <div class="labgrid">${LABS.map(l => {
     const on = l.disc === cur.disc;
     const n = faultsFor(l.disc).filter(f => faultState(f) === 'open').length;
-    return `<button class="labsel ${on ? 'on' : ''}" data-action="${on ? 'go' : 'game-lab'}"
+    return `<button class="labsel ${on ? 'on' : ''}" data-action="go"
       data-view="${l.view}" data-disc="${l.disc}">
       <span class="k">${n ? `${n} OPEN` : 'CLEAR'}${on ? ' · OPEN LAB ›' : ''}</span>
       <span class="nm">${esc(l.name)}</span>
@@ -8035,7 +8210,7 @@ function puttDistTable(P, note){
 // the empty state, because a page that has no rounds is exactly where the form matters most.
 function logRoundCard(){
   return `
-  <h2>Log a round · 60 seconds</h2>
+  <h2 id="round-log">Log a round · 60 seconds</h2>
   <div class="card">
     <div class="formrow g3">
       <div><label>Score</label><input id="rdScore" inputmode="numeric" placeholder="84"></div>
@@ -10028,6 +10203,17 @@ function bumpGearCounters(){
 
 // ---------- Actions ----------
 const ACTIONS = {
+  'hq-explore': () => window.CaddieExplorer?.open(),
+  'hq-back': () => {
+    const previous=hqTrail.pop();if(!previous)return;
+    hqGoingBack=true;render(previous.view,previous.arg);hqGoingBack=false;
+    window.scrollTo(0,previous.y||0);
+  },
+  'hq-route': el => {
+    render(el.dataset.view||'home',el.dataset.seg);
+    const target=document.getElementById(el.dataset.target);
+    if(target){revealSection(target);target.scrollIntoView({behavior:'smooth',block:'start'});}
+  },
   'session-category': el => render('sessions', el.dataset.kind || 'days'),
   'meaning': el => openMeaning(el.dataset.metric, {
     view: el.dataset.view, seg: el.dataset.seg, i: el.dataset.i,
@@ -10042,7 +10228,7 @@ const ACTIONS = {
   },
   // `data-seg` is how a link asks for one FACE of a multi-segment view (Rounds). Every
   // other view ignores it, so one action still covers every link in the app.
-  'go': el => { editingCourse = null; render(el.dataset.view, el.dataset.seg); },
+  'go': el => { editingCourse = null; if(el.dataset.disc)gameLab=el.dataset.disc; render(el.dataset.view, el.dataset.seg); },
   // Switching segment is not going anywhere — it is the same tab showing a different face
   // of the same subject — so it redraws in place and keeps the scroll. current.arg has to
   // move with it, or the next rerender() (a chip tap, a saved course) would snap back.
@@ -11302,6 +11488,7 @@ function fetchFeed(){
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 
+window.CaddieHQ={search:hqSearch,explore:hqExplore};
 // ---------- Boot ----------
 load(); save();
 applyTheme();

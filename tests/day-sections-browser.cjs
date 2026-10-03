@@ -40,16 +40,24 @@ const server=http.createServer((q,r)=>{
     for(const view of ['home','bag','game','rounds','coach']){
       await page.locator('#nav [data-view="'+view+'"]').click();
       const folds=page.locator('.section-fold-toggle');
-      assert.ok(await folds.count()>0,view+' has collapsible sections');
+      const native=page.locator('details[data-section-key]');
+      assert.ok(await folds.count()+await native.count()>0,view+' has collapsible sections');
       assert.equal(await page.locator('.section-fold-tools').count(),0,'no separate bulk-action row');
       assert.ok((await page.locator('.page-sections').boundingBox()).height<=52,'compact section row');
       await bulk('Expand all');
-      const first=folds.first(),ids=(await first.getAttribute('aria-controls')).split(' ');
-      await first.click();
-      assert.equal(await first.getAttribute('aria-expanded'),'false');
-      for(const id of ids)assert.ok(!await page.locator('[id="'+id+'"]').isVisible(),view+' closes content');
-      await first.focus();await page.keyboard.press('Enter');
-      assert.equal(await first.getAttribute('aria-expanded'),'true');
+      if(await folds.count()){
+        const first=folds.first(),ids=(await first.getAttribute('aria-controls')).split(' ');
+        await first.click();
+        assert.equal(await first.getAttribute('aria-expanded'),'false');
+        for(const id of ids)assert.ok(!await page.locator('[id="'+id+'"]').isVisible(),view+' closes content');
+        await first.focus();await page.keyboard.press('Enter');
+        assert.equal(await first.getAttribute('aria-expanded'),'true');
+      }else{
+        const first=native.first(),summary=first.locator(':scope > summary');
+        await summary.click();assert.equal(await first.getAttribute('open'),null);
+        await summary.focus();await page.keyboard.press('Enter');
+        assert.notEqual(await first.getAttribute('open'),null,'native-only page supports keyboard expansion');
+      }
       await bulk('Collapse all');
       assert.equal(await page.locator('.section-fold-toggle[aria-expanded="true"]').count(),0);
       assert.equal(await page.locator('details[data-section-key][open]').count(),0,'native sections collapse too');
@@ -69,7 +77,8 @@ const server=http.createServer((q,r)=>{
   await page.locator('#nav [data-view="bag"]').click();
   assert.equal(await page.locator('.section-fold-toggle').first().getAttribute('data-fold-key'),key);
   assert.equal(await page.locator('.section-fold-toggle').first().getAttribute('aria-expanded'),'false');
-  await page.locator('.jumpbar .jump').first().click();
+  const headingId=await page.locator('.section-heading').first().getAttribute('id');
+  await page.locator('.jumpbar .jump[data-jump="'+headingId+'"]').click();
   assert.equal(await page.locator('.section-fold-toggle').first().getAttribute('aria-expanded'),'true');
   // Closing a named section must not swallow the independent section below it.
   await page.locator('.section-fold-toggle').filter({hasText:'Wedge yardage matrix'}).click();

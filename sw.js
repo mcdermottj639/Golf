@@ -1,6 +1,6 @@
 // Caddie HQ service worker — offline-first cache of the app shell.
-const CACHE = 'caddiehq-v199';  // bump `BUILD` in app.js to match
-const ASSETS = ['./', './index.html', './styles.css', './app.js', './lessons.js', './courses-db.js',
+const CACHE = 'caddiehq-v200';  // bump `BUILD` in app.js to match
+const ASSETS = ['./', './index.html', './styles.css', './revamp.css', './explorer.js', './app.js', './lessons.js', './courses-db.js',
   './course-cards.js', './manifest.webmanifest', './icon.svg', './futurefit33-rh.jpg', './coach-feed.json', './front9-feed.json', './path-feed.json', './corrections-20260922.json', './range-20260922-feed.json', './futurefit-feed.json', './range-20260925-feed.json', './bag-20261001-feed.json', './range-20261001-feed.json', './round-20261001-feed.json', './round-takeaways.js', './bay-takeaways.js', './round-review.js', './round-review.css'];
 
 self.addEventListener('install', e => {

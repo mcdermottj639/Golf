@@ -27,11 +27,13 @@ jobs:
       - name: Verify data and existing-install updates
         run: |
           node --check app.js
+          node --check explorer.js
           node --check round-review.js
           node --check round-takeaways.js
           node --check bay-takeaways.js
           node -e "for (const f of ['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"
           node tests/findability.cjs
+          node tests/revamp-search.cjs
           node tests/sep22-migration.cjs
           node tests/range-sep22-5i-vg3.cjs
           node tests/metric-samples.cjs

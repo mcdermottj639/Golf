@@ -16,7 +16,7 @@ const server=http.createServer((q,r)=>{const file=path.join(root,q.url.split('?'
   for(const view of ['home','bag','game','rounds','coach']) {
    await page.locator('#nav button[data-view="'+view+'"]').click();
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'page overflow '+view+' '+width);
-   if(width>=1000) assert.ok((await page.locator('#nav').boundingBox()).width<220,'desktop rail');
+   if(width>=1000) {const rail=(await page.locator('#nav').boundingBox()).width;assert.ok(rail>=180&&rail<=250,'desktop rail stays compact');}
   }
   await page.locator('#nav button[data-view="game"]').click();
   await page.locator('[data-action="session-category"][data-kind="cumulative"]').first().click();
