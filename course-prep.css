@@ -1,4 +1,22 @@
 /* Scoped Course Prep UI; existing workspace layout and golf records stay intact. */
+.cp-live-guides{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:12px 0}
+.cp-live-guides .btn{min-height:44px}
+body.cp-guide-open{overflow:hidden}
+.cp-guide-dialog{width:min(620px,calc(100% - 24px));max-width:none;max-height:calc(100dvh - 28px);margin:auto;padding:0;border:1px solid #d8dfd0;border-radius:18px;background:#fff;color:#193e32;box-shadow:0 24px 90px #0005;overflow:auto;font-family:var(--sans,sans-serif)}
+.cp-guide-dialog::backdrop{background:#102a23b8;backdrop-filter:blur(3px)}
+.cp-guide-dialog header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px}
+.cp-guide-dialog header p{margin:0 0 4px;font-size:11px;color:#657a69}
+.cp-guide-dialog h2{margin:0;font-size:24px;line-height:1.2;letter-spacing:-.5px;text-transform:none;color:#193e32}
+.cp-guide-dialog h2 span{font-size:14px;font-weight:400;letter-spacing:0}
+.cp-guide-dialog header button{width:44px;height:44px;flex-shrink:0;background:#eef2e7;color:#193e32;border:1px solid #d8dfd0;border-radius:12px;font:28px/1 sans-serif;cursor:pointer}
+.cp-guide-dialog header button:focus-visible{outline:3px solid #b9943d;outline-offset:2px}
+.cp-guide-dialog figure{margin:0;height:min(68dvh,650px);min-height:180px;background:#b9b7a6}
+.cp-guide-dialog img{display:block;width:100%;height:100%;object-fit:contain}
+.cp-guide-dialog-error{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;height:100%;padding:24px;background:#edf1e4;font-size:15px}
+.cp-guide-dialog-error p{font-size:13px;line-height:1.5;margin:0;max-width:260px}
+.cp-guide-dialog [hidden]{display:none}
+.cp-guide-dialog footer{padding:12px 16px;font-size:11px;line-height:1.6;color:#657a69}
+.cp-guide-dialog footer a{color:inherit;text-decoration:underline}
 .cp-entry{background:#173f33;color:#fff;border-radius:20px;padding:22px;display:flex;align-items:center;justify-content:space-between;gap:24px;margin:16px 0 22px}
 .cp-entry h2{color:#fff;font-size:24px;text-transform:none;letter-spacing:-.6px;margin:6px 0}
 .cp-entry p{color:#d5e1d7;margin:0;font-size:14px}
@@ -47,6 +65,24 @@
 .cp-map-summary{display:flex;justify-content:space-between;gap:14px;padding:14px 16px 2px;font-size:11px;line-height:1.5;color:var(--cp-muted)}
 .cp-map-summary b{display:block;font-size:21px;line-height:1.25;color:var(--cp-ink)}
 .cp-map-summary>span:last-child{text-align:right}
+.cp-map-legend{display:flex;align-items:center;flex-wrap:wrap;gap:7px 12px;padding:11px 16px 0;color:var(--cp-muted);font-size:11px}
+.cp-map-legend>span{display:flex;align-items:center;gap:5px}
+.cp-map-legend i{display:inline-grid;place-items:center;border-radius:50%;width:18px;height:18px;color:#fff;font:700 10px sans-serif}
+.cp-legend-tee{background:#204d3e}.cp-legend-target{background:#b77224}.cp-legend-green{background:#668a43}
+.cp-map-legend .cp-map-club{margin-left:auto;font-weight:600;color:var(--cp-ink)}
+.cp-camera-tools{padding-top:7px}
+.cp-camera-tools button{font-size:11px;background:#f4f6ef}
+.cp-club-compare{margin-top:14px;padding-top:15px;border-top:1px solid var(--cp-line)}
+.cp-club-compare h4{font-size:14px;letter-spacing:0;text-transform:none;margin:0 0 10px;color:var(--cp-ink)}
+.cp-compare-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.cp-compare-options button{padding:11px 5px;border:1px solid var(--cp-line);border-radius:10px;background:var(--cp-panel);color:var(--cp-ink);min-width:0}
+.cp-compare-options b,.cp-compare-options span,.cp-compare-options small{display:block}
+.cp-compare-options b{font-size:18px}.cp-compare-options span{font-size:10px;margin-top:6px}.cp-compare-options small{font-size:10px;margin-top:4px;color:var(--cp-muted)}
+.cp-compare-options button[aria-pressed=true]{background:#eaf0df;border-color:#9bb672;color:#193e32}
+.cp-club-compare>p{font-size:10px;line-height:1.6;color:var(--cp-muted);margin:9px 0}
+.cp-approach{padding:12px;background:#edf3e6;border-radius:10px;color:#193e32;font-size:12px;line-height:1.6}
+.cp-approach span{display:block;font-size:11px;margin-top:5px}
+.cp-review-next{width:100%;min-height:44px;border:0;border-radius:9px;background:#204d3e;color:#fff;padding:12px;font-size:13px;font-weight:600;margin-top:8px}
 .cp-error-code{max-width:100%;font-size:12px;overflow-wrap:anywhere;color:#193e32;background:#fff9;padding:7px 10px;border-radius:6px}
 .cp-workspace #cp-basis{width:100%;font-size:14px;border:1px solid var(--cp-line);border-radius:8px;padding:10px;background:var(--cp-panel);color:var(--cp-ink);min-height:42px}
 .cp-guide{margin:0;height:100%;width:100%;position:relative;background:#b9b7a6}

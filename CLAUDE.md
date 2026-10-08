@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v206, October 8 2026)
+## Course Prep (v207, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
 Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
@@ -129,12 +129,24 @@ distance source plus per-tee/per-hole notes, reviewed flags, tee/target position
 rollout assumptions. Existing `S.planCalls` remains the authority for club choices,
 shared with the regular briefing and live-round prep. Club choices are per course/hole;
 notes and map positions are per tee/hole. All are included in normal golf backups.
+The live-hole header offers **Hole guide** when a matching course/hole has a sourced
+illustration. `openGuide(courseId,n)` opens a native modal dialog over the round; Close,
+Escape and the backdrop return focus to the button without changing the live hole,
+score or notes. Navigation closes the dialog. Image failure shows a connection hint
+and official source link. The guide never loads Google or writes player state.
 
 Saved playing carries remain the default. The optional range source reads the latest
 available struck-shot batch from `swingEvolutionRows()`, showing date, sample and setup;
 it never writes those measurements into the Bag. Unset clubs remain visible. Carry
 rings express distance, not shot dispersion; manually entered rollout is a scenario,
-not a forecast of fairway conditions. Never infer green contours, today's pins,
+not a forecast of fairway conditions. With a saved target, the planner ranks up to
+three current carry-ladder clubs by absolute carry-distance difference. The approach
+comparison uses target-to-mapped-green distance and the same selected source. These
+are arithmetic comparisons, explicitly not hazard-aware or safety recommendations;
+unset carries are omitted from comparisons but stay visible in the bag choices.
+Choosing a comparison only changes the existing tee-club plan call. Save review & next
+marks that tee/hole reviewed and advances to the next unreviewed hole, wrapping once.
+Never infer green contours, today's pins,
 forced carries or safe landing zones from incomplete map geometry.
 
 The club's scorecard image is printed **01/24**, read October 8, 2026. Seven tee
@@ -163,7 +175,12 @@ Enable Maps JavaScript API + billing and restrict the browser key to that API an
 `caddiehq_google_maps_key_v1`, outside golf backups; deployments can alternatively
 provide `window.CADDIE_GOOGLE_MAPS_KEY`. Do not commit an unrestricted key. Map objects
 are reused, asynchronous loads have navigation guards, and leaving a hole cancels
-its flyover. No Google imagery or derived geometry is cached; the service worker now
+its flyover. Tee/aim/green markers use compact T/A/G colors with a legend. Distances
+sit beside the map in all mapped modes; carry rings can be hidden. Whole hole and
+Green close-up explicitly reframe existing map objects. Normal club changes retain
+the camera; first arrival on a different hole frames it. 3D uses terrain-clamped camera
+positions and custom PinElements, with an abbreviated-label fallback. No Google
+imagery or derived geometry is cached; the service worker now
 intercepts only same-origin requests. Offline routes and notes remain usable with no key.
 
 After an authorization rejection, merely clearing the planner's error does not retry
@@ -186,7 +203,10 @@ restriction even when installed on an iPhone home screen.
 feed idempotence and preservation of golf state and personal calls. The real-browser
 `tests/course-prep-browser.cjs` exercises 320/390/1440 layouts, editing, persistence,
 range-source isolation, backup round trips and offline use. Google adapter checks use
-a mock API: live satellite/3D imagery still requires a valid billing-enabled key.
+a mock API. Jack confirmed real Satellite and 3D imagery on his iPhone after enabling
+Maps JavaScript API (October 8); automated tests do not certify live Google imagery.
+Browser checks cover all 18 guide links, real modal focus/close behavior, image errors,
+round-state preservation, carry comparisons, overlay toggles and camera reuse.
 
 ## Review process — every bay day, every analysis pass (v122)
 
