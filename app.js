@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v215';
+const BUILD = 'v216';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v216', d:'2026-10-08', items:['COMPLETE HOLE GUIDES: Illustrations appear after the full image loads, so a slow download cannot leave just the top strip showing. Prep and live-round guides retry interrupted loads and include a Retry image button.','CURRENT-HOLE PINS: 3D reuses only the active hole’s tee, green and optional target pins, clearing them before changing views or closing the live map.'] },
   { b:'v215', d:'2026-10-08', items:['LIVE HOLE MAP: Open Interactive map from your Pound Ridge scorecard for the current hole’s 3D view, tap-to-measure yardages and optional GPS reference. Switch to the illustrated guide or close to return to the same hole.','3D FIRST: Interactive map starts in 3D, with Overhead beside it. Hole guide still opens first in course prep, and Simple map remains the offline fallback.'] },
   { b:'v214', d:'2026-10-08', items:['ONE INTERACTIVE MAP: Hole guide and Interactive map are the two main views. Switch between Overhead and 3D inside the map; Simple map remains available and opens automatically offline. Your targets, tee and yardages stay shared.'] },
   { b:'v213', d:'2026-10-08', items:['3D CAMERA REPAIR: Use the terrain-relative camera mode supported by Google. A camera-animation failure now keeps the map, markers and tap yardages available instead of replacing them with an error page.'] },

@@ -3,8 +3,17 @@
 const assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES+'/playwright');
 const root=path.join(__dirname,'..'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml'};
+const guideBytes=process.env.CADDIE_GUIDE_IMAGE?fs.readFileSync(process.env.CADDIE_GUIDE_IMAGE):Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="750" height="1107"><rect width="750" height="1107" fill="#b9b7a6"/><text x="200" y="1000">Full guide</text></svg>');
+const guideSplit=Math.min(12500,guideBytes.length-6),guideStream={mode:'hold',pending:[],requests:[]};
 const server=http.createServer((req,res)=>{
   const route=new URL(req.url,'http://localhost').pathname;
+  if(route==='/qa-guide'){
+    guideStream.requests.push(req.url);
+    if(guideStream.mode==='fail'){res.writeHead(503);return res.end();}
+    res.writeHead(200,{'Content-Type':process.env.CADDIE_GUIDE_IMAGE?'image/jpeg':'image/svg+xml','Content-Length':guideBytes.length,'Cache-Control':'no-store'});
+    if(guideStream.mode==='full')return res.end(guideBytes);
+    res.write(guideBytes.subarray(0,guideSplit));guideStream.pending.push(res);return;
+  }
   const file=path.resolve(root,'.'+(route==='/'?'/index.html':route));
   if(!file.startsWith(root+path.sep))return res.writeHead(403).end();
   fs.readFile(file,(err,data)=>{res.writeHead(err?404:200,{'Content-Type':types[path.extname(file)]||'application/octet-stream'});res.end(err?'':data);});
@@ -18,15 +27,23 @@ const mode=async(p,m)=>{
   if(!await p.locator('.cp-map-views').count())await p.locator('.cp-modes [data-mode="map"]').click();
   await p.locator('.cp-map-views [data-mode="'+m+'"]').click();
 };
+async function assertHolePins(p,n){
+  const pins=await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>({point:[e.position.lat,e.position.lng],label:e.label})));
+  const expected=await p.evaluate(n=>{const s=JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge,h=CADDIE_PREP_COURSES[0].holes[n-1],saved=s.holes[s.tee+':'+n]||{};return [saved.tee||h.path[0],h.path.at(-1),...(saved.target?[saved.target]:[])];},n);
+  assert.deepEqual(pins.map(p=>p.point),expected,'only current-hole pin positions for hole '+n);
+  assert.equal(pins[0].label,'Tee');
+  assert.ok(await p.evaluate(()=>mapQA.markersCreated<=3),'3D retains at most three marker identities');
+  assert.ok(await p.evaluate(()=>mapQA.markerDetach.every(connected=>connected)),'markers unregister before their map is detached');
+}
 function googleMock(){
-  window.mapQA={maps:0,scenes:0,flights:0,stops:0,fits:0,markerImports:0,fail3dDraw:false,overlays:[]};
+  window.mapQA={maps:0,scenes:0,flights:0,stops:0,fits:0,markerImports:0,fail3dDraw:false,overlays:[],markersCreated:0,markerDetach:[]};
   class Map{constructor(el,opts){this.el=el;this.opts=opts;this.listeners={};mapQA.maps++;mapQA.mapGesture=opts.gestureHandling;}getDiv(){return this.el;}addListener(k,f){this.listeners[k]=f;}fitBounds(b){this.bounds=b;mapQA.fits++;}}
   class Overlay{constructor(opts){this.opts=opts;mapQA.overlays.push(this);}setMap(map){this.opts.map=map;}}
   class Point{constructor(x,y){this.x=x;this.y=y;}}
   class Bounds{constructor(){this.points=[];}extend(p){this.points.push(p);}}
   class Scene extends HTMLElement{constructor(opts){super();const allowed=['center','range','heading','tilt','roll','mode','gestureHandling'];for(const k of Object.keys(opts))if(!allowed.includes(k))throw new TypeError('Unsupported Map3DElement option: '+k);Object.assign(this,opts);mapQA.scenes++;}flyCameraTo(opts){if(opts.endCamera.altitudeMode==='CLAMP_TO_GROUND')return Promise.reject(new TypeError('Altitude mode CLAMP_TO_GROUND is not supported for camera animations.'));if(mapQA.failCamera)return Promise.reject(new Error('Simulated camera failure'));if(mapQA.stopping)throw Error('camera started before stop completed');this.lastFlight=opts;mapQA.flights++;}async stopCameraAnimation(){mapQA.stops++;mapQA.stopping=true;await new Promise(r=>setTimeout(r,0));mapQA.stopping=false;}}
   class Line extends HTMLElement{constructor(opts){super();if(mapQA.fail3dDraw)throw new Error("Simulated 3D drawing failure");Object.assign(this,opts);}}
-  class Marker extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
+  class Marker extends HTMLElement{constructor(opts){super();Object.assign(this,opts);mapQA.markersCreated++;}set label(value){if(value==='')throw new TypeError('Google marker labels reject empty strings');this.markerLabel=value;}get label(){return this.markerLabel;}connectedCallback(){this.scene=this.parentElement;}disconnectedCallback(){mapQA.markerDetach.push(!!this.scene?.isConnected);}}
   customElements.define('qa-map-scene',Scene);customElements.define('qa-map-line',Line);customElements.define('qa-map-marker',Marker);
   class Pin extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
   customElements.define('qa-map-pin',Pin);
@@ -67,6 +84,40 @@ function locationMock(){
     assert.equal(googleRequests,0,'keyless Interactive map opens Simple map without Google');
     assert.equal(await p.locator('.cp-clubs [data-club]').count(),initial.carries.length);
     assert.equal(await p.locator('#cp-club-readout .cp-distances').count(),0,'no misleading zero-distance target before a landing spot exists');
+    // Stream only the JPEG's first rows: dimensions exist before the image is
+    // complete, which previously exposed the top-strip failure from the phone.
+    const guideSource=await p.evaluate(url=>{const h=CADDIE_PREP_COURSES[0].holes[0],old=h.guide;h.guide=url+'qa-guide?partial';return old;},url);
+    await mode(p,'guide');await p.locator('.cp-guide-loading').waitFor();
+    await p.waitForFunction(()=>{const e=document.querySelector('#cp-guide-image');return e&&!e.complete;});
+    if(process.env.CADDIE_GUIDE_IMAGE)await p.waitForFunction(()=>document.querySelector('#cp-guide-image').naturalWidth>0);
+    assert.equal(await p.locator('#cp-guide-image').isVisible(),false,'partial images stay hidden');
+    const beforeImage=await state(p);
+    for(const response of guideStream.pending.splice(0))response.end(guideBytes.subarray(guideSplit));
+    await p.locator('.cp-guide[data-guide-state="ready"] img').waitFor();
+    for(const width of [320,390,1440]){
+      await p.setViewportSize({width,height:width===1440?1000:844});
+      const fit=await p.locator('#cp-guide-image').evaluate(e=>{const i=e.getBoundingClientRect(),f=e.closest('figure').getBoundingClientRect();return e.complete&&e.naturalHeight>0&&getComputedStyle(e).objectFit==='contain'&&i.top>=f.top&&i.bottom<=f.bottom+1&&i.left>=f.left&&i.right<=f.right+1&&i.height>=300;});
+      assert.ok(fit,'complete image fits its frame at '+width);
+      await p.locator('.cp-map-panel').evaluate(e=>e.scrollIntoView({block:'center'}));
+      await p.locator('.cp-map-panel').screenshot({path:path.join(screens,'complete-guide-'+width+'.png')});
+    }
+    await p.setViewportSize({width:390,height:844});await p.clock.install();
+    await p.evaluate(url=>CADDIE_PREP_COURSES[0].holes[0].guide=url+'qa-guide?timeout',url);
+    await mode(p,'guide');await p.locator('.cp-guide-loading').waitFor();
+    const requestCount=guideStream.requests.length;guideStream.mode='full';
+    await p.clock.fastForward(12001);await p.locator('.cp-guide[data-guide-state="ready"] img').waitFor();
+    assert.ok(guideStream.requests.length>requestCount&&guideStream.requests.at(-1).includes('caddie-guide-retry='),'stalled download automatically retries a fresh URL');
+    guideStream.mode='fail';await p.evaluate(url=>CADDIE_PREP_COURSES[0].holes[0].guide=url+'qa-guide?failure',url);
+    await mode(p,'guide');await p.locator('.cp-guide-dialog-error').waitFor();assert.equal(await p.locator('#cp-guide-image').isVisible(),false);
+    guideStream.mode='full';await p.locator('[data-guide-retry]').click();await p.locator('.cp-guide[data-guide-state="ready"] img').waitFor();
+    assert.ok(guideStream.requests.at(-1).includes('caddie-guide-retry='),'manual image retry bypasses the failed response');
+    assert.deepEqual(await state(p),beforeImage,'image loading/retries preserve all golf state');
+    guideStream.mode='hold';await p.evaluate(url=>CADDIE_PREP_COURSES[0].holes[0].guide=url+'qa-guide?old-hole',url);
+    await mode(p,'guide');await p.locator('.cp-guide-loading').waitFor();
+    await p.locator('.cp-holes [data-n="2"]').click();await p.locator('.cp-guide[data-guide-state="ready"] img').waitFor();
+    for(const response of guideStream.pending.splice(0))response.end(guideBytes.subarray(guideSplit));
+    assert.match(await p.locator('#cp-guide-image').getAttribute('src'),/Golf2\.jpg$/,'late image responses do not replace the selected hole');
+    await p.evaluate(source=>CADDIE_PREP_COURSES[0].holes[0].guide=source,guideSource);
     for(let n=1;n<=18;n++){
       await p.locator('.cp-holes [data-n="'+n+'"]').click();await mode(p,'route');
       const tee=+await p.locator('[data-point="tee"] circle').getAttribute('cy'),green=+await p.locator('[data-point="green"] circle').getAttribute('cy');
@@ -151,6 +202,7 @@ function locationMock(){
       await p.waitForFunction(n=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[n-1];return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge.holes['granite:'+n]?.tee||h.path[0],h.path.at(-1));},n);
       const cam=await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera);
       assert.equal(cam.tilt,58);assert.equal(cam.roll,0);assert.equal(cam.altitudeMode,'RELATIVE_TO_GROUND');assert.equal(cam.center.altitude,0);
+      await assertHolePins(p,n);
     }
     await p.locator('[data-cp="frame"][data-focus="green"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.range===190);
     await p.locator('[data-cp="frame"][data-focus="tee"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.tilt===58);
@@ -222,11 +274,17 @@ function locationMock(){
       await p.locator('[data-action="live-hole-guide"]').click();assert.match(await p.locator('#cp-live-guide img').getAttribute('src'),new RegExp('Golf'+n+'\\.jpg$'));
       await p.keyboard.press('Escape');await p.locator('#cp-live-guide').waitFor({state:'detached'});assert.deepEqual((await state(p)).live,beforeGuide,'guide preserves hole '+n);
     }
-    guideFailure=true;await p.locator('[data-action="live-hole-guide"]').click();
-    // A fresh URL exercises a real failed request even if the guide is decoded in memory.
-    await p.locator('#cp-live-guide img').evaluate(img=>{img.src+='?qa=failed-request';});
+    guideFailure=true;await p.evaluate(()=>CADDIE_PREP_COURSES[0].holes[17].guide+='?qa=failed-request');await p.locator('[data-action="live-hole-guide"]').click();
     await p.locator('.cp-guide-dialog-error').waitFor();assert.ok(await p.locator('#cp-live-guide footer a').isVisible());
-    await p.mouse.click(2,2);await p.locator('#cp-live-guide').waitFor({state:'detached'});assert.equal(await p.evaluate(()=>document.body.classList.contains('cp-guide-open')),false);guideFailure=false;
+    guideFailure=false;await p.locator('[data-guide-retry]').click();await p.locator('#cp-live-guide .cp-guide[data-guide-state="ready"] img').waitFor();
+    await p.mouse.click(2,2);await p.locator('#cp-live-guide').waitFor({state:'detached'});assert.equal(await p.evaluate(()=>document.body.classList.contains('cp-guide-open')),false);
+    await p.evaluate(url=>CADDIE_PREP_COURSES[0].holes[17].guide=url+'qa-guide?live-partial',url);guideStream.mode='hold';
+    const beforeLiveImage=await state(p);await p.locator('[data-action="live-hole-guide"]').click();await p.locator('#cp-live-guide .cp-guide-loading').waitFor();
+    assert.equal(await p.locator('#cp-live-guide img').isVisible(),false);
+    await p.keyboard.press('Escape');await p.locator('#cp-live-guide').waitFor({state:'detached'});
+    for(const response of guideStream.pending.splice(0))response.end(guideBytes.subarray(guideSplit));
+    assert.deepEqual(await state(p),beforeLiveImage,'closing a downloading live guide preserves the round');
+    await p.evaluate(()=>CADDIE_PREP_COURSES[0].holes[17].guide='https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf18.jpg');
     // Live maps use the same measurement renderer without leaving or rerendering
     // the current scorecard. Google remains mocked; native dialog/layout is real.
     await p.evaluate(locationMock);
@@ -240,6 +298,7 @@ function locationMock(){
       assert.equal(await p.locator('.cp-imagery-views [data-mode="3d"]').getAttribute('aria-pressed'),'true');
       assert.equal(await p.locator('[data-cp="shot-plan"]').count(),0);
       await p.waitForFunction(n=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[n-1],s=JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge;return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(s.holes[s.tee+':'+n]?.tee||h.path[0],h.path.at(-1));},n);
+      await assertHolePins(p,n);
       const liveYardages=await p.locator('.cp-map-summary').innerText();
       await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();assert.equal(await p.locator('.cp-map-summary').innerText(),liveYardages);
       await mode(p,'route');await p.locator('#cp-route-map').waitFor();assert.equal(await p.locator('[data-cp="overview"]').count(),0);
@@ -265,6 +324,10 @@ function locationMock(){
     assert.ok(await p.evaluate(point=>CaddieCoursePrep.geo.distance(JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge.holes['granite:18'].target,point)<0.02,liveTarget),'live target matches the tapped coordinate within saved precision');
     assert.match(await p.locator('.cp-map-summary').innerText(),/180 yd[\s\S]*left to green/);
     assert.deepEqual((await state(p)).live,liveBeforeMeasurement,'target edits never change the live scorecard');
+    await assertHolePins(p,18);
+    await p.locator('[data-cp="clear-target"]').click();await assertHolePins(p,18);assert.equal(await p.locator('qa-map-marker').count(),2,'clearing a target removes its pin');
+    await p.locator('qa-map-scene').evaluate((el,point)=>{const e=new Event('gmp-click');e.position={lat:point[0],lng:point[1]};el.dispatchEvent(e);},liveTarget);
+    await assertHolePins(p,18);
     const beforeLiveGPS=await state(p);
     assert.equal(await p.evaluate(()=>locationQA.calls),0,'live map waits for explicit location request');
     await p.locator('[data-cp="locate"]').click();await p.evaluate(point=>locationQA.fix(point),liveTarget);

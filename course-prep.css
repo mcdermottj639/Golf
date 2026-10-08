@@ -97,7 +97,13 @@ body.cp-guide-open{overflow:hidden}
 .cp-error-code{max-width:100%;font-size:12px;overflow-wrap:anywhere;color:#193e32;background:#fff9;padding:7px 10px;border-radius:6px}
 .cp-workspace #cp-basis{width:100%;font-size:14px;border:1px solid var(--cp-line);border-radius:8px;padding:10px;background:var(--cp-panel);color:var(--cp-ink);min-height:42px}
 .cp-guide{margin:0;height:100%;width:100%;position:relative;background:#b9b7a6}
-.cp-guide img{display:block;width:100%;height:100%;object-fit:contain}
+.cp-guide img{display:block;width:100%;height:100%;object-fit:contain;object-position:center}
+.cp-guide [hidden]{display:none!important}
+.cp-guide-loading{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:#193e32;font-size:14px}
+.cp-guide .cp-guide-dialog-error{position:absolute;inset:0;box-sizing:border-box}
+.cp-guide-dialog-error button{min-height:44px;padding:10px 16px;border:1px solid #c5d3b7;border-radius:9px;background:#204d3e;color:#fff;font:600 13px var(--sans,sans-serif);cursor:pointer}
+.cp-guide-dialog-error a{font-size:12px;color:inherit;text-decoration:underline}
+.cp-guide[data-guide-state=error] figcaption{display:none}
 .cp-guide figcaption{position:absolute;left:10px;bottom:10px;padding:7px 10px;border-radius:6px;background:#173f33eb;color:#fff;font-size:10px}
 .cp-map-message{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;gap:12px;background:radial-gradient(ellipse at top,#edf1df,#dddccb)}
 .cp-map-message h3{font-size:24px;color:#193e32;margin:0;letter-spacing:-.7px}

@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v215, October 8 2026)
+## Course Prep (v216, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep
 and Explorer. The Pound Ridge live hole opens its map in a popup over the scorecard.
@@ -167,7 +167,18 @@ sections; older feed records remain byte-for-byte intact. `fetchFeed()` loads
 `course-prep-feed.json` last. OpenStreetMap's reference tee is unspecified: choosing a
 scorecard tee changes yardage, not the start of the route. Users can set their actual
 tee. Source geometry, IDs, ODbL attribution and licensing live in `data/course-prep/`.
-Official hole illustrations load from the club and are not cached or rehosted.
+Official hole illustrations load from the club and are not added to the app's offline
+cache or rehosted. Prep and live-round dialogs share the same image loader. Keep each
+image hidden until its load event and full decode complete, with a loading indicator
+in the reserved frame. A streamed JPEG already has natural dimensions after only its
+first rows arrive: v215 displayed those rows and could stay as a top strip on a stalled
+download (reproduced with the club's JPEG). naturalWidth alone is not readiness.
+After an error or 12-second timeout, retry once with a fresh URL; then show Retry image
+and retain the guide/map navigation. Manual retry also uses a fresh URL. Clean up
+timers/handlers on hole/view changes, navigation and popup close; late image callbacks
+must never replace a newer hole. Do not alter the illustration's aspect ratio or crop
+its tee/green. Validate delayed/chunked downloads, timeout/error recovery, rapid hole
+switches, and the full image in prep and live dialogs at 320/390 widths.
 The Hole guide is the initial view on entry and every hole change (arrows, numbered
 holes, plan rows and overview map). Only Hole guide and Interactive map are top-level choices.
 Inside Interactive map, 3D is first and the initial default; Overhead is beside it in
@@ -208,7 +219,17 @@ Enable Maps JavaScript API + billing and restrict the browser key to that API an
 `caddiehq_google_maps_key_v1`, outside golf backups; deployments can alternatively
 provide `window.CADDIE_GOOGLE_MAPS_KEY`. Do not commit an unrestricted key. Map objects
 are reused, asynchronous loads have navigation guards, and leaving a hole cancels
-its flyover. The selected target has a distance-to-target / distance-left-to-green label
+its flyover. 3D owns a maximum of three reusable Marker3DElements (measuring origin,
+green and optional target); update their positions/labels for the current hole rather
+than create a new set on every GPS/target update. Keep a separate registry of route/ring
+lines. Clear owned overlays before detaching the map on redraw, view/hole navigation,
+error or dialog close, while Google's renderer can still unregister them. Clearing a
+target also clears/removes its pin. Never delete arbitrary SDK children. Browser checks
+must verify current-hole coordinates/labels, bounded marker count and removal before
+map detach in both prep and live dialogs. The real Google SDK 3.66.7 accepts marker
+reuse and position/label clearing with null; it rejects an empty-string label. Keep
+that contract in the browser mock. API validation without a key does not certify
+licensed imagery on the phone. The selected target has a distance-to-target / distance-left-to-green label
 in all three mapped modes. Before a target is chosen, the mapped green shows its
 distance from the active reference. 3D uses only the existing Marker3DElement label;
 Satellite uses a standard Marker label with labelOrigin; no custom PinElement dependency.

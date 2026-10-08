@@ -43,6 +43,7 @@
   }
   let bridge, root, liveDialog, hole = 1, mode = 'guide', lastMapMode = '3d', overview = false, edit = 'target';
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps2d, maps3d, overlays2d = [];
+  let lines3d = [], markers3d = [];
   let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
   let showRings = true, framed2d = null, framed3d = null;
   let cameraQueue = Promise.resolve(), cameraRevision = 0;
@@ -51,6 +52,7 @@
   const LOCATION_MAX_AGE = 45000, LOCATION_MAX_ACCURACY = 25;
   let liveFix = null, locationWatch = null, locationEpoch = 0, locationTimer, locationNotice = '';
   let projection = null, imageError = false, animationHandler, animationTimer, bagSnapshot;
+  let guideLoad = null;
   const model = () => clean(bridge.get());
   const currentHole = () => course.holes[hole - 1];
   const teeSet = () => course.tees.find(t => t.id === model().tee);
@@ -135,6 +137,57 @@
   function status(text) { const el = root && root.querySelector('#cp-save-status'); if (el) el.textContent = text; }
   const button = (action, label, extra) => '<button type="button" data-cp="' + action + '" ' + (extra || '') + '>' + label + '</button>';
   const link = (url, label) => '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
+  function guideFigure(source, h, live = false) {
+    return '<figure class="cp-guide" data-guide-state="loading" aria-busy="true">'+
+      '<img '+(live?'':'id="cp-guide-image" ')+'alt="Official illustrated guide for '+esc(source.name)+' hole '+h.n+'" referrerpolicy="no-referrer" decoding="async" hidden>'+
+      '<div class="cp-guide-loading" role="status">Loading hole guide…</div>'+
+      '<div class="cp-guide-dialog-error" role="status" hidden><b>The illustration could not load.</b><p>Check your connection and try again.</p><button type="button" data-guide-retry>Retry image</button></div>'+
+      (live?'':'<figcaption>Hole '+h.n+' · Official club guide</figcaption>')+'</figure>';
+  }
+  function stopGuideLoad(within) {
+    if(guideLoad && (!within || within.contains(guideLoad.figure))){guideLoad.cancel();guideLoad=null;}
+  }
+  function loadGuide(figure, source) {
+    stopGuideLoad();
+    const img=figure.querySelector('img'), loading=figure.querySelector('.cp-guide-loading');
+    const failure=figure.querySelector('.cp-guide-dialog-error'), retry=figure.querySelector('[data-guide-retry]');
+    let disposed=false, revision=0, timer, retried=false;
+    function start(fresh=false) {
+      const token=++revision;
+      clearTimeout(timer);
+      figure.dataset.guideState='loading';figure.setAttribute('aria-busy','true');
+      img.hidden=true;loading.hidden=false;failure.hidden=true;
+      const active=()=>!disposed && token===revision && figure.isConnected && figure.dataset.guideState==='loading';
+      const fail=()=>{
+        if(!active())return;
+        clearTimeout(timer);
+        if(!retried && navigator.onLine!==false){retried=true;start(true);return;}
+        figure.dataset.guideState='error';figure.setAttribute('aria-busy','false');
+        loading.hidden=true;failure.hidden=false;
+        img.onload=img.onerror=null;img.removeAttribute('src');
+      };
+      img.onload=async()=>{
+        try {
+          // A streaming JPEG can paint only its first rows while naturalWidth is
+          // already populated. Reveal it only after the full response decodes.
+          if(img.decode)await img.decode();
+          if(!active())return;
+          if(!img.complete || !img.naturalWidth || !img.naturalHeight)return fail();
+          clearTimeout(timer);figure.dataset.guideState='ready';figure.setAttribute('aria-busy','false');
+          img.hidden=false;loading.hidden=true;
+        } catch {fail();}
+      };
+      img.onerror=fail;
+      timer=setTimeout(fail,12000);
+      const url=new URL(source,document.baseURI);
+      if(fresh)url.searchParams.set('caddie-guide-retry',Date.now()+'-'+token);
+      img.src=url.href;
+    }
+    const again=()=>{retried=false;start(true);};
+    retry.addEventListener('click',again);
+    guideLoad={figure,cancel:()=>{disposed=true;revision++;clearTimeout(timer);img.onload=img.onerror=null;retry.removeEventListener('click',again);img.removeAttribute('src');}};
+    start();
+  }
   function teaser() {
     return '<section class="cp-entry"><div><span class="cp-eyebrow">COURSE PREP · 18 HOLES</span><h2 data-no-fold>Pound Ridge, before the first tee.</h2><p>Explore every hole. Put your bag on the map. Save your plan.</p></div>' +
       '<button class="hq-btn" data-action="open-course-prep">Prepare Pound Ridge <span aria-hidden="true">↗</span></button></section>';
@@ -203,6 +256,7 @@
     const content = document.createElement('div');
     content.className = 'cp-workspace cp-live-map-content';
     content.innerHTML = mapSurface() + setup();
+    clearGoogle3d();
     liveDialog.querySelector('.cp-live-map-content').replaceWith(content);
     mount(content);
   }
@@ -215,14 +269,15 @@
     const scene = maps3d;
     return queueCamera(() => scene?.stopCameraAnimation()).catch(() => {});
   }
-  function unmount(keepLocation = false) { epoch++; stopFlyover(); closeGuide(); if(!keepLocation)stopLocation(); root = null; }
+  function unmount(keepLocation = false) { epoch++; stopFlyover(); clearGoogle3d(); stopGuideLoad(); closeGuide(); if(!keepLocation)stopLocation(); root = null; }
   function releaseLiveMap(dialog) {
     if(liveDialog !== dialog)return;
-    epoch++; stopFlyover(); stopLocation(); root = null; liveDialog = null;
+    epoch++; stopFlyover(); clearGoogle3d(); stopLocation(); root = null; liveDialog = null;
   }
   function closeGuide() {
     const dialog = document.querySelector('dialog.cp-guide-dialog[open]');
     if(!dialog)return;
+    stopGuideLoad(dialog);
     releaseLiveMap(dialog);
     dialog.close(); dialog.remove();
   }
@@ -242,6 +297,7 @@
       if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();
     });
     dialog.addEventListener('close',()=>{
+      stopGuideLoad(dialog);
       releaseLiveMap(dialog);
       dialog.remove();
       if(!document.querySelector('dialog.cp-guide-dialog[open]')){
@@ -258,12 +314,10 @@
     if(!h)return false;
     const dialog = holeDialog(source,h,'cp-live-guide','Close hole guide',
       (source.id===course.id?'<div class="cp-workspace"><div class="cp-modes" role="group" aria-label="Hole view"><button type="button" aria-pressed="true">Hole guide</button><button type="button" data-live-map aria-pressed="false">Interactive map</button></div></div>':'')+
-      '<figure><img src="'+esc(h.guide)+'" alt="Official illustrated guide for '+esc(source.name)+' hole '+h.n+'" referrerpolicy="no-referrer"><div class="cp-guide-dialog-error" hidden><b>The illustration could not load.</b><p>Check your connection or open the club’s guide below.</p></div></figure>'+
+      guideFigure(source,h,true)+
       '<footer>Official club illustration · not to scale. '+link(source.tour,'Open course guide ↗')+'</footer>');
     dialog.querySelector('[data-live-map]')?.addEventListener('click',()=>openLiveMap(source.id,h.n));
-    dialog.querySelector('img').addEventListener('error',()=>{
-      dialog.querySelector('img').hidden=true;dialog.querySelector('.cp-guide-dialog-error').hidden=false;
-    });
+    loadGuide(dialog.querySelector('.cp-guide'),h.guide);
     return true;
   }
   function openLiveMap(courseId, n, start = '3d') {
@@ -467,15 +521,16 @@
     if (!root) return;
     const token=++epoch, stage=root.querySelector('#cp-map-stage');
     stopFlyover();
+    stopGuideLoad();
+    clearGoogle3d();
     stage.dataset.view = mode;
     stage.replaceChildren();
     drawControls();
     if (mode==='guide') {
-      stage.innerHTML = '<figure class="cp-guide"><img id="cp-guide-image" src="'+esc(currentHole().guide)+'" alt="Pound Ridge official illustration of hole '+hole+'" referrerpolicy="no-referrer"><figcaption>Hole '+hole+' · Official club guide</figcaption></figure>';
-      stage.querySelector('img').addEventListener('error',()=>{
-        if(token!==epoch||!root)return; imageError=true;
-        stage.innerHTML='<div class="cp-map-message"><b>The club’s image is unavailable here.</b><p>Your course map and saved plan are still ready.</p>'+button('mode','Open simple map','data-mode="route"')+link(course.tour,'Open the club’s guide ↗')+'</div>';
-      });
+      stage.innerHTML = guideFigure(course,currentHole());
+      const failure=stage.querySelector('.cp-guide-dialog-error');
+      failure.insertAdjacentHTML('beforeend',button('mode','Open simple map','data-mode="route"')+link(course.tour,'Open the club’s guide ↗'));
+      loadGuide(stage.querySelector('.cp-guide'),currentHole().guide);
       return;
     }
     if (mode==='route') {
@@ -652,6 +707,7 @@
     googleFailure=message;googleFailureMode=failedMode;
     if(!root||!['3d','satellite'].includes(mode))return;
     stopFlyover();
+    clearGoogle3d();
     root.querySelector('#cp-map-stage').innerHTML='<div class="cp-map-message"><h3>Google Maps is unavailable</h3><p>'+esc(message)+'</p>'+(googleErrorCode?'<code class="cp-error-code">'+esc(googleErrorCode)+'</code>':'')+button('retry','Reload & retry')+button('map-setup','Maps setup')+button('mode','Use simple map','data-mode="route"')+'</div>';
     drawControls();
   }
@@ -668,21 +724,34 @@
       if(roll)add(new google.maps.Circle({map:maps2d,center:ll(origin()),radius:(c.carry+roll)*0.9144,strokeColor:'#ffb766',strokeWeight:2,fillOpacity:0,clickable:false}));
     }
   }
+  function clearGoogle3d() {
+    // Remove our overlays while the map is still attached. Detaching the map
+    // first disposes Google's renderer before its markers can unregister.
+    lines3d.splice(0).forEach(line=>line.remove());
+    markers3d.forEach(marker=>{marker.position=null;marker.label=null;marker.remove();});
+  }
   function drawGoogle3d(lib) {
     if(!lib||!maps3d)return;
-    [...maps3d.children].forEach(x=>x.remove());
+    lines3d.splice(0).forEach(line=>line.remove());
+    const addLine=element=>{lines3d.push(element);maps3d.append(element);};
     const line=(path,color,width)=>new lib.Polyline3DElement({path:path.map(ll),strokeColor:color,strokeWidth:width,altitudeMode:'CLAMP_TO_GROUND',drawsOccludedSegments:true});
-    maps3d.append(line(currentHole().path,'#c5e78a',4));
-    if(savedHole().target)maps3d.append(line([origin(),target(),green()],'#ffb766',3));
+    addLine(line(currentHole().path,'#c5e78a',4));
+    if(savedHole().target)addLine(line([origin(),target(),green()],'#ffb766',3));
     // Basic 3D markers need only maps3d. Optional PinElement customization must not
     // become a startup dependency: a customization failure must not hide the map.
-    if(lib.Marker3DElement)[[origin(),liveLocation()?'You':'Tee'],[green(),savedHole().target?'Green':'Green · '+yard(distance(origin(),green()))+' yd'],...(savedHole().target?[[target(),targetYardage()]]:[])].forEach(([p,label])=>{
-      maps3d.append(new lib.Marker3DElement({position:ll(p),label,altitudeMode:'CLAMP_TO_GROUND'}));
+    const points=[[origin(),liveLocation()?'You':'Tee'],[green(),savedHole().target?'Green':'Green · '+yard(distance(origin(),green()))+' yd'],...(savedHole().target?[[target(),targetYardage()]]:[])];
+    if(lib.Marker3DElement)points.forEach(([p,label],i)=>{
+      // Keep at most three stable marker identities. GPS/target updates and hole
+      // changes move these pins instead of accumulating asynchronous pin renders.
+      const marker=markers3d[i] || (markers3d[i]=new lib.Marker3DElement({altitudeMode:'CLAMP_TO_GROUND'}));
+      marker.position=ll(p);marker.label=label;
+      if(marker.parentNode!==maps3d)maps3d.append(marker);
     });
+    markers3d.slice(points.length).forEach(marker=>{marker.position=null;marker.label=null;marker.remove();});
     const c=selected(),roll=savedHole().roll||0;
     if(showRings && c && c.carry > 0)for(const [d,color] of [[c.carry,'#c5e78a'],...(roll?[[c.carry+roll,'#ffb766']]:[])]) {
       const circle=Array.from({length:73},(_,i)=>destination(origin(),d,i*5));
-      maps3d.append(line(circle,color,3));
+      addLine(line(circle,color,3));
     }
   }
   async function flyover() {
