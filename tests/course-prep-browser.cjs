@@ -20,7 +20,7 @@ function googleMock(){
   class Overlay{constructor(opts){this.opts=opts;mapQA.overlays.push(this);}setMap(map){this.opts.map=map;}}
   class Point{constructor(x,y){this.x=x;this.y=y;}}
   class Bounds{constructor(){this.points=[];}extend(p){this.points.push(p);}}
-  class Scene extends HTMLElement{constructor(opts){super();Object.assign(this,opts);mapQA.scenes++;}flyCameraTo(opts){if(mapQA.stopping)throw Error('camera started before stop completed');this.lastFlight=opts;mapQA.flights++;}async stopCameraAnimation(){mapQA.stops++;mapQA.stopping=true;await new Promise(r=>setTimeout(r,0));mapQA.stopping=false;}}
+  class Scene extends HTMLElement{constructor(opts){super();const allowed=['center','range','heading','tilt','roll','mode','gestureHandling'];for(const k of Object.keys(opts))if(!allowed.includes(k))throw new TypeError('Unsupported Map3DElement option: '+k);Object.assign(this,opts);mapQA.scenes++;}flyCameraTo(opts){if(mapQA.stopping)throw Error('camera started before stop completed');this.lastFlight=opts;mapQA.flights++;}async stopCameraAnimation(){mapQA.stops++;mapQA.stopping=true;await new Promise(r=>setTimeout(r,0));mapQA.stopping=false;}}
   class Line extends HTMLElement{constructor(opts){super();if(mapQA.fail3dDraw)throw new Error("Simulated 3D drawing failure");Object.assign(this,opts);}}
   class Marker extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
   customElements.define('qa-map-scene',Scene);customElements.define('qa-map-line',Line);customElements.define('qa-map-marker',Marker);

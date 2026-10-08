@@ -454,7 +454,10 @@
         if(token!==epoch||!root)return;
         stageName = 'starting the 3D viewer';
         if(!maps3d) {
-          maps3d=new lib.Map3DElement({...teeCamera(),mode:'SATELLITE',gestureHandling:'GREEDY'});
+          // Map3DElementOptions does not accept CameraOptions.altitudeMode.
+          // Keep ground clamping on flyCameraTo below, never on the constructor.
+          const {center,range,heading,tilt,roll}=teeCamera();
+          maps3d=new lib.Map3DElement({center,range,heading,tilt,roll,mode:'SATELLITE',gestureHandling:'GREEDY'});
           maps3d.className='cp-google-map';
           maps3d.addEventListener('gmp-click',e=>{if(e.position)choosePoint([e.position.lat,e.position.lng]);});
           maps3d.addEventListener('gmp-error',()=>{if(root&&mode==='3d')mapError('3D could not initialize on this device. Try Satellite or the course map.','3d');});

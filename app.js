@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v211';
+const BUILD = 'v212';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v212', d:'2026-10-08', items:['3D STARTUP FIX: Corrected the viewer initialization introduced in v211. Tee-to-green framing and Back to tee remain available.'] },
   { b:'v211', d:'2026-10-08', items:['TEE TO GREEN: Each hole’s 3D view starts behind the tee looking toward the green. Back to tee restores that view after exploring. Camera commands run in order, and flyovers keep looking forward at the green.'] },
   { b:'v210', d:'2026-10-08', items:['EASIER MAP CONTROLS: Drag Satellite and Google 3D with one finger. Pinch to zoom, scroll outside the map to move the page, or tap Shot plan to jump straight to your club choices.'] },
   { b:'v209', d:'2026-10-08', items:['YARDAGES ON THE MAP: Tap a landing point in Google 3D, Satellite or the course map to see distance to it and yards left to the mapped green beside your target.', 'MEASURE FROM HERE: Use my location requests your phone’s location and updates yardages as you move on the course. Accuracy and the active reference stay visible; Use tee returns to prep. Location is temporary, stops when you leave or background the app, and never replaces your saved tee.'] },
