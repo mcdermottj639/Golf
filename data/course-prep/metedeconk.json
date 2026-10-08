@@ -1,0 +1,669 @@
+{
+  "id": "metedeconk",
+  "storageKey": "metedeconk",
+  "name": "Metedeconk National",
+  "shortName": "Metedeconk",
+  "place": "Jackson, NJ",
+  "aliases": [
+    "Metedeconk National Golf Club",
+    "Metedeconk National GC",
+    "Metedeconk",
+    "The Conk"
+  ],
+  "bounds": [
+    40.152,
+    -74.352,
+    40.171,
+    -74.32
+  ],
+  "center": [
+    40.1615,
+    -74.337
+  ],
+  "par": 108,
+  "defaultTee": "member",
+  "verified": "2026-10-08",
+  "source": "https://tours.skyfoxgolf.com/360/metedeconk",
+  "sourceLabel": "Official club tour · SkyFox",
+  "tour": "https://tours.skyfoxgolf.com/360/metedeconk",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.367,40.143,-74.325,40.170",
+  "cardNote": "Four tee rows and pars read from the club-linked SkyFox tour on October 8, 2026. The club has 27 physical holes across three nines. Hole numbers remain 1–27 whichever order you play. Combination-specific stroke indexes, course ratings and slopes are not inferred; confirm them on your round’s card.",
+  "tees": [
+    {
+      "id": "champ",
+      "name": "Champ",
+      "total": 10960,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        416,
+        220,
+        598,
+        448,
+        517,
+        193,
+        405,
+        490,
+        441,
+        575,
+        450,
+        202,
+        401,
+        374,
+        572,
+        352,
+        194,
+        438,
+        416,
+        419,
+        586,
+        427,
+        188,
+        542,
+        187,
+        455,
+        454
+      ]
+    },
+    {
+      "id": "member",
+      "name": "Member",
+      "total": 10006,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        386,
+        196,
+        573,
+        393,
+        486,
+        168,
+        363,
+        412,
+        395,
+        531,
+        402,
+        184,
+        380,
+        354,
+        550,
+        325,
+        160,
+        412,
+        372,
+        380,
+        538,
+        400,
+        164,
+        506,
+        150,
+        416,
+        410
+      ]
+    },
+    {
+      "id": "middle",
+      "name": "Middle",
+      "total": 9123,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        347,
+        160,
+        536,
+        352,
+        453,
+        140,
+        338,
+        371,
+        349,
+        490,
+        350,
+        140,
+        321,
+        329,
+        514,
+        304,
+        145,
+        388,
+        351,
+        366,
+        505,
+        382,
+        147,
+        470,
+        121,
+        364,
+        390
+      ]
+    },
+    {
+      "id": "forward",
+      "name": "Forward",
+      "total": 8087,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        309,
+        120,
+        495,
+        320,
+        408,
+        122,
+        306,
+        348,
+        307,
+        466,
+        304,
+        116,
+        281,
+        270,
+        461,
+        284,
+        121,
+        356,
+        328,
+        340,
+        400,
+        317,
+        94,
+        437,
+        92,
+        340,
+        345
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole1_aerial.png",
+      "sourceStrokeIndex": 9,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1186921601
+    },
+    {
+      "n": 2,
+      "par": 3,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole2_aerial.png",
+      "sourceStrokeIndex": 15,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1186921612
+    },
+    {
+      "n": 3,
+      "par": 5,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole3_aerial.png",
+      "sourceStrokeIndex": 1,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1186921613
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole4_aerial.png",
+      "sourceStrokeIndex": 5,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1186921625
+    },
+    {
+      "n": 5,
+      "par": 5,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole5_aerial.png",
+      "sourceStrokeIndex": 13,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1186921626
+    },
+    {
+      "n": 6,
+      "par": 3,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole6_aerial.png",
+      "sourceStrokeIndex": 17,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1372369332
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole7_aerial.png",
+      "sourceStrokeIndex": 11,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1186964210
+    },
+    {
+      "n": 8,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole8_aerial.png",
+      "sourceStrokeIndex": 7,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1186964217
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole9_aerial.png",
+      "sourceStrokeIndex": 3,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1186964223
+    },
+    {
+      "n": 10,
+      "par": 5,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole10_aerial.png",
+      "sourceStrokeIndex": 8,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1372369335
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole11_aerial.png",
+      "sourceStrokeIndex": 6,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1372369342
+    },
+    {
+      "n": 12,
+      "par": 3,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole12_aerial.png",
+      "sourceStrokeIndex": 16,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1372369344
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole13_aerial.png",
+      "sourceStrokeIndex": 12,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1372369345
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole14_aerial.png",
+      "sourceStrokeIndex": 14,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1372369346
+    },
+    {
+      "n": 15,
+      "par": 5,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole15_aerial.png",
+      "sourceStrokeIndex": 2,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1372369347
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole16_aerial.png",
+      "sourceStrokeIndex": 10,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1372369349
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole17_aerial.png",
+      "sourceStrokeIndex": 18,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1372369350
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole18_aerial.png",
+      "sourceStrokeIndex": 4,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "osmId": 1372369351
+    },
+    {
+      "n": 19,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole19_aerial.png",
+      "sourceStrokeIndex": 12,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "mapReady": false,
+      "mapNote": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+    },
+    {
+      "n": 20,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole20_aerial.png",
+      "sourceStrokeIndex": 10,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "mapReady": false,
+      "mapNote": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+    },
+    {
+      "n": 21,
+      "par": 5,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole21_aerial.png",
+      "sourceStrokeIndex": 6,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "mapReady": false,
+      "mapNote": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+    },
+    {
+      "n": 22,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole22_aerial.png",
+      "sourceStrokeIndex": 2,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "mapReady": false,
+      "mapNote": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+    },
+    {
+      "n": 23,
+      "par": 3,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole23_aerial.png",
+      "sourceStrokeIndex": 14,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "mapReady": false,
+      "mapNote": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+    },
+    {
+      "n": 24,
+      "par": 5,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole24_aerial.png",
+      "sourceStrokeIndex": 16,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "mapReady": false,
+      "mapNote": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+    },
+    {
+      "n": 25,
+      "par": 3,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole25_aerial.png",
+      "sourceStrokeIndex": 18,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "mapReady": false,
+      "mapNote": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+    },
+    {
+      "n": 26,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole26_aerial.png",
+      "sourceStrokeIndex": 8,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "mapReady": false,
+      "mapNote": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+    },
+    {
+      "n": 27,
+      "par": 4,
+      "si": null,
+      "guide": "https://tours.skyfoxgolf.com/storage/aerials/metedeconk/hole27_aerial.png",
+      "sourceStrokeIndex": 4,
+      "prompt": "Choose your landing spot and club before the shot. Confirm the actual tee, hazards and conditions at the course.",
+      "mapReady": false,
+      "mapNote": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+    }
+  ],
+  "nines": [
+    {
+      "id": "first",
+      "name": "First nine",
+      "holes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "second",
+      "name": "Second nine",
+      "holes": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "third",
+      "name": "Third nine",
+      "holes": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    }
+  ],
+  "routings": [
+    {
+      "id": "first-second",
+      "name": "First + Second · 1–18",
+      "holes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "second-third",
+      "name": "Second + Third · 10–27",
+      "holes": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "id": "third-first",
+      "name": "Third + First · 19–27, 1–9",
+      "holes": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "first-third",
+      "name": "First + Third · 1–9, 19–27",
+      "holes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "id": "second-first",
+      "name": "Second + First · 10–18, 1–9",
+      "holes": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "third-second",
+      "name": "Third + Second · 19–27, 10–18",
+      "holes": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "first",
+      "name": "First nine only",
+      "holes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "second",
+      "name": "Second nine only",
+      "holes": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "third",
+      "name": "Third nine only",
+      "holes": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    }
+  ]
+}

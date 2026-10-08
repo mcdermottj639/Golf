@@ -16,7 +16,13 @@ const courses=ids.map(id=>{
   }
   for(const name of [c.id,c.name,...(c.aliases||[])])names.add(name.trim().toLowerCase().replace(/\s+/g,' '));
   assert.ok(c.storageKey&&!storage.has(c.storageKey));storage.add(c.storageKey);
-  assert.ok([9,18].includes(c.holes.length),id+': specify an individual 9/18-hole routing');
+  assert.ok([9,18,27].includes(c.holes.length),id+': unsupported hole count');
+  if(c.holes.length===27){
+    assert.deepEqual(c.nines.flatMap(n=>n.holes),Array.from({length:27},(_,i)=>i+1));
+    assert.ok(c.nines.every(n=>n.holes.length===9));
+    assert.equal(new Set(c.routings.map(r=>r.id)).size,c.routings.length);
+    for(const r of c.routings){assert.ok([9,18].includes(r.holes.length));assert.equal(new Set(r.holes).size,r.holes.length);assert.ok(r.holes.every(n=>c.holes.some(h=>h.n===n)));}
+  }
   assert.ok(c.bounds.length===4&&c.bounds.every(Number.isFinite));
   const inside=p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)&&p[0]>c.bounds[0]&&p[0]<c.bounds[2]&&p[1]>c.bounds[1]&&p[1]<c.bounds[3];
   assert.ok(inside(c.center));assert.match(c.source,/^https:\/\//);assert.ok(c.cardNote);
@@ -28,6 +34,8 @@ const courses=ids.map(id=>{
   for(const t of c.tees){assert.equal(t.yards.length,c.holes.length);assert.ok(t.yards.every(y=>Number.isInteger(y)&&y>0));assert.equal(t.yards.reduce((a,b)=>a+b,0),t.total);}
   for(const h of c.holes){
     if(h.mapReady===false)assert.ok(h.mapNote,id+': explain unavailable hole map');
+    if(h.guide)assert.match(h.guide,/^https:\/\//);
+    if(h.mapReady===false&&!h.osmId){h.path=[];continue;}
     const way=raw.features.find(f=>f.id===h.osmId);
     assert.ok(way,id+': missing source way for hole '+h.n);
     assert.equal(+way.tags.ref,h.n);assert.equal(+way.tags.par,h.par);
@@ -36,8 +44,8 @@ const courses=ids.map(id=>{
     h.path=way.path;
   }
   c.features=raw.features.flatMap(f=>{
-    const kind=f.tags.golf==='water_hazard'||f.tags.golf==='lateral_water_hazard'||f.tags.natural==='water'?'water':f.tags.golf;
-    return ['fairway','green','bunker','water'].includes(kind)?[{kind,id:f.id,path:f.path}]:[];
+    const kind=f.tags.golf==='water_hazard'||f.tags.golf==='lateral_water_hazard'||f.tags.natural==='water'?'water':f.tags.natural==='wood'||f.tags.landuse==='forest'?'wood':f.tags.golf;
+    return ['fairway','green','bunker','water','tee','rough','wood'].includes(kind)?[{kind,id:f.id,path:f.path}]:[];
   });
   return c;
 });

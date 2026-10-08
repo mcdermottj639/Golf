@@ -4,11 +4,11 @@ const root=path.join(__dirname,'..'),read=f=>fs.readFileSync(path.join(root,f),'
 const dummy={addEventListener(){},querySelectorAll(){return []},classList:{add(){},remove(){},toggle(){}},style:{},dataset:{}};
 const storage={},ctx={console,setTimeout(){},clearTimeout(){},setInterval(){},document:{addEventListener(){},querySelector(){return dummy},querySelectorAll(){return []},getElementById(){return dummy},body:dummy},navigator:{},localStorage:{getItem:k=>storage[k]||null,setItem:(k,v)=>storage[k]=v},window:{addEventListener(){},matchMedia:()=>({matches:false,addEventListener(){}})}};
 vm.createContext(ctx);
-for(const f of ['lessons.js','courses-db.js','course-cards.js','course-prep-data.js','course-prep.js'])vm.runInContext(read(f),ctx);
+for(const f of ['lessons.js','courses-db.js','course-cards.js','course-prep-data.js','hole-guide.js','course-prep.js'])vm.runInContext(read(f),ctx);
 let app=read('app.js');
 vm.runInContext(app.slice(0,app.indexOf('// ---------- Boot ----------'))+`
 rerender=()=>{};toast=()=>{};load();initCoursePrep();
-window.prepTest={applyFeed,get:()=>S,briefHole,liveBriefing,livePlay,coursePrepNote,publishedCard};
+window.prepTest={applyFeed,get:()=>S,briefHole,liveBriefing,livePlay,coursePrepNote,publishedCard,liveRound,priorLayout,liveCard};
 })();`,ctx);
 const T=ctx.window.prepTest,C=ctx.window.CADDIE_PREP_COURSES[0],P=ctx.window.CaddieCoursePrep;
 const feedNames=app.match(/Promise\.all\(\[([^\]]+)\]\.map\(name => fetch/)[1].match(/'([^']+)'/g).map(x=>x.slice(1,-1));
@@ -43,12 +43,12 @@ assert.equal(JSON.stringify(state.carries),JSON.stringify(before.carries));
 console.log('PASS course prep: 18 source routes, seven official tee totals/ratings, geometry math, input bounds, idempotent feed, preserved rounds/bag/calls and live prep note.');
 
 const catalog=ctx.window.CADDIE_PREP_COURSES;
-assert.equal(catalog.length,3);const stable=clone(state);
+assert.equal(catalog.length,4);const stable=clone(state);
 for(const course of catalog){
   const raw=JSON.parse(read('data/course-prep/'+course.id+'-osm.json'));
   P.openHole(1,course.id);assert.equal(P.courseId,course.id);
   assert.ok(P.render().includes(course.shortName));
-  for(const h of course.holes){const way=raw.features.find(f=>f.id===h.osmId);assert.deepEqual(clone(h.path),way.path);assert.ok(h.path.every(P.geo.pointOK));}
+  for(const h of course.holes){if(!h.osmId){assert.equal(h.mapReady,false);assert.ok(h.guide);continue;}const way=raw.features.find(f=>f.id===h.osmId);assert.deepEqual(clone(h.path),way.path);assert.ok(h.path.every(P.geo.pointOK));}
   const other=catalog.find(c=>c.id!==course.id);
   assert.equal(P.geo.pointOK(other.center),false,'course-specific GPS boundary');
   const plan=P.clean({tee:course.defaultTee,holes:{[course.defaultTee+':1']:{note:course.id,target:course.center,tee:other.center}}},course.id);
@@ -61,6 +61,27 @@ assert.equal(T.coursePrepNote('Pound Ridge Golf Club',1),'Aim at my saved target
 assert.equal(P.openHole(1,'unknown-course'),false);assert.equal(P.findCourse('Sterling'),undefined,'no ambiguous partial course match');
 console.log('PASS multi-course data: original coordinates, isolated boundaries and notes, sourced live cards, exact aliases, no state writes during navigation.');
 
-assert.equal(catalog.flatMap(c=>c.holes).filter(h=>h.mapReady!==false).length,53);
+assert.equal(catalog.flatMap(c=>c.holes).filter(h=>h.mapReady!==false).length,71);
 assert.equal(P.openLiveMap('wianno',2),false,'unverified endpoint never opens a live measuring map');
 P.openHole(2,'wianno');assert.ok(P.render().includes('17 of 18 interactive hole maps ready'));
+
+const M=P.findCourse('The Conk');assert.equal(M.holes.length,27);assert.equal(M.holes.filter(h=>h.guide).length,27);assert.equal(M.tees.length,4);
+for(const h of catalog.flatMap(c=>c.holes)){
+ const c=catalog.find(c=>c.holes.includes(h)),geometry=ctx.window.CaddieHoleGuide.layout(c,h);
+ if(h.mapReady===false){assert.equal(geometry,null);continue;}
+ assert.ok(geometry.tee[1]>geometry.green[1],'tee is below green');
+ for(const p of [geometry.tee,geometry.green])assert.ok(p[0]>=0&&p[0]<=600&&p[1]>=0&&p[1]<=900);
+ const svg=ctx.window.CaddieHoleGuide.render(c,h);assert.ok(!svg.includes('NaN'));assert.ok(svg.includes('CADDIE HQ GUIDE'));
+}
+for(const route of M.routings){
+ const L={course:M.name,routingId:route.id,routingLabel:route.name,date:'2026-10-08',holes:route.holes.map(n=>({n,par:M.holes[n-1].par,s:M.holes[n-1].par})),cur:0,stage:'card'};
+ const r=T.liveRound(L);assert.equal(r.routingId,route.id);assert.deepEqual(clone(r.holes.map(h=>h.n)),clone(route.holes));
+ assert.ok(T.liveCard(L).includes(route.name.replaceAll('&','&amp;')));
+}
+console.log('PASS illustrated guides: sourced shapes, tee-to-green orientation, all 27 official Metedeconk guides, physical-hole routing and preserved round identity.');
+
+const oldRounds=state.rounds;
+state.rounds=[{course:M.name,date:'2026-10-08',routingId:'third',rating:36,slope:130,holes:M.holes.slice(18).map(h=>({n:h.n,par:h.par,s:h.par}))}];
+assert.equal(T.priorLayout(M.name,null,'third').rating,36,'nine-hole rating stays with the same routing');
+assert.equal(T.priorLayout(M.name,null,'first-third'),null,'a different nine combination cannot inherit the rating or card');
+state.rounds=oldRounds;

@@ -31,6 +31,7 @@ jobs:
           node --check round-review.js
           node --check round-takeaways.js
           node --check bay-takeaways.js
+          node --check hole-guide.js
           node --check course-prep.js
           node --check course-prep-data.js
           node scripts/build-course-prep.cjs --check

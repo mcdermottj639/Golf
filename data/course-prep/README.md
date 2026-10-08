@@ -48,7 +48,7 @@ instances are reused across holes; authentication errors, offline use and unsupp
 3D rendering leave the course map and saved plan available. The service worker caches
 only same-origin content and never caches Google map responses or external imagery.
 
-## Shared course catalog (v217)
+## Shared course catalog (v218)
 
 `catalog.json` lists supported routings. `<id>.json` stores course identity, exact
 aliases, independent storage key, bounds, sourced tee rows and hole-to-OSM-way IDs.
@@ -59,8 +59,8 @@ source subset to the service-worker assets. No provider credential is part of a 
 
 New courses are Wianno Club (Osterville, MA) and Sterling Farms Golf Course
 (Stamford, CT), 18 holes each. The course picker and all live-map buttons share the
-same renderer. Exact declared aliases match names; ambiguous layouts must be separate
-packs. Preserve `poundRidge` as Pound Ridge’s storage key for existing installs.
+same renderer. Exact declared aliases match names; multi-nine facilities require
+explicit nines and ordered live routings. Preserve `poundRidge` as Pound Ridge’s storage key for existing installs.
 New courses store notes/targets/reviews separately. Navigating never migrates or
 rewrites the player’s rounds, club data, or previously saved Pound Ridge plan.
 
@@ -80,8 +80,8 @@ unset. Both packs ask the golfer to check against the course’s card.
 Sterling’s official tour https://www.sterlingfarmsgc.com/-course-video-tour links
 17 available hole images on https://cdn.cybergolf.com/images/1928/holeN.jpg .
 The source page’s hole-12 link points at a broken legacy path, so hole 12 deliberately
-has no illustration. It opens the interactive map. These remain external images;
-they are not cached or rehosted. Wianno likewise opens the map when no guide exists.
+has no official illustration. It now opens a generated Caddie HQ guide. These remain external images;
+they are not cached or rehosted. Wianno opens Caddie HQ guides for its 17 verified mapped holes.
 
 Both new OSM subsets were retrieved October 8, 2026 from the exact API URLs stored
 in their files. All 18 numbered centerlines match the published par sequence.
@@ -93,4 +93,50 @@ Coverage review: Wianno hole 2 is retained as source data but marked `mapReady:f
 Its source endpoint is near a tagged tee (way 989266485) rather than a confirmed green.
 No map yardages, Google pins, or live-map button are shown for that hole; its card and
 saved club/note remain usable. Do not silently snap the endpoint to a nearby green.
-This first catalog therefore has 54 scorecard holes and 53 enabled interactive maps.
+The complete catalog now has 81 scorecard holes, 80 available guides and 71 enabled
+interactive maps (Metedeconk 19–27 also await checked route coordinates).
+
+
+## Metedeconk — three physical nines
+
+Official source: https://www.metedeconk.org/ links its Course Tour to
+https://tours.skyfoxgolf.com/360/metedeconk . Each `/hole-N` page (1–27) supplies
+par, all four tee yardages and `/storage/aerials/metedeconk/holeN_aerial.png`.
+Read October 8, 2026. Images remain on the official tour provider; no rehosting or
+external-image offline caching. All 27 image links are identified in the pack.
+
+The following per-nine sums reconcile exactly to the official tour landing page:
+
+| Tee | 1–9 | 10–18 | 19–27 | Founders (1+2) | Pines (2+3) | Tournament (3+1) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Champ | 3728 | 3558 | 3674 | 7286 | 7232 | 7402 |
+| Member | 3372 | 3298 | 3336 | 6670 | 6634 | 6708 |
+| Middle | 3046 | 2981 | 3096 | 6027 | 6077 | 6142 |
+| Forward | 2735 | 2659 | 2693 | 5394 | 5352 | 5428 |
+
+Nine order also corroborated by NJ Golf's official April 4, 2021 article:
+https://njgolf.org/news/post/metedeconk-national-to-host-38th-mid-amateur-championship
+The Tournament routing is third then first. Live setup permits all six ordered
+pairs and each individual nine. Physical hole numbers remain 1–27. Source stroke
+indexes are retained as `sourceStrokeIndex` only; mixed-nine handicap assignments
+and rating/slope are unset pending a routing-specific card. No historical round is
+rewritten or assigned to a guessed routing.
+
+OSM supplies 18 numbered routes in the source region. The third nine has no verified
+route here: images, pars, tee yardages and saved plans are available; measured maps
+are withheld. No synthetic coordinate is substituted. Downloadable source ways
+retain original IDs, versions and coordinates.
+
+## Caddie HQ illustrated guides
+
+`hole-guide.js` renders directly from each enabled route and nearby mapped shapes.
+It uses a tee-to-green projection with cross-hole width expanded for legibility
+(explicitly not to scale, never a measurement surface), actual playable polygons, fine grass/stripe
+texture, sand/water fills and decorative canopies restricted to mapped woodland.
+It excludes neighboring hole routes. Styling is not measured topography, real tree
+positions, putting contours or a safe-target recommendation. Existing source tee and
+woodland ways have been included from the same October 8 OSM downloads for Wianno
+and Sterling. Official guides remain available alongside the generated option.
+The generated illustration works offline without Google. Never replace source
+geometry with the imaginary shape from the design mockup. Missing maps are shown as
+unavailable; absence of a hazard polygon never means absence of a hazard.

@@ -204,6 +204,25 @@ body.night .cp-map-views .cp-simple-view[aria-pressed=true]{background:#335343;c
 .cp-guide-dialog>header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #dde4d8}
 .cp-guide-dialog .cp-modes{padding-top:8px}
 .cp-live-map-dialog .cp-map-stage{height:clamp(240px,48dvh,500px)}
+.cp-nines{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0 0 10px}
+.cp-nines button{border:1px solid #d8e0cf;background:#fff;color:#204d3e;border-radius:12px;padding:10px 4px;font-size:13px;min-height:52px}
+.cp-nines button span{display:block;font-size:11px;margin-top:3px;opacity:.7}
+.cp-nines button[aria-pressed=true]{background:#204d3e;color:#fff;border-color:#204d3e}
+.cp-nines+.cp-holes{grid-template-columns:repeat(9,minmax(0,1fr))}
+.cp-guide-styles{display:flex;justify-content:center;gap:6px;padding:10px;background:#f7f6ef;flex-shrink:0}
+.cp-guide-styles button{border:0;background:transparent;border-radius:9px;color:#66776d;padding:9px 14px;font-size:12px;min-height:40px}
+.cp-guide-styles button[aria-pressed=true]{background:#fff;color:#204d3e;box-shadow:0 1px 4px #173f3312;font-weight:700}
+.cp-map-stage[data-view=guide]{height:auto;min-height:365px;display:flex;flex-direction:column;background:#f7f6ef}
+.cp-map-stage[data-view=guide]>.cp-guide{height:clamp(400px,110vw,660px);flex:none}
+.cp-art-guide{margin:0!important;position:relative;width:100%;height:auto!important;min-height:0!important;background:#f7f6ef!important;overflow:hidden}
+.cp-art-guide .cp-hole-art{display:block;width:100%;height:auto;max-height:750px;font-family:var(--sans,sans-serif)}
+.cp-art-guide figcaption{position:static!important;text-align:center;background:transparent!important;color:#657563!important;padding:0 12px 15px!important;font-size:11px!important}
+.cp-live-guide-body>.cp-guide{height:min(68dvh,650px)}
+.cp-live-guide-body>.cp-guide>img{width:100%;height:100%;object-fit:contain}
+.cp-live-guide-body .cp-hole-art{max-height:72dvh}
+.cp-live-map-dialog .cp-map-stage[data-view=guide]{height:auto}
+#lvRoutingWrap[hidden]{display:none}
+#lvRoutingWrap select{width:100%;min-height:48px}
 .cp-live-map-dialog .cp-setup{margin:12px;border-radius:12px;padding:14px}
 .cp-live-map-dialog .cp-map-caption{font-size:11px}
 .cp-live-map-dialog .cp-workspace{background:var(--cp-panel)}

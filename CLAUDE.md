@@ -28,6 +28,7 @@ courses-db.js         Course autocomplete database
 round-takeaways.js    Shared scoring and club-data insight selection + compact visual cards
 bay-takeaways.js      Full-day range insight selection, explanations, source links and practice tests
 course-prep.js/.css   Shared course planner and live maps; lazy Google satellite/3D views
+hole-guide.js        Sourced illustrated hole renderer; offline, tee-to-green
 course-prep-data.js   Generated course catalog + sourced OSM routes, available offline
 data/course-prep/    Per-course packs, catalog order and original-coordinate OSM subsets
 scripts/build-course-prep.cjs  Validates packs and generates the offline browser catalog
@@ -121,17 +122,19 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v217, October 8 2026)
+## Course Prep (v218, October 8 2026)
 
 Rounds leads with **Explore courses**. The picker contains Pound Ridge, Wianno and
-Sterling Farms; each has 18 sourced scorecard holes. Wianno hole 2 is held for map review,
-so 53 of the 54 holes currently offer interactive yardages. Individual standing plans and
+Sterling Farms plus Metedeconk. The first three have 18 holes each; Metedeconk has
+27 physical holes and three nine selectors. There are 81 scorecard holes, 80 guides
+and 71 enabled measuring maps. Wianno hole 2 and Metedeconk 19–27 have no verified
+measuring route; club illustrations still work for all 27 Metedeconk holes. Individual standing plans and
 Explorer link directly to their course. Every supported live hole opens its own map
 in a popup over the scorecard. `courseprep` maps back to Rounds in navigation.
 `course-prep.js` receives narrow course-ID callbacks from `initCoursePrep()`; it must
 never replace the full player state. Course `storageKey` retains the legacy
 `S.coursePrep.poundRidge` unchanged; new records are `S.coursePrep.wianno` and
-`S.coursePrep['sterling-farms']`. Each holds its own selected tee and distance source,
+`S.coursePrep['sterling-farms']` and `S.coursePrep.metedeconk`. Each holds its own selected tee and distance source,
 per-tee/per-hole notes, reviewed flags, tee/target positions and rollout assumptions.
 Simply opening/switching maps must never write player state. Course changes invalidate
 pending image/map/camera callbacks, clear overlays before map detach, stop and discard
@@ -142,8 +145,9 @@ without it still refer to Pound Ridge, and a live popup resumes only for the mat
 live course AND hole. Existing `S.planCalls` remains the authority for club choices,
 shared with the regular briefing and live-round prep. Club choices are per course/hole;
 notes and map positions are per tee/hole. All are included in normal golf backups.
-The live-hole header offers **Hole guide** when a matching course/hole has a sourced
-illustration, plus **Interactive map** for every supported mapped course. `openGuide(courseId,n)` and
+The live-hole header offers **Hole guide** when the hole has official artwork or
+a usable route for a Caddie HQ illustration, plus **Interactive map** only for a
+verified mapped hole. `openGuide(courseId,n)` and
 `openLiveMap(courseId,n)` open native modal dialogs over the round; Close,
 Escape and the backdrop return focus to the button without changing the live hole,
 score or notes. Navigation closes the dialog. Image failure shows a connection hint
@@ -191,13 +195,25 @@ timers/handlers on hole/view changes, navigation and popup close; late image cal
 must never replace a newer hole. Do not alter the illustration's aspect ratio or crop
 its tee/green. Validate delayed/chunked downloads, timeout/error recovery, rapid hole
 switches, and the full image in prep and live dialogs at 320/390 widths.
-A sourced Hole guide is the initial view on entry and every hole change (arrows, numbered
-holes, plan rows and overview map). Where an illustration is unavailable, omit its tab
-and start the Interactive map in 3D (Simple map without a key/offline). Wianno has no
-verified public club illustrations; Sterling Farms has 17 linked from its official
-course tour. The hole-12 image link on that tour is broken and is deliberately omitted.
-Never use a different hole’s image or fabricate an illustrated guide. Only Hole guide
-and Interactive map are top-level choices when both are available.
+Hole guide is the initial view whenever either official artwork or a usable mapped
+route is available. Official illustrations retain priority where present; a compact
+Club illustration / Caddie HQ guide switch makes both available. Wianno's mapped
+holes and Sterling hole 12 now open the generated guide. The same renderer is used
+in prep and the live dialog. `hole-guide.js` projects the source coordinates from
+tee (bottom) to green (top), expands cross-hole width for legibility (explicitly
+not to scale; never used for distance measurements), draws real fairway/green/bunker/water/tee outlines,
+and adds mowing/grass texture and canopy styling within mapped woodland only.
+Tree glyphs and shading are decorative, not precise tree positions, elevation or
+putting contours. Never manufacture playable outlines to fill missing data. The
+art explicitly identifies incomplete hazard coverage and OSM attribution; it is not
+an official club illustration or a distance-measuring surface. It needs no key or
+network. Future mapped course packs receive the renderer automatically. Do not use
+an AI-generated imaginary course layout as a real guide. The user-approved mockup
+was a design direction; shipped playable shapes must come from source geometry.
+`hasGuide` is shared by prep and live; image-only holes must remain accessible when
+`mapReady:false`. A failed external image can offer the generated guide when available.
+Both kinds of guide fit fully without cropping; SVG masks/filters use an explicit
+user-space frame so near-vertical holes do not collapse into a narrow strip.
 Inside Interactive map, 3D is first and the initial default; Overhead is beside it in
 the imagery switch; Simple map is a secondary button and the offline fallback. Within
 prep, retain the last chosen map style in memory across guide/hole navigation. Opening
@@ -207,7 +223,7 @@ changing tee, target, location or plan data; returning online never auto-loads G
 Google reconnect alone restores the requested map view so Retry still retries Maps.
 If the illustration cannot load, its fallback offers the offline course map.
 The focused map rotates the actual coordinates to put the active measuring reference
-(tee or live location) below the green. Its inverse transform handles taps; the 18-hole overview remains north-up.
+(tee or live location) below the green. Its inverse transform handles taps; the course overview remains north-up.
 Focused mode draws only that hole’s route, sourced polygons and 100-yard arcs from
 the active reference. Do not invent fairway/hazard outlines where the OSM data is missing. Target
 comparisons are shown only after a landing point is set; a green fallback must never
@@ -284,10 +300,20 @@ restriction even when installed on an iPhone home screen.
 **Adding courses:** author a `data/course-prep/<id>.json` pack and its corresponding
 `<id>-osm.json` source subset, then add its slug to `catalog.json`. Run
 `node scripts/build-course-prep.cjs`; CI runs `--check` to reject stale generated data.
-The generator validates unique IDs/names/storage keys, an explicit 9- or 18-hole routing,
+The generator validates unique IDs/names/storage keys, 9/18-hole packs or a 27-hole
+facility with explicit physical nines and ordered 9/18-hole live routings,
 ordered hole numbers, tee totals, pars, stroke indexes, coordinates inside course bounds,
-and original OSM ways/par/ref matches. A 27-hole facility needs separately identified
-routings; never map an ambiguous 18-hole live card to an arbitrary set of 27 holes.
+and original OSM ways/par/ref matches. Metedeconk's club-linked SkyFox tour supplies
+all 27 illustrations, pars and four tee yardage rows; their 18-hole combinations
+reconcile to the tour's published Founders/Pines/Tournament totals. Stroke indexes
+and ratings for mixed nines are not inferred. First/second-nine OSM routes retain
+original coordinates; the third nine has official images but no checked route.
+Missing-route holes have an empty path and `mapReady:false`, and must never reach
+GPS, distance or Google drawing code. Live setup exposes explicit nine order when
+Metedeconk is selected. Store `routingId`/`routingLabel` in the draft and round, keep
+physical hole numbers in the hole array, and preserve play order. Historical layouts
+only prefill a new routed round if its routing ID matches. No existing rounds are
+renumbered or migrated. Course-note/club joins continue to use physical hole IDs.
 A source route can be held with `mapReady:false` plus `mapNote`. Retain the source
 coordinates for the audit, omit it from map overview and live-map buttons, and show
 Map under review in prep with no GPS, pins or mapped yardages. Wianno hole 2 is held:
@@ -314,6 +340,10 @@ already includes every route so offline course switching needs no new network re
 
 `tests/course-prep.cjs` checks scorecard arithmetic, source geometry, geometry math,
 feed idempotence and preservation of golf state and personal calls. The real-browser
+`tests/course-guides-browser.cjs` checks source-based art at 320/390/1440 widths,
+all 27 Metedeconk images, every ordered nine combination, physical-hole live popups,
+offline artwork and unchanged records. External club images use fixtures in automated
+checks; fixture checks do not certify the club CDN.
 `tests/course-prep-browser.cjs` exercises 320/390/1440 layouts, editing, persistence,
 range-source isolation, backup round trips and offline use. Google adapter checks use
 a mock API. Jack confirmed real Satellite and 3D imagery on his iPhone after enabling

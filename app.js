@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v217';
+const BUILD = 'v218';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v218', d:'2026-10-08', items:['YOUR OWN YARDAGE BOOK: Caddie HQ guides turn sourced hole shapes into tee-to-green illustrations with fairway stripes, sand, water and woodland styling. Available offline in prep and live rounds, with official club artwork kept alongside them.','THE CONK: All 27 Metedeconk holes, four official tee rows and club illustrations. Choose your nines for live scoring; physical hole numbers keep the right guide and saved plan together. First/second-nine maps are available; third-nine measuring maps await verified coordinates.'] },
   { b:'v217', d:'2026-10-08', items:['YOUR COURSE LIBRARY: Explore Pound Ridge, Wianno and Sterling Farms from one course picker. Shared 3D/overhead maps, tap yardages and optional GPS work in prep and live rounds. Unverified hole maps are clearly marked while club choices and notes stay available.','SEPARATE PLANS: Targets, notes, reviewed holes and club choices stay with their course. Pound Ridge plans carry forward intact. Sterling adds 17 official guide images; unavailable illustrations open the interactive map. New Blue tee cards identify their published sources.'] },
   { b:'v216', d:'2026-10-08', items:['COMPLETE HOLE GUIDES: Illustrations appear after the full image loads, so a slow download cannot leave just the top strip showing. Prep and live-round guides retry interrupted loads and include a Retry image button.','CURRENT-HOLE PINS: 3D reuses only the active hole’s tee, green and optional target pins, clearing them before changing views or closing the live map.'] },
   { b:'v215', d:'2026-10-08', items:['LIVE HOLE MAP: Open Interactive map from your Pound Ridge scorecard for the current hole’s 3D view, tap-to-measure yardages and optional GPS reference. Switch to the illustrated guide or close to return to the same hole.','3D FIRST: Interactive map starts in 3D, with Overhead beside it. Hole guide still opens first in course prep, and Simple map remains the offline fallback.'] },
@@ -9005,7 +9006,7 @@ function roundView(i){
     <div class="rdtop">
       <div class="rdid">
         <div class="rdd">${esc(fmtDate(r.date))}${r.tees ? ` · ${esc(r.tees)}` : ''}${
-          r.nine ? ` · ${r.nine === 'F' ? 'front' : 'back'} nine` : ''}</div>
+          r.routingLabel ? ' · '+esc(r.routingLabel) : r.nine ? ` · ${r.nine === 'F' ? 'front' : 'back'} nine` : ''}</div>
         <h2>${esc(r.course || 'Round')}</h2>
         <div class="sm faint">${a.par != null ? `par ${a.par}` : ''}${
           r.rating != null && r.slope ? ` · ${r.rating}/${r.slope}` : ''}${
@@ -9231,10 +9232,11 @@ function roundView(i){
 const newestLiveFirst = (a, b) =>
   (b.date || '').localeCompare(a.date || '') || ((b.live ? 1 : 0) - (a.live ? 1 : 0));
 
-function priorLayout(course, nine){
+function priorLayout(course, nine, routingId){
   const key = (course || '').trim().toLowerCase();
   if(!key) return null;
   const cards = S.rounds.filter(r => (r.course || '').trim().toLowerCase() === key
+      && (!routingId || r.routingId === routingId)
       && Array.isArray(r.holes) && r.holes.some(h => h && h.par))
     .sort(newestLiveFirst);
   if(!cards.length) return null;
@@ -9243,7 +9245,7 @@ function priorLayout(course, nine){
     if(!h || !h.par) return;
     by.set(h.n ?? (r.nine === 'B' ? i + 10 : i + 1), { par:h.par, si:h.si ?? null });
   }));
-  const want = nine ? 9 : 18;
+  const want = routingId ? (window.CaddieCoursePrep?.findCourse(course)?.routings?.find(r=>r.id===routingId)?.holes.length || 18) : nine ? 9 : 18;
   const exact = cards.find(r => r.holes.length === want && (!nine || (r.nine || 'F') === nine));
   return { by, from:cards[0].date, tees:cards[0].tees || '',
     rating: exact ? (exact.rating ?? null) : null,
@@ -9623,6 +9625,7 @@ function liveRound(L){
     putts: holes.length && holes.every(h => h.putts != null)
       ? holes.reduce((a, h) => a + h.putts, 0) : null,
     troubles: L.troubles || [], note: L.note || '', holes };
+  if(L.routingId){r.routingId=L.routingId;r.routingLabel=L.routingLabel;}
   if(L.tees) r.tees = L.tees;
   if(L.nine && holes.length <= 9) r.nine = L.nine;
   return r;
@@ -9668,7 +9671,7 @@ function live(){
 // The total is the detector — a course that should be 71 reading 72 is one glance.
 function liveCard(L){
   const tot = L.holes.reduce((a, h) => a + h.par, 0);
-  const half = n => L.holes.filter(h => h.n <= 9 === (n === 'out')).reduce((a, h) => a + h.par, 0);
+  const half = n => L.holes.slice(n==='out'?0:9,n==='out'?9:18).reduce((a, h) => a + h.par, 0);
   const guesses = L.holes.filter(h => h.parAuto).length;
   const SRC = {
     mine: { lab:'From your own card', cls:'f-ok',
@@ -9696,7 +9699,7 @@ function liveCard(L){
   <div class="card">
     <h2 style="margin-top:0">Check the card</h2>
     <h3>${esc(L.course)}</h3>
-    <p class="sm faint">${fmtDate(L.date)}${L.nine ? ` · ${L.nine === 'F' ? 'front' : 'back'} nine` : ' · full 18'}</p>
+    <p class="sm faint">${fmtDate(L.date)}${L.routingLabel ? ' · '+esc(L.routingLabel) : L.nine ? ` · ${L.nine === 'F' ? 'front' : 'back'} nine` : ' · full 18'}</p>
     <span class="flag ${SRC.cls || 'f-new'}" style="position:static;display:inline-block;margin-top:8px">${SRC.lab || ''}</span>
     <p class="sm" style="margin-top:8px">${SRC.b || ''}</p>
   </div>
@@ -9704,7 +9707,7 @@ function liveCard(L){
   <div class="card">
     <div class="ptot">
       <div><b>${tot}</b><span>Par</span></div>
-      ${L.nine ? '' : `<div><b>${half('out')}</b><span>Out</span></div>
+      ${L.holes.length!==18 ? '' : `<div><b>${half('out')}</b><span>Out</span></div>
       <div><b>${half('in')}</b><span>In</span></div>`}
       ${guesses ? `<div class="warnbox"><b>${guesses}</b><span>guessed</span></div>` : ''}
     </div>
@@ -9799,6 +9802,13 @@ function showPicks(on){
   p.hidden = !on;
 }
 
+function syncLiveRouting(){
+  const source=window.CaddieCoursePrep?.findCourse(document.getElementById('lvCourse')?.value);
+  const wrap=document.getElementById('lvRoutingWrap'),select=document.getElementById('lvRouting'),nine=document.getElementById('lvNine');
+  if(!wrap||!select||!nine)return;
+  const routes=source?.routings;wrap.hidden=!routes;nine.closest('div').hidden=!!routes;
+  if(routes && select.dataset.course!==source.id){select.innerHTML=routes.map(r=>'<option value="'+esc(r.id)+'">'+esc(r.name)+'</option>').join('');select.dataset.course=source.id;}
+}
 function liveStart(){
   const d = today();
   const soon = S.briefings.filter(b => b.date && b.date >= d)
@@ -9821,6 +9831,7 @@ function liveStart(){
         <option value="">Full 18</option><option value="F">Front 9</option><option value="B">Back 9</option>
       </select></div>
     </div>
+    <div id="lvRoutingWrap" hidden><label for="lvRouting">Which nines are you playing?</label><select id="lvRouting"></select><p class="sm faint">Course hole numbers stay 1–27 so your maps and saved plans match.</p></div>
     <div style="margin-top:12px"><button class="btn" data-action="live-start">Start the round →</button></div>
     ${known.length ? `<p class="sm faint" style="margin-top:10px">Par and stroke index prefill automatically at ${known.map(esc).join(' · ')} — you've played them with a full card before.</p>` : ''}
   </div>
@@ -9881,7 +9892,7 @@ let lvHoleSeen = null, lvSeen = new Set();
 function livePlay(L){
   const h = L.holes[L.cur];
   const prepCourse = window.CaddieCoursePrep?.findCourse(L.course);
-  const guideCourse = prepCourse?.holes.some(item=>item.n===h.n&&item.guide) ? prepCourse : null;
+  const guideCourse = prepCourse?.holes.some(item=>item.n===h.n&&window.CaddieCoursePrep.hasGuide(prepCourse,item)) ? prepCourse : null;
   const t = liveThru(L);
   const par3 = h.par === 3;
   const clubs = bagClubs();
@@ -10149,7 +10160,7 @@ function liveFinish(L){
   <button class="backlink" data-action="live-nav" data-d="-1">← Back to the card</button>
   <div class="card">
     <h2>${esc(L.course)}</h2>
-    <p class="sm faint">${fmtDate(L.date)}${L.nine ? ` · ${L.nine === 'F' ? 'front' : 'back'} nine` : ''} · ${r.holes.length} holes${
+    <p class="sm faint">${fmtDate(L.date)}${L.routingLabel ? ' · '+esc(L.routingLabel) : L.nine ? ` · ${L.nine === 'F' ? 'front' : 'back'} nine` : ''} · ${r.holes.length} holes${
       skipped ? ` · ${skipped} not scored, they won't be counted` : ''}</p>
     <div class="rowgrid g3" style="margin-bottom:4px">
       <div class="stat"><div class="v">${r.score || '—'}</div><div class="l">Score</div></div>
@@ -10349,7 +10360,7 @@ const ACTIONS = {
 
   // ----- Live round -----
   'live-new': () => render('live'),
-  'live-pick': el => { const i = $('#lvCourse'); if(i) i.value = el.dataset.course; showPicks(false); },
+  'live-pick': el => { const i = $('#lvCourse'); if(i) i.value = el.dataset.course; syncLiveRouting(); showPicks(false); },
   'live-start': () => {
     const typed = $('#lvCourse').value.trim();
     if(!typed) return toast('Name the course first');
@@ -10358,15 +10369,17 @@ const ACTIONS = {
     // thumbed in on the first tee must not fork off from "Sterling Farms Golf Course".
     const known = [...S.courses.map(c => c.name), ...S.rounds.map(r => r.course)]
       .find(n => n && n.toLowerCase() === typed.toLowerCase());
-    const course = known || typed;
+    const pack=window.CaddieCoursePrep?.findCourse(typed);
+    const course = known || pack?.name || typed;
+    const routing=pack?.routings?.find(r=>r.id===document.getElementById('lvRouting')?.value) || pack?.routings?.[0];
     const date = $('#lvDate').value || today();
-    const nine = $('#lvNine').value || null;
-    const prior = priorLayout(course, nine);
+    const nine = routing ? null : $('#lvNine').value || null;
+    const prior = priorLayout(course, nine, routing?.id);
     const pub = publishedCard(course, nine);
     const first = nine === 'B' ? 10 : 1;
     const holes = [];
-    for(let i = 0; i < (nine ? 9 : 18); i++){
-      const n = first + i;
+    const physicalHoles=routing?.holes || Array.from({length:nine?9:18},(_,i)=>first+i);
+    for(const n of physicalHoles){
       const mine = prior && prior.by.get(n);
       const card = pub && pub.by.get(n);
       // His own card, then the published one, then a guess that ADMITS it is a guess.
@@ -10387,7 +10400,7 @@ const ACTIONS = {
     // Straight to the card check rather than to hole 1. One glance at eighteen pars and a
     // total costs a couple of seconds on the first tee; discovering on the 14th that the
     // card has been wrong all day costs the round's data, which is what happened Aug 20.
-    S.live = { date, course, nine, cur:0, holes, stage:'card', prevLayout: !!prior,
+    S.live = { date, course, nine, ...(routing?{routingId:routing.id,routingLabel:routing.name}:{}), cur:0, holes, stage:'card', prevLayout: !!prior,
       cardSrc: prior ? 'mine' : pub ? (pub.ver === 'read' ? 'card' : 'soft') : 'guess',
       cardFrom: prior ? fmtDate(prior.from) : pub ? pub.src : '',
       tees: prior ? prior.tees : '', rating: prior ? prior.rating : null,
@@ -11052,7 +11065,7 @@ document.addEventListener('input', e => {
 // mousedown-prevented default so the input never blurs — losing focus closes the iOS
 // keyboard, which reflows the page out from under the finger mid-tap.
 document.addEventListener('focusin', e => { if(e.target.id === 'lvCourse') showPicks(true); });
-document.addEventListener('input', e => { if(e.target.id === 'lvCourse') pickFilter(e.target.value); });
+document.addEventListener('input', e => { if(e.target.id === 'lvCourse'){pickFilter(e.target.value);syncLiveRouting();} });
 document.addEventListener('mousedown', e => { if(e.target.closest('.pkrow')) e.preventDefault(); });
 
 // Course directory autofill: picking/typing a known course fills its state.
