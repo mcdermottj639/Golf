@@ -125,7 +125,11 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v231, October 8 2026)
+## Course Prep (v232, October 8 2026)
+
+The six 3D camera/shot-plan controls sit in a compact grid beside the hole title and above the map; mobile hole arrows stack to preserve space. Live dialogs keep their existing control area.
+
+Interactive maps distinguish the blue T tee icon (blue location dot when using GPS), green flag, and red target/club landing pin. Google 3D uses static SVG templates without importing the optional marker library; Simple map uses the same tee/flag artwork. Marker identities remain stable and geographic positions are unchanged.
 
 Rounds leads with **Explore courses**. Generic entry opens the nearest supported course using the same saved `S.here` location as Live Round. The picker sorts by straight-line distance and labels miles. Explicit course links keep their intended course; hole navigation and redraws never auto-select another course. Use my location refreshes the shared fix on a deliberate tap; a late callback must not interrupt navigation. No location means stable catalog order. Reset view beside the map-style controls returns 3D to its starting tee camera and Simple map to the focused hole without clearing targets or notes. Browser double-tap zoom is disabled with `touch-action:manipulation`, retaining pinch zoom and scrolling. The picker contains Pound Ridge, Wianno and
 Sterling Farms plus Metedeconk. The first three have 18 holes each; Metedeconk has

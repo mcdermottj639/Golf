@@ -17,6 +17,19 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
   const baseline=await state(p);
   await open('sterling-farms',2);
   assert.ok(await p.locator('#cp-tee-preview').isVisible(),'par 5 starts with a tee club');
+  assert.deepEqual(await p.locator('qa-map-marker').evaluateAll(ms=>ms.map(m=>({kind:m.dataset.iconKind,custom:!!m.querySelector('template')?.content.querySelector('svg')}))),[
+   {kind:'tee',custom:true},{kind:'green',custom:true},{kind:'target',custom:false}
+  ],'tee and flag use SVG icons; landing retains default red pin');
+  assert.equal(await p.evaluate(()=>mapQA.markerImports),0,'icons need no optional marker library');
+
+  for(const width of [320,390,1440]){
+   await p.setViewportSize({width,height:844});
+   assert.equal(await p.locator('#cp-header-camera button').count(),6);
+   assert.ok(await p.evaluate(()=>document.querySelector('#cp-header-camera').getBoundingClientRect().bottom<document.querySelector('#cp-map-stage').getBoundingClientRect().top),'camera controls above map');
+   assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'header fits '+width);
+   await p.screenshot({path:'/tmp/map-header-'+width+'.png'});
+  }
+  await p.setViewportSize({width:390,height:844});
   const projection=await p.evaluate(()=>{
    const geo=CaddieCoursePrep.geo,markers=Array.from(document.querySelectorAll('qa-map-marker'));
    const start=markers[0].position,landing=markers.find(m=>m.label.endsWith(' yd carry'));

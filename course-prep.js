@@ -329,7 +329,7 @@
     const count = course.holes.filter(x => m.holes[m.tee + ':' + x.n]?.reviewed).length;
     return '<div class="cp-workspace" id="course-prep">' +
       coursePicker()+
-      '<div class="cp-grid"><div class="cp-map-column"><section class="cp-map-panel" aria-label="Hole guide and map"><header class="cp-hole-heading"><div><span class="cp-eyebrow">' + esc(t.name) + ' TEES</span><h3>Hole ' + hole + '<small>Par ' + h.par + ' · ' + yard(t.yards[hole - 1]) + ' yd' + (h.si ? ' · Hcp '+h.si : '') + '</small></h3></div><div class="cp-arrows">' +
+      '<div class="cp-grid"><div class="cp-map-column"><section class="cp-map-panel" aria-label="Hole guide and map"><header class="cp-hole-heading"><div><span class="cp-eyebrow">' + esc(t.name) + ' TEES</span><h3>Hole ' + hole + '<small>Par ' + h.par + ' · ' + yard(t.yards[hole - 1]) + ' yd' + (h.si ? ' · Hcp '+h.si : '') + '</small></h3></div><div id="cp-header-camera"></div><div class="cp-arrows">' +
       button('previous', '←', 'aria-label="Previous hole" ' + (hole === 1 ? 'disabled' : '')) + button('next', '→', 'aria-label="Next hole" ' + (hole === course.holes.length ? 'disabled' : '')) + '</div></header>' +
       mapSurface() + '</section>' +
       '<section class="cp-hole-browser" aria-label="Explore holes"><div class="cp-progress"><span><b id="cp-reviewed-count">' + count + '/'+course.holes.length+'</b> holes reviewed</span><span id="cp-save-status" role="status" aria-live="polite">Plans saved on this device</span></div>' +
@@ -642,14 +642,39 @@
         return [anchor[0]-(-x*si+y*co)/111195,anchor[1]+(x*co+y*si)/(111195*cosLat)];
       }};
   }
+  // Static SVG templates work with maps3d without loading the optional marker library.
+  function mapIcon(kind) {
+    const shape=kind==='green'
+      ? '<path d="M10 30h20" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M15 29V8" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M17 8l14 6-14 6z" fill="#d9f58d"/>'
+      : kind==='you'
+      ? '<circle cx="20" cy="20" r="7" style="fill:#fff;stroke:none"/>'
+      : '<path d="M12 12h16M20 12v17" stroke="#fff" stroke-width="4" stroke-linecap="round"/>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="40" viewBox="0 0 40 44"><path d="M15 35l5 7 5-7" fill="'+(kind==='green'?'#245d43':'#176b9b')+'"/><circle cx="20" cy="20" r="18" style="fill:'+(kind==='green'?'#245d43':'#176b9b')+';stroke:#fff;stroke-width:2"/>'+shape+'</svg>';
+  }
+  function decorateMapMarker(marker,kind) {
+    if(marker.dataset.iconKind===kind)return;
+    try {
+      marker.replaceChildren();
+      if(kind!=='target') {
+        const template=document.createElement('template');
+        template.innerHTML=mapIcon(kind);
+        marker.append(template);
+      }
+      marker.dataset.iconKind=kind;
+    } catch (_) { /* An optional icon must never prevent the map from opening. */ }
+  }
   function svgMap() {
     projection = projectFor(overview);
     const {width:w,height:h,heading} = projection;
     const path = pts => pts.map(p => projection.to(p).map(x => x.toFixed(2)).join(',')).join(' ');
     const pnt = (p, kind, label) => {
-      const [x,y]=projection.to(p), dy=kind==='tee'?23:kind==='green'&&savedHole().target?23:-17;
+      const [x,y]=projection.to(p), dy=kind==='tee'?23:kind==='green'&&savedHole().target?23:-37;
       const margin=Math.min(w/2-8,label.length*3.8), labelX=Math.max(margin,Math.min(w-margin,x));
-      return '<g class="cp-map-point cp-point-'+kind+'" data-point="'+kind+'"><circle cx="'+x+'" cy="'+y+'" r="7"/><text x="'+labelX+'" y="'+Math.max(45,Math.min(h-40,y+dy))+'" text-anchor="middle" class="cp-map-label">'+label+'</text></g>';
+      const iconKind=kind==='tee'?(liveLocation()?'you':'tee'):kind;
+      const icon=kind==='tee'||kind==='green'
+        ? '<g pointer-events="none" transform="translate('+(x-14.4)+','+(y-32)+') scale(.8)">'+mapIcon(iconKind)+'</g>'
+        : '<path d="M0 0C-3-5-10-12-10-19a10 10 0 1 1 20 0C10-12 3-5 0 0Z" transform="translate('+x+','+y+')" fill="#e53935" stroke="#fff" stroke-width="1.5"/>';
+      return '<g class="cp-map-point cp-point-'+kind+'" data-point="'+kind+'"><circle cx="'+x+'" cy="'+y+'" r="7" style="fill:transparent;stroke:none"/>'+icon+'<text x="'+labelX+'" y="'+Math.max(45,Math.min(h-40,y+dy))+'" text-anchor="middle" class="cp-map-label">'+label+'</text></g>';
     };
     const polys = course.features.filter(f=>['fairway','green','bunker','water'].includes(f.kind)).map(f => '<polygon points="'+path(f.path)+'" class="cp-feature cp-feature-'+f.kind+'"/>').join('');
     const lines = (overview ? mappedHoles() : [currentHole()]).map(holeData => {
@@ -685,6 +710,8 @@
   function drawControls() {
     if (!root) return;
     drawTeePreview();
+    const headerCamera=root.querySelector('#cp-header-camera');
+    if(headerCamera)headerCamera.innerHTML='';
     if(mode==='guide'){
       root.querySelector('#cp-reference').hidden=true;root.querySelector('#cp-map-controls').innerHTML='';
       root.querySelector('#cp-map-caption').innerHTML=guideCaption(course,currentHole());return;
@@ -701,7 +728,11 @@
       (mapped && !overview ? button('edit','Landing target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
       (mapped && !overview && selected()?.carry>0 ? button('rings','Carry rings','aria-pressed="'+showRings+'"'):'')+
       (savedHole().target ? button('clear-target','Clear target'):'') + (savedHole().tee ? button('reset-tee','Reset tee'):'') + '</div>';
-    if(mapped && (mode==='3d'))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+(!liveDialog?button('shot-plan','Shot plan ↓'):'')+(mode==='3d'?button('frame','Back to tee','data-focus="tee"'):'')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
+    if(mapped && mode==='3d') {
+      const controls='<div class="cp-map-tools cp-camera-tools">'+(!liveDialog?button('shot-plan','Shot plan ↓'):'')+button('frame','Tee','data-focus="tee" aria-label="Back to tee"')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green','data-focus="green" aria-label="Green close-up"')+button('fly','Fly hole','aria-label="Fly this hole"')+button('stop','Stop')+'</div>';
+      if(headerCamera)headerCamera.innerHTML=controls;
+      else el.innerHTML+=controls;
+    }
     root.querySelector('#cp-map-caption').innerHTML = mode === 'guide'
       ? 'Official club illustration · not to scale. '+link(course.tour,'Open course guide ↗')
       : ((mode==='3d')?'One finger to move · pinch to zoom. Scroll outside the map to move the page. ':'')+(overview ? mappedHoles().length+' mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
@@ -907,11 +938,12 @@
     if(savedHole().target&&!preview)addLine(line([origin(),target(),green()],'#ffb766',3));
     // Basic 3D markers need only maps3d. Optional PinElement customization must not
     // become a startup dependency: a customization failure must not hide the map.
-    const points=[[origin(),liveLocation()?'You':'Tee'],[green(),savedHole().target?'Green':'Green · '+yard(distance(origin(),green()))+' yd'],...(savedHole().target&&!preview?[[target(),targetYardage()]]:[]),...(preview?[[preview.landing,landingLabel(preview)]]:[])];
-    if(lib.Marker3DElement)points.forEach(([p,label],i)=>{
+    const points=[[origin(),liveLocation()?'You':'Tee',liveLocation()?'you':'tee'],[green(),savedHole().target?'Green':'Green · '+yard(distance(origin(),green()))+' yd','green'],...(savedHole().target&&!preview?[[target(),targetYardage()]]:[]),...(preview?[[preview.landing,landingLabel(preview)]]:[])];
+    if(lib.Marker3DElement)points.forEach(([p,label,kind='target'],i)=>{
       // Keep at most three stable marker identities. GPS/target updates and hole
       // changes move these pins instead of accumulating asynchronous pin renders.
       const marker=markers3d[i] || (markers3d[i]=new lib.Marker3DElement({altitudeMode:'CLAMP_TO_GROUND'}));
+      decorateMapMarker(marker,kind);
       marker.position=ll(p);marker.label=label;
       if(marker.parentNode!==maps3d)maps3d.append(marker);
     });

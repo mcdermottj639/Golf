@@ -135,7 +135,7 @@ body.cp-guide-open{overflow:hidden}
 .cp-map-label{font:600 12px sans-serif;fill:#193e32;paint-order:stroke;stroke:#eef1e4;stroke-width:4px;stroke-linejoin:round}
 .cp-map-point circle{fill:#fff;stroke:#204d3e;stroke-width:3}
 .cp-point-target circle{fill:#be711f;stroke:#fff}
-.cp-point-target text{fill:#8f4d12}
+.cp-point-target text{fill:#b42320}
 .cp-map-scale,.cp-map-compass{color:#58745b;fill:#58745b;font:11px sans-serif}
 .cp-map-kicker{font:700 10px sans-serif;letter-spacing:1.3px;fill:#58745b}
 .cp-yardage-arc{fill:none;stroke:#869878;stroke-width:1;stroke-dasharray:4 5;opacity:.65}
@@ -294,7 +294,7 @@ body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
 .cp-tee-preview select{max-width:100%;min-height:40px;padding:3px 18px 3px 0;border:0;background:transparent;color:inherit;font:700 16px var(--sans,sans-serif)}
 .cp-tee-preview>span{display:block;font-size:11px;line-height:1.4}
 .cp-point-landing circle{fill:#168b8a;stroke:#fff}
-.cp-point-landing text{fill:#11605f}
+.cp-point-landing text{fill:#b42320}
 .cp-tee-line{fill:none;stroke:#168b8a;stroke-width:3;stroke-dasharray:6 4}
 
 /* Compact guide zoom is always before the artwork, in prep and live dialogs. */
@@ -306,3 +306,18 @@ body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
 /* One small club/carry pill; full recommendation details remain below the map. */
 .cp-tee-preview{top:8px;left:8px;width:168px;max-width:calc(100% - 80px);padding:0 6px;border-radius:9px}
 .cp-tee-preview select{display:block;width:100%;min-height:40px;padding:4px 0;font-size:16px;text-overflow:ellipsis}
+
+/* Keep camera actions beside the hole heading, above the map on phones. */
+#cp-header-camera:empty{display:none}
+.cp-hole-heading:has(#cp-header-camera button){display:grid;grid-template-columns:minmax(76px,1fr) minmax(112px,1.25fr) 34px;gap:8px;padding:8px 14px}
+#cp-header-camera .cp-camera-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:0;margin:0}
+#cp-header-camera .cp-camera-tools button{min-height:28px;padding:3px 2px;font-size:10px;line-height:1.15;border-radius:7px;white-space:normal}
+.cp-hole-heading:has(#cp-header-camera button) .cp-arrows{flex-direction:column}
+.cp-hole-heading:has(#cp-header-camera button) .cp-arrows button{width:34px;min-height:38px}
+.cp-hole-heading:has(#cp-header-camera button) h3{font-size:24px}
+@media(min-width:600px){
+ .cp-hole-heading:has(#cp-header-camera button){grid-template-columns:minmax(140px,1fr) minmax(220px,1fr) 93px}
+ .cp-hole-heading:has(#cp-header-camera button) .cp-arrows{flex-direction:row}
+ #cp-header-camera .cp-camera-tools{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #cp-header-camera .cp-camera-tools button{font-size:11px}
+}

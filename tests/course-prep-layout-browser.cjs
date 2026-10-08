@@ -33,6 +33,7 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
    assert.equal(await p.locator('#cp-downloads').getAttribute('open'),null);
    assert.equal(await p.locator('.cp-guide-zoom output').textContent(),'100%');
    await mode(p,'3d');await p.locator('qa-map-scene').waitFor();
+   await p.screenshot({path:'/tmp/header-layout-'+width+'.png'});
    assert.ok(await p.locator('#cp-map-stage').evaluate(e=>e.getBoundingClientRect().top<innerHeight*.5),'interactive map is also visible immediately');
    await p.evaluate(()=>{document.querySelector('qa-map-scene').range=50;});
    await p.locator('[data-cp="reset-view"]').click();
