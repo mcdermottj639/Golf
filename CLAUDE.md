@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v203, October 8 2026)
+## Course Prep (v204, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
 Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
@@ -155,6 +155,17 @@ provide `window.CADDIE_GOOGLE_MAPS_KEY`. Do not commit an unrestricted key. Map 
 are reused, asynchronous loads have navigation guards, and leaving a hole cancels
 its flyover. No Google imagery or derived geometry is cached; the service worker now
 intercepts only same-origin requests. Offline routes and notes remain usable with no key.
+
+After an authorization rejection, merely clearing the planner's error does not retry
+Google: the loaded SDK retains its failed session. **Reload & retry** (and reconnecting
+the same rejected key) reloads the page and restores the hole/view using a consumed-once
+`sessionStorage` value; it does not reset the user's golf data or saved key. Auth failure
+invalidates pending map loads so they cannot replace the error with a stale blank map.
+The existing browser suite verifies actual navigation and a new Google loader request
+for both Retry and reconnecting the same rejected key. The initial rejection's cause
+cannot be inferred from the generic auth callback; check the actual Cloud configuration
+or Google's console error before asserting a specific cause. Caddie HQ uses the Websites
+restriction even when installed on an iPhone home screen.
 
 `tests/course-prep.cjs` checks scorecard arithmetic, source geometry, geometry math,
 feed idempotence and preservation of golf state and personal calls. The real-browser

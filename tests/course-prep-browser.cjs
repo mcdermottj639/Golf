@@ -74,7 +74,15 @@ function googleMock(){
     await p.locator('[data-cp="next"]').click();await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.scenes),1,'reuse 3D map');
     await p.locator('qa-map-scene').dispatchEvent('gmp-error');assert.match(await p.locator('#cp-map-stage').innerText(),/3D could not initialize/);
     await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();await p.locator('[data-cp="next"]').click();await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.maps),1,'reuse satellite map');
-    await p.evaluate(()=>window.gm_authFailure());assert.match(await p.locator('#cp-map-stage').innerText(),/Google rejected/);await p.locator('#cp-map-stage [data-mode="route"]').click();await p.locator('#cp-route-map').waitFor();
+    await p.evaluate(()=>window.gm_authFailure());assert.match(await p.locator('#cp-map-stage').innerText(),/Google rejected/);
+    await Promise.all([p.waitForEvent('load',{timeout:5000}),p.locator('#cp-map-stage [data-cp="retry"]').click()]);
+    await p.locator('.cp-google-map').waitFor();assert.equal(googleRequests,2,'retry must request a fresh Google session');
+    assert.match(await p.locator('.cp-hole-heading').innerText(),/Hole 3/,'retry restores the selected hole');
+    assert.deepEqual((await state(p)).coursePrep,saved,'retry preserves the saved plan');
+    await p.evaluate(()=>window.gm_authFailure());await p.locator('#cp-map-stage [data-cp="map-setup"]').click();await p.locator('#cp-api-key').fill('AIza'+'x'.repeat(35));
+    await Promise.all([p.waitForEvent('load',{timeout:5000}),p.locator('[data-cp="key-save"]').click()]);
+    await p.locator('.cp-google-map').waitFor();assert.equal(googleRequests,3,'reconnecting the same rejected key must create a fresh session');
+    await mode(p,'route');await p.locator('#cp-route-map').waitFor();
     // Existing backup actions carry plans, not the separate Maps credential.
     await explore(p,'[data-action="go"][data-view="data"]');
     const [download]=await Promise.all([p.waitForEvent('download'),p.locator('[data-action="export"]').click()]);const exported=JSON.parse(fs.readFileSync(await download.path(),'utf8'));

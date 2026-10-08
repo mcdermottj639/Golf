@@ -3,6 +3,7 @@
   'use strict';
   const course = window.CADDIE_PREP_COURSES[0];
   const KEY = 'caddiehq_google_maps_key_v1';
+  const RESUME = 'caddiehq_course_prep_resume_v1';
   const rad = x => x * Math.PI / 180;
   const deg = x => x * 180 / Math.PI;
   const esc = x => String(x == null ? '' : x).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -42,6 +43,7 @@
   }
   let bridge, root, hole = 1, mode = 'route', overview = false, edit = 'target';
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps2d, maps3d, overlays2d = [];
+  let googleAuthFailed = false;
   let projection = null, imageError = false, animationHandler, animationTimer, bagSnapshot;
   const model = () => clean(bridge.get());
   const currentHole = () => course.holes[hole - 1];
@@ -55,6 +57,18 @@
   const selected = () => bag().find(c => c.key === bridge.club(hole)) || null;
   const yard = n => Math.round(n).toLocaleString('en-US');
   function key() { try { return localStorage.getItem(KEY) || window.CADDIE_GOOGLE_MAPS_KEY || ''; } catch { return window.CADDIE_GOOGLE_MAPS_KEY || ''; } }
+  function reconnectGoogle() {
+    // Google retains authorization inside its loaded SDK. Start a new page session
+    // after changing Cloud settings, keeping the user's current hole and map view.
+    try { sessionStorage.setItem(RESUME, JSON.stringify({hole, mode})); } catch {}
+    window.location.reload();
+  }
+  function resumeAfterReload() {
+    let pending;
+    try { pending = JSON.parse(sessionStorage.getItem(RESUME) || 'null'); sessionStorage.removeItem(RESUME); } catch { return false; }
+    if(!pending || !Number.isInteger(pending.hole) || pending.hole < 1 || pending.hole > 18 || !['route','guide','satellite','3d'].includes(pending.mode)) return false;
+    hole = pending.hole; mode = pending.mode; overview = false; return true;
+  }
   function saveHole(patch) {
     const next = model(), k = holeKey();
     next.holes[k] = {...(next.holes[k] || {}), ...patch};
@@ -72,7 +86,7 @@
   }
   function setup() {
     return '<details class="cp-setup" id="cp-setup"><summary>Google Maps setup <span>' + (key() ? 'Key saved' : 'Connect satellite & 3D') + '</span></summary>' +
-      '<p>Enable Maps JavaScript API and billing in your Google Cloud project. Use a browser key restricted to this website and that API. ' +
+      '<p>Enable Maps JavaScript API and billing in the same Google Cloud project as your key. Choose Websites as the application restriction, including on iPhone, and restrict the key to Maps JavaScript API. ' +
       link('https://console.cloud.google.com/google/maps-apis/credentials', 'Open Google setup ↗') + '</p>' +
       '<label for="cp-api-key">Browser API key</label><div class="cp-key-row"><input id="cp-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="' + (key() ? 'A key is saved · paste to replace' : 'Paste your restricted key') + '">' +
       button('key-save', 'Connect') + (key() ? button('key-clear', 'Disconnect') : '') + '</div>' +
@@ -156,13 +170,13 @@
         const value = root.querySelector('#cp-api-key').value.trim();
         if (!/^AIza[0-9A-Za-z_-]{20,}$/.test(value)) return bridge.toast('Paste a valid Google Maps browser key');
         try { localStorage.setItem(KEY, value); } catch { return bridge.toast('Could not save the key on this device'); }
-        if (googleKey && googleKey !== value) { bridge.toast('Key saved. Reloading to apply it.'); window.location.reload(); return; }
+        if (googleKey && (googleKey !== value || googleAuthFailed)) { reconnectGoogle(); return; }
         googleFailure = ''; googlePromise = undefined; redraw(); bridge.toast('Maps key saved'); break;
       }
       case 'key-clear':
         try { localStorage.removeItem(KEY); } catch {}
         mode = 'route'; googleFailure = ''; redraw(); bridge.toast('Saved Maps key removed'); break;
-      case 'retry': googleFailure = ''; googlePromise = undefined; drawView(); break;
+      case 'retry': reconnectGoogle(); break;
       case 'fly': flyover(); break;
       case 'stop': stopFlyover(); break;
       case 'zoom-in': if (maps3d && mode === '3d') maps3d.range = Math.max(100, maps3d.range * 0.7); break;
@@ -344,7 +358,7 @@
       const end=(error)=>{if(done)return;done=true;clearTimeout(timer);if(error){googlePromise=undefined;reject(error);}else resolve();};
       const timer=setTimeout(()=>end(new Error('Maps timeout')),15000);
       window.__caddieMapsReady=()=>end();
-      window.gm_authFailure=()=>{googleFailure='Google rejected the Maps key. Check Maps JavaScript API, billing and website restrictions.';end(new Error(googleFailure));mapError(googleFailure);};
+      window.gm_authFailure=()=>{epoch++;googleAuthFailed=true;googleFailure='Google rejected the Maps key. Check Maps JavaScript API, billing and website restrictions.';end(new Error(googleFailure));mapError(googleFailure);};
       script.onerror=()=>end(new Error('Maps network error'));
       script.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(googleKey)+'&loading=async&v=weekly&callback=__caddieMapsReady';
       document.head.appendChild(script);
@@ -355,7 +369,7 @@
     googleFailure=message;googleFailureMode=failedMode;
     if(!root||!['3d','satellite'].includes(mode))return;
     stopFlyover();
-    root.querySelector('#cp-map-stage').innerHTML='<div class="cp-map-message"><h3>Google Maps is unavailable</h3><p>'+esc(message)+'</p>'+button('mode','Use the course map','data-mode="route"')+button('retry','Retry')+button('map-setup','Maps setup')+'</div>';
+    root.querySelector('#cp-map-stage').innerHTML='<div class="cp-map-message"><h3>Google Maps is unavailable</h3><p>'+esc(message)+'</p>'+button('mode','Use the course map','data-mode="route"')+button('retry','Reload & retry')+button('map-setup','Maps setup')+'</div>';
     drawControls();
   }
   function drawGoogle2d() {
@@ -399,7 +413,7 @@
     animationTimer=setTimeout(stopFlyover,30000);next();
   }
   window.CaddieCoursePrep = Object.freeze({
-    init: options => {bridge=options;}, render, mount, unmount, teaser,
+    init: options => {bridge=options;}, render, mount, unmount, teaser, resumeAfterReload,
     openHole: n => {hole=Number.isInteger(+n)&&+n>=1&&+n<=18?+n:1;overview=false;},
     courseName: course.name, clean,
     geo: Object.freeze({distance,destination,bearing,pointOK})
