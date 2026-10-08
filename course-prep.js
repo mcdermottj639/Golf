@@ -41,7 +41,7 @@
     }
     return out;
   }
-  let bridge, root, hole = 1, mode = 'guide', lastMapMode = 'satellite', overview = false, edit = 'target';
+  let bridge, root, liveDialog, hole = 1, mode = 'guide', lastMapMode = '3d', overview = false, edit = 'target';
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps2d, maps3d, overlays2d = [];
   let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
   let showRings = true, framed2d = null, framed3d = null;
@@ -112,7 +112,7 @@
   function reconnectGoogle() {
     // Google retains authorization inside its loaded SDK. Start a new page session
     // after changing Cloud settings, keeping the user's current hole and map view.
-    try { sessionStorage.setItem(RESUME, JSON.stringify({hole, mode})); } catch {}
+    try { sessionStorage.setItem(RESUME, JSON.stringify({hole, mode, live: !!liveDialog?.open})); } catch {}
     window.location.reload();
   }
   function resumeAfterReload() {
@@ -121,7 +121,8 @@
     if(!pending || !Number.isInteger(pending.hole) || pending.hole < 1 || pending.hole > 18 || !['route','guide','satellite','3d'].includes(pending.mode)) return false;
     hole = pending.hole; mode = pending.mode;
     if(mode!=='guide'){lastMapMode=mode;if(navigator.onLine===false)mode='route';}
-    overview = false; return true;
+    overview = false;
+    return pending.live && bridge.liveHole?.() === hole ? 'live' : true;
   }
   function saveHole(patch) {
     const next = model(), k = holeKey();
@@ -149,9 +150,15 @@
   function mapViews() {
     if(mode==='guide')return '';
     return '<div class="cp-map-views"><div class="cp-imagery-views" role="group" aria-label="Imagery view">'+
-      [['satellite','Overhead'],['3d','3D']].map(([k,label])=>button('mode',label,'data-mode="'+k+'" aria-pressed="'+(mode===k)+'"')).join('')+'</div>'+
+      [['3d','3D'],['satellite','Overhead']].map(([k,label])=>button('mode',label,'data-mode="'+k+'" aria-pressed="'+(mode===k)+'"')).join('')+'</div>'+
       button('mode','Simple map','class="cp-simple-view" data-mode="route" aria-pressed="'+(mode==='route')+'"')+'</div>'+
       (mode==='route'?'<p class="cp-map-view-note" role="status">'+(navigator.onLine===false?'You’re offline · using the simple map':'Simple map · works offline')+'</p>':'');
+  }
+  function mapSurface() {
+    return '<div class="cp-modes" role="group" aria-label="Hole view">'+
+      button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"')+
+      button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"')+'</div>'+mapViews()+
+      '<div class="cp-reference" id="cp-reference" hidden></div><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div>';
   }
   function render() {
     bagSnapshot = null;
@@ -165,8 +172,7 @@
       '<div class="cp-holes" role="group" aria-label="Choose a hole">' + course.holes.map(x => '<button type="button" data-cp="hole" data-n="' + x.n + '" aria-label="Hole ' + x.n + ', par ' + x.par + '" ' + (x.n === hole ? 'aria-current="step"' : '') + ' class="' + (m.holes[m.tee + ':' + x.n]?.reviewed ? 'reviewed' : '') + '"><b>' + x.n + '</b><span>Par ' + x.par + '</span></button>').join('') + '</div>' +
       '<div class="cp-grid"><section class="cp-map-panel"><header class="cp-hole-heading"><div><span class="cp-eyebrow">' + esc(t.name) + ' TEES</span><h3>Hole ' + hole + '<small>Par ' + h.par + ' · ' + yard(t.yards[hole - 1]) + ' yd · Hcp ' + h.si + '</small></h3></div><div class="cp-arrows">' +
       button('previous', '←', 'aria-label="Previous hole" ' + (hole === 1 ? 'disabled' : '')) + button('next', '→', 'aria-label="Next hole" ' + (hole === 18 ? 'disabled' : '')) + '</div></header>' +
-      '<div class="cp-modes" role="group" aria-label="Hole view">' + button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"') + button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"') + '</div>' + mapViews() +
-      '<div class="cp-reference" id="cp-reference" hidden></div><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div></section>' +
+      mapSurface() + '</section>' +
       '<aside class="cp-plan"><section class="cp-plan-card"><span class="cp-eyebrow">THE PLAN</span><h3>' + (h.par === 3 ? 'Choose the carry.' : h.par === 5 ? 'Build it shot by shot.' : 'Pick your landing area.') + '</h3><p class="cp-prompt">' + esc(h.prompt) + '</p>' +
       '<label for="cp-basis">Distance source</label><select id="cp-basis"><option value="playing" '+(m.basis==='playing'?'selected':'')+'>Saved playing carries</option><option value="range" '+(m.basis==='range'?'selected':'')+'>Latest range measurements</option></select>' +
       '<p class="cp-muted">'+(m.basis==='range'?'Range conditions and club settings may differ from this round. These are planning references; your Bag stays unchanged.':'Switch to range measurements to compare clubs whose playing carry is still unset.')+'</p>' +
@@ -189,7 +195,17 @@
       '<p>Map distances are approximate horizontal measurements, not laser yardages or slope-adjusted plays-like distances. The map is incomplete: unmarked areas may contain hazards. Google 3D detail varies by location; it does not show today’s pins or putting contours.</p>' +
       '<p>' + link(course.source, 'Official scorecard') + ' · ' + link(course.tour, 'Official hole guides') + ' · ' + link('https://www.openstreetmap.org/copyright', '© OpenStreetMap contributors · ODbL') + ' · <a href="./data/course-prep/pound-ridge-osm.json" download>Map source data</a></p></details></div>';
   }
-  function redraw() { bridge.refresh(); }
+  function redraw() {
+    if(!liveDialog?.open)return bridge.refresh();
+    // Replace only the popup contents. Rerendering the live page would close it
+    // and could disturb an unfinished scorecard edit underneath the dialog.
+    bagSnapshot = null;
+    const content = document.createElement('div');
+    content.className = 'cp-workspace cp-live-map-content';
+    content.innerHTML = mapSurface() + setup();
+    liveDialog.querySelector('.cp-live-map-content').replaceWith(content);
+    mount(content);
+  }
   function changeHole(n) { if (!Number.isInteger(n) || n < 1 || n > 18) return; stopFlyover(); hole = n; framed3d = null; mode = 'guide'; imageError = false; overview = false; redraw(); }
   function stopFlyover() {
     if (animationHandler && maps3d) maps3d.removeEventListener('gmp-animationend', animationHandler);
@@ -200,28 +216,33 @@
     return queueCamera(() => scene?.stopCameraAnimation()).catch(() => {});
   }
   function unmount(keepLocation = false) { epoch++; stopFlyover(); closeGuide(); if(!keepLocation)stopLocation(); root = null; }
-  function closeGuide() { document.querySelector('dialog.cp-guide-dialog[open]')?.close?.(); }
-  function openGuide(courseId, n) {
-    const source = window.CADDIE_PREP_COURSES.find(c => c.id === courseId);
-    const h = source?.holes.find(item => item.n === +n && item.guide);
-    if(!h)return false;
+  function releaseLiveMap(dialog) {
+    if(liveDialog !== dialog)return;
+    epoch++; stopFlyover(); stopLocation(); root = null; liveDialog = null;
+  }
+  function closeGuide() {
+    const dialog = document.querySelector('dialog.cp-guide-dialog[open]');
+    if(!dialog)return;
+    releaseLiveMap(dialog);
+    dialog.close(); dialog.remove();
+  }
+  function holeDialog(source, h, id, closeLabel, content) {
+    const previous = document.querySelector('dialog.cp-guide-dialog[open]');
+    const trigger = previous?.cpReturnFocus || document.activeElement;
     closeGuide();
-    const trigger = document.activeElement, dialog = document.createElement('dialog');
-    dialog.id='cp-live-guide';dialog.className='cp-guide-dialog';
+    const dialog = document.createElement('dialog');
+    dialog.cpReturnFocus = trigger;
+    dialog.id=id;dialog.className='cp-guide-dialog'+(id==='cp-live-map'?' cp-live-map-dialog':'');
     dialog.setAttribute('aria-labelledby','cp-guide-title');
-    dialog.innerHTML='<header><div><p>'+esc(source.name)+'</p><h2 id="cp-guide-title">Hole '+h.n+' <span>· Par '+h.par+'</span></h2></div><button type="button" aria-label="Close hole guide" autofocus>×</button></header>'+
-      '<figure><img src="'+esc(h.guide)+'" alt="Official illustrated guide for '+esc(source.name)+' hole '+h.n+'" referrerpolicy="no-referrer"><div class="cp-guide-dialog-error" hidden><b>The illustration could not load.</b><p>Check your connection or open the club’s guide below.</p></div></figure>'+
-      '<footer>Official club illustration · not to scale. '+link(source.tour,'Open course guide ↗')+'</footer>';
+    dialog.innerHTML='<header><div><p>'+esc(source.name)+'</p><h2 id="cp-guide-title">Hole '+h.n+' <span>· Par '+h.par+'</span></h2></div><button type="button" aria-label="'+closeLabel+'" autofocus>×</button></header>'+content;
     dialog.querySelector('header button').addEventListener('click',()=>dialog.close());
-    dialog.querySelector('img').addEventListener('error',()=>{
-      dialog.querySelector('img').hidden=true;dialog.querySelector('.cp-guide-dialog-error').hidden=false;
-    });
     dialog.addEventListener('click',event=>{
       if(event.target!==dialog)return;
       const r=dialog.getBoundingClientRect();
       if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)dialog.close();
     });
     dialog.addEventListener('close',()=>{
+      releaseLiveMap(dialog);
       dialog.remove();
       if(!document.querySelector('dialog.cp-guide-dialog[open]')){
         document.body.classList.remove('cp-guide-open');
@@ -229,6 +250,31 @@
       }
     },{once:true});
     document.body.appendChild(dialog);document.body.classList.add('cp-guide-open');dialog.showModal();
+    return dialog;
+  }
+  function openGuide(courseId, n) {
+    const source = window.CADDIE_PREP_COURSES.find(c => c.id === courseId);
+    const h = source?.holes.find(item => item.n === +n && item.guide);
+    if(!h)return false;
+    const dialog = holeDialog(source,h,'cp-live-guide','Close hole guide',
+      (source.id===course.id?'<div class="cp-workspace"><div class="cp-modes" role="group" aria-label="Hole view"><button type="button" aria-pressed="true">Hole guide</button><button type="button" data-live-map aria-pressed="false">Interactive map</button></div></div>':'')+
+      '<figure><img src="'+esc(h.guide)+'" alt="Official illustrated guide for '+esc(source.name)+' hole '+h.n+'" referrerpolicy="no-referrer"><div class="cp-guide-dialog-error" hidden><b>The illustration could not load.</b><p>Check your connection or open the club’s guide below.</p></div></figure>'+
+      '<footer>Official club illustration · not to scale. '+link(source.tour,'Open course guide ↗')+'</footer>');
+    dialog.querySelector('[data-live-map]')?.addEventListener('click',()=>openLiveMap(source.id,h.n));
+    dialog.querySelector('img').addEventListener('error',()=>{
+      dialog.querySelector('img').hidden=true;dialog.querySelector('.cp-guide-dialog-error').hidden=false;
+    });
+    return true;
+  }
+  function openLiveMap(courseId, n, start = '3d') {
+    const h = course.id===courseId && course.holes.find(item=>item.n===+n);
+    if(!h || !bridge)return false;
+    const dialog = holeDialog(course,h,'cp-live-map','Close interactive map','<div class="cp-live-map-content"></div>');
+    liveDialog = dialog; hole = h.n; framed3d = null; framed2d = null;
+    mode = key() && navigator.onLine!==false && ['3d','satellite','route'].includes(start) ? start : 'route';
+    lastMapMode = mode; overview = false; edit = 'target';
+    if(!googleAuthFailed && googleFailureMode && googleFailureMode!==mode)googleFailure='';
+    redraw();
     return true;
   }
   function mount(node) {
@@ -254,6 +300,7 @@
       case 'mode': {
         const requested=el.dataset.mode;
         if(!['guide','map','route','satellite','3d'].includes(requested))break;
+        if(liveDialog && requested==='guide'){openGuide(course.id,hole);break;}
         stopFlyover();
         mode=requested==='map'?(key()?lastMapMode:'route'):requested;
         if(requested!=='map'&&mode!=='guide')lastMapMode=mode;
@@ -316,7 +363,7 @@
     }
   }
   function readout() {
-    if (!root) return;
+    if (!root?.querySelector('#cp-club-readout')) return;
     const c = selected(), roll = savedHole().roll || 0;
     const toTarget = distance(origin(), target()), toGreen = distance(target(), green());
     const selectedKey = bridge.club(hole);
@@ -406,11 +453,11 @@
     const el = root.querySelector('#cp-map-controls');
     const mapped = mode !== 'guide' && (mode === 'route' || (!!key() && !googleFailure));
     el.innerHTML = (mapped && !overview ? '<div class="cp-map-summary">'+(savedHole().target ? '<span><b>'+yard(distance(origin(),target()))+' yd</b> to your target</span><span><b>'+yard(distance(target(),green()))+' yd</b> left to green</span>' : '<span><b>'+yard(distance(origin(),green()))+' yd</b> '+referenceName().toLowerCase()+' → mapped green</span><span>Tap a landing spot<br>to plan your shot</span>')+'</div>' : '') +
-      (mapped && !overview ? '<div class="cp-map-legend"><span><i class="cp-legend-tee">'+(liveLocation()?'●':'T')+'</i> '+(liveLocation()?'You':'Tee')+'</span><span><i class="cp-legend-target">A</i> Aim</span><span><i class="cp-legend-green">G</i> Green</span>'+(selected()?.carry>0?'<span class="cp-map-club">'+esc(selected().label)+' · '+yard(selected().carry)+' yd carry</span>':'')+'</div>':'') + '<div class="cp-map-tools">' + (mode === 'route' ? button('overview', overview ? 'Focus this hole' : 'All 18 holes') : '') +
+      (mapped && !overview ? '<div class="cp-map-legend"><span><i class="cp-legend-tee">'+(liveLocation()?'●':'T')+'</i> '+(liveLocation()?'You':'Tee')+'</span><span><i class="cp-legend-target">A</i> Aim</span><span><i class="cp-legend-green">G</i> Green</span>'+(selected()?.carry>0?'<span class="cp-map-club">'+esc(selected().label)+' · '+yard(selected().carry)+' yd carry</span>':'')+'</div>':'') + '<div class="cp-map-tools">' + (mode === 'route' && !liveDialog ? button('overview', overview ? 'Focus this hole' : 'All 18 holes') : '') +
       (mapped && !overview ? button('edit','Landing target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
       (mapped && !overview && selected()?.carry>0 ? button('rings','Carry rings','aria-pressed="'+showRings+'"'):'')+
       (savedHole().target ? button('clear-target','Clear target'):'') + (savedHole().tee ? button('reset-tee','Reset tee'):'') + '</div>';
-    if(mapped && ['satellite','3d'].includes(mode))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+button('shot-plan','Shot plan ↓')+(mode==='3d'?button('frame','Back to tee','data-focus="tee"'):'')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
+    if(mapped && ['satellite','3d'].includes(mode))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+(!liveDialog?button('shot-plan','Shot plan ↓'):'')+(mode==='3d'?button('frame','Back to tee','data-focus="tee"'):'')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
     root.querySelector('#cp-map-caption').innerHTML = mode === 'guide'
       ? 'Official club illustration · not to scale. '+link(course.tour,'Open course guide ↗')
       : (['satellite','3d'].includes(mode)?'One finger to move · pinch to zoom. Scroll outside the map to move the page. ':'')+(overview ? '18 mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
@@ -668,7 +715,8 @@
   });
   window.addEventListener('pagehide',()=>stopLocation());
   window.CaddieCoursePrep = Object.freeze({
-    init: options => {bridge=options;}, render, mount, unmount, teaser, resumeAfterReload, openGuide,
+    init: options => {bridge=options;}, render, mount, unmount, teaser, resumeAfterReload, openGuide, openLiveMap,
+    resumeLiveMap: () => openLiveMap(course.id,hole,mode),
     openHole: n => {hole=Number.isInteger(+n)&&+n>=1&&+n<=18?+n:1;framed3d=null;mode='guide';imageError=false;overview=false;},
     courseName: course.name, clean,
     geo: Object.freeze({distance,destination,bearing,pointOK})

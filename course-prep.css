@@ -11,7 +11,7 @@ body.cp-guide-open{overflow:hidden}
 .cp-guide-dialog header button{width:44px;height:44px;flex-shrink:0;background:#eef2e7;color:#193e32;border:1px solid #d8dfd0;border-radius:12px;font:28px/1 sans-serif;cursor:pointer}
 .cp-guide-dialog header button:focus-visible{outline:3px solid #b9943d;outline-offset:2px}
 .cp-guide-dialog figure{margin:0;height:min(68dvh,650px);min-height:180px;background:#b9b7a6}
-.cp-guide-dialog img{display:block;width:100%;height:100%;object-fit:contain}
+.cp-guide-dialog>figure>img{display:block;width:100%;height:100%;object-fit:contain}
 .cp-guide-dialog-error{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;height:100%;padding:24px;background:#edf1e4;font-size:15px}
 .cp-guide-dialog-error p{font-size:13px;line-height:1.5;margin:0;max-width:260px}
 .cp-guide-dialog [hidden]{display:none}
@@ -188,3 +188,11 @@ body.night .cp-entry,body.night .cp-hero{border-color:#486644}
 body.night .cp-imagery-views{background:#102e25}
 body.night .cp-imagery-views button[aria-pressed=true]{background:#335343;color:#fff}
 body.night .cp-map-views .cp-simple-view[aria-pressed=true]{background:#335343;color:#fff}
+
+/* Live maps share the planner renderer, inside a scorecard-preserving dialog. */
+.cp-guide-dialog>header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #dde4d8}
+.cp-guide-dialog .cp-modes{padding-top:8px}
+.cp-live-map-dialog .cp-map-stage{height:clamp(240px,48dvh,500px)}
+.cp-live-map-dialog .cp-setup{margin:12px;border-radius:12px;padding:14px}
+.cp-live-map-dialog .cp-map-caption{font-size:11px}
+.cp-live-map-dialog .cp-workspace{background:var(--cp-panel)}

@@ -62,7 +62,7 @@ function locationMock(){
     assert.equal(await p.locator('.cp-holes button').count(),18);assert.equal(await p.locator('#cp-tees option').count(),7);
     assert.match(await p.locator('.cp-hole-heading').innerText(),/380 yd/);
     assert.equal(await p.locator('.cp-modes [data-mode="map"]').getAttribute('aria-pressed'),'true');
-    assert.deepEqual(await p.locator('.cp-imagery-views button').allTextContents(),['Overhead','3D']);
+    assert.deepEqual(await p.locator('.cp-imagery-views button').allTextContents(),['3D','Overhead']);
     assert.equal(await p.locator('.cp-simple-view').getAttribute('aria-pressed'),'true');
     assert.equal(googleRequests,0,'keyless Interactive map opens Simple map without Google');
     assert.equal(await p.locator('.cp-clubs [data-club]').count(),initial.carries.length);
@@ -201,7 +201,7 @@ function locationMock(){
     await p.reload();await ready(p);assert.deepEqual((await state(p)).coursePrep,saved);
     const final=await state(p);for(const k of ['carries','clubs','rounds','bays'])assert.deepEqual(final[k],initial[k],k+' preserved');
     await explore(p,'[data-action="live-new"]');await p.locator('#lvCourse').fill('Pound Ridge Golf Club');await p.locator('[data-action="live-start"]').click();await p.locator('[data-action="live-card-play"]').click();
-    assert.match(await p.locator('.lvhn').innerText(),/Hole 1/);assert.ok(await p.locator('[data-action="open-course-prep"][data-n="1"]').isVisible());
+    assert.match(await p.locator('.lvhn').innerText(),/Hole 1/);assert.ok(await p.locator('[data-action="live-hole-map"][data-n="1"]').isVisible());
     await p.locator('.holeintel .hi-head').click();assert.ok((await p.locator('.holeintel .hi-grid').innerText()).includes(note),'saved note reaches the live hole');
     // The guide is a modal over the active round, not a navigation or score edit.
     for(const width of [320,390,1440]){
@@ -227,6 +227,71 @@ function locationMock(){
     await p.locator('#cp-live-guide img').evaluate(img=>{img.src+='?qa=failed-request';});
     await p.locator('.cp-guide-dialog-error').waitFor();assert.ok(await p.locator('#cp-live-guide footer a').isVisible());
     await p.mouse.click(2,2);await p.locator('#cp-live-guide').waitFor({state:'detached'});assert.equal(await p.evaluate(()=>document.body.classList.contains('cp-guide-open')),false);guideFailure=false;
+    // Live maps use the same measurement renderer without leaving or rerendering
+    // the current scorecard. Google remains mocked; native dialog/layout is real.
+    await p.evaluate(locationMock);
+    for(const [width,n] of [[320,1],[390,9],[1440,18]]){
+      await p.setViewportSize({width,height:width===1440?1000:844});
+      await p.locator('.lvbar[data-i="'+(n-1)+'"]').click();
+      const beforeMap=await state(p),scorecard=await p.locator('.lvhn').elementHandle();
+      await p.locator('[data-action="live-hole-map"]').click();await p.locator('#cp-live-map qa-map-scene').waitFor();
+      assert.match(await p.locator('#cp-guide-title').innerText(),new RegExp('^Hole '+n+' · Par '));
+      assert.deepEqual(await p.locator('.cp-imagery-views button').allTextContents(),['3D','Overhead']);
+      assert.equal(await p.locator('.cp-imagery-views [data-mode="3d"]').getAttribute('aria-pressed'),'true');
+      assert.equal(await p.locator('[data-cp="shot-plan"]').count(),0);
+      await p.waitForFunction(n=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[n-1],s=JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge;return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(s.holes[s.tee+':'+n]?.tee||h.path[0],h.path.at(-1));},n);
+      const liveYardages=await p.locator('.cp-map-summary').innerText();
+      await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();assert.equal(await p.locator('.cp-map-summary').innerText(),liveYardages);
+      await mode(p,'route');await p.locator('#cp-route-map').waitFor();assert.equal(await p.locator('[data-cp="overview"]').count(),0);
+      const bounds=await p.locator('#cp-live-map').evaluate(e=>{e.scrollTop=0;const r=e.getBoundingClientRect();return {fits:r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight,overflow:e.scrollWidth>e.clientWidth+1};});
+      assert.ok(bounds.fits&&!bounds.overflow,'live map fits '+width);
+      assert.ok(await p.locator('.cp-map-views button').evaluateAll(els=>els.every(e=>e.getBoundingClientRect().height>=44)));
+      await p.screenshot({path:path.join(screens,'live-map-'+width+'.png')});
+      assert.ok(await scorecard.evaluate(e=>e.isConnected),'style changes keep scorecard DOM intact');
+      await p.locator('[aria-label="Close interactive map"]').click();await p.locator('#cp-live-map').waitFor({state:'detached'});
+      assert.deepEqual(await state(p),beforeMap,'live map viewing preserves all golf state');
+      assert.equal(await p.evaluate(()=>document.activeElement?.dataset.action),'live-hole-map');
+    }
+    await p.setViewportSize({width:390,height:844});
+    // Moving between the guide and map returns focus to the original live trigger.
+    await p.locator('[data-action="live-hole-guide"]').click();await p.locator('[data-live-map]').click();await p.locator('qa-map-scene').waitFor();
+    await mode(p,'guide');await p.locator('#cp-live-guide img').waitFor();
+    await p.keyboard.press('Escape');await p.locator('#cp-live-guide').waitFor({state:'detached'});
+    assert.equal(await p.evaluate(()=>document.activeElement?.dataset.action),'live-hole-guide');
+    const liveBeforeMeasurement=(await state(p)).live;
+    await p.locator('[data-action="live-hole-map"]').click();await p.locator('qa-map-scene').waitFor();
+    const liveTarget=await p.evaluate(()=>{const h=CADDIE_PREP_COURSES[0].holes[17],g=CaddieCoursePrep.geo;return g.destination(h.path[0],180,g.bearing(h.path[0],h.path.at(-1)));});
+    await p.locator('qa-map-scene').evaluate((el,point)=>{const e=new Event('gmp-click');e.position={lat:point[0],lng:point[1]};el.dispatchEvent(e);},liveTarget);
+    assert.ok(await p.evaluate(point=>CaddieCoursePrep.geo.distance(JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge.holes['granite:18'].target,point)<0.02,liveTarget),'live target matches the tapped coordinate within saved precision');
+    assert.match(await p.locator('.cp-map-summary').innerText(),/180 yd[\s\S]*left to green/);
+    assert.deepEqual((await state(p)).live,liveBeforeMeasurement,'target edits never change the live scorecard');
+    const beforeLiveGPS=await state(p);
+    assert.equal(await p.evaluate(()=>locationQA.calls),0,'live map waits for explicit location request');
+    await p.locator('[data-cp="locate"]').click();await p.evaluate(point=>locationQA.fix(point),liveTarget);
+    assert.match(await p.locator('#cp-reference').innerText(),/My location/);
+    assert.equal(await p.locator('.cp-map-summary b').first().innerText(),'0 yd');
+    assert.deepEqual(await state(p),beforeLiveGPS,'live GPS is never persisted');
+    await mode(p,'satellite');assert.equal(await p.evaluate(()=>locationQA.active()),1);
+    await p.keyboard.press('Escape');await p.locator('#cp-live-map').waitFor({state:'detached'});
+    assert.equal(await p.evaluate(()=>locationQA.active()),0,'closing live map stops GPS');
+    await p.locator('[data-action="live-hole-map"]').click();await p.locator('qa-map-scene').waitFor();
+    assert.equal(await p.locator('#cp-reference b').innerText(),'Reference tee');
+    await context.setOffline(true);await p.locator('#cp-route-map').waitFor();
+    assert.match(await p.locator('.cp-map-view-note').innerText(),/offline/);
+    assert.deepEqual((await state(p)).live,liveBeforeMeasurement);
+    await context.setOffline(false);await p.keyboard.press('Escape');await p.locator('#cp-live-map').waitFor({state:'detached'});
+    await p.evaluate(()=>localStorage.removeItem('caddiehq_google_maps_key_v1'));
+    await p.locator('[data-action="live-hole-map"]').click();await p.locator('#cp-route-map').waitFor();
+    await p.keyboard.press('Escape');await p.locator('#cp-live-map').waitFor({state:'detached'});
+    await p.evaluate(()=>localStorage.setItem('caddiehq_google_maps_key_v1','AIza'+'x'.repeat(35)));
+    await p.locator('[data-action="live-hole-map"]').click();await p.locator('qa-map-scene').waitFor();
+    await p.evaluate(()=>window.gm_authFailure());await p.locator('#cp-map-stage [data-cp="retry"]').waitFor();
+    await Promise.all([p.waitForEvent('load',{timeout:5000}),p.locator('#cp-map-stage [data-cp="retry"]').click()]);
+    await p.locator('#cp-live-map qa-map-scene').waitFor();assert.match(await p.locator('#cp-guide-title').innerText(),/^Hole 18 /);
+    assert.deepEqual((await state(p)).live,liveBeforeMeasurement,'Google retry restores the same live scorecard and popup');
+    await p.keyboard.press('Escape');await p.locator('#cp-live-map').waitFor({state:'detached'});assert.match(await p.locator('.lvhn').innerText(),/Hole 18/);
+    await p.reload();await ready(p);await p.locator('#nav [data-view="rounds"]').click();await p.locator('[data-action="open-course-prep"]').first().click();await mode(p,'map');await p.locator('qa-map-scene').waitFor();
+    assert.equal(await p.locator('.cp-imagery-views [data-mode="3d"]').getAttribute('aria-pressed'),'true','3D is the initial imagery default');
     // Explicit device-location reference: no initial request, no stored coordinates,
     // no overwrite of the saved tee, and yardages follow movement in every map mode.
     const gps=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});

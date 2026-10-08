@@ -119,10 +119,11 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v214, October 8 2026)
+## Course Prep (v215, October 8 2026)
 
-Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
-Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
+Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep
+and Explorer. The Pound Ridge live hole opens its map in a popup over the scorecard.
+`courseprep` maps back to Rounds in navigation.
 `course-prep.js` receives narrow callbacks from `initCoursePrep()`; it must never
 replace the full player state. `S.coursePrep.poundRidge` holds the selected tee and
 distance source plus per-tee/per-hole notes, reviewed flags, tee/target positions and
@@ -130,10 +131,19 @@ rollout assumptions. Existing `S.planCalls` remains the authority for club choic
 shared with the regular briefing and live-round prep. Club choices are per course/hole;
 notes and map positions are per tee/hole. All are included in normal golf backups.
 The live-hole header offers **Hole guide** when a matching course/hole has a sourced
-illustration. `openGuide(courseId,n)` opens a native modal dialog over the round; Close,
+illustration, plus **Interactive map** for Pound Ridge. `openGuide(courseId,n)` and
+`openLiveMap(courseId,n)` open native modal dialogs over the round; Close,
 Escape and the backdrop return focus to the button without changing the live hole,
 score or notes. Navigation closes the dialog. Image failure shows a connection hint
 and official source link. The guide never loads Google or writes player state.
+The map reuses the planner's renderer, targets, yardages, optional foreground GPS,
+camera controls and Google setup. It opens in 3D (Simple map without a key/offline).
+Guide/map switching stays in the popup for the current live hole. No all-hole selector
+or planner jump appears there. Changing map style rerenders only the popup, never
+the scorecard underneath. Closing it also stops location tracking and flyovers.
+Retry/reconnecting preserves the live popup only if the saved live course/hole still
+matches; otherwise it returns to prep. Popup open/close and style changes never write
+golf state. Explicit target/tee edits use the existing per-tee/per-hole prep record.
 
 Saved playing carries remain the default. The optional range source reads the latest
 available struck-shot batch from `swingEvolutionRows()`, showing date, sample and setup;
@@ -160,9 +170,10 @@ tee. Source geometry, IDs, ODbL attribution and licensing live in `data/course-p
 Official hole illustrations load from the club and are not cached or rehosted.
 The Hole guide is the initial view on entry and every hole change (arrows, numbered
 holes, plan rows and overview map). Only Hole guide and Interactive map are top-level choices.
-Inside Interactive map, Overhead and 3D form the imagery switch; Simple map is a secondary
-button and the offline fallback. Retain the last chosen map style in memory across guide/hole
-navigation. No key defaults the main map entry to Simple map; explicit imagery buttons still
+Inside Interactive map, 3D is first and the initial default; Overhead is beside it in
+the imagery switch; Simple map is a secondary button and the offline fallback. Within
+prep, retain the last chosen map style in memory across guide/hole navigation. Opening
+a live map popup starts in 3D. No key defaults map entry to Simple map; explicit imagery buttons still
 explain connection setup. Going offline while viewing imagery selects Simple map without
 changing tee, target, location or plan data; returning online never auto-loads Google.
 Google reconnect alone restores the requested map view so Retry still retries Maps.
@@ -3784,4 +3795,4 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v213 camera correction:** Real Google SDK 3.66.7 was loaded without a key for API contract checks. It confirms v211 constructor rejection and rejects v212 flyCameraTo with `InvalidValueError: in property endCamera: Altitude mode CLAMP_TO_GROUND is not supported for camera animations.` Camera targets now explicitly use altitude 0 + RELATIVE_TO_GROUND; ground-clamped markers/lines remain correct. The real SDK accepts this request past validation; no licensed imagery or device rendering was certified. Never copy marker altitude modes into camera calls. Draw overlays before camera work. Catch asynchronous camera rejections locally, retaining map/markers/yardages with direct-property framing (preserve observed absolute center altitude) and a brief toast; do not call mapError for optional camera motion. Regression covers rejected animations at entry and via controls, data preservation and all 18 camera modes.
 
-**v214 map navigation:** Two main buttons (Hole guide / Interactive map), nested Overhead / 3D controls and secondary Simple map. Preserve guide-first hole entry, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. Internal mode values remain guide/route/satellite/3d for compatibility; map is a navigation action only.
+**v214 map navigation:** Two main buttons (Hole guide / Interactive map), nested 3D / Overhead controls (3D first/default as of v215) and secondary Simple map. Preserve guide-first hole entry, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. Internal mode values remain guide/route/satellite/3d for compatibility; map is a navigation action only.

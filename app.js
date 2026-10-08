@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v214';
+const BUILD = 'v215';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v215', d:'2026-10-08', items:['LIVE HOLE MAP: Open Interactive map from your Pound Ridge scorecard for the current hole’s 3D view, tap-to-measure yardages and optional GPS reference. Switch to the illustrated guide or close to return to the same hole.','3D FIRST: Interactive map starts in 3D, with Overhead beside it. Hole guide still opens first in course prep, and Simple map remains the offline fallback.'] },
   { b:'v214', d:'2026-10-08', items:['ONE INTERACTIVE MAP: Hole guide and Interactive map are the two main views. Switch between Overhead and 3D inside the map; Simple map remains available and opens automatically offline. Your targets, tee and yardages stay shared.'] },
   { b:'v213', d:'2026-10-08', items:['3D CAMERA REPAIR: Use the terrain-relative camera mode supported by Google. A camera-animation failure now keeps the map, markers and tap yardages available instead of replacing them with an error page.'] },
   { b:'v212', d:'2026-10-08', items:['3D STARTUP FIX: Corrected the viewer initialization introduced in v211. Tee-to-green framing and Back to tee remain available.'] },
@@ -10106,7 +10107,7 @@ function livePlay(L){
       <span class="lvsaved">● SAVED</span></div>
   </div>
 
-  ${guideCourse || sameCourse(L.course, 'Pound Ridge Golf Club') ? `<div class="cp-live-guides">${guideCourse ? `<button type="button" class="btn" data-action="live-hole-guide" data-course="${esc(guideCourse.id)}" data-n="${h.n}" aria-haspopup="dialog">Hole guide ⤢</button>` : ''}${sameCourse(L.course,'Pound Ridge Golf Club') ? `<button type="button" class="btn ghost tiny" data-action="open-course-prep" data-n="${h.n}">Map & plan ↗</button>` : ''}</div>` : ''}
+  ${guideCourse || sameCourse(L.course, 'Pound Ridge Golf Club') ? `<div class="cp-live-guides">${guideCourse ? `<button type="button" class="btn" data-action="live-hole-guide" data-course="${esc(guideCourse.id)}" data-n="${h.n}" aria-haspopup="dialog">Hole guide ⤢</button>` : ''}${sameCourse(L.course,'Pound Ridge Golf Club') ? `<button type="button" class="btn" data-action="live-hole-map" data-course="pound-ridge" data-n="${h.n}" aria-haspopup="dialog">Interactive map ⤢</button>` : ''}</div>` : ''}
   ${prep}
 
   <div class="lvseg">
@@ -10271,6 +10272,7 @@ function bumpGearCounters(){
 // ---------- Actions ----------
 const ACTIONS = {
   'live-hole-guide': el => window.CaddieCoursePrep?.openGuide(el.dataset.course,+el.dataset.n),
+  'live-hole-map': el => window.CaddieCoursePrep?.openLiveMap(el.dataset.course,+el.dataset.n),
   'open-course-prep': el => { window.CaddieCoursePrep?.openHole(el?.dataset.n || 1); render('courseprep'); },
   'hq-explore': () => window.CaddieExplorer?.open(),
   'hq-back': () => {
@@ -11582,6 +11584,7 @@ function coursePrepNote(course, n){
 function initCoursePrep(){
   window.CaddieCoursePrep?.init({
     get: () => S.coursePrep?.poundRidge,
+    liveHole: () => S.live?.stage === 'play' && sameCourse(S.live.course,'Pound Ridge Golf Club') ? S.live.holes?.[S.live.cur]?.n : null,
     save: plan => { S.coursePrep = S.coursePrep || {}; S.coursePrep.poundRidge = plan; save(); },
     bag: basis => {
       const evidence = basis === 'range' ? swingEvolutionRows() : new Map();
@@ -11615,7 +11618,9 @@ window.CaddieHQ={search:hqSearch,explore:hqExplore};
 load(); save();
 initCoursePrep();
 applyTheme();
-render(window.CaddieCoursePrep?.resumeAfterReload() ? 'courseprep' : 'home');
+const prepResume = window.CaddieCoursePrep?.resumeAfterReload();
+render(prepResume === 'live' ? 'live' : prepResume ? 'courseprep' : 'home');
+if(prepResume === 'live')window.CaddieCoursePrep.resumeLiveMap();
 fetchFeed();
 if(S.weather) fetchWeather();  // silent refresh only if previously enabled
 // iOS resumes a suspended PWA without reloading the page — re-check the
