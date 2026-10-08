@@ -102,7 +102,8 @@ deep links use them. Activity is the day-by-day log; Progress & trends is the ex
 cumulative analysis. Four labs open in one tap. Overview adds a sourced digest and recent
 activity, followed by the **complete** original home content inside `.hq-legacy`.
 Bag presents the roster first; each carry-bearing club has a full-history link using its
-canonical club key. Latest rounds and start/resume/log actions lead the Rounds scorecards.
+canonical club key and returns directly to My Bag (v219). Cumulative analysis history
+continues to return to Bag at a glance. Latest rounds and start/resume/log actions lead the Rounds scorecards.
 Lab routines belong to Progress; dated/course briefings belong to Rounds.
 
 `window.CaddieHQ` exposes only `search` and `explore`, not mutable player state. Explorer
@@ -3710,11 +3711,17 @@ adjustment chart and removal. Individual iron removal uses data-member; do not r
 the whole set when a member row is selected. Save carries uses the same original rows
 and wedge synchronization. Existing notes and historical data are not rewritten.
 Persistent details IDs preserve expanded rows through a rerender. Bench and specialty
-wedge tools remain separate. BUILD/cache v185.
+wedge tools remain separate. Full-history buttons use the individual iron member or
+carry-row canonical key, including unmeasured clubs and iron members without a carry row.
+Their data-from="bag" context returns to My Bag; history does not write player data.
+BUILD/cache v219.
 Validation: bag-management checks one row per physical club, thirteen unique carry
 inputs, descending display, per-member removal, preserved chart, and no duplicate
-ladder. Browser layout verification is still blocked by the corrupted Chromium download;
-Jack explicitly approved merging with that visual check unverified on Oct 1, 2026.
+ladder. tests/club-history.cjs verifies origin-aware navigation and complete player-state
+preservation. Club-history browser tests target 320/390/1440px, repeated Bag/history/back
+navigation, cumulative entry, source navigation, unmeasured clubs and stored-data preservation.
+For v219, browser execution was unavailable in the cloud workspace; Jack explicitly
+approved publication with phone/desktop visual verification unverified on October 8, 2026.
 
 
 ## PING G440 replaces canceled hybrid order (v186)

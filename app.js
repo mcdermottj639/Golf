@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v218';
+const BUILD = 'v219';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v219', d:'2026-10-08', items:['BAG: Full club history returns directly to My Bag, including individual irons and unmeasured clubs.'] },
   { b:'v218', d:'2026-10-08', items:['YOUR OWN YARDAGE BOOK: Caddie HQ guides turn sourced hole shapes into tee-to-green illustrations with fairway stripes, sand, water and woodland styling. Available offline in prep and live rounds, with official club artwork kept alongside them.','THE CONK: All 27 Metedeconk holes, four official tee rows and club illustrations. Choose your nines for live scoring; physical hole numbers keep the right guide and saved plan together. First/second-nine maps are available; third-nine measuring maps await verified coordinates.'] },
   { b:'v217', d:'2026-10-08', items:['YOUR COURSE LIBRARY: Explore Pound Ridge, Wianno and Sterling Farms from one course picker. Shared 3D/overhead maps, tap yardages and optional GPS work in prep and live rounds. Unverified hole maps are clearly marked while club choices and notes stay available.','SEPARATE PLANS: Targets, notes, reviewed holes and club choices stay with their course. Pound Ridge plans carry forward intact. Sterling adds 17 official guide images; unavailable illustrations open the interactive map. New Blue tee cards identify their published sources.'] },
   { b:'v216', d:'2026-10-08', items:['COMPLETE HOLE GUIDES: Illustrations appear after the full image loads, so a slow download cannot leave just the top strip showing. Prep and live-round guides retry interrupted loads and include a Retry image button.','CURRENT-HOLE PINS: 3D reuses only the active hole’s tee, green and optional target pins, clearing them before changing views or closing the live map.'] },
@@ -3632,8 +3633,8 @@ function compactBag(lineup){
           ${row ? `<label for="bag-carry-${i}">Playing carry · yards</label><div class="formrow"><input id="bag-carry-${i}" aria-label="${esc(label)} carry in yards" data-carry="${i}" inputmode="numeric" value="${row.carry ?? ''}" placeholder="Unmeasured"><button class="btn ghost tiny" data-action="save-carries">Save carry</button></div>
           ${gap != null ? `<p class="sm">${gap} yd to ${esc(clubAbbr(next.club))}${gap>=15 ? ' · wide gap' : gap<=5 ? ' · similar distance' : ''}</p>` : ''}
           ${pf && row.carry ? `<p class="sm">${Math.round(row.carry*pf)} yd today · adjusted for air temperature</p>` : ''}
-          ${ladderBadge(row)}${ladderOffer(row,i)}
-          <button class="btn ghost tiny" data-action="club-history" data-club="${esc(clubCanon(row.club))}">Full ${esc(label)} history →</button>` : ''}
+          ${ladderBadge(row)}${ladderOffer(row,i)}` : ''}
+          ${row || member ? `<button class="btn ghost tiny" data-action="club-history" data-club="${esc(clubCanon(member || row.club))}" data-from="bag">Full ${esc(label)} history →</button>` : ''}
           <p class="sm">${esc(c.spec || '')}</p>
           ${c.note ? `<p class="sm">${esc(c.note)}</p>` : ''}
           ${c.futureFit ? futureFitReference(c.futureFit) : ''}
@@ -3861,7 +3862,9 @@ function swingEvolutionCard(selectedClub){
 }
 
 // Club history uses the same retained cohorts as Swing evolution; no new stored data.
-function clubHistoryView(club){
+function clubHistoryView(arg){
+  const club = arg && typeof arg === 'object' ? arg.club : arg;
+  const fromBag = arg && typeof arg === 'object' && arg.from === 'bag';
   const rows = swingEvolutionRows().get(club) || [];
   const days = new Set(rows.map(r=>r.date)).size;
   const format = (v,unit,dec) => `${Number(v).toFixed(dec)}${unit?' '+unit:''}`;
@@ -3878,7 +3881,7 @@ function clubHistoryView(club){
   }).join('');
   const latest=rows.find(r=>!r.summary)||rows[0];
   const ftp=latest?.values.ftp,smash=latest?.values.smash,carry=latest?.values.carry;
-  return `<button class="backlink" data-action="session-category" data-kind="cumulative">← Bag at a glance</button>
+  return `<button class="backlink" data-action="club-history-back" data-from="${fromBag?'bag':'cumulative'}">← ${fromBag?'My Bag':'Bag at a glance'}</button>
     <section class="card"><span class="eyebrow">Full club history</span><h2>${esc(clubCanonLabel(club))}</h2><p>${days} recorded days · ${rows.length} batches · range data</p><p class="sm">Every available batch, including earlier setups. New imported sessions appear automatically. Historical club models sharing this playing label remain identified by their recorded setup.</p></section>
     <section class="card"><h2>What to work on next</h2>${latest?`<p><b>Repeat a controlled baseline</b> · ${esc(fmtDate(latest.date))}</p><p>${carry?`Carry averaged ${format(carry.value,'yd',1)}. `:''}${ftp?`Face-to-path averaged ${format(ftp.value,'°',1)} (${ftp.value>0?'face right of its path':ftp.value<0?'face left of its path':'face aligned with its path'}). `:''}${smash?`Smash averaged ${format(smash.value,'',2)} — ball speed relative to club speed. `:''}</p><p><b>Next session:</b> Record 10 shots with the same club setting and target. Compare carry spread, face-to-path and smash with this baseline. Look for a tighter distance pattern while maintaining contact quality; the longest shot alone does not establish progress.</p><p class="sm">This focus uses the latest retained batch when available. Review the timeline below for repeated patterns; changes in setup or sample size can explain differences.</p>`:'<p>Add a recorded range session to establish a baseline.</p>'}</section>
     <section class="card"><h2>Evolution by metric</h2><p class="sm">Open a metric for every reading, oldest first. Tap a reading for its source day. Differences describe recorded batches, not proven improvement; same-day blocks are not separate days.</p>${trends||'<p>No readings yet.</p>'}</section>
@@ -10787,7 +10790,8 @@ const ACTIONS = {
     el.textContent = opening ? 'Collapse all' : 'Expand all';
   },
   'open-session': el => render('session', el.dataset.i),
-  'club-history': el => render('clubhistory', el.dataset.club),
+  'club-history': el => render('clubhistory', {club:el.dataset.club, from:el.dataset.from}),
+  'club-history-back': el => el.dataset.from === 'bag' ? render('bag') : render('sessions', 'cumulative'),
   'open-bay': el => render('bay', el.dataset.i),
   'open-bay-source': el => render('bay', 'source:'+el.dataset.i),
   'build-sim-practice': () => {

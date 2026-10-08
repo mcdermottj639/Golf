@@ -42,6 +42,30 @@ const server=http.createServer((q,r)=>{
   assert.equal(await page.locator('.swing-evo-club').getAttribute('data-club'),'Dr');
   await page.locator('.club-trend-row').first().click();
   assert.equal(await page.locator('.swing-evolution').count(),0);
+  await page.locator('#nav [data-view="bag"]').click();
+  // Wait for all import requests before taking a stored-data baseline.
+  await page.waitForLoadState('networkidle');
+  const stored = await page.evaluate(()=>localStorage.getItem('caddiehq_v1'));
+  for(const width of [320,390,1440]){
+    await page.setViewportSize({width,height:900});
+    for(const canon of ['5W','7i','4H','7i']){
+      const item=page.locator('.bag-item').filter({has:page.locator(`[data-action="club-history"][data-club="${canon}"]`)});
+      if(!await item.evaluate(x=>x.open)) await item.locator(':scope > summary').click();
+      const shortcut=item.locator('[data-action="club-history"]');
+      assert.equal(await shortcut.count(),1);
+      assert.equal(await shortcut.getAttribute('data-from'),'bag');
+      await shortcut.click();
+      assert.equal(await page.locator('.backlink').innerText(),'← My Bag');
+      if(canon==='4H') assert.equal(await page.locator('.card').filter({has:page.getByRole('heading',{name:'Evolution by metric',exact:true})}).getByText('No readings yet.',{exact:true}).count(),1);
+      else assert.equal(await page.locator('.swing-evo-club').getAttribute('data-club'),canon);
+      assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'bag history overflow '+width);
+      await page.locator('.backlink').click();
+      await page.locator('.bag-scan').waitFor();
+      assert.equal(await page.locator('#nav [data-view="bag"]').getAttribute('class'),'on');
+      assert.equal(await page.evaluate(()=>localStorage.getItem('caddiehq_v1')),stored);
+    }
+    await page.screenshot({path:'/tmp/bag-history-back-'+width+'.png'});
+  }
   assert.deepEqual(errors,[]);
   console.log('PASS club history: 320/390/1440, isolated club, complete batches, metric trends, back and source navigation, no page errors.');
  }finally{await browser.close();server.close();}
