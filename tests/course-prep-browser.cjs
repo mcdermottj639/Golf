@@ -39,10 +39,22 @@ function googleMock(){
     assert.equal(await p.locator('.cp-holes button').count(),18);assert.equal(await p.locator('#cp-tees option').count(),7);
     assert.match(await p.locator('.cp-hole-heading').innerText(),/380 yd/);
     assert.equal(await p.locator('.cp-clubs [data-club]').count(),initial.carries.length);
+    assert.equal(await p.locator('#cp-club-readout .cp-distances').count(),0,'no misleading zero-distance target before a landing spot exists');
+    for(let n=1;n<=18;n++){
+      await p.locator('.cp-holes [data-n="'+n+'"]').click();await mode(p,'route');
+      const tee=+await p.locator('[data-point="tee"] circle').getAttribute('cy'),green=+await p.locator('[data-point="green"] circle').getAttribute('cy');
+      assert.ok(tee>green,'green above tee on hole '+n);assert.equal(await p.locator('.cp-route-line').count(),1,'focused view hides neighboring routes');
+    }
+    await p.locator('.cp-holes [data-n="1"]').click();await mode(p,'route');
+    await p.locator('[data-point="green"] circle').click({force:true});
+    const mappedTarget=(await state(p)).coursePrep.poundRidge.holes['granite:1'].target;
+    assert.ok(await p.evaluate(point=>{const c=CADDIE_PREP_COURSES[0];return CaddieCoursePrep.geo.distance(point,c.holes[0].path.at(-1))<1;},mappedTarget),'rotated map click lands within one yard of the mapped green');
+    await p.locator('[data-cp="clear-target"]').click();
     for(const width of [320,390,1440]){
       await p.setViewportSize({width,height:width===1440?1000:844});await p.evaluate(()=>scrollTo(0,0));
       const bounds=await p.evaluate(()=>({width:innerWidth,content:document.documentElement.scrollWidth,holeButtons:[...document.querySelectorAll('.cp-holes button')].map(e=>({left:e.getBoundingClientRect().left,right:e.getBoundingClientRect().right})),skip:document.querySelector('.hq-skip').getBoundingClientRect().bottom}));
       assert.ok(bounds.content<=width+1,'page fits '+width);assert.ok(bounds.holeButtons.every(b=>b.left>=0&&b.right<=width),'hole buttons fit '+width);assert.ok(bounds.skip<=0,'skip link stays offscreen when unfocused');
+      await p.locator('.cp-map-panel').screenshot({path:path.join(screens,'course-map-'+width+'.png')});
       await p.screenshot({path:path.join(screens,'course-prep-'+width+'.png'),fullPage:true});
     }
     await p.setViewportSize({width:390,height:844});
@@ -75,11 +87,20 @@ function googleMock(){
     await p.locator('qa-map-scene').dispatchEvent('gmp-error');assert.match(await p.locator('#cp-map-stage').innerText(),/3D could not initialize/);
     await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true');await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.maps),1,'reuse satellite map');
     await p.evaluate(()=>window.gm_authFailure());assert.match(await p.locator('#cp-map-stage').innerText(),/Google rejected/);
+    await p.evaluate(()=>console.error('Google Maps JavaScript API error: BillingNotEnabledMapError https://example.test/?key=PRIVATE_TEST_KEY'));
+    assert.equal(await p.locator('.cp-error-code').innerText(),'BillingNotEnabledMapError');
+    assert.match(await p.locator('#cp-map-stage').innerText(),/Enable billing/);
+    assert.ok(!(await p.locator('#course-prep').innerText()).includes('PRIVATE_TEST_KEY'));
+    await mode(p,'3d');assert.equal(await p.locator('.cp-error-code').innerText(),'BillingNotEnabledMapError','auth error persists across imagery tabs');
+    assert.equal(await p.locator('qa-map-scene').count(),0,'rejected Google session cannot show a misleading 3D viewer');
+    await mode(p,'satellite');
     await Promise.all([p.waitForEvent('load',{timeout:5000}),p.locator('#cp-map-stage [data-cp="retry"]').click()]);
     await p.locator('.cp-google-map').waitFor();assert.equal(googleRequests,2,'retry must request a fresh Google session');
     assert.match(await p.locator('.cp-hole-heading').innerText(),/Hole 3/,'retry restores the selected hole');
     assert.deepEqual((await state(p)).coursePrep,saved,'retry preserves the saved plan');
-    await p.evaluate(()=>window.gm_authFailure());await p.locator('#cp-map-stage [data-cp="map-setup"]').click();await p.locator('#cp-api-key').fill('AIza'+'x'.repeat(35));
+    await p.evaluate(()=>{console.warn('Google Maps JavaScript API error: RefererNotAllowedMapError');window.gm_authFailure();});
+    assert.equal(await p.locator('.cp-error-code').innerText(),'RefererNotAllowedMapError','specific code survives a later generic auth callback');
+    await p.locator('#cp-map-stage [data-cp="map-setup"]').click();await p.locator('#cp-api-key').fill('AIza'+'x'.repeat(35));
     await Promise.all([p.waitForEvent('load',{timeout:5000}),p.locator('[data-cp="key-save"]').click()]);
     await p.locator('.cp-google-map').waitFor();assert.equal(googleRequests,3,'reconnecting the same rejected key must create a fresh session');
     await mode(p,'route');await p.locator('#cp-route-map').waitFor();

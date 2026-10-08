@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v205, October 8 2026)
+## Course Prep (v206, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
 Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
@@ -150,6 +150,12 @@ The Hole guide is the initial view on entry and every hole change (arrows, numbe
 holes, plan rows and overview map). Other views remain explicit choices for that hole.
 Google reconnect alone restores the requested map view so Retry still retries Maps.
 If the illustration cannot load, its fallback offers the offline course map.
+The focused map rotates the actual coordinates to put the reference/user tee below
+the green. Its inverse transform handles taps; the 18-hole overview remains north-up.
+Focused mode draws only that hole’s route, sourced polygons and 100-yard arcs from
+the tee. Do not invent fairway/hazard outlines where the OSM data is missing. Target
+comparisons are shown only after a landing point is set; a green fallback must never
+pretend a target has been chosen or show a misleading zero-yard approach.
 
 Google Maps loads only when Satellite or Google 3D is selected with a key configured.
 Enable Maps JavaScript API + billing and restrict the browser key to that API and
@@ -168,7 +174,12 @@ invalidates pending map loads so they cannot replace the error with a stale blan
 The existing browser suite verifies actual navigation and a new Google loader request
 for both Retry and reconnecting the same rejected key. The initial rejection's cause
 cannot be inferred from the generic auth callback; check the actual Cloud configuration
-or Google's console error before asserting a specific cause. Caddie HQ uses the Websites
+or Google's console error before asserting a specific cause. The lazy Maps loader
+observes only documented Maps API error messages on console.error/warn, preserves
+the original log behavior, and retains/displays only the error-code token in memory
+(no URL, raw message or key). Known codes map to specific setup instructions; the
+generic callback remains a fallback. Global authorization failures persist across
+map modes and override later 3D initialization errors until a real page reload. Caddie HQ uses the Websites
 restriction even when installed on an iPhone home screen.
 
 `tests/course-prep.cjs` checks scorecard arithmetic, source geometry, geometry math,

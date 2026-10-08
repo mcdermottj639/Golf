@@ -43,7 +43,7 @@
   }
   let bridge, root, hole = 1, mode = 'guide', overview = false, edit = 'target';
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps2d, maps3d, overlays2d = [];
-  let googleAuthFailed = false;
+  let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
   let projection = null, imageError = false, animationHandler, animationTimer, bagSnapshot;
   const model = () => clean(bridge.get());
   const currentHole = () => course.holes[hole - 1];
@@ -158,8 +158,11 @@
       case 'next': changeHole(hole + 1); break;
       case 'mode':
         stopFlyover(); mode = el.dataset.mode;
-        if(googleFailureMode && googleFailureMode !== mode) googleFailure = '';
-        overview = false; redraw(); break;
+        if(!googleAuthFailed && googleFailureMode && googleFailureMode !== mode) googleFailure = '';
+        if(el.dataset.pickTarget)edit='target';
+        overview = false; redraw();
+        if(el.dataset.pickTarget)root?.querySelector('#cp-map-stage').scrollIntoView({block:'center',behavior:'smooth'});
+        break;
       case 'club': bridge.setClub(hole, el.dataset.club); redraw(); break;
       case 'overview': overview = !overview; drawView(); break;
       case 'edit': edit = el.dataset.kind; drawControls(); break;
@@ -206,76 +209,97 @@
     const c = selected(), roll = savedHole().roll || 0;
     const toTarget = distance(origin(), target()), toGreen = distance(target(), green());
     const selectedKey = bridge.club(hole);
-    let html = '<div class="cp-distances"><span><b>' + yard(toTarget) + '</b>yd to ' + (savedHole().target ? 'your target' : 'mapped green') + '</span><span><b>' + yard(toGreen) + '</b>yd target → green</span></div>';
+    const hasTarget = !!savedHole().target;
+    let html = hasTarget
+      ? '<div class="cp-distances"><span><b>' + yard(toTarget) + '</b>yd to your target</span><span><b>' + yard(toGreen) + '</b>yd left to green</span></div>'
+      : '<div class="cp-target-prompt"><b>Choose your landing target.</b><br>Tap a spot on the course map to compare clubs and see the distance left to the green.' + button('mode','Pick a target on the map','data-mode="route" data-pick-target="true"') + '</div>';
     if (c && c.carry > 0) {
       html += '<div class="cp-club-summary"><b>' + esc(c.label) + ' · ' + yard(c.carry) + ' yd carry</b><span>' + esc(c.provenance) + '</span>' +
         (roll ? '<span>' + yard(c.carry + roll) + ' yd with your +' + roll + ' yd rollout assumption</span>' : '<span>Carry only · no rollout assumed</span>') + '</div>';
       if(c.rangeTotal>0) html += '<p class="cp-muted">Same range batch: '+yard(c.rangeTotal)+' yd total. This is measured range context, not predicted rollout here.</p>';
-      const gap = toTarget - c.carry;
-      html += '<p class="cp-muted">At this mapped distance, your carry is about ' + yard(Math.abs(gap)) + ' yd ' + (gap >= 0 ? 'short of' : 'past') + ' the target. Check the tee position and conditions at the course.</p>';
+      if(hasTarget){
+        const gap = toTarget - c.carry, totalGap = toTarget - c.carry - roll;
+        html += '<p class="cp-muted">Carry alone: about ' + yard(Math.abs(gap)) + ' yd ' + (gap >= 0 ? 'short of' : 'past') + ' your target.' + (roll ? ' With your rollout: '+yard(Math.abs(totalGap))+' yd '+(totalGap>=0?'short of':'past')+'.' : '') + ' Check your tee position and conditions.</p>';
+      }
     } else html += '<p class="cp-muted">' + (c ? 'This club has no carry for the selected distance source. Try latest range measurements or set its playing carry in Bag.' : selectedKey ? 'Your saved club is no longer in the active carry ladder. Choose a current club above.' : 'Choose a club to show its carry ring and compare it with your target.') + '</p>';
     root.querySelector('#cp-club-readout').innerHTML = html;
   }
   function projectFor(all) {
     const points = all ? course.holes.flatMap(h => h.path) : [...currentHole().path, origin(), target()];
-    const clat = points.reduce((s,p) => s + p[0],0) / points.length;
-    const xy = p => [p[1] * Math.cos(rad(clat)) * 111195, -p[0] * 111195];
+    const anchor = all ? course.center : origin(), cosLat = Math.cos(rad(anchor[0]));
+    const heading = all ? 0 : bearing(origin(), green()), angle = -rad(heading), co = Math.cos(angle), si = Math.sin(angle);
+    const xy = p => {
+      const x = (p[1]-anchor[1])*cosLat*111195, y = -(p[0]-anchor[0])*111195;
+      return [x*co-y*si,x*si+y*co];
+    };
+    const stage = root.querySelector('#cp-map-stage'), width = stage.clientWidth || 400, height = stage.clientHeight || 500;
     const projected = points.map(xy), xs = projected.map(p => p[0]), ys = projected.map(p => p[1]);
-    let left = Math.min(...xs), right = Math.max(...xs), top = Math.min(...ys), bottom = Math.max(...ys);
-    const padding = all ? 80 : 55;
-    left -= padding; right += padding; top -= padding; bottom += padding;
-    const scale = Math.min(600 / (right-left), 500 / (bottom-top));
+    const left = Math.min(...xs), right = Math.max(...xs), top = Math.min(...ys), bottom = Math.max(...ys);
+    const scale = Math.min((width-90)/Math.max(100,right-left), (height-130)/Math.max(80,bottom-top));
     const mx = (left+right)/2, my = (top+bottom)/2;
-    return {scale, to:p=>{const [x,y]=xy(p);return [300+(x-mx)*scale,250+(y-my)*scale];},
-      from:p=>[-(my+(p[1]-250)/scale)/111195,(mx+(p[0]-300)/scale)/(111195*Math.cos(rad(clat)))]};
+    return {scale,width,height,heading,
+      to:p=>{const [x,y]=xy(p);return [width/2+(x-mx)*scale,height/2+(y-my)*scale];},
+      from:p=>{
+        const x=mx+(p[0]-width/2)/scale,y=my+(p[1]-height/2)/scale;
+        return [anchor[0]-(-x*si+y*co)/111195,anchor[1]+(x*co+y*si)/(111195*cosLat)];
+      }};
   }
   function svgMap() {
     projection = projectFor(overview);
+    const {width:w,height:h,heading} = projection;
     const path = pts => pts.map(p => projection.to(p).map(x => x.toFixed(2)).join(',')).join(' ');
-    const pnt = (p, color, label) => {
-      const [x,y]=projection.to(p);
-      return '<g><circle cx="'+x+'" cy="'+y+'" r="8" fill="'+color+'" stroke="#fff" stroke-width="3"/><text x="'+(x+12)+'" y="'+(y+5)+'" class="cp-map-label">'+label+'</text></g>';
+    const pnt = (p, kind, label) => {
+      const [x,y]=projection.to(p), dy=kind==='tee'?23:-17;
+      return '<g class="cp-map-point cp-point-'+kind+'" data-point="'+kind+'"><circle cx="'+x+'" cy="'+y+'" r="7"/><text x="'+x+'" y="'+(y+dy)+'" text-anchor="middle" class="cp-map-label">'+label+'</text></g>';
     };
     const polys = course.features.map(f => '<polygon points="'+path(f.path)+'" class="cp-feature cp-feature-'+f.kind+'"/>').join('');
-    const lines = course.holes.map(h => {
-      const [x,y]=projection.to(h.path[0]);
-      return '<g data-cp="map-hole" data-n="'+h.n+'"'+(overview?' tabindex="0" role="button" aria-label="Explore hole '+h.n+'"':'')+'><polyline points="'+path(h.path)+'" class="cp-route-line '+(h.n===hole?'selected':'')+'"/>'+
-        (overview?'<circle cx="'+x+'" cy="'+y+'" r="14" class="cp-hole-dot"/><text x="'+x+'" y="'+(y+5)+'" text-anchor="middle" class="cp-hole-number">'+h.n+'</text>':'')+'</g>';
+    const lines = (overview ? course.holes : [currentHole()]).map(holeData => {
+      const [x,y]=projection.to(holeData.path[0]);
+      return '<g data-cp="map-hole" data-n="'+holeData.n+'"'+(overview?' tabindex="0" role="button" aria-label="Explore hole '+holeData.n+'"':'')+'><polyline points="'+path(holeData.path)+'" class="cp-route-line '+(holeData.n===hole?'selected':'')+'"/>'+
+        (overview?'<circle cx="'+x+'" cy="'+y+'" r="13" class="cp-hole-dot"/><text x="'+x+'" y="'+(y+4)+'" text-anchor="middle" class="cp-hole-number">'+holeData.n+'</text>':'')+'</g>';
     }).join('');
-    let overlay = '';
+    let overlay = '', yardages = '';
     if (!overview) {
       const c=selected(), [x,y]=projection.to(origin()), roll=savedHole().roll||0;
+      for(let d=100;d<distance(origin(),green())-25;d+=100){
+        const arc=Array.from({length:25},(_,i)=>destination(origin(),d,heading-28+i*56/24));
+        const [lx,ly]=projection.to(arc[0]);
+        yardages += '<polyline points="'+path(arc)+'" class="cp-yardage-arc"/><text x="'+Math.max(13,lx-5)+'" y="'+(ly-6)+'" class="cp-yardage-label">'+d+' yd</text>';
+      }
       if (c && c.carry > 0) {
         overlay += '<circle cx="'+x+'" cy="'+y+'" r="'+(c.carry*0.9144*projection.scale)+'" class="cp-carry-ring"/>';
         if (roll) overlay += '<circle cx="'+x+'" cy="'+y+'" r="'+((c.carry+roll)*0.9144*projection.scale)+'" class="cp-roll-ring"/>';
       }
-      overlay += '<polyline points="'+path([origin(),target(),green()])+'" class="cp-aim-line"/>' +
-        pnt(origin(),'#bbd67d','Tee') + pnt(green(),'#e8e4ca','Green') +
-        (savedHole().target ? pnt(target(),'#e39b4e','Target') : '');
+      if(savedHole().target)overlay += '<polyline points="'+path([origin(),target(),green()])+'" class="cp-aim-line"/>';
+      overlay += pnt(origin(),'tee',savedHole().tee?'Your tee':'Reference tee') + pnt(green(),'green','Mapped green') +
+        (savedHole().target ? pnt(target(),'target','Your target') : '');
     }
-    const scaleYards = overview ? 200 : 50, scaleWidth=scaleYards*0.9144*projection.scale;
-    return '<svg id="cp-route-map" viewBox="0 0 600 500" preserveAspectRatio="xMidYMid meet" aria-label="Approximate mapped routes for Pound Ridge. '+(overview?'Choose a hole.':'Click to set your target or tee.')+'" role="img">'+
-      '<defs><pattern id="cp-grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#ffffff" stroke-opacity=".04"/></pattern></defs>'+
-      '<rect width="600" height="500" fill="#163f34"/><rect width="600" height="500" fill="url(#cp-grid)"/>'+polys+lines+overlay+
-      '<g class="cp-map-scale"><path d="M25 462v8h'+scaleWidth+'v-8" fill="none" stroke="currentColor" stroke-width="2"/><text x="25" y="452">'+scaleYards+' yd</text><text x="562" y="35">N ↑</text></g></svg>';
+    const scaleYards = overview ? 100 : 50, scaleWidth=scaleYards*0.9144*projection.scale;
+    return '<svg id="cp-route-map" viewBox="0 0 '+w+' '+h+'" aria-label="Approximate mapped routes for Pound Ridge. '+(overview?'Choose a hole.':'Tee at bottom. Click to set your target or tee.')+'" role="img">'+
+      '<defs><pattern id="cp-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#204d3e" stroke-opacity=".035"/></pattern></defs>'+
+      '<rect width="'+w+'" height="'+h+'" fill="#eef1e4"/><rect width="'+w+'" height="'+h+'" fill="url(#cp-grid)"/>'+polys+yardages+lines+overlay+
+      '<text x="18" y="27" class="cp-map-kicker">'+(overview?'POUND RIDGE · 18 HOLES':'TEE → GREEN')+'</text>'+
+      '<g class="cp-map-compass" transform="translate('+(w-27)+' 31)"><text x="0" y="-16" text-anchor="middle">N</text><path d="M0 -10L-4 4L0 1L4 4Z" transform="rotate('+(-heading)+')"/></g>'+
+      '<g class="cp-map-scale"><path d="M18 '+(h-24)+'v6h'+scaleWidth+'v-6" fill="none" stroke="currentColor" stroke-width="2"/><text x="18" y="'+(h-31)+'">'+scaleYards+' yd</text></g></svg>';
   }
   function drawControls() {
     if (!root) return;
     const el = root.querySelector('#cp-map-controls');
     const mapped = mode !== 'guide' && (mode === 'route' || (!!key() && !googleFailure));
-    el.innerHTML = '<div class="cp-map-tools">' + (mode === 'route' ? button('overview', overview ? 'Focus this hole' : 'All 18 holes') : '') +
-      (mapped && !overview ? button('edit','Set target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
+    el.innerHTML = (mode === 'route' && !overview ? '<div class="cp-map-summary">'+(savedHole().target ? '<span><b>'+yard(distance(origin(),target()))+' yd</b> to your target</span><span><b>'+yard(distance(target(),green()))+' yd</b> left to green</span>' : '<span><b>'+yard(distance(origin(),green()))+' yd</b> reference tee → mapped green</span><span>Tap a landing spot<br>to plan your shot</span>')+'</div>' : '') + '<div class="cp-map-tools">' + (mode === 'route' ? button('overview', overview ? 'Focus this hole' : 'All 18 holes') : '') +
+      (mapped && !overview ? button('edit','Landing target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
       (mode === '3d' && mapped ? button('fly','Fly this hole')+button('stop','Stop')+button('zoom-in','＋','aria-label="Zoom in"')+button('zoom-out','−','aria-label="Zoom out"'):'') +
       (savedHole().target ? button('clear-target','Clear target'):'') + (savedHole().tee ? button('reset-tee','Reset tee'):'') + '</div>';
     root.querySelector('#cp-map-caption').innerHTML = mode === 'guide'
       ? 'Official club illustration · not to scale. '+link(course.tour,'Open course guide ↗')
-      : (overview ? '18 mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+edit+'. '+(savedHole().tee?'Your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
+      : (overview ? '18 mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(savedHole().tee?'Your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
         '<span>Approximate routes · incomplete hazard coverage · '+link('https://www.openstreetmap.org/copyright','© OpenStreetMap contributors')+'</span>';
   }
   async function drawView() {
     if (!root) return;
     const token=++epoch, stage=root.querySelector('#cp-map-stage');
     stopFlyover();
+    stage.dataset.view = mode;
     stage.replaceChildren();
     drawControls();
     if (mode==='guide') {
@@ -302,7 +326,7 @@
       stage.innerHTML='<div class="cp-map-message"><span class="cp-orbit" aria-hidden="true">◎</span><h3>'+ (mode==='3d'?'Explore Pound Ridge in 3D':'Google satellite view') +'</h3><p>Connect your Google Maps key to load this view inside Caddie HQ.</p>'+button('map-setup','Connect Google Maps')+button('mode','Use the course map','data-mode="route"')+link('https://www.google.com/maps/search/?api=1&query=Pound+Ridge+Golf+Club','Open Pound Ridge in Google Maps ↗')+'</div>';
       return;
     }
-    if (googleFailure) return mapError(googleFailure, googleFailureMode);
+    if (googleAuthFailed || googleFailure) return mapError(googleFailure, googleFailureMode);
     stage.innerHTML='<div class="cp-map-message" role="status">Loading Google '+(mode==='3d'?'3D':'satellite')+'…</div>';
     try {
       await loadGoogle();
@@ -347,7 +371,43 @@
     else if(mode==='satellite'&&maps2d)drawGoogle2d();
     else if(mode==='3d'&&maps3d)drawGoogle3d(google.maps.maps3d);
   }
+  function googleErrorAdvice() {
+    const messages = {
+      BillingNotEnabledMapError: 'Enable billing in the Google Cloud project that owns this key.',
+      ClientBillingNotEnabledMapError: 'Enable billing in the Google Cloud project that owns this key.',
+      ApiNotActivatedMapError: 'Enable Maps JavaScript API in the Google Cloud project that owns this key.',
+      ApiTargetBlockedMapError: 'In this key’s API restrictions, allow Maps JavaScript API.',
+      RefererNotAllowedMapError: 'In this key’s Website restrictions, add https://mcdermottj639.github.io/* and save.',
+      InvalidKeyMapError: 'Google does not recognize this key. Copy the complete key from Google Cloud and reconnect it below.',
+      ExpiredKeyMapError: 'Google does not recognize this key yet. Wait a few minutes after creating it, then reload. If it persists, check the key in Google Cloud.',
+      MissingKeyMapError: 'Google did not receive an API key. Reconnect your Maps key below.',
+      OverQuotaMapError: 'The project’s Maps usage limit has been reached. Check its quota in Google Cloud.',
+      ProjectDeniedMapError: 'Google denied this project. Check its Maps API status in Google Cloud.',
+      DeletedApiProjectMapError: 'This key belongs to a deleted project. Reconnect a key from your active Maps project.'
+    };
+    return messages[googleErrorCode] || 'Google rejected the Maps key. Check Maps JavaScript API, billing and website restrictions in the project that owns this key.';
+  }
+  function rejectGoogle() {
+    epoch++; googleAuthFailed = true;
+    mapError(googleErrorAdvice());
+  }
+  function observeGoogleErrors() {
+    if (googleConsoleObserved) return;
+    googleConsoleObserved = true;
+    // Google documents its specific authorization code in the console, while
+    // gm_authFailure has no arguments. Retain only that code, never URLs or keys.
+    for (const level of ['error','warn']) {
+      const original = console[level];
+      console[level] = function(...args) {
+        original.apply(console, args);
+        const message = args.filter(a => typeof a === 'string').join(' ');
+        const match = message.match(/Google Maps JavaScript API error:\s*([A-Za-z][A-Za-z0-9]*MapError)\b/);
+        if (match) { googleErrorCode = match[1]; rejectGoogle(); }
+      };
+    }
+  }
   function loadGoogle() {
+    observeGoogleErrors();
     if(window.google?.maps?.importLibrary)return Promise.resolve();
     if(googlePromise)return googlePromise;
     googleKey=key();
@@ -358,7 +418,7 @@
       const end=(error)=>{if(done)return;done=true;clearTimeout(timer);if(error){googlePromise=undefined;reject(error);}else resolve();};
       const timer=setTimeout(()=>end(new Error('Maps timeout')),15000);
       window.__caddieMapsReady=()=>end();
-      window.gm_authFailure=()=>{epoch++;googleAuthFailed=true;googleFailure='Google rejected the Maps key. Check Maps JavaScript API, billing and website restrictions.';end(new Error(googleFailure));mapError(googleFailure);};
+      window.gm_authFailure=()=>{rejectGoogle();end(new Error(googleFailure));};
       script.onerror=()=>end(new Error('Maps network error'));
       script.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(googleKey)+'&loading=async&v=weekly&callback=__caddieMapsReady';
       document.head.appendChild(script);
@@ -366,10 +426,11 @@
     return googlePromise;
   }
   function mapError(message, failedMode = '') {
+    if(googleAuthFailed) {message=googleErrorAdvice();failedMode='';}
     googleFailure=message;googleFailureMode=failedMode;
     if(!root||!['3d','satellite'].includes(mode))return;
     stopFlyover();
-    root.querySelector('#cp-map-stage').innerHTML='<div class="cp-map-message"><h3>Google Maps is unavailable</h3><p>'+esc(message)+'</p>'+button('mode','Use the course map','data-mode="route"')+button('retry','Reload & retry')+button('map-setup','Maps setup')+'</div>';
+    root.querySelector('#cp-map-stage').innerHTML='<div class="cp-map-message"><h3>Google Maps is unavailable</h3><p>'+esc(message)+'</p>'+(googleErrorCode?'<code class="cp-error-code">'+esc(googleErrorCode)+'</code>':'')+button('retry','Reload & retry')+button('map-setup','Maps setup')+button('mode','Use the course map','data-mode="route"')+'</div>';
     drawControls();
   }
   function drawGoogle2d() {
@@ -387,7 +448,7 @@
   function drawGoogle3d(lib) {
     if(!lib||!maps3d)return;
     [...maps3d.children].forEach(x=>x.remove());
-    const line=(path,color,width)=>new lib.Polyline3DElement({coordinates:path.map(ll),strokeColor:color,strokeWidth:width,altitudeMode:'CLAMP_TO_GROUND',drawsOccludedSegments:true});
+    const line=(path,color,width)=>new lib.Polyline3DElement({path:path.map(ll),strokeColor:color,strokeWidth:width,altitudeMode:'CLAMP_TO_GROUND',drawsOccludedSegments:true});
     maps3d.append(line(currentHole().path,'#c5e78a',5),line([origin(),target(),green()],'#ffb766',3));
     if(lib.Marker3DElement)[[origin(),'Your tee'],[green(),'Mapped green'],...(savedHole().target?[[target(),'Your target']]:[])].forEach(([p,label])=>{
       maps3d.append(new lib.Marker3DElement({position:ll(p),label,altitudeMode:'CLAMP_TO_GROUND'}));
@@ -412,6 +473,7 @@
     animationHandler=next;maps3d.addEventListener('gmp-animationend',next);
     animationTimer=setTimeout(stopFlyover,30000);next();
   }
+  window.addEventListener('resize',()=>{if(root && mode==='route')drawView();});
   window.CaddieCoursePrep = Object.freeze({
     init: options => {bridge=options;}, render, mount, unmount, teaser, resumeAfterReload,
     openHole: n => {hole=Number.isInteger(+n)&&+n>=1&&+n<=18?+n:1;mode='guide';imageError=false;overview=false;},
