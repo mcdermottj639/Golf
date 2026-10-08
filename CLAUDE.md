@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v212, October 8 2026)
+## Course Prep (v213, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
 Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
@@ -3773,6 +3773,8 @@ the same page-level fold pattern, with its evidence disclosure kept inside. Neit
 panel stays fully expanded after Collapse all; primary navigation and Play/Resume stay
 accessible. Conditions and the focus card participate in section shortcuts and memory.
 
-**v212 startup correction:** v211 mistakenly spread CameraOptions into Map3DElementOptions, passing unsupported altitudeMode at construction. Explicitly select center/range/heading/tilt/roll for startup; ground clamping belongs only in flyCameraTo endCamera. The strict constructor browser mock now rejects unsupported options; it reproduces v211 startup failure and passes with this correction. This is contract/mock validation, not live device imagery verification.
+**v212 startup correction:** v211 mistakenly spread CameraOptions into Map3DElementOptions, passing unsupported altitudeMode at construction. Explicitly select center/range/heading/tilt/roll for startup; altitudeMode belongs only in flyCameraTo endCamera, but its value must be RELATIVE_TO_GROUND (see v213 correction). The strict constructor browser mock now rejects unsupported options; it reproduces v211 startup failure and passes with this correction. This is contract/mock validation, not live device imagery verification.
 
 **v211 tee camera:** 3D initialization and each hole entry frame from behind the saved/reference tee toward the green, independent of GPS measurement origin. Back to tee restores this viewpoint; guide remains the first tab. Serialize asynchronous stop/start camera calls with revision guards so stale work cannot cancel a newer frame. Club/GPS updates retain camera. Flyover begins at tee and keeps last segment heading at green. Browser mock exercises delayed stop completion and all 18 headings; real Google imagery is not available to automated QA without the device-held key.
+
+**v213 camera correction:** Real Google SDK 3.66.7 was loaded without a key for API contract checks. It confirms v211 constructor rejection and rejects v212 flyCameraTo with `InvalidValueError: in property endCamera: Altitude mode CLAMP_TO_GROUND is not supported for camera animations.` Camera targets now explicitly use altitude 0 + RELATIVE_TO_GROUND; ground-clamped markers/lines remain correct. The real SDK accepts this request past validation; no licensed imagery or device rendering was certified. Never copy marker altitude modes into camera calls. Draw overlays before camera work. Catch asynchronous camera rejections locally, retaining map/markers/yardages with direct-property framing (preserve observed absolute center altitude) and a brief toast; do not call mapError for optional camera motion. Regression covers rejected animations at entry and via controls, data preservation and all 18 camera modes.

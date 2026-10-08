@@ -455,7 +455,7 @@
         stageName = 'starting the 3D viewer';
         if(!maps3d) {
           // Map3DElementOptions does not accept CameraOptions.altitudeMode.
-          // Keep ground clamping on flyCameraTo below, never on the constructor.
+          // Terrain-relative altitude belongs to flyCameraTo, never the constructor.
           const {center,range,heading,tilt,roll}=teeCamera();
           maps3d=new lib.Map3DElement({center,range,heading,tilt,roll,mode:'SATELLITE',gestureHandling:'GREEDY'});
           maps3d.className='cp-google-map';
@@ -463,10 +463,10 @@
           maps3d.addEventListener('gmp-error',()=>{if(root&&mode==='3d')mapError('3D could not initialize on this device. Try Satellite or the course map.','3d');});
         }
         stage.replaceChildren(maps3d);
-        stageName = 'positioning the 3D camera';
-        if(framed3d!==hole){await frameGoogle('tee');if(token!==epoch||!root)return;framed3d=hole;}
         stageName = 'drawing the 3D hole';
         drawGoogle3d(lib);
+        stageName = 'positioning the 3D camera';
+        if(framed3d!==hole){await frameGoogle('tee');if(token!==epoch||!root)return;framed3d=hole;}
       }
     } catch {
       if(token===epoch&&root)mapError(googleFailure || (mode==='3d'?'The 3D view':'Satellite')+' could not finish '+stageName+'. Reload and retry, or choose another view.', mode);
@@ -477,7 +477,7 @@
     // Look along the hole from above/behind its tee, independent of GPS yardages.
     const tee=teeOrigin(), heading=bearing(tee,green());
     const length=distance(tee,green());
-    return {center:ll(destination(tee,length*0.3,heading)),altitudeMode:'CLAMP_TO_GROUND',
+    return {center:{...ll(destination(tee,length*0.3,heading)),altitude:0},altitudeMode:'RELATIVE_TO_GROUND',
       range:Math.max(240,length*0.9144*0.95),heading,tilt:58,roll:0};
   }
   function frameGoogle(focus) {
@@ -491,11 +491,33 @@
     if(mode==='3d' && maps3d){
       const mid=[(Math.min(...path.map(p=>p[0]))+Math.max(...path.map(p=>p[0])))/2,(Math.min(...path.map(p=>p[1]))+Math.max(...path.map(p=>p[1])))/2];
       const radius=Math.max(...path.map(p=>distance(mid,p)))*0.9144;
-      const endCamera=focus==='tee'?teeCamera():{center:ll(focus==='green'?green():mid),altitudeMode:'CLAMP_TO_GROUND',range:focus==='green'?190:Math.max(360,radius*3.2),heading:bearing(teeOrigin(),green()),tilt:focus==='green'?20:42,roll:0};
-      return stopped.then(()=>queueCamera(()=>{
-        if(revision===cameraRevision&&root&&mode==='3d')return maps3d.flyCameraTo({endCamera,durationMillis:0});
-      }));
+      const endCamera=focus==='tee'?teeCamera():{center:{...ll(focus==='green'?green():mid),altitude:0},altitudeMode:'RELATIVE_TO_GROUND',range:focus==='green'?190:Math.max(360,radius*3.2),heading:bearing(teeOrigin(),green()),tilt:focus==='green'?20:42,roll:0};
+      return stopped.then(()=>moveGoogleCamera(endCamera,0,revision));
     }
+  }
+  function moveGoogleCamera(endCamera,durationMillis,revision) {
+    const scene=maps3d, current=()=>revision===cameraRevision&&root&&mode==='3d'&&maps3d===scene;
+    return queueCamera(async()=>{
+      if(!current())return false;
+      try {
+        // Google rejects CLAMP_TO_GROUND for camera animations (including 0 ms).
+        // RELATIVE_TO_GROUND + altitude 0 aims at the terrain without an elevation API.
+        await scene.flyCameraTo({endCamera,durationMillis});
+        return current();
+      } catch {
+        if(!current())return false;
+        // Camera motion is optional: retain imagery, markers and tap yardages.
+        // Direct properties use absolute altitude; retain the viewer's observed value.
+        const {center,range,heading,tilt,roll=0}=endCamera;
+        try {
+          const altitude=scene.center?.altitude;
+          Object.assign(scene,{center:{lat:center.lat,lng:center.lng,...(Number.isFinite(altitude)?{altitude}:{})},range,heading,tilt,roll});
+        } catch {}
+        if(durationMillis>0)stopFlyover();
+        bridge.toast('Camera animation unavailable. You can still move the map and tap for yardages.');
+        return false;
+      }
+    });
   }
   function choosePoint(p) {
     if(!pointOK(p))return bridge.toast('Choose a point within the Pound Ridge course area');
@@ -612,7 +634,7 @@
       if(!root||mode!=='3d'||i>=path.length){stopFlyover();return;}
       const p=path[i],heading=i<path.length-1?bearing(p,path[i+1]):bearing(path[i-1],p);
       i++;
-      queueCamera(()=>revision===cameraRevision&&maps3d.flyCameraTo({endCamera:{center:ll(p),altitudeMode:'CLAMP_TO_GROUND',range:360,tilt:58,heading},durationMillis:window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:2800})).catch(()=>stopFlyover());
+      moveGoogleCamera({center:{...ll(p),altitude:0},altitudeMode:'RELATIVE_TO_GROUND',range:360,tilt:58,heading},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:2800,revision);
     };
     animationHandler=next;maps3d.addEventListener('gmp-animationend',next);
     animationTimer=setTimeout(stopFlyover,30000);next();

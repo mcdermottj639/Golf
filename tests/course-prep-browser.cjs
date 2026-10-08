@@ -20,7 +20,7 @@ function googleMock(){
   class Overlay{constructor(opts){this.opts=opts;mapQA.overlays.push(this);}setMap(map){this.opts.map=map;}}
   class Point{constructor(x,y){this.x=x;this.y=y;}}
   class Bounds{constructor(){this.points=[];}extend(p){this.points.push(p);}}
-  class Scene extends HTMLElement{constructor(opts){super();const allowed=['center','range','heading','tilt','roll','mode','gestureHandling'];for(const k of Object.keys(opts))if(!allowed.includes(k))throw new TypeError('Unsupported Map3DElement option: '+k);Object.assign(this,opts);mapQA.scenes++;}flyCameraTo(opts){if(mapQA.stopping)throw Error('camera started before stop completed');this.lastFlight=opts;mapQA.flights++;}async stopCameraAnimation(){mapQA.stops++;mapQA.stopping=true;await new Promise(r=>setTimeout(r,0));mapQA.stopping=false;}}
+  class Scene extends HTMLElement{constructor(opts){super();const allowed=['center','range','heading','tilt','roll','mode','gestureHandling'];for(const k of Object.keys(opts))if(!allowed.includes(k))throw new TypeError('Unsupported Map3DElement option: '+k);Object.assign(this,opts);mapQA.scenes++;}flyCameraTo(opts){if(opts.endCamera.altitudeMode==='CLAMP_TO_GROUND')return Promise.reject(new TypeError('Altitude mode CLAMP_TO_GROUND is not supported for camera animations.'));if(mapQA.failCamera)return Promise.reject(new Error('Simulated camera failure'));if(mapQA.stopping)throw Error('camera started before stop completed');this.lastFlight=opts;mapQA.flights++;}async stopCameraAnimation(){mapQA.stops++;mapQA.stopping=true;await new Promise(r=>setTimeout(r,0));mapQA.stopping=false;}}
   class Line extends HTMLElement{constructor(opts){super();if(mapQA.fail3dDraw)throw new Error("Simulated 3D drawing failure");Object.assign(this,opts);}}
   class Marker extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
   customElements.define('qa-map-scene',Scene);customElements.define('qa-map-line',Line);customElements.define('qa-map-marker',Marker);
@@ -129,11 +129,25 @@ function locationMock(){
       await p.evaluate(n=>{CaddieCoursePrep.openHole(n);document.querySelector('[data-cp="mode"][data-mode="3d"]').click();},n);
       await p.waitForFunction(n=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[n-1];return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge.holes['granite:'+n]?.tee||h.path[0],h.path.at(-1));},n);
       const cam=await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera);
-      assert.equal(cam.tilt,58);assert.equal(cam.roll,0);
+      assert.equal(cam.tilt,58);assert.equal(cam.roll,0);assert.equal(cam.altitudeMode,'RELATIVE_TO_GROUND');assert.equal(cam.center.altitude,0);
     }
     await p.locator('[data-cp="frame"][data-focus="green"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.range===190);
     await p.locator('[data-cp="frame"][data-focus="tee"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.tilt===58);
     await p.evaluate(()=>{CaddieCoursePrep.openHole(2);document.querySelector('[data-cp="mode"][data-mode="3d"]').click();});
+    await p.waitForFunction(()=>document.querySelector('qa-map-scene')?.lastFlight.endCamera.heading===CaddieCoursePrep.geo.bearing(CADDIE_PREP_COURSES[0].holes[1].path[0],CADDIE_PREP_COURSES[0].holes[1].path.at(-1)));
+    // An asynchronous animation failure must not remove a usable map or its yardages.
+    const beforeCameraFailure=await state(p);
+    await p.evaluate(()=>mapQA.failCamera=true);
+    await p.locator('[data-cp="frame"][data-focus="green"]').click();
+    await p.waitForFunction(()=>document.querySelector('qa-map-scene')?.range===190);
+    assert.equal(await p.locator('#cp-map-stage .cp-map-message').count(),0);
+    assert.ok(await p.locator('qa-map-marker').count()>=2);
+    assert.deepEqual(await state(p),beforeCameraFailure,'camera fallback preserves golf data');
+    await p.locator('.cp-holes [data-n="3"]').click();await mode(p,'3d');
+    await p.waitForFunction(()=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[2];return e?.heading===CaddieCoursePrep.geo.bearing(h.path[0],h.path.at(-1));});
+    assert.equal(await p.locator('#cp-map-stage .cp-map-message').count(),0,'initial framing failure leaves map usable');
+    await p.evaluate(()=>mapQA.failCamera=false);
+    await p.locator('.cp-holes [data-n="2"]').click();await mode(p,'3d');
     await p.waitForFunction(()=>document.querySelector('qa-map-scene')?.lastFlight.endCamera.heading===CaddieCoursePrep.geo.bearing(CADDIE_PREP_COURSES[0].holes[1].path[0],CADDIE_PREP_COURSES[0].holes[1].path.at(-1)));
     await p.locator('qa-map-scene').dispatchEvent('gmp-error');assert.match(await p.locator('#cp-map-stage').innerText(),/3D could not initialize/);
     await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true');await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.maps),1,'reuse satellite map');
