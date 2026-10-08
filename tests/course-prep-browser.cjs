@@ -39,10 +39,10 @@ function cameraAtTee({n,direct=false}={}) {
 }
 async function assertHolePins(p,n){
   const pins=await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>({point:[e.position.lat,e.position.lng],label:e.label})));
-  const expected=await p.evaluate(n=>{const c=CaddieCoursePrep.findCourse(CaddieCoursePrep.courseId),s=JSON.parse(localStorage.caddiehq_v1).coursePrep?.[c.storageKey]||{tee:c.defaultTee,holes:{}},h=c.holes[n-1],saved=s.holes?.[s.tee+':'+n]||{};return [saved.tee||h.path[0],h.path.at(-1),...(saved.target?[saved.target]:[])];},n);
+  const expected=await p.evaluate(n=>{const c=CaddieCoursePrep.findCourse(CaddieCoursePrep.courseId),s=JSON.parse(localStorage.caddiehq_v1).coursePrep?.[c.storageKey]||{tee:c.defaultTee,holes:{}},h=c.holes[n-1],saved=s.holes?.[s.tee+':'+n]||{};return [saved.tee||h.path[0],h.path.at(-1),...(saved.target&&!Array.from(document.querySelectorAll('qa-map-marker')).some(m=>m.label?.endsWith(' yd carry'))?[saved.target]:[])];},n);
   assert.deepEqual(pins.filter(p=>!p.label.endsWith(' yd carry')).map(p=>p.point),expected,'only current-hole pin positions for hole '+n);
   assert.equal(pins[0].label,'Tee');
-  assert.ok(await p.evaluate(()=>mapQA.markersCreated<=4),'3D retains at most four marker identities');
+  assert.ok(await p.evaluate(()=>mapQA.markersCreated<=3),'3D retains at most three marker identities');
   assert.ok(await p.evaluate(()=>mapQA.markerDetach.every(connected=>connected)),'markers unregister before their map is detached');
 }
 function googleMock(){
@@ -186,7 +186,7 @@ if(require.main===module)(async()=>{
     assert.equal(await p.locator('qa-map-scene').evaluate(e=>e.gestureHandling),'GREEDY');
     const beforeJump=await state(p);await p.locator('[data-cp="shot-plan"]').click();assert.deepEqual(await state(p),beforeJump,'jumping to the plan preserves golf state');
     const initialLabels=await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>e.label));
-    assert.deepEqual(initialLabels.slice(0,2),['Tee','Green']);assert.match(initialLabels[2],/^\d[\d,]* yd · \d[\d,]* yd left$/);
+    assert.deepEqual(initialLabels.slice(0,2),['Tee','Green']);assert.match(initialLabels[2],/ · \d[\d,]* yd carry$/);
     assert.equal(await p.evaluate(()=>mapQA.markerImports),0,'3D has no optional marker-library startup dependency');
     const beforeViewSwitch=await state(p),sameYardages=await p.locator('.cp-map-summary').innerText();
     await mode(p,'route');await p.locator('#cp-route-map').waitFor();

@@ -40,14 +40,14 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
   await p.locator('qa-map-scene').evaluate(el=>el.dispatchEvent(new CustomEvent('gmp-click',{detail:null}))); // no position: no write
   const aim=await p.evaluate(()=>CaddieCoursePrep.findCourse('sterling-farms').holes[1].path[1]);
   await p.locator('qa-map-scene').evaluate((el,aim)=>{const e=new Event('gmp-click');e.position={lat:aim[0],lng:aim[1]};el.dispatchEvent(e);},aim);
-  assert.equal(await p.locator('qa-map-marker').count(),4,'saved target remains separate from carry landing');
+  assert.equal(await p.locator('qa-map-marker').count(),3,'only tee, green and club landing pins appear despite a saved target');
   const saved=await state(p);
   await open('wianno',2);assert.ok(await p.locator('#cp-tee-preview').isVisible(),'par 4 gets preview');
   const par3=await p.evaluate(()=>CaddieCoursePrep.findCourse('wianno').holes.find(h=>h.par===3).n);
   await open('wianno',par3);assert.ok(await p.locator('#cp-tee-preview').isHidden(),'no automatic tee preview on par 3');
   assert.equal(await p.locator('qa-map-marker').count(),2,'no previous landing pin on par 3');
   await open('sterling-farms',2);assert.equal(await p.locator('#cp-map-club').inputValue(),choices.at(-1),'saved club takes priority');
-  await mode(p,'route');assert.equal(await p.locator('[data-point="landing"]').count(),1);assert.equal(await p.locator('[data-point="target"]').count(),1);
+  await mode(p,'route');assert.equal(await p.locator('[data-point="landing"]').count(),1);assert.equal(await p.locator('[data-point="target"]').count(),0);
   for(const width of [320,390,1440]){
    await p.setViewportSize({width,height:844});
    assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'no horizontal overflow at '+width);

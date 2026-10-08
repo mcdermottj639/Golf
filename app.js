@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v230';
+const BUILD = 'v231';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v231', d:'2026-10-08', items:['ONE LANDING PIN: Tee-shot preview shows only the selected club’s projected landing. Saved targets remain stored and available for planning without adding a second fairway pin.'] },
   { b:'v230', d:'2026-10-08', items:['SMALLER MAP CLUB PICKER: A compact club-and-carry selector replaces the large recommendation card so the hole stays visible. Landing markers and detailed yardages remain available.'] },
   { b:'v229', d:'2026-10-08', items:['GUIDE ZOOM AT THE TOP: Compact minus, plus and Full hole controls sit above every guide in Course Prep and live rounds. Full hole remains the starting view.'] },
   { b:'v228', d:'2026-10-08', items:['TEE SHOT PREVIEW: Par 4 and par 5 maps open with your saved or suggested club, carry ring and projected landing marker. Change club directly on the map; the 3D starting view and Reset view frame the tee shot. Suggestions never replace saved targets or club choices.'] },

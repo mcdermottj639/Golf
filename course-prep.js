@@ -670,9 +670,9 @@
         if (roll) overlay += '<circle cx="'+x+'" cy="'+y+'" r="'+((c.carry+roll)*0.9144*projection.scale)+'" class="cp-roll-ring"/>';
       }
       if(preview)overlay += '<polyline points="'+path([preview.tee,preview.landing])+'" class="cp-tee-line"/>'+pnt(preview.landing,'landing',esc(landingLabel(preview)));
-      if(savedHole().target)overlay += '<polyline points="'+path([origin(),target(),green()])+'" class="cp-aim-line"/>';
+      if(savedHole().target&&!preview)overlay += '<polyline points="'+path([origin(),target(),green()])+'" class="cp-aim-line"/>';
       overlay += pnt(origin(),'tee',referenceName()) + pnt(green(),'green',savedHole().target?'Mapped green':'Green · '+yard(distance(origin(),green()))+' yd') +
-        (savedHole().target ? pnt(target(),'target',targetYardage()) : '');
+        (savedHole().target&&!preview ? pnt(target(),'target',targetYardage()) : '');
     }
     const scaleYards = overview ? 100 : 50, scaleWidth=scaleYards*0.9144*projection.scale;
     return '<svg id="cp-route-map" viewBox="0 0 '+w+' '+h+'" aria-label="Approximate mapped routes for '+esc(course.shortName)+'. '+(overview?'Choose a hole.':'Tee at bottom. Click to set your target or tee.')+'" role="img">'+
@@ -696,7 +696,7 @@
     drawReference();
     const el = root.querySelector('#cp-map-controls');
     const mapped = mode !== 'guide' && (mode === 'route' || (!!key() && !googleFailure));
-    el.innerHTML = (mapped && !overview ? '<div class="cp-map-summary">'+(savedHole().target ? '<span><b>'+yard(distance(origin(),target()))+' yd</b> to your target</span><span><b>'+yard(distance(target(),green()))+' yd</b> left to green</span>' : teePreview()?'<span><b>'+esc(selected().label)+' · '+yard(selected().carry)+' yd</b>projected carry from '+referenceName().toLowerCase()+'</span><span><b>'+yard(teePreview().left)+' yd</b>left from projected landing</span>' : '<span><b>'+yard(distance(origin(),green()))+' yd</b> '+referenceName().toLowerCase()+' → mapped green</span><span>Tap a landing spot<br>to plan your shot</span>')+'</div>' : '') +
+    el.innerHTML = (mapped && !overview ? '<div class="cp-map-summary">'+(savedHole().target&&!teePreview() ? '<span><b>'+yard(distance(origin(),target()))+' yd</b> to your target</span><span><b>'+yard(distance(target(),green()))+' yd</b> left to green</span>' : teePreview()?'<span><b>'+esc(selected().label)+' · '+yard(selected().carry)+' yd</b>projected carry from '+referenceName().toLowerCase()+'</span><span><b>'+yard(teePreview().left)+' yd</b>left from projected landing</span>' : '<span><b>'+yard(distance(origin(),green()))+' yd</b> '+referenceName().toLowerCase()+' → mapped green</span><span>Tap a landing spot<br>to plan your shot</span>')+'</div>' : '') +
       (mapped && !overview ? '<div class="cp-map-legend"><span><i class="cp-legend-tee">'+(liveLocation()?'●':'T')+'</i> '+(liveLocation()?'You':'Tee')+'</span><span><i class="cp-legend-target">A</i> Aim</span><span><i class="cp-legend-green">G</i> Green</span>'+(selected()?.carry>0?'<span class="cp-map-club">'+esc(selected().label)+' · '+yard(selected().carry)+' yd carry</span>':'')+'</div>':'') + '<div class="cp-map-tools">' + (mode === 'route' && !liveDialog ? button('overview', overview ? 'Focus this hole' : 'All '+course.holes.length+' holes') : '') +
       (mapped && !overview ? button('edit','Landing target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
       (mapped && !overview && selected()?.carry>0 ? button('rings','Carry rings','aria-pressed="'+showRings+'"'):'')+
@@ -904,12 +904,12 @@
     addLine(line(currentHole().path,'#c5e78a',4));
     const preview=teePreview();
     if(preview)addLine(line([preview.tee,preview.landing],'#49d4d0',4));
-    if(savedHole().target)addLine(line([origin(),target(),green()],'#ffb766',3));
+    if(savedHole().target&&!preview)addLine(line([origin(),target(),green()],'#ffb766',3));
     // Basic 3D markers need only maps3d. Optional PinElement customization must not
     // become a startup dependency: a customization failure must not hide the map.
-    const points=[[origin(),liveLocation()?'You':'Tee'],[green(),savedHole().target?'Green':'Green · '+yard(distance(origin(),green()))+' yd'],...(savedHole().target?[[target(),targetYardage()]]:[]),...(preview?[[preview.landing,landingLabel(preview)]]:[])];
+    const points=[[origin(),liveLocation()?'You':'Tee'],[green(),savedHole().target?'Green':'Green · '+yard(distance(origin(),green()))+' yd'],...(savedHole().target&&!preview?[[target(),targetYardage()]]:[]),...(preview?[[preview.landing,landingLabel(preview)]]:[])];
     if(lib.Marker3DElement)points.forEach(([p,label],i)=>{
-      // Keep at most four stable marker identities. GPS/target updates and hole
+      // Keep at most three stable marker identities. GPS/target updates and hole
       // changes move these pins instead of accumulating asynchronous pin renders.
       const marker=markers3d[i] || (markers3d[i]=new lib.Marker3DElement({altitudeMode:'CLAMP_TO_GROUND'}));
       marker.position=ll(p);marker.label=label;

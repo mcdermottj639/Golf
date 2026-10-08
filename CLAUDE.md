@@ -125,7 +125,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v230, October 8 2026)
+## Course Prep (v231, October 8 2026)
 
 Rounds leads with **Explore courses**. Generic entry opens the nearest supported course using the same saved `S.here` location as Live Round. The picker sorts by straight-line distance and labels miles. Explicit course links keep their intended course; hole navigation and redraws never auto-select another course. Use my location refreshes the shared fix on a deliberate tap; a late callback must not interrupt navigation. No location means stable catalog order. Reset view beside the map-style controls returns 3D to its starting tee camera and Simple map to the focused hole without clearing targets or notes. Browser double-tap zoom is disabled with `touch-action:manipulation`, retaining pinch zoom and scrolling. The picker contains Pound Ridge, Wianno and
 Sterling Farms plus Metedeconk. The first three have 18 holes each; Metedeconk has
@@ -230,8 +230,7 @@ longest available carry at/below a saved target or 30 yards short of the mapped 
 not a hazard/dispersion/conditions optimizer. Unset saved club carries remain unset.
 Carry landing uses a straight shot aimed at the saved target or the first intersection
 of a carry-radius circle with the mapped route, never cumulative dogleg length.
-Show a compact single-row club/carry selector, carry circle and separate projected marker on opening. Keep recommendation source and yards-left details below the map; do not restore the large overlaid card. Retain
-saved target pins independently. Par 3s and holes without verified geometry have no
+Show a compact single-row club/carry selector, carry circle and separate projected marker on opening. Keep recommendation source and yards-left details below the map; do not restore the large overlaid card. Retain saved targets in state, but hide their pin and aim line while the tee preview is active: exactly one fairway pin shows the club landing. The on-map summary prioritizes that landing; target details stay in the planning section. Par 3s and holes without verified geometry have no
 automatic tee preview. Active GPS measurement pauses it, preserving current-position
 yardages. The starting/Reset 3D camera frames the tee and projected landing; Whole hole
 still shows the full route. Club changes update overlays without resetting the camera.
@@ -293,8 +292,8 @@ Enable Maps JavaScript API + billing and restrict the browser key to that API an
 `caddiehq_google_maps_key_v1`, outside golf backups; deployments can alternatively
 provide `window.CADDIE_GOOGLE_MAPS_KEY`. Do not commit an unrestricted key. Map objects
 are reused, asynchronous loads have navigation guards, and leaving a hole cancels
-its flyover. 3D owns a maximum of four reusable Marker3DElements (measuring origin,
-green, optional saved target and optional projected carry landing); update their positions/labels for the current hole rather
+its flyover. 3D owns a maximum of three reusable Marker3DElements (measuring origin,
+green, and either the saved target or projected carry landing); update their positions/labels for the current hole rather
 than create a new set on every GPS/target update. Keep a separate registry of route/ring
 lines. Clear owned overlays before detaching the map on redraw, view/hole navigation,
 error or dialog close, while Google's renderer can still unregister them. Clearing a
