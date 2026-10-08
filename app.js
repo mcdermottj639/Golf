@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v226';
+const BUILD = 'v227';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v227', d:'2026-10-08', items:['NEAREST COURSE FIRST: Course Prep opens the closest course using your saved location, with distances and a location refresh beside the picker. Specific course links still open that course.','RESET VIEW: Return the interactive map to its starting view in prep or live rounds. TOUCH CONTROLS: Disable browser double-tap zoom while keeping pinch zoom and scrolling available.'] },
   { b:'v226', d:'2026-10-08', items:['MAPS FIRST: Course Prep opens straight to the hole guide and map, with hole browsing, tee settings and planning below. Downloads are in a compact expandable section.','FULL HOLE BY DEFAULT: Guides open at 100%; zoom remains optional. Changing holes keeps your selected guide or interactive map view, including 3D or Simple map.'] },
   { b:'v225', d:'2026-10-08', items:['CLOSER HOLE GUIDES: All club illustrations and Caddie HQ guides open at 140% with zoom controls, scrolling and a Full hole reset in prep and live rounds.'] },
   { b:'v224', d:'2026-10-08', items:['SIMPLER MAPS: Removed Overhead. Use 3D with the closer hole flyover, or Simple map for offline yardages.'] },
@@ -10303,7 +10304,7 @@ function bumpGearCounters(){
 const ACTIONS = {
   'live-hole-guide': el => window.CaddieCoursePrep?.openGuide(el.dataset.course,+el.dataset.n),
   'live-hole-map': el => window.CaddieCoursePrep?.openLiveMap(el.dataset.course,+el.dataset.n),
-  'open-course-prep': el => { window.CaddieCoursePrep?.openHole(el?.dataset.n || 1,el?.dataset.course); render('courseprep'); },
+  'open-course-prep': el => { if(!el?.dataset.course)window.CaddieCoursePrep?.openNearest(); window.CaddieCoursePrep?.openHole(el?.dataset.n || 1,el?.dataset.course); render('courseprep'); },
   'hq-explore': () => window.CaddieExplorer?.open(),
   'hq-back': () => {
     const previous=hqTrail.pop();if(!previous)return;
@@ -11616,6 +11617,8 @@ function coursePrepNote(course, n){
 }
 function initCoursePrep(){
   window.CaddieCoursePrep?.init({
+    here: () => S.here,
+    locate: done => askHere(true,done),
     get: id => S.coursePrep?.[window.CaddieCoursePrep.findCourse(id)?.storageKey],
     liveHole: id => S.live?.stage === 'play' && window.CaddieCoursePrep.findCourse(S.live.course)?.id===id ? S.live.holes?.[S.live.cur]?.n : null,
     save: (id,plan) => { const source=window.CaddieCoursePrep.findCourse(id);if(!source)return;S.coursePrep = S.coursePrep || {}; S.coursePrep[source.storageKey] = plan; save(); },

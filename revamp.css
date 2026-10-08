@@ -698,3 +698,6 @@ body.night .sheet.card { background: var(--card); border-radius: 22px 22px 0 0; 
 .bench-item label { display: block; font-size: 12px; margin-bottom: 5px; }
 .bench-notes .sm { font-size: 12px; }
 .bench-error { margin: 8px 0 0; }
+
+/* Suppress browser double-tap zoom without disabling pinch accessibility. */
+html,body{touch-action:manipulation}

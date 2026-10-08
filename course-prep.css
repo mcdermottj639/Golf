@@ -283,3 +283,5 @@ body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
 .cp-downloads p{font-size:12px;line-height:1.6;color:var(--cp-muted)}
 .cp-downloads>button{margin-top:12px}
 @media(min-width:761px){.cp-grid{grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr)}}
+
+.cp-course-picker [data-cp="nearby"]{font:600 12px var(--sans,sans-serif);color:var(--cp-ink);background:transparent;border:1px solid var(--cp-line);border-radius:10px;min-height:44px;padding:6px}

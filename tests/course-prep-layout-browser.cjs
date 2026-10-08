@@ -34,6 +34,10 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
    assert.equal(await p.locator('.cp-guide-zoom output').textContent(),'100%');
    await mode(p,'3d');await p.locator('qa-map-scene').waitFor();
    assert.ok(await p.locator('#cp-map-stage').evaluate(e=>e.getBoundingClientRect().top<innerHeight*.5),'interactive map is also visible immediately');
+   await p.evaluate(()=>{document.querySelector('qa-map-scene').range=50;});
+   await p.locator('[data-cp="reset-view"]').click();
+   await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight?.endCamera.range>50);
+   assert.equal(await p.locator('#cp-map-stage').evaluate(e=>e.dispatchEvent(new MouseEvent('dblclick',{bubbles:true,cancelable:true}))),false,'double click map event is suppressed');
    await p.locator('.cp-arrows [data-cp="next"]').click();await p.locator('qa-map-scene').waitFor();
    assert.match(await p.locator('.cp-hole-heading h3').innerText(),/^Hole 2/);
    assert.equal(await p.locator('.cp-map-views [data-mode="3d"]').getAttribute('aria-pressed'),'true');

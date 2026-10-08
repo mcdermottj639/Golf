@@ -249,7 +249,7 @@
     if(mode==='guide')return '';
     return '<div class="cp-map-views"><div class="cp-imagery-views" role="group" aria-label="Imagery view">'+
       [['3d','3D']].map(([k,label])=>button('mode',label,'data-mode="'+k+'" aria-pressed="'+(mode===k)+'"')).join('')+'</div>'+
-      button('mode','Simple map','class="cp-simple-view" data-mode="route" aria-pressed="'+(mode==='route')+'"')+'</div>'+
+      button('mode','Simple map','class="cp-simple-view" data-mode="route" aria-pressed="'+(mode==='route')+'"')+button('reset-view','Reset view','title="Return to the starting hole view"')+'</div>'+
       (mode==='route'?'<p class="cp-map-view-note" role="status">'+(navigator.onLine===false?'You’re offline · using the simple map':'Simple map · works offline')+'</p>':'');
   }
   function mapSurface() {
@@ -260,8 +260,14 @@
       button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"')+'</div>'+mapViews()+
       '<div class="cp-map-stage" id="cp-map-stage"></div><div class="cp-reference" id="cp-reference" hidden></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div>';
   }
+  function nearbyCourses() {
+    const here=bridge?.here?.();
+    const valid=here && Number.isFinite(here.lat) && Number.isFinite(here.lon);
+    return courses.map(c=>({course:c,miles:valid&&c.center?.every(Number.isFinite)?distance([here.lat,here.lon],c.center)/1760:null}))
+      .sort((a,b)=>(a.miles??Infinity)-(b.miles??Infinity));
+  }
   function coursePicker() {
-    return '<div class="cp-course-picker"><label for="cp-courses">Course</label><select id="cp-courses">'+courses.map(c=>'<option value="'+c.id+'" '+(c.id===course.id?'selected':'')+'>'+esc(c.shortName)+'</option>').join('')+'</select></div>';
+    return '<div class="cp-course-picker"><label for="cp-courses">Course</label><select id="cp-courses">'+nearbyCourses().map(({course:c,miles})=>'<option value="'+c.id+'" '+(c.id===course.id?'selected':'')+'>'+esc(c.shortName)+(miles===null?'':' · '+(miles<10?miles.toFixed(1):Math.round(miles))+' mi')+'</option>').join('')+'</select>'+button('nearby','Locate','title="Use my location to open the nearest course" aria-label="Use my location"')+'</div>';
   }
   function downloads() {
     return '<details class="cp-downloads" id="cp-downloads"><summary>Downloads & offline access <span id="cp-download-status" role="status">Checking offline availability…</span></summary><p><strong>'+esc(course.shortName)+' on this device</strong></p><div class="cp-download-actions">'+button('favorite',packs?.favorite(course.id)?'★ Favorite':'☆ Favorite','aria-pressed="'+!!packs?.favorite(course.id)+'"')+button('download','Download for offline')+'</div><p>Favorites stay downloaded, plus five recent courses up to 30 MB. Offline includes mapped Caddie HQ guides and simple maps; Google imagery and club artwork need internet.</p><div id="cp-download-list"></div>'+button('remove-download','Remove this download')+'<p>Removing a download also removes its favorite status. Your rounds, notes and targets stay saved.</p></details>';
@@ -435,6 +441,7 @@
   function mount(node) {
     root = node;
     if (!root) return;
+    root.addEventListener('dblclick', e=>{if(e.target.closest('#cp-map-stage')){e.preventDefault();e.stopPropagation();}},true);
     root.addEventListener('click', onClick);
     root.addEventListener('input', onInput);
     root.addEventListener('change', onChange);
@@ -460,6 +467,11 @@
     const el = e.target.closest('[data-cp]');
     if (!el || !root?.contains(el)) return;
     switch (el.dataset.cp) {
+      case 'nearby': {
+        const node=root,id=course.id,n=hole;
+        bridge.locate?.(()=>{if(root!==node||course.id!==id||hole!==n)return;selectCourse(nearbyCourses()[0].course.id);redraw();});
+        break;
+      }
       case 'retry-pack': loadErrors.delete(course.id);redraw();break;
       case 'favorite': packs.pin(course.id,!packs.favorite(course.id)).catch(()=>bridge.toast('Download incomplete. Connect and retry.'));break;
       case 'download': {
@@ -495,6 +507,7 @@
       case 'rings': showRings=!showRings;refreshOverlays();drawControls();break;
       case 'locate': useLocation();break;
       case 'use-tee': stopLocation();updateMeasurements();break;
+      case 'reset-view': overview=false;if(mode==='3d')Promise.resolve(frameGoogle('tee')).catch(()=>bridge.toast('The camera could not move. Try again.'));else drawView();break;
       case 'frame': Promise.resolve(frameGoogle(el.dataset.focus || 'hole')).catch(()=>bridge.toast('The camera could not move. Try again.'));break;
       case 'shot-plan': root.querySelector('.cp-plan').scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});break;
       case 'overview': overview = !overview; drawView(); break;
@@ -896,6 +909,7 @@
   window.addEventListener('pagehide',()=>stopLocation());
   window.CaddieCoursePrep = Object.freeze({
     init: options => {bridge=options;packs?.start();}, render, mount, unmount, teaser, resumeAfterReload, openGuide, openLiveMap,
+    openNearest: () => selectCourse(nearbyCourses()[0].course.id),
     resumeLiveMap: () => openLiveMap(course.id,hole,mode),
     openHole: (n,courseId) => {if(courseId&&!selectCourse(courseId))return false;hole=course.holes.some(h=>h.n===+n)?+n:1;framed3d=null;mode=initialMode();imageError=false;overview=false;return true;},
     get courseName(){return course.name;}, get courseId(){return course.id;}, findCourse, clean, hasGuide,
