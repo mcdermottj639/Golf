@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v202';
+const BUILD = 'v203';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v203', d:'2026-10-08', items:['POUND RIDGE COURSE PREP: All 18 official hole guides, seven tee cards, an offline route map, current-bag carry rings, editable tee/target positions, rollout scenarios and saved hole notes. Google satellite and 3D flyovers connect with your restricted Maps key.', 'VERIFIED COURSE CARD: Official Pound Ridge tee yardages and men’s ratings replace older third-party values. Existing rounds, club records and your personal plan calls remain intact.'] },
   { b:'v202', d:'2026-10-07', items:['BAG: Compact bench rows with one-tap Add to bag, replacement choices only at capacity, and expandable club notes.'] },
   { b:'v201', d:'2026-10-07', items:['BAG: Benched clubs can return to the starting bag. Choose a replacement at capacity; saved carry numbers and history are retained.'] },
   { b:'v200', d:'2026-10-02', items:['CADDIE HQ, REIMAGINED: A new visual system across the entire app, with Overview, Bag, Progress, Rounds and Coach.', 'FIND ANYTHING: Global search and a complete workspace directory, plus clear page context and back navigation.', 'YOUR NEXT MOVE: Recent sessions, direct lab access, club-history shortcuts and evidence-led summaries. Every existing number, source, insight and tracking tool is preserved.', 'RESTORABLE: The complete v199 app is saved as backup/caddie-hq-v199-2026-10-02.'] },
@@ -1326,6 +1327,7 @@ const TITLES = {
   coach:['Coach','Lessons that follow your game — not generic tips.'],
   drills:['Drills','What you can actually do — with the kit you own.'],
   rounds:['Rounds','Your cards, the plans behind them, and the courses.'],
+  courseprep:['Course Prep','Pound Ridge · your bag, your targets, your plan.'],
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
@@ -1956,6 +1958,7 @@ let drillTag = null;
 // moment he navigates anywhere else. Nothing about an open picker belongs in the record.
 let planPick = null;
 function render(view, arg, keepScroll){
+  window.CaddieCoursePrep?.unmount();
   window.CaddieExplorer?.close();
   hqSearchCache=null;
   closeCheat();  // the cheat sheet overlay lives on <body>, so navigation must clear it
@@ -2003,11 +2006,11 @@ function render(view, arg, keepScroll){
   // view that hangs off Rounds: a round card, and a course plan you opened from one.
   const NAV_OF = { clubhistory:'game', sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
                    drills:'coach', shelf:'coach', lesson:'coach', landed:'home', numbers:'home', timeline:'home',
-                   round:'rounds', rounds:'rounds' };
+                   round:'rounds', rounds:'rounds', courseprep:'rounds' };
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === navView));
-  const R = { home, bag, game, clubhistory:clubHistoryView, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
+  const R = { home, bag, game, courseprep:coursePrepView, clubhistory:clubHistoryView, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
@@ -2028,6 +2031,7 @@ function render(view, arg, keepScroll){
   was.forEach(([id, open]) => { const d = document.getElementById(id); if(d) d.open = open; });
   buildJumpBar();
   hqUpdateShell();hqHasRendered=true;
+  if(view === 'courseprep') window.CaddieCoursePrep?.mount(document.getElementById('course-prep'));
   if(!keepScroll) window.scrollTo(0,0);
 }
 
@@ -2238,6 +2242,7 @@ function preps(){
   // No back link: this is the Round prep SEGMENT of Rounds now (Aug 27 2026), not a page
   // you arrived at from somewhere — the segmented control above it is the way back out.
   return `
+  ${window.CaddieCoursePrep?.teaser() || ''}
   ${any ? cheatBtn('prep') : ''}
   ${!any ? `<div class="card"><p class="sm">No course plans yet. Tell Claude where you're playing and one lands here — tee strategy, the holes that cost you, lay-up numbers off your ladder, and a note on every hole the research can support.</p></div>` : ''}
   ${block('Coming up', p.up)}
@@ -3020,7 +3025,7 @@ function hqBagLinks(){
 }
 function hqRoundIntro(){
   const recent=allDayRows().filter(r=>r.kind==='outdoor'||r.kind==='sim').slice(0,3);
-  return `<section class="hq-panel hq-round-latest"><h2>Pick up where you left off</h2><div>${hqActivityRows(recent)}<div class="hq-hero-actions"><button class="hq-btn" data-action="live-new">${S.live?'Resume your round':'Start a live round'} ${hqIcon('arrow')}</button><button class="hq-btn hq-btn-secondary" data-action="hq-route" data-view="rounds" data-seg="cards" data-target="round-log">Log a completed round</button></div></div></section>`;
+  return `${window.CaddieCoursePrep?.teaser() || ''}<section class="hq-panel hq-round-latest"><h2>Pick up where you left off</h2><div>${hqActivityRows(recent)}<div class="hq-hero-actions"><button class="hq-btn" data-action="live-new">${S.live?'Resume your round':'Start a live round'} ${hqIcon('arrow')}</button><button class="hq-btn hq-btn-secondary" data-action="hq-route" data-view="rounds" data-seg="cards" data-target="round-log">Log a completed round</button></div></div></section>`;
 }
 function hqExplore(){
   const item=(kind,label,description,act)=>({kind,label,description,act});
@@ -3031,6 +3036,7 @@ function hqExplore(){
     item('Your workspace','Activity log','Every range day, simulator round, course round and film',{a:'session-category',kind:'days'}),
     item('Play & improve','Start or resume a round','Live hole-by-hole logging and scoring',{a:'live-new'}),
     item('Play & improve','Rounds & scorecards','Your complete scoring record and analytics',{a:'go',v:'rounds',seg:'cards'}),
+    item('Play & improve','Pound Ridge · Course Prep','18 holes, Google 3D, satellite, targets and your club distances',{a:'open-course-prep'}),
     item('Play & improve','Course plans','Personal tee strategy, holes and preparation',{a:'go',v:'rounds',seg:'prep'}),
     item('Play & improve','Courses','Every course, rating, record and bucket-list stop',{a:'go',v:'rounds',seg:'courses'}),
     item('Play & improve','Practice planner','Generate and track a Golf Lounge TrackMan session',{a:'hq-route',v:'coach',target:'sim-practice'}),
@@ -3080,7 +3086,7 @@ function hqSearch(query){
   }).sort((a,b)=>b._score-a._score).map(({_score,...row})=>({...row,description:row.description||(row.act?.value!=null?`${row.act.value}${row.act.unit?' '+row.act.unit:''} · ${row.act.prov||row.kind}`:row.kind+' · open the complete record')}));
 }
 function hqUpdateShell(){
-  let parent={home:'home',bag:'bag',clubhistory:'bag',game:'game',sessions:'game',bay:'game',swing:'game',shortgame:'game',putting:'game',mental:'game',positions:'game',session:'game',rounds:'rounds',round:'rounds',briefing:'rounds',live:'rounds',coach:'coach',drills:'coach',shelf:'coach',lesson:'coach'}[current.view]||'home';
+  let parent={home:'home',bag:'bag',clubhistory:'bag',game:'game',sessions:'game',bay:'game',swing:'game',shortgame:'game',putting:'game',mental:'game',positions:'game',session:'game',rounds:'rounds',round:'rounds',courseprep:'rounds',briefing:'rounds',live:'rounds',coach:'coach',drills:'coach',shelf:'coach',lesson:'coach'}[current.view]||'home';
   if(current.view==='briefing'){
     const plan=S.briefings.find(b=>b.id===current.arg);
     const course=plan&&(S.courses.some(c=>c.name.toLowerCase()===String(plan.course||'').toLowerCase())||S.rounds.some(r=>courseMatches(r.course,plan.course)));
@@ -7004,6 +7010,7 @@ function briefing(id){
   const backSeg = backView === 'rounds' ? ' data-seg="prep"' : '';
   return `
   <button class="backlink" data-action="go" data-view="${backView}"${backSeg}>← ${backLabel}</button>
+  ${sameCourse(b.course, 'Pound Ridge Golf Club') ? window.CaddieCoursePrep?.teaser() || '' : ''}
   <div class="card">
     <h2>${b.date ? 'Round prep · ' + fmtDate(b.date) : 'Standing plan'}</h2>
     <h3 style="font-size:19px">${esc(b.course)}</h3>
@@ -9401,7 +9408,9 @@ function clearPlanCall(b, n){
 // page from ever disagreeing: the live logger, the plan's own hole table and planHeld()
 // all read the hole through here.
 function briefHole(b, n){
-  const h = b && Array.isArray(b.holes) ? b.holes.find(x => x && x.n === n) : null;
+  let h = b && Array.isArray(b.holes) ? b.holes.find(x => x && x.n === n) : null;
+  const visualNote = coursePrepNote(b && b.course, n);
+  if(visualNote) h = {...(h || {n}), prepNote:visualNote};
   const mine = planCall(b, n);
   // HIS CALL REACHES THE TEE EVEN WHERE THE PLAN SAID NOTHING. A hole the research could
   // not describe is exactly the one he is most likely to have his own view about, so an
@@ -9409,7 +9418,7 @@ function briefHole(b, n){
   // the "did the plan say anything" guard below.
   if(mine) return { ...(h || { n }), club: mine.club, yours: true, since: mine.ts,
     planClub: h ? h.club : null };
-  return h && (h.play || h.note || (h.why || []).length) ? h : null;
+  return h && (h.play || h.note || h.prepNote || (h.why || []).length) ? h : null;
 }
 // The one phrasing of his call, so the plan page and the tee read identically.
 const myCall = hn => hn && hn.yours && (hn.club || []).length
@@ -9430,6 +9439,7 @@ function holeRows(hn){
   if(hn.leaves) rows.push(['Leaves', emph(hn.leaves), '']);
   if(hn.green) rows.push(['Green', emph(hn.green), '']);
   if(hn.avoid) rows.push(['Avoid', emph(hn.avoid), 'hot']);
+  if(hn.prepNote) rows.push(['Your note', esc(hn.prepNote), 'mine']);
   return rows;
 }
 // Every hole the plan's own table should list: the ones it describes, plus any he has put
@@ -10084,6 +10094,7 @@ function livePlay(L){
       <span class="lvsaved">● SAVED</span></div>
   </div>
 
+  ${L && sameCourse(L.course, 'Pound Ridge Golf Club') ? `<button class="btn ghost tiny" data-action="open-course-prep" data-n="${h.n}">Hole ${h.n} · course map & plan ↗</button>` : ''}
   ${prep}
 
   <div class="lvseg">
@@ -10247,6 +10258,7 @@ function bumpGearCounters(){
 
 // ---------- Actions ----------
 const ACTIONS = {
+  'open-course-prep': el => { window.CaddieCoursePrep?.openHole(el?.dataset.n || 1); render('courseprep'); },
   'hq-explore': () => window.CaddieExplorer?.open(),
   'hq-back': () => {
     const previous=hqTrail.pop();if(!previous)return;
@@ -11543,13 +11555,52 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
+}
+
+// Course Prep passes narrow read/write callbacks; it never owns or replaces golf state.
+function coursePrepView(){ return window.CaddieCoursePrep?.render() || '<div class="card"><p>Course Prep is unavailable. Refresh to load the current app.</p></div>'; }
+function coursePrepNote(course, n){
+  if(!sameCourse(course, 'Pound Ridge Golf Club')) return '';
+  const p = window.CaddieCoursePrep?.clean(S.coursePrep?.poundRidge);
+  return p?.holes[p.tee + ':' + n]?.note || '';
+}
+function initCoursePrep(){
+  window.CaddieCoursePrep?.init({
+    get: () => S.coursePrep?.poundRidge,
+    save: plan => { S.coursePrep = S.coursePrep || {}; S.coursePrep.poundRidge = plan; save(); },
+    bag: basis => {
+      const evidence = basis === 'range' ? swingEvolutionRows() : new Map();
+      return orderedCarries().map(row => {
+      const kind = provOfCarry(row);
+      const provenance = kind === 'offer' ? 'Saved playing carry · a separate bay offer is on the Bag page'
+        : kind === 'trackman' ? 'Accepted TrackMan carry · confirm for course conditions'
+        : kind === 'bay' ? 'Saved measured carry · confirm for course conditions'
+        : S.carriesCalibrated ? 'Your calibrated playing carry' : 'Estimated playing carry';
+      const recent = (evidence.get(clubCanon(row.club)) || []).find(r => r.values.carry?.value > 0);
+      const measured = basis === 'range';
+      return {key:clubKey(row.club), label:abbrOf(row.club),
+        carry:measured ? recent?.values.carry?.value ?? null : row.carry,
+        rangeTotal:measured ? recent?.values.total?.value ?? null : null,
+        provenance:measured ? recent ? 'Range · ' + recent.date + ' · ' + (recent.values.carry.n || 'unknown') + ' shots · ' + (recent.setup || recent.label) : 'No range carry recorded' : provenance};
+      });
+    },
+    club: n => (S.planCalls?.['pound ridge golf club']?.[n]?.club || [])[0] || '',
+    setClub: (n, key) => {
+      if(!Number.isInteger(n) || n < 1 || n > 18 || !S.carries.some(c => clubKey(c.club) === key)) return;
+      S.planCalls = S.planCalls || {};
+      const calls = S.planCalls['pound ridge golf club'] = S.planCalls['pound ridge golf club'] || {};
+      calls[n] = {club:[key], ts:today()}; save();
+    },
+    refresh: rerender, toast
+  });
 }
 
 window.CaddieHQ={search:hqSearch,explore:hqExplore};
 // ---------- Boot ----------
 load(); save();
+initCoursePrep();
 applyTheme();
 render('home');
 fetchFeed();

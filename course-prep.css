@@ -1,0 +1,116 @@
+/* Scoped Course Prep UI; existing workspace layout and golf records stay intact. */
+.cp-entry{background:#173f33;color:#fff;border-radius:20px;padding:22px;display:flex;align-items:center;justify-content:space-between;gap:24px;margin:16px 0 22px}
+.cp-entry h2{color:#fff;font-size:24px;text-transform:none;letter-spacing:-.6px;margin:6px 0}
+.cp-entry p{color:#d5e1d7;margin:0;font-size:14px}
+.cp-entry .hq-btn{background:#d7ec9d;color:#123e31;flex-shrink:0}
+.cp-eyebrow{display:block;font:700 10px/1.4 var(--sans,sans-serif);letter-spacing:1.6px;text-transform:uppercase;color:#738374}
+.cp-entry .cp-eyebrow,.cp-hero .cp-eyebrow{color:#c4de98}
+.cp-workspace{--cp-panel:#fff;--cp-ink:#193e32;--cp-muted:#66776d;--cp-line:#dde4d8;color:var(--cp-ink)}
+.cp-workspace *{box-sizing:border-box}
+.cp-workspace button,.cp-workspace select,.cp-workspace input,.cp-workspace textarea{font-family:inherit}
+.cp-workspace button{cursor:pointer}
+.cp-workspace button:disabled{opacity:.4;cursor:default}
+.cp-workspace button:focus-visible,.cp-workspace a:focus-visible,.cp-workspace select:focus-visible,.cp-workspace input:focus-visible,.cp-workspace textarea:focus-visible{outline:3px solid #b9943d;outline-offset:3px}
+.cp-hero{display:flex;justify-content:space-between;gap:24px;align-items:center;background:radial-gradient(ellipse at 95% 0,#456346 0,transparent 60%),#183f33;border:1px solid #325144;border-radius:22px;padding:28px;color:#fff}
+.cp-hero h2{font:700 clamp(28px,4vw,42px)/1.05 var(--sans,sans-serif);letter-spacing:-1.6px;color:#fff;text-transform:none;margin:8px 0 12px}
+.cp-hero h2 span{display:block;font-size:15px;line-height:1.5;font-weight:400;letter-spacing:0;color:#d6e4d7;margin-top:12px}
+.cp-hero p{font-size:12px;margin:0;color:#d6e4d7}
+.cp-tee-control{min-width:230px}
+.cp-tee-control label{font-size:11px;color:#d6e4d7;margin-bottom:8px;display:block}
+.cp-tee-control select{background:#fff;color:#173f33;border:0;border-radius:10px;padding:12px;min-height:44px;width:100%;font-size:16px}
+.cp-tee-control>span{display:block;font-size:11px;color:#d6e4d7;margin-top:8px}
+.cp-progress{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:var(--cp-muted);padding:14px 3px}
+.cp-progress b{color:var(--cp-ink)}
+.cp-holes{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:4px;margin:0 0 18px}
+.cp-holes button{border:1px solid var(--cp-line);border-radius:9px;background:var(--cp-panel);color:var(--cp-ink);min-height:51px;padding:5px 0;position:relative}
+.cp-holes b,.cp-holes span{display:block}
+.cp-holes b{font-size:15px}
+.cp-holes span{font-size:9px;color:var(--cp-muted);margin-top:3px}
+.cp-holes button[aria-current]{background:#204d3e;border-color:#204d3e;color:white}
+.cp-holes button[aria-current] span{color:#d7e5d6}
+.cp-holes button.reviewed:after{content:'';width:5px;height:5px;background:#92bc54;border-radius:50%;position:absolute;right:4px;top:4px}
+.cp-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(290px,1fr);gap:20px;align-items:start}
+.cp-map-panel,.cp-plan-card{background:var(--cp-panel);border:1px solid var(--cp-line);border-radius:18px;min-width:0;overflow:hidden}
+.cp-hole-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px}
+.cp-hole-heading h3{font-size:27px;letter-spacing:-.8px;color:var(--cp-ink);margin:3px 0 0}
+.cp-hole-heading h3 small{display:block;font-size:12px;font-weight:400;letter-spacing:0;color:var(--cp-muted);margin-top:5px}
+.cp-arrows{display:flex;gap:5px}
+.cp-arrows button,.cp-map-tools button{background:transparent;border:1px solid var(--cp-line);border-radius:9px;color:var(--cp-ink);min-height:38px;padding:7px 12px;font-size:12px}
+.cp-arrows button{width:39px;font-size:18px;padding:0}
+.cp-modes{display:grid;grid-template-columns:repeat(4,1fr);padding:0 12px 12px;gap:3px}
+.cp-modes button{padding:10px 3px;min-height:40px;border:0;border-radius:8px;background:transparent;color:var(--cp-muted);font-size:12px;font-weight:600;white-space:nowrap}
+.cp-modes button[aria-pressed=true]{background:#eaf0df;color:#193e32}
+.cp-map-stage{height:480px;position:relative;isolation:isolate;background:#e8e5d9;overflow:hidden}
+.cp-map-stage>svg,.cp-google-map{display:block;width:100%;height:100%;min-height:100%}
+.cp-map-stage>svg{overflow:hidden;background:#163f34}
+.cp-workspace #cp-basis{width:100%;font-size:14px;border:1px solid var(--cp-line);border-radius:8px;padding:10px;background:var(--cp-panel);color:var(--cp-ink);min-height:42px}
+.cp-guide{margin:0;height:100%;width:100%;position:relative;background:#b9b7a6}
+.cp-guide img{display:block;width:100%;height:100%;object-fit:contain}
+.cp-guide figcaption{position:absolute;left:10px;bottom:10px;padding:7px 10px;border-radius:6px;background:#173f33eb;color:#fff;font-size:10px}
+.cp-map-message{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;gap:12px;background:radial-gradient(ellipse at top,#edf1df,#dddccb)}
+.cp-map-message h3{font-size:24px;color:#193e32;margin:0;letter-spacing:-.7px}
+.cp-map-message p{max-width:310px;font-size:13px;line-height:1.65;color:#566959;margin:0}
+.cp-map-message button{background:#204d3e;border:0;border-radius:9px;color:#fff;min-height:42px;padding:10px 18px;font-size:13px}
+.cp-map-message button+button{background:#ffffff88;color:#204d3e}
+.cp-map-message a{font-size:12px;color:#204d3e;text-decoration:underline}
+.cp-orbit{font-size:64px;color:#567248;line-height:1}
+.cp-map-tools{display:flex;flex-wrap:wrap;gap:5px;padding:12px 12px 0}
+.cp-map-tools:empty{display:none}
+.cp-map-tools button[aria-pressed=true]{background:#eaf0df;border-color:#a9bf86}
+.cp-map-caption{font-size:11px;line-height:1.6;color:var(--cp-muted);padding:12px 15px}
+.cp-map-caption>span{display:block;margin-top:4px;font-size:10px}
+.cp-map-caption a,.cp-sources a,.cp-setup a{color:inherit;text-decoration:underline}
+.cp-feature{stroke:#173f33;stroke-width:1}
+.cp-feature-water{fill:#4b8087}
+.cp-feature-bunker{fill:#c8bb92}
+.cp-feature-green{fill:#799c6a}
+.cp-feature-fairway{fill:#396b46}
+.cp-route-line{fill:none;stroke:#a7b6a5;stroke-opacity:.2;stroke-width:3;stroke-linecap:round}
+.cp-route-line.selected{stroke:#cee8a0;stroke-opacity:1;stroke-width:5}
+.cp-hole-dot{fill:#e8efda;stroke:#173f33;stroke-width:2}
+.cp-hole-number{fill:#193e32;font:700 13px sans-serif}
+.cp-map-label{font:600 13px sans-serif;fill:#fff;paint-order:stroke;stroke:#163f34;stroke-width:4px}
+.cp-map-scale{color:#dce3d5;fill:#dce3d5;font:12px sans-serif}
+.cp-carry-ring{fill:none;stroke:#c5e78a;stroke-width:2;stroke-dasharray:8 5}
+.cp-roll-ring{fill:none;stroke:#ffb766;stroke-width:2;stroke-dasharray:3 5}
+.cp-aim-line{fill:none;stroke:#ffb766;stroke-width:2;stroke-dasharray:5 5}
+.cp-plan{display:grid;gap:14px;min-width:0}
+.cp-plan-card{padding:20px}
+.cp-plan-card h3{font-size:23px;line-height:1.15;letter-spacing:-.7px;margin:7px 0 12px;color:var(--cp-ink)}
+.cp-prompt{font-size:13px;line-height:1.65;margin:0 0 19px;color:var(--cp-muted)}
+.cp-workspace label{font-size:12px;line-height:1.5}
+.cp-plan-card>label{display:block;margin:12px 0 7px;font-weight:600}
+.cp-plan-card label>span{float:right;color:var(--cp-muted)}
+.cp-clubs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.cp-clubs button{border:1px solid var(--cp-line);border-radius:9px;background:transparent;color:var(--cp-ink);padding:9px 2px;min-height:51px}
+.cp-clubs button b,.cp-clubs button span{display:block}
+.cp-clubs button b{font-size:14px}
+.cp-clubs button span{font-size:10px;margin-top:3px}
+.cp-clubs button[aria-pressed=true]{background:#204d3e;color:#fff;border-color:#204d3e}
+.cp-distances{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 0 13px;margin-top:4px;border-bottom:1px solid var(--cp-line)}
+.cp-distances span{font-size:10px;color:var(--cp-muted)}
+.cp-distances b{display:block;font-size:30px;font-weight:600;letter-spacing:-1px;color:var(--cp-ink);line-height:1.2}
+.cp-club-summary{padding:14px 0 6px;font-size:14px}
+.cp-club-summary span{display:block;font-size:11px;color:var(--cp-muted);margin-top:5px;line-height:1.5}
+.cp-muted{font-size:11px;line-height:1.6;color:var(--cp-muted)}
+.cp-workspace input[type=range]{width:100%;accent-color:#54743e;padding:0;min-height:28px}
+.cp-workspace textarea{width:100%;border:1px solid var(--cp-line);border-radius:9px;padding:12px;background:var(--cp-panel);color:var(--cp-ink);font-size:16px;line-height:1.5;resize:vertical}
+.cp-reviewed{display:flex!important;align-items:center;gap:9px;min-height:38px;font-size:13px!important}
+.cp-reviewed input{width:18px;height:18px;accent-color:#204d3e;flex-shrink:0}
+.cp-round-plan,.cp-setup,.cp-sources{background:var(--cp-panel);border:1px solid var(--cp-line);border-radius:14px;margin-top:16px;padding:17px}
+.cp-workspace summary{font-size:14px;font-weight:600;cursor:pointer;line-height:1.6}
+.cp-workspace summary span{font-size:11px;font-weight:400;color:var(--cp-muted);margin-left:8px}
+.cp-plan-table{margin-top:15px}
+.cp-plan-table button{width:100%;border:0;border-top:1px solid var(--cp-line);background:transparent;color:var(--cp-ink);display:grid;grid-template-columns:28px 100px 75px 1fr;gap:10px;text-align:left;padding:14px 0;font-size:12px;line-height:1.5}
+.cp-plan-table button>span:last-child{color:var(--cp-muted)}
+.cp-key-row{display:flex;gap:8px;margin:8px 0}
+.cp-key-row input{font-size:16px;min-width:0;flex:1;padding:10px;background:var(--cp-panel);color:var(--cp-ink);border:1px solid var(--cp-line);border-radius:8px}
+.cp-key-row button{background:#204d3e;color:#fff;border:0;border-radius:8px;padding:10px 14px}
+.cp-setup p,.cp-sources p{font-size:12px;color:var(--cp-muted);line-height:1.7;margin:12px 0 0}
+.cp-live-note{margin:8px 0;padding:10px 12px;border-left:3px solid #a1bd70;background:var(--cp-panel,#f1f5e8);font-size:12px;line-height:1.6}
+body.night .cp-workspace{--cp-panel:#19382e;--cp-ink:#e2eadb;--cp-muted:#b1c0b4;--cp-line:#385447}
+body.night .cp-entry,body.night .cp-hero{border-color:#486644}
+@media(max-width:1050px){.cp-grid{grid-template-columns:minmax(0,1.2fr) minmax(280px,1fr)}.cp-holes{grid-template-columns:repeat(9,minmax(0,1fr))}.cp-map-stage{height:450px}}
+@media(max-width:760px){.cp-grid{grid-template-columns:1fr}.cp-hero{padding:22px;align-items:stretch;flex-direction:column;gap:20px}.cp-tee-control{min-width:0;max-width:100%}.cp-entry{flex-direction:column;align-items:stretch;gap:16px;padding:20px}.cp-entry .hq-btn{justify-content:space-between}.cp-map-stage{height:420px}.cp-plan{grid-template-columns:1fr 1fr}.cp-clubs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:540px){.cp-workspace>.backlink{margin-bottom:10px}.cp-hero{padding:20px}.cp-hero h2{font-size:34px}.cp-progress{font-size:10px;gap:6px}.cp-holes{gap:3px}.cp-holes button{min-height:46px}.cp-holes b{font-size:14px}.cp-holes span{font-size:8px}.cp-map-stage{height:365px}.cp-hole-heading{padding:15px}.cp-modes{padding:0 7px 9px}.cp-modes button{font-size:11px}.cp-plan{grid-template-columns:1fr}.cp-clubs{grid-template-columns:repeat(5,minmax(0,1fr))}.cp-plan-card{padding:18px}.cp-plan-table button{grid-template-columns:23px 1fr 60px}.cp-plan-table button>span:last-child{grid-column:2/4}.cp-key-row{flex-wrap:wrap}.cp-key-row input{flex-basis:100%}.cp-workspace summary span{display:block;margin-left:0}.cp-map-message{padding:22px}}
+@media(prefers-reduced-motion:reduce){.cp-workspace *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}

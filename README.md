@@ -12,6 +12,7 @@ mobile bottom navigation, a desktop rail and a global **Find anything** Explorer
 | **Bag** | Scannable club roster + carries, full club history, setup/settings, bench, gapping, yardage matrix and equipment decisions |
 | **Progress** | Activity by day, cumulative trends, every club and source; one-tap Swing, Short-game, Putting and Mental labs |
 | **Rounds** | Recent rounds, complete course/simulator reviews, scorecards, live logging, course plans and course directory |
+| **Course Prep** | Pound Ridge: all 18 holes, seven tees, course map, current bag/range comparisons, editable targets and saved notes; optional Google satellite/3D flyovers |
 | **Coach** | Personalized coaching library, drills, progress, practice planner and saved results |
 | **Explorer** | Search clubs, dates, rounds, sources, numbers, plans and lessons from any page; Cmd/Ctrl+K on a keyboard |
 
@@ -21,6 +22,11 @@ data migration is required for v200. The previous app is retained on
 `backup/caddie-hq-v199-2026-10-02` for rollback.
 
 ## Run it
+
+Open **Rounds → Prepare Pound Ridge** to plan a round. Google satellite and 3D need
+a billing-enabled Maps JavaScript API browser key entered under **Google Maps setup**.
+See [setup and source details](data/course-prep/README.md). The course map and saved
+strategy work without Google and are available offline after the app has loaded.
 
 Open `index.html` in a browser, or serve the folder:
 

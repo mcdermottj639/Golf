@@ -1,7 +1,7 @@
 // Caddie HQ service worker — offline-first cache of the app shell.
-const CACHE = 'caddiehq-v202';  // bump `BUILD` in app.js to match
+const CACHE = 'caddiehq-v203';  // bump `BUILD` in app.js to match
 const ASSETS = ['./', './index.html', './styles.css', './revamp.css', './explorer.js', './app.js', './lessons.js', './courses-db.js',
-  './course-cards.js', './manifest.webmanifest', './icon.svg', './futurefit33-rh.jpg', './coach-feed.json', './front9-feed.json', './path-feed.json', './corrections-20260922.json', './range-20260922-feed.json', './futurefit-feed.json', './range-20260925-feed.json', './bag-20261001-feed.json', './range-20261001-feed.json', './round-20261001-feed.json', './round-takeaways.js', './bay-takeaways.js', './round-review.js', './round-review.css'];
+  './course-cards.js', './manifest.webmanifest', './icon.svg', './futurefit33-rh.jpg', './coach-feed.json', './front9-feed.json', './path-feed.json', './corrections-20260922.json', './range-20260922-feed.json', './futurefit-feed.json', './range-20260925-feed.json', './bag-20261001-feed.json', './range-20261001-feed.json', './round-20261001-feed.json', './round-takeaways.js', './bay-takeaways.js', './round-review.js', './round-review.css', './course-prep.js', './course-prep.css', './course-prep-data.js', './course-prep-feed.json', './data/course-prep/pound-ridge-osm.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -13,6 +13,8 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  // External Maps/imagery responses must never enter the offline cache.
+  if (new URL(e.request.url).origin !== self.location.origin) return;
   // no-store defeats GitHub Pages' 10-minute HTTP cache so updates land
   // immediately; the SW cache still serves everything offline.
   e.respondWith(

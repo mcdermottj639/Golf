@@ -1,0 +1,96 @@
+// Real UI and offline checks. Google is mocked: this does not certify live imagery.
+'use strict';
+const assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs'),path=require('node:path');
+const {chromium}=require(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES+'/playwright');
+const root=path.join(__dirname,'..'),types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml'};
+const server=http.createServer((req,res)=>{
+  const route=new URL(req.url,'http://localhost').pathname;
+  const file=path.resolve(root,'.'+(route==='/'?'/index.html':route));
+  if(!file.startsWith(root+path.sep))return res.writeHead(403).end();
+  fs.readFile(file,(err,data)=>{res.writeHead(err?404:200,{'Content-Type':types[path.extname(file)]||'application/octet-stream'});res.end(err?'':data);});
+});
+const state=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('caddiehq_v1')));
+const ready=p=>p.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('pound-ridge-visual-prep-briefing-20261008-v1'));
+async function prep(p){await p.locator('#nav [data-view="rounds"]').click();await p.locator('[data-action="open-course-prep"]').first().click();await p.locator('#cp-route-map').waitFor();}
+async function explore(p,selector){await p.locator('.hq-search-trigger:visible').first().click();await p.locator('.hq-explorer-link'+selector).first().click();}
+const mode=(p,m)=>p.locator('.cp-modes [data-mode="'+m+'"]').click();
+function googleMock(){
+  window.mapQA={maps:0,scenes:0,flights:0,stops:0};
+  class Map{constructor(el,opts){this.el=el;this.opts=opts;this.listeners={};mapQA.maps++;}getDiv(){return this.el;}addListener(k,f){this.listeners[k]=f;}fitBounds(b){this.bounds=b;}}
+  class Overlay{constructor(opts){this.opts=opts;}setMap(map){this.opts.map=map;}}
+  class Bounds{constructor(){this.points=[];}extend(p){this.points.push(p);}}
+  class Scene extends HTMLElement{constructor(opts){super();Object.assign(this,opts);mapQA.scenes++;}flyCameraTo(opts){this.lastFlight=opts;mapQA.flights++;}stopCameraAnimation(){mapQA.stops++;}}
+  class Line extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
+  class Marker extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
+  customElements.define('qa-map-scene',Scene);customElements.define('qa-map-line',Line);customElements.define('qa-map-marker',Marker);
+  const maps3d={Map3DElement:Scene,Polyline3DElement:Line,Marker3DElement:Marker};
+  window.google={maps:{maps3d,Map,LatLngBounds:Bounds,Polyline:Overlay,Circle:Overlay,Marker:Overlay,importLibrary:async name=>name==='maps3d'?maps3d:{Map,Marker:Overlay}}};
+  window.__caddieMapsReady();
+}
+(async()=>{
+  await new Promise(r=>server.listen(0,'127.0.0.1',r));
+  const url='http://127.0.0.1:'+server.address().port+'/',errors=[],screens=process.env.CADDIE_QA_DIR||'/tmp/caddie-prep-qa';fs.mkdirSync(screens,{recursive:true});
+  const browser=await chromium.launch({headless:true,executablePath:process.env.CADDIE_CHROMIUM||(fs.existsSync('/tmp/chromium')?'/tmp/chromium':undefined),args:['--no-sandbox']});
+  try{
+    const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block',acceptDownloads:true}),p=await context.newPage();p.setDefaultTimeout(12000);p.on('pageerror',e=>errors.push(e.message));
+    let googleRequests=0;
+    await p.route('https://maps.googleapis.com/maps/api/js*',async route=>{googleRequests++;await route.fulfill({contentType:'text/javascript',body:'('+googleMock.toString()+')()'});});
+    await p.goto(url);await ready(p);const initial=await state(p);await prep(p);
+    assert.equal(await p.locator('.cp-holes button').count(),18);assert.equal(await p.locator('#cp-tees option').count(),7);
+    assert.match(await p.locator('.cp-hole-heading').innerText(),/380 yd/);
+    assert.equal(await p.locator('.cp-clubs [data-club]').count(),initial.carries.length);
+    for(const width of [320,390,1440]){
+      await p.setViewportSize({width,height:width===1440?1000:844});await p.evaluate(()=>scrollTo(0,0));
+      const bounds=await p.evaluate(()=>({width:innerWidth,content:document.documentElement.scrollWidth,holeButtons:[...document.querySelectorAll('.cp-holes button')].map(e=>({left:e.getBoundingClientRect().left,right:e.getBoundingClientRect().right})),skip:document.querySelector('.hq-skip').getBoundingClientRect().bottom}));
+      assert.ok(bounds.content<=width+1,'page fits '+width);assert.ok(bounds.holeButtons.every(b=>b.left>=0&&b.right<=width),'hole buttons fit '+width);assert.ok(bounds.skip<=0,'skip link stays offscreen when unfocused');
+      await p.screenshot({path:path.join(screens,'course-prep-'+width+'.png'),fullPage:true});
+    }
+    await p.setViewportSize({width:390,height:844});
+    await p.locator('#cp-tees').selectOption('oak');assert.match(await p.locator('.cp-hole-heading').innerText(),/415 yd/);
+    await p.locator('#cp-tees').selectOption('granite');
+    await p.locator('[data-cp="club"][data-club="5-wood"]').click();assert.match(await p.locator('#cp-club-readout').innerText(),/no carry/);
+    await p.locator('#cp-basis').selectOption('range');assert.match(await p.locator('#cp-club-readout').innerText(),/Range · 2026-/);assert.ok(await p.locator('.cp-carry-ring').count());
+    const note='5W toward my target; check the front-edge carry. <img src=x onerror=alert(1)>';
+    await p.locator('#cp-note').fill(note);await p.locator('#cp-reviewed').check();assert.equal(await p.locator('#cp-reviewed-count').innerText(),'1/18');
+    await p.locator('#cp-roll').fill('15');assert.equal(await p.locator('#cp-roll-label').textContent(),'15 yd');
+    await p.locator('#cp-route-map').click({position:{x:170,y:160}});
+    assert.ok((await state(p)).coursePrep.poundRidge.holes['granite:1'].target);
+    await p.locator('[data-cp="edit"][data-kind="tee"]').click();await p.locator('#cp-route-map').click({position:{x:140,y:85}});
+    assert.ok((await state(p)).coursePrep.poundRidge.holes['granite:1'].tee);
+    await p.locator('#cp-round-plan summary').click();assert.equal(await p.locator('.cp-plan-table [data-n="1"] > span:last-child').innerText(),note);
+    await p.locator('.cp-holes [data-n="15"]').click();assert.match(await p.locator('.cp-hole-heading').innerText(),/Par 3 · 144 yd/);
+    await p.locator('.cp-holes [data-n="1"]').click();assert.equal(await p.locator('#cp-note').inputValue(),note);
+    await p.locator('#cp-tees').selectOption('oak');assert.equal(await p.locator('#cp-note').inputValue(),'');await p.locator('#cp-tees').selectOption('granite');assert.equal(await p.locator('#cp-note').inputValue(),note);
+    await p.locator('[data-cp="overview"]').click();assert.equal(await p.locator('[data-cp="map-hole"][role="button"]').count(),18);await p.locator('[data-cp="map-hole"][data-n="18"]').press('Enter');assert.match(await p.locator('.cp-hole-heading').innerText(),/Hole 18/);
+    await p.locator('.cp-holes [data-n="1"]').click();
+    const saved=(await state(p)).coursePrep;
+    await p.reload();await ready(p);await prep(p);assert.deepEqual((await state(p)).coursePrep,saved);assert.equal(await p.locator('#cp-note').inputValue(),note);
+    assert.equal(googleRequests,0,'no Google request before a configured imagery view');
+    await mode(p,'3d');assert.match(await p.locator('#cp-map-stage').innerText(),/Connect your Google Maps key/);
+    await p.locator('[data-cp="map-setup"]').click();await p.locator('#cp-api-key').fill('invalid');await p.locator('[data-cp="key-save"]').click();assert.equal(googleRequests,0);
+    await p.locator('#cp-api-key').fill('AIza'+'x'.repeat(35));await p.locator('[data-cp="key-save"]').click();await p.locator('qa-map-scene').waitFor();
+    assert.equal(googleRequests,1);assert.ok(await p.locator('qa-map-line').count()>=3);
+    const framed=await p.evaluate(()=>mapQA.flights);await p.locator('[data-cp="fly"]').click();assert.equal(await p.evaluate(()=>mapQA.flights),framed+1);await p.locator('qa-map-scene').dispatchEvent('gmp-animationend');assert.equal(await p.evaluate(()=>mapQA.flights),framed+2);
+    await p.locator('[data-cp="next"]').click();await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.scenes),1,'reuse 3D map');
+    await p.locator('qa-map-scene').dispatchEvent('gmp-error');assert.match(await p.locator('#cp-map-stage').innerText(),/3D could not initialize/);
+    await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();await p.locator('[data-cp="next"]').click();await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.maps),1,'reuse satellite map');
+    await p.evaluate(()=>window.gm_authFailure());assert.match(await p.locator('#cp-map-stage').innerText(),/Google rejected/);await p.locator('#cp-map-stage [data-mode="route"]').click();await p.locator('#cp-route-map').waitFor();
+    // Existing backup actions carry plans, not the separate Maps credential.
+    await explore(p,'[data-action="go"][data-view="data"]');
+    const [download]=await Promise.all([p.waitForEvent('download'),p.locator('[data-action="export"]').click()]);const exported=JSON.parse(fs.readFileSync(await download.path(),'utf8'));
+    assert.deepEqual(exported.coursePrep,saved);assert.ok(!JSON.stringify(exported).includes('AIza'+'x'.repeat(35)));
+    const [chooser]=await Promise.all([p.waitForEvent('filechooser'),p.locator('[data-action="import"]').click()]);await chooser.setFiles({name:'prep-test.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(exported))});
+    await p.reload();await ready(p);assert.deepEqual((await state(p)).coursePrep,saved);
+    const final=await state(p);for(const k of ['carries','clubs','rounds','bays'])assert.deepEqual(final[k],initial[k],k+' preserved');
+    await explore(p,'[data-action="live-new"]');await p.locator('#lvCourse').fill('Pound Ridge Golf Club');await p.locator('[data-action="live-start"]').click();await p.locator('[data-action="live-card-play"]').click();
+    assert.match(await p.locator('.lvhn').innerText(),/Hole 1/);assert.ok(await p.locator('[data-action="open-course-prep"][data-n="1"]').isVisible());
+    await p.locator('.holeintel .hi-head').click();assert.ok((await p.locator('.holeintel .hi-grid').innerText()).includes(note),'saved note reaches the live hole');
+    // Actual service worker, actual offline reload, and a note saved offline.
+    const offline=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'allow'}),op=await offline.newPage();op.on('pageerror',e=>errors.push(e.message));
+    await op.goto(url);await ready(op);await op.evaluate(()=>navigator.serviceWorker.ready);await op.waitForFunction(()=>!!navigator.serviceWorker.controller);await prep(op);
+    await op.locator('#cp-note').fill('Offline prep survives');await offline.setOffline(true);await op.reload();await prep(op);assert.equal(await op.locator('#cp-note').inputValue(),'Offline prep survives');
+    await op.locator('.cp-holes [data-n="18"]').click();assert.match(await op.locator('.cp-hole-heading').innerText(),/Hole 18/);await op.locator('#cp-note').fill('Saved while offline');assert.equal((await state(op)).coursePrep.poundRidge.holes['granite:18'].note,'Saved while offline');
+    const cached=await op.evaluate(async()=>{const keys=await caches.keys();const requests=(await Promise.all(keys.map(async k=>(await (await caches.open(k)).keys()).map(r=>r.url)))).flat();return requests;});assert.ok(cached.every(u=>new URL(u).origin===new URL(url).origin));
+    assert.deepEqual(errors,[]);console.log('PASS course prep browser: 320/390/1440 layouts, all holes/tees, saved club/target/tee/notes, range isolation, backup/import, live prep, mocked 2D/3D reuse/flyover/auth fallback, actual offline reload. Live Google imagery requires a real key.');
+  }finally{await browser.close();await new Promise(r=>server.close(r));}
+})().catch(e=>{console.error(e);process.exitCode=1;});

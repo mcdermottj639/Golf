@@ -1,0 +1,258 @@
+{
+  "updated": "2026-10-08",
+  "entries": [
+    {
+      "id": "pound-ridge-official-card-20261008-v1",
+      "type": "layout",
+      "layout": {
+        "course": "Pound Ridge Golf Club",
+        "par": [
+          4,
+          4,
+          4,
+          3,
+          4,
+          3,
+          5,
+          4,
+          5,
+          4,
+          3,
+          4,
+          5,
+          4,
+          3,
+          5,
+          4,
+          4
+        ],
+        "si": [
+          7,
+          1,
+          5,
+          15,
+          17,
+          13,
+          11,
+          3,
+          9,
+          12,
+          8,
+          10,
+          16,
+          6,
+          18,
+          14,
+          4,
+          2
+        ],
+        "tot": 72,
+        "ver": "read",
+        "as": "2026-10-08",
+        "src": "Pound Ridge Golf Club official scorecard image 00021.png, printed edition 01/24, read October 8 2026. Men’s ratings are transcribed separately from the women’s row. https://www.poundridgegolf.com/golf/scorecard",
+        "tees": [
+          {
+            "t": "Black",
+            "r": 75.9,
+            "s": 148,
+            "y": 7165
+          },
+          {
+            "t": "Oak",
+            "r": 74.2,
+            "s": 144,
+            "y": 6773
+          },
+          {
+            "t": "Pound",
+            "r": 72.4,
+            "s": 138,
+            "y": 6486
+          },
+          {
+            "t": "Granite",
+            "r": 71.7,
+            "s": 138,
+            "y": 6261
+          },
+          {
+            "t": "Ridge",
+            "r": 70.2,
+            "s": 134,
+            "y": 6010
+          },
+          {
+            "t": "Sand",
+            "r": 68.3,
+            "s": 132,
+            "y": 5683
+          }
+        ]
+      }
+    },
+    {
+      "id": "pound-ridge-mapped-location-20261008-v1",
+      "type": "geo",
+      "geo": {
+        "course": "Pound Ridge Golf Club",
+        "lat": 41.1789284,
+        "lon": -73.5686855,
+        "prec": "approximate",
+        "place": "Pound Ridge Golf Club · mapped first tee",
+        "src": "OpenStreetMap way 1052050658, first coordinate; retrieved October 8 2026. A mapped reference tee, not a surveyed tee marker or clubhouse entrance."
+      }
+    },
+    {
+      "id": "pound-ridge-visual-prep-briefing-20261008-v1",
+      "type": "briefing",
+      "briefing": {
+        "course": "Pound Ridge Golf Club",
+        "focus": "Prepare Pound Ridge from the official tee card and your current Bag. Open Course Prep for the 18 hole guides, targets and saved club choices.",
+        "rules": [
+          "Choose your tees first; Granite is the starting view, not a confirmed booking.",
+          "Use carry for a forced carry. Treat rollout as a separate assumption.",
+          "Pick a target and a miss you can accept. Verify the tee position at the course."
+        ],
+        "holes": [
+          {
+            "n": 1,
+            "par": 4,
+            "play": "Pick a specific landing target before choosing the tee club. Use the official guide to check the trouble beyond the green."
+          },
+          {
+            "n": 2,
+            "par": 4,
+            "play": "The card’s toughest hole. Plan the approach you can reach comfortably; a lay-up remains an option when the carry is too demanding."
+          },
+          {
+            "n": 3,
+            "par": 4,
+            "play": "Check the forced carry from the tee you actually play. Your carry number, rather than total distance, is the useful comparison."
+          },
+          {
+            "n": 4,
+            "par": 3,
+            "play": "Set the green center as your reference, then check the day’s flag and conditions on arrival."
+          },
+          {
+            "n": 5,
+            "par": 4,
+            "play": "A short par 4: compare a positional tee shot with a longer club. Choose the approach distance you want to leave."
+          },
+          {
+            "n": 6,
+            "par": 3,
+            "play": "Use a repeatable stock carry for this par 3. Check the front edge and the miss you can accept before choosing a club."
+          },
+          {
+            "n": 7,
+            "par": 5,
+            "play": "Build a three-shot route first. Set a comfortable wedge yardage, then work backward to the second-shot target."
+          },
+          {
+            "n": 8,
+            "par": 4,
+            "play": "Stroke index 3. Study the club’s diagram and choose a landing area; the map does not include every hazard."
+          },
+          {
+            "n": 9,
+            "par": 5,
+            "play": "The longest hole from Granite. Plan the second-shot landing area as carefully as the tee shot."
+          },
+          {
+            "n": 10,
+            "par": 4,
+            "play": "Compare your fairway-finding clubs against driver. Use the map to see the approach left by each target."
+          },
+          {
+            "n": 11,
+            "par": 3,
+            "play": "One of the longer par 3s. Compare your current hybrid and iron carries; confirm the tee marker rather than borrowing another tee’s yardage."
+          },
+          {
+            "n": 12,
+            "par": 4,
+            "play": "Choose a position before choosing a club. Verify the fairway-bunker carry at the course before committing to a target."
+          },
+          {
+            "n": 13,
+            "par": 5,
+            "play": "Make the blind-tee picture clear using the official hole guide. Pick a visible aiming reference at the course and plan the next shot."
+          },
+          {
+            "n": 14,
+            "par": 4,
+            "play": "Check the tee carry from the actual markers. Leave a margin for a less-than-perfect strike when trouble must be carried."
+          },
+          {
+            "n": 15,
+            "par": 3,
+            "play": "The shortest hole from Granite. Check the water and green shape in the club guide, then verify the front-edge carry on arrival."
+          },
+          {
+            "n": 16,
+            "par": 5,
+            "play": "Choose a lay-up that leaves a full, familiar wedge. Ground conditions can change rollout substantially."
+          },
+          {
+            "n": 17,
+            "par": 4,
+            "play": "Stroke index 4. Keep a clear landing target and a separate approach plan as the round gets late."
+          },
+          {
+            "n": 18,
+            "par": 4,
+            "play": "The card’s second-toughest hole. Commit to the same routine and inspect the approach trouble in the official guide."
+          }
+        ],
+        "sections": [
+          {
+            "t": "Official tee card, now verified",
+            "k": "Seven tee sets are available in Course Prep; the scorecard image is dated 01/24.",
+            "b": "The club’s own published card was read October 8, 2026. Black 7,165; Oak 6,773; Pound 6,486; Granite 6,261; Ridge 6,010; Sand 5,683; Pine 5,151 yards. Men’s rating/slope: Black 75.9/148; Oak 74.2/144; Pound 72.4/138; Granite 71.7/138; Ridge 70.2/134; Sand 68.3/132. No men’s Pine rating is printed, so none is guessed. This corrects earlier third-party rating values without rewriting your past rounds. https://www.poundridgegolf.com/golf/scorecard"
+          },
+          {
+            "t": "A plan that follows your current bag",
+            "k": "Course Prep reads your saved playing carries each time you open it.",
+            "b": "The old briefing used an earlier bag, including wedges and club distances that are no longer current. Those old calls are archived below. Choose today’s tee club in Course Prep or in this plan; both use the same personal choice and both reach the live-round logger. Targets and notes are saved per tee set. The mapped tee is only a reference: set your own tee position when using distances."
+          },
+          {
+            "t": "September hole-by-hole research — archive",
+            "k": "Historical club calls and distances, retained for reference. Use Course Prep for your current bag.",
+            "b": "HOLE 1\n*Driver* — the one genuinely open tee shot out here\n*145 in* — an 8-iron on the estimated ladder\n*Long.* A bunker horseshoes the green and there is *water behind it*\n380, par 4, *stroke index 7*\nSourced: the drive is *nice and open* — reviewers single it out as the friendly tee shot of the round — but the green complex is treacherous, ringed by a horseshoe bunker with water behind\nSo the approach is the shot on this hole, not the drive. *Middle of the green*, and the front half of the middle at that\n\nHOLE 2\n*Driver, and accept the narrowing* — you need the yardage here\n*178 in* — a 5-iron, over water if you go at the flag\n*Short.* The approach carries *water* unless you take the bail-out left\n413, par 4, *stroke index 1* — the hardest hole on the course, and it plays as long as two of the par 5s\nSourced: the *further you hit it, the narrower the fairway gets*, with bunkers left for the long drive. Downslope off the tee, then the hole climbs back up to the green\nSourced: the approach *must carry water* to get at the pin — and there is *ample bail-out left of the green*\n*Take the bail-out.* Stroke index 1, a 5-iron in your hands and water short is a bogey hole played sensibly and a triple played bravely\n\nHOLE 3\n*Driver or 2-iron* — whichever you can carry the water with\n*134 with driver · 164 with the 2-iron*\n*Right.* An *enormous mound of bunkering* runs down that side\n369, par 4, *stroke index 5*\nSourced: the drive has to *carry water* and avoid a huge bunker mound right\nWater on the tee shot means the carry number decides the club — not the leave. If the 2-iron clears it, hit the 2-iron\n\nHOLE 4\n*9-iron to the middle* — 8-iron if there is any wind\n*Right.* Bunkers right and then *water further right*\n139, par 3, *stroke index 15*\nSourced: bunkers short, left and right, with water beyond the right ones. One reviewer's summary is worth quoting — *should be an easy hole, but a bad shot can easily lead to a real high number*\n9-iron carries 134 on the estimated ladder, so the middle of the green is the club — not the flag\n\nHOLE 5\n*2-iron or 5-iron* — pick the one that leaves a FULL wedge\n*85 after the 2-iron · 110 after the 5-iron*\n*The pot bunkers.* They are dotted over the *entire* hole, so there is no side to favour\n290, par 4, *stroke index 17* — the second-easiest hole on the card\nSourced: *pot bunkers dot the entire hole*\nA drivable-looking par 4 with pot bunkers everywhere is a *layup-and-wedge* hole. The 5-iron leaves 110, a full 50°, which is the shot you want — the 4-iron that used to be this call came out of the bag Sep 8\n\nHOLE 6\n*8-iron* — it is downhill, so take one less than the number\n*Anything off-centre.* A crowned green sheds it away from the hole\n162, par 3, *stroke index 13*\nSourced: *downhill par 3 to a crowned green*\n7-iron carries 158 on the flat. Downhill takes a club off, and a crowned green makes the middle the only sane target\n\nHOLE 7\n*Driver, then lay to a full wedge* — the birdie chance of the front\n*245 after the drive* — a 7-iron lay-up leaves 87, a full 56°\n480, par 5, *stroke index 11*. Sourced: *a fairly easy par 5* — which on this course is a thing worth knowing\n*Zero par-5 birdies* is a finding you already carry from two separate sources, GHIN and Wianno. The par 5s here are 7, 9, 13 and 16, and this is the friendliest of the four\nThe lay-up number is the whole hole: 87 yards is a full 56°, and a full wedge is a birdie look\n\nHOLE 8\n*Fairway first.* Stroke index 3 — par is a good score\n*139 in* — a 9-iron or a soft 8\n374, par 4, *stroke index 3* — the third-hardest hole out here\n*No source describes this hole.* The card says it is hard and the reviews do not say why, so play it as an unknown: fairway, middle of the green, take your 4 or your 5 and go\nPositioning matters more than distance everywhere on this course — the bunkers are built with mounds around them, and missing a bunker into the thick grass is worse than being in it\n\nHOLE 9\n*Three shots.* The second is where this hole bites\n*286 after the drive* — a 5-iron then leaves 106, a full 50°\n*Forcing the second* into a narrow gap for a green you cannot hold anyway\n521, par 5, *stroke index 9*. Sourced: *a tough par 5 — the fairway is pretty narrow on the second shot, and it leads to another crowned green*\nA narrow second shot and a crowned green is the definition of a three-shot hole\nLongest hole on the course. Bogey here is not a problem — a 7 from the trees is\n\nHOLE 10\n*2-iron* — it takes both sides out of play\n*135 in* — a 9-iron\n*Left.* The woods run down that side of the dogleg\n340, par 4, *stroke index 12*. Sourced: a *slight dogleg left* where you can challenge it by flirting with the woods left\nSourced, and this is the important half: *bailing out right finds a multi-layered mound with bunkers that is as dangerous as the woods*\nBoth sides punish, and the hole is 340 yards. The 2-iron is the answer to a hole that has an answer\n\nHOLE 11\n*2-iron or 5-iron to the middle* — check the tee marker, it plays 181 to 206\n*Right.* A *steep falloff* right, with a long narrow bunker under it\nPar 3, *stroke index 8*, and the yardage moves a lot with the tee — sourced as *181 to 206 yards*\nSourced: rock walls two to seven feet high surround the tee on three sides, and *with a back-right pin the shot is frightening*\nThe 4-iron that carried this hole came out of the bag Sep 8. From the back it is a 2-iron (205); from the front, a 5-iron (180). Take the middle and two putts — this is a hole to walk off with a 3 or a 4, never a 5\n\nHOLE 12\n*2-iron or 5-iron* — the drive has to clear a fairway bunker\n*132 after the 2-iron · 157 after the 5-iron*\n337, par 4, *stroke index 10*. Sourced: *a scenic hole requiring an accurate drive to clear a fairway bunker*\nWhich bunker, and at what carry, is not published. Look from the tee before you pick the club — a 2-iron that does not clear it is worse than a 5-iron short of it\n\nHOLE 13\n*Driver over Pete's Rock*, then a PW lay-up — do NOT go at this green in two\n*213 after the drive* — PW leaves 91, a full 56° into a tiny green\n*Left.* A *deep ravine with a bunker in the floor of it* guards the green that side\n448, par 5, *stroke index 16* — the third-easiest hole on the card, and the most famous one out here\nSourced: the drive is *over 'Pete's Rock'*, a boulder that blocks the view of the fairway from the tee, to a *saddle-shaped landing area with danger both sides*\nSourced: the green is *tiny and perched*, with a cavernous bunker guarding the front, that ravine left and woods right. Reviewers call the narrowness the hardest part of the hole\nA tiny perched green from 213 is not a shot. A full 56° from 91 is, and it is your best birdie look of the back nine\n\nHOLE 14\n*Driver* — take on the carry, the green is the kindest here\n*144 in* — an 8-iron\n379, par 4, *stroke index 6*\nSourced: the tee shot is picturesque and *requires a fairly long carry*, but the *green complex is among the most simple on the entire course*\nA simple green after a demanding drive is the one hole out here where being aggressive off the tee pays. The carry distance is not published — look before you swing\n\nHOLE 15\n*Enough club to carry the pond* — the front edge is water\n*Short.* The tee shot is over a *reed-lined pond* to a sliver of green\nPar 3, *stroke index 18* — the easiest hole on the card, and one of the best on it\nSourced: played over a *reed-lined pond to a sliver of green* — long and shallow, wetland in front, rock around the perimeter and a big hill along two sides. From the shorter tees it is a *direct, slightly uphill iron; the elevation is the only real challenge*\n*The yardage is not published* in any source that could be reached — read the marker on the tee\nA long, shallow green means the depth you have to judge is tiny and the front of it is water. Take the club that gets you *past* the middle\n\nHOLE 16\n*Driver, then lay to a full wedge* — the green is elevated, so club up on the third\n*259 after the drive* — a 7-iron lay-up leaves 101, a full 50°\n*Left.* A *steep bank runs down into sand* the whole way along that side\n494, par 5, *stroke index 14*. Sourced: a steep bank left falling into sand, *pot bunkers dotting the fairway*, and an elevated green\nPot bunkers in the lay-up zone is an argument for a longer lay-up club, not a shorter one — pick the number, then pick the club that flies the bunkers\nAn elevated green plays a club longer, and short is already your standing miss\n\nHOLE 17\n*Fairway first* — stroke index 4, and bunkers everywhere\n*161 in* — a 6-iron\n396, par 4, *stroke index 4* — sourced as *one of the tougher holes, with lots of bunkers*\nWhich bunkers and where is not published. On a Pete Dye course the safe read is that they are where a good drive wants to finish\nPar here is a win. The round is not lost on 17 unless you make it be\n\nHOLE 18\n*Driver, favour the RIGHT half* — everything on this hole is left\n*180 in* — a 5-iron flat, but it plays uphill, and the 4-iron that used to be 'one more' came out of the bag Sep 8\n*Left*, on both shots. Bunkers up the whole left side off the tee, then a *lake* left of the green\n415, par 4, *stroke index 2* — the second-hardest hole on the course and the closing hole\nSourced: *uphill, with bunkers on the left running the whole fairway — they only stop when a lake comes into play on the left*. One review's words: *danger after danger on the left. If you're going to miss, miss right*\nUphill means a club more on the approach, and short-and-right is a chip. Short-and-left is a drop"
+          },
+          {
+            "t": "Earlier research — The tee sheet decision: Granite, not Oak",
+            "k": "Archived September research; fixed club choices and distances may be out of date.",
+            "b": "Five sets: Black 7,165, Oak 6,773, Granite 6,261, Sand 5,683, Pine 5,151.\n\nGranite is the one. It is the same length as the courses you play well - Lakeside is 6,189, Richter Park 6,547 - and it is the set the hole-by-hole yardages in this plan appear to come from: they sum to roughly 6,270 with two holes estimated, which lines up with the published Granite figure of 6,261. That is an inference from arithmetic, not a sourced tee assignment, so check the card in the pro shop.\n\nWhy it matters more here than elsewhere. This course was ranked no. 7 in Golf Advisor's 2020 Top 50 Toughest Golf Courses in the U.S., off 350,000 reader ratings. From the Black tees it is 76.0/150. An extra 500 yards on a Pete Dye course with forced carries is not a stretch, it is a different game - and the holes where you would feel it (the 2nd, the 9th, the 18th) are already the hardest ones on the card."
+          },
+          {
+            "t": "Earlier research — The water, hole by hole",
+            "k": "Archived September research; fixed club choices and distances may be out of date.",
+            "b": "Hunted specifically, because unlike a pin a pond does not move:\n\n1st - water BEHIND the green, behind the horseshoe bunker. Only in play if you air-mail the approach, which makes the long miss the expensive one.\n2nd - water on the APPROACH, short of the green, with a bail-out area left. Stroke index 1. Take the bail-out.\n3rd - water on the DRIVE. The tee shot has to carry it.\n4th - water RIGHT of the green, beyond the right-hand bunkers. Par 3, 139 yards.\n15th - a reed-lined POND fronting the green. Par 3, and the green is a shallow sliver, so the front edge is the water.\n18th - a LAKE left of the green, at the end of a left-hand bunker chain that runs the whole fairway.\n\nNot water but the same conversation: the 13th green has a deep ravine left with a bunker in the floor of it, and there are wetlands through the property that the 14,000 feet of rock wall runs around.\n\nWhat is NOT confirmed: whether any of the remaining twelve holes carry water. Absence of a mention in a review is not absence of a hazard, and no published hole-by-hole for this course could be opened directly from here - everything above is from reviews and course write-ups. Treat this list as 'water certainly here' rather than 'water nowhere else', and log what you find."
+          },
+          {
+            "t": "Earlier research — Pete Dye bunkering: position beats distance",
+            "k": "Archived September research; fixed club choices and distances may be out of date.",
+            "b": "Sourced: Pete and Perry Dye's signature volcanic bunkers and mounds work with the natural wetlands, trees and exposed rock; pot bunkers dot whole holes (the 5th and the 16th are both named); bunkers are built with mounds around them, so missing a bunker into thick grass makes the approach harder than being in the sand; and rock walls, two to seven feet high in places, are used as both natural and man-made barriers - the 11th tee is walled on three sides.\n\nThe practical version for your game, off your own numbers. Your standing miss off the tee is the drive that leaves no play at the green - the 'Dead' column on the tee-club table exists because of it - and this is the course where that miss costs the most. Four holes on this card have an answer that is not a driver: the 5th (290, pot bunkers everywhere), the 10th (340, woods left and mounded bunkers right), the 12th (337, a fairway bunker to clear) and the 13th (a lay-up after the drive). Take the answer.\n\nThe other half is the greens. Two are described as crowned (the 6th and the 9th), one as tiny and perched (13th), one as a shallow sliver (15th), one as long and narrow (11th's neighbourhood). A crowned or perched green does not hold an off-centre shot, which is the case for the middle on every single approach here - and it is the same instruction the Lakeside plan gives for a different reason."
+          },
+          {
+            "t": "Earlier research — The four par 5s are the round",
+            "k": "Archived September research; fixed club choices and distances may be out of date.",
+            "b": "You carry a finding from two independent sources - your GHIN history and the Wianno member-guest - that you make no birdies on par 5s. This course gives you four of them, and three are gettable in three sensible shots:\n\n7th, 480, sourced as 'a fairly easy par 5'. Driver, 7-iron, 87 yards - a full 56°.\n9th, 521, narrow on the second and a crowned green. Driver, 5-iron, 106 yards - a full 50°. This one is a par hole.\n13th, 448, drive over Pete's Rock then a PW to 91 - a full 56° into a tiny green.\n16th, 494, driver then a 7-iron to 101 - a full 50°, to an elevated green, so club up.\n\nThe pattern is deliberate and it is the whole tactic: on every one of them the lay-up club is chosen to leave a FULL wedge, not the shortest possible shot. A 40-yard pitch is the hardest shot in golf and a 90-yard 56° is one of your best. All four numbers come off the estimated ladder, which is not calibrated - so treat them as the shape of the plan rather than as exact."
+          },
+          {
+            "t": "Earlier research — You have never played here",
+            "k": "Archived September research; fixed club choices and distances may be out of date.",
+            "b": "Pound Ridge went into your Courses list on Jul 29 2026 and you have not logged a round there. That has three consequences worth stating.\n\nThe hole cards in the live logger will show this plan's note and NOTHING under 'Last' - there is no record to print. That is expected, not a bug.\n\nThe par and stroke index will still prefill, because a reconciled scorecard for Pound Ridge has been on file since Aug 20: par 72, and stroke indexes for all eighteen. Every one of those eighteen pars is independently confirmed by the hole-by-hole review this plan is built from - a par 3 on 4, 6, 11 and 15, a par 5 on 7, 9, 13 and 16, par 4s everywhere else - which is a real check on a card that was assembled rather than photographed.\n\nAnd the plan gets its second draft from you. Blind tee shots are the specific thing to write a note about here: the 13th over Pete's Rock is blind by design, the 12th needs a carry number nobody publishes, and the 14th needs one too. Write down what you actually took and where it finished, and the next visit starts with your own numbers instead of a reviewer's adjectives."
+          },
+          {
+            "t": "Earlier research — Notes — the paper trail",
+            "k": "Archived September research; fixed club choices and distances may be out of date.",
+            "b": "RESEARCHED - the card. Pound Ridge Golf Club, par 72, on file since Aug 20 2026 from mScorecard/Golfify cross-checked against the Black-tee total of 7,165 (76.0/150). Par: 4,4,4,3,4,3,5,4,5 / 4,3,4,5,4,3,5,4,4. Stroke index: 7,1,5,15,17,13,11,3,9 / 12,8,10,16,6,18,14,4,2. All eighteen pars are corroborated independently by the hole-by-hole review below, which is the first time a reconciled card in this app has been checked against a second source hole for hole.\n\nRESEARCHED - the hole-by-hole. The Ultimate Loop's review of Pound Ridge carries a yardage and a description for most holes: 1st 380, 2nd 413, 3rd 369, 4th 139, 5th 290, 6th 162, 7th 480, 8th 374, 9th 521, 10th 340, 11th 181-206, 12th 337, 13th 448, 14th 379, 16th 494, 17th 396, 18th 415. The 15th's yardage is not given there and could not be found elsewhere. These sum to about 6,270 with the 11th taken at 190 and the 15th excluded, which is why this plan calls them the Granite numbers - an inference.\n\nRESEARCHED - hazards and character. CBS New York's 'How To Navigate And Beat Pound Ridge': the five tee sets and their yardages, the 2nd playing as long as two of the par 5s and narrowing as you hit it further, the 15th as a short, slightly uphill iron whose elevation is the challenge. LINKS Magazine and the club's own description: 14,000 linear feet of rock wall around trees, wetlands and water hazards; Pete's Rock at the 13th; the 15th's long shallow green protected by wetlands in front and rock around it. Golf.com: the 13th at 485 from the back, the saddle landing area, the deep ravine and bunker left of the green, woods right. Top 100 Golf Courses: the 15th played over a reed-lined pond to a sliver of green. The Golf Wire: no. 7 in Golf Advisor's 2020 Top 50 Toughest U.S. Courses. Golf Wisconsin: rock formations left on site, the 13th over Pete's Rock.\n\nDROPPED, deliberately. One review attaches 'a narrow green protected between a long marshy carry and a granite rock face' to the SIXTEENTH, while two other sources put that description on the FIFTEENTH - and the card says the 16th is a par 5 and the 15th a par 3. The syndicated-tip numbering problem is exactly what the pin-it-before-you-write rule exists for, so that description is attached to the 15th where two sources agree, and nothing is attached to the 16th from it.\n\nNOT AVAILABLE, and worth knowing for next time: every scorecard host and the club's own site are blocked by this session's network policy - poundridgegolf.com, offcourse, golfify, bluegolf, 18Birdies, golf.com and Wikipedia all refuse to load. Everything above came from search summaries of those pages rather than the pages themselves, which is why yardages carry one source rather than two.\n\nNOT SOURCED, and therefore not written: any description of the 8th beyond its stroke index, the carry distances on the 12th and 14th, the yardage of the 15th, the fairway bunker positions on the 17th, and which side of any green the bunkers sit on except where named above.\n\nESTIMATED, throughout: every 'leaves' number comes off the carry ladder, which is not calibrated. Driver 235, 2-iron 205, 5-iron 180, 6-iron 170, 7-iron 158, 8-iron 146, 9-iron 134, PW 122, 50° 108, 56° 95. THE BAG CHANGED Sep 8 2026: the 4-iron (190) came OUT, the 5-wood dropped to 19.5° into its slot, and the mini driver came back at 15.5° as the fairway finder. NEITHER wood has a measured carry, so no number in this plan comes off one — the four 4-iron calls (5th, 11th, 12th, 18th) were re-read off the 2-iron's 205 and the 5-iron's 180 instead."
+          }
+        ]
+      }
+    }
+  ]
+}

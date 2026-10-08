@@ -27,6 +27,9 @@ lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
 round-takeaways.js    Shared scoring and club-data insight selection + compact visual cards
 bay-takeaways.js      Full-day range insight selection, explanations, source links and practice tests
+course-prep.js/.css   Interactive Pound Ridge planner; lazy Google satellite/3D views
+course-prep-data.js   Official scorecard + attributed OpenStreetMap routes, available offline
+course-prep-feed.json Apply-once course card, mapped location and refreshed standing prep
 coach-feed.json       One-way "coach inbox" — see Data model below  ← updates land here
 sw.js                 Service worker (offline cache of the shell)
 manifest.webmanifest  PWA manifest;  icon.svg — app icon
@@ -115,6 +118,49 @@ not a shallow-checkout CI test). `tests/revamp-browser.cjs` verifies 320–1920p
 search, full day/source/round/history paths, live-round resumption, zero-valued practice
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
+
+## Course Prep (v203, October 8 2026)
+
+Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
+Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
+`course-prep.js` receives narrow callbacks from `initCoursePrep()`; it must never
+replace the full player state. `S.coursePrep.poundRidge` holds the selected tee and
+distance source plus per-tee/per-hole notes, reviewed flags, tee/target positions and
+rollout assumptions. Existing `S.planCalls` remains the authority for club choices,
+shared with the regular briefing and live-round prep. Club choices are per course/hole;
+notes and map positions are per tee/hole. All are included in normal golf backups.
+
+Saved playing carries remain the default. The optional range source reads the latest
+available struck-shot batch from `swingEvolutionRows()`, showing date, sample and setup;
+it never writes those measurements into the Bag. Unset clubs remain visible. Carry
+rings express distance, not shot dispersion; manually entered rollout is a scenario,
+not a forecast of fairway conditions. Never infer green contours, today's pins,
+forced carries or safe landing zones from incomplete map geometry.
+
+The club's scorecard image is printed **01/24**, read October 8, 2026. Seven tee
+yardage rows are available; Pine's men's rating is absent and must remain unset.
+The new apply-once layout corrects older third-party ratings without rewriting rounds.
+The new standing briefing preserves the prior researched material in labelled archive
+sections; older feed records remain byte-for-byte intact. `fetchFeed()` loads
+`course-prep-feed.json` last. OpenStreetMap's reference tee is unspecified: choosing a
+scorecard tee changes yardage, not the start of the route. Users can set their actual
+tee. Source geometry, IDs, ODbL attribution and licensing live in `data/course-prep/`.
+Official hole illustrations load from the club and are not cached or rehosted.
+
+Google Maps loads only when Satellite or Google 3D is selected with a key configured.
+Enable Maps JavaScript API + billing and restrict the browser key to that API and
+`https://mcdermottj639.github.io/*`. Setup stores it separately in
+`caddiehq_google_maps_key_v1`, outside golf backups; deployments can alternatively
+provide `window.CADDIE_GOOGLE_MAPS_KEY`. Do not commit an unrestricted key. Map objects
+are reused, asynchronous loads have navigation guards, and leaving a hole cancels
+its flyover. No Google imagery or derived geometry is cached; the service worker now
+intercepts only same-origin requests. Offline routes and notes remain usable with no key.
+
+`tests/course-prep.cjs` checks scorecard arithmetic, source geometry, geometry math,
+feed idempotence and preservation of golf state and personal calls. The real-browser
+`tests/course-prep-browser.cjs` exercises 320/390/1440 layouts, editing, persistence,
+range-source isolation, backup round trips and offline use. Google adapter checks use
+a mock API: live satellite/3D imagery still requires a valid billing-enabled key.
 
 ## Review process — every bay day, every analysis pass (v122)
 
