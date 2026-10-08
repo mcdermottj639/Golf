@@ -55,8 +55,8 @@ body.cp-guide-open{overflow:hidden}
 .cp-arrows{display:flex;gap:5px}
 .cp-arrows button,.cp-map-tools button{background:transparent;border:1px solid var(--cp-line);border-radius:9px;color:var(--cp-ink);min-height:38px;padding:7px 12px;font-size:12px}
 .cp-arrows button{width:39px;font-size:18px;padding:0}
-.cp-modes{display:grid;grid-template-columns:repeat(4,1fr);padding:0 12px 12px;gap:3px}
-.cp-modes button{padding:10px 3px;min-height:40px;border:0;border-radius:8px;background:transparent;color:var(--cp-muted);font-size:12px;font-weight:600;white-space:nowrap}
+.cp-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:0 12px 12px;gap:3px}
+.cp-modes button{padding:10px 3px;min-height:44px;border:0;border-radius:8px;background:transparent;color:var(--cp-muted);font-size:12px;font-weight:600;white-space:nowrap}
 .cp-modes button[aria-pressed=true]{background:#eaf0df;color:#193e32}
 .cp-reference{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;padding:11px 14px;background:#f3f6ee;border-top:1px solid #dde4d8;color:#193e32}
 .cp-reference[hidden]{display:none}
@@ -175,3 +175,16 @@ body.night .cp-entry,body.night .cp-hero{border-color:#486644}
 @media(max-width:540px){.cp-workspace>.backlink{margin-bottom:10px}.cp-hero{padding:20px}.cp-hero h2{font-size:34px}.cp-progress{font-size:10px;gap:6px}.cp-holes{gap:3px}.cp-holes button{min-height:46px}.cp-holes b{font-size:14px}.cp-holes span{font-size:8px}.cp-map-stage{height:365px}.cp-hole-heading{padding:15px}.cp-modes{padding:0 7px 9px}.cp-modes button{font-size:11px}.cp-plan{grid-template-columns:1fr}.cp-clubs{grid-template-columns:repeat(5,minmax(0,1fr))}.cp-plan-card{padding:18px}.cp-plan-table button{grid-template-columns:23px 1fr 60px}.cp-plan-table button>span:last-child{grid-column:2/4}.cp-key-row{flex-wrap:wrap}.cp-key-row input{flex-basis:100%}.cp-workspace summary span{display:block;margin-left:0}.cp-map-message{padding:22px}}
 @media(prefers-reduced-motion:reduce){.cp-workspace *{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 @media(max-width:540px){.cp-map-stage[data-view=route]{height:460px}}
+
+/* One map workspace: imagery switches live inside the Interactive map view. */
+.cp-map-views{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--cp-line);background:var(--cp-panel)}
+.cp-imagery-views{display:flex;flex:1;min-width:0;padding:3px;border:1px solid var(--cp-line);border-radius:12px;background:#f3f5ee}
+.cp-map-views button{min-height:44px;padding:8px 12px;border:0;border-radius:9px;font-size:12px;font-weight:600;white-space:nowrap;color:var(--cp-muted);background:transparent}
+.cp-imagery-views button{flex:1;min-width:0}
+.cp-imagery-views button[aria-pressed=true]{background:#fff;color:#193e32;box-shadow:0 1px 4px #193e3215}
+.cp-map-views .cp-simple-view{flex-shrink:0;text-decoration:underline;text-underline-offset:3px;padding-inline:8px}
+.cp-map-views .cp-simple-view[aria-pressed=true]{color:var(--cp-ink);background:#eaf0df;text-decoration:none}
+.cp-map-view-note{margin:0;padding:0 14px 10px;color:var(--cp-muted);background:var(--cp-panel);font-size:11px;line-height:1.5}
+body.night .cp-imagery-views{background:#102e25}
+body.night .cp-imagery-views button[aria-pressed=true]{background:#335343;color:#fff}
+body.night .cp-map-views .cp-simple-view[aria-pressed=true]{background:#335343;color:#fff}

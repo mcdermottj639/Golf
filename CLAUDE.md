@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v213, October 8 2026)
+## Course Prep (v214, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
 Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
@@ -159,7 +159,12 @@ scorecard tee changes yardage, not the start of the route. Users can set their a
 tee. Source geometry, IDs, ODbL attribution and licensing live in `data/course-prep/`.
 Official hole illustrations load from the club and are not cached or rehosted.
 The Hole guide is the initial view on entry and every hole change (arrows, numbered
-holes, plan rows and overview map). Other views remain explicit choices for that hole.
+holes, plan rows and overview map). Only Hole guide and Interactive map are top-level choices.
+Inside Interactive map, Overhead and 3D form the imagery switch; Simple map is a secondary
+button and the offline fallback. Retain the last chosen map style in memory across guide/hole
+navigation. No key defaults the main map entry to Simple map; explicit imagery buttons still
+explain connection setup. Going offline while viewing imagery selects Simple map without
+changing tee, target, location or plan data; returning online never auto-loads Google.
 Google reconnect alone restores the requested map view so Retry still retries Maps.
 If the illustration cannot load, its fallback offers the offline course map.
 The focused map rotates the actual coordinates to put the active measuring reference
@@ -186,7 +191,7 @@ pagehide and backgrounding also stop/clear it; foregrounding requires another ta
 changes while releasing it on other navigation. Epoch guards ignore late callbacks.
 Location updates preserve Google camera position and never change the saved tee.
 
-Google Maps loads only when Satellite or Google 3D is selected with a key configured.
+Google Maps loads only when Overhead or 3D is selected with a key configured and the browser is online.
 Enable Maps JavaScript API + billing and restrict the browser key to that API and
 `https://mcdermottj639.github.io/*`. Setup stores it separately in
 `caddiehq_google_maps_key_v1`, outside golf backups; deployments can alternatively
@@ -3778,3 +3783,5 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 **v211 tee camera:** 3D initialization and each hole entry frame from behind the saved/reference tee toward the green, independent of GPS measurement origin. Back to tee restores this viewpoint; guide remains the first tab. Serialize asynchronous stop/start camera calls with revision guards so stale work cannot cancel a newer frame. Club/GPS updates retain camera. Flyover begins at tee and keeps last segment heading at green. Browser mock exercises delayed stop completion and all 18 headings; real Google imagery is not available to automated QA without the device-held key.
 
 **v213 camera correction:** Real Google SDK 3.66.7 was loaded without a key for API contract checks. It confirms v211 constructor rejection and rejects v212 flyCameraTo with `InvalidValueError: in property endCamera: Altitude mode CLAMP_TO_GROUND is not supported for camera animations.` Camera targets now explicitly use altitude 0 + RELATIVE_TO_GROUND; ground-clamped markers/lines remain correct. The real SDK accepts this request past validation; no licensed imagery or device rendering was certified. Never copy marker altitude modes into camera calls. Draw overlays before camera work. Catch asynchronous camera rejections locally, retaining map/markers/yardages with direct-property framing (preserve observed absolute center altitude) and a brief toast; do not call mapError for optional camera motion. Regression covers rejected animations at entry and via controls, data preservation and all 18 camera modes.
+
+**v214 map navigation:** Two main buttons (Hole guide / Interactive map), nested Overhead / 3D controls and secondary Simple map. Preserve guide-first hole entry, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. Internal mode values remain guide/route/satellite/3d for compatibility; map is a navigation action only.

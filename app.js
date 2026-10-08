@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v213';
+const BUILD = 'v214';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v214', d:'2026-10-08', items:['ONE INTERACTIVE MAP: Hole guide and Interactive map are the two main views. Switch between Overhead and 3D inside the map; Simple map remains available and opens automatically offline. Your targets, tee and yardages stay shared.'] },
   { b:'v213', d:'2026-10-08', items:['3D CAMERA REPAIR: Use the terrain-relative camera mode supported by Google. A camera-animation failure now keeps the map, markers and tap yardages available instead of replacing them with an error page.'] },
   { b:'v212', d:'2026-10-08', items:['3D STARTUP FIX: Corrected the viewer initialization introduced in v211. Tee-to-green framing and Back to tee remain available.'] },
   { b:'v211', d:'2026-10-08', items:['TEE TO GREEN: Each hole’s 3D view starts behind the tee looking toward the green. Back to tee restores that view after exploring. Camera commands run in order, and flyovers keep looking forward at the green.'] },

@@ -11,9 +11,13 @@ const server=http.createServer((req,res)=>{
 });
 const state=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('caddiehq_v1')));
 const ready=p=>p.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('pound-ridge-visual-prep-briefing-20261008-v1'));
-async function prep(p){await p.locator('#nav [data-view="rounds"]').click();await p.locator('[data-action="open-course-prep"]').first().click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true','guide opens first');await mode(p,'route');await p.locator('#cp-route-map').waitFor();}
+async function prep(p){await p.locator('#nav [data-view="rounds"]').click();await p.locator('[data-action="open-course-prep"]').first().click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true','guide opens first');assert.deepEqual(await p.locator('.cp-modes button').allTextContents(),['Hole guide','Interactive map']);assert.equal(await p.locator('.cp-map-views').count(),0,'map styles stay inside the map view');await p.locator('.cp-modes [data-mode="map"]').click();await mode(p,'route');await p.locator('#cp-route-map').waitFor();}
 async function explore(p,selector){await p.locator('.hq-search-trigger:visible').first().click();await p.locator('.hq-explorer-link'+selector).first().click();}
-const mode=(p,m)=>p.locator('.cp-modes [data-mode="'+m+'"]').click();
+const mode=async(p,m)=>{
+  if(m==='guide'||m==='map')return p.locator('.cp-modes [data-mode="'+m+'"]').click();
+  if(!await p.locator('.cp-map-views').count())await p.locator('.cp-modes [data-mode="map"]').click();
+  await p.locator('.cp-map-views [data-mode="'+m+'"]').click();
+};
 function googleMock(){
   window.mapQA={maps:0,scenes:0,flights:0,stops:0,fits:0,markerImports:0,fail3dDraw:false,overlays:[]};
   class Map{constructor(el,opts){this.el=el;this.opts=opts;this.listeners={};mapQA.maps++;mapQA.mapGesture=opts.gestureHandling;}getDiv(){return this.el;}addListener(k,f){this.listeners[k]=f;}fitBounds(b){this.bounds=b;mapQA.fits++;}}
@@ -57,6 +61,10 @@ function locationMock(){
     await p.goto(url);await ready(p);const initial=await state(p);await prep(p);
     assert.equal(await p.locator('.cp-holes button').count(),18);assert.equal(await p.locator('#cp-tees option').count(),7);
     assert.match(await p.locator('.cp-hole-heading').innerText(),/380 yd/);
+    assert.equal(await p.locator('.cp-modes [data-mode="map"]').getAttribute('aria-pressed'),'true');
+    assert.deepEqual(await p.locator('.cp-imagery-views button').allTextContents(),['Overhead','3D']);
+    assert.equal(await p.locator('.cp-simple-view').getAttribute('aria-pressed'),'true');
+    assert.equal(googleRequests,0,'keyless Interactive map opens Simple map without Google');
     assert.equal(await p.locator('.cp-clubs [data-club]').count(),initial.carries.length);
     assert.equal(await p.locator('#cp-club-readout .cp-distances').count(),0,'no misleading zero-distance target before a landing spot exists');
     for(let n=1;n<=18;n++){
@@ -65,15 +73,18 @@ function locationMock(){
       assert.ok(tee>green,'green above tee on hole '+n);assert.equal(await p.locator('.cp-route-line').count(),1,'focused view hides neighboring routes');
     }
     await p.locator('.cp-holes [data-n="1"]').click();await mode(p,'route');
-    await p.locator('[data-point="green"] circle').click({force:true});
+    await p.locator('[data-point="green"] circle').click();
     const mappedTarget=(await state(p)).coursePrep.poundRidge.holes['granite:1'].target;
-    assert.ok(await p.evaluate(point=>{const c=CADDIE_PREP_COURSES[0];return CaddieCoursePrep.geo.distance(point,c.holes[0].path.at(-1))<1;},mappedTarget),'rotated map click lands within one yard of the mapped green');
+    assert.ok(await p.evaluate(point=>{const c=CADDIE_PREP_COURSES[0];return CaddieCoursePrep.geo.distance(point,c.holes[0].path.at(-1))<2;},mappedTarget),'rotated map click lands within two yards at mobile pixel resolution');
     await p.locator('[data-cp="clear-target"]').click();
     for(const width of [320,390,1440]){
       await p.setViewportSize({width,height:width===1440?1000:844});await p.evaluate(()=>scrollTo(0,0));
       const bounds=await p.evaluate(()=>({width:innerWidth,content:document.documentElement.scrollWidth,holeButtons:[...document.querySelectorAll('.cp-holes button')].map(e=>({left:e.getBoundingClientRect().left,right:e.getBoundingClientRect().right})),skip:document.querySelector('.hq-skip').getBoundingClientRect().bottom}));
       assert.ok(bounds.content<=width+1,'page fits '+width);assert.ok(bounds.holeButtons.every(b=>b.left>=0&&b.right<=width),'hole buttons fit '+width);assert.ok(bounds.skip<=0,'skip link stays offscreen when unfocused');
+      assert.ok(await p.locator('.cp-map-views button').evaluateAll(els=>els.every(e=>e.getBoundingClientRect().height>=44)),'map controls have touch targets');
       await p.locator('.cp-map-panel').screenshot({path:path.join(screens,'course-map-'+width+'.png')});
+      await mode(p,'guide');await p.locator('#cp-guide-image').waitFor();await p.locator('.cp-hole-heading').screenshot({path:path.join(screens,'hole-heading-'+width+'.png')});
+      assert.equal(await p.locator('.cp-map-views').count(),0);await mode(p,'route');
       await p.screenshot({path:path.join(screens,'course-prep-'+width+'.png'),fullPage:true});
     }
     await p.setViewportSize({width:390,height:844});
@@ -115,6 +126,16 @@ function locationMock(){
     const initialLabels=await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>e.label));
     assert.deepEqual(initialLabels.slice(0,2),['Tee','Green']);assert.match(initialLabels[2],/^\d[\d,]* yd · \d[\d,]* yd left$/);
     assert.equal(await p.evaluate(()=>mapQA.markerImports),0,'3D has no optional marker-library startup dependency');
+    const beforeViewSwitch=await state(p),sameYardages=await p.locator('.cp-map-summary').innerText();
+    await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();
+    assert.equal(await p.locator('.cp-map-views [data-mode="satellite"]').getAttribute('aria-pressed'),'true');
+    assert.equal(await p.locator('.cp-map-summary').innerText(),sameYardages);
+    await mode(p,'3d');await p.locator('qa-map-scene').waitFor();
+    await mode(p,'guide');await mode(p,'map');await p.locator('qa-map-scene').waitFor();
+    assert.equal(await p.locator('.cp-map-views [data-mode="3d"]').getAttribute('aria-pressed'),'true','map returns to chosen style');
+    assert.equal(await p.locator('.cp-map-summary').innerText(),sameYardages);
+    assert.deepEqual(await state(p),beforeViewSwitch,'switching map styles preserves targets and all golf data');
+
     await p.evaluate(()=>{mapQA.fail3dDraw=true;});await p.locator('.cp-clubs [data-club="5-wood"]').click();
     await p.locator('#cp-map-stage .cp-map-message').waitFor();assert.match(await p.locator('#cp-map-stage').innerText(),/drawing the 3D hole/);
     assert.ok(!(await p.locator('#cp-map-stage').innerText()).includes('billing'));
@@ -126,14 +147,14 @@ function locationMock(){
     const framed=await p.evaluate(()=>mapQA.flights);await p.locator('[data-cp="fly"]').click();await p.waitForFunction(n=>mapQA.flights===n+1,framed);assert.equal(await p.evaluate(()=>mapQA.flights),framed+1);await p.locator('qa-map-scene').dispatchEvent('gmp-animationend');assert.equal(await p.evaluate(()=>mapQA.flights),framed+2);
     await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true');await mode(p,'3d');await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.scenes),1,'reuse 3D map');
     for(let n=1;n<=18;n++){
-      await p.evaluate(n=>{CaddieCoursePrep.openHole(n);document.querySelector('[data-cp="mode"][data-mode="3d"]').click();},n);
+      await p.locator('.cp-holes [data-n="'+n+'"]').click();await mode(p,'3d');
       await p.waitForFunction(n=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[n-1];return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge.holes['granite:'+n]?.tee||h.path[0],h.path.at(-1));},n);
       const cam=await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera);
       assert.equal(cam.tilt,58);assert.equal(cam.roll,0);assert.equal(cam.altitudeMode,'RELATIVE_TO_GROUND');assert.equal(cam.center.altitude,0);
     }
     await p.locator('[data-cp="frame"][data-focus="green"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.range===190);
     await p.locator('[data-cp="frame"][data-focus="tee"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.tilt===58);
-    await p.evaluate(()=>{CaddieCoursePrep.openHole(2);document.querySelector('[data-cp="mode"][data-mode="3d"]').click();});
+    await p.locator('.cp-holes [data-n="2"]').click();await mode(p,'3d');
     await p.waitForFunction(()=>document.querySelector('qa-map-scene')?.lastFlight.endCamera.heading===CaddieCoursePrep.geo.bearing(CADDIE_PREP_COURSES[0].holes[1].path[0],CADDIE_PREP_COURSES[0].holes[1].path.at(-1)));
     // An asynchronous animation failure must not remove a usable map or its yardages.
     const beforeCameraFailure=await state(p);
@@ -276,8 +297,16 @@ function locationMock(){
     assert.deepEqual(await state(dp),beforeDevice);await device.close();
     // Actual service worker, actual offline reload, and a note saved offline.
     const offline=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'allow'}),op=await offline.newPage();op.on('pageerror',e=>errors.push(e.message));
+    await op.route('https://maps.googleapis.com/maps/api/js*',r=>r.fulfill({contentType:'text/javascript',body:'('+googleMock.toString()+')()'}));
     await op.goto(url);await ready(op);await op.evaluate(()=>navigator.serviceWorker.ready);await op.waitForFunction(()=>!!navigator.serviceWorker.controller);await prep(op);
-    await op.locator('#cp-note').fill('Offline prep survives');await offline.setOffline(true);await op.reload();await prep(op);assert.equal(await op.locator('#cp-note').inputValue(),'Offline prep survives');
+    await op.locator('#cp-note').fill('Offline prep survives');
+    await op.evaluate(()=>localStorage.setItem('caddiehq_google_maps_key_v1','AIza'+'x'.repeat(35)));
+    await mode(op,'3d');await op.locator('qa-map-scene').waitFor();const beforeOffline=await state(op);
+    await offline.setOffline(true);await op.locator('#cp-route-map').waitFor();
+    assert.match(await op.locator('.cp-map-view-note').innerText(),/offline/);
+    assert.deepEqual(await state(op),beforeOffline,'automatic offline map fallback preserves all golf data');
+    await mode(op,'3d');await op.locator('#cp-route-map').waitFor();assert.equal(await op.locator('.cp-simple-view').getAttribute('aria-pressed'),'true');
+    await op.reload();await prep(op);assert.equal(await op.locator('#cp-note').inputValue(),'Offline prep survives');
     await op.locator('.cp-holes [data-n="18"]').click();assert.match(await op.locator('.cp-hole-heading').innerText(),/Hole 18/);await op.locator('#cp-note').fill('Saved while offline');assert.equal((await state(op)).coursePrep.poundRidge.holes['granite:18'].note,'Saved while offline');
     const cached=await op.evaluate(async()=>{const keys=await caches.keys();const requests=(await Promise.all(keys.map(async k=>(await (await caches.open(k)).keys()).map(r=>r.url)))).flat();return requests;});assert.ok(cached.every(u=>new URL(u).origin===new URL(url).origin));
     assert.deepEqual(errors,[]);console.log('PASS course prep browser: 320/390/1440 layouts, all holes/tees, saved plans, live guides, backup/import, offline reload, map yardage labels, native Geolocation movement, simulated GPS errors/staleness/lifecycle, no location persistence, mocked Google reuse/flyover/auth fallback. Live Google imagery requires a real key.');

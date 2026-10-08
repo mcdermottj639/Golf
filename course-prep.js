@@ -41,7 +41,7 @@
     }
     return out;
   }
-  let bridge, root, hole = 1, mode = 'guide', overview = false, edit = 'target';
+  let bridge, root, hole = 1, mode = 'guide', lastMapMode = 'satellite', overview = false, edit = 'target';
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps2d, maps3d, overlays2d = [];
   let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
   let showRings = true, framed2d = null, framed3d = null;
@@ -119,7 +119,9 @@
     let pending;
     try { pending = JSON.parse(sessionStorage.getItem(RESUME) || 'null'); sessionStorage.removeItem(RESUME); } catch { return false; }
     if(!pending || !Number.isInteger(pending.hole) || pending.hole < 1 || pending.hole > 18 || !['route','guide','satellite','3d'].includes(pending.mode)) return false;
-    hole = pending.hole; mode = pending.mode; overview = false; return true;
+    hole = pending.hole; mode = pending.mode;
+    if(mode!=='guide'){lastMapMode=mode;if(navigator.onLine===false)mode='route';}
+    overview = false; return true;
   }
   function saveHole(patch) {
     const next = model(), k = holeKey();
@@ -137,12 +139,19 @@
       '<button class="hq-btn" data-action="open-course-prep">Prepare Pound Ridge <span aria-hidden="true">↗</span></button></section>';
   }
   function setup() {
-    return '<details class="cp-setup" id="cp-setup"><summary>Google Maps setup <span>' + (key() ? 'Key saved' : 'Connect satellite & 3D') + '</span></summary>' +
+    return '<details class="cp-setup" id="cp-setup"><summary>Google Maps setup <span>' + (key() ? 'Key saved' : 'Connect overhead & 3D') + '</span></summary>' +
       '<p>Enable Maps JavaScript API and billing in the same Google Cloud project as your key. Choose Websites as the application restriction, including on iPhone, and restrict the key to Maps JavaScript API. ' +
       link('https://console.cloud.google.com/google/maps-apis/credentials', 'Open Google setup ↗') + '</p>' +
       '<label for="cp-api-key">Browser API key</label><div class="cp-key-row"><input id="cp-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="' + (key() ? 'A key is saved · paste to replace' : 'Paste your restricted key') + '">' +
       button('key-save', 'Connect') + (key() ? button('key-clear', 'Disconnect') : '') + '</div>' +
       '<p class="cp-muted">Saved only on this device, outside golf backups. Restrict the website to https://mcdermottj639.github.io/* and set usage limits in Google Cloud. Maps need internet; course routes and your saved notes work offline after loading.</p></details>';
+  }
+  function mapViews() {
+    if(mode==='guide')return '';
+    return '<div class="cp-map-views"><div class="cp-imagery-views" role="group" aria-label="Imagery view">'+
+      [['satellite','Overhead'],['3d','3D']].map(([k,label])=>button('mode',label,'data-mode="'+k+'" aria-pressed="'+(mode===k)+'"')).join('')+'</div>'+
+      button('mode','Simple map','class="cp-simple-view" data-mode="route" aria-pressed="'+(mode==='route')+'"')+'</div>'+
+      (mode==='route'?'<p class="cp-map-view-note" role="status">'+(navigator.onLine===false?'You’re offline · using the simple map':'Simple map · works offline')+'</p>':'');
   }
   function render() {
     bagSnapshot = null;
@@ -156,7 +165,7 @@
       '<div class="cp-holes" role="group" aria-label="Choose a hole">' + course.holes.map(x => '<button type="button" data-cp="hole" data-n="' + x.n + '" aria-label="Hole ' + x.n + ', par ' + x.par + '" ' + (x.n === hole ? 'aria-current="step"' : '') + ' class="' + (m.holes[m.tee + ':' + x.n]?.reviewed ? 'reviewed' : '') + '"><b>' + x.n + '</b><span>Par ' + x.par + '</span></button>').join('') + '</div>' +
       '<div class="cp-grid"><section class="cp-map-panel"><header class="cp-hole-heading"><div><span class="cp-eyebrow">' + esc(t.name) + ' TEES</span><h3>Hole ' + hole + '<small>Par ' + h.par + ' · ' + yard(t.yards[hole - 1]) + ' yd · Hcp ' + h.si + '</small></h3></div><div class="cp-arrows">' +
       button('previous', '←', 'aria-label="Previous hole" ' + (hole === 1 ? 'disabled' : '')) + button('next', '→', 'aria-label="Next hole" ' + (hole === 18 ? 'disabled' : '')) + '</div></header>' +
-      '<div class="cp-modes" role="group" aria-label="Map view">' + [['guide','Hole guide'],['route','Course map'],['satellite','Satellite'],['3d','Google 3D']].map(([k,v]) => button('mode', v, 'data-mode="' + k + '" aria-pressed="' + (mode === k) + '"')).join('') + '</div>' +
+      '<div class="cp-modes" role="group" aria-label="Hole view">' + button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"') + button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"') + '</div>' + mapViews() +
       '<div class="cp-reference" id="cp-reference" hidden></div><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div></section>' +
       '<aside class="cp-plan"><section class="cp-plan-card"><span class="cp-eyebrow">THE PLAN</span><h3>' + (h.par === 3 ? 'Choose the carry.' : h.par === 5 ? 'Build it shot by shot.' : 'Pick your landing area.') + '</h3><p class="cp-prompt">' + esc(h.prompt) + '</p>' +
       '<label for="cp-basis">Distance source</label><select id="cp-basis"><option value="playing" '+(m.basis==='playing'?'selected':'')+'>Saved playing carries</option><option value="range" '+(m.basis==='range'?'selected':'')+'>Latest range measurements</option></select>' +
@@ -242,13 +251,19 @@
       case 'hole': case 'map-hole': changeHole(+el.dataset.n); break;
       case 'previous': changeHole(hole - 1); break;
       case 'next': changeHole(hole + 1); break;
-      case 'mode':
-        stopFlyover(); mode = el.dataset.mode;
+      case 'mode': {
+        const requested=el.dataset.mode;
+        if(!['guide','map','route','satellite','3d'].includes(requested))break;
+        stopFlyover();
+        mode=requested==='map'?(key()?lastMapMode:'route'):requested;
+        if(requested!=='map'&&mode!=='guide')lastMapMode=mode;
+        if(mode!=='guide'&&navigator.onLine===false)mode='route';
         if(!googleAuthFailed && googleFailureMode && googleFailureMode !== mode) googleFailure = '';
         if(el.dataset.pickTarget)edit='target';
         overview = false; redraw();
         if(el.dataset.pickTarget)root?.querySelector('#cp-map-stage').scrollIntoView({block:'center',behavior:'smooth'});
         break;
+      }
       case 'club': bridge.setClub(hole, el.dataset.club); redraw(); break;
       case 'review-next': {
         saveHole({reviewed:true});
@@ -308,7 +323,7 @@
     const hasTarget = !!savedHole().target;
     let html = hasTarget
       ? '<div class="cp-distances"><span><b>' + yard(toTarget) + '</b>yd to your target</span><span><b>' + yard(toGreen) + '</b>yd left to green</span></div>'
-      : '<div class="cp-target-prompt"><b>Choose your landing target.</b><br>Tap a spot on the course map to compare clubs and see the distance left to the green.' + button('mode','Pick a target on the map','data-mode="route" data-pick-target="true"') + '</div>';
+      : '<div class="cp-target-prompt"><b>Choose your landing target.</b><br>Tap a spot on the interactive map to compare clubs and see the distance left to the green.' + button('mode','Pick a target on the map','data-mode="map" data-pick-target="true"') + '</div>';
     if (c && c.carry > 0) {
       html += '<div class="cp-club-summary"><b>' + esc(c.label) + ' · ' + yard(c.carry) + ' yd carry</b><span>' + esc(c.provenance) + '</span>' +
         (roll ? '<span>' + yard(c.carry + roll) + ' yd with your +' + roll + ' yd rollout assumption</span>' : '<span>Carry only · no rollout assumed</span>') + '</div>';
@@ -412,7 +427,7 @@
       stage.innerHTML = '<figure class="cp-guide"><img id="cp-guide-image" src="'+esc(currentHole().guide)+'" alt="Pound Ridge official illustration of hole '+hole+'" referrerpolicy="no-referrer"><figcaption>Hole '+hole+' · Official club guide</figcaption></figure>';
       stage.querySelector('img').addEventListener('error',()=>{
         if(token!==epoch||!root)return; imageError=true;
-        stage.innerHTML='<div class="cp-map-message"><b>The club’s image is unavailable here.</b><p>Your course map and saved plan are still ready.</p>'+button('mode','Open course map','data-mode="route"')+link(course.tour,'Open the club’s guide ↗')+'</div>';
+        stage.innerHTML='<div class="cp-map-message"><b>The club’s image is unavailable here.</b><p>Your course map and saved plan are still ready.</p>'+button('mode','Open simple map','data-mode="route"')+link(course.tour,'Open the club’s guide ↗')+'</div>';
       });
       return;
     }
@@ -429,7 +444,7 @@
       return;
     }
     if (!key()) {
-      stage.innerHTML='<div class="cp-map-message"><span class="cp-orbit" aria-hidden="true">◎</span><h3>'+ (mode==='3d'?'Explore Pound Ridge in 3D':'Google satellite view') +'</h3><p>Connect your Google Maps key to load this view inside Caddie HQ.</p>'+button('map-setup','Connect Google Maps')+button('mode','Use the course map','data-mode="route"')+link('https://www.google.com/maps/search/?api=1&query=Pound+Ridge+Golf+Club','Open Pound Ridge in Google Maps ↗')+'</div>';
+      stage.innerHTML='<div class="cp-map-message"><span class="cp-orbit" aria-hidden="true">◎</span><h3>'+ (mode==='3d'?'Explore Pound Ridge in 3D':'Google satellite view') +'</h3><p>Connect your Google Maps key to load this view inside Caddie HQ.</p>'+button('map-setup','Connect Google Maps')+button('mode','Use simple map','data-mode="route"')+link('https://www.google.com/maps/search/?api=1&query=Pound+Ridge+Golf+Club','Open Pound Ridge in Google Maps ↗')+'</div>';
       return;
     }
     if (googleAuthFailed || googleFailure) return mapError(googleFailure, googleFailureMode);
@@ -460,7 +475,7 @@
           maps3d=new lib.Map3DElement({center,range,heading,tilt,roll,mode:'SATELLITE',gestureHandling:'GREEDY'});
           maps3d.className='cp-google-map';
           maps3d.addEventListener('gmp-click',e=>{if(e.position)choosePoint([e.position.lat,e.position.lng]);});
-          maps3d.addEventListener('gmp-error',()=>{if(root&&mode==='3d')mapError('3D could not initialize on this device. Try Satellite or the course map.','3d');});
+          maps3d.addEventListener('gmp-error',()=>{if(root&&mode==='3d')mapError('3D could not initialize on this device. Try Overhead or the simple map.','3d');});
         }
         stage.replaceChildren(maps3d);
         stageName = 'drawing the 3D hole';
@@ -590,7 +605,7 @@
     googleFailure=message;googleFailureMode=failedMode;
     if(!root||!['3d','satellite'].includes(mode))return;
     stopFlyover();
-    root.querySelector('#cp-map-stage').innerHTML='<div class="cp-map-message"><h3>Google Maps is unavailable</h3><p>'+esc(message)+'</p>'+(googleErrorCode?'<code class="cp-error-code">'+esc(googleErrorCode)+'</code>':'')+button('retry','Reload & retry')+button('map-setup','Maps setup')+button('mode','Use the course map','data-mode="route"')+'</div>';
+    root.querySelector('#cp-map-stage').innerHTML='<div class="cp-map-message"><h3>Google Maps is unavailable</h3><p>'+esc(message)+'</p>'+(googleErrorCode?'<code class="cp-error-code">'+esc(googleErrorCode)+'</code>':'')+button('retry','Reload & retry')+button('map-setup','Maps setup')+button('mode','Use simple map','data-mode="route"')+'</div>';
     drawControls();
   }
   function drawGoogle2d() {
@@ -640,6 +655,14 @@
     animationTimer=setTimeout(stopFlyover,30000);next();
   }
   window.addEventListener('resize',()=>{if(root && mode==='route')drawView();});
+  window.addEventListener('offline',()=>{
+    if(root&&['satellite','3d'].includes(mode)){stopFlyover();mode='route';overview=false;redraw();}
+    else if(root&&mode==='route')redraw();
+  });
+  window.addEventListener('online',()=>{
+    const note=root?.querySelector('.cp-map-view-note');
+    if(note)note.textContent='Simple map · works offline';
+  });
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden && locationWatch!==null){stopLocation('Location paused while the app was away. Tap Use my location to resume.');updateMeasurements();}
   });
