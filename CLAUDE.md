@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v210, October 8 2026)
+## Course Prep (v211, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
 Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
@@ -3772,3 +3772,5 @@ adjustment; no calculation or location-permission behavior changes. The focus ca
 the same page-level fold pattern, with its evidence disclosure kept inside. Neither
 panel stays fully expanded after Collapse all; primary navigation and Play/Resume stay
 accessible. Conditions and the focus card participate in section shortcuts and memory.
+
+**v211 tee camera:** 3D initialization and each hole entry frame from behind the saved/reference tee toward the green, independent of GPS measurement origin. Back to tee restores this viewpoint; guide remains the first tab. Serialize asynchronous stop/start camera calls with revision guards so stale work cannot cancel a newer frame. Club/GPS updates retain camera. Flyover begins at tee and keeps last segment heading at green. Browser mock exercises delayed stop completion and all 18 headings; real Google imagery is not available to automated QA without the device-held key.

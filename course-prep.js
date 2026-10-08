@@ -45,6 +45,8 @@
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps2d, maps3d, overlays2d = [];
   let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
   let showRings = true, framed2d = null, framed3d = null;
+  let cameraQueue = Promise.resolve(), cameraRevision = 0;
+  const queueCamera = work => (cameraQueue = cameraQueue.catch(() => {}).then(work));
   // Device location is a foreground-only measuring reference, never a saved tee.
   const LOCATION_MAX_AGE = 45000, LOCATION_MAX_ACCURACY = 25;
   let liveFix = null, locationWatch = null, locationEpoch = 0, locationTimer, locationNotice = '';
@@ -179,12 +181,14 @@
       '<p>' + link(course.source, 'Official scorecard') + ' · ' + link(course.tour, 'Official hole guides') + ' · ' + link('https://www.openstreetmap.org/copyright', '© OpenStreetMap contributors · ODbL') + ' · <a href="./data/course-prep/pound-ridge-osm.json" download>Map source data</a></p></details></div>';
   }
   function redraw() { bridge.refresh(); }
-  function changeHole(n) { if (!Number.isInteger(n) || n < 1 || n > 18) return; stopFlyover(); hole = n; mode = 'guide'; imageError = false; overview = false; redraw(); }
+  function changeHole(n) { if (!Number.isInteger(n) || n < 1 || n > 18) return; stopFlyover(); hole = n; framed3d = null; mode = 'guide'; imageError = false; overview = false; redraw(); }
   function stopFlyover() {
     if (animationHandler && maps3d) maps3d.removeEventListener('gmp-animationend', animationHandler);
     animationHandler = null;
     clearTimeout(animationTimer);
-    try { maps3d?.stopCameraAnimation(); } catch {}
+    cameraRevision++;
+    const scene = maps3d;
+    return queueCamera(() => scene?.stopCameraAnimation()).catch(() => {});
   }
   function unmount(keepLocation = false) { epoch++; stopFlyover(); closeGuide(); if(!keepLocation)stopLocation(); root = null; }
   function closeGuide() { document.querySelector('dialog.cp-guide-dialog[open]')?.close?.(); }
@@ -254,7 +258,7 @@
       case 'rings': showRings=!showRings;refreshOverlays();drawControls();break;
       case 'locate': useLocation();break;
       case 'use-tee': stopLocation();updateMeasurements();break;
-      case 'frame': frameGoogle(el.dataset.focus || 'hole');break;
+      case 'frame': Promise.resolve(frameGoogle(el.dataset.focus || 'hole')).catch(()=>bridge.toast('The camera could not move. Try again.'));break;
       case 'shot-plan': root.querySelector('.cp-plan').scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});break;
       case 'overview': overview = !overview; drawView(); break;
       case 'edit': edit = el.dataset.kind; if(edit==='tee')stopLocation();updateMeasurements(); break;
@@ -391,7 +395,7 @@
       (mapped && !overview ? button('edit','Landing target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
       (mapped && !overview && selected()?.carry>0 ? button('rings','Carry rings','aria-pressed="'+showRings+'"'):'')+
       (savedHole().target ? button('clear-target','Clear target'):'') + (savedHole().tee ? button('reset-tee','Reset tee'):'') + '</div>';
-    if(mapped && ['satellite','3d'].includes(mode))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+button('shot-plan','Shot plan ↓')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
+    if(mapped && ['satellite','3d'].includes(mode))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+button('shot-plan','Shot plan ↓')+(mode==='3d'?button('frame','Back to tee','data-focus="tee"'):'')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
     root.querySelector('#cp-map-caption').innerHTML = mode === 'guide'
       ? 'Official club illustration · not to scale. '+link(course.tour,'Open course guide ↗')
       : (['satellite','3d'].includes(mode)?'One finger to move · pinch to zoom. Scroll outside the map to move the page. ':'')+(overview ? '18 mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
@@ -450,14 +454,14 @@
         if(token!==epoch||!root)return;
         stageName = 'starting the 3D viewer';
         if(!maps3d) {
-          maps3d=new lib.Map3DElement({center:ll(course.center),range:1600,tilt:55,mode:'SATELLITE',gestureHandling:'GREEDY'});
+          maps3d=new lib.Map3DElement({...teeCamera(),mode:'SATELLITE',gestureHandling:'GREEDY'});
           maps3d.className='cp-google-map';
           maps3d.addEventListener('gmp-click',e=>{if(e.position)choosePoint([e.position.lat,e.position.lng]);});
           maps3d.addEventListener('gmp-error',()=>{if(root&&mode==='3d')mapError('3D could not initialize on this device. Try Satellite or the course map.','3d');});
         }
         stage.replaceChildren(maps3d);
         stageName = 'positioning the 3D camera';
-        if(framed3d!==hole){frameGoogle('hole');framed3d=hole;}
+        if(framed3d!==hole){await frameGoogle('tee');if(token!==epoch||!root)return;framed3d=hole;}
         stageName = 'drawing the 3D hole';
         drawGoogle3d(lib);
       }
@@ -466,8 +470,15 @@
     }
   }
   const ll = p => ({lat:p[0],lng:p[1]});
+  function teeCamera() {
+    // Look along the hole from above/behind its tee, independent of GPS yardages.
+    const tee=teeOrigin(), heading=bearing(tee,green());
+    const length=distance(tee,green());
+    return {center:ll(destination(tee,length*0.3,heading)),altitudeMode:'CLAMP_TO_GROUND',
+      range:Math.max(240,length*0.9144*0.95),heading,tilt:58,roll:0};
+  }
   function frameGoogle(focus) {
-    stopFlyover();
+    const stopped=stopFlyover(), revision=cameraRevision;
     const path=[...currentHole().path,origin(),...(savedHole().target?[target()]:[])];
     if(mode==='satellite' && maps2d){
       const bounds=new google.maps.LatLngBounds();
@@ -477,7 +488,10 @@
     if(mode==='3d' && maps3d){
       const mid=[(Math.min(...path.map(p=>p[0]))+Math.max(...path.map(p=>p[0])))/2,(Math.min(...path.map(p=>p[1]))+Math.max(...path.map(p=>p[1])))/2];
       const radius=Math.max(...path.map(p=>distance(mid,p)))*0.9144;
-      maps3d.flyCameraTo({endCamera:{center:ll(focus==='green'?green():mid),altitudeMode:'CLAMP_TO_GROUND',range:focus==='green'?190:Math.max(360,radius*3.2),heading:bearing(origin(),green()),tilt:focus==='green'?20:42},durationMillis:0});
+      const endCamera=focus==='tee'?teeCamera():{center:ll(focus==='green'?green():mid),altitudeMode:'CLAMP_TO_GROUND',range:focus==='green'?190:Math.max(360,radius*3.2),heading:bearing(teeOrigin(),green()),tilt:focus==='green'?20:42,roll:0};
+      return stopped.then(()=>queueCamera(()=>{
+        if(revision===cameraRevision&&root&&mode==='3d')return maps3d.flyCameraTo({endCamera,durationMillis:0});
+      }));
     }
   }
   function choosePoint(p) {
@@ -584,16 +598,18 @@
       maps3d.append(line(circle,color,3));
     }
   }
-  function flyover() {
+  async function flyover() {
     if(mode!=='3d'||!maps3d)return;
-    stopFlyover();
-    const path=[origin(),...currentHole().path.slice(1)];
+    const stopped=stopFlyover(), revision=cameraRevision;
+    await stopped;
+    if(revision!==cameraRevision||!root||mode!=='3d')return;
+    const path=[teeOrigin(),...currentHole().path.slice(1)];
     let i=0;
     const next=()=>{
       if(!root||mode!=='3d'||i>=path.length){stopFlyover();return;}
-      const p=path[i],heading=bearing(p,path[Math.min(i+1,path.length-1)]);
+      const p=path[i],heading=i<path.length-1?bearing(p,path[i+1]):bearing(path[i-1],p);
       i++;
-      maps3d.flyCameraTo({endCamera:{center:ll(p),altitudeMode:'CLAMP_TO_GROUND',range:360,tilt:58,heading},durationMillis:window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:2800});
+      queueCamera(()=>revision===cameraRevision&&maps3d.flyCameraTo({endCamera:{center:ll(p),altitudeMode:'CLAMP_TO_GROUND',range:360,tilt:58,heading},durationMillis:window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:2800})).catch(()=>stopFlyover());
     };
     animationHandler=next;maps3d.addEventListener('gmp-animationend',next);
     animationTimer=setTimeout(stopFlyover,30000);next();
@@ -605,7 +621,7 @@
   window.addEventListener('pagehide',()=>stopLocation());
   window.CaddieCoursePrep = Object.freeze({
     init: options => {bridge=options;}, render, mount, unmount, teaser, resumeAfterReload, openGuide,
-    openHole: n => {hole=Number.isInteger(+n)&&+n>=1&&+n<=18?+n:1;mode='guide';imageError=false;overview=false;},
+    openHole: n => {hole=Number.isInteger(+n)&&+n>=1&&+n<=18?+n:1;framed3d=null;mode='guide';imageError=false;overview=false;},
     courseName: course.name, clean,
     geo: Object.freeze({distance,destination,bearing,pointOK})
   });

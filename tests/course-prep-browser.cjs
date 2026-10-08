@@ -20,7 +20,7 @@ function googleMock(){
   class Overlay{constructor(opts){this.opts=opts;mapQA.overlays.push(this);}setMap(map){this.opts.map=map;}}
   class Point{constructor(x,y){this.x=x;this.y=y;}}
   class Bounds{constructor(){this.points=[];}extend(p){this.points.push(p);}}
-  class Scene extends HTMLElement{constructor(opts){super();Object.assign(this,opts);mapQA.scenes++;}flyCameraTo(opts){this.lastFlight=opts;mapQA.flights++;}stopCameraAnimation(){mapQA.stops++;}}
+  class Scene extends HTMLElement{constructor(opts){super();Object.assign(this,opts);mapQA.scenes++;}flyCameraTo(opts){if(mapQA.stopping)throw Error('camera started before stop completed');this.lastFlight=opts;mapQA.flights++;}async stopCameraAnimation(){mapQA.stops++;mapQA.stopping=true;await new Promise(r=>setTimeout(r,0));mapQA.stopping=false;}}
   class Line extends HTMLElement{constructor(opts){super();if(mapQA.fail3dDraw)throw new Error("Simulated 3D drawing failure");Object.assign(this,opts);}}
   class Marker extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
   customElements.define('qa-map-scene',Scene);customElements.define('qa-map-line',Line);customElements.define('qa-map-marker',Marker);
@@ -120,11 +120,21 @@ function locationMock(){
     assert.ok(!(await p.locator('#cp-map-stage').innerText()).includes('billing'));
     await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();
     await p.evaluate(()=>{mapQA.fail3dDraw=false;});await mode(p,'3d');await p.locator('qa-map-scene').waitFor();
-    await p.locator('[data-cp="frame"][data-focus="green"]').click();assert.equal(await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera.range),190);
+    await p.locator('[data-cp="frame"][data-focus="green"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight?.endCamera.range===190);assert.equal(await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera.range),190);
     const cameraBefore=await p.evaluate(()=>mapQA.flights);await p.locator('.cp-clubs [data-club="5-wood"]').click();await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.flights),cameraBefore,'club changes preserve 3D camera');
-    await p.locator('[data-cp="frame"][data-focus="hole"]').click();assert.ok(await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera.range>190));
-    const framed=await p.evaluate(()=>mapQA.flights);await p.locator('[data-cp="fly"]').click();assert.equal(await p.evaluate(()=>mapQA.flights),framed+1);await p.locator('qa-map-scene').dispatchEvent('gmp-animationend');assert.equal(await p.evaluate(()=>mapQA.flights),framed+2);
+    await p.locator('[data-cp="frame"][data-focus="hole"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight?.endCamera.range>190);assert.ok(await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera.range>190));
+    const framed=await p.evaluate(()=>mapQA.flights);await p.locator('[data-cp="fly"]').click();await p.waitForFunction(n=>mapQA.flights===n+1,framed);assert.equal(await p.evaluate(()=>mapQA.flights),framed+1);await p.locator('qa-map-scene').dispatchEvent('gmp-animationend');assert.equal(await p.evaluate(()=>mapQA.flights),framed+2);
     await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true');await mode(p,'3d');await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.scenes),1,'reuse 3D map');
+    for(let n=1;n<=18;n++){
+      await p.evaluate(n=>{CaddieCoursePrep.openHole(n);document.querySelector('[data-cp="mode"][data-mode="3d"]').click();},n);
+      await p.waitForFunction(n=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[n-1];return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge.holes['granite:'+n]?.tee||h.path[0],h.path.at(-1));},n);
+      const cam=await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera);
+      assert.equal(cam.tilt,58);assert.equal(cam.roll,0);
+    }
+    await p.locator('[data-cp="frame"][data-focus="green"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.range===190);
+    await p.locator('[data-cp="frame"][data-focus="tee"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.tilt===58);
+    await p.evaluate(()=>{CaddieCoursePrep.openHole(2);document.querySelector('[data-cp="mode"][data-mode="3d"]').click();});
+    await p.waitForFunction(()=>document.querySelector('qa-map-scene')?.lastFlight.endCamera.heading===CaddieCoursePrep.geo.bearing(CADDIE_PREP_COURSES[0].holes[1].path[0],CADDIE_PREP_COURSES[0].holes[1].path.at(-1)));
     await p.locator('qa-map-scene').dispatchEvent('gmp-error');assert.match(await p.locator('#cp-map-stage').innerText(),/3D could not initialize/);
     await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true');await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.maps),1,'reuse satellite map');
     assert.equal(await p.evaluate(()=>mapQA.mapGesture),'greedy');
