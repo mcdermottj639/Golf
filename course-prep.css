@@ -238,3 +238,17 @@ body.night .cp-map-views .cp-simple-view[aria-pressed=true]{background:#335343;c
 .cp-downloads summary{cursor:pointer;min-height:32px}
 #cp-download-list>div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;padding:8px 0;border-top:1px solid var(--line,#d5ded6)}
 .cp-pack-loading{padding:30px 16px;text-align:center;line-height:1.6}
+
+/* Zoom the complete guide inside a scrollable window; Full hole restores all edges. */
+.cp-guide-zoom{--guide-height:clamp(400px,110vw,660px);width:100%;min-width:0;flex:none}
+.cp-guide-zoom-tools{display:flex;align-items:center;justify-content:center;gap:7px;padding:8px;background:#f7f6ef;color:#204d3e;flex-wrap:wrap}
+.cp-guide-zoom-tools button{min-height:44px;min-width:44px;border:1px solid #d8dfd0;border-radius:9px;background:#fff;color:#204d3e;padding:7px 10px;font:600 13px var(--sans,sans-serif);cursor:pointer}
+.cp-guide-zoom-tools button:disabled{opacity:.4;cursor:default}
+.cp-guide-zoom-tools output{font-size:12px;min-width:38px;text-align:center}
+.cp-guide-zoom-tools span{font-size:11px;color:#657a69}
+.cp-guide-viewport{width:100%;height:var(--guide-height);overflow:auto;overscroll-behavior-x:contain;background:#b9b7a6;touch-action:pan-x pan-y pinch-zoom}
+.cp-guide-zoom-content{width:calc(100% * var(--guide-scale));height:calc(var(--guide-height) * var(--guide-scale))}
+.cp-guide-zoom-content>figure{width:100%;height:100%!important;min-height:0!important;max-height:none!important;margin:0}
+.cp-guide-zoom-content .cp-hole-art{width:100%;height:100%;max-height:none!important}
+.cp-guide-zoom-content .cp-art-guide figcaption{position:absolute!important;bottom:4px;left:0;right:0;padding:4px!important;background:#f7f6efdd!important}
+.cp-live-guide-body .cp-guide-zoom{--guide-height:clamp(300px,60dvh,650px)}

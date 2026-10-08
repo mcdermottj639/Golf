@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v224';
+const BUILD = 'v225';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v225', d:'2026-10-08', items:['CLOSER HOLE GUIDES: All club illustrations and Caddie HQ guides open at 140% with zoom controls, scrolling and a Full hole reset in prep and live rounds.'] },
   { b:'v224', d:'2026-10-08', items:['SIMPLER MAPS: Removed Overhead. Use 3D with the closer hole flyover, or Simple map for offline yardages.'] },
   { b:'v223', d:'2026-10-08', items:['CLOSER FLYOVER: Fly this hole now follows the route from a closer camera position in Course Prep and live rounds.'] },
   { b:'v222', d:'2026-10-08', items:['NAVIGATION: Rounds and Bag switch places. Bottom tabs now run Overview, Rounds, Progress, Bag, Coach.'] },

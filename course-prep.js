@@ -67,7 +67,28 @@
   const usesArt = (source,h) => canDrawGuide(source,h) && (guideStyle==='caddie' || !h.guide || navigator.onLine===false);
   const guideChoices = (source,h) => h.guide && canDrawGuide(source,h) ? '<div class="cp-guide-styles" role="group" aria-label="Guide style">'+button('guide-style','Club illustration','data-style="club" aria-pressed="'+!usesArt(source,h)+'"')+button('guide-style','Caddie HQ guide','data-style="caddie" aria-pressed="'+usesArt(source,h)+'"')+'</div>' : '';
   const guideCaption = (source,h) => usesArt(source,h) ? 'Illustrated overview · not to scale · incomplete hazard coverage. '+link('https://www.openstreetmap.org/copyright','© OpenStreetMap contributors') : 'Official club illustration · not to scale. '+link(source.tour,'Open course guide ↗');
-  const guideContent = (source,h,live=false) => guideChoices(source,h)+(usesArt(source,h) ? window.CaddieHoleGuide.render(source,h) : guideFigure(source,h,live));
+  const guideContent = (source,h,live=false) => guideChoices(source,h)+'<div class="cp-guide-zoom" style="--guide-scale:1.4"><div class="cp-guide-zoom-tools" role="group" aria-label="Hole guide zoom"><button type="button" data-guide-zoom="out" aria-label="Zoom out hole guide">−</button><output aria-live="polite">140%</output><button type="button" data-guide-zoom="in" aria-label="Zoom in hole guide">+</button><button type="button" data-guide-zoom="full">Full hole</button><span>Scroll to explore</span></div><div class="cp-guide-viewport" tabindex="0" aria-label="Zoomed hole guide; scroll to explore"><div class="cp-guide-zoom-content">'+(usesArt(source,h) ? window.CaddieHoleGuide.render(source,h) : guideFigure(source,h,live))+'</div></div></div>';
+  function setupGuideZoom(container) {
+    const wrap=container.querySelector('.cp-guide-zoom');if(!wrap)return;
+    const viewport=wrap.querySelector('.cp-guide-viewport');let zoom=1.4;
+    function apply(next,initial=false){
+      const x=initial ? .5 : (viewport.scrollLeft+viewport.clientWidth/2)/viewport.scrollWidth;
+      const y=initial ? .5 : (viewport.scrollTop+viewport.clientHeight/2)/viewport.scrollHeight;
+      zoom=Math.max(1,Math.min(2.4,Math.round(next*10)/10));
+      wrap.style.setProperty('--guide-scale',zoom);
+      wrap.querySelector('output').textContent=Math.round(zoom*100)+'%';
+      wrap.querySelector('[data-guide-zoom="out"]').disabled=zoom===1;
+      wrap.querySelector('[data-guide-zoom="in"]').disabled=zoom===2.4;
+      viewport.scrollLeft=x*viewport.scrollWidth-viewport.clientWidth/2;
+      viewport.scrollTop=y*viewport.scrollHeight-viewport.clientHeight/2;
+    }
+    wrap.addEventListener('click',event=>{
+      const control=event.target.closest('[data-guide-zoom]');if(!control)return;
+      event.stopPropagation();
+      apply(control.dataset.guideZoom==='full'?1:zoom+(control.dataset.guideZoom==='in' ? .2 : -.2));
+    });
+    apply(zoom,true);
+  }
   const model = () => clean(bridge.get(course.id));
   const currentHole = () => course.holes[hole - 1];
   const mappedHoles = () => course.holes.filter(h=>h.mapReady!==false);
@@ -385,6 +406,7 @@
       '<footer>'+guideCaption(source,h)+'</footer>');
     dialog.querySelector('[data-live-map]')?.addEventListener('click',()=>openLiveMap(source.id,h.n));
     dialog.querySelectorAll('[data-cp="guide-style"]').forEach(el=>el.addEventListener('click',()=>{guideStyle=el.dataset.style;openGuide(source.id,h.n);}));
+    setupGuideZoom(dialog);
     if(!usesArt(source,h))loadGuide(dialog.querySelector('.cp-guide'),h.guide);
     return true;
   }
@@ -630,6 +652,7 @@
     drawControls();
     if (mode==='guide' && hasGuide(course,currentHole())) {
       stage.innerHTML = guideContent(course,currentHole());
+      setupGuideZoom(stage);
       stage.dataset.art = usesArt(course,currentHole()) ? 'true' : 'false';
       if(!usesArt(course,currentHole())){
         const failure=stage.querySelector('.cp-guide-dialog-error');

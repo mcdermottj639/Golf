@@ -195,8 +195,8 @@ download (reproduced with the club's JPEG). naturalWidth alone is not readiness.
 After an error or 12-second timeout, retry once with a fresh URL; then show Retry image
 and retain the guide/map navigation. Manual retry also uses a fresh URL. Clean up
 timers/handlers on hole/view changes, navigation and popup close; late image callbacks
-must never replace a newer hole. Do not alter the illustration's aspect ratio or crop
-its tee/green. Validate delayed/chunked downloads, timeout/error recovery, rapid hole
+must never replace a newer hole. Do not alter the illustration's aspect ratio. Zoomed portions must remain scroll-reachable;
+Full hole must show its complete tee-to-green extent. Validate delayed/chunked downloads, timeout/error recovery, rapid hole
 switches, and the full image in prep and live dialogs at 320/390 widths.
 Hole guide is the initial view whenever either official artwork or a usable mapped
 route is available. Official illustrations retain priority online where present; downloaded mapped guides take priority offline. A compact
@@ -215,7 +215,11 @@ an AI-generated imaginary course layout as a real guide. The user-approved mocku
 was a design direction; shipped playable shapes must come from source geometry.
 `hasGuide` is shared by prep and live; image-only holes must remain accessible when
 `mapReady:false`. A failed external image can offer the generated guide when available.
-Both kinds of guide fit fully without cropping; SVG masks/filters use an explicit
+v225 opens both guide styles at 140% inside a scrollable viewport, in prep and live
+dialogs. Zoom controls span 100–240%; Full hole restores 100% and all image edges.
+Use actual scrollable dimensions, not clipped transforms; retain both tee and green
+in the full content. Zoom/scroll must never write golf state or restart image loading.
+Each newly opened guide starts at 140%. At 100%, both kinds of guide fit fully; SVG masks/filters use an explicit
 user-space frame so near-vertical holes do not collapse into a narrow strip.
 Inside Interactive map, 3D is the only imagery mode (v224); Simple map remains the
 offline alternative. Overhead UI, map library loading and 2D overlay code are removed.
