@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v200';
+const BUILD = 'v201';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v201', d:'2026-10-07', items:['BAG: Benched clubs can return to the starting bag. Choose a replacement at capacity; saved carry numbers and history are retained.'] },
   { b:'v200', d:'2026-10-02', items:['CADDIE HQ, REIMAGINED: A new visual system across the entire app, with Overview, Bag, Progress, Rounds and Coach.', 'FIND ANYTHING: Global search and a complete workspace directory, plus clear page context and back navigation.', 'YOUR NEXT MOVE: Recent sessions, direct lab access, club-history shortcuts and evidence-led summaries. Every existing number, source, insight and tracking tool is preserved.', 'RESTORABLE: The complete v199 app is saved as backup/caddie-hq-v199-2026-10-02.'] },
   { b:'v199', d:'2026-10-02', items:['CLEANER SECTIONS: Compact Sections menu beside the page shortcuts; clear chevrons and remembered folding for existing panels too.', 'MORE ROOM FOR YOUR NUMBERS: Compact expandable conditions and a foldable Today focus card.', 'BETTER NAVIGATION: Distinct tab icons, shortcuts to existing foldable panels, and section boundaries that keep neighboring cards accessible.'] },
   { b:'v198', d:'2026-10-02', items:['ONE RANGE DAY: Range and Map My Bag uploads on the same date share one daily entry and combined club totals. Original sources remain available.', 'FOLD SECTIONS: Collapse or expand page sections; choices are remembered on this device.'] },
@@ -3308,6 +3309,7 @@ function clubRow(c){
       ${Array.isArray(c.activeMembers) ? `<p class="sm">Active: ${c.activeMembers.map(esc).join(', ')}</p>` : ''}
       ${c.note ? expandable(c.note) : ''}
       ${['gaming','ordered'].includes(c.status) && physicalClubCount(c)>0 ? `<div class="formrow" style="margin-top:8px">${rosterMembers(c) ? `<select aria-label="Iron to remove" id="bench-${esc(c.id)}">${rosterMembers(c).map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select>` : ''}<button class="btn" data-action="bench-club" data-id="${esc(c.id)}">Remove from bag</button></div>` : ''}
+      ${c.status === 'backup' && physicalClubCount(c)>0 ? `<div class="formrow" style="margin-top:8px"><select aria-label="Club to replace" id="restore-${esc(c.id)}"><option value="">${activeBagCount()+physicalClubCount(c)>14 ? 'Choose a club to replace' : 'Use an open spot'}</option>${replacementOptions().map(o=>`<option value="${esc(o.value)}">Replace ${esc(o.label)}</option>`).join('')}</select><input id="restore-label-${esc(c.id)}" aria-label="Playing label" placeholder="Playing label if needed (e.g. 4H)"><button class="btn" data-action="start-club" data-id="${esc(c.id)}">Move to starters</button></div>` : ''}
       ${c.futureFit ? futureFitReference(c.futureFit) : ''}
           ${c.pingAdapter ? pingHybridReference(c.pingAdapter) : ''}
       ${mismatch ? `<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>` : ''}
@@ -3503,7 +3505,7 @@ function benchClub(id, member){
     c.activeMembers=members.filter(m=>m!==member);
     if(!c.activeMembers.length) c.status='backup';
     S.clubs.push({id:uid(),name:c.name.split(' · ')[0]+' '+member,cat:c.cat,status:'backup',rounds:0,
-      spec:'From '+c.name,note:'Removed from the active bag. Previous shot history is retained.',savedCarries:rows});
+      playingClub:member,spec:'From '+c.name,note:'Removed from the active bag. Previous shot history is retained.',savedCarries:rows});
   }else{c.status='backup';c.savedCarries=rows;}
   S.carries=S.carries.filter(row=>!rows.includes(row));
   return true;
@@ -3539,6 +3541,26 @@ function addManualClub(club, label = '', replacement = ''){
     }
   }
   S.clubs.push(club);
+  return null;
+}
+// Reuse the validated add/replace transaction, retaining the existing equipment identity.
+function startClub(id, replacement = '', playingLabel = ''){
+  const original = S.clubs.find(c=>c.id===id && c.status==='backup');
+  if(!original || physicalClubCount(original)===0) return 'Choose a benched club.';
+  const club = {...original, status:'gaming'};
+  const saved = original.savedCarries || [];
+  const legacyIron = /([3-9]-iron|PW)$/.exec(original.name || '');
+  const label = playingLabel || original.playingClub || (saved.length===1 ? saved[0].club : legacyIron ? legacyIron[1] : '');
+  const error = addManualClub(club, label, replacement);
+  if(error) return error;
+  // addManualClub appends the same ID only after validation succeeds.
+  S.clubs.splice(S.clubs.indexOf(original), 1);
+  saved.forEach(row=>{
+    const index=S.carries.findIndex(c=>clubCanon(c.club)===clubCanon(row.club));
+    if(index>=0) S.carries[index]={...row};
+    else S.carries.push({...row});
+  });
+  delete club.savedCarries;
   return null;
 }
 // One physical club per scan row, joined to the existing saved carry (never a copy).
@@ -10543,6 +10565,12 @@ const ACTIONS = {
   'bench-club': el => {
     const select = document.getElementById('bench-' + el.dataset.id);
     if(benchClub(el.dataset.id, el.dataset.member || select?.value)){ save(); rerender(); toast('Moved to bench · history kept'); }
+  },
+  'start-club': el => {
+    const replacement = document.getElementById('restore-' + el.dataset.id)?.value || '';
+    const error = startClub(el.dataset.id, replacement, document.getElementById('restore-label-' + el.dataset.id)?.value.trim() || '');
+    if(error) return toast(error);
+    save(); rerender(); toast('Moved to starters · saved carries restored');
   },
   'show-add-club': () => { $('#addClubForm').style.display='block'; $('#clNa').focus(); },
   'add-club': () => {

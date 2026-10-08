@@ -3418,6 +3418,12 @@ activeMembers tracks a partial set without pretending it is one club. Add a club
 can replace one active member atomically. Reject changes exceeding 14 active/ordered
 physical clubs including putter; balls/accessories count zero. Rejection must not
 mutate either store. Backup/wishlist additions remain allowed at capacity.
+Benched equipment exposes Move to starters and an optional replacement selector.
+startClub reuses the atomic add validation, retains the equipment ID and restores
+savedCarries (including measurement provenance). Full bags require a replacement;
+validation failures leave both stores untouched. Empty iron-set containers cannot
+be promoted; their individually benched irons each have their own restore control.
+The v201 release fixes the previously missing reverse action.
 
 Validation: bag-management integration tests cover an existing calibrated install,
 append-only history, idempotence, 4H/4i separation, 14-club rejection without mutation,

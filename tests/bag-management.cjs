@@ -10,7 +10,7 @@ for(const f of ['lessons.js','courses-db.js','course-cards.js'])vm.runInContext(
 let src=fs.readFileSync(path.join(root,'app.js'),'utf8');
 src=src.slice(0,src.indexOf('// ---------- Boot ----------'))+`
 rerender=()=>{};toast=()=>{};load();
-window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView,addManualClub,benchClub,activeBagCount,rosterMembers,clubCanon,bagClubs,orderedCarries,ladderCard,ACTIONS};
+window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayView,bayCarryVisual,bayConsistencyVisual,bayDeliveryVisual,sessionLibrary,sessionShortcuts,isClearMishit,struckShots,analysisClubs,analysisDelivery,cumulativeView,addManualClub,benchClub,startClub,activeBagCount,rosterMembers,clubCanon,bagClubs,orderedCarries,ladderCard,ACTIONS};
 })();`;
 vm.runInContext(src,ctx);
 const T=ctx.window.reviewTest,feed=JSON.parse(fs.readFileSync(path.join(root,'coach-feed.json'),'utf8'));
@@ -33,7 +33,7 @@ T.applyFeed(bagFeed);
 assert.ok(!T.get().clubs.some(c=>c.id==='manual-duplicate' || c.id==='manual-duplicate-label'));
 assert.ok(T.get().clubs.some(c=>c.id==='keep-wood'));
 assert.ok(T.get().clubs.some(c=>c.id==='keep-other-hybrid'));
-assert.equal(T.get().clubs.find(c=>c.id==='bag-ds-adapt-4h-20261001').status,'ordered');
+assert.equal(T.get().clubs.find(c=>c.id==='bag-ds-adapt-4h-20261001').status,'gaming');
 
 assert.equal(T.get().carries.find(c=>c.club==='5-iron').carry,177);
 T.applyFeed(require('../range-20260922-feed.json'));T.applyFeed(require('../futurefit-feed.json'));T.applyFeed(require('../range-20260925-feed.json'));
@@ -108,3 +108,33 @@ T.ACTIONS['bench-club']({dataset:{id:'c6',member:'6-iron'}});
 assert.equal(T.rosterMembers(T.get().clubs.find(c=>c.id==='c6')).length,memberCount-1);
 assert.ok(T.rosterMembers(T.get().clubs.find(c=>c.id==='c6')).includes('7-iron'));
 console.log('PASS compact row removes only the selected iron.');
+
+// Reverse movement preserves identity, carries and history, and rejects full bags atomically.
+const restoreState=JSON.stringify(T.get());
+const restoreHistory=JSON.stringify(T.get().bays);
+const active=T.get().clubs.find(c=>c.id==='extra');
+T.get().carries.push({club:'7 wood',carry:null});
+const savedRow=T.get().carries.find(c=>c.club==='7 wood');
+savedRow.carry=211;savedRow.meas={carry:211,source:'verified'};
+assert.equal(T.benchClub(active.id),true);
+assert.match(T.bag(),/data-action="start-club" data-id="extra"/);
+assert.equal(T.startClub(active.id),null);
+assert.equal(T.get().clubs.filter(c=>c.id===active.id).length,1);
+assert.equal(T.get().carries.find(c=>c.club==='7 wood').carry,211);
+assert.equal(T.get().carries.find(c=>c.club==='7 wood').meas.source,'verified');
+assert.equal(T.startClub(active.id),'Choose a benched club.');
+// Fill any vacancies, then ensure an over-capacity restore cannot alter either store.
+while(T.activeBagCount()<14) T.addManualClub({id:'fill-'+T.activeBagCount(),name:'Putter',cat:'putter',status:'gaming'});
+const full=JSON.stringify(T.get());
+assert.match(T.startClub('bench'),/14 clubs maximum/);
+assert.equal(JSON.stringify(T.get()),full);
+assert.equal(T.startClub('bench','extra','Driver'),null);
+assert.equal(T.activeBagCount(),14);
+assert.equal(T.get().clubs.find(c=>c.id==='extra').status,'backup');
+assert.equal(JSON.stringify(T.get().bays),restoreHistory);
+// An individually benched iron returns as exactly one physical club.
+const iron=T.get().clubs.find(c=>c.status==='backup' && c.name.endsWith('6-iron'));
+assert.equal(T.startClub(iron.id,'bench'),null);
+assert.equal(T.activeBagCount(),14);
+assert.ok(T.get().carries.some(c=>c.club==='6-iron'));
+console.log('PASS bench-to-starter restoration, identity, calibrated carries, capacity, replacement and individual irons.');
