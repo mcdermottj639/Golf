@@ -44,7 +44,7 @@
   let bridge, root, hole = 1, mode = 'guide', overview = false, edit = 'target';
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps2d, maps3d, overlays2d = [];
   let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
-  let showRings = true, framed2d = null, framed3d = null, pinClass;
+  let showRings = true, framed2d = null, framed3d = null;
   let projection = null, imageError = false, animationHandler, animationTimer, bagSnapshot;
   const model = () => clean(bridge.get());
   const currentHole = () => course.holes[hole - 1];
@@ -376,8 +376,10 @@
     }
     if (googleAuthFailed || googleFailure) return mapError(googleFailure, googleFailureMode);
     stage.innerHTML='<div class="cp-map-message" role="status">Loading Google '+(mode==='3d'?'3D':'satellite')+'…</div>';
+    let stageName = 'loading Google';
     try {
       await loadGoogle();
+      stageName = 'loading the map library';
       if(token!==epoch||!root)return;
       if(mode==='satellite') {
         const [lib]=await Promise.all([google.maps.importLibrary('maps'),google.maps.importLibrary('marker')]);
@@ -390,9 +392,9 @@
         stage.replaceChildren(maps2d.getDiv());
         if(framed2d!==hole){frameGoogle('hole');framed2d=hole;}drawGoogle2d();
       } else {
-        const [lib,markers]=await Promise.all([google.maps.importLibrary('maps3d'),google.maps.importLibrary('marker')]);
-        pinClass=markers.PinElement;
+        const lib=await google.maps.importLibrary('maps3d');
         if(token!==epoch||!root)return;
+        stageName = 'starting the 3D viewer';
         if(!maps3d) {
           maps3d=new lib.Map3DElement({center:ll(course.center),range:1600,tilt:55,mode:'SATELLITE',gestureHandling:'COOPERATIVE'});
           maps3d.className='cp-google-map';
@@ -400,10 +402,14 @@
           maps3d.addEventListener('gmp-error',()=>{if(root&&mode==='3d')mapError('3D could not initialize on this device. Try Satellite or the course map.','3d');});
         }
         stage.replaceChildren(maps3d);
+        stageName = 'positioning the 3D camera';
         if(framed3d!==hole){frameGoogle('hole');framed3d=hole;}
+        stageName = 'drawing the 3D hole';
         drawGoogle3d(lib);
       }
-    } catch { if(token===epoch&&root)mapError(googleFailure||'Google Maps could not load. Check the key, billing, website restrictions and internet connection.'); }
+    } catch {
+      if(token===epoch&&root)mapError(googleFailure || (mode==='3d'?'The 3D view':'Satellite')+' could not finish '+stageName+'. Reload and retry, or choose another view.', mode);
+    }
   }
   const ll = p => ({lat:p[0],lng:p[1]});
   function frameGoogle(focus) {
@@ -510,10 +516,10 @@
     const line=(path,color,width)=>new lib.Polyline3DElement({path:path.map(ll),strokeColor:color,strokeWidth:width,altitudeMode:'CLAMP_TO_GROUND',drawsOccludedSegments:true});
     maps3d.append(line(currentHole().path,'#c5e78a',4));
     if(savedHole().target)maps3d.append(line([origin(),target(),green()],'#ffb766',3));
-    if(lib.Marker3DElement)[[origin(),'T','#204d3e'],[green(),'G','#668a43'],...(savedHole().target?[[target(),'A','#b77224']]:[])].forEach(([p,label,color])=>{
-      const marker=new lib.Marker3DElement({position:ll(p),label:pinClass?'':label,altitudeMode:'CLAMP_TO_GROUND'});
-      if(pinClass)marker.append(new pinClass({scale:.8,background:color,borderColor:'#fff',glyphColor:'#fff',glyphText:label}));
-      maps3d.append(marker);
+    // Basic 3D markers need only maps3d. Optional PinElement customization must not
+    // become a startup dependency: a customization failure must not hide the map.
+    if(lib.Marker3DElement)[[origin(),'T'],[green(),'G'],...(savedHole().target?[[target(),'A']]:[])].forEach(([p,label])=>{
+      maps3d.append(new lib.Marker3DElement({position:ll(p),label,altitudeMode:'CLAMP_TO_GROUND'}));
     });
     const c=selected(),roll=savedHole().roll||0;
     if(showRings && c && c.carry > 0)for(const [d,color] of [[c.carry,'#c5e78a'],...(roll?[[c.carry+roll,'#ffb766']]:[])]) {

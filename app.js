@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v207';
+const BUILD = 'v208';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v208', d:'2026-10-08', items:['3D MAP RECOVERY: Restore simple tee, aim and green markers without the extra marker-library dependency. A viewer failure identifies its loading stage and no longer blocks the other Google view or assumes a billing problem.'] },
   { b:'v207', d:'2026-10-08', items:['LIVE HOLE GUIDES: Open each available official hole illustration over the live scorecard and close back to the same hole. All 18 Pound Ridge guides are available.', 'PLAN THE SHOT: Compare your bag’s carries to a landing target, see approach-distance options and review the next hole with one tap. Satellite and 3D gain compact colored markers, nearby distance readouts, carry-ring controls and whole-hole/green views. Club changes preserve your map camera.'] },
   { b:'v206', d:'2026-10-08', items:['CLEARER COURSE MAP: A tee-to-green view, yardage arcs, readable terrain and target distances make each hole easier to plan. The shot planner asks for a landing target before comparing your club.', 'GOOGLE MAPS DIAGNOSIS: Specific Google authorization errors now identify the setting to fix when available. Rejected sessions keep their explanation when switching Satellite and 3D.'] },
   { b:'v205', d:'2026-10-08', items:['HOLE GUIDE FIRST: Every hole opens with its official illustrated guide. Course map, Satellite and Google 3D remain one tap away.'] },

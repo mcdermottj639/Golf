@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v207, October 8 2026)
+## Course Prep (v208, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
 Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
@@ -175,11 +175,16 @@ Enable Maps JavaScript API + billing and restrict the browser key to that API an
 `caddiehq_google_maps_key_v1`, outside golf backups; deployments can alternatively
 provide `window.CADDIE_GOOGLE_MAPS_KEY`. Do not commit an unrestricted key. Map objects
 are reused, asynchronous loads have navigation guards, and leaving a hole cancels
-its flyover. Tee/aim/green markers use compact T/A/G colors with a legend. Distances
+its flyover. Tee/aim/green markers use compact T/A/G labels with a legend; Satellite uses matching colors. Distances
 sit beside the map in all mapped modes; carry rings can be hidden. Whole hole and
 Green close-up explicitly reframe existing map objects. Normal club changes retain
 the camera; first arrival on a different hole frames it. 3D uses terrain-clamped camera
-positions and custom PinElements, with an abbreviated-label fallback. No Google
+positions and basic Marker3DElements with short labels. v207 made custom PinElements
+a startup dependency; Jack then reported 3D failing after it had worked. v208 removes
+that optional dependency and scopes initialization/drawing failures to the active view.
+The exact iPhone exception was not available: do not claim a proven device-specific cause.
+Non-auth failures show a fixed loading-stage description, never raw errors or credentials;
+known authorization failures retain their specific Google error advice. No Google
 imagery or derived geometry is cached; the service worker now
 intercepts only same-origin requests. Offline routes and notes remain usable with no key.
 

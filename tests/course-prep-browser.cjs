@@ -15,18 +15,18 @@ async function prep(p){await p.locator('#nav [data-view="rounds"]').click();awai
 async function explore(p,selector){await p.locator('.hq-search-trigger:visible').first().click();await p.locator('.hq-explorer-link'+selector).first().click();}
 const mode=(p,m)=>p.locator('.cp-modes [data-mode="'+m+'"]').click();
 function googleMock(){
-  window.mapQA={maps:0,scenes:0,flights:0,stops:0,fits:0};
+  window.mapQA={maps:0,scenes:0,flights:0,stops:0,fits:0,markerImports:0,fail3dDraw:false};
   class Map{constructor(el,opts){this.el=el;this.opts=opts;this.listeners={};mapQA.maps++;}getDiv(){return this.el;}addListener(k,f){this.listeners[k]=f;}fitBounds(b){this.bounds=b;mapQA.fits++;}}
   class Overlay{constructor(opts){this.opts=opts;}setMap(map){this.opts.map=map;}}
   class Bounds{constructor(){this.points=[];}extend(p){this.points.push(p);}}
   class Scene extends HTMLElement{constructor(opts){super();Object.assign(this,opts);mapQA.scenes++;}flyCameraTo(opts){this.lastFlight=opts;mapQA.flights++;}stopCameraAnimation(){mapQA.stops++;}}
-  class Line extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
+  class Line extends HTMLElement{constructor(opts){super();if(mapQA.fail3dDraw)throw new Error("Simulated 3D drawing failure");Object.assign(this,opts);}}
   class Marker extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
   customElements.define('qa-map-scene',Scene);customElements.define('qa-map-line',Line);customElements.define('qa-map-marker',Marker);
   class Pin extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
   customElements.define('qa-map-pin',Pin);
   const maps3d={Map3DElement:Scene,Polyline3DElement:Line,Marker3DElement:Marker};
-  window.google={maps:{SymbolPath:{CIRCLE:0},maps3d,Map,LatLngBounds:Bounds,Polyline:Overlay,Circle:Overlay,Marker:Overlay,importLibrary:async name=>name==='maps3d'?maps3d:{Map,Marker:Overlay,PinElement:Pin}}};
+  window.google={maps:{SymbolPath:{CIRCLE:0},maps3d,Map,LatLngBounds:Bounds,Polyline:Overlay,Circle:Overlay,Marker:Overlay,importLibrary:async name=>{if(name==='marker')mapQA.markerImports++;return name==='maps3d'?maps3d:{Map,Marker:Overlay,PinElement:Pin};}}};
   window.__caddieMapsReady();
 }
 (async()=>{
@@ -99,7 +99,13 @@ function googleMock(){
     await p.locator('[data-cp="map-setup"]').click();await p.locator('#cp-api-key').fill('invalid');await p.locator('[data-cp="key-save"]').click();assert.equal(googleRequests,0);
     await p.locator('#cp-api-key').fill('AIza'+'x'.repeat(35));await p.locator('[data-cp="key-save"]').click();await p.locator('qa-map-scene').waitFor();
     assert.equal(googleRequests,1);assert.ok(await p.locator('qa-map-line').count()>=3);
-    assert.deepEqual(await p.locator('qa-map-pin').evaluateAll(els=>els.map(e=>e.glyphText)),['T','G','A']);
+    assert.deepEqual(await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>e.label)),['T','G','A']);
+    assert.equal(await p.evaluate(()=>mapQA.markerImports),0,'3D has no optional marker-library startup dependency');
+    await p.evaluate(()=>{mapQA.fail3dDraw=true;});await p.locator('.cp-clubs [data-club="5-wood"]').click();
+    await p.locator('#cp-map-stage .cp-map-message').waitFor();assert.match(await p.locator('#cp-map-stage').innerText(),/drawing the 3D hole/);
+    assert.ok(!(await p.locator('#cp-map-stage').innerText()).includes('billing'));
+    await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();
+    await p.evaluate(()=>{mapQA.fail3dDraw=false;});await mode(p,'3d');await p.locator('qa-map-scene').waitFor();
     await p.locator('[data-cp="frame"][data-focus="green"]').click();assert.equal(await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera.range),190);
     const cameraBefore=await p.evaluate(()=>mapQA.flights);await p.locator('.cp-clubs [data-club="5-wood"]').click();await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.flights),cameraBefore,'club changes preserve 3D camera');
     await p.locator('[data-cp="frame"][data-focus="hole"]').click();assert.ok(await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera.range>190));
