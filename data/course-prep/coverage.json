@@ -1,0 +1,79 @@
+[
+  {
+    "id": "pound-ridge",
+    "verified": "2026-10-08",
+    "source": "https://www.poundridgegolf.com/golf/scorecard",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 17268,
+    "exceptions": []
+  },
+  {
+    "id": "wianno",
+    "verified": "2026-10-08",
+    "source": "https://18birdies.com/golf-courses/club/959eb2a0-86ac-11e4-8c28-020000005b00/wianno-club",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 91072,
+    "exceptions": []
+  },
+  {
+    "id": "sterling-farms",
+    "verified": "2026-10-08",
+    "source": "https://www.grassy.golf/courses/sterling-farms-golf-course-us-ct/scorecard",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 120055,
+    "exceptions": []
+  },
+  {
+    "id": "metedeconk",
+    "verified": "2026-10-08",
+    "source": "https://tours.skyfoxgolf.com/360/metedeconk",
+    "holes": 27,
+    "maps": 18,
+    "guides": 27,
+    "bytes": 314143,
+    "exceptions": [
+      {
+        "hole": 19,
+        "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+      },
+      {
+        "hole": 20,
+        "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+      },
+      {
+        "hole": 21,
+        "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+      },
+      {
+        "hole": 22,
+        "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+      },
+      {
+        "hole": 23,
+        "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+      },
+      {
+        "hole": 24,
+        "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+      },
+      {
+        "hole": 25,
+        "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+      },
+      {
+        "hole": 26,
+        "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+      },
+      {
+        "hole": 27,
+        "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+      }
+    ]
+  }
+]

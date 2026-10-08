@@ -69,8 +69,7 @@
       "si": 1,
       "osmId": 1136751491,
       "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
-      "mapReady": false,
-      "mapNote": "The source route’s green position could not be confirmed. Keep your club choice and hole note here while the map is checked."
+      "mapVerification": "Player confirmed physical hole 2 tee and green on 2026-10-08. The original route endpoint is inside source polygon 989266485; its tee tag is incorrect. Original source coordinates retained."
     },
     {
       "n": 3,
@@ -183,6 +182,15 @@
       "si": 4,
       "osmId": 1136768078,
       "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    }
+  ],
+  "featureCorrections": [
+    {
+      "id": 989266485,
+      "from": "tee",
+      "to": "green",
+      "confirmed": "2026-10-08",
+      "note": "Player familiar with Wianno confirmed this polygon as hole 2 green, south of West Bay Road, rather than a tee. Coordinates come unchanged from OpenStreetMap."
     }
   ]
 }

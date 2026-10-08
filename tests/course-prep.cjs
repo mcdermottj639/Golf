@@ -5,6 +5,7 @@ const dummy={addEventListener(){},querySelectorAll(){return []},classList:{add()
 const storage={},ctx={console,setTimeout(){},clearTimeout(){},setInterval(){},document:{addEventListener(){},querySelector(){return dummy},querySelectorAll(){return []},getElementById(){return dummy},body:dummy},navigator:{},localStorage:{getItem:k=>storage[k]||null,setItem:(k,v)=>storage[k]=v},window:{addEventListener(){},matchMedia:()=>({matches:false,addEventListener(){}})}};
 vm.createContext(ctx);
 for(const f of ['lessons.js','courses-db.js','course-cards.js','course-prep-data.js','hole-guide.js','course-prep.js'])vm.runInContext(read(f),ctx);
+for(const c of ctx.window.CADDIE_PREP_COURSES)Object.assign(c,JSON.parse(read(c.pack.url)));
 let app=read('app.js');
 vm.runInContext(app.slice(0,app.indexOf('// ---------- Boot ----------'))+`
 rerender=()=>{};toast=()=>{};load();initCoursePrep();
@@ -61,9 +62,14 @@ assert.equal(T.coursePrepNote('Pound Ridge Golf Club',1),'Aim at my saved target
 assert.equal(P.openHole(1,'unknown-course'),false);assert.equal(P.findCourse('Sterling'),undefined,'no ambiguous partial course match');
 console.log('PASS multi-course data: original coordinates, isolated boundaries and notes, sourced live cards, exact aliases, no state writes during navigation.');
 
-assert.equal(catalog.flatMap(c=>c.holes).filter(h=>h.mapReady!==false).length,71);
-assert.equal(P.openLiveMap('wianno',2),false,'unverified endpoint never opens a live measuring map');
-P.openHole(2,'wianno');assert.ok(P.render().includes('17 of 18 interactive hole maps ready'));
+assert.equal(catalog.flatMap(c=>c.holes).filter(h=>h.mapReady!==false).length,72);
+const W=P.findCourse('wianno'),w2=W.holes[1],wraw=JSON.parse(read('data/course-prep/wianno-osm.json'));
+assert.notEqual(w2.mapReady,false);assert.ok(w2.mapVerification);
+assert.equal(wraw.features.find(f=>f.id===989266485).tags.golf,'tee','raw source remains unchanged');
+assert.equal(W.features.find(f=>f.id===989266485).kind,'green','confirmed correction reaches all map renderers');
+assert.deepEqual(clone(w2.path),wraw.features.find(f=>f.id===1136751491).path,'confirmed route coordinates stay unchanged');
+assert.ok(P.hasGuide(W,w2),'hole 2 has a sourced illustration');
+P.openHole(2,'wianno');assert.ok(!P.render().includes('17 of 18 interactive hole maps ready'));
 
 const M=P.findCourse('The Conk');assert.equal(M.holes.length,27);assert.equal(M.holes.filter(h=>h.guide).length,27);assert.equal(M.tees.length,4);
 for(const h of catalog.flatMap(c=>c.holes)){

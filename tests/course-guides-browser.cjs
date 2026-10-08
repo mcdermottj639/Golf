@@ -25,7 +25,7 @@ const {server,chromium,state,ready,prep,explore,mode,googleMock}=require('./cour
   await p.locator('#cp-courses').selectOption('sterling-farms');await p.locator('.cp-guide-styles [data-style="caddie"]').click();await p.locator('.cp-hole-art').waitFor();
   await p.locator('.cp-map-panel').screenshot({style:'#nav,.toast{visibility:hidden!important}',path:screens+'/sterling-guide.png'});
   await p.locator('.cp-holes [data-n="12"]').click();assert.equal(await p.locator('.cp-hole-art').count(),1,'missing club image has generated guide');
-  await p.locator('#cp-courses').selectOption('metedeconk');assert.equal(await p.locator('.cp-nines button').count(),3);assert.equal(await p.locator('#cp-tees option').count(),4);
+  await p.locator('#cp-courses').selectOption('metedeconk');await p.locator('.cp-hole-heading').waitFor();assert.equal(await p.locator('.cp-nines button').count(),3);assert.equal(await p.locator('#cp-tees option').count(),4);
   for(const start of [1,10,19]){
    await p.locator('.cp-nines [data-n="'+start+'"]').click();assert.equal(await p.locator('.cp-holes button').count(),9);
    for(let n=start;n<start+9;n++){await p.locator('.cp-holes [data-n="'+n+'"]').click();await p.locator('.cp-guide[data-guide-state="ready"] img').waitFor();assert.match(await p.locator('.cp-guide img').getAttribute('src'),new RegExp('/hole'+n+'_aerial.png'));}

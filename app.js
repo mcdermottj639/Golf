@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v219';
+const BUILD = 'v221';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v221', d:'2026-10-08', items:['COURSES ON YOUR PHONE: Individual course downloads, verified offline availability, safe updates and favorites. Pound Ridge, Wianno, Sterling Farms and Metedeconk are favorites by default; scores and notes stay separate.'] },
+  { b:'v220', d:'2026-10-08', items:['WIANNO HOLE 2: Player-confirmed green corrects a source map label, unlocking its illustrated guide and interactive yardages in prep and live rounds.'] },
   { b:'v219', d:'2026-10-08', items:['BAG: Full club history returns directly to My Bag, including individual irons and unmeasured clubs.'] },
   { b:'v218', d:'2026-10-08', items:['YOUR OWN YARDAGE BOOK: Caddie HQ guides turn sourced hole shapes into tee-to-green illustrations with fairway stripes, sand, water and woodland styling. Available offline in prep and live rounds, with official club artwork kept alongside them.','THE CONK: All 27 Metedeconk holes, four official tee rows and club illustrations. Choose your nines for live scoring; physical hole numbers keep the right guide and saved plan together. First/second-nine maps are available; third-nine measuring maps await verified coordinates.'] },
   { b:'v217', d:'2026-10-08', items:['YOUR COURSE LIBRARY: Explore Pound Ridge, Wianno and Sterling Farms from one course picker. Shared 3D/overhead maps, tap yardages and optional GPS work in prep and live rounds. Unverified hole maps are clearly marked while club choices and notes stay available.','SEPARATE PLANS: Targets, notes, reviewed holes and club choices stay with their course. Pound Ridge plans carry forward intact. Sterling adds 17 official guide images; unavailable illustrations open the interactive map. New Blue tee cards identify their published sources.'] },

@@ -228,3 +228,13 @@ body.night .cp-map-views .cp-simple-view[aria-pressed=true]{background:#335343;c
 .cp-live-map-dialog .cp-workspace{background:var(--cp-panel)}
 
 .cp-hero .cp-coverage{margin-top:8px;color:#d7ec9d}
+/* Course downloads share the existing responsive course workspace. */
+.cp-downloads{padding:14px 16px;margin:0 0 18px;border:1px solid var(--line,#d5ded6);border-radius:16px;background:var(--card,#fff)}
+.cp-downloads>div:first-child{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px}
+.cp-downloads [role=status]{font-size:12px;line-height:1.5}
+.cp-download-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.cp-downloads button{min-height:44px;border:1px solid var(--line,#d5ded6);border-radius:10px;padding:8px 12px;background:transparent;color:inherit;font:inherit;cursor:pointer}
+.cp-downloads details{margin-top:12px;font-size:12px;line-height:1.6}
+.cp-downloads summary{cursor:pointer;min-height:32px}
+#cp-download-list>div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;padding:8px 0;border-top:1px solid var(--line,#d5ded6)}
+.cp-pack-loading{padding:30px 16px;text-align:center;line-height:1.6}

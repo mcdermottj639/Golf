@@ -29,9 +29,10 @@ round-takeaways.js    Shared scoring and club-data insight selection + compact v
 bay-takeaways.js      Full-day range insight selection, explanations, source links and practice tests
 course-prep.js/.css   Shared course planner and live maps; lazy Google satellite/3D views
 hole-guide.js        Sourced illustrated hole renderer; offline, tee-to-green
-course-prep-data.js   Generated course catalog + sourced OSM routes, available offline
+course-prep-data.js   Generated lightweight directory; scorecards and coverage, no geometry
+course-packs.js       Versioned downloads, offline cache, favorites and recent-course limits
 data/course-prep/    Per-course packs, catalog order and original-coordinate OSM subsets
-scripts/build-course-prep.cjs  Validates packs and generates the offline browser catalog
+scripts/build-course-prep.cjs  Validates sources; generates directory, JSON packs and coverage report
 course-prep-feed.json Apply-once course card, mapped location and refreshed standing prep
 coach-feed.json       One-way "coach inbox" — see Data model below  ← updates land here
 sw.js                 Service worker (offline cache of the shell)
@@ -123,12 +124,12 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v218, October 8 2026)
+## Course Prep (v221, October 8 2026)
 
 Rounds leads with **Explore courses**. The picker contains Pound Ridge, Wianno and
 Sterling Farms plus Metedeconk. The first three have 18 holes each; Metedeconk has
-27 physical holes and three nine selectors. There are 81 scorecard holes, 80 guides
-and 71 enabled measuring maps. Wianno hole 2 and Metedeconk 19–27 have no verified
+27 physical holes and three nine selectors. There are 81 scorecard holes, 81 guides
+and 72 enabled measuring maps. Metedeconk 19–27 have no verified
 measuring route; club illustrations still work for all 27 Metedeconk holes. Individual standing plans and
 Explorer link directly to their course. Every supported live hole opens its own map
 in a popup over the scorecard. `courseprep` maps back to Rounds in navigation.
@@ -197,7 +198,7 @@ must never replace a newer hole. Do not alter the illustration's aspect ratio or
 its tee/green. Validate delayed/chunked downloads, timeout/error recovery, rapid hole
 switches, and the full image in prep and live dialogs at 320/390 widths.
 Hole guide is the initial view whenever either official artwork or a usable mapped
-route is available. Official illustrations retain priority where present; a compact
+route is available. Official illustrations retain priority online where present; downloaded mapped guides take priority offline. A compact
 Club illustration / Caddie HQ guide switch makes both available. Wianno's mapped
 holes and Sterling hole 12 now open the generated guide. The same renderer is used
 in prep and the live dialog. `hole-guide.js` projects the source coordinates from
@@ -317,10 +318,11 @@ only prefill a new routed round if its routing ID matches. No existing rounds ar
 renumbered or migrated. Course-note/club joins continue to use physical hole IDs.
 A source route can be held with `mapReady:false` plus `mapNote`. Retain the source
 coordinates for the audit, omit it from map overview and live-map buttons, and show
-Map under review in prep with no GPS, pins or mapped yardages. Wianno hole 2 is held:
-its raw OSM endpoint is near a `golf=tee` way (989266485), about 75 meters from the
-nearest mapped green center. That inconsistency cannot be fixed by guessing a nearby
-green. Other Wianno endpoints are within about 3 meters of mapped green centers.
+Map under review in prep with no GPS, pins or mapped yardages. Wianno hole 2 is enabled after player confirmation on October 8, 2026:
+its endpoint already lies in polygon 989266485 south of West Bay Road, which OSM
+incorrectly tags as a tee. `featureCorrections` records the confirmed tee-to-green
+classification correction; the generator validates the source tag and provenance,
+then changes only the generated feature kind. Preserve all original coordinates.
 Sterling hole 3 initially appeared to lack a green because the first query rectangle
 cut it off; the final source query includes the whole course. Source import completeness
 and endpoint checks are separate from preserving the raw coordinate values.
@@ -336,8 +338,49 @@ An onboarded course without a standing briefing can still expose saved calls/not
 an ephemeral empty briefing with its canonical name. Exact declared aliases enable live
 map matching; never fuzzy-match one layout to another. Guide images are loaded from the
 club’s host with the existing full-decode/retry path, never copied into the repository.
-Add the OSM source subset to `sw.js` for offline source downloads. The compiled catalog
-already includes every route so offline course switching needs no new network request.
+**Course downloads (v221):** Do not add course geometry or source subsets to the shell
+service-worker assets. The generator emits a small `course-prep-data.js` directory,
+`data/course-prep/packs/<id>.json`, and `data/course-prep/coverage.json`. The directory
+retains scorecards/aliases/routings for synchronous live setup and search; paths and
+feature polygons load only when a course is opened. SHA-256 versions are generated
+from the exact pack bytes. Schema version 1, stable course/storage keys and explicit
+`<course-id>:<physical-hole-number>` IDs protect joins; never renumber physical holes
+or repurpose IDs. Existing saved keys and physical numbers remain unchanged.
+
+`course-packs.js` owns Cache Storage `caddiehq-course-packs-v1`, separate from the
+versioned shell cache and `caddiehq_v1` golf data. Download preferences use only
+`caddiehq_course_downloads_v1`. Pound Ridge, Wianno, Sterling Farms and Metedeconk
+are default favorites; explicit user overrides persist. Startup/reconnection fetches
+favorite packs sequentially without hydrating their geometry into startup memory.
+Other courses load on demand. Keep all favorites plus the five most recent nonfavorites
+up to 30 MiB; trim only disposable packs, never local golf state. Explicit Download
+for offline pins a course. Explicit removal unpins it and removes only its cached pack.
+A currently open course may remain in memory until reload.
+
+Validate successful HTTP, SHA-256, schema, course/storage identity, physical holes
+and route shape before a single cache.put replaces a previous pack. Failed updates
+fall back to the verified previous copy; a cache quota failure still permits online
+use but must not report available offline. Concurrent requests share one download.
+Downloaded updates do not change an already displayed route mid-round; reload uses
+the new copy. Availability reads the actual cache, including after returning to the
+app; stored preference alone is never evidence that the browser retained a pack.
+Async prep/dialog loading must be guarded against navigation and closed popups.
+Missing downloads replace only the map surface; scorecards, club choices and saved
+notes remain available and editable from directory metadata while offline.
+
+The service worker preserves the pack cache across shell upgrades and bypasses pack
+requests so it cannot cache unverified responses or duplicate evicted packs. Never
+clear caches belonging to another application on the same origin. Offline guides
+prefer Caddie HQ geometry where available; Google imagery and official external art
+are not downloaded. Metedeconk 19–27 still lack mapped guides/simple maps offline.
+Browser eviction can remove offline downloads; the UI checks status and offers retry.
+
+For a batch, author several source packs, run the generator once, and inspect the
+coverage report for missing maps and explained exceptions. Commit the directory,
+packs and report together. Do not expand the default favorites set when onboarding
+new courses. Run `tests/course-packs.cjs` for failed updates, quota/eviction, favorites,
+LRU and golf-state isolation; `tests/course-packs-browser.cjs` covers lazy geometry,
+real offline reload, mobile layouts, live maps, missing packs/retry and retained notes.
 
 `tests/course-prep.cjs` checks scorecard arithmetic, source geometry, geometry math,
 feed idempotence and preservation of golf state and personal calls. The real-browser

@@ -1,24 +1,27 @@
 // Caddie HQ service worker — offline-first cache of the app shell.
-const CACHE = 'caddiehq-v219';  // bump `BUILD` in app.js to match
+const CACHE = 'caddiehq-v221';  // bump `BUILD` in app.js to match
 const ASSETS = ['./', './index.html', './styles.css', './revamp.css', './explorer.js', './app.js', './lessons.js', './courses-db.js',
-  './course-cards.js', './manifest.webmanifest', './icon.svg', './futurefit33-rh.jpg', './coach-feed.json', './front9-feed.json', './path-feed.json', './corrections-20260922.json', './range-20260922-feed.json', './futurefit-feed.json', './range-20260925-feed.json', './bag-20261001-feed.json', './range-20261001-feed.json', './round-20261001-feed.json', './round-takeaways.js', './bay-takeaways.js', './round-review.js', './round-review.css', './hole-guide.js', './course-prep.js', './course-prep.css', './course-prep-data.js', './course-prep-feed.json', './data/course-prep/pound-ridge-osm.json', './data/course-prep/wianno-osm.json', './data/course-prep/sterling-farms-osm.json', './data/course-prep/metedeconk-osm.json'];
+  './course-cards.js', './manifest.webmanifest', './icon.svg', './futurefit33-rh.jpg', './coach-feed.json', './front9-feed.json', './path-feed.json', './corrections-20260922.json', './range-20260922-feed.json', './futurefit-feed.json', './range-20260925-feed.json', './bag-20261001-feed.json', './range-20261001-feed.json', './round-20261001-feed.json', './round-takeaways.js', './bay-takeaways.js', './round-review.js', './round-review.css', './hole-guide.js', './course-prep.js', './course-prep.css', './course-prep-data.js', './course-packs.js', './course-prep-feed.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    Promise.all(keys.filter(k => /^caddiehq-v\d+$/.test(k) && k !== CACHE).map(k => caches.delete(k)))
   ).then(() => self.clients.claim()));
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   // External Maps/imagery responses must never enter the offline cache.
   if (new URL(e.request.url).origin !== self.location.origin) return;
+  // Pack writes are validated and owned by course-packs.js; never duplicate in the shell cache.
+  if (new URL(e.request.url).pathname.includes('/data/course-prep/packs/')) return;
   // no-store defeats GitHub Pages' 10-minute HTTP cache so updates land
   // immediately; the SW cache still serves everything offline.
   e.respondWith(
     fetch(e.request, { cache: 'no-store' }).then(res => {
+      if(!res.ok)return caches.match(e.request).then(old=>old||res);
       const copy = res.clone();
       caches.open(CACHE).then(c => c.put(e.request, copy));
       return res;

@@ -452,7 +452,7 @@ if(require.main===module)(async()=>{
     const poundSaved=(await state(mp)).coursePrep.poundRidge;
     for(const [id,width] of [['wianno',320],['sterling-farms',390],['pound-ridge',1440]]){
       await mp.setViewportSize({width,height:width===1440?1000:844});
-      await mp.locator('#cp-courses').selectOption(id);
+      await mp.locator('#cp-courses').selectOption(id);await mp.waitForFunction(id=>CaddieCoursePacks.ready(id),id);await mp.locator('.cp-hole-heading').waitFor();
       if(id==='wianno'){
         assert.equal(await mp.locator('.cp-art-guide').count(),1,'custom guide for Wianno');await mode(mp,'map');
         await mp.locator('qa-map-scene').waitFor();assert.equal(await mp.locator('[data-mode="3d"]').getAttribute('aria-pressed'),'true');
@@ -482,7 +482,7 @@ if(require.main===module)(async()=>{
       await mp.locator('#cp-courses').selectOption(id);await mode(mp,'3d');await mp.locator('qa-map-scene').waitFor();
       assert.equal(await mp.locator('#cp-note').inputValue(),'Independent '+id+' plan');await assertHolePins(mp,1);
       for(const n of [2,9,12,18]){
-        await mp.locator('.cp-holes [data-n="'+n+'"]').click();if(id==='wianno'&&n===2){assert.match(await mp.locator('#cp-map-stage h3').innerText(),/Map under review/);assert.equal(await mp.locator('qa-map-scene').count(),0);assert.equal(await mp.locator('#cp-reference').isVisible(),false);assert.equal(await mp.locator('.cp-map-summary').count(),0);continue;}await mode(mp,'3d');await mp.locator('qa-map-scene').waitFor();await assertHolePins(mp,n);
+        await mp.locator('.cp-holes [data-n="'+n+'"]').click();await mode(mp,'3d');await mp.locator('qa-map-scene').waitFor();await assertHolePins(mp,n);
         await mp.waitForFunction(()=>{const c=CaddieCoursePrep.findCourse(CaddieCoursePrep.courseId),n=+document.querySelector('.cp-holes [aria-current]').dataset.n,h=c.holes[n-1],e=document.querySelector('qa-map-scene');return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(h.path[0],h.path.at(-1));});
       }
     }
@@ -515,7 +515,7 @@ if(require.main===module)(async()=>{
     await explore(mp,'[data-action="go"][data-view="data"]');
     const [multiDownload]=await Promise.all([mp.waitForEvent('download'),mp.locator('[data-action="export"]').click()]);const multiExport=JSON.parse(fs.readFileSync(await multiDownload.path(),'utf8'));
     assert.deepEqual(multiExport.coursePrep,multiPlans);assert.ok(!JSON.stringify(multiExport).includes('AIza'+'m'.repeat(35)));
-    // The offline shell contains every onboarded course, including future source downloads.
+    // Default favorite packs are downloaded separately from the offline shell.
     await op.locator('#cp-courses').selectOption('wianno');await mode(op,'route');await op.locator('#cp-route-map').waitFor();await op.locator('#cp-note').fill('Wianno offline');
     await op.locator('#cp-courses').selectOption('sterling-farms');await mode(op,'route');await op.locator('#cp-route-map').waitFor();
     await op.locator('#cp-courses').selectOption('wianno');assert.equal(await op.locator('#cp-note').inputValue(),'Wianno offline');
