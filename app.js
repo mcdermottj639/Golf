@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v201';
+const BUILD = 'v202';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v202', d:'2026-10-07', items:['BAG: Compact bench rows with one-tap Add to bag, replacement choices only at capacity, and expandable club notes.'] },
   { b:'v201', d:'2026-10-07', items:['BAG: Benched clubs can return to the starting bag. Choose a replacement at capacity; saved carry numbers and history are retained.'] },
   { b:'v200', d:'2026-10-02', items:['CADDIE HQ, REIMAGINED: A new visual system across the entire app, with Overview, Bag, Progress, Rounds and Coach.', 'FIND ANYTHING: Global search and a complete workspace directory, plus clear page context and back navigation.', 'YOUR NEXT MOVE: Recent sessions, direct lab access, club-history shortcuts and evidence-led summaries. Every existing number, source, insight and tracking tool is preserved.', 'RESTORABLE: The complete v199 app is saved as backup/caddie-hq-v199-2026-10-02.'] },
   { b:'v199', d:'2026-10-02', items:['CLEANER SECTIONS: Compact Sections menu beside the page shortcuts; clear chevrons and remembered folding for existing panels too.', 'MORE ROOM FOR YOUR NUMBERS: Compact expandable conditions and a foldable Today focus card.', 'BETTER NAVIGATION: Distinct tab icons, shortcuts to existing foldable panels, and section boundaries that keep neighboring cards accessible.'] },
@@ -3296,6 +3297,7 @@ function clubPill(c){
 }
 // The roster row: what it is, what it is, what it measures, and where it stands.
 function clubRow(c){
+  if(c.status === 'backup') return benchRow(c);
   const [pill, pcls] = clubPill(c);
   const row = carryRow(c);
   const mismatch = c.cat === 'putter' && c.flow === 'toe' && S.profile.stroke === 'SBST';
@@ -3309,7 +3311,7 @@ function clubRow(c){
       ${Array.isArray(c.activeMembers) ? `<p class="sm">Active: ${c.activeMembers.map(esc).join(', ')}</p>` : ''}
       ${c.note ? expandable(c.note) : ''}
       ${['gaming','ordered'].includes(c.status) && physicalClubCount(c)>0 ? `<div class="formrow" style="margin-top:8px">${rosterMembers(c) ? `<select aria-label="Iron to remove" id="bench-${esc(c.id)}">${rosterMembers(c).map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select>` : ''}<button class="btn" data-action="bench-club" data-id="${esc(c.id)}">Remove from bag</button></div>` : ''}
-      ${c.status === 'backup' && physicalClubCount(c)>0 ? `<div class="formrow" style="margin-top:8px"><select aria-label="Club to replace" id="restore-${esc(c.id)}"><option value="">${activeBagCount()+physicalClubCount(c)>14 ? 'Choose a club to replace' : 'Use an open spot'}</option>${replacementOptions().map(o=>`<option value="${esc(o.value)}">Replace ${esc(o.label)}</option>`).join('')}</select><input id="restore-label-${esc(c.id)}" aria-label="Playing label" placeholder="Playing label if needed (e.g. 4H)"><button class="btn" data-action="start-club" data-id="${esc(c.id)}">Move to starters</button></div>` : ''}
+
       ${c.futureFit ? futureFitReference(c.futureFit) : ''}
           ${c.pingAdapter ? pingHybridReference(c.pingAdapter) : ''}
       ${mismatch ? `<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>` : ''}
@@ -3323,6 +3325,26 @@ function clubRow(c){
            <div class="sm faint">Groove life ${groovePct(c)}% · ${c.rounds || 0} rounds</div>` : ''}
     </div>
     <div class="cp"><span class="pill ${pcls}">${esc(pill)}</span></div>
+  </div>`;
+}
+// Bench uses the full card width on phones; rarely needed fields stay out of the scan.
+function benchRow(c){
+  const physical=physicalClubCount(c)>0;
+  const full=activeBagCount()+physicalClubCount(c)>14;
+  const mismatch=c.cat==='putter' && c.flow==='toe' && S.profile.stroke==='SBST';
+  const details=[c.note ? expandable(c.note) : '',
+    c.futureFit ? futureFitReference(c.futureFit) : '',
+    c.pingAdapter ? pingHybridReference(c.pingAdapter) : '',
+    mismatch ? '<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>' : '',
+    Array.isArray(c.activeMembers) && c.activeMembers.length ? `<p class="sm">Set: ${c.activeMembers.map(esc).join(', ')}</p>` : ''
+  ].join('');
+  const button=`<button class="btn bench-add" data-action="start-club" data-id="${esc(c.id)}">Add to bag</button>`;
+  return `<div class="bench-item" data-club-id="${esc(c.id)}">
+    <div class="bench-heading"><div class="bench-name"><div class="cn">${esc(c.name)}</div><div class="cs">${esc(clubSpecLine(c) || clubType(c))}</div></div>
+      ${physical && !full ? button : ''}</div>
+    ${physical && full ? `<details class="bench-swap"><summary>Swap into bag</summary><div class="bench-swap-fields"><label for="restore-${esc(c.id)}">Replace a club</label><select id="restore-${esc(c.id)}"><option value="">Choose a starter</option>${replacementOptions().map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('')}</select>${button}</div></details>` : ''}
+    ${physical ? `<div class="bench-label" id="restore-label-wrap-${esc(c.id)}" hidden><label for="restore-label-${esc(c.id)}">Club label for shot tracking</label><input id="restore-label-${esc(c.id)}" placeholder="e.g. 4H or 7-iron"></div><p class="sm warn bench-error" id="restore-error-${esc(c.id)}" role="status" hidden></p>` : ''}
+    ${details ? `<details class="bench-notes"><summary>Club details${mismatch ? ' · stroke fit note' : ''}</summary>${details}</details>` : ''}
   </div>`;
 }
 // ----- Grinds & bounce -----
@@ -10569,8 +10591,17 @@ const ACTIONS = {
   'start-club': el => {
     const replacement = document.getElementById('restore-' + el.dataset.id)?.value || '';
     const error = startClub(el.dataset.id, replacement, document.getElementById('restore-label-' + el.dataset.id)?.value.trim() || '');
-    if(error) return toast(error);
-    save(); rerender(); toast('Moved to starters · saved carries restored');
+    if(error){
+      const message=document.getElementById('restore-error-' + el.dataset.id);
+      if(message){ message.textContent=error; message.hidden=false; }
+      if(error.includes('playing label')){
+        const wrapper=document.getElementById('restore-label-wrap-' + el.dataset.id);
+        if(wrapper) wrapper.hidden=false;
+        document.getElementById('restore-label-' + el.dataset.id)?.focus();
+      }
+      return toast(error);
+    }
+    save(); rerender(); toast('Added to bag · saved carries restored');
   },
   'show-add-club': () => { $('#addClubForm').style.display='block'; $('#clNa').focus(); },
   'add-club': () => {

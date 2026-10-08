@@ -3418,7 +3418,12 @@ activeMembers tracks a partial set without pretending it is one club. Add a club
 can replace one active member atomically. Reject changes exceeding 14 active/ordered
 physical clubs including putter; balls/accessories count zero. Rejection must not
 mutate either store. Backup/wishlist additions remain allowed at capacity.
-Benched equipment exposes Move to starters and an optional replacement selector.
+Benched equipment uses full-width compact benchRow entries (v202). Add to bag is
+one tap when there is room. At capacity, Swap into bag expands a full-width replacement
+selector. Notes and adapter charts remain in Club details; the custom playing-label
+field appears only when identity inference needs help. Inline validation keeps errors
+beside the affected club. Do not restore the three-column type/name/pill bench layout
+or display the replacement and label fields on every row.
 startClub reuses the atomic add validation, retains the equipment ID and restores
 savedCarries (including measurement provenance). Full bags require a replacement;
 validation failures leave both stores untouched. Empty iron-set containers cannot

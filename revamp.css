@@ -681,3 +681,20 @@ body.night .sheet.card { background: var(--card); border-radius: 22px 22px 0 0; 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; animation-duration: 0s !important; }
 }
+
+/* Compact bench: one primary action, details and swap controls on demand. */
+.bench-item { padding: 14px 0; border-top: 1px solid var(--line); }
+.bench-heading { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+.bench-name { min-width: 0; }
+.bench-name .cn { font-size: 14px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+.bench-name .cs { font-size: 11px; color: var(--faint); margin-top: 3px; overflow-wrap: anywhere; }
+.bench-item .bench-add { flex: none; min-height: 44px; padding: 9px 12px; font-size: 12px; white-space: nowrap; }
+.bench-notes, .bench-swap { margin-top: 8px; }
+.bench-notes > summary, .bench-swap > summary { cursor: pointer; padding: 8px 0; font-size: 12px; color: var(--gtext); }
+.bench-swap > summary { font-weight: 700; }
+.bench-swap-fields { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 4px 0 8px; }
+.bench-item select, .bench-item input { width: 100%; min-width: 0; box-sizing: border-box; font-size: 16px; }
+.bench-label { margin-top: 8px; }
+.bench-item label { display: block; font-size: 12px; margin-bottom: 5px; }
+.bench-notes .sm { font-size: 12px; }
+.bench-error { margin: 8px 0 0; }
