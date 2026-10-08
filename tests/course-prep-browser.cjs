@@ -27,12 +27,22 @@ const mode=async(p,m)=>{
   if(!await p.locator('.cp-map-views').count())await p.locator('.cp-modes [data-mode="map"]').click();
   await p.locator('.cp-map-views [data-mode="'+m+'"]').click();
 };
+function cameraAtTee({n,direct=false}={}) {
+  const c=CaddieCoursePrep.findCourse(CaddieCoursePrep.courseId);
+  n=n||Number(document.querySelector('.cp-holes [aria-current]')?.dataset.n);
+  const h=c.holes[n-1],scene=document.querySelector('qa-map-scene');if(!h?.path||!scene)return false;
+  const plan=CaddieCoursePrep.clean(JSON.parse(localStorage.caddiehq_v1).coursePrep?.[c.storageKey],c.id);
+  const tee=plan.holes[plan.tee+':'+n]?.tee||h.path[0];
+  const landing=Array.from(document.querySelectorAll('qa-map-marker')).find(m=>m.label?.endsWith(' yd carry'))?.position;
+  const aim=landing?[landing.lat,landing.lng]:h.path.at(-1);
+  return Math.abs((direct?scene.heading:scene.lastFlight?.endCamera.heading)-CaddieCoursePrep.geo.bearing(tee,aim))<0.00001;
+}
 async function assertHolePins(p,n){
   const pins=await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>({point:[e.position.lat,e.position.lng],label:e.label})));
   const expected=await p.evaluate(n=>{const c=CaddieCoursePrep.findCourse(CaddieCoursePrep.courseId),s=JSON.parse(localStorage.caddiehq_v1).coursePrep?.[c.storageKey]||{tee:c.defaultTee,holes:{}},h=c.holes[n-1],saved=s.holes?.[s.tee+':'+n]||{};return [saved.tee||h.path[0],h.path.at(-1),...(saved.target?[saved.target]:[])];},n);
-  assert.deepEqual(pins.map(p=>p.point),expected,'only current-hole pin positions for hole '+n);
+  assert.deepEqual(pins.filter(p=>!p.label.endsWith(' yd carry')).map(p=>p.point),expected,'only current-hole pin positions for hole '+n);
   assert.equal(pins[0].label,'Tee');
-  assert.ok(await p.evaluate(()=>mapQA.markersCreated<=3),'3D retains at most three marker identities');
+  assert.ok(await p.evaluate(()=>mapQA.markersCreated<=4),'3D retains at most four marker identities');
   assert.ok(await p.evaluate(()=>mapQA.markerDetach.every(connected=>connected)),'markers unregister before their map is detached');
 }
 function googleMock(){
@@ -83,7 +93,8 @@ if(require.main===module)(async()=>{
     assert.equal(await p.locator('.cp-simple-view').getAttribute('aria-pressed'),'true');
     assert.equal(googleRequests,0,'keyless Interactive map opens Simple map without Google');
     assert.equal(await p.locator('.cp-clubs [data-club]').count(),initial.carries.length);
-    assert.equal(await p.locator('#cp-club-readout .cp-distances').count(),0,'no misleading zero-distance target before a landing spot exists');
+    assert.match(await p.locator('#cp-club-readout .cp-distances').innerText(),/projected carry/,'unsaved landing is explicitly a projection');
+    assert.equal(await p.locator('[data-point="target"]').count(),0,'suggestion never creates a saved target');
     // Stream only the JPEG's first rows: dimensions exist before the image is
     // complete, which previously exposed the top-strip failure from the phone.
     const guideSource=await p.evaluate(url=>{const h=CADDIE_PREP_COURSES[0].holes[0],old=h.guide;h.guide=url+'qa-guide?partial';return old;},url);
@@ -155,7 +166,7 @@ if(require.main===module)(async()=>{
     await p.locator('[data-cp="rings"]').click();assert.equal(await p.locator('.cp-carry-ring').count(),0);await p.locator('[data-cp="rings"]').click();assert.ok(await p.locator('.cp-carry-ring').count());
     for(const width of [320,390,1440]){await p.setViewportSize({width,height:width===1440?1000:844});assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));await p.locator('.cp-plan-card').first().screenshot({path:path.join(screens,'shot-plan-'+width+'.png')});}
     await p.setViewportSize({width:390,height:844});
-    await p.locator('[data-cp="edit"][data-kind="tee"]').click();await p.locator('#cp-route-map').click({position:{x:140,y:85}});
+    await p.locator('[data-cp="edit"][data-kind="tee"]').click();await p.locator('#cp-route-map').click({position:{x:140,y:340}});
     assert.ok((await state(p)).coursePrep.poundRidge.holes['granite:1'].tee);
     await p.locator('#cp-round-plan summary').click();assert.equal(await p.locator('.cp-plan-table [data-n="1"] > span:last-child').innerText(),note);
     await p.locator('.cp-holes [data-n="15"]').click();assert.match(await p.locator('.cp-hole-heading').innerText(),/Par 3 · 144 yd/);
@@ -199,7 +210,7 @@ if(require.main===module)(async()=>{
     await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="map"]').getAttribute('aria-pressed'),'true','next hole retains the interactive map');await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.scenes),1,'reuse 3D map');
     for(let n=1;n<=18;n++){
       await p.locator('.cp-holes [data-n="'+n+'"]').click();await mode(p,'3d');
-      await p.waitForFunction(n=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[n-1];return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge.holes['granite:'+n]?.tee||h.path[0],h.path.at(-1));},n);
+      await p.waitForFunction(cameraAtTee,{n});
       const cam=await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera);
       assert.equal(cam.tilt,58);assert.equal(cam.roll,0);assert.equal(cam.altitudeMode,'RELATIVE_TO_GROUND');assert.equal(cam.center.altitude,0);
       await assertHolePins(p,n);
@@ -207,7 +218,7 @@ if(require.main===module)(async()=>{
     await p.locator('[data-cp="frame"][data-focus="green"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.range===190);
     await p.locator('[data-cp="frame"][data-focus="tee"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.tilt===58);
     await p.locator('.cp-holes [data-n="2"]').click();await mode(p,'3d');
-    await p.waitForFunction(()=>document.querySelector('qa-map-scene')?.lastFlight.endCamera.heading===CaddieCoursePrep.geo.bearing(CADDIE_PREP_COURSES[0].holes[1].path[0],CADDIE_PREP_COURSES[0].holes[1].path.at(-1)));
+    await p.waitForFunction(cameraAtTee,{n:2});
     // An asynchronous animation failure must not remove a usable map or its yardages.
     const beforeCameraFailure=await state(p);
     await p.evaluate(()=>mapQA.failCamera=true);
@@ -217,11 +228,11 @@ if(require.main===module)(async()=>{
     assert.ok(await p.locator('qa-map-marker').count()>=2);
     assert.deepEqual(await state(p),beforeCameraFailure,'camera fallback preserves golf data');
     await p.locator('.cp-holes [data-n="3"]').click();await mode(p,'3d');
-    await p.waitForFunction(()=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[2];return e?.heading===CaddieCoursePrep.geo.bearing(h.path[0],h.path.at(-1));});
+    await p.waitForFunction(cameraAtTee,{n:3,direct:true});
     assert.equal(await p.locator('#cp-map-stage .cp-map-message').count(),0,'initial framing failure leaves map usable');
     await p.evaluate(()=>mapQA.failCamera=false);
     await p.locator('.cp-holes [data-n="2"]').click();await mode(p,'3d');
-    await p.waitForFunction(()=>document.querySelector('qa-map-scene')?.lastFlight.endCamera.heading===CaddieCoursePrep.geo.bearing(CADDIE_PREP_COURSES[0].holes[1].path[0],CADDIE_PREP_COURSES[0].holes[1].path.at(-1)));
+    await p.waitForFunction(cameraAtTee,{n:2});
     await p.locator('qa-map-scene').dispatchEvent('gmp-error');assert.match(await p.locator('#cp-map-stage').innerText(),/3D could not initialize/);
     await mode(p,'route');await p.locator('[data-cp="next"]').click();await mode(p,'3d');await p.locator('qa-map-scene').waitFor();
     await p.evaluate(()=>window.gm_authFailure());assert.match(await p.locator('#cp-map-stage').innerText(),/Google rejected/);
@@ -294,7 +305,7 @@ if(require.main===module)(async()=>{
       assert.deepEqual(await p.locator('.cp-imagery-views button').allTextContents(),['3D']);
       assert.equal(await p.locator('.cp-imagery-views [data-mode="3d"]').getAttribute('aria-pressed'),'true');
       assert.equal(await p.locator('[data-cp="shot-plan"]').count(),0);
-      await p.waitForFunction(n=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[n-1],s=JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge;return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(s.holes[s.tee+':'+n]?.tee||h.path[0],h.path.at(-1));},n);
+      await p.waitForFunction(cameraAtTee,{n});
       await assertHolePins(p,n);
       const liveYardages=await p.locator('.cp-map-summary').innerText();
       await mode(p,'3d');await p.locator('.cp-google-map').waitFor();assert.equal(await p.locator('.cp-map-summary').innerText(),liveYardages);
@@ -322,7 +333,7 @@ if(require.main===module)(async()=>{
     assert.match(await p.locator('.cp-map-summary').innerText(),/180 yd[\s\S]*left to green/);
     assert.deepEqual((await state(p)).live,liveBeforeMeasurement,'target edits never change the live scorecard');
     await assertHolePins(p,18);
-    await p.locator('[data-cp="clear-target"]').click();await assertHolePins(p,18);assert.equal(await p.locator('qa-map-marker').count(),2,'clearing a target removes its pin');
+    await p.locator('[data-cp="clear-target"]').click();await assertHolePins(p,18);assert.equal(await p.locator('qa-map-marker').count(),3,'clearing a target removes its pin but retains the carry preview');
     await p.locator('qa-map-scene').evaluate((el,point)=>{const e=new Event('gmp-click');e.position={lat:point[0],lng:point[1]};el.dispatchEvent(e);},liveTarget);
     await assertHolePins(p,18);
     const beforeLiveGPS=await state(p);
@@ -480,7 +491,7 @@ if(require.main===module)(async()=>{
       assert.equal(await mp.locator('#cp-note').inputValue(),'Independent '+id+' plan');await assertHolePins(mp,1);
       for(const n of [2,9,12,18]){
         await mp.locator('.cp-holes [data-n="'+n+'"]').click();await mode(mp,'3d');await mp.locator('qa-map-scene').waitFor();await assertHolePins(mp,n);
-        await mp.waitForFunction(()=>{const c=CaddieCoursePrep.findCourse(CaddieCoursePrep.courseId),n=+document.querySelector('.cp-holes [aria-current]').dataset.n,h=c.holes[n-1],e=document.querySelector('qa-map-scene');return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(h.path[0],h.path.at(-1));});
+        await mp.waitForFunction(cameraAtTee);
       }
     }
     const multiPlans=(await state(mp)).coursePrep,multiCalls=(await state(mp)).planCalls;

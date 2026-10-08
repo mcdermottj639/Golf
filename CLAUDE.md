@@ -125,7 +125,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v227, October 8 2026)
+## Course Prep (v229, October 8 2026)
 
 Rounds leads with **Explore courses**. Generic entry opens the nearest supported course using the same saved `S.here` location as Live Round. The picker sorts by straight-line distance and labels miles. Explicit course links keep their intended course; hole navigation and redraws never auto-select another course. Use my location refreshes the shared fix on a deliberate tap; a late callback must not interrupt navigation. No location means stable catalog order. Reset view beside the map-style controls returns 3D to its starting tee camera and Simple map to the focused hole without clearing targets or notes. Browser double-tap zoom is disabled with `touch-action:manipulation`, retaining pinch zoom and scrolling. The picker contains Pound Ridge, Wianno and
 Sterling Farms plus Metedeconk. The first three have 18 holes each; Metedeconk has
@@ -217,11 +217,25 @@ was a design direction; shipped playable shapes must come from source geometry.
 `mapReady:false`. A failed external image can offer the generated guide when available.
 v226 restores Full hole (100%) as the default for every newly opened guide in prep
 and live dialogs. The v225 140% default was rejected because it disrupted the working
-guides. Keep zoom optional (100–240%), below the illustration; Full hole restores all
+guides. Keep zoom optional (100–240%) in a compact single row above the illustration; Full hole restores all
 image edges. Use actual scrollable dimensions, not clipped transforms, and preserve
 the original aspect ratio. Zoom/scroll must never write golf state or reload images.
 At 100%, both kinds of guide fit fully; SVG masks/filters use an explicit user-space
 frame so near-vertical holes do not collapse into a narrow strip.
+
+Par 4/5 interactive maps derive a tee-shot preview without saving state: explicit club
+choice first, a matching undated course-plan recommendation second, otherwise the
+longest available carry at/below a saved target or 30 yards short of the mapped green
+(shortest measured club if none fit). This is a distance-only starting suggestion,
+not a hazard/dispersion/conditions optimizer. Unset saved club carries remain unset.
+Carry landing uses a straight shot aimed at the saved target or the first intersection
+of a carry-radius circle with the mapped route, never cumulative dogleg length.
+Show the club selector, carry circle and separate projected marker on opening; retain
+saved target pins independently. Par 3s and holes without verified geometry have no
+automatic tee preview. Active GPS measurement pauses it, preserving current-position
+yardages. The starting/Reset 3D camera frames the tee and projected landing; Whole hole
+still shows the full route. Club changes update overlays without resetting the camera.
+Opening, navigation and suggestions never write `S.planCalls` or course notes/targets.
 
 The prep workspace is map-first: a compact app header and course picker, then the hole heading,
 previous/next buttons and guide/map surface. Hole browsing and review progress sit
@@ -229,7 +243,7 @@ below the map. Course/tee settings, shot planning and notes follow on phones and
 beside the map on desktop. Downloads, the full-round plan, Google setup and sources
 are secondary sections; downloads start collapsed. Do not reintroduce a tall hero,
 download card, tee settings or full hole grid above the map. Measurement-origin
-controls, guide styles and optional guide zoom also follow the visual. `body.cpfocus`
+controls and guide styles follow the visual; compact guide zoom controls precede it. `body.cpfocus`
 compacts only the Course Prep shell; keep its back, search and theme controls. Verify the actual artwork
 and map surface appear in the first phone viewport at 320 and 390 pixels.
 
@@ -279,8 +293,8 @@ Enable Maps JavaScript API + billing and restrict the browser key to that API an
 `caddiehq_google_maps_key_v1`, outside golf backups; deployments can alternatively
 provide `window.CADDIE_GOOGLE_MAPS_KEY`. Do not commit an unrestricted key. Map objects
 are reused, asynchronous loads have navigation guards, and leaving a hole cancels
-its flyover. 3D owns a maximum of three reusable Marker3DElements (measuring origin,
-green and optional target); update their positions/labels for the current hole rather
+its flyover. 3D owns a maximum of four reusable Marker3DElements (measuring origin,
+green, optional saved target and optional projected carry landing); update their positions/labels for the current hole rather
 than create a new set on every GPS/target update. Keep a separate registry of route/ring
 lines. Clear owned overlays before detaching the map on redraw, view/hole navigation,
 error or dialog close, while Google's renderer can still unregister them. Clearing a
@@ -290,10 +304,10 @@ map detach in both prep and live dialogs. The real Google SDK 3.66.7 accepts mar
 reuse and position/label clearing with null; it rejects an empty-string label. Keep
 that contract in the browser mock. API validation without a key does not certify
 licensed imagery on the phone. The selected target has a distance-to-target / distance-left-to-green label
-in all three mapped modes. Before a target is chosen, the mapped green shows its
-distance from the active reference. 3D uses only the existing Marker3DElement label;
-Satellite uses a standard Marker label with labelOrigin; no custom PinElement dependency.
-Satellite and 3D use greedy gesture handling for one-finger panning; pinch zoom remains
+in both interactive map modes. Before a target is chosen, the mapped green shows its
+distance from the active reference. 3D uses only the existing Marker3DElement label,
+with no custom PinElement dependency. Overhead/Satellite was removed in v224.
+3D uses greedy gesture handling for one-finger panning; pinch zoom remains
 available. The caption explains that swiping outside the map scrolls the page, and
 **Shot plan ↓** scrolls to club choices without changing map, target or location state.
 The controls also retain the numeric distances; carry rings can be hidden. Whole hole and

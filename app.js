@@ -99,13 +99,15 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v227';
+const BUILD = 'v229';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v229', d:'2026-10-08', items:['GUIDE ZOOM AT THE TOP: Compact minus, plus and Full hole controls sit above every guide in Course Prep and live rounds. Full hole remains the starting view.'] },
+  { b:'v228', d:'2026-10-08', items:['TEE SHOT PREVIEW: Par 4 and par 5 maps open with your saved or suggested club, carry ring and projected landing marker. Change club directly on the map; the 3D starting view and Reset view frame the tee shot. Suggestions never replace saved targets or club choices.'] },
   { b:'v227', d:'2026-10-08', items:['NEAREST COURSE FIRST: Course Prep opens the closest course using your saved location, with distances and a location refresh beside the picker. Specific course links still open that course.','RESET VIEW: Return the interactive map to its starting view in prep or live rounds. TOUCH CONTROLS: Disable browser double-tap zoom while keeping pinch zoom and scrolling available.'] },
   { b:'v226', d:'2026-10-08', items:['MAPS FIRST: Course Prep opens straight to the hole guide and map, with hole browsing, tee settings and planning below. Downloads are in a compact expandable section.','FULL HOLE BY DEFAULT: Guides open at 100%; zoom remains optional. Changing holes keeps your selected guide or interactive map view, including 3D or Simple map.'] },
   { b:'v225', d:'2026-10-08', items:['CLOSER HOLE GUIDES: All club illustrations and Caddie HQ guides open at 140% with zoom controls, scrolling and a Full hole reset in prep and live rounds.'] },
@@ -11637,6 +11639,11 @@ function initCoursePrep(){
         rangeTotal:measured ? recent?.values.total?.value ?? null : null,
         provenance:measured ? recent ? 'Range · ' + recent.date + ' · ' + (recent.values.carry.n || 'unknown') + ' shots · ' + (recent.setup || recent.label) : 'No range carry recorded' : provenance};
       });
+    },
+    recommendedClub: (id,n) => {
+      const source=window.CaddieCoursePrep.findCourse(id);
+      const plans=preferExact(S.briefings.filter(b=>b.course&&!b.date&&courseMatches(b.course,source.name)),source.name,b=>b.course);
+      return plans.find(b=>b.holes?.some(h=>h.n===n&&h.club?.length))?.holes.find(h=>h.n===n)?.club?.[0]||'';
     },
     club: (id,n) => (S.planCalls?.[planKey({course:window.CaddieCoursePrep.findCourse(id)?.name})]?.[n]?.club || [])[0] || '',
     setClub: (id,n, key) => {
