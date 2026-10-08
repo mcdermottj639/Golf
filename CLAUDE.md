@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v204, October 8 2026)
+## Course Prep (v205, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
 Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
@@ -146,6 +146,10 @@ sections; older feed records remain byte-for-byte intact. `fetchFeed()` loads
 scorecard tee changes yardage, not the start of the route. Users can set their actual
 tee. Source geometry, IDs, ODbL attribution and licensing live in `data/course-prep/`.
 Official hole illustrations load from the club and are not cached or rehosted.
+The Hole guide is the initial view on entry and every hole change (arrows, numbered
+holes, plan rows and overview map). Other views remain explicit choices for that hole.
+Google reconnect alone restores the requested map view so Retry still retries Maps.
+If the illustration cannot load, its fallback offers the offline course map.
 
 Google Maps loads only when Satellite or Google 3D is selected with a key configured.
 Enable Maps JavaScript API + billing and restrict the browser key to that API and

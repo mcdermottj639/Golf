@@ -11,7 +11,7 @@ const server=http.createServer((req,res)=>{
 });
 const state=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('caddiehq_v1')));
 const ready=p=>p.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('pound-ridge-visual-prep-briefing-20261008-v1'));
-async function prep(p){await p.locator('#nav [data-view="rounds"]').click();await p.locator('[data-action="open-course-prep"]').first().click();await p.locator('#cp-route-map').waitFor();}
+async function prep(p){await p.locator('#nav [data-view="rounds"]').click();await p.locator('[data-action="open-course-prep"]').first().click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true','guide opens first');await mode(p,'route');await p.locator('#cp-route-map').waitFor();}
 async function explore(p,selector){await p.locator('.hq-search-trigger:visible').first().click();await p.locator('.hq-explorer-link'+selector).first().click();}
 const mode=(p,m)=>p.locator('.cp-modes [data-mode="'+m+'"]').click();
 function googleMock(){
@@ -61,7 +61,7 @@ function googleMock(){
     await p.locator('.cp-holes [data-n="15"]').click();assert.match(await p.locator('.cp-hole-heading').innerText(),/Par 3 · 144 yd/);
     await p.locator('.cp-holes [data-n="1"]').click();assert.equal(await p.locator('#cp-note').inputValue(),note);
     await p.locator('#cp-tees').selectOption('oak');assert.equal(await p.locator('#cp-note').inputValue(),'');await p.locator('#cp-tees').selectOption('granite');assert.equal(await p.locator('#cp-note').inputValue(),note);
-    await p.locator('[data-cp="overview"]').click();assert.equal(await p.locator('[data-cp="map-hole"][role="button"]').count(),18);await p.locator('[data-cp="map-hole"][data-n="18"]').press('Enter');assert.match(await p.locator('.cp-hole-heading').innerText(),/Hole 18/);
+    await mode(p,'route');await p.locator('[data-cp="overview"]').click();assert.equal(await p.locator('[data-cp="map-hole"][role="button"]').count(),18);await p.locator('[data-cp="map-hole"][data-n="18"]').press('Enter');assert.match(await p.locator('.cp-hole-heading').innerText(),/Hole 18/);
     await p.locator('.cp-holes [data-n="1"]').click();
     const saved=(await state(p)).coursePrep;
     await p.reload();await ready(p);await prep(p);assert.deepEqual((await state(p)).coursePrep,saved);assert.equal(await p.locator('#cp-note').inputValue(),note);
@@ -71,9 +71,9 @@ function googleMock(){
     await p.locator('#cp-api-key').fill('AIza'+'x'.repeat(35));await p.locator('[data-cp="key-save"]').click();await p.locator('qa-map-scene').waitFor();
     assert.equal(googleRequests,1);assert.ok(await p.locator('qa-map-line').count()>=3);
     const framed=await p.evaluate(()=>mapQA.flights);await p.locator('[data-cp="fly"]').click();assert.equal(await p.evaluate(()=>mapQA.flights),framed+1);await p.locator('qa-map-scene').dispatchEvent('gmp-animationend');assert.equal(await p.evaluate(()=>mapQA.flights),framed+2);
-    await p.locator('[data-cp="next"]').click();await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.scenes),1,'reuse 3D map');
+    await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true');await mode(p,'3d');await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.scenes),1,'reuse 3D map');
     await p.locator('qa-map-scene').dispatchEvent('gmp-error');assert.match(await p.locator('#cp-map-stage').innerText(),/3D could not initialize/);
-    await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();await p.locator('[data-cp="next"]').click();await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.maps),1,'reuse satellite map');
+    await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true');await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.maps),1,'reuse satellite map');
     await p.evaluate(()=>window.gm_authFailure());assert.match(await p.locator('#cp-map-stage').innerText(),/Google rejected/);
     await Promise.all([p.waitForEvent('load',{timeout:5000}),p.locator('#cp-map-stage [data-cp="retry"]').click()]);
     await p.locator('.cp-google-map').waitFor();assert.equal(googleRequests,2,'retry must request a fresh Google session');

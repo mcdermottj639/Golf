@@ -41,7 +41,7 @@
     }
     return out;
   }
-  let bridge, root, hole = 1, mode = 'route', overview = false, edit = 'target';
+  let bridge, root, hole = 1, mode = 'guide', overview = false, edit = 'target';
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps2d, maps3d, overlays2d = [];
   let googleAuthFailed = false;
   let projection = null, imageError = false, animationHandler, animationTimer, bagSnapshot;
@@ -128,7 +128,7 @@
       '<p>' + link(course.source, 'Official scorecard') + ' · ' + link(course.tour, 'Official hole guides') + ' · ' + link('https://www.openstreetmap.org/copyright', '© OpenStreetMap contributors · ODbL') + ' · <a href="./data/course-prep/pound-ridge-osm.json" download>Map source data</a></p></details></div>';
   }
   function redraw() { bridge.refresh(); }
-  function changeHole(n) { if (!Number.isInteger(n) || n < 1 || n > 18) return; stopFlyover(); hole = n; imageError = false; overview = false; redraw(); }
+  function changeHole(n) { if (!Number.isInteger(n) || n < 1 || n > 18) return; stopFlyover(); hole = n; mode = 'guide'; imageError = false; overview = false; redraw(); }
   function stopFlyover() {
     if (animationHandler && maps3d) maps3d.removeEventListener('gmp-animationend', animationHandler);
     animationHandler = null;
@@ -414,7 +414,7 @@
   }
   window.CaddieCoursePrep = Object.freeze({
     init: options => {bridge=options;}, render, mount, unmount, teaser, resumeAfterReload,
-    openHole: n => {hole=Number.isInteger(+n)&&+n>=1&&+n<=18?+n:1;overview=false;},
+    openHole: n => {hole=Number.isInteger(+n)&&+n>=1&&+n<=18?+n:1;mode='guide';imageError=false;overview=false;},
     courseName: course.name, clean,
     geo: Object.freeze({distance,destination,bearing,pointOK})
   });

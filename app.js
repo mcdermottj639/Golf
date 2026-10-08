@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v204';
+const BUILD = 'v205';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v205', d:'2026-10-08', items:['HOLE GUIDE FIRST: Every hole opens with its official illustrated guide. Course map, Satellite and Google 3D remain one tap away.'] },
   { b:'v204', d:'2026-10-08', items:['GOOGLE MAPS RECONNECT: Reload & retry starts a fresh Google session after key, billing or website settings change, returning to the same hole and map view. Reconnecting the same previously rejected key also retries cleanly. Saved plans and golf records are retained.'] },
   { b:'v203', d:'2026-10-08', items:['POUND RIDGE COURSE PREP: All 18 official hole guides, seven tee cards, an offline route map, current-bag carry rings, editable tee/target positions, rollout scenarios and saved hole notes. Google satellite and 3D flyovers connect with your restricted Maps key.', 'VERIFIED COURSE CARD: Official Pound Ridge tee yardages and men’s ratings replace older third-party values. Existing rounds, club records and your personal plan calls remain intact.'] },
   { b:'v202', d:'2026-10-07', items:['BAG: Compact bench rows with one-tap Add to bag, replacement choices only at capacity, and expandable club notes.'] },
