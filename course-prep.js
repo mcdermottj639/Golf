@@ -67,10 +67,10 @@
   const usesArt = (source,h) => canDrawGuide(source,h) && (guideStyle==='caddie' || !h.guide || navigator.onLine===false);
   const guideChoices = (source,h) => h.guide && canDrawGuide(source,h) ? '<div class="cp-guide-styles" role="group" aria-label="Guide style">'+button('guide-style','Club illustration','data-style="club" aria-pressed="'+!usesArt(source,h)+'"')+button('guide-style','Caddie HQ guide','data-style="caddie" aria-pressed="'+usesArt(source,h)+'"')+'</div>' : '';
   const guideCaption = (source,h) => usesArt(source,h) ? 'Illustrated overview · not to scale · incomplete hazard coverage. '+link('https://www.openstreetmap.org/copyright','© OpenStreetMap contributors') : 'Official club illustration · not to scale. '+link(source.tour,'Open course guide ↗');
-  const guideContent = (source,h,live=false) => guideChoices(source,h)+'<div class="cp-guide-zoom" style="--guide-scale:1.4"><div class="cp-guide-zoom-tools" role="group" aria-label="Hole guide zoom"><button type="button" data-guide-zoom="out" aria-label="Zoom out hole guide">−</button><output aria-live="polite">140%</output><button type="button" data-guide-zoom="in" aria-label="Zoom in hole guide">+</button><button type="button" data-guide-zoom="full">Full hole</button><span>Scroll to explore</span></div><div class="cp-guide-viewport" tabindex="0" aria-label="Zoomed hole guide; scroll to explore"><div class="cp-guide-zoom-content">'+(usesArt(source,h) ? window.CaddieHoleGuide.render(source,h) : guideFigure(source,h,live))+'</div></div></div>';
+  const guideContent = (source,h,live=false) => '<div class="cp-guide-zoom" style="--guide-scale:1"><div class="cp-guide-viewport" tabindex="0" aria-label="Full hole guide"><div class="cp-guide-zoom-content">'+(usesArt(source,h) ? window.CaddieHoleGuide.render(source,h) : guideFigure(source,h,live))+'</div></div>'+guideChoices(source,h)+'<div class="cp-guide-zoom-tools" role="group" aria-label="Hole guide zoom"><button type="button" data-guide-zoom="out" aria-label="Zoom out hole guide" disabled>−</button><output aria-live="polite">100%</output><button type="button" data-guide-zoom="in" aria-label="Zoom in hole guide">+</button><button type="button" data-guide-zoom="full">Full hole</button><span>Zoom for detail</span></div></div>';
   function setupGuideZoom(container) {
     const wrap=container.querySelector('.cp-guide-zoom');if(!wrap)return;
-    const viewport=wrap.querySelector('.cp-guide-viewport');let zoom=1.4;
+    const viewport=wrap.querySelector('.cp-guide-viewport');let zoom=1;
     function apply(next,initial=false){
       const x=initial ? .5 : (viewport.scrollLeft+viewport.clientWidth/2)/viewport.scrollWidth;
       const y=initial ? .5 : (viewport.scrollTop+viewport.clientHeight/2)/viewport.scrollHeight;
@@ -79,6 +79,8 @@
       wrap.querySelector('output').textContent=Math.round(zoom*100)+'%';
       wrap.querySelector('[data-guide-zoom="out"]').disabled=zoom===1;
       wrap.querySelector('[data-guide-zoom="in"]').disabled=zoom===2.4;
+      wrap.querySelector('.cp-guide-zoom-tools span').textContent=zoom===1?'Zoom for detail':'Scroll to explore';
+      viewport.setAttribute('aria-label',zoom===1?'Full hole guide':'Zoomed hole guide; scroll to explore');
       viewport.scrollLeft=x*viewport.scrollWidth-viewport.clientWidth/2;
       viewport.scrollTop=y*viewport.scrollHeight-viewport.clientHeight/2;
     }
@@ -256,13 +258,13 @@
     return '<div class="cp-modes'+(hasGuide(course,currentHole())?'':' cp-map-only')+'" role="group" aria-label="Hole view">'+
       (hasGuide(course,currentHole()) ? button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"') : '')+
       button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"')+'</div>'+mapViews()+
-      '<div class="cp-reference" id="cp-reference" hidden></div><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div>';
+      '<div class="cp-map-stage" id="cp-map-stage"></div><div class="cp-reference" id="cp-reference" hidden></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div>';
   }
   function coursePicker() {
-    return '<div class="cp-course-picker"><label for="cp-courses">Choose your course</label><select id="cp-courses">'+courses.map(c=>'<option value="'+c.id+'" '+(c.id===course.id?'selected':'')+'>'+esc(c.shortName)+' · '+esc(c.place)+'</option>').join('')+'</select></div>';
+    return '<div class="cp-course-picker"><label for="cp-courses">Course</label><select id="cp-courses">'+courses.map(c=>'<option value="'+c.id+'" '+(c.id===course.id?'selected':'')+'>'+esc(c.shortName)+'</option>').join('')+'</select></div>';
   }
   function downloads() {
-    return '<section class="cp-downloads" aria-label="Course downloads"><div><strong>'+esc(course.shortName)+' on this device</strong><span id="cp-download-status" role="status">Checking offline availability…</span></div><div class="cp-download-actions">'+button('favorite',packs?.favorite(course.id)?'★ Favorite':'☆ Favorite','aria-pressed="'+!!packs?.favorite(course.id)+'"')+button('download','Download for offline')+'</div><details><summary>Manage downloads</summary><p>Favorites stay downloaded, plus five recent courses up to 30 MB. Your scores and notes are separate. Offline includes mapped Caddie HQ guides and simple maps; Google imagery and club artwork need internet.</p><div id="cp-download-list"></div>'+button('remove-download','Remove this download')+'<p>Removing a download also removes its favorite status. Your rounds, notes and targets stay saved.</p></details></section>';
+    return '<details class="cp-downloads" id="cp-downloads"><summary>Downloads & offline access <span id="cp-download-status" role="status">Checking offline availability…</span></summary><p><strong>'+esc(course.shortName)+' on this device</strong></p><div class="cp-download-actions">'+button('favorite',packs?.favorite(course.id)?'★ Favorite':'☆ Favorite','aria-pressed="'+!!packs?.favorite(course.id)+'"')+button('download','Download for offline')+'</div><p>Favorites stay downloaded, plus five recent courses up to 30 MB. Offline includes mapped Caddie HQ guides and simple maps; Google imagery and club artwork need internet.</p><div id="cp-download-list"></div>'+button('remove-download','Remove this download')+'<p>Removing a download also removes its favorite status. Your rounds, notes and targets stay saved.</p></details>';
   }
   async function downloadStatus() {
     if(!packs||!root)return;
@@ -280,18 +282,18 @@
     bagSnapshot = null;
     const m = model(), t = teeSet(), h = currentHole(), hs = savedHole();
     const count = course.holes.filter(x => m.holes[m.tee + ':' + x.n]?.reviewed).length;
-    return '<div class="cp-workspace" id="course-prep"><button class="backlink" data-action="go" data-view="rounds" data-seg="prep">← All round prep</button>' +
-      coursePicker()+downloads()+
-      '<section class="cp-hero"><div><span class="cp-eyebrow">YOUR COURSE PLAN</span><h2 data-no-fold>'+esc(course.shortName)+'<span>Know the shot before you play it.</span></h2><p>'+course.holes.length+' holes · Par '+course.par+' · '+esc(course.place)+'</p>'+(mappedHoles().length<course.holes.length?'<p class="cp-coverage">'+mappedHoles().length+' of '+course.holes.length+' interactive hole maps ready</p>':'')+'</div>' +
-      '<div class="cp-tee-control"><label for="cp-tees">Explore from</label><select id="cp-tees">' + course.tees.map(x => '<option value="' + x.id + '" ' + (x.id === t.id ? 'selected' : '') + '>' + x.name + ' · ' + yard(x.total) + ' yd</option>').join('') +
-      '</select><span>' + (t.rating ? t.rating.toFixed(1) + ' rating · ' + t.slope + ' slope · men' : 'Rating not verified for this tee') + '</span></div></section>' +
-      '<div class="cp-progress"><span><b id="cp-reviewed-count">' + count + '/'+course.holes.length+'</b> holes reviewed</span><span id="cp-save-status" role="status" aria-live="polite">Plans saved on this device</span></div>' +
-      (course.nines ? '<div class="cp-nines" role="group" aria-label="Choose a nine">'+course.nines.map(n=>button('nine',esc(n.name)+'<span>'+n.holes[0]+'–'+n.holes.at(-1)+'</span>','data-n="'+n.holes[0]+'" aria-pressed="'+n.holes.includes(hole)+'"')).join('')+'</div>' : '')+
-      '<div class="cp-holes" role="group" aria-label="Choose a hole">' + course.holes.filter(x=>!course.nines || course.nines.find(n=>n.holes.includes(hole)).holes.includes(x.n)).map(x => '<button type="button" data-cp="hole" data-n="' + x.n + '" aria-label="Hole ' + x.n + ', par ' + x.par + '" ' + (x.n === hole ? 'aria-current="step"' : '') + ' class="' + (m.holes[m.tee + ':' + x.n]?.reviewed ? 'reviewed' : '') + '"><b>' + x.n + '</b><span>Par ' + x.par + '</span></button>').join('') + '</div>' +
-      '<div class="cp-grid"><section class="cp-map-panel"><header class="cp-hole-heading"><div><span class="cp-eyebrow">' + esc(t.name) + ' TEES</span><h3>Hole ' + hole + '<small>Par ' + h.par + ' · ' + yard(t.yards[hole - 1]) + ' yd' + (h.si ? ' · Hcp '+h.si : '') + '</small></h3></div><div class="cp-arrows">' +
+    return '<div class="cp-workspace" id="course-prep">' +
+      coursePicker()+
+      '<div class="cp-grid"><div class="cp-map-column"><section class="cp-map-panel" aria-label="Hole guide and map"><header class="cp-hole-heading"><div><span class="cp-eyebrow">' + esc(t.name) + ' TEES</span><h3>Hole ' + hole + '<small>Par ' + h.par + ' · ' + yard(t.yards[hole - 1]) + ' yd' + (h.si ? ' · Hcp '+h.si : '') + '</small></h3></div><div class="cp-arrows">' +
       button('previous', '←', 'aria-label="Previous hole" ' + (hole === 1 ? 'disabled' : '')) + button('next', '→', 'aria-label="Next hole" ' + (hole === course.holes.length ? 'disabled' : '')) + '</div></header>' +
       mapSurface() + '</section>' +
-      '<aside class="cp-plan"><section class="cp-plan-card"><span class="cp-eyebrow">THE PLAN</span><h3>' + (h.par === 3 ? 'Choose the carry.' : h.par === 5 ? 'Build it shot by shot.' : 'Pick your landing area.') + '</h3><p class="cp-prompt">' + esc(h.prompt) + '</p>' +
+      '<section class="cp-hole-browser" aria-label="Explore holes"><div class="cp-progress"><span><b id="cp-reviewed-count">' + count + '/'+course.holes.length+'</b> holes reviewed</span><span id="cp-save-status" role="status" aria-live="polite">Plans saved on this device</span></div>' +
+      (course.nines ? '<div class="cp-nines" role="group" aria-label="Choose a nine">'+course.nines.map(n=>button('nine',esc(n.name)+'<span>'+n.holes[0]+'–'+n.holes.at(-1)+'</span>','data-n="'+n.holes[0]+'" aria-pressed="'+n.holes.includes(hole)+'"')).join('')+'</div>' : '')+
+      '<div class="cp-holes" role="group" aria-label="Choose a hole">' + course.holes.filter(x=>!course.nines || course.nines.find(n=>n.holes.includes(hole)).holes.includes(x.n)).map(x => '<button type="button" data-cp="hole" data-n="' + x.n + '" aria-label="Hole ' + x.n + ', par ' + x.par + '" ' + (x.n === hole ? 'aria-current="step"' : '') + ' class="' + (m.holes[m.tee + ':' + x.n]?.reviewed ? 'reviewed' : '') + '"><b>' + x.n + '</b><span>Par ' + x.par + '</span></button>').join('') + '</div></section></div>' +
+      '<aside class="cp-plan"><section class="cp-course-settings"><h3>Course & tees</h3><p>'+esc(course.shortName)+' · '+course.holes.length+' holes · Par '+course.par+'<br>'+esc(course.place)+'</p>'+(mappedHoles().length<course.holes.length?'<p class="cp-coverage">'+mappedHoles().length+' of '+course.holes.length+' interactive hole maps ready</p>':'')+
+      '<div class="cp-tee-control"><label for="cp-tees">Explore from</label><select id="cp-tees">' + course.tees.map(x => '<option value="' + x.id + '" ' + (x.id === t.id ? 'selected' : '') + '>' + x.name + ' · ' + yard(x.total) + ' yd</option>').join('') +
+      '</select><span>' + (t.rating ? t.rating.toFixed(1) + ' rating · ' + t.slope + ' slope · men' : 'Rating not verified for this tee') + '</span></div></section>' +
+      '<section class="cp-plan-card"><span class="cp-eyebrow">HOLE '+hole+' · YOUR SHOT PLAN</span><h3>' + (h.par === 3 ? 'Choose the carry.' : h.par === 5 ? 'Build it shot by shot.' : 'Pick your landing area.') + '</h3><p class="cp-prompt">' + esc(h.prompt) + '</p>' +
       '<label for="cp-basis">Distance source</label><select id="cp-basis"><option value="playing" '+(m.basis==='playing'?'selected':'')+'>Saved playing carries</option><option value="range" '+(m.basis==='range'?'selected':'')+'>Latest range measurements</option></select>' +
       '<p class="cp-muted">'+(m.basis==='range'?'Range conditions and club settings may differ from this round. These are planning references; your Bag stays unchanged.':'Switch to range measurements to compare clubs whose playing carry is still unset.')+'</p>' +
       '<label>Your tee club</label><div class="cp-clubs" role="group" aria-label="Choose your tee club">' + bag().map(c => button('club', '<b>' + esc(c.label) + '</b><span>' + (c.carry>0?yard(c.carry)+' yd':'Unset') + '</span>', 'data-club="' + esc(c.key) + '" aria-pressed="' + (bridge.club(course.id,hole) === c.key) + '"')).join('') + '</div>' +
@@ -308,7 +310,7 @@
         const s = m.holes[m.tee + ':' + x.n] || {}, c = bag().find(y => y.key === bridge.club(course.id,x.n));
         return '<button type="button" data-cp="hole" data-n="' + x.n + '"><b>' + x.n + '</b><span>Par ' + x.par + ' · ' + t.yards[x.n - 1] + ' yd</span><strong>' + esc(c?.label || 'Choose club') + '</strong><span>' + esc(s.note || (s.reviewed ? 'Reviewed' : 'Add a plan')) + '</span></button>';
       }).join('') + '</div></details>' +
-      setup() +
+      downloads() + setup() +
       '<details class="cp-sources" id="cp-sources"><summary>Sources & map accuracy</summary><p>'+esc(course.cardNote)+' Tee selection changes the scorecard yardage; the route starts at an unspecified mapped tee until you set your own tee position.</p>' +
       '<p>Map distances are approximate horizontal measurements, not laser yardages or slope-adjusted plays-like distances. The map is incomplete: unmarked areas may contain hazards. Google 3D detail varies by location; it does not show today’s pins or putting contours.</p>' +
       '<p>' + link(course.source, course.sourceLabel || 'Scorecard source') + (course.tour ? ' · ' + link(course.tour, 'Official course tour') : '') + ' · ' + link('https://www.openstreetmap.org/copyright', '© OpenStreetMap contributors · ODbL') + ' · <a href="./data/course-prep/'+course.id+'-osm.json" download>Map source data</a></p></details></div>';
@@ -336,7 +338,13 @@
     }
     return true;
   }
-  function changeHole(n) { if (!course.holes.some(h=>h.n===n)) return; stopFlyover(); hole = n; if(!mapReady())stopLocation(); framed3d = null; mode = initialMode(); imageError = false; overview = false; redraw(); }
+  function changeHole(n) {
+    if (!course.holes.some(h=>h.n===n)) return;
+    stopFlyover();hole=n;if(!mapReady())stopLocation();framed3d=null;
+    // Keep the chosen guide/map view and imagery style while browsing holes.
+    if(mode==='guide'&&!hasGuide(course,currentHole()))mode=key()&&navigator.onLine!==false?lastMapMode:'route';
+    imageError=false;overview=false;redraw();
+  }
   function stopFlyover() {
     if (animationHandler && maps3d) maps3d.removeEventListener('gmp-animationend', animationHandler);
     animationHandler = null;
@@ -459,8 +467,8 @@
         packs.pin(id,true).then(()=>{loadErrors.delete(id);if(course.id===id&&!packReady())redraw();}).catch(()=>bridge.toast('Download incomplete. Connect and retry.'));break;
       }
       case 'remove-download': packs.remove(course.id).catch(()=>bridge.toast('Could not remove this download.'));break;
-      case 'guide-style': guideStyle=el.dataset.style;redraw();break;
-      case 'nine': case 'hole': case 'map-hole': changeHole(+el.dataset.n); break;
+      case 'guide-style': guideStyle=el.dataset.style;redraw();root?.querySelector('.cp-map-panel')?.scrollIntoView({block:'start'});break;
+      case 'nine': case 'hole': case 'map-hole': changeHole(+el.dataset.n);root?.querySelector('.cp-map-panel')?.scrollIntoView({block:'start'});break;
       case 'previous': changeHole(hole - 1); break;
       case 'next': changeHole(hole + 1); break;
       case 'mode': {
@@ -482,7 +490,7 @@
       case 'review-next': {
         saveHole({reviewed:true});
         const m=model(), next=Array.from({length:course.holes.length},(_,i)=>(hole+i)%course.holes.length+1).find(n=>!m.holes[m.tee+':'+n]?.reviewed);
-        if(next)changeHole(next);else{redraw();bridge.toast('All '+course.holes.length+' holes reviewed');} break;
+        if(next){changeHole(next);root?.querySelector('.cp-map-panel')?.scrollIntoView({block:'start'});}else{redraw();bridge.toast('All '+course.holes.length+' holes reviewed');} break;
       }
       case 'rings': showRings=!showRings;refreshOverlays();drawControls();break;
       case 'locate': useLocation();break;

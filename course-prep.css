@@ -252,3 +252,34 @@ body.night .cp-map-views .cp-simple-view[aria-pressed=true]{background:#335343;c
 .cp-guide-zoom-content .cp-hole-art{width:100%;height:100%;max-height:none!important}
 .cp-guide-zoom-content .cp-art-guide figcaption{position:absolute!important;bottom:4px;left:0;right:0;padding:4px!important;background:#f7f6efdd!important}
 .cp-live-guide-body .cp-guide-zoom{--guide-height:clamp(300px,60dvh,650px)}
+
+/* Map-first prep: keep course selection and hole navigation above the visual. */
+body.cpfocus .hero.hq-shell{padding:calc(12px + env(safe-area-inset-top)) 0 12px}
+body.cpfocus .hq-shell .hq-brand,body.cpfocus .hq-shell .tag,body.cpfocus .hq-shell .hq-breadcrumb{display:none}
+body.cpfocus .hq-shell .hq-page-heading{grid-column:1;grid-row:1;margin-top:0}
+body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
+.cp-course-picker{display:flex;gap:10px;margin:4px 0 12px}
+.cp-course-picker label{display:block;margin:0;font-size:12px}
+.cp-course-picker select{max-width:none;width:100%;min-height:44px;padding:9px 12px;font-weight:600}
+.cp-map-column{min-width:0}
+.cp-map-panel{scroll-margin-top:16px}
+.cp-hole-heading{padding:12px 14px}
+.cp-arrows button{width:44px;min-height:44px}
+.cp-guide-styles{padding:6px 8px}
+.cp-guide-styles button{min-height:44px;padding:8px 10px}
+.cp-hole-browser{margin-top:12px;padding:0 2px 2px}
+.cp-hole-browser .cp-holes{grid-template-columns:repeat(9,minmax(0,1fr));margin-bottom:0}
+.cp-hole-browser .cp-progress{padding:8px 0 12px}
+.cp-course-settings{padding:18px;border:1px solid var(--cp-line);border-radius:18px;background:var(--cp-panel);min-width:0;grid-column:1/-1}
+.cp-course-settings h3{font-size:17px;margin:0 0 10px;color:var(--cp-ink)}
+.cp-course-settings p{margin:0 0 14px;font-size:12px;line-height:1.6;color:var(--cp-muted)}
+.cp-course-settings .cp-coverage{color:var(--cp-ink)}
+.cp-course-settings .cp-tee-control{min-width:0}
+.cp-course-settings .cp-tee-control label,.cp-course-settings .cp-tee-control>span{color:var(--cp-muted)}
+.cp-course-settings .cp-tee-control select{border:1px solid var(--cp-line);background:var(--cp-panel);color:var(--cp-ink)}
+.cp-downloads{margin:16px 0 0;padding:17px;background:var(--cp-panel);border-color:var(--cp-line);border-radius:14px}
+.cp-downloads summary{min-height:28px}
+.cp-downloads summary span{display:block;margin:3px 0 0;font-size:11px}
+.cp-downloads p{font-size:12px;line-height:1.6;color:var(--cp-muted)}
+.cp-downloads>button{margin-top:12px}
+@media(min-width:761px){.cp-grid{grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr)}}

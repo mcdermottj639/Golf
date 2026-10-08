@@ -125,7 +125,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v221, October 8 2026)
+## Course Prep (v226, October 8 2026)
 
 Rounds leads with **Explore courses**. The picker contains Pound Ridge, Wianno and
 Sterling Farms plus Metedeconk. The first three have 18 holes each; Metedeconk has
@@ -215,12 +215,31 @@ an AI-generated imaginary course layout as a real guide. The user-approved mocku
 was a design direction; shipped playable shapes must come from source geometry.
 `hasGuide` is shared by prep and live; image-only holes must remain accessible when
 `mapReady:false`. A failed external image can offer the generated guide when available.
-v225 opens both guide styles at 140% inside a scrollable viewport, in prep and live
-dialogs. Zoom controls span 100–240%; Full hole restores 100% and all image edges.
-Use actual scrollable dimensions, not clipped transforms; retain both tee and green
-in the full content. Zoom/scroll must never write golf state or restart image loading.
-Each newly opened guide starts at 140%. At 100%, both kinds of guide fit fully; SVG masks/filters use an explicit
-user-space frame so near-vertical holes do not collapse into a narrow strip.
+v226 restores Full hole (100%) as the default for every newly opened guide in prep
+and live dialogs. The v225 140% default was rejected because it disrupted the working
+guides. Keep zoom optional (100–240%), below the illustration; Full hole restores all
+image edges. Use actual scrollable dimensions, not clipped transforms, and preserve
+the original aspect ratio. Zoom/scroll must never write golf state or reload images.
+At 100%, both kinds of guide fit fully; SVG masks/filters use an explicit user-space
+frame so near-vertical holes do not collapse into a narrow strip.
+
+The prep workspace is map-first: a compact app header and course picker, then the hole heading,
+previous/next buttons and guide/map surface. Hole browsing and review progress sit
+below the map. Course/tee settings, shot planning and notes follow on phones and sit
+beside the map on desktop. Downloads, the full-round plan, Google setup and sources
+are secondary sections; downloads start collapsed. Do not reintroduce a tall hero,
+download card, tee settings or full hole grid above the map. Measurement-origin
+controls, guide styles and optional guide zoom also follow the visual. `body.cpfocus`
+compacts only the Course Prep shell; keep its back, search and theme controls. Verify the actual artwork
+and map surface appear in the first phone viewport at 320 and 390 pixels.
+
+Changing holes retains the selected guide or interactive map mode (including 3D or
+Simple map), whether using arrows, hole/nine buttons or the full-round plan. Hole/nine
+jumps return the map to view. A newly opened course still starts with its guide.
+A hole without verified map geometry keeps the selected map tab and explains the
+coverage gap; never substitute another hole or invent geometry. View changes never
+write golf state. `tests/course-prep-layout-browser.cjs` exercises above-the-fold
+placement, retained views, physical-nine boundaries and unchanged state.
 Inside Interactive map, 3D is the only imagery mode (v224); Simple map remains the
 offline alternative. Overhead UI, map library loading and 2D overlay code are removed.
 Legacy satellite resume values normalize to 3D; do not discard the resumed course/hole. Within
@@ -3957,4 +3976,4 @@ instead of 360 m for a closer view on every leg in both prep and live maps; reta
 
 **v213 camera correction:** Real Google SDK 3.66.7 was loaded without a key for API contract checks. It confirms v211 constructor rejection and rejects v212 flyCameraTo with `InvalidValueError: in property endCamera: Altitude mode CLAMP_TO_GROUND is not supported for camera animations.` Camera targets now explicitly use altitude 0 + RELATIVE_TO_GROUND; ground-clamped markers/lines remain correct. The real SDK accepts this request past validation; no licensed imagery or device rendering was certified. Never copy marker altitude modes into camera calls. Draw overlays before camera work. Catch asynchronous camera rejections locally, retaining map/markers/yardages with direct-property framing (preserve observed absolute center altitude) and a brief toast; do not call mapError for optional camera motion. Regression covers rejected animations at entry and via controls, data preservation and all 18 camera modes.
 
-**v214 map navigation:** Two main buttons (Hole guide / Interactive map), 3D controls (Overhead removed in v224) and secondary Simple map. Preserve guide-first hole entry, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
+**v214 map navigation:** Two main buttons (Hole guide / Interactive map), 3D controls (Overhead removed in v224) and secondary Simple map. Preserve guide-first course entry, selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
