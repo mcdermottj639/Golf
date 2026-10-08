@@ -45,18 +45,67 @@
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps2d, maps3d, overlays2d = [];
   let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
   let showRings = true, framed2d = null, framed3d = null;
+  // Device location is a foreground-only measuring reference, never a saved tee.
+  const LOCATION_MAX_AGE = 45000, LOCATION_MAX_ACCURACY = 25;
+  let liveFix = null, locationWatch = null, locationEpoch = 0, locationTimer, locationNotice = '';
   let projection = null, imageError = false, animationHandler, animationTimer, bagSnapshot;
   const model = () => clean(bridge.get());
   const currentHole = () => course.holes[hole - 1];
   const teeSet = () => course.tees.find(t => t.id === model().tee);
   const holeKey = () => model().tee + ':' + hole;
   const savedHole = () => model().holes[holeKey()] || {};
-  const origin = () => pointOK(savedHole().tee) ? savedHole().tee : currentHole().path[0];
+  const liveLocation = () => liveFix && Date.now()-liveFix.time < LOCATION_MAX_AGE;
+  const teeOrigin = () => pointOK(savedHole().tee) ? savedHole().tee : currentHole().path[0];
+  const origin = () => liveLocation() ? liveFix.point : teeOrigin();
+  const referenceName = () => liveLocation() ? 'My location' : savedHole().tee ? 'Your tee' : 'Reference tee';
   const green = () => currentHole().path.at(-1);
   const target = () => pointOK(savedHole().target) ? savedHole().target : green();
   const bag = () => bagSnapshot || (bagSnapshot = bridge.bag(model().basis));
   const selected = () => bag().find(c => c.key === bridge.club(hole)) || null;
   const yard = n => Math.round(n).toLocaleString('en-US');
+  const targetYardage = () => yard(distance(origin(),target()))+' yd · '+yard(distance(target(),green()))+' yd left';
+  function stopLocation(message = '') {
+    locationEpoch++;
+    if(locationWatch !== null) navigator.geolocation?.clearWatch(locationWatch);
+    locationWatch = null; liveFix = null; locationNotice = message;
+    clearTimeout(locationTimer);
+  }
+  function updateMeasurements() {
+    if(!root)return;
+    readout(); refreshOverlays(); drawControls();
+  }
+  function useLocation() {
+    stopLocation();
+    if(!navigator.geolocation) {locationNotice='Location is unavailable in this browser. Use Set tee instead.';updateMeasurements();return;}
+    const token=locationEpoch;
+    locationNotice='Finding your location…'; edit='target'; updateMeasurements();
+    const fail = message => {if(token!==locationEpoch)return;stopLocation(message);updateMeasurements();};
+    locationTimer=setTimeout(()=>fail('No fresh location received. Measuring from the tee; tap Use my location to retry.'),15000);
+    try {
+      locationWatch=navigator.geolocation.watchPosition(position=>{
+        if(token!==locationEpoch||!root)return;
+        const coords=position.coords, point=[coords.latitude,coords.longitude], age=Date.now()-position.timestamp;
+        if(!Number.isFinite(age)||age< -5000||age>=LOCATION_MAX_AGE){locationNotice='Waiting for a fresh location. Measuring from the tee.';liveFix=null;updateMeasurements();return;}
+        if(!pointOK(point)){fail('You’re outside Pound Ridge. Measuring from the tee.');return;}
+        if(!Number.isFinite(coords.accuracy)||coords.accuracy<0||coords.accuracy>LOCATION_MAX_ACCURACY){
+          liveFix=null;locationNotice='GPS accuracy is too low'+(Number.isFinite(coords.accuracy)?' (±'+yard(coords.accuracy/0.9144)+' yd)':'')+'. Measuring from the tee while waiting for a better fix.';updateMeasurements();return;
+        }
+        liveFix={point,accuracy:coords.accuracy,time:Math.min(Date.now(),position.timestamp)};locationNotice='';
+        clearTimeout(locationTimer);
+        locationTimer=setTimeout(()=>fail('Location expired. Measuring from the tee; tap Use my location to refresh.'),LOCATION_MAX_AGE-Math.max(0,age)+10);
+        updateMeasurements();
+      },error=>fail(error.code===1?'Location permission is off. Allow location for this site in your browser settings, or use Set tee.':error.code===3?'Location timed out. Measuring from the tee; tap Use my location to retry.':'Location is unavailable. Measuring from the tee; try again outdoors.'),{enableHighAccuracy:true,maximumAge:0,timeout:12000});
+      drawReference();
+    } catch {fail('Location could not start. Measuring from the tee; use Set tee instead.');}
+  }
+  function drawReference() {
+    const el=root?.querySelector('#cp-reference');if(!el)return;
+    el.hidden=mode==='guide';
+    el.innerHTML='<div><span>MEASURING FROM</span><b>'+referenceName()+'</b>'+(liveLocation()?'<small>Live · accuracy ±'+yard(liveFix.accuracy/0.9144)+' yd</small>':'')+'</div><div class="cp-reference-actions">'+
+      button('locate',locationWatch!==null?'Refresh location':'Use my location','aria-pressed="'+!!liveLocation()+'"')+
+      (locationWatch!==null||liveFix?button('use-tee','Use tee'):'')+'</div>'+
+      (locationNotice?'<p role="status">'+esc(locationNotice)+'</p>':'');
+  }
   function key() { try { return localStorage.getItem(KEY) || window.CADDIE_GOOGLE_MAPS_KEY || ''; } catch { return window.CADDIE_GOOGLE_MAPS_KEY || ''; } }
   function reconnectGoogle() {
     // Google retains authorization inside its loaded SDK. Start a new page session
@@ -106,7 +155,7 @@
       '<div class="cp-grid"><section class="cp-map-panel"><header class="cp-hole-heading"><div><span class="cp-eyebrow">' + esc(t.name) + ' TEES</span><h3>Hole ' + hole + '<small>Par ' + h.par + ' · ' + yard(t.yards[hole - 1]) + ' yd · Hcp ' + h.si + '</small></h3></div><div class="cp-arrows">' +
       button('previous', '←', 'aria-label="Previous hole" ' + (hole === 1 ? 'disabled' : '')) + button('next', '→', 'aria-label="Next hole" ' + (hole === 18 ? 'disabled' : '')) + '</div></header>' +
       '<div class="cp-modes" role="group" aria-label="Map view">' + [['guide','Hole guide'],['route','Course map'],['satellite','Satellite'],['3d','Google 3D']].map(([k,v]) => button('mode', v, 'data-mode="' + k + '" aria-pressed="' + (mode === k) + '"')).join('') + '</div>' +
-      '<div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div></section>' +
+      '<div class="cp-reference" id="cp-reference" hidden></div><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div></section>' +
       '<aside class="cp-plan"><section class="cp-plan-card"><span class="cp-eyebrow">THE PLAN</span><h3>' + (h.par === 3 ? 'Choose the carry.' : h.par === 5 ? 'Build it shot by shot.' : 'Pick your landing area.') + '</h3><p class="cp-prompt">' + esc(h.prompt) + '</p>' +
       '<label for="cp-basis">Distance source</label><select id="cp-basis"><option value="playing" '+(m.basis==='playing'?'selected':'')+'>Saved playing carries</option><option value="range" '+(m.basis==='range'?'selected':'')+'>Latest range measurements</option></select>' +
       '<p class="cp-muted">'+(m.basis==='range'?'Range conditions and club settings may differ from this round. These are planning references; your Bag stays unchanged.':'Switch to range measurements to compare clubs whose playing carry is still unset.')+'</p>' +
@@ -137,7 +186,7 @@
     clearTimeout(animationTimer);
     try { maps3d?.stopCameraAnimation(); } catch {}
   }
-  function unmount() { epoch++; stopFlyover(); closeGuide(); root = null; }
+  function unmount(keepLocation = false) { epoch++; stopFlyover(); closeGuide(); if(!keepLocation)stopLocation(); root = null; }
   function closeGuide() { document.querySelector('dialog.cp-guide-dialog[open]')?.close?.(); }
   function openGuide(courseId, n) {
     const source = window.CADDIE_PREP_COURSES.find(c => c.id === courseId);
@@ -203,11 +252,13 @@
         if(next)changeHole(next);else{redraw();bridge.toast('All 18 holes reviewed');} break;
       }
       case 'rings': showRings=!showRings;refreshOverlays();drawControls();break;
+      case 'locate': useLocation();break;
+      case 'use-tee': stopLocation();updateMeasurements();break;
       case 'frame': frameGoogle(el.dataset.focus || 'hole');break;
       case 'overview': overview = !overview; drawView(); break;
-      case 'edit': edit = el.dataset.kind; drawControls(); break;
+      case 'edit': edit = el.dataset.kind; if(edit==='tee')stopLocation();updateMeasurements(); break;
       case 'clear-target': saveHole({target: undefined}); drawView(); readout(); break;
-      case 'reset-tee': saveHole({tee: undefined}); drawView(); readout(); break;
+      case 'reset-tee': stopLocation();saveHole({tee: undefined}); drawView(); readout(); break;
       case 'map-setup': root.querySelector('#cp-setup').open = true; root.querySelector('#cp-api-key').focus(); break;
       case 'key-save': {
         const value = root.querySelector('#cp-api-key').value.trim();
@@ -259,7 +310,7 @@
       if(c.rangeTotal>0) html += '<p class="cp-muted">Same range batch: '+yard(c.rangeTotal)+' yd total. This is measured range context, not predicted rollout here.</p>';
       if(hasTarget){
         const gap = toTarget - c.carry, totalGap = toTarget - c.carry - roll;
-        html += '<p class="cp-muted">Carry alone: about ' + yard(Math.abs(gap)) + ' yd ' + (gap >= 0 ? 'short of' : 'past') + ' your target.' + (roll ? ' With your rollout: '+yard(Math.abs(totalGap))+' yd '+(totalGap>=0?'short of':'past')+'.' : '') + ' Check your tee position and conditions.</p>';
+        html += '<p class="cp-muted">Carry alone: about ' + yard(Math.abs(gap)) + ' yd ' + (gap >= 0 ? 'short of' : 'past') + ' your target.' + (roll ? ' With your rollout: '+yard(Math.abs(totalGap))+' yd '+(totalGap>=0?'short of':'past')+'.' : '') + ' Measured from '+referenceName().toLowerCase()+'. Check conditions.</p>';
       }
     } else html += '<p class="cp-muted">' + (c ? 'This club has no carry for the selected distance source. Try latest range measurements or set its playing carry in Bag.' : selectedKey ? 'Your saved club is no longer in the active carry ladder. Choose a current club above.' : 'Choose a club to show its carry ring and compare it with your target.') + '</p>';
     if(hasTarget && bag().some(club=>club.carry>0)){
@@ -295,8 +346,9 @@
     const {width:w,height:h,heading} = projection;
     const path = pts => pts.map(p => projection.to(p).map(x => x.toFixed(2)).join(',')).join(' ');
     const pnt = (p, kind, label) => {
-      const [x,y]=projection.to(p), dy=kind==='tee'?23:-17;
-      return '<g class="cp-map-point cp-point-'+kind+'" data-point="'+kind+'"><circle cx="'+x+'" cy="'+y+'" r="7"/><text x="'+x+'" y="'+(y+dy)+'" text-anchor="middle" class="cp-map-label">'+label+'</text></g>';
+      const [x,y]=projection.to(p), dy=kind==='tee'?23:kind==='green'&&savedHole().target?23:-17;
+      const margin=Math.min(w/2-8,label.length*3.8), labelX=Math.max(margin,Math.min(w-margin,x));
+      return '<g class="cp-map-point cp-point-'+kind+'" data-point="'+kind+'"><circle cx="'+x+'" cy="'+y+'" r="7"/><text x="'+labelX+'" y="'+Math.max(45,Math.min(h-40,y+dy))+'" text-anchor="middle" class="cp-map-label">'+label+'</text></g>';
     };
     const polys = course.features.map(f => '<polygon points="'+path(f.path)+'" class="cp-feature cp-feature-'+f.kind+'"/>').join('');
     const lines = (overview ? course.holes : [currentHole()]).map(holeData => {
@@ -317,30 +369,31 @@
         if (roll) overlay += '<circle cx="'+x+'" cy="'+y+'" r="'+((c.carry+roll)*0.9144*projection.scale)+'" class="cp-roll-ring"/>';
       }
       if(savedHole().target)overlay += '<polyline points="'+path([origin(),target(),green()])+'" class="cp-aim-line"/>';
-      overlay += pnt(origin(),'tee',savedHole().tee?'Your tee':'Reference tee') + pnt(green(),'green','Mapped green') +
-        (savedHole().target ? pnt(target(),'target','Your target') : '');
+      overlay += pnt(origin(),'tee',referenceName()) + pnt(green(),'green',savedHole().target?'Mapped green':'Green · '+yard(distance(origin(),green()))+' yd') +
+        (savedHole().target ? pnt(target(),'target',targetYardage()) : '');
     }
     const scaleYards = overview ? 100 : 50, scaleWidth=scaleYards*0.9144*projection.scale;
     return '<svg id="cp-route-map" viewBox="0 0 '+w+' '+h+'" aria-label="Approximate mapped routes for Pound Ridge. '+(overview?'Choose a hole.':'Tee at bottom. Click to set your target or tee.')+'" role="img">'+
       '<defs><pattern id="cp-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#204d3e" stroke-opacity=".035"/></pattern></defs>'+
       '<rect width="'+w+'" height="'+h+'" fill="#eef1e4"/><rect width="'+w+'" height="'+h+'" fill="url(#cp-grid)"/>'+polys+yardages+lines+overlay+
-      '<text x="18" y="27" class="cp-map-kicker">'+(overview?'POUND RIDGE · 18 HOLES':'TEE → GREEN')+'</text>'+
+      '<text x="18" y="27" class="cp-map-kicker">'+(overview?'POUND RIDGE · 18 HOLES':liveLocation()?'MY LOCATION → GREEN':'TEE → GREEN')+'</text>'+
       '<g class="cp-map-compass" transform="translate('+(w-27)+' 31)"><text x="0" y="-16" text-anchor="middle">N</text><path d="M0 -10L-4 4L0 1L4 4Z" transform="rotate('+(-heading)+')"/></g>'+
       '<g class="cp-map-scale"><path d="M18 '+(h-24)+'v6h'+scaleWidth+'v-6" fill="none" stroke="currentColor" stroke-width="2"/><text x="18" y="'+(h-31)+'">'+scaleYards+' yd</text></g></svg>';
   }
   function drawControls() {
     if (!root) return;
+    drawReference();
     const el = root.querySelector('#cp-map-controls');
     const mapped = mode !== 'guide' && (mode === 'route' || (!!key() && !googleFailure));
-    el.innerHTML = (mapped && !overview ? '<div class="cp-map-summary">'+(savedHole().target ? '<span><b>'+yard(distance(origin(),target()))+' yd</b> to your target</span><span><b>'+yard(distance(target(),green()))+' yd</b> left to green</span>' : '<span><b>'+yard(distance(origin(),green()))+' yd</b> '+(savedHole().tee?'your tee':'reference tee')+' → mapped green</span><span>Tap a landing spot<br>to plan your shot</span>')+'</div>' : '') +
-      (mapped && !overview ? '<div class="cp-map-legend"><span><i class="cp-legend-tee">T</i> Tee</span><span><i class="cp-legend-target">A</i> Aim</span><span><i class="cp-legend-green">G</i> Green</span>'+(selected()?.carry>0?'<span class="cp-map-club">'+esc(selected().label)+' · '+yard(selected().carry)+' yd carry</span>':'')+'</div>':'') + '<div class="cp-map-tools">' + (mode === 'route' ? button('overview', overview ? 'Focus this hole' : 'All 18 holes') : '') +
+    el.innerHTML = (mapped && !overview ? '<div class="cp-map-summary">'+(savedHole().target ? '<span><b>'+yard(distance(origin(),target()))+' yd</b> to your target</span><span><b>'+yard(distance(target(),green()))+' yd</b> left to green</span>' : '<span><b>'+yard(distance(origin(),green()))+' yd</b> '+referenceName().toLowerCase()+' → mapped green</span><span>Tap a landing spot<br>to plan your shot</span>')+'</div>' : '') +
+      (mapped && !overview ? '<div class="cp-map-legend"><span><i class="cp-legend-tee">'+(liveLocation()?'●':'T')+'</i> '+(liveLocation()?'You':'Tee')+'</span><span><i class="cp-legend-target">A</i> Aim</span><span><i class="cp-legend-green">G</i> Green</span>'+(selected()?.carry>0?'<span class="cp-map-club">'+esc(selected().label)+' · '+yard(selected().carry)+' yd carry</span>':'')+'</div>':'') + '<div class="cp-map-tools">' + (mode === 'route' ? button('overview', overview ? 'Focus this hole' : 'All 18 holes') : '') +
       (mapped && !overview ? button('edit','Landing target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
       (mapped && !overview && selected()?.carry>0 ? button('rings','Carry rings','aria-pressed="'+showRings+'"'):'')+
       (savedHole().target ? button('clear-target','Clear target'):'') + (savedHole().tee ? button('reset-tee','Reset tee'):'') + '</div>';
     if(mapped && ['satellite','3d'].includes(mode))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
     root.querySelector('#cp-map-caption').innerHTML = mode === 'guide'
       ? 'Official club illustration · not to scale. '+link(course.tour,'Open course guide ↗')
-      : (overview ? '18 mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(savedHole().tee?'Your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
+      : (overview ? '18 mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
         '<span>Approximate routes · incomplete hazard coverage · '+link('https://www.openstreetmap.org/copyright','© OpenStreetMap contributors')+'</span>';
   }
   async function drawView() {
@@ -432,9 +485,11 @@
   }
   function refreshOverlays() {
     if(!root)return;
-    if(mode==='route')drawView();
-    else if(mode==='satellite'&&maps2d)drawGoogle2d();
-    else if(mode==='3d'&&maps3d)drawGoogle3d(google.maps.maps3d);
+    try {
+      if(mode==='route')drawView();
+      else if(!googleFailure && mode==='satellite'&&maps2d)drawGoogle2d();
+      else if(!googleFailure && mode==='3d'&&maps3d)drawGoogle3d(google.maps.maps3d);
+    } catch {mapError('This view could not update the yardage markers. Reload and retry, or choose another view.',mode);}
   }
   function googleErrorAdvice() {
     const messages = {
@@ -503,7 +558,8 @@
     const add=o=>{overlays2d.push(o);return o;};
     add(new google.maps.Polyline({map:maps2d,path:currentHole().path.map(ll),strokeColor:'#c5e78a',strokeWeight:4,clickable:false}));
     if(savedHole().target)add(new google.maps.Polyline({map:maps2d,path:[origin(),target(),green()].map(ll),strokeColor:'#ffb766',strokeWeight:2,clickable:false}));
-    [[origin(),'T','#204d3e'],[green(),'G','#668a43'],...(savedHole().target?[[target(),'A','#b77224']]:[])].forEach(([p,label,color])=>add(new google.maps.Marker({map:maps2d,position:ll(p),label:{text:label,color:'#fff',fontSize:'12px',fontWeight:'700'},icon:{path:google.maps.SymbolPath.CIRCLE,scale:11,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2},clickable:false})));
+    [[origin(),liveLocation()?'You':'T','#204d3e'],[green(),'G','#668a43'],...(savedHole().target?[[target(),'A','#b77224']]:[])].forEach(([p,label,color])=>add(new google.maps.Marker({map:maps2d,position:ll(p),label:{text:label,color:'#fff',fontSize:'12px',fontWeight:'700'},icon:{path:google.maps.SymbolPath.CIRCLE,scale:liveLocation()&&label==='You'?15:11,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2},clickable:false})));
+    add(new google.maps.Marker({map:maps2d,position:ll(target()),label:{text:savedHole().target?targetYardage():'Green · '+yard(distance(origin(),green()))+' yd',color:'#193e32',fontSize:'12px',fontWeight:'700',className:'cp-google-yardage-label'},icon:{path:google.maps.SymbolPath.CIRCLE,scale:1,fillOpacity:0,strokeOpacity:0,labelOrigin:new google.maps.Point(0,-28)},clickable:false,zIndex:1000}));
     const c=selected(),roll=savedHole().roll||0;
     if(showRings && c && c.carry > 0) {
       add(new google.maps.Circle({map:maps2d,center:ll(origin()),radius:c.carry*0.9144,strokeColor:'#c5e78a',strokeWeight:2,fillOpacity:0,clickable:false}));
@@ -518,7 +574,7 @@
     if(savedHole().target)maps3d.append(line([origin(),target(),green()],'#ffb766',3));
     // Basic 3D markers need only maps3d. Optional PinElement customization must not
     // become a startup dependency: a customization failure must not hide the map.
-    if(lib.Marker3DElement)[[origin(),'T'],[green(),'G'],...(savedHole().target?[[target(),'A']]:[])].forEach(([p,label])=>{
+    if(lib.Marker3DElement)[[origin(),liveLocation()?'You':'Tee'],[green(),savedHole().target?'Green':'Green · '+yard(distance(origin(),green()))+' yd'],...(savedHole().target?[[target(),targetYardage()]]:[])].forEach(([p,label])=>{
       maps3d.append(new lib.Marker3DElement({position:ll(p),label,altitudeMode:'CLAMP_TO_GROUND'}));
     });
     const c=selected(),roll=savedHole().roll||0;
@@ -542,6 +598,10 @@
     animationTimer=setTimeout(stopFlyover,30000);next();
   }
   window.addEventListener('resize',()=>{if(root && mode==='route')drawView();});
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden && locationWatch!==null){stopLocation('Location paused while the app was away. Tap Use my location to resume.');updateMeasurements();}
+  });
+  window.addEventListener('pagehide',()=>stopLocation());
   window.CaddieCoursePrep = Object.freeze({
     init: options => {bridge=options;}, render, mount, unmount, teaser, resumeAfterReload, openGuide,
     openHole: n => {hole=Number.isInteger(+n)&&+n>=1&&+n<=18?+n:1;mode='guide';imageError=false;overview=false;},

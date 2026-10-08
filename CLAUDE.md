@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v208, October 8 2026)
+## Course Prep (v209, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
 Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
@@ -162,12 +162,29 @@ The Hole guide is the initial view on entry and every hole change (arrows, numbe
 holes, plan rows and overview map). Other views remain explicit choices for that hole.
 Google reconnect alone restores the requested map view so Retry still retries Maps.
 If the illustration cannot load, its fallback offers the offline course map.
-The focused map rotates the actual coordinates to put the reference/user tee below
-the green. Its inverse transform handles taps; the 18-hole overview remains north-up.
+The focused map rotates the actual coordinates to put the active measuring reference
+(tee or live location) below the green. Its inverse transform handles taps; the 18-hole overview remains north-up.
 Focused mode draws only that hole’s route, sourced polygons and 100-yard arcs from
-the tee. Do not invent fairway/hazard outlines where the OSM data is missing. Target
+the active reference. Do not invent fairway/hazard outlines where the OSM data is missing. Target
 comparisons are shown only after a landing point is set; a green fallback must never
 pretend a target has been chosen or show a misleading zero-yard approach.
+
+**Use my location** starts a foreground `watchPosition` only after an explicit tap.
+The location, accuracy and timestamp stay in memory; no GPS coordinate or trail is
+written to golf state, backups or browser storage. The saved/manual tee remains intact.
+The common `origin()` supplies all distance readouts, target labels, carry rings and
+club comparisons, with **Measuring from** showing My location / Your tee / Reference tee.
+GPS fixes must be inside the existing course bounds, at most 25 meters estimated
+accuracy and less than 45 seconds old. Poor/stale readings, timeout, denial and off-course
+positions explicitly return to the tee with a status message. A fresh acquisition has
+15 seconds to arrive; normal sensor options request high accuracy, no cached fix and a
+12-second timeout. The accuracy estimate is displayed in yards, not a guarantee of a
+laser measurement. Location requests are only useful on-course; never use a home fix
+for a course yardage. **Use tee** and **Set tee** stop location. Navigation away,
+pagehide and backgrounding also stop/clear it; foregrounding requires another tap.
+`unmount(view === 'courseprep')` preserves one watch across internal redraws and hole
+changes while releasing it on other navigation. Epoch guards ignore late callbacks.
+Location updates preserve Google camera position and never change the saved tee.
 
 Google Maps loads only when Satellite or Google 3D is selected with a key configured.
 Enable Maps JavaScript API + billing and restrict the browser key to that API and
@@ -175,8 +192,11 @@ Enable Maps JavaScript API + billing and restrict the browser key to that API an
 `caddiehq_google_maps_key_v1`, outside golf backups; deployments can alternatively
 provide `window.CADDIE_GOOGLE_MAPS_KEY`. Do not commit an unrestricted key. Map objects
 are reused, asynchronous loads have navigation guards, and leaving a hole cancels
-its flyover. Tee/aim/green markers use compact T/A/G labels with a legend; Satellite uses matching colors. Distances
-sit beside the map in all mapped modes; carry rings can be hidden. Whole hole and
+its flyover. The selected target has a distance-to-target / distance-left-to-green label
+in all three mapped modes. Before a target is chosen, the mapped green shows its
+distance from the active reference. 3D uses only the existing Marker3DElement label;
+Satellite uses a standard Marker label with labelOrigin; no custom PinElement dependency.
+The controls also retain the numeric distances; carry rings can be hidden. Whole hole and
 Green close-up explicitly reframe existing map objects. Normal club changes retain
 the camera; first arrival on a different hole frames it. 3D uses terrain-clamped camera
 positions and basic Marker3DElements with short labels. v207 made custom PinElements
@@ -211,7 +231,11 @@ range-source isolation, backup round trips and offline use. Google adapter check
 a mock API. Jack confirmed real Satellite and 3D imagery on his iPhone after enabling
 Maps JavaScript API (October 8); automated tests do not certify live Google imagery.
 Browser checks cover all 18 guide links, real modal focus/close behavior, image errors,
-round-state preservation, carry comparisons, overlay toggles and camera reuse.
+round-state preservation, carry comparisons, overlay toggles and camera reuse. They also
+verify on-map yardages, actual browser Geolocation with simulated on-course positions,
+denied/unavailable/timeout GPS, off-course and inaccurate/stale fixes, cancellation,
+background/navigation cleanup and absence of GPS writes to player state. Google
+rendering itself still uses a mock; these tests cannot verify Jack’s physical GPS or iPhone imagery.
 
 ## Review process — every bay day, every analysis pass (v122)
 

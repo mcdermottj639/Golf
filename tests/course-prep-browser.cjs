@@ -15,9 +15,10 @@ async function prep(p){await p.locator('#nav [data-view="rounds"]').click();awai
 async function explore(p,selector){await p.locator('.hq-search-trigger:visible').first().click();await p.locator('.hq-explorer-link'+selector).first().click();}
 const mode=(p,m)=>p.locator('.cp-modes [data-mode="'+m+'"]').click();
 function googleMock(){
-  window.mapQA={maps:0,scenes:0,flights:0,stops:0,fits:0,markerImports:0,fail3dDraw:false};
+  window.mapQA={maps:0,scenes:0,flights:0,stops:0,fits:0,markerImports:0,fail3dDraw:false,overlays:[]};
   class Map{constructor(el,opts){this.el=el;this.opts=opts;this.listeners={};mapQA.maps++;}getDiv(){return this.el;}addListener(k,f){this.listeners[k]=f;}fitBounds(b){this.bounds=b;mapQA.fits++;}}
-  class Overlay{constructor(opts){this.opts=opts;}setMap(map){this.opts.map=map;}}
+  class Overlay{constructor(opts){this.opts=opts;mapQA.overlays.push(this);}setMap(map){this.opts.map=map;}}
+  class Point{constructor(x,y){this.x=x;this.y=y;}}
   class Bounds{constructor(){this.points=[];}extend(p){this.points.push(p);}}
   class Scene extends HTMLElement{constructor(opts){super();Object.assign(this,opts);mapQA.scenes++;}flyCameraTo(opts){this.lastFlight=opts;mapQA.flights++;}stopCameraAnimation(){mapQA.stops++;}}
   class Line extends HTMLElement{constructor(opts){super();if(mapQA.fail3dDraw)throw new Error("Simulated 3D drawing failure");Object.assign(this,opts);}}
@@ -26,8 +27,18 @@ function googleMock(){
   class Pin extends HTMLElement{constructor(opts){super();Object.assign(this,opts);}}
   customElements.define('qa-map-pin',Pin);
   const maps3d={Map3DElement:Scene,Polyline3DElement:Line,Marker3DElement:Marker};
-  window.google={maps:{SymbolPath:{CIRCLE:0},maps3d,Map,LatLngBounds:Bounds,Polyline:Overlay,Circle:Overlay,Marker:Overlay,importLibrary:async name=>{if(name==='marker')mapQA.markerImports++;return name==='maps3d'?maps3d:{Map,Marker:Overlay,PinElement:Pin};}}};
+  window.google={maps:{SymbolPath:{CIRCLE:0},Point,maps3d,Map,LatLngBounds:Bounds,Polyline:Overlay,Circle:Overlay,Marker:Overlay,importLibrary:async name=>{if(name==='marker')mapQA.markerImports++;return name==='maps3d'?maps3d:{Map,Marker:Overlay,PinElement:Pin};}}};
   window.__caddieMapsReady();
+}
+function locationMock(){
+  const watches=new Map();let next=0;
+  window.locationQA={calls:0,cleared:[],last:null,options:null,
+    fix(point,accuracy=5,age=0){this.last.success({coords:{latitude:point[0],longitude:point[1],accuracy},timestamp:Date.now()-age});},
+    error(code){this.last.error({code});},active:()=>watches.size};
+  Object.defineProperty(navigator,'geolocation',{configurable:true,value:{
+    watchPosition(success,error,options){const id=++next;locationQA.calls++;locationQA.options=options;locationQA.last={success,error};watches.set(id,locationQA.last);return id;},
+    clearWatch(id){locationQA.cleared.push(id);watches.delete(id);}
+  }});
 }
 (async()=>{
   await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -99,7 +110,8 @@ function googleMock(){
     await p.locator('[data-cp="map-setup"]').click();await p.locator('#cp-api-key').fill('invalid');await p.locator('[data-cp="key-save"]').click();assert.equal(googleRequests,0);
     await p.locator('#cp-api-key').fill('AIza'+'x'.repeat(35));await p.locator('[data-cp="key-save"]').click();await p.locator('qa-map-scene').waitFor();
     assert.equal(googleRequests,1);assert.ok(await p.locator('qa-map-line').count()>=3);
-    assert.deepEqual(await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>e.label)),['T','G','A']);
+    const initialLabels=await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>e.label));
+    assert.deepEqual(initialLabels.slice(0,2),['Tee','Green']);assert.match(initialLabels[2],/^\d[\d,]* yd · \d[\d,]* yd left$/);
     assert.equal(await p.evaluate(()=>mapQA.markerImports),0,'3D has no optional marker-library startup dependency');
     await p.evaluate(()=>{mapQA.fail3dDraw=true;});await p.locator('.cp-clubs [data-club="5-wood"]').click();
     await p.locator('#cp-map-stage .cp-map-message').waitFor();assert.match(await p.locator('#cp-map-stage').innerText(),/drawing the 3D hole/);
@@ -167,12 +179,80 @@ function googleMock(){
     await p.locator('#cp-live-guide img').evaluate(img=>{img.src+='?qa=failed-request';});
     await p.locator('.cp-guide-dialog-error').waitFor();assert.ok(await p.locator('#cp-live-guide footer a').isVisible());
     await p.mouse.click(2,2);await p.locator('#cp-live-guide').waitFor({state:'detached'});assert.equal(await p.evaluate(()=>document.body.classList.contains('cp-guide-open')),false);guideFailure=false;
+    // Explicit device-location reference: no initial request, no stored coordinates,
+    // no overwrite of the saved tee, and yardages follow movement in every map mode.
+    const gps=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
+    await gps.addInitScript(locationMock);const gp=await gps.newPage();gp.setDefaultTimeout(12000);gp.on('pageerror',e=>errors.push(e.message));
+    await gp.route('https://maps.googleapis.com/maps/api/js*',r=>r.fulfill({contentType:'text/javascript',body:'('+googleMock.toString()+')()'}));
+    await gp.goto(url);await ready(gp);await prep(gp);await gp.clock.install();
+    assert.equal(await gp.evaluate(()=>locationQA.calls),0,'location requires an explicit tap');
+    await gp.locator('[data-cp="edit"][data-kind="tee"]').click();await gp.locator('#cp-route-map').click({position:{x:140,y:320}});
+    await gp.locator('[data-cp="edit"][data-kind="target"]').click();await gp.locator('#cp-route-map').click({position:{x:170,y:145}});
+    const beforeLocation=await state(gp),teeDistance=await gp.locator('.cp-map-summary b').first().innerText();
+    const points=await gp.evaluate(()=>{const h=CADDIE_PREP_COURSES[0].holes[0],g=CaddieCoursePrep.geo;return [g.destination(h.path[0],110,g.bearing(h.path[0],h.path.at(-1))),g.destination(h.path[0],150,g.bearing(h.path[0],h.path.at(-1)))];});
+    await gp.locator('[data-cp="locate"]').click();await gp.evaluate(point=>locationQA.fix(point),points[0]);
+    assert.match(await gp.locator('#cp-reference').innerText(),/My location[\s\S]*±5 yd/);
+    assert.notEqual(await gp.locator('.cp-map-summary b').first().innerText(),teeDistance);
+    assert.deepEqual(await state(gp),beforeLocation,'GPS does not write any golf state');
+    const assertLocationLabels=async()=>{
+      const expected=await gp.evaluate(point=>{const s=JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge,h=CADDIE_PREP_COURSES[0].holes[0],t=s.holes[s.tee+':1'].target;return Math.round(CaddieCoursePrep.geo.distance(point,t)).toLocaleString('en-US')+' yd · '+Math.round(CaddieCoursePrep.geo.distance(t,h.path.at(-1))).toLocaleString('en-US')+' yd left';},points[0]);
+      assert.ok((await gp.locator('#cp-route-map').textContent()).includes(expected));return expected;
+    };
+    const expected=await assertLocationLabels();
+    await gp.locator('[data-cp="locate"]').click();assert.equal(await gp.locator('.cp-map-summary b').first().innerText(),teeDistance,'pending refresh consistently returns to the tee');await gp.evaluate(point=>locationQA.fix(point),points[0]);
+    for(const width of [320,390,1440]){
+      await gp.setViewportSize({width,height:width===1440?1000:844});assert.ok(await gp.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+      await gp.locator('#cp-reference').screenshot({path:path.join(screens,'location-reference-'+width+'.png')});
+      await gp.locator('#cp-route-map').screenshot({path:path.join(screens,'location-map-'+width+'.png')});
+    }
+    await gp.setViewportSize({width:390,height:844});
+    await mode(gp,'3d');await gp.locator('[data-cp="map-setup"]').click();await gp.locator('#cp-api-key').fill('AIza'+'x'.repeat(35));await gp.locator('[data-cp="key-save"]').click();await gp.locator('qa-map-scene').waitFor();
+    assert.deepEqual(await gp.locator('qa-map-marker').evaluateAll(els=>els.map(e=>e.label)),['You','Green',expected]);
+    const camera=await gp.evaluate(()=>mapQA.flights);await gp.evaluate(point=>locationQA.fix(point),points[1]);
+    assert.equal(await gp.evaluate(()=>mapQA.flights),camera,'GPS movement preserves the 3D camera');
+    assert.notEqual((await gp.locator('qa-map-marker').evaluateAll(els=>els.map(e=>e.label)))[2],expected);
+    await gp.evaluate(point=>locationQA.fix(point),points[0]);
+    await mode(gp,'satellite');await gp.locator('.cp-google-map').waitFor();
+    assert.equal(await gp.evaluate(()=>mapQA.overlays.findLast(o=>o.opts.map&&o.opts.label?.className==='cp-google-yardage-label').opts.label.text),expected);
+    assert.equal(await gp.evaluate(()=>locationQA.active()),1,'map switches reuse the same location watch');
+    await gp.locator('[data-cp="use-tee"]').click();assert.equal(await gp.evaluate(()=>locationQA.active()),0);
+    assert.equal(await gp.locator('.cp-map-summary b').first().innerText(),teeDistance);assert.deepEqual(await state(gp),beforeLocation);
+    await gp.evaluate(point=>locationQA.fix(point),points[1]);assert.match(await gp.locator('#cp-reference').innerText(),/Your tee/,'late callback cannot restart GPS');
+    // Real 3D click adapter updates the saved target and the labels, without a camera reset.
+    await mode(gp,'3d');await gp.locator('qa-map-scene').waitFor();
+    await gp.locator('qa-map-scene').evaluate((el,point)=>{const e=new Event('gmp-click');e.position={lat:point[0],lng:point[1]};el.dispatchEvent(e);},points[1]);
+    assert.deepEqual((await state(gp)).coursePrep.poundRidge.holes['granite:1'].target,points[1].map(n=>+n.toFixed(7)));
+    for(const [code,message] of [[1,/permission is off/],[2,/Location is unavailable/],[3,/timed out/]]){
+      await gp.locator('[data-cp="locate"]').click();await gp.evaluate(code=>locationQA.error(code),code);
+      assert.match(await gp.locator('#cp-reference').innerText(),message);assert.equal(await gp.evaluate(()=>locationQA.active()),0);
+    }
+    await gp.locator('[data-cp="locate"]').click();await gp.evaluate(()=>locationQA.fix([40,-74]));assert.match(await gp.locator('#cp-reference').innerText(),/outside Pound Ridge/);assert.equal(await gp.evaluate(()=>locationQA.active()),0);
+    await gp.locator('[data-cp="locate"]').click();await gp.evaluate(point=>locationQA.fix(point,100),points[0]);assert.match(await gp.locator('#cp-reference').innerText(),/accuracy is too low/);assert.match(await gp.locator('#cp-reference b').innerText(),/Your tee/);
+    await gp.evaluate(point=>locationQA.fix(point,5,50000),points[0]);assert.match(await gp.locator('#cp-reference').innerText(),/fresh location/);
+    await gp.evaluate(point=>locationQA.fix(point),points[0]);await gp.clock.fastForward(46000);assert.match(await gp.locator('#cp-reference').innerText(),/Location expired/);assert.equal(await gp.evaluate(()=>locationQA.active()),0);
+    await gp.locator('[data-cp="locate"]').click();await gp.evaluate(point=>locationQA.fix(point),points[0]);
+    await gp.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
+    assert.equal(await gp.evaluate(()=>locationQA.active()),0);assert.match(await gp.locator('#cp-reference').innerText(),/Location paused/);
+    await gp.evaluate(()=>{delete document.hidden;});
+    await gp.locator('[data-cp="locate"]').click();await gp.evaluate(point=>locationQA.fix(point),points[0]);
+    await gp.locator('#nav [data-view="bag"]').click();assert.equal(await gp.evaluate(()=>locationQA.active()),0,'leaving prep stops location');await prep(gp);
+    assert.match(await gp.locator('#cp-reference b').innerText(),/Your tee/);
+    await gp.evaluate(()=>{Object.defineProperty(navigator,'geolocation',{configurable:true,value:undefined});});await gp.locator('[data-cp="locate"]').click();assert.match(await gp.locator('#cp-reference').innerText(),/unavailable in this browser/);
+    await gps.close();
+    // Exercise the browser's real Geolocation implementation with permission and
+    // simulated on-course coordinates, in addition to deterministic error cases.
+    const device=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block',permissions:['geolocation'],geolocation:{latitude:points[0][0],longitude:points[0][1],accuracy:5}}),dp=await device.newPage();
+    dp.on('pageerror',e=>errors.push(e.message));await dp.goto(url);await ready(dp);await prep(dp);const beforeDevice=await state(dp);
+    await dp.locator('[data-cp="locate"]').click();await dp.getByText('My location',{exact:true}).first().waitFor();assert.match(await dp.locator('#cp-reference').innerText(),/Live · accuracy/);
+    const oldYardage=await dp.locator('.cp-map-summary b').first().innerText();
+    await device.setGeolocation({latitude:points[1][0],longitude:points[1][1],accuracy:5});await dp.waitForFunction(old=>document.querySelector('.cp-map-summary b').innerText!==old,oldYardage);
+    assert.deepEqual(await state(dp),beforeDevice);await device.close();
     // Actual service worker, actual offline reload, and a note saved offline.
     const offline=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'allow'}),op=await offline.newPage();op.on('pageerror',e=>errors.push(e.message));
     await op.goto(url);await ready(op);await op.evaluate(()=>navigator.serviceWorker.ready);await op.waitForFunction(()=>!!navigator.serviceWorker.controller);await prep(op);
     await op.locator('#cp-note').fill('Offline prep survives');await offline.setOffline(true);await op.reload();await prep(op);assert.equal(await op.locator('#cp-note').inputValue(),'Offline prep survives');
     await op.locator('.cp-holes [data-n="18"]').click();assert.match(await op.locator('.cp-hole-heading').innerText(),/Hole 18/);await op.locator('#cp-note').fill('Saved while offline');assert.equal((await state(op)).coursePrep.poundRidge.holes['granite:18'].note,'Saved while offline');
     const cached=await op.evaluate(async()=>{const keys=await caches.keys();const requests=(await Promise.all(keys.map(async k=>(await (await caches.open(k)).keys()).map(r=>r.url)))).flat();return requests;});assert.ok(cached.every(u=>new URL(u).origin===new URL(url).origin));
-    assert.deepEqual(errors,[]);console.log('PASS course prep browser: 320/390/1440 layouts, all holes/tees, saved club/target/tee/notes, range isolation, backup/import, live prep, mocked 2D/3D reuse/flyover/auth fallback, actual offline reload. Live Google imagery requires a real key.');
+    assert.deepEqual(errors,[]);console.log('PASS course prep browser: 320/390/1440 layouts, all holes/tees, saved plans, live guides, backup/import, offline reload, map yardage labels, native Geolocation movement, simulated GPS errors/staleness/lifecycle, no location persistence, mocked Google reuse/flyover/auth fallback. Live Google imagery requires a real key.');
   }finally{await browser.close();await new Promise(r=>server.close(r));}
 })().catch(e=>{console.error(e);process.exitCode=1;});
