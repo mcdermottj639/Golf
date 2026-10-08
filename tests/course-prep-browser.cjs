@@ -79,7 +79,7 @@ if(require.main===module)(async()=>{
     assert.equal(await p.locator('.cp-holes button').count(),18);assert.equal(await p.locator('#cp-tees option').count(),7);
     assert.match(await p.locator('.cp-hole-heading').innerText(),/380 yd/);
     assert.equal(await p.locator('.cp-modes [data-mode="map"]').getAttribute('aria-pressed'),'true');
-    assert.deepEqual(await p.locator('.cp-imagery-views button').allTextContents(),['3D','Overhead']);
+    assert.deepEqual(await p.locator('.cp-imagery-views button').allTextContents(),['3D']);
     assert.equal(await p.locator('.cp-simple-view').getAttribute('aria-pressed'),'true');
     assert.equal(googleRequests,0,'keyless Interactive map opens Simple map without Google');
     assert.equal(await p.locator('.cp-clubs [data-club]').count(),initial.carries.length);
@@ -178,8 +178,8 @@ if(require.main===module)(async()=>{
     assert.deepEqual(initialLabels.slice(0,2),['Tee','Green']);assert.match(initialLabels[2],/^\d[\d,]* yd · \d[\d,]* yd left$/);
     assert.equal(await p.evaluate(()=>mapQA.markerImports),0,'3D has no optional marker-library startup dependency');
     const beforeViewSwitch=await state(p),sameYardages=await p.locator('.cp-map-summary').innerText();
-    await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();
-    assert.equal(await p.locator('.cp-map-views [data-mode="satellite"]').getAttribute('aria-pressed'),'true');
+    await mode(p,'route');await p.locator('#cp-route-map').waitFor();
+    assert.equal(await p.locator('[data-mode="satellite"]').count(),0);
     assert.equal(await p.locator('.cp-map-summary').innerText(),sameYardages);
     await mode(p,'3d');await p.locator('qa-map-scene').waitFor();
     await mode(p,'guide');await mode(p,'map');await p.locator('qa-map-scene').waitFor();
@@ -190,7 +190,7 @@ if(require.main===module)(async()=>{
     await p.evaluate(()=>{mapQA.fail3dDraw=true;});await p.locator('.cp-clubs [data-club="5-wood"]').click();
     await p.locator('#cp-map-stage .cp-map-message').waitFor();assert.match(await p.locator('#cp-map-stage').innerText(),/drawing the 3D hole/);
     assert.ok(!(await p.locator('#cp-map-stage').innerText()).includes('billing'));
-    await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();
+    await mode(p,'route');await p.locator('#cp-route-map').waitFor();
     await p.evaluate(()=>{mapQA.fail3dDraw=false;});await mode(p,'3d');await p.locator('qa-map-scene').waitFor();
     await p.locator('[data-cp="frame"][data-focus="green"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight?.endCamera.range===190);assert.equal(await p.locator('qa-map-scene').evaluate(e=>e.lastFlight.endCamera.range),190);
     const cameraBefore=await p.evaluate(()=>mapQA.flights);await p.locator('.cp-clubs [data-club="5-wood"]').click();await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.flights),cameraBefore,'club changes preserve 3D camera');
@@ -223,10 +223,7 @@ if(require.main===module)(async()=>{
     await p.locator('.cp-holes [data-n="2"]').click();await mode(p,'3d');
     await p.waitForFunction(()=>document.querySelector('qa-map-scene')?.lastFlight.endCamera.heading===CaddieCoursePrep.geo.bearing(CADDIE_PREP_COURSES[0].holes[1].path[0],CADDIE_PREP_COURSES[0].holes[1].path.at(-1)));
     await p.locator('qa-map-scene').dispatchEvent('gmp-error');assert.match(await p.locator('#cp-map-stage').innerText(),/3D could not initialize/);
-    await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true');await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.maps),1,'reuse satellite map');
-    assert.equal(await p.evaluate(()=>mapQA.mapGesture),'greedy');
-    const fits=await p.evaluate(()=>mapQA.fits);await p.locator('.cp-clubs [data-club="5-wood"]').click();await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.fits),fits,'club changes preserve satellite camera');
-    await p.locator('[data-cp="frame"][data-focus="green"]').click();assert.equal(await p.evaluate(()=>mapQA.fits),fits+1);
+    await mode(p,'route');await p.locator('[data-cp="next"]').click();await mode(p,'3d');await p.locator('qa-map-scene').waitFor();
     await p.evaluate(()=>window.gm_authFailure());assert.match(await p.locator('#cp-map-stage').innerText(),/Google rejected/);
     await p.evaluate(()=>console.error('Google Maps JavaScript API error: BillingNotEnabledMapError https://example.test/?key=PRIVATE_TEST_KEY'));
     assert.equal(await p.locator('.cp-error-code').innerText(),'BillingNotEnabledMapError');
@@ -234,7 +231,7 @@ if(require.main===module)(async()=>{
     assert.ok(!(await p.locator('#course-prep').innerText()).includes('PRIVATE_TEST_KEY'));
     await mode(p,'3d');assert.equal(await p.locator('.cp-error-code').innerText(),'BillingNotEnabledMapError','auth error persists across imagery tabs');
     assert.equal(await p.locator('qa-map-scene').count(),0,'rejected Google session cannot show a misleading 3D viewer');
-    await mode(p,'satellite');
+    await mode(p,'3d');
     await Promise.all([p.waitForEvent('load',{timeout:5000}),p.locator('#cp-map-stage [data-cp="retry"]').click()]);
     await p.locator('.cp-google-map').waitFor();assert.equal(googleRequests,2,'retry must request a fresh Google session');
     assert.match(await p.locator('.cp-hole-heading').innerText(),/Hole 3/,'retry restores the selected hole');
@@ -294,13 +291,13 @@ if(require.main===module)(async()=>{
       const beforeMap=await state(p),scorecard=await p.locator('.lvhn').elementHandle();
       await p.locator('[data-action="live-hole-map"]').click();await p.locator('#cp-live-map qa-map-scene').waitFor();
       assert.match(await p.locator('#cp-guide-title').innerText(),new RegExp('^Hole '+n+' · Par '));
-      assert.deepEqual(await p.locator('.cp-imagery-views button').allTextContents(),['3D','Overhead']);
+      assert.deepEqual(await p.locator('.cp-imagery-views button').allTextContents(),['3D']);
       assert.equal(await p.locator('.cp-imagery-views [data-mode="3d"]').getAttribute('aria-pressed'),'true');
       assert.equal(await p.locator('[data-cp="shot-plan"]').count(),0);
       await p.waitForFunction(n=>{const e=document.querySelector('qa-map-scene'),h=CADDIE_PREP_COURSES[0].holes[n-1],s=JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge;return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(s.holes[s.tee+':'+n]?.tee||h.path[0],h.path.at(-1));},n);
       await assertHolePins(p,n);
       const liveYardages=await p.locator('.cp-map-summary').innerText();
-      await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();assert.equal(await p.locator('.cp-map-summary').innerText(),liveYardages);
+      await mode(p,'3d');await p.locator('.cp-google-map').waitFor();assert.equal(await p.locator('.cp-map-summary').innerText(),liveYardages);
       await mode(p,'route');await p.locator('#cp-route-map').waitFor();assert.equal(await p.locator('[data-cp="overview"]').count(),0);
       const bounds=await p.locator('#cp-live-map').evaluate(e=>{e.scrollTop=0;const r=e.getBoundingClientRect();return {fits:r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight,overflow:e.scrollWidth>e.clientWidth+1};});
       assert.ok(bounds.fits&&!bounds.overflow,'live map fits '+width);
@@ -334,7 +331,7 @@ if(require.main===module)(async()=>{
     assert.match(await p.locator('#cp-reference').innerText(),/My location/);
     assert.equal(await p.locator('.cp-map-summary b').first().innerText(),'0 yd');
     assert.deepEqual(await state(p),beforeLiveGPS,'live GPS is never persisted');
-    await mode(p,'satellite');assert.equal(await p.evaluate(()=>locationQA.active()),1);
+    await mode(p,'3d');assert.equal(await p.evaluate(()=>locationQA.active()),1);
     await p.keyboard.press('Escape');await p.locator('#cp-live-map').waitFor({state:'detached'});
     assert.equal(await p.evaluate(()=>locationQA.active()),0,'closing live map stops GPS');
     await p.locator('[data-action="live-hole-map"]').click();await p.locator('qa-map-scene').waitFor();
@@ -388,8 +385,8 @@ if(require.main===module)(async()=>{
     assert.equal(await gp.evaluate(()=>mapQA.flights),camera,'GPS movement preserves the 3D camera');
     assert.notEqual((await gp.locator('qa-map-marker').evaluateAll(els=>els.map(e=>e.label)))[2],expected);
     await gp.evaluate(point=>locationQA.fix(point),points[0]);
-    await mode(gp,'satellite');await gp.locator('.cp-google-map').waitFor();
-    assert.equal(await gp.evaluate(()=>mapQA.overlays.findLast(o=>o.opts.map&&o.opts.label?.className==='cp-google-yardage-label').opts.label.text),expected);
+    await mode(gp,'route');await gp.locator('#cp-route-map').waitFor();
+    assert.ok((await gp.locator('.cp-map-summary').innerText()).includes('to your target'));
     assert.equal(await gp.evaluate(()=>locationQA.active()),1,'map switches reuse the same location watch');
     await gp.locator('[data-cp="use-tee"]').click();assert.equal(await gp.evaluate(()=>locationQA.active()),0);
     assert.equal(await gp.locator('.cp-map-summary b').first().innerText(),teeDistance);assert.deepEqual(await state(gp),beforeLocation);

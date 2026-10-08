@@ -51,10 +51,10 @@
     return out;
   }
   let bridge, root, liveDialog, hole = 1, mode = 'guide', lastMapMode = '3d', overview = false, edit = 'target';
-  let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps2d, maps3d, overlays2d = [];
+  let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps3d;
   let lines3d = [], markers3d = [];
   let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
-  let showRings = true, framed2d = null, framed3d = null;
+  let showRings = true, framed3d = null;
   let cameraQueue = Promise.resolve(), cameraRevision = 0;
   const queueCamera = work => (cameraQueue = cameraQueue.catch(() => {}).then(work));
   // Device location is a foreground-only measuring reference, never a saved tee.
@@ -137,8 +137,9 @@
   function resumeAfterReload() {
     let pending;
     try { pending = JSON.parse(sessionStorage.getItem(RESUME) || 'null'); sessionStorage.removeItem(RESUME); } catch { return false; }
+    if(pending?.mode==='satellite')pending.mode='3d'; // migrate a pre-v224 resume
     const source = pending && findCourse(pending.courseId || courses[0].id);
-    if(!source || !source.holes.some(h => h.n === pending.hole) || !['route','guide','satellite','3d'].includes(pending.mode)) return false;
+    if(!source || !source.holes.some(h => h.n === pending.hole) || !['route','guide','3d'].includes(pending.mode)) return false;
     selectCourse(source.id);
     hole = pending.hole; mode = pending.mode==='guide'&&!hasGuide(course,currentHole()) ? initialMode() : pending.mode;
     if(mode!=='guide'){lastMapMode=mode;if(navigator.onLine===false)mode='route';}
@@ -214,7 +215,7 @@
       '<button class="hq-btn" data-action="open-course-prep">Explore courses <span aria-hidden="true">↗</span></button></section>';
   }
   function setup() {
-    return '<details class="cp-setup" id="cp-setup"><summary>Google Maps setup <span>' + (key() ? 'Key saved' : 'Connect overhead & 3D') + '</span></summary>' +
+    return '<details class="cp-setup" id="cp-setup"><summary>Google Maps setup <span>' + (key() ? 'Key saved' : 'Connect 3D') + '</span></summary>' +
       '<p>Enable Maps JavaScript API and billing in the same Google Cloud project as your key. Choose Websites as the application restriction, including on iPhone, and restrict the key to Maps JavaScript API. ' +
       link('https://console.cloud.google.com/google/maps-apis/credentials', 'Open Google setup ↗') + '</p>' +
       '<label for="cp-api-key">Browser API key</label><div class="cp-key-row"><input id="cp-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="' + (key() ? 'A key is saved · paste to replace' : 'Paste your restricted key') + '">' +
@@ -224,7 +225,7 @@
   function mapViews() {
     if(mode==='guide')return '';
     return '<div class="cp-map-views"><div class="cp-imagery-views" role="group" aria-label="Imagery view">'+
-      [['3d','3D'],['satellite','Overhead']].map(([k,label])=>button('mode',label,'data-mode="'+k+'" aria-pressed="'+(mode===k)+'"')).join('')+'</div>'+
+      [['3d','3D']].map(([k,label])=>button('mode',label,'data-mode="'+k+'" aria-pressed="'+(mode===k)+'"')).join('')+'</div>'+
       button('mode','Simple map','class="cp-simple-view" data-mode="route" aria-pressed="'+(mode==='route')+'"')+'</div>'+
       (mode==='route'?'<p class="cp-map-view-note" role="status">'+(navigator.onLine===false?'You’re offline · using the simple map':'Simple map · works offline')+'</p>':'');
   }
@@ -308,8 +309,7 @@
     const next=findCourse(id);if(!next)return false;
     if(next.id!==course.id){
       epoch++;stopFlyover();stopGuideLoad();clearGoogle3d();stopLocation();
-      overlays2d.forEach(x=>x.setMap(null));overlays2d=[];
-      course=next;hole=1;bagSnapshot=null;framed2d=null;framed3d=null;
+      course=next;hole=1;bagSnapshot=null;framed3d=null;
       projection=null;overview=false;edit='target';guideStyle='auto';lastMapMode='3d';mode=initialMode();
       if(!googleAuthFailed){googleFailure='';googleFailureMode='';}
     }
@@ -390,12 +390,13 @@
   }
   function openLiveMap(courseId, n, start = '3d') {
     if(packs&&!packs.ready(findCourse(courseId)?.id))return loadDialog(courseId,n,'map',start);
+    if(start==='satellite')start='3d'; // legacy callers resume in 3D
     const source=findCourse(courseId), h=source?.holes.find(item=>item.n===+n);
     if(!h || h.mapReady===false || !bridge)return false;
     closeGuide();selectCourse(source.id);
     const dialog = holeDialog(course,h,'cp-live-map','Close interactive map','<div class="cp-live-map-content"></div>');
-    liveDialog = dialog; hole = h.n; framed3d = null; framed2d = null;
-    mode = key() && navigator.onLine!==false && ['3d','satellite','route'].includes(start) ? start : 'route';
+    liveDialog = dialog; hole = h.n; framed3d = null;
+    mode = key() && navigator.onLine!==false && ['3d','route'].includes(start) ? start : 'route';
     lastMapMode = mode; overview = false; edit = 'target';
     if(!googleAuthFailed && googleFailureMode && googleFailureMode!==mode)googleFailure='';
     redraw();
@@ -442,7 +443,7 @@
       case 'next': changeHole(hole + 1); break;
       case 'mode': {
         const requested=el.dataset.mode;
-        if(!['guide','map','route','satellite','3d'].includes(requested))break;
+        if(!['guide','map','route','3d'].includes(requested))break;
         if(requested==='guide'&&!hasGuide(course,currentHole()))break;
         if(liveDialog && requested==='guide'){openGuide(course.id,hole);break;}
         stopFlyover();
@@ -612,10 +613,10 @@
       (mapped && !overview ? button('edit','Landing target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
       (mapped && !overview && selected()?.carry>0 ? button('rings','Carry rings','aria-pressed="'+showRings+'"'):'')+
       (savedHole().target ? button('clear-target','Clear target'):'') + (savedHole().tee ? button('reset-tee','Reset tee'):'') + '</div>';
-    if(mapped && ['satellite','3d'].includes(mode))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+(!liveDialog?button('shot-plan','Shot plan ↓'):'')+(mode==='3d'?button('frame','Back to tee','data-focus="tee"'):'')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
+    if(mapped && (mode==='3d'))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+(!liveDialog?button('shot-plan','Shot plan ↓'):'')+(mode==='3d'?button('frame','Back to tee','data-focus="tee"'):'')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
     root.querySelector('#cp-map-caption').innerHTML = mode === 'guide'
       ? 'Official club illustration · not to scale. '+link(course.tour,'Open course guide ↗')
-      : (['satellite','3d'].includes(mode)?'One finger to move · pinch to zoom. Scroll outside the map to move the page. ':'')+(overview ? mappedHoles().length+' mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
+      : ((mode==='3d')?'One finger to move · pinch to zoom. Scroll outside the map to move the page. ':'')+(overview ? mappedHoles().length+' mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
         '<span>Approximate routes · incomplete hazard coverage · '+link('https://www.openstreetmap.org/copyright','© OpenStreetMap contributors')+'</span>';
   }
   async function drawView() {
@@ -653,27 +654,16 @@
       return;
     }
     if (!key()) {
-      stage.innerHTML='<div class="cp-map-message"><span class="cp-orbit" aria-hidden="true">◎</span><h3>'+ (mode==='3d'?'Explore '+esc(course.shortName)+' in 3D':'Google satellite view') +'</h3><p>Connect your Google Maps key to load this view inside Caddie HQ.</p>'+button('map-setup','Connect Google Maps')+button('mode','Use simple map','data-mode="route"')+link('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(course.name+' '+course.place),'Open '+esc(course.shortName)+' in Google Maps ↗')+'</div>';
+      stage.innerHTML='<div class="cp-map-message"><span class="cp-orbit" aria-hidden="true">◎</span><h3>'+ ('Explore '+esc(course.shortName)+' in 3D') +'</h3><p>Connect your Google Maps key to load this view inside Caddie HQ.</p>'+button('map-setup','Connect Google Maps')+button('mode','Use simple map','data-mode="route"')+link('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(course.name+' '+course.place),'Open '+esc(course.shortName)+' in Google Maps ↗')+'</div>';
       return;
     }
     if (googleAuthFailed || googleFailure) return mapError(googleFailure, googleFailureMode);
-    stage.innerHTML='<div class="cp-map-message" role="status">Loading Google '+(mode==='3d'?'3D':'satellite')+'…</div>';
+    stage.innerHTML='<div class="cp-map-message" role="status">Loading Google '+'3D'+'…</div>';
     let stageName = 'loading Google';
     try {
       await loadGoogle();
       stageName = 'loading the map library';
       if(token!==epoch||!root)return;
-      if(mode==='satellite') {
-        const [lib]=await Promise.all([google.maps.importLibrary('maps'),google.maps.importLibrary('marker')]);
-        if(token!==epoch||!root)return;
-        if(!maps2d) {
-          const div=document.createElement('div');div.className='cp-google-map';
-          maps2d=new lib.Map(div,{center:ll(course.center),zoom:16,mapTypeId:'satellite',gestureHandling:'greedy',streetViewControl:false,mapTypeControl:false,fullscreenControl:true});
-          maps2d.addListener('click',e=>{if(e.latLng)choosePoint([e.latLng.lat(),e.latLng.lng()]);});
-        }
-        stage.replaceChildren(maps2d.getDiv());
-        if(framed2d!==hole){frameGoogle('hole');framed2d=hole;}drawGoogle2d();
-      } else {
         const lib=await google.maps.importLibrary('maps3d');
         if(token!==epoch||!root)return;
         stageName = 'starting the 3D viewer';
@@ -684,16 +674,15 @@
           maps3d=new lib.Map3DElement({center,range,heading,tilt,roll,mode:'SATELLITE',gestureHandling:'GREEDY'});
           maps3d.className='cp-google-map';
           maps3d.addEventListener('gmp-click',e=>{if(e.position)choosePoint([e.position.lat,e.position.lng]);});
-          maps3d.addEventListener('gmp-error',()=>{if(root&&mode==='3d')mapError('3D could not initialize on this device. Try Overhead or the simple map.','3d');});
+          maps3d.addEventListener('gmp-error',()=>{if(root&&mode==='3d')mapError('3D could not initialize on this device. Try the simple map.','3d');});
         }
         stage.replaceChildren(maps3d);
         stageName = 'drawing the 3D hole';
         drawGoogle3d(lib);
         stageName = 'positioning the 3D camera';
         if(framed3d!==hole){await frameGoogle('tee');if(token!==epoch||!root)return;framed3d=hole;}
-      }
     } catch {
-      if(token===epoch&&root)mapError(googleFailure || (mode==='3d'?'The 3D view':'Satellite')+' could not finish '+stageName+'. Reload and retry, or choose another view.', mode);
+      if(token===epoch&&root)mapError(googleFailure || 'The 3D view'+' could not finish '+stageName+'. Reload and retry, or choose another view.', mode);
     }
   }
   const ll = p => ({lat:p[0],lng:p[1]});
@@ -707,11 +696,6 @@
   function frameGoogle(focus) {
     const stopped=stopFlyover(), revision=cameraRevision;
     const path=[...currentHole().path,origin(),...(savedHole().target?[target()]:[])];
-    if(mode==='satellite' && maps2d){
-      const bounds=new google.maps.LatLngBounds();
-      const points=focus==='green'?[destination(green(),70,0),destination(green(),70,90),destination(green(),70,180),destination(green(),70,270)]:path;
-      points.forEach(p=>bounds.extend(ll(p)));maps2d.fitBounds(bounds,45);
-    }
     if(mode==='3d' && maps3d){
       const mid=[(Math.min(...path.map(p=>p[0]))+Math.max(...path.map(p=>p[0])))/2,(Math.min(...path.map(p=>p[1]))+Math.max(...path.map(p=>p[1])))/2];
       const radius=Math.max(...path.map(p=>distance(mid,p)))*0.9144;
@@ -751,7 +735,6 @@
     if(!root)return;
     try {
       if(mode==='route')drawView();
-      else if(!googleFailure && mode==='satellite'&&maps2d)drawGoogle2d();
       else if(!googleFailure && mode==='3d'&&maps3d)drawGoogle3d(google.maps.maps3d);
     } catch {mapError('This view could not update the yardage markers. Reload and retry, or choose another view.',mode);}
   }
@@ -812,24 +795,11 @@
   function mapError(message, failedMode = '') {
     if(googleAuthFailed) {message=googleErrorAdvice();failedMode='';}
     googleFailure=message;googleFailureMode=failedMode;
-    if(!root||!['3d','satellite'].includes(mode))return;
+    if(!root||mode!=='3d')return;
     stopFlyover();
     clearGoogle3d();
     root.querySelector('#cp-map-stage').innerHTML='<div class="cp-map-message"><h3>Google Maps is unavailable</h3><p>'+esc(message)+'</p>'+(googleErrorCode?'<code class="cp-error-code">'+esc(googleErrorCode)+'</code>':'')+button('retry','Reload & retry')+button('map-setup','Maps setup')+button('mode','Use simple map','data-mode="route"')+'</div>';
     drawControls();
-  }
-  function drawGoogle2d() {
-    overlays2d.forEach(x=>x.setMap(null));overlays2d=[];
-    const add=o=>{overlays2d.push(o);return o;};
-    add(new google.maps.Polyline({map:maps2d,path:currentHole().path.map(ll),strokeColor:'#c5e78a',strokeWeight:4,clickable:false}));
-    if(savedHole().target)add(new google.maps.Polyline({map:maps2d,path:[origin(),target(),green()].map(ll),strokeColor:'#ffb766',strokeWeight:2,clickable:false}));
-    [[origin(),liveLocation()?'You':'T','#204d3e'],[green(),'G','#668a43'],...(savedHole().target?[[target(),'A','#b77224']]:[])].forEach(([p,label,color])=>add(new google.maps.Marker({map:maps2d,position:ll(p),label:{text:label,color:'#fff',fontSize:'12px',fontWeight:'700'},icon:{path:google.maps.SymbolPath.CIRCLE,scale:liveLocation()&&label==='You'?15:11,fillColor:color,fillOpacity:1,strokeColor:'#fff',strokeWeight:2},clickable:false})));
-    add(new google.maps.Marker({map:maps2d,position:ll(target()),label:{text:savedHole().target?targetYardage():'Green · '+yard(distance(origin(),green()))+' yd',color:'#193e32',fontSize:'12px',fontWeight:'700',className:'cp-google-yardage-label'},icon:{path:google.maps.SymbolPath.CIRCLE,scale:1,fillOpacity:0,strokeOpacity:0,labelOrigin:new google.maps.Point(0,-28)},clickable:false,zIndex:1000}));
-    const c=selected(),roll=savedHole().roll||0;
-    if(showRings && c && c.carry > 0) {
-      add(new google.maps.Circle({map:maps2d,center:ll(origin()),radius:c.carry*0.9144,strokeColor:'#c5e78a',strokeWeight:2,fillOpacity:0,clickable:false}));
-      if(roll)add(new google.maps.Circle({map:maps2d,center:ll(origin()),radius:(c.carry+roll)*0.9144,strokeColor:'#ffb766',strokeWeight:2,fillOpacity:0,clickable:false}));
-    }
   }
   function clearGoogle3d() {
     // Remove our overlays while the map is still attached. Detaching the map
@@ -872,7 +842,7 @@
       if(!root||mode!=='3d'||i>=path.length){stopFlyover();return;}
       const p=path[i],heading=i<path.length-1?bearing(p,path[i+1]):bearing(path[i-1],p);
       i++;
-      moveGoogleCamera({center:{...ll(p),altitude:0},altitudeMode:'RELATIVE_TO_GROUND',range:360,tilt:58,heading},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:2800,revision);
+      moveGoogleCamera({center:{...ll(p),altitude:0},altitudeMode:'RELATIVE_TO_GROUND',range:200,tilt:58,heading},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:2800,revision);
     };
     animationHandler=next;maps3d.addEventListener('gmp-animationend',next);
     animationTimer=setTimeout(stopFlyover,30000);next();
@@ -880,7 +850,7 @@
   window.addEventListener('course-downloads-change',downloadStatus);
   window.addEventListener('resize',()=>{if(root && mode==='route')drawView();});
   window.addEventListener('offline',()=>{
-    if(root&&['satellite','3d'].includes(mode)){stopFlyover();mode='route';overview=false;redraw();}
+    if(root&&(mode==='3d')){stopFlyover();mode='route';overview=false;redraw();}
     else if(root&&mode==='route')redraw();
     else if(root&&mode==='guide'&&packReady())redraw();
   });
@@ -896,7 +866,7 @@
   window.CaddieCoursePrep = Object.freeze({
     init: options => {bridge=options;packs?.start();}, render, mount, unmount, teaser, resumeAfterReload, openGuide, openLiveMap,
     resumeLiveMap: () => openLiveMap(course.id,hole,mode),
-    openHole: (n,courseId) => {if(courseId&&!selectCourse(courseId))return false;hole=course.holes.some(h=>h.n===+n)?+n:1;framed3d=null;framed2d=null;mode=initialMode();imageError=false;overview=false;return true;},
+    openHole: (n,courseId) => {if(courseId&&!selectCourse(courseId))return false;hole=course.holes.some(h=>h.n===+n)?+n:1;framed3d=null;mode=initialMode();imageError=false;overview=false;return true;},
     get courseName(){return course.name;}, get courseId(){return course.id;}, findCourse, clean, hasGuide,
     geo: Object.freeze({distance,destination,bearing,pointOK})
   });

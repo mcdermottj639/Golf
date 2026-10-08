@@ -27,7 +27,7 @@ lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
 round-takeaways.js    Shared scoring and club-data insight selection + compact visual cards
 bay-takeaways.js      Full-day range insight selection, explanations, source links and practice tests
-course-prep.js/.css   Shared course planner and live maps; lazy Google satellite/3D views
+course-prep.js/.css   Shared course planner and live maps; lazy Google 3D views
 hole-guide.js        Sourced illustrated hole renderer; offline, tee-to-green
 course-prep-data.js   Generated lightweight directory; scorecards and coverage, no geometry
 course-packs.js       Versioned downloads, offline cache, favorites and recent-course limits
@@ -217,8 +217,9 @@ was a design direction; shipped playable shapes must come from source geometry.
 `mapReady:false`. A failed external image can offer the generated guide when available.
 Both kinds of guide fit fully without cropping; SVG masks/filters use an explicit
 user-space frame so near-vertical holes do not collapse into a narrow strip.
-Inside Interactive map, 3D is first and the initial default; Overhead is beside it in
-the imagery switch; Simple map is a secondary button and the offline fallback. Within
+Inside Interactive map, 3D is the only imagery mode (v224); Simple map remains the
+offline alternative. Overhead UI, map library loading and 2D overlay code are removed.
+Legacy satellite resume values normalize to 3D; do not discard the resumed course/hole. Within
 prep, retain the last chosen map style in memory across guide/hole navigation. Opening
 a live map popup starts in 3D. No key defaults map entry to Simple map; explicit imagery buttons still
 explain connection setup. Going offline while viewing imagery selects Simple map without
@@ -249,7 +250,7 @@ pagehide and backgrounding also stop/clear it; foregrounding requires another ta
 changes while releasing it on other navigation. Epoch guards ignore late callbacks.
 Location updates preserve Google camera position and never change the saved tee.
 
-Google Maps loads only when Overhead or 3D is selected with a key configured and the browser is online.
+Google Maps loads only when 3D is selected with a key configured and the browser is online.
 Enable Maps JavaScript API + billing and restrict the browser key to that API and
 `https://mcdermottj639.github.io/*`. Setup stores it separately in
 `caddiehq_google_maps_key_v1`, outside golf backups; deployments can alternatively
@@ -3946,8 +3947,10 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v212 startup correction:** v211 mistakenly spread CameraOptions into Map3DElementOptions, passing unsupported altitudeMode at construction. Explicitly select center/range/heading/tilt/roll for startup; altitudeMode belongs only in flyCameraTo endCamera, but its value must be RELATIVE_TO_GROUND (see v213 correction). The strict constructor browser mock now rejects unsupported options; it reproduces v211 startup failure and passes with this correction. This is contract/mock validation, not live device imagery verification.
 
-**v211 tee camera:** 3D initialization and each hole entry frame from behind the saved/reference tee toward the green, independent of GPS measurement origin. Back to tee restores this viewpoint; guide remains the first tab. Serialize asynchronous stop/start camera calls with revision guards so stale work cannot cancel a newer frame. Club/GPS updates retain camera. Flyover begins at tee and keeps last segment heading at green. Browser mock exercises delayed stop completion and all 18 headings; real Google imagery is not available to automated QA without the device-held key.
+**v211 tee camera:** 3D initialization and each hole entry frame from behind the saved/reference tee toward the green, independent of GPS measurement origin. Back to tee restores this viewpoint; guide remains the first tab. Serialize asynchronous stop/start camera calls with revision guards so stale work cannot cancel a newer frame. Club/GPS updates retain camera. Flyover begins at tee and keeps last segment heading at green. v223 uses a 200 m camera range
+instead of 360 m for a closer view on every leg in both prep and live maps; retain the
+58° tilt, 2.8-second legs, ground-relative camera and existing cancellation guards. Browser mock exercises delayed stop completion and all 18 headings; real Google imagery is not available to automated QA without the device-held key.
 
 **v213 camera correction:** Real Google SDK 3.66.7 was loaded without a key for API contract checks. It confirms v211 constructor rejection and rejects v212 flyCameraTo with `InvalidValueError: in property endCamera: Altitude mode CLAMP_TO_GROUND is not supported for camera animations.` Camera targets now explicitly use altitude 0 + RELATIVE_TO_GROUND; ground-clamped markers/lines remain correct. The real SDK accepts this request past validation; no licensed imagery or device rendering was certified. Never copy marker altitude modes into camera calls. Draw overlays before camera work. Catch asynchronous camera rejections locally, retaining map/markers/yardages with direct-property framing (preserve observed absolute center altitude) and a brief toast; do not call mapError for optional camera motion. Regression covers rejected animations at entry and via controls, data preservation and all 18 camera modes.
 
-**v214 map navigation:** Two main buttons (Hole guide / Interactive map), nested 3D / Overhead controls (3D first/default as of v215) and secondary Simple map. Preserve guide-first hole entry, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. Internal mode values remain guide/route/satellite/3d for compatibility; map is a navigation action only.
+**v214 map navigation:** Two main buttons (Hole guide / Interactive map), 3D controls (Overhead removed in v224) and secondary Simple map. Preserve guide-first hole entry, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
