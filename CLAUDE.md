@@ -97,8 +97,9 @@ remain intact. The remote rollback branch is `backup/caddie-hq-v199-2026-10-02` 
 `e6b3f1c00cef2b7c097801ac325e3d4bf717ed43` (tree
 `8934e202bfdb8d9fa61ede53428588ead65c04ee`). Restoring code never means clearing localStorage.
 
-Five primary destinations: Overview (`home`), Bag (`bag`), Progress (`game`), Rounds and
-Coach. Retain these internal route IDs and all legacy aliases because saved updates and
+Five primary destinations, in navigation order: Overview (`home`), Rounds (`rounds`),
+Progress (`game`), Bag (`bag`) and Coach (`coach`). v222 swaps Rounds and Bag at Jack’s
+request; keep each icon and label with its existing route. Retain these internal route IDs and all legacy aliases because saved updates and
 deep links use them. Activity is the day-by-day log; Progress & trends is the existing
 cumulative analysis. Four labs open in one tap. Overview adds a sourced digest and recent
 activity, followed by the **complete** original home content inside `.hq-legacy`.

@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v221';
+const BUILD = 'v222';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v222', d:'2026-10-08', items:['NAVIGATION: Rounds and Bag switch places. Bottom tabs now run Overview, Rounds, Progress, Bag, Coach.'] },
   { b:'v221', d:'2026-10-08', items:['COURSES ON YOUR PHONE: Individual course downloads, verified offline availability, safe updates and favorites. Pound Ridge, Wianno, Sterling Farms and Metedeconk are favorites by default; scores and notes stay separate.'] },
   { b:'v220', d:'2026-10-08', items:['WIANNO HOLE 2: Player-confirmed green corrects a source map label, unlocking its illustrated guide and interactive yardages in prep and live rounds.'] },
   { b:'v219', d:'2026-10-08', items:['BAG: Full club history returns directly to My Bag, including individual irons and unmeasured clubs.'] },
