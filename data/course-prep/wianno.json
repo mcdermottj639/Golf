@@ -1,0 +1,188 @@
+{
+  "id": "wianno",
+  "storageKey": "wianno",
+  "name": "Wianno Club",
+  "shortName": "Wianno",
+  "place": "Osterville, MA",
+  "aliases": [
+    "Wianno Golf Club",
+    "Wianno"
+  ],
+  "bounds": [
+    41.6126347,
+    -70.39607339999999,
+    41.629582,
+    -70.3751361
+  ],
+  "center": [
+    41.62110835,
+    -70.38560475
+  ],
+  "par": 70,
+  "defaultTee": "blue",
+  "verified": "2026-10-08",
+  "source": "https://18birdies.com/golf-courses/club/959eb2a0-86ac-11e4-8c28-020000005b00/wianno-club",
+  "sourceLabel": "Published scorecard · 18Birdies",
+  "tour": "",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-70.395,41.614,-70.365,41.64",
+  "cardNote": "Blue tee yardages, pars and stroke indexes read from 18Birdies on October 8, 2026. This is a third-party published card; confirm it against the card at the course. Ratings are not independently verified.",
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6086,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        319,
+        452,
+        150,
+        465,
+        210,
+        380,
+        340,
+        555,
+        160,
+        436,
+        118,
+        470,
+        290,
+        192,
+        405,
+        402,
+        320,
+        422
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 15,
+      "osmId": 1136751489,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 1,
+      "osmId": 1136751491,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapReady": false,
+      "mapNote": "The source route’s green position could not be confirmed. Keep your club choice and hole note here while the map is checked."
+    },
+    {
+      "n": 3,
+      "par": 3,
+      "si": 17,
+      "osmId": 1136751492,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 4,
+      "par": 5,
+      "si": 11,
+      "osmId": 1136751493,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 5,
+      "par": 3,
+      "si": 7,
+      "osmId": 1136751496,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 5,
+      "osmId": 1136754585,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 9,
+      "osmId": 1136754586,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 8,
+      "par": 5,
+      "si": 3,
+      "osmId": 1136754591,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 9,
+      "par": 3,
+      "si": 13,
+      "osmId": 1136751486,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 2,
+      "osmId": 1136759122,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 11,
+      "par": 3,
+      "si": 18,
+      "osmId": 1136759123,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 12,
+      "par": 5,
+      "si": 10,
+      "osmId": 1136759126,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": 16,
+      "osmId": 1136759138,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 14,
+      "par": 3,
+      "si": 12,
+      "osmId": 1136765868,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "si": 6,
+      "osmId": 1136768068,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 8,
+      "osmId": 1136768069,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 17,
+      "par": 4,
+      "si": 14,
+      "osmId": 1136768071,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 4,
+      "osmId": 1136768078,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    }
+  ]
+}

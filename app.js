@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v216';
+const BUILD = 'v217';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v217', d:'2026-10-08', items:['YOUR COURSE LIBRARY: Explore Pound Ridge, Wianno and Sterling Farms from one course picker. Shared 3D/overhead maps, tap yardages and optional GPS work in prep and live rounds. Unverified hole maps are clearly marked while club choices and notes stay available.','SEPARATE PLANS: Targets, notes, reviewed holes and club choices stay with their course. Pound Ridge plans carry forward intact. Sterling adds 17 official guide images; unavailable illustrations open the interactive map. New Blue tee cards identify their published sources.'] },
   { b:'v216', d:'2026-10-08', items:['COMPLETE HOLE GUIDES: Illustrations appear after the full image loads, so a slow download cannot leave just the top strip showing. Prep and live-round guides retry interrupted loads and include a Retry image button.','CURRENT-HOLE PINS: 3D reuses only the active hole’s tee, green and optional target pins, clearing them before changing views or closing the live map.'] },
   { b:'v215', d:'2026-10-08', items:['LIVE HOLE MAP: Open Interactive map from your Pound Ridge scorecard for the current hole’s 3D view, tap-to-measure yardages and optional GPS reference. Switch to the illustrated guide or close to return to the same hole.','3D FIRST: Interactive map starts in 3D, with Overhead beside it. Hole guide still opens first in course prep, and Simple map remains the offline fallback.'] },
   { b:'v214', d:'2026-10-08', items:['ONE INTERACTIVE MAP: Hole guide and Interactive map are the two main views. Switch between Overhead and 3D inside the map; Simple map remains available and opens automatically offline. Your targets, tee and yardages stay shared.'] },
@@ -1340,7 +1341,7 @@ const TITLES = {
   coach:['Coach','Lessons that follow your game — not generic tips.'],
   drills:['Drills','What you can actually do — with the kit you own.'],
   rounds:['Rounds','Your cards, the plans behind them, and the courses.'],
-  courseprep:['Course Prep','Pound Ridge · your bag, your targets, your plan.'],
+  courseprep:['Course Prep','Your courses · your bag, your targets, your plan.'],
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
@@ -3049,7 +3050,7 @@ function hqExplore(){
     item('Your workspace','Activity log','Every range day, simulator round, course round and film',{a:'session-category',kind:'days'}),
     item('Play & improve','Start or resume a round','Live hole-by-hole logging and scoring',{a:'live-new'}),
     item('Play & improve','Rounds & scorecards','Your complete scoring record and analytics',{a:'go',v:'rounds',seg:'cards'}),
-    item('Play & improve','Pound Ridge · Course Prep','18 holes, Google 3D, satellite, targets and your club distances',{a:'open-course-prep'}),
+    ...(window.CADDIE_PREP_COURSES || []).map(c=>item('Play & improve',c.shortName+' · Course Prep',c.holes.length+' holes, Google 3D, targets and your club distances',{a:'open-course-prep',course:c.id})),
     item('Play & improve','Course plans','Personal tee strategy, holes and preparation',{a:'go',v:'rounds',seg:'prep'}),
     item('Play & improve','Courses','Every course, rating, record and bucket-list stop',{a:'go',v:'rounds',seg:'courses'}),
     item('Play & improve','Practice planner','Generate and track a Golf Lounge TrackMan session',{a:'hq-route',v:'coach',target:'sim-practice'}),
@@ -7023,7 +7024,7 @@ function briefing(id){
   const backSeg = backView === 'rounds' ? ' data-seg="prep"' : '';
   return `
   <button class="backlink" data-action="go" data-view="${backView}"${backSeg}>← ${backLabel}</button>
-  ${sameCourse(b.course, 'Pound Ridge Golf Club') ? window.CaddieCoursePrep?.teaser() || '' : ''}
+  ${window.CaddieCoursePrep?.findCourse(b.course) ? window.CaddieCoursePrep.teaser(b.course) : ''}
   <div class="card">
     <h2>${b.date ? 'Round prep · ' + fmtDate(b.date) : 'Standing plan'}</h2>
     <h3 style="font-size:19px">${esc(b.course)}</h3>
@@ -9264,7 +9265,12 @@ function publishedCard(course, nine){
   // to outrank the file it is correcting.
   const fed = (S.layouts || []).filter(hit).pop();
   const base = typeof COURSE_CARDS_OK !== 'undefined' ? COURSE_CARDS_OK.find(hit) : null;
-  const c = fed || base;
+  // A newly onboarded course also supplies a sourced baseline to live scoring.
+  // Existing corrections and historical card precedence remain stronger.
+  const pack = window.CaddieCoursePrep?.findCourse(course);
+  const catalog = pack ? {par:pack.holes.map(h=>h.par),si:pack.holes.map(h=>h.si),ver:'read',src:pack.cardNote+' '+pack.source,
+    tees:pack.tees.filter(t=>Number.isFinite(t.rating)&&Number.isFinite(t.slope)).map(t=>({t:t.name,r:t.rating,s:t.slope,y:t.total}))} : null;
+  const c = fed || base || catalog;
   if(!c || !Array.isArray(c.par)) return null;
   // A fed `layout` REPLACES the card — that is the whole point of it, and why an entry
   // correcting a wrong stroke index must be able to ship without one rather than have the
@@ -9366,7 +9372,7 @@ function courseMilesLab(name){
 
 function liveBriefing(L){
   const all = S.briefings.filter(b => b.course && courseMatches(b.course, L.course));
-  if(!all.length) return null;
+  if(!all.length){const source=window.CaddieCoursePrep?.findCourse(L.course);return source?{course:source.name,holes:[]}:null;}
   // The Black's plan for a round on the Black. planHeld() grades a card through here too,
   // so the exact-name rule keeps a round from being marked against the other course's plan.
   const pool = preferExact(all, L.course, b => b.course);
@@ -9874,7 +9880,8 @@ let lvHoleSeen = null, lvSeen = new Set();
 
 function livePlay(L){
   const h = L.holes[L.cur];
-  const guideCourse = (window.CADDIE_PREP_COURSES || []).find(c => sameCourse(L.course,c.name) && c.holes.some(item => item.n === h.n && item.guide));
+  const prepCourse = window.CaddieCoursePrep?.findCourse(L.course);
+  const guideCourse = prepCourse?.holes.some(item=>item.n===h.n&&item.guide) ? prepCourse : null;
   const t = liveThru(L);
   const par3 = h.par === 3;
   const clubs = bagClubs();
@@ -10108,7 +10115,7 @@ function livePlay(L){
       <span class="lvsaved">● SAVED</span></div>
   </div>
 
-  ${guideCourse || sameCourse(L.course, 'Pound Ridge Golf Club') ? `<div class="cp-live-guides">${guideCourse ? `<button type="button" class="btn" data-action="live-hole-guide" data-course="${esc(guideCourse.id)}" data-n="${h.n}" aria-haspopup="dialog">Hole guide ⤢</button>` : ''}${sameCourse(L.course,'Pound Ridge Golf Club') ? `<button type="button" class="btn" data-action="live-hole-map" data-course="pound-ridge" data-n="${h.n}" aria-haspopup="dialog">Interactive map ⤢</button>` : ''}</div>` : ''}
+  ${prepCourse ? `<div class="cp-live-guides">${guideCourse ? `<button type="button" class="btn" data-action="live-hole-guide" data-course="${esc(guideCourse.id)}" data-n="${h.n}" aria-haspopup="dialog">Hole guide ⤢</button>` : ''}${prepCourse.holes.some(item=>item.n===h.n&&item.mapReady!==false) ? `<button type="button" class="btn" data-action="live-hole-map" data-course="${esc(prepCourse.id)}" data-n="${h.n}" aria-haspopup="dialog">Interactive map ⤢</button>` : '<span class="sm faint">Hole map under review · your scorecard and plan are ready.</span>'}</div>` : ''}
   ${prep}
 
   <div class="lvseg">
@@ -10274,7 +10281,7 @@ function bumpGearCounters(){
 const ACTIONS = {
   'live-hole-guide': el => window.CaddieCoursePrep?.openGuide(el.dataset.course,+el.dataset.n),
   'live-hole-map': el => window.CaddieCoursePrep?.openLiveMap(el.dataset.course,+el.dataset.n),
-  'open-course-prep': el => { window.CaddieCoursePrep?.openHole(el?.dataset.n || 1); render('courseprep'); },
+  'open-course-prep': el => { window.CaddieCoursePrep?.openHole(el?.dataset.n || 1,el?.dataset.course); render('courseprep'); },
   'hq-explore': () => window.CaddieExplorer?.open(),
   'hq-back': () => {
     const previous=hqTrail.pop();if(!previous)return;
@@ -11578,15 +11585,15 @@ function fetchFeed(){
 // Course Prep passes narrow read/write callbacks; it never owns or replaces golf state.
 function coursePrepView(){ return window.CaddieCoursePrep?.render() || '<div class="card"><p>Course Prep is unavailable. Refresh to load the current app.</p></div>'; }
 function coursePrepNote(course, n){
-  if(!sameCourse(course, 'Pound Ridge Golf Club')) return '';
-  const p = window.CaddieCoursePrep?.clean(S.coursePrep?.poundRidge);
+  const source=window.CaddieCoursePrep?.findCourse(course);if(!source)return '';
+  const p = window.CaddieCoursePrep.clean(S.coursePrep?.[source.storageKey],source.id);
   return p?.holes[p.tee + ':' + n]?.note || '';
 }
 function initCoursePrep(){
   window.CaddieCoursePrep?.init({
-    get: () => S.coursePrep?.poundRidge,
-    liveHole: () => S.live?.stage === 'play' && sameCourse(S.live.course,'Pound Ridge Golf Club') ? S.live.holes?.[S.live.cur]?.n : null,
-    save: plan => { S.coursePrep = S.coursePrep || {}; S.coursePrep.poundRidge = plan; save(); },
+    get: id => S.coursePrep?.[window.CaddieCoursePrep.findCourse(id)?.storageKey],
+    liveHole: id => S.live?.stage === 'play' && window.CaddieCoursePrep.findCourse(S.live.course)?.id===id ? S.live.holes?.[S.live.cur]?.n : null,
+    save: (id,plan) => { const source=window.CaddieCoursePrep.findCourse(id);if(!source)return;S.coursePrep = S.coursePrep || {}; S.coursePrep[source.storageKey] = plan; save(); },
     bag: basis => {
       const evidence = basis === 'range' ? swingEvolutionRows() : new Map();
       return orderedCarries().map(row => {
@@ -11603,11 +11610,13 @@ function initCoursePrep(){
         provenance:measured ? recent ? 'Range · ' + recent.date + ' · ' + (recent.values.carry.n || 'unknown') + ' shots · ' + (recent.setup || recent.label) : 'No range carry recorded' : provenance};
       });
     },
-    club: n => (S.planCalls?.['pound ridge golf club']?.[n]?.club || [])[0] || '',
-    setClub: (n, key) => {
-      if(!Number.isInteger(n) || n < 1 || n > 18 || !S.carries.some(c => clubKey(c.club) === key)) return;
+    club: (id,n) => (S.planCalls?.[planKey({course:window.CaddieCoursePrep.findCourse(id)?.name})]?.[n]?.club || [])[0] || '',
+    setClub: (id,n, key) => {
+      const source=window.CaddieCoursePrep.findCourse(id);
+      if(!source?.holes.some(h=>h.n===n) || !S.carries.some(c => clubKey(c.club) === key)) return;
       S.planCalls = S.planCalls || {};
-      const calls = S.planCalls['pound ridge golf club'] = S.planCalls['pound ridge golf club'] || {};
+      const courseKey=planKey({course:source.name});
+      const calls = S.planCalls[courseKey] = S.planCalls[courseKey] || {};
       calls[n] = {club:[key], ts:today()}; save();
     },
     refresh: rerender, toast

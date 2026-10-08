@@ -33,6 +33,7 @@ jobs:
           node --check bay-takeaways.js
           node --check course-prep.js
           node --check course-prep-data.js
+          node scripts/build-course-prep.cjs --check
           node -e "for (const f of ['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"
           node tests/findability.cjs
           node tests/revamp-search.cjs

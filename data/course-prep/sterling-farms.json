@@ -1,0 +1,203 @@
+{
+  "id": "sterling-farms",
+  "storageKey": "sterling-farms",
+  "name": "Sterling Farms Golf Course",
+  "shortName": "Sterling Farms",
+  "place": "Stamford, CT",
+  "aliases": [
+    "Sterling Farms",
+    "Sterling Farms Golf Club"
+  ],
+  "bounds": [
+    41.0997477,
+    -73.53192109999999,
+    41.1111278,
+    -73.5177017
+  ],
+  "center": [
+    41.10543775,
+    -73.5248114
+  ],
+  "par": 72,
+  "defaultTee": "blue",
+  "verified": "2026-10-08",
+  "source": "https://www.grassy.golf/courses/sterling-farms-golf-course-us-ct/scorecard",
+  "sourceLabel": "Published scorecard · Grassy",
+  "tour": "https://www.sterlingfarmsgc.com/-course-video-tour",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.532,41.100,-73.517,41.112",
+  "cardNote": "Blue tee yardages, pars and stroke indexes read from Grassy on October 8, 2026. This is a third-party published card; confirm it against the card at the course. Ratings are not independently verified.",
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6158,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        346,
+        517,
+        302,
+        345,
+        211,
+        428,
+        381,
+        202,
+        337,
+        389,
+        366,
+        342,
+        462,
+        386,
+        153,
+        306,
+        210,
+        475
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 11,
+      "osmId": 687884145,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole1.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 5,
+      "si": 15,
+      "osmId": 687884146,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole2.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "si": 17,
+      "osmId": 687884147,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole3.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 1,
+      "osmId": 687884149,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole4.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 5,
+      "par": 3,
+      "si": 7,
+      "osmId": 687884150,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole5.jpg",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 6,
+      "par": 5,
+      "si": 13,
+      "osmId": 687884154,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole6.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 9,
+      "osmId": 687884155,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole7.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 8,
+      "par": 3,
+      "si": 3,
+      "osmId": 687884156,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole8.jpg",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 5,
+      "osmId": 687884157,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole9.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 12,
+      "osmId": 687884158,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole10.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 10,
+      "osmId": 687884160,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole11.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 4,
+      "osmId": 687884161,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 13,
+      "par": 5,
+      "si": 8,
+      "osmId": 687884162,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole13.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 2,
+      "osmId": 687884163,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole14.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 15,
+      "par": 3,
+      "si": 14,
+      "osmId": 687884165,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole15.jpg",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 16,
+      "osmId": 687884166,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole16.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 6,
+      "osmId": 687884170,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole17.jpg",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 18,
+      "par": 5,
+      "si": 18,
+      "osmId": 687884171,
+      "guide": "https://cdn.cybergolf.com/images/1928/hole18.jpg",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    }
+  ]
+}

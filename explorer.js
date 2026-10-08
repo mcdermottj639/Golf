@@ -18,7 +18,7 @@
   const actionFields = {
     a: 'action', v: 'view', view: 'view', seg: 'seg', id: 'id', i: 'i',
     metric: 'metric', prov: 'prov', value: 'value', unit: 'unit',
-    kind: 'kind', club: 'club', shelf: 'shelf', disc: 'disc', target: 'target',
+    kind: 'kind', club: 'club', shelf: 'shelf', disc: 'disc', target: 'target', course: 'course',
   };
 
   function make(tag, className, text) {

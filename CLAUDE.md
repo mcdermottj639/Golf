@@ -27,8 +27,10 @@ lessons.js            Coaching lesson library (window.LESSONS)
 courses-db.js         Course autocomplete database
 round-takeaways.js    Shared scoring and club-data insight selection + compact visual cards
 bay-takeaways.js      Full-day range insight selection, explanations, source links and practice tests
-course-prep.js/.css   Interactive Pound Ridge planner; lazy Google satellite/3D views
-course-prep-data.js   Official scorecard + attributed OpenStreetMap routes, available offline
+course-prep.js/.css   Shared course planner and live maps; lazy Google satellite/3D views
+course-prep-data.js   Generated course catalog + sourced OSM routes, available offline
+data/course-prep/    Per-course packs, catalog order and original-coordinate OSM subsets
+scripts/build-course-prep.cjs  Validates packs and generates the offline browser catalog
 course-prep-feed.json Apply-once course card, mapped location and refreshed standing prep
 coach-feed.json       One-way "coach inbox" — see Data model below  ← updates land here
 sw.js                 Service worker (offline cache of the shell)
@@ -119,19 +121,29 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v216, October 8 2026)
+## Course Prep (v217, October 8 2026)
 
-Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep
-and Explorer. The Pound Ridge live hole opens its map in a popup over the scorecard.
-`courseprep` maps back to Rounds in navigation.
-`course-prep.js` receives narrow callbacks from `initCoursePrep()`; it must never
-replace the full player state. `S.coursePrep.poundRidge` holds the selected tee and
-distance source plus per-tee/per-hole notes, reviewed flags, tee/target positions and
-rollout assumptions. Existing `S.planCalls` remains the authority for club choices,
+Rounds leads with **Explore courses**. The picker contains Pound Ridge, Wianno and
+Sterling Farms; each has 18 sourced scorecard holes. Wianno hole 2 is held for map review,
+so 53 of the 54 holes currently offer interactive yardages. Individual standing plans and
+Explorer link directly to their course. Every supported live hole opens its own map
+in a popup over the scorecard. `courseprep` maps back to Rounds in navigation.
+`course-prep.js` receives narrow course-ID callbacks from `initCoursePrep()`; it must
+never replace the full player state. Course `storageKey` retains the legacy
+`S.coursePrep.poundRidge` unchanged; new records are `S.coursePrep.wianno` and
+`S.coursePrep['sterling-farms']`. Each holds its own selected tee and distance source,
+per-tee/per-hole notes, reviewed flags, tee/target positions and rollout assumptions.
+Simply opening/switching maps must never write player state. Course changes invalidate
+pending image/map/camera callbacks, clear overlays before map detach, stop and discard
+GPS, reset the framing and start at hole 1. Bounds come from the selected course pack;
+never accept a location or saved target from a different course. Google credentials
+remain one shared device setting. Retry state includes course ID; legacy resume records
+without it still refer to Pound Ridge, and a live popup resumes only for the matching
+live course AND hole. Existing `S.planCalls` remains the authority for club choices,
 shared with the regular briefing and live-round prep. Club choices are per course/hole;
 notes and map positions are per tee/hole. All are included in normal golf backups.
 The live-hole header offers **Hole guide** when a matching course/hole has a sourced
-illustration, plus **Interactive map** for Pound Ridge. `openGuide(courseId,n)` and
+illustration, plus **Interactive map** for every supported mapped course. `openGuide(courseId,n)` and
 `openLiveMap(courseId,n)` open native modal dialogs over the round; Close,
 Escape and the backdrop return focus to the button without changing the live hole,
 score or notes. Navigation closes the dialog. Image failure shows a connection hint
@@ -159,7 +171,7 @@ marks that tee/hole reviewed and advances to the next unreviewed hole, wrapping 
 Never infer green contours, today's pins,
 forced carries or safe landing zones from incomplete map geometry.
 
-The club's scorecard image is printed **01/24**, read October 8, 2026. Seven tee
+Pound Ridge’s scorecard image is printed **01/24**, read October 8, 2026. Seven tee
 yardage rows are available; Pine's men's rating is absent and must remain unset.
 The new apply-once layout corrects older third-party ratings without rewriting rounds.
 The new standing briefing preserves the prior researched material in labelled archive
@@ -179,8 +191,13 @@ timers/handlers on hole/view changes, navigation and popup close; late image cal
 must never replace a newer hole. Do not alter the illustration's aspect ratio or crop
 its tee/green. Validate delayed/chunked downloads, timeout/error recovery, rapid hole
 switches, and the full image in prep and live dialogs at 320/390 widths.
-The Hole guide is the initial view on entry and every hole change (arrows, numbered
-holes, plan rows and overview map). Only Hole guide and Interactive map are top-level choices.
+A sourced Hole guide is the initial view on entry and every hole change (arrows, numbered
+holes, plan rows and overview map). Where an illustration is unavailable, omit its tab
+and start the Interactive map in 3D (Simple map without a key/offline). Wianno has no
+verified public club illustrations; Sterling Farms has 17 linked from its official
+course tour. The hole-12 image link on that tour is broken and is deliberately omitted.
+Never use a different hole’s image or fabricate an illustrated guide. Only Hole guide
+and Interactive map are top-level choices when both are available.
 Inside Interactive map, 3D is first and the initial default; Overhead is beside it in
 the imagery switch; Simple map is a secondary button and the offline fallback. Within
 prep, retain the last chosen map style in memory across guide/hole navigation. Opening
@@ -264,18 +281,54 @@ generic callback remains a fallback. Global authorization failures persist acros
 map modes and override later 3D initialization errors until a real page reload. Caddie HQ uses the Websites
 restriction even when installed on an iPhone home screen.
 
+**Adding courses:** author a `data/course-prep/<id>.json` pack and its corresponding
+`<id>-osm.json` source subset, then add its slug to `catalog.json`. Run
+`node scripts/build-course-prep.cjs`; CI runs `--check` to reject stale generated data.
+The generator validates unique IDs/names/storage keys, an explicit 9- or 18-hole routing,
+ordered hole numbers, tee totals, pars, stroke indexes, coordinates inside course bounds,
+and original OSM ways/par/ref matches. A 27-hole facility needs separately identified
+routings; never map an ambiguous 18-hole live card to an arbitrary set of 27 holes.
+A source route can be held with `mapReady:false` plus `mapNote`. Retain the source
+coordinates for the audit, omit it from map overview and live-map buttons, and show
+Map under review in prep with no GPS, pins or mapped yardages. Wianno hole 2 is held:
+its raw OSM endpoint is near a `golf=tee` way (989266485), about 75 meters from the
+nearest mapped green center. That inconsistency cannot be fixed by guessing a nearby
+green. Other Wianno endpoints are within about 3 meters of mapped green centers.
+Sterling hole 3 initially appeared to lack a green because the first query rectangle
+cut it off; the final source query includes the whole course. Source import completeness
+and endpoint checks are separate from preserving the raw coordinate values.
+Current additional packs use one published Blue tee card each: Wianno 6,086 yards
+(18Birdies, consistent with the existing standing plan/card) and Sterling Farms 6,158
+(Grassy). Their UI and source notes explicitly label third-party transcription and
+leave unverified ratings/slope unset. They are not claimed to be freshly verified club
+cards. The official Sterling tour supplies images, not those tee yardages. Further
+tee sets require individually sourced rows, not geometry-derived scorecard yardages.
+`publishedCard()` uses the catalog only below existing feed corrections and base cards;
+Jack’s actual historical layouts still win in live setup. No existing round is rewritten.
+An onboarded course without a standing briefing can still expose saved calls/notes via
+an ephemeral empty briefing with its canonical name. Exact declared aliases enable live
+map matching; never fuzzy-match one layout to another. Guide images are loaded from the
+club’s host with the existing full-decode/retry path, never copied into the repository.
+Add the OSM source subset to `sw.js` for offline source downloads. The compiled catalog
+already includes every route so offline course switching needs no new network request.
+
 `tests/course-prep.cjs` checks scorecard arithmetic, source geometry, geometry math,
 feed idempotence and preservation of golf state and personal calls. The real-browser
 `tests/course-prep-browser.cjs` exercises 320/390/1440 layouts, editing, persistence,
 range-source isolation, backup round trips and offline use. Google adapter checks use
 a mock API. Jack confirmed real Satellite and 3D imagery on his iPhone after enabling
 Maps JavaScript API (October 8); automated tests do not certify live Google imagery.
-Browser checks cover all 18 guide links, real modal focus/close behavior, image errors,
+Browser checks cover all 18 Pound Ridge guide links, real modal focus/close behavior, image errors,
 round-state preservation, carry comparisons, overlay toggles and camera reuse. They also
 verify on-map yardages, actual browser Geolocation with simulated on-course positions,
 denied/unavailable/timeout GPS, off-course and inaccurate/stale fixes, cancellation,
 background/navigation cleanup and absence of GPS writes to player state. Google
 rendering itself still uses a mock; these tests cannot verify Jack’s physical GPS or iPhone imagery.
+Multi-course checks cover 320/390/1440 selectors, independent notes/targets/calls,
+course-specific pins and camera bearings, GPS cancellation and late-callback rejection,
+live popups/Google retry restoring the correct course, Explorer destinations, backup
+contents and offline switching. Image fixtures exercise layout/lifecycle; they do not
+certify a remote club CDN’s uptime.
 
 ## Review process — every bay day, every analysis pass (v122)
 

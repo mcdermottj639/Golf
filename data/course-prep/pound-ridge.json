@@ -1,0 +1,367 @@
+{
+  "id": "pound-ridge",
+  "name": "Pound Ridge Golf Club",
+  "shortName": "Pound Ridge",
+  "place": "Pound Ridge, New York",
+  "center": [
+    41.176,
+    -73.571
+  ],
+  "par": 72,
+  "defaultTee": "granite",
+  "verified": "2026-10-08",
+  "cardEdition": "01/24",
+  "source": "https://www.poundridgegolf.com/golf/scorecard",
+  "scorecard": "https://www.poundridgegolf.com/images/documents/00021.png",
+  "tour": "https://www.poundridgegolf.com/golf/overview",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.580,41.169,-73.557,41.189",
+  "tees": [
+    {
+      "id": "black",
+      "name": "Black",
+      "rating": 75.9,
+      "slope": 148,
+      "total": 7165,
+      "yards": [
+        453,
+        485,
+        412,
+        169,
+        317,
+        216,
+        509,
+        422,
+        573,
+        404,
+        206,
+        412,
+        480,
+        426,
+        174,
+        570,
+        460,
+        477
+      ]
+    },
+    {
+      "id": "oak",
+      "name": "Oak",
+      "rating": 74.2,
+      "slope": 144,
+      "total": 6773,
+      "yards": [
+        415,
+        451,
+        398,
+        161,
+        309,
+        189,
+        501,
+        400,
+        548,
+        378,
+        198,
+        384,
+        466,
+        401,
+        151,
+        523,
+        446,
+        454
+      ]
+    },
+    {
+      "id": "pound",
+      "name": "Pound",
+      "rating": 72.4,
+      "slope": 138,
+      "total": 6486,
+      "yards": [
+        415,
+        413,
+        369,
+        161,
+        309,
+        189,
+        501,
+        400,
+        521,
+        340,
+        181,
+        337,
+        466,
+        379,
+        151,
+        493,
+        446,
+        415
+      ]
+    },
+    {
+      "id": "granite",
+      "name": "Granite",
+      "rating": 71.7,
+      "slope": 138,
+      "total": 6261,
+      "yards": [
+        380,
+        413,
+        369,
+        139,
+        290,
+        162,
+        480,
+        374,
+        521,
+        340,
+        181,
+        337,
+        448,
+        379,
+        144,
+        493,
+        396,
+        415
+      ]
+    },
+    {
+      "id": "ridge",
+      "name": "Ridge",
+      "rating": 70.2,
+      "slope": 134,
+      "total": 6010,
+      "yards": [
+        380,
+        371,
+        319,
+        139,
+        290,
+        162,
+        480,
+        374,
+        513,
+        340,
+        143,
+        337,
+        448,
+        307,
+        144,
+        493,
+        396,
+        374
+      ]
+    },
+    {
+      "id": "sand",
+      "name": "Sand",
+      "rating": 68.3,
+      "slope": 132,
+      "total": 5683,
+      "yards": [
+        354,
+        371,
+        319,
+        119,
+        263,
+        155,
+        429,
+        355,
+        513,
+        315,
+        143,
+        291,
+        418,
+        307,
+        129,
+        449,
+        379,
+        374
+      ]
+    },
+    {
+      "id": "pine",
+      "name": "Pine",
+      "rating": null,
+      "slope": null,
+      "total": 5151,
+      "yards": [
+        317,
+        338,
+        295,
+        108,
+        252,
+        127,
+        407,
+        324,
+        468,
+        284,
+        136,
+        249,
+        389,
+        308,
+        124,
+        405,
+        299,
+        321
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 7,
+      "osmId": 1052050658,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf1.jpg",
+      "prompt": "Pick a specific landing target before choosing the tee club. Use the official guide to check the trouble beyond the green."
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 1,
+      "osmId": 1052050659,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf2.jpg",
+      "prompt": "The card’s toughest hole. Plan the approach you can reach comfortably; a lay-up remains an option when the carry is too demanding."
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "si": 5,
+      "osmId": 1052050660,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf3.jpg",
+      "prompt": "Check the forced carry from the tee you actually play. Your carry number, rather than total distance, is the useful comparison."
+    },
+    {
+      "n": 4,
+      "par": 3,
+      "si": 15,
+      "osmId": 1052050661,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf4.jpg",
+      "prompt": "Set the green center as your reference, then check the day’s flag and conditions on arrival."
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 17,
+      "osmId": 1052050662,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf5.jpg",
+      "prompt": "A short par 4: compare a positional tee shot with a longer club. Choose the approach distance you want to leave."
+    },
+    {
+      "n": 6,
+      "par": 3,
+      "si": 13,
+      "osmId": 1052050663,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf6.jpg",
+      "prompt": "Use a repeatable stock carry for this par 3. Check the front edge and the miss you can accept before choosing a club."
+    },
+    {
+      "n": 7,
+      "par": 5,
+      "si": 11,
+      "osmId": 1052050664,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf7.jpg",
+      "prompt": "Build a three-shot route first. Set a comfortable wedge yardage, then work backward to the second-shot target."
+    },
+    {
+      "n": 8,
+      "par": 4,
+      "si": 3,
+      "osmId": 1052050665,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf8.jpg",
+      "prompt": "Stroke index 3. Study the club’s diagram and choose a landing area; the map does not include every hazard."
+    },
+    {
+      "n": 9,
+      "par": 5,
+      "si": 9,
+      "osmId": 1052050666,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf9.jpg",
+      "prompt": "The longest hole from Granite. Plan the second-shot landing area as carefully as the tee shot."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 12,
+      "osmId": 1052050667,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf10.jpg",
+      "prompt": "Compare your fairway-finding clubs against driver. Use the map to see the approach left by each target."
+    },
+    {
+      "n": 11,
+      "par": 3,
+      "si": 8,
+      "osmId": 1052050668,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf11.jpg",
+      "prompt": "One of the longer par 3s. Compare your current hybrid and iron carries; confirm the tee marker rather than borrowing another tee’s yardage."
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 10,
+      "osmId": 1052050669,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf12.jpg",
+      "prompt": "Choose a position before choosing a club. Verify the fairway-bunker carry at the course before committing to a target."
+    },
+    {
+      "n": 13,
+      "par": 5,
+      "si": 16,
+      "osmId": 1052050670,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf13.jpg",
+      "prompt": "Make the blind-tee picture clear using the official hole guide. Pick a visible aiming reference at the course and plan the next shot."
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 6,
+      "osmId": 1052050671,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf14.jpg",
+      "prompt": "Check the tee carry from the actual markers. Leave a margin for a less-than-perfect strike when trouble must be carried."
+    },
+    {
+      "n": 15,
+      "par": 3,
+      "si": 18,
+      "osmId": 1052050672,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf15.jpg",
+      "prompt": "The shortest hole from Granite. Check the water and green shape in the club guide, then verify the front-edge carry on arrival."
+    },
+    {
+      "n": 16,
+      "par": 5,
+      "si": 14,
+      "osmId": 1052050673,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf16.jpg",
+      "prompt": "Choose a lay-up that leaves a full, familiar wedge. Ground conditions can change rollout substantially."
+    },
+    {
+      "n": 17,
+      "par": 4,
+      "si": 4,
+      "osmId": 1052050674,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf17.jpg",
+      "prompt": "Stroke index 4. Keep a clear landing target and a separate approach plan as the round gets late."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 2,
+      "osmId": 1052050675,
+      "guide": "https://www.poundridgegolf.com/images/galleries/courseOverview/PoundRidgeGolf18.jpg",
+      "prompt": "The card’s second-toughest hole. Commit to the same routine and inspect the approach trouble in the official guide."
+    }
+  ],
+  "storageKey": "poundRidge",
+  "bounds": [
+    41.165,
+    -73.585,
+    41.185,
+    -73.555
+  ],
+  "sourceLabel": "Official scorecard",
+  "cardNote": "Yardages and men’s ratings were read from the club’s scorecard (printed 01/24), checked October 8, 2026.",
+  "aliases": [
+    "Pound Ridge"
+  ]
+}

@@ -1,14 +1,18 @@
 /* Course Prep: local plans + sourced routes; Google imagery is optional and lazy. */
 (function () {
   'use strict';
-  const course = window.CADDIE_PREP_COURSES[0];
+  const courses = window.CADDIE_PREP_COURSES;
+  const normalize = value => String(value || '').trim().toLowerCase().replace(/\s+/g,' ');
+  const findCourse = value => courses.find(c => [c.id,c.name,...(c.aliases || [])].some(name => normalize(name) === normalize(value)));
+  let course = courses[0];
   const KEY = 'caddiehq_google_maps_key_v1';
   const RESUME = 'caddiehq_course_prep_resume_v1';
   const rad = x => x * Math.PI / 180;
   const deg = x => x * 180 / Math.PI;
   const esc = x => String(x == null ? '' : x).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const pointOK = p => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite) &&
-    p[0] > 41.165 && p[0] < 41.185 && p[1] > -73.585 && p[1] < -73.555;
+  const pointFor = (p, source) => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite) &&
+    p[0] > source.bounds[0] && p[0] < source.bounds[2] && p[1] > source.bounds[1] && p[1] < source.bounds[3];
+  const pointOK = p => pointFor(p,course);
   function distance(a, b) {
     const h = Math.sin(rad(b[0] - a[0]) / 2) ** 2 +
       Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(rad(b[1] - a[1]) / 2) ** 2;
@@ -24,19 +28,20 @@
     const endLat = Math.asin(Math.sin(lat) * Math.cos(d) + Math.cos(lat) * Math.sin(d) * Math.cos(h));
     return [deg(endLat), deg(lng + Math.atan2(Math.sin(h) * Math.sin(d) * Math.cos(lat), Math.cos(d) - Math.sin(lat) * Math.sin(endLat)))];
   }
-  function clean(input) {
+  function clean(input, courseId = course.id) {
+    const source = findCourse(courseId) || course;
     const src = input && typeof input === 'object' ? input : {};
-    const out = { tee: course.tees.some(t => t.id === src.tee) ? src.tee : course.defaultTee,
+    const out = { tee: source.tees.some(t => t.id === src.tee) ? src.tee : source.defaultTee,
       basis: src.basis === 'range' ? 'range' : 'playing', holes: {} };
-    for (const t of course.tees) for (let n = 1; n <= 18; n++) {
+    for (const t of source.tees) for (const {n} of source.holes) {
       const k = t.id + ':' + n, h = src.holes && src.holes[k];
       if (!h || typeof h !== 'object') continue;
       out.holes[k] = {
         note: typeof h.note === 'string' ? h.note.slice(0, 1800) : '',
         roll: Number.isFinite(+h.roll) ? Math.max(0, Math.min(60, +h.roll)) : 0,
         reviewed: h.reviewed === true,
-        ...(pointOK(h.tee) ? {tee: h.tee.slice()} : {}),
-        ...(pointOK(h.target) ? {target: h.target.slice()} : {})
+        ...(pointFor(h.tee,source) ? {tee: h.tee.slice()} : {}),
+        ...(pointFor(h.target,source) ? {target: h.target.slice()} : {})
       };
     }
     return out;
@@ -53,8 +58,10 @@
   let liveFix = null, locationWatch = null, locationEpoch = 0, locationTimer, locationNotice = '';
   let projection = null, imageError = false, animationHandler, animationTimer, bagSnapshot;
   let guideLoad = null;
-  const model = () => clean(bridge.get());
+  const model = () => clean(bridge.get(course.id));
   const currentHole = () => course.holes[hole - 1];
+  const mappedHoles = () => course.holes.filter(h=>h.mapReady!==false);
+  const mapReady = () => currentHole().mapReady!==false;
   const teeSet = () => course.tees.find(t => t.id === model().tee);
   const holeKey = () => model().tee + ':' + hole;
   const savedHole = () => model().holes[holeKey()] || {};
@@ -65,7 +72,7 @@
   const green = () => currentHole().path.at(-1);
   const target = () => pointOK(savedHole().target) ? savedHole().target : green();
   const bag = () => bagSnapshot || (bagSnapshot = bridge.bag(model().basis));
-  const selected = () => bag().find(c => c.key === bridge.club(hole)) || null;
+  const selected = () => bag().find(c => c.key === bridge.club(course.id,hole)) || null;
   const yard = n => Math.round(n).toLocaleString('en-US');
   const targetYardage = () => yard(distance(origin(),target()))+' yd · '+yard(distance(target(),green()))+' yd left';
   function stopLocation(message = '') {
@@ -90,7 +97,7 @@
         if(token!==locationEpoch||!root)return;
         const coords=position.coords, point=[coords.latitude,coords.longitude], age=Date.now()-position.timestamp;
         if(!Number.isFinite(age)||age< -5000||age>=LOCATION_MAX_AGE){locationNotice='Waiting for a fresh location. Measuring from the tee.';liveFix=null;updateMeasurements();return;}
-        if(!pointOK(point)){fail('You’re outside Pound Ridge. Measuring from the tee.');return;}
+        if(!pointOK(point)){fail('You’re outside '+course.shortName+'. Measuring from the tee.');return;}
         if(!Number.isFinite(coords.accuracy)||coords.accuracy<0||coords.accuracy>LOCATION_MAX_ACCURACY){
           liveFix=null;locationNotice='GPS accuracy is too low'+(Number.isFinite(coords.accuracy)?' (±'+yard(coords.accuracy/0.9144)+' yd)':'')+'. Measuring from the tee while waiting for a better fix.';updateMeasurements();return;
         }
@@ -114,22 +121,24 @@
   function reconnectGoogle() {
     // Google retains authorization inside its loaded SDK. Start a new page session
     // after changing Cloud settings, keeping the user's current hole and map view.
-    try { sessionStorage.setItem(RESUME, JSON.stringify({hole, mode, live: !!liveDialog?.open})); } catch {}
+    try { sessionStorage.setItem(RESUME, JSON.stringify({courseId:course.id,hole, mode, live: !!liveDialog?.open})); } catch {}
     window.location.reload();
   }
   function resumeAfterReload() {
     let pending;
     try { pending = JSON.parse(sessionStorage.getItem(RESUME) || 'null'); sessionStorage.removeItem(RESUME); } catch { return false; }
-    if(!pending || !Number.isInteger(pending.hole) || pending.hole < 1 || pending.hole > 18 || !['route','guide','satellite','3d'].includes(pending.mode)) return false;
-    hole = pending.hole; mode = pending.mode;
+    const source = pending && findCourse(pending.courseId || courses[0].id);
+    if(!source || !source.holes.some(h => h.n === pending.hole) || !['route','guide','satellite','3d'].includes(pending.mode)) return false;
+    selectCourse(source.id);
+    hole = pending.hole; mode = pending.mode==='guide'&&!currentHole().guide ? initialMode() : pending.mode;
     if(mode!=='guide'){lastMapMode=mode;if(navigator.onLine===false)mode='route';}
     overview = false;
-    return pending.live && bridge.liveHole?.() === hole ? 'live' : true;
+    return pending.live && bridge.liveHole?.(course.id) === hole ? 'live' : true;
   }
   function saveHole(patch) {
     const next = model(), k = holeKey();
     next.holes[k] = {...(next.holes[k] || {}), ...patch};
-    bridge.save(clean(next));
+    bridge.save(course.id,clean(next));
     status('Saved on this device');
     const row = root?.querySelector('.cp-plan-table [data-n="' + hole + '"] > span:last-child');
     if (row) row.textContent = next.holes[k].note || (next.holes[k].reviewed ? 'Reviewed' : 'Add a plan');
@@ -188,9 +197,11 @@
     guideLoad={figure,cancel:()=>{disposed=true;revision++;clearTimeout(timer);img.onload=img.onerror=null;retry.removeEventListener('click',again);img.removeAttribute('src');}};
     start();
   }
-  function teaser() {
-    return '<section class="cp-entry"><div><span class="cp-eyebrow">COURSE PREP · 18 HOLES</span><h2 data-no-fold>Pound Ridge, before the first tee.</h2><p>Explore every hole. Put your bag on the map. Save your plan.</p></div>' +
-      '<button class="hq-btn" data-action="open-course-prep">Prepare Pound Ridge <span aria-hidden="true">↗</span></button></section>';
+  function teaser(courseId) {
+    const source = findCourse(courseId);
+    if(source)return '<section class="cp-entry"><div><span class="cp-eyebrow">COURSE PREP · '+source.holes.length+' HOLES</span><h2 data-no-fold>'+esc(source.shortName)+', before the first tee.</h2><p>Your bag, targets and hole notes.</p></div><button class="hq-btn" data-action="open-course-prep" data-course="'+source.id+'">Prepare '+esc(source.shortName)+' ↗</button></section>';
+    return '<section class="cp-entry"><div><span class="cp-eyebrow">COURSE PREP · '+courses.length+' COURSES</span><h2 data-no-fold>Your courses, before the first tee.</h2><p>Explore every hole. Put your bag on the map. Save your plan.</p></div>' +
+      '<button class="hq-btn" data-action="open-course-prep">Explore courses <span aria-hidden="true">↗</span></button></section>';
   }
   function setup() {
     return '<details class="cp-setup" id="cp-setup"><summary>Google Maps setup <span>' + (key() ? 'Key saved' : 'Connect overhead & 3D') + '</span></summary>' +
@@ -208,8 +219,9 @@
       (mode==='route'?'<p class="cp-map-view-note" role="status">'+(navigator.onLine===false?'You’re offline · using the simple map':'Simple map · works offline')+'</p>':'');
   }
   function mapSurface() {
-    return '<div class="cp-modes" role="group" aria-label="Hole view">'+
-      button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"')+
+    if(!mapReady())return '<div class="cp-reference" id="cp-reference" hidden></div><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div>';
+    return '<div class="cp-modes'+(currentHole().guide?'':' cp-map-only')+'" role="group" aria-label="Hole view">'+
+      (currentHole().guide ? button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"') : '')+
       button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"')+'</div>'+mapViews()+
       '<div class="cp-reference" id="cp-reference" hidden></div><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div>';
   }
@@ -218,18 +230,19 @@
     const m = model(), t = teeSet(), h = currentHole(), hs = savedHole();
     const count = course.holes.filter(x => m.holes[m.tee + ':' + x.n]?.reviewed).length;
     return '<div class="cp-workspace" id="course-prep"><button class="backlink" data-action="go" data-view="rounds" data-seg="prep">← All round prep</button>' +
-      '<section class="cp-hero"><div><span class="cp-eyebrow">YOUR NEXT COURSE</span><h2 data-no-fold>Pound Ridge<span>Know the shot before you play it.</span></h2><p>18 holes · Par 72 · Pound Ridge, NY</p></div>' +
+      '<div class="cp-course-picker"><label for="cp-courses">Choose your course</label><select id="cp-courses">'+courses.map(c=>'<option value="'+c.id+'" '+(c.id===course.id?'selected':'')+'>'+esc(c.shortName)+' · '+esc(c.place)+'</option>').join('')+'</select></div>'+
+      '<section class="cp-hero"><div><span class="cp-eyebrow">YOUR COURSE PLAN</span><h2 data-no-fold>'+esc(course.shortName)+'<span>Know the shot before you play it.</span></h2><p>'+course.holes.length+' holes · Par '+course.par+' · '+esc(course.place)+'</p>'+(mappedHoles().length<course.holes.length?'<p class="cp-coverage">'+mappedHoles().length+' of '+course.holes.length+' interactive hole maps ready</p>':'')+'</div>' +
       '<div class="cp-tee-control"><label for="cp-tees">Explore from</label><select id="cp-tees">' + course.tees.map(x => '<option value="' + x.id + '" ' + (x.id === t.id ? 'selected' : '') + '>' + x.name + ' · ' + yard(x.total) + ' yd</option>').join('') +
-      '</select><span>' + (t.rating ? t.rating.toFixed(1) + ' rating · ' + t.slope + ' slope · men' : 'Men’s rating not on the published card') + '</span></div></section>' +
-      '<div class="cp-progress"><span><b id="cp-reviewed-count">' + count + '/18</b> holes reviewed</span><span id="cp-save-status" role="status" aria-live="polite">Plans saved on this device</span></div>' +
+      '</select><span>' + (t.rating ? t.rating.toFixed(1) + ' rating · ' + t.slope + ' slope · men' : 'Rating not verified for this tee') + '</span></div></section>' +
+      '<div class="cp-progress"><span><b id="cp-reviewed-count">' + count + '/'+course.holes.length+'</b> holes reviewed</span><span id="cp-save-status" role="status" aria-live="polite">Plans saved on this device</span></div>' +
       '<div class="cp-holes" role="group" aria-label="Choose a hole">' + course.holes.map(x => '<button type="button" data-cp="hole" data-n="' + x.n + '" aria-label="Hole ' + x.n + ', par ' + x.par + '" ' + (x.n === hole ? 'aria-current="step"' : '') + ' class="' + (m.holes[m.tee + ':' + x.n]?.reviewed ? 'reviewed' : '') + '"><b>' + x.n + '</b><span>Par ' + x.par + '</span></button>').join('') + '</div>' +
-      '<div class="cp-grid"><section class="cp-map-panel"><header class="cp-hole-heading"><div><span class="cp-eyebrow">' + esc(t.name) + ' TEES</span><h3>Hole ' + hole + '<small>Par ' + h.par + ' · ' + yard(t.yards[hole - 1]) + ' yd · Hcp ' + h.si + '</small></h3></div><div class="cp-arrows">' +
-      button('previous', '←', 'aria-label="Previous hole" ' + (hole === 1 ? 'disabled' : '')) + button('next', '→', 'aria-label="Next hole" ' + (hole === 18 ? 'disabled' : '')) + '</div></header>' +
+      '<div class="cp-grid"><section class="cp-map-panel"><header class="cp-hole-heading"><div><span class="cp-eyebrow">' + esc(t.name) + ' TEES</span><h3>Hole ' + hole + '<small>Par ' + h.par + ' · ' + yard(t.yards[hole - 1]) + ' yd' + (h.si ? ' · Hcp '+h.si : '') + '</small></h3></div><div class="cp-arrows">' +
+      button('previous', '←', 'aria-label="Previous hole" ' + (hole === 1 ? 'disabled' : '')) + button('next', '→', 'aria-label="Next hole" ' + (hole === course.holes.length ? 'disabled' : '')) + '</div></header>' +
       mapSurface() + '</section>' +
       '<aside class="cp-plan"><section class="cp-plan-card"><span class="cp-eyebrow">THE PLAN</span><h3>' + (h.par === 3 ? 'Choose the carry.' : h.par === 5 ? 'Build it shot by shot.' : 'Pick your landing area.') + '</h3><p class="cp-prompt">' + esc(h.prompt) + '</p>' +
       '<label for="cp-basis">Distance source</label><select id="cp-basis"><option value="playing" '+(m.basis==='playing'?'selected':'')+'>Saved playing carries</option><option value="range" '+(m.basis==='range'?'selected':'')+'>Latest range measurements</option></select>' +
       '<p class="cp-muted">'+(m.basis==='range'?'Range conditions and club settings may differ from this round. These are planning references; your Bag stays unchanged.':'Switch to range measurements to compare clubs whose playing carry is still unset.')+'</p>' +
-      '<label>Your tee club</label><div class="cp-clubs" role="group" aria-label="Choose your tee club">' + bag().map(c => button('club', '<b>' + esc(c.label) + '</b><span>' + (c.carry>0?yard(c.carry)+' yd':'Unset') + '</span>', 'data-club="' + esc(c.key) + '" aria-pressed="' + (bridge.club(hole) === c.key) + '"')).join('') + '</div>' +
+      '<label>Your tee club</label><div class="cp-clubs" role="group" aria-label="Choose your tee club">' + bag().map(c => button('club', '<b>' + esc(c.label) + '</b><span>' + (c.carry>0?yard(c.carry)+' yd':'Unset') + '</span>', 'data-club="' + esc(c.key) + '" aria-pressed="' + (bridge.club(course.id,hole) === c.key) + '"')).join('') + '</div>' +
       (!bag().length ? '<p>Add a playing carry in your Bag to place a club on the map.</p>' : '') +
       '<div id="cp-club-readout"></div>' +
       '<label for="cp-roll">Rollout assumption <span id="cp-roll-label">' + (hs.roll || 0) + ' yd</span></label><input id="cp-roll" type="range" min="0" max="60" step="1" value="' + (hs.roll || 0) + '">' +
@@ -237,16 +250,16 @@
       '<section class="cp-plan-card"><h3>Your hole note</h3><label class="cp-muted" for="cp-note">Target, miss to avoid, or next-shot idea</label><textarea id="cp-note" rows="3" maxlength="1800" placeholder="e.g. 5W to the open side; check the front-edge carry…">' + esc(hs.note || '') + '</textarea>' +
       '<label class="cp-reviewed"><input type="checkbox" id="cp-reviewed" ' + (hs.reviewed ? 'checked' : '') + '> I’ve reviewed this hole</label>' +
       button('review-next','Save review & next hole','class="cp-review-next"') +
-      '<p class="cp-muted">Your tee-club choice and note also appear in the live-round prep for Pound Ridge.</p></section></aside></div>' +
-      '<details class="cp-round-plan" id="cp-round-plan"><summary>Your 18-hole plan <span>Club choices & notes</span></summary><div class="cp-plan-table">' +
+      '<p class="cp-muted">Your tee-club choice and note also appear in the live-round prep for '+esc(course.shortName)+'.</p></section></aside></div>' +
+      '<details class="cp-round-plan" id="cp-round-plan"><summary>Your '+course.holes.length+'-hole plan <span>Club choices & notes</span></summary><div class="cp-plan-table">' +
       course.holes.map(x => {
-        const s = m.holes[m.tee + ':' + x.n] || {}, c = bag().find(y => y.key === bridge.club(x.n));
+        const s = m.holes[m.tee + ':' + x.n] || {}, c = bag().find(y => y.key === bridge.club(course.id,x.n));
         return '<button type="button" data-cp="hole" data-n="' + x.n + '"><b>' + x.n + '</b><span>Par ' + x.par + ' · ' + t.yards[x.n - 1] + ' yd</span><strong>' + esc(c?.label || 'Choose club') + '</strong><span>' + esc(s.note || (s.reviewed ? 'Reviewed' : 'Add a plan')) + '</span></button>';
       }).join('') + '</div></details>' +
       setup() +
-      '<details class="cp-sources" id="cp-sources"><summary>Sources & map accuracy</summary><p>Yardages and men’s ratings were read from the club’s scorecard (printed 01/24), checked October 8, 2026. Tee selection changes the scorecard yardage; the route starts at an unspecified mapped tee until you set your own tee position.</p>' +
+      '<details class="cp-sources" id="cp-sources"><summary>Sources & map accuracy</summary><p>'+esc(course.cardNote)+' Tee selection changes the scorecard yardage; the route starts at an unspecified mapped tee until you set your own tee position.</p>' +
       '<p>Map distances are approximate horizontal measurements, not laser yardages or slope-adjusted plays-like distances. The map is incomplete: unmarked areas may contain hazards. Google 3D detail varies by location; it does not show today’s pins or putting contours.</p>' +
-      '<p>' + link(course.source, 'Official scorecard') + ' · ' + link(course.tour, 'Official hole guides') + ' · ' + link('https://www.openstreetmap.org/copyright', '© OpenStreetMap contributors · ODbL') + ' · <a href="./data/course-prep/pound-ridge-osm.json" download>Map source data</a></p></details></div>';
+      '<p>' + link(course.source, course.sourceLabel || 'Scorecard source') + (course.tour ? ' · ' + link(course.tour, 'Official course tour') : '') + ' · ' + link('https://www.openstreetmap.org/copyright', '© OpenStreetMap contributors · ODbL') + ' · <a href="./data/course-prep/'+course.id+'-osm.json" download>Map source data</a></p></details></div>';
   }
   function redraw() {
     if(!liveDialog?.open)return bridge.refresh();
@@ -260,7 +273,19 @@
     liveDialog.querySelector('.cp-live-map-content').replaceWith(content);
     mount(content);
   }
-  function changeHole(n) { if (!Number.isInteger(n) || n < 1 || n > 18) return; stopFlyover(); hole = n; framed3d = null; mode = 'guide'; imageError = false; overview = false; redraw(); }
+  const initialMode = () => currentHole().guide ? 'guide' : key() && navigator.onLine !== false ? '3d' : 'route';
+  function selectCourse(id) {
+    const next=findCourse(id);if(!next)return false;
+    if(next.id!==course.id){
+      epoch++;stopFlyover();stopGuideLoad();clearGoogle3d();stopLocation();
+      overlays2d.forEach(x=>x.setMap(null));overlays2d=[];
+      course=next;hole=1;bagSnapshot=null;framed2d=null;framed3d=null;
+      projection=null;overview=false;edit='target';lastMapMode='3d';mode=initialMode();
+      if(!googleAuthFailed){googleFailure='';googleFailureMode='';}
+    }
+    return true;
+  }
+  function changeHole(n) { if (!course.holes.some(h=>h.n===n)) return; stopFlyover(); hole = n; if(!mapReady())stopLocation(); framed3d = null; mode = initialMode(); imageError = false; overview = false; redraw(); }
   function stopFlyover() {
     if (animationHandler && maps3d) maps3d.removeEventListener('gmp-animationend', animationHandler);
     animationHandler = null;
@@ -309,11 +334,11 @@
     return dialog;
   }
   function openGuide(courseId, n) {
-    const source = window.CADDIE_PREP_COURSES.find(c => c.id === courseId);
+    const source = findCourse(courseId);
     const h = source?.holes.find(item => item.n === +n && item.guide);
     if(!h)return false;
     const dialog = holeDialog(source,h,'cp-live-guide','Close hole guide',
-      (source.id===course.id?'<div class="cp-workspace"><div class="cp-modes" role="group" aria-label="Hole view"><button type="button" aria-pressed="true">Hole guide</button><button type="button" data-live-map aria-pressed="false">Interactive map</button></div></div>':'')+
+      (source?'<div class="cp-workspace"><div class="cp-modes" role="group" aria-label="Hole view"><button type="button" aria-pressed="true">Hole guide</button><button type="button" data-live-map aria-pressed="false">Interactive map</button></div></div>':'')+
       guideFigure(source,h,true)+
       '<footer>Official club illustration · not to scale. '+link(source.tour,'Open course guide ↗')+'</footer>');
     dialog.querySelector('[data-live-map]')?.addEventListener('click',()=>openLiveMap(source.id,h.n));
@@ -321,8 +346,9 @@
     return true;
   }
   function openLiveMap(courseId, n, start = '3d') {
-    const h = course.id===courseId && course.holes.find(item=>item.n===+n);
-    if(!h || !bridge)return false;
+    const source=findCourse(courseId), h=source?.holes.find(item=>item.n===+n);
+    if(!h || h.mapReady===false || !bridge)return false;
+    closeGuide();selectCourse(source.id);
     const dialog = holeDialog(course,h,'cp-live-map','Close interactive map','<div class="cp-live-map-content"></div>');
     liveDialog = dialog; hole = h.n; framed3d = null; framed2d = null;
     mode = key() && navigator.onLine!==false && ['3d','satellite','route'].includes(start) ? start : 'route';
@@ -354,6 +380,7 @@
       case 'mode': {
         const requested=el.dataset.mode;
         if(!['guide','map','route','satellite','3d'].includes(requested))break;
+        if(requested==='guide'&&!currentHole().guide)break;
         if(liveDialog && requested==='guide'){openGuide(course.id,hole);break;}
         stopFlyover();
         mode=requested==='map'?(key()?lastMapMode:'route'):requested;
@@ -365,11 +392,11 @@
         if(el.dataset.pickTarget)root?.querySelector('#cp-map-stage').scrollIntoView({block:'center',behavior:'smooth'});
         break;
       }
-      case 'club': bridge.setClub(hole, el.dataset.club); redraw(); break;
+      case 'club': bridge.setClub(course.id,hole, el.dataset.club); redraw(); break;
       case 'review-next': {
         saveHole({reviewed:true});
-        const m=model(), next=Array.from({length:18},(_,i)=>(hole+i)%18+1).find(n=>!m.holes[m.tee+':'+n]?.reviewed);
-        if(next)changeHole(next);else{redraw();bridge.toast('All 18 holes reviewed');} break;
+        const m=model(), next=Array.from({length:course.holes.length},(_,i)=>(hole+i)%course.holes.length+1).find(n=>!m.holes[m.tee+':'+n]?.reviewed);
+        if(next)changeHole(next);else{redraw();bridge.toast('All '+course.holes.length+' holes reviewed');} break;
       }
       case 'rings': showRings=!showRings;refreshOverlays();drawControls();break;
       case 'locate': useLocation();break;
@@ -407,20 +434,22 @@
     }
   }
   function onChange(e) {
-    if (e.target.id === 'cp-tees') { const m = model(); m.tee = e.target.value; bridge.save(clean(m)); redraw(); }
-    if (e.target.id === 'cp-basis') { const m = model(); m.basis = e.target.value; bridge.save(clean(m)); redraw(); }
+    if (e.target.id === 'cp-courses') { if(selectCourse(e.target.value))redraw();return; }
+    if (e.target.id === 'cp-tees') { const m = model(); m.tee = e.target.value; bridge.save(course.id,clean(m)); redraw(); }
+    if (e.target.id === 'cp-basis') { const m = model(); m.basis = e.target.value; bridge.save(course.id,clean(m)); redraw(); }
     if (e.target.id === 'cp-reviewed') {
       saveHole({reviewed: e.target.checked});
       const m = model(), count = course.holes.filter(h => m.holes[m.tee + ':' + h.n]?.reviewed).length;
-      root.querySelector('#cp-reviewed-count').textContent = count + '/18';
+      root.querySelector('#cp-reviewed-count').textContent = count + '/'+course.holes.length;
       root.querySelector('.cp-holes [data-n="' + hole + '"]').classList.toggle('reviewed', e.target.checked);
     }
   }
   function readout() {
     if (!root?.querySelector('#cp-club-readout')) return;
+    if(!mapReady()){root.querySelector('#cp-club-readout').innerHTML='<p class="cp-muted">Save your club choice and note for this hole. Map yardages are unavailable while its positions are checked.</p>';return;}
     const c = selected(), roll = savedHole().roll || 0;
     const toTarget = distance(origin(), target()), toGreen = distance(target(), green());
-    const selectedKey = bridge.club(hole);
+    const selectedKey = bridge.club(course.id,hole);
     const hasTarget = !!savedHole().target;
     let html = hasTarget
       ? '<div class="cp-distances"><span><b>' + yard(toTarget) + '</b>yd to your target</span><span><b>' + yard(toGreen) + '</b>yd left to green</span></div>'
@@ -443,7 +472,7 @@
     root.querySelector('#cp-club-readout').innerHTML = html;
   }
   function projectFor(all) {
-    const points = all ? course.holes.flatMap(h => h.path) : [...currentHole().path, origin(), target()];
+    const points = all ? mappedHoles().flatMap(h => h.path) : [...currentHole().path, origin(), target()];
     const anchor = all ? course.center : origin(), cosLat = Math.cos(rad(anchor[0]));
     const heading = all ? 0 : bearing(origin(), green()), angle = -rad(heading), co = Math.cos(angle), si = Math.sin(angle);
     const xy = p => {
@@ -472,7 +501,7 @@
       return '<g class="cp-map-point cp-point-'+kind+'" data-point="'+kind+'"><circle cx="'+x+'" cy="'+y+'" r="7"/><text x="'+labelX+'" y="'+Math.max(45,Math.min(h-40,y+dy))+'" text-anchor="middle" class="cp-map-label">'+label+'</text></g>';
     };
     const polys = course.features.map(f => '<polygon points="'+path(f.path)+'" class="cp-feature cp-feature-'+f.kind+'"/>').join('');
-    const lines = (overview ? course.holes : [currentHole()]).map(holeData => {
+    const lines = (overview ? mappedHoles() : [currentHole()]).map(holeData => {
       const [x,y]=projection.to(holeData.path[0]);
       return '<g data-cp="map-hole" data-n="'+holeData.n+'"'+(overview?' tabindex="0" role="button" aria-label="Explore hole '+holeData.n+'"':'')+'><polyline points="'+path(holeData.path)+'" class="cp-route-line '+(holeData.n===hole?'selected':'')+'"/>'+
         (overview?'<circle cx="'+x+'" cy="'+y+'" r="13" class="cp-hole-dot"/><text x="'+x+'" y="'+(y+4)+'" text-anchor="middle" class="cp-hole-number">'+holeData.n+'</text>':'')+'</g>';
@@ -494,27 +523,31 @@
         (savedHole().target ? pnt(target(),'target',targetYardage()) : '');
     }
     const scaleYards = overview ? 100 : 50, scaleWidth=scaleYards*0.9144*projection.scale;
-    return '<svg id="cp-route-map" viewBox="0 0 '+w+' '+h+'" aria-label="Approximate mapped routes for Pound Ridge. '+(overview?'Choose a hole.':'Tee at bottom. Click to set your target or tee.')+'" role="img">'+
+    return '<svg id="cp-route-map" viewBox="0 0 '+w+' '+h+'" aria-label="Approximate mapped routes for '+esc(course.shortName)+'. '+(overview?'Choose a hole.':'Tee at bottom. Click to set your target or tee.')+'" role="img">'+
       '<defs><pattern id="cp-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#204d3e" stroke-opacity=".035"/></pattern></defs>'+
       '<rect width="'+w+'" height="'+h+'" fill="#eef1e4"/><rect width="'+w+'" height="'+h+'" fill="url(#cp-grid)"/>'+polys+yardages+lines+overlay+
-      '<text x="18" y="27" class="cp-map-kicker">'+(overview?'POUND RIDGE · 18 HOLES':liveLocation()?'MY LOCATION → GREEN':'TEE → GREEN')+'</text>'+
+      '<text x="18" y="27" class="cp-map-kicker">'+(overview?esc(course.shortName.toUpperCase())+' · '+mappedHoles().length+' MAPPED HOLES':liveLocation()?'MY LOCATION → GREEN':'TEE → GREEN')+'</text>'+
       '<g class="cp-map-compass" transform="translate('+(w-27)+' 31)"><text x="0" y="-16" text-anchor="middle">N</text><path d="M0 -10L-4 4L0 1L4 4Z" transform="rotate('+(-heading)+')"/></g>'+
       '<g class="cp-map-scale"><path d="M18 '+(h-24)+'v6h'+scaleWidth+'v-6" fill="none" stroke="currentColor" stroke-width="2"/><text x="18" y="'+(h-31)+'">'+scaleYards+' yd</text></g></svg>';
   }
   function drawControls() {
     if (!root) return;
+    if(!mapReady()){
+      root.querySelector('#cp-reference').hidden=true;root.querySelector('#cp-map-controls').innerHTML='';
+      root.querySelector('#cp-map-caption').textContent='Your hole plan is available. Mapped yardages are awaiting a position check.';return;
+    }
     drawReference();
     const el = root.querySelector('#cp-map-controls');
     const mapped = mode !== 'guide' && (mode === 'route' || (!!key() && !googleFailure));
     el.innerHTML = (mapped && !overview ? '<div class="cp-map-summary">'+(savedHole().target ? '<span><b>'+yard(distance(origin(),target()))+' yd</b> to your target</span><span><b>'+yard(distance(target(),green()))+' yd</b> left to green</span>' : '<span><b>'+yard(distance(origin(),green()))+' yd</b> '+referenceName().toLowerCase()+' → mapped green</span><span>Tap a landing spot<br>to plan your shot</span>')+'</div>' : '') +
-      (mapped && !overview ? '<div class="cp-map-legend"><span><i class="cp-legend-tee">'+(liveLocation()?'●':'T')+'</i> '+(liveLocation()?'You':'Tee')+'</span><span><i class="cp-legend-target">A</i> Aim</span><span><i class="cp-legend-green">G</i> Green</span>'+(selected()?.carry>0?'<span class="cp-map-club">'+esc(selected().label)+' · '+yard(selected().carry)+' yd carry</span>':'')+'</div>':'') + '<div class="cp-map-tools">' + (mode === 'route' && !liveDialog ? button('overview', overview ? 'Focus this hole' : 'All 18 holes') : '') +
+      (mapped && !overview ? '<div class="cp-map-legend"><span><i class="cp-legend-tee">'+(liveLocation()?'●':'T')+'</i> '+(liveLocation()?'You':'Tee')+'</span><span><i class="cp-legend-target">A</i> Aim</span><span><i class="cp-legend-green">G</i> Green</span>'+(selected()?.carry>0?'<span class="cp-map-club">'+esc(selected().label)+' · '+yard(selected().carry)+' yd carry</span>':'')+'</div>':'') + '<div class="cp-map-tools">' + (mode === 'route' && !liveDialog ? button('overview', overview ? 'Focus this hole' : 'All '+course.holes.length+' holes') : '') +
       (mapped && !overview ? button('edit','Landing target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
       (mapped && !overview && selected()?.carry>0 ? button('rings','Carry rings','aria-pressed="'+showRings+'"'):'')+
       (savedHole().target ? button('clear-target','Clear target'):'') + (savedHole().tee ? button('reset-tee','Reset tee'):'') + '</div>';
     if(mapped && ['satellite','3d'].includes(mode))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+(!liveDialog?button('shot-plan','Shot plan ↓'):'')+(mode==='3d'?button('frame','Back to tee','data-focus="tee"'):'')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
     root.querySelector('#cp-map-caption').innerHTML = mode === 'guide'
       ? 'Official club illustration · not to scale. '+link(course.tour,'Open course guide ↗')
-      : (['satellite','3d'].includes(mode)?'One finger to move · pinch to zoom. Scroll outside the map to move the page. ':'')+(overview ? '18 mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
+      : (['satellite','3d'].includes(mode)?'One finger to move · pinch to zoom. Scroll outside the map to move the page. ':'')+(overview ? mappedHoles().length+' mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
         '<span>Approximate routes · incomplete hazard coverage · '+link('https://www.openstreetmap.org/copyright','© OpenStreetMap contributors')+'</span>';
   }
   async function drawView() {
@@ -526,6 +559,9 @@
     stage.dataset.view = mode;
     stage.replaceChildren();
     drawControls();
+    if(!mapReady()){
+      stage.innerHTML='<div class="cp-map-message"><span class="cp-eyebrow">HOLE '+hole+'</span><h3>Map under review</h3><p>'+esc(currentHole().mapNote || 'The mapped positions for this hole need checking.')+'</p>'+link(course.source,'View the published scorecard ↗')+'</div>';return;
+    }
     if (mode==='guide') {
       stage.innerHTML = guideFigure(course,currentHole());
       const failure=stage.querySelector('.cp-guide-dialog-error');
@@ -546,7 +582,7 @@
       return;
     }
     if (!key()) {
-      stage.innerHTML='<div class="cp-map-message"><span class="cp-orbit" aria-hidden="true">◎</span><h3>'+ (mode==='3d'?'Explore Pound Ridge in 3D':'Google satellite view') +'</h3><p>Connect your Google Maps key to load this view inside Caddie HQ.</p>'+button('map-setup','Connect Google Maps')+button('mode','Use simple map','data-mode="route"')+link('https://www.google.com/maps/search/?api=1&query=Pound+Ridge+Golf+Club','Open Pound Ridge in Google Maps ↗')+'</div>';
+      stage.innerHTML='<div class="cp-map-message"><span class="cp-orbit" aria-hidden="true">◎</span><h3>'+ (mode==='3d'?'Explore '+esc(course.shortName)+' in 3D':'Google satellite view') +'</h3><p>Connect your Google Maps key to load this view inside Caddie HQ.</p>'+button('map-setup','Connect Google Maps')+button('mode','Use simple map','data-mode="route"')+link('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(course.name+' '+course.place),'Open '+esc(course.shortName)+' in Google Maps ↗')+'</div>';
       return;
     }
     if (googleAuthFailed || googleFailure) return mapError(googleFailure, googleFailureMode);
@@ -637,7 +673,7 @@
     });
   }
   function choosePoint(p) {
-    if(!pointOK(p))return bridge.toast('Choose a point within the Pound Ridge course area');
+    if(!pointOK(p))return bridge.toast('Choose a point within the '+course.shortName+' course area');
     saveHole({[edit]:p.map(x=>+x.toFixed(7))});readout();refreshOverlays();drawControls();
   }
   function refreshOverlays() {
@@ -786,8 +822,8 @@
   window.CaddieCoursePrep = Object.freeze({
     init: options => {bridge=options;}, render, mount, unmount, teaser, resumeAfterReload, openGuide, openLiveMap,
     resumeLiveMap: () => openLiveMap(course.id,hole,mode),
-    openHole: n => {hole=Number.isInteger(+n)&&+n>=1&&+n<=18?+n:1;framed3d=null;mode='guide';imageError=false;overview=false;},
-    courseName: course.name, clean,
+    openHole: (n,courseId) => {if(courseId&&!selectCourse(courseId))return false;hole=course.holes.some(h=>h.n===+n)?+n:1;framed3d=null;framed2d=null;mode=initialMode();imageError=false;overview=false;return true;},
+    get courseName(){return course.name;}, get courseId(){return course.id;}, findCourse, clean,
     geo: Object.freeze({distance,destination,bearing,pointOK})
   });
 })();

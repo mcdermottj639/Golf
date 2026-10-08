@@ -8,7 +8,7 @@ for(const f of ['lessons.js','courses-db.js','course-cards.js','course-prep-data
 let app=read('app.js');
 vm.runInContext(app.slice(0,app.indexOf('// ---------- Boot ----------'))+`
 rerender=()=>{};toast=()=>{};load();initCoursePrep();
-window.prepTest={applyFeed,get:()=>S,briefHole,liveBriefing,livePlay,coursePrepNote};
+window.prepTest={applyFeed,get:()=>S,briefHole,liveBriefing,livePlay,coursePrepNote,publishedCard};
 })();`,ctx);
 const T=ctx.window.prepTest,C=ctx.window.CADDIE_PREP_COURSES[0],P=ctx.window.CaddieCoursePrep;
 const feedNames=app.match(/Promise\.all\(\[([^\]]+)\]\.map\(name => fetch/)[1].match(/'([^']+)'/g).map(x=>x.slice(1,-1));
@@ -41,3 +41,26 @@ assert.equal(T.coursePrepNote('Spyglass Hill',1),'');
 const html=P.render();assert.ok(html.includes('&lt;script&gt;bad()&lt;/script&gt;'));assert.ok(!html.includes('<script>bad()'));
 assert.equal(JSON.stringify(state.carries),JSON.stringify(before.carries));
 console.log('PASS course prep: 18 source routes, seven official tee totals/ratings, geometry math, input bounds, idempotent feed, preserved rounds/bag/calls and live prep note.');
+
+const catalog=ctx.window.CADDIE_PREP_COURSES;
+assert.equal(catalog.length,3);const stable=clone(state);
+for(const course of catalog){
+  const raw=JSON.parse(read('data/course-prep/'+course.id+'-osm.json'));
+  P.openHole(1,course.id);assert.equal(P.courseId,course.id);
+  assert.ok(P.render().includes(course.shortName));
+  for(const h of course.holes){const way=raw.features.find(f=>f.id===h.osmId);assert.deepEqual(clone(h.path),way.path);assert.ok(h.path.every(P.geo.pointOK));}
+  const other=catalog.find(c=>c.id!==course.id);
+  assert.equal(P.geo.pointOK(other.center),false,'course-specific GPS boundary');
+  const plan=P.clean({tee:course.defaultTee,holes:{[course.defaultTee+':1']:{note:course.id,target:course.center,tee:other.center}}},course.id);
+  assert.deepEqual(clone(plan.holes[course.defaultTee+':1'].target),clone(course.center));assert.equal(plan.holes[course.defaultTee+':1'].tee,undefined);
+  assert.equal(T.publishedCard(course.name,null).by.get(1).par,course.holes[0].par);
+  assert.equal(P.findCourse(course.aliases[0]).id,course.id);
+}
+assert.deepEqual(clone(state),stable,'course entry/read-only cleaning never changes player state');
+assert.equal(T.coursePrepNote('Pound Ridge Golf Club',1),'Aim at my saved target <script>bad()</script>','notes resolve their own course independently of the active map');
+assert.equal(P.openHole(1,'unknown-course'),false);assert.equal(P.findCourse('Sterling'),undefined,'no ambiguous partial course match');
+console.log('PASS multi-course data: original coordinates, isolated boundaries and notes, sourced live cards, exact aliases, no state writes during navigation.');
+
+assert.equal(catalog.flatMap(c=>c.holes).filter(h=>h.mapReady!==false).length,53);
+assert.equal(P.openLiveMap('wianno',2),false,'unverified endpoint never opens a live measuring map');
+P.openHole(2,'wianno');assert.ok(P.render().includes('17 of 18 interactive hole maps ready'));

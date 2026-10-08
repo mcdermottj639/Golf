@@ -24,6 +24,11 @@ body.cp-guide-open{overflow:hidden}
 .cp-eyebrow{display:block;font:700 10px/1.4 var(--sans,sans-serif);letter-spacing:1.6px;text-transform:uppercase;color:#738374}
 .cp-entry .cp-eyebrow,.cp-hero .cp-eyebrow{color:#c4de98}
 .cp-workspace{--cp-panel:#fff;--cp-ink:#193e32;--cp-muted:#66776d;--cp-line:#dde4d8;color:var(--cp-ink)}
+.cp-course-picker{display:flex;align-items:center;gap:12px;margin:12px 0 16px;min-width:0}
+.cp-course-picker label{flex-shrink:0;font-size:12px;font-weight:700;color:var(--cp-muted)}
+.cp-course-picker select{flex:1;min-width:0;max-width:480px;min-height:48px;padding:10px 12px;border:1px solid var(--cp-line);border-radius:12px;background:var(--cp-panel);color:var(--cp-ink);font-size:16px}
+.cp-modes.cp-map-only{grid-template-columns:1fr}
+@media(max-width:440px){.cp-course-picker{display:block}.cp-course-picker label{display:block;margin-bottom:7px}.cp-course-picker select{width:100%;max-width:100%}}
 .cp-workspace *{box-sizing:border-box}
 .cp-workspace button,.cp-workspace select,.cp-workspace input,.cp-workspace textarea{font-family:inherit}
 .cp-workspace button{cursor:pointer}
@@ -202,3 +207,5 @@ body.night .cp-map-views .cp-simple-view[aria-pressed=true]{background:#335343;c
 .cp-live-map-dialog .cp-setup{margin:12px;border-radius:12px;padding:14px}
 .cp-live-map-dialog .cp-map-caption{font-size:11px}
 .cp-live-map-dialog .cp-workspace{background:var(--cp-panel)}
+
+.cp-hero .cp-coverage{margin-top:8px;color:#d7ec9d}

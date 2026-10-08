@@ -29,7 +29,7 @@ const mode=async(p,m)=>{
 };
 async function assertHolePins(p,n){
   const pins=await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>({point:[e.position.lat,e.position.lng],label:e.label})));
-  const expected=await p.evaluate(n=>{const s=JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge,h=CADDIE_PREP_COURSES[0].holes[n-1],saved=s.holes[s.tee+':'+n]||{};return [saved.tee||h.path[0],h.path.at(-1),...(saved.target?[saved.target]:[])];},n);
+  const expected=await p.evaluate(n=>{const c=CaddieCoursePrep.findCourse(CaddieCoursePrep.courseId),s=JSON.parse(localStorage.caddiehq_v1).coursePrep?.[c.storageKey]||{tee:c.defaultTee,holes:{}},h=c.holes[n-1],saved=s.holes?.[s.tee+':'+n]||{};return [saved.tee||h.path[0],h.path.at(-1),...(saved.target?[saved.target]:[])];},n);
   assert.deepEqual(pins.map(p=>p.point),expected,'only current-hole pin positions for hole '+n);
   assert.equal(pins[0].label,'Tee');
   assert.ok(await p.evaluate(()=>mapQA.markersCreated<=3),'3D retains at most three marker identities');
@@ -437,6 +437,89 @@ function locationMock(){
     await op.reload();await prep(op);assert.equal(await op.locator('#cp-note').inputValue(),'Offline prep survives');
     await op.locator('.cp-holes [data-n="18"]').click();assert.match(await op.locator('.cp-hole-heading').innerText(),/Hole 18/);await op.locator('#cp-note').fill('Saved while offline');assert.equal((await state(op)).coursePrep.poundRidge.holes['granite:18'].note,'Saved while offline');
     const cached=await op.evaluate(async()=>{const keys=await caches.keys();const requests=(await Promise.all(keys.map(async k=>(await (await caches.open(k)).keys()).map(r=>r.url)))).flat();return requests;});assert.ok(cached.every(u=>new URL(u).origin===new URL(url).origin));
+
+    // Multi-course behavior must preserve independent plans across prep, live and backups.
+    const multi=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block',acceptDownloads:true}),mp=await multi.newPage();
+    mp.setDefaultTimeout(12000);mp.on('pageerror',e=>errors.push(e.message));
+    await mp.addInitScript(()=>localStorage.setItem('caddiehq_google_maps_key_v1','AIza'+'m'.repeat(35)));
+    await mp.addInitScript(locationMock);
+    await mp.route('https://maps.googleapis.com/maps/api/js*',r=>r.fulfill({contentType:'text/javascript',body:'('+googleMock.toString()+')()'}));
+    await mp.route(/https:\/\/(www\.poundridgegolf\.com\/images\/|cdn\.cybergolf\.com\/images\/)/,r=>r.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="400" height="650"><rect width="400" height="650" fill="#b9b7a6"/><text x="40" y="325">Official guide image fixture</text></svg>'}));
+    await mp.goto(url);await ready(mp);const multiInitial=await state(mp);await prep(mp);
+    assert.deepEqual(await mp.locator('#cp-courses option').evaluateAll(a=>a.map(x=>x.value)),['pound-ridge','wianno','sterling-farms']);
+    await mp.locator('#cp-note').fill('Pound Ridge plan stays here');
+    await mp.locator('.cp-clubs [data-club="5-wood"]').click();
+    const poundSaved=(await state(mp)).coursePrep.poundRidge;
+    for(const [id,width] of [['wianno',320],['sterling-farms',390],['pound-ridge',1440]]){
+      await mp.setViewportSize({width,height:width===1440?1000:844});
+      await mp.locator('#cp-courses').selectOption(id);
+      if(id==='wianno'){
+        assert.equal(await mp.locator('.cp-modes [data-mode="guide"]').count(),0,'no broken guide tab for an unsourced illustration');
+        await mp.locator('qa-map-scene').waitFor();assert.equal(await mp.locator('[data-mode="3d"]').getAttribute('aria-pressed'),'true');
+      }else{await mp.locator('.cp-guide[data-guide-state="ready"] img').waitFor();await mode(mp,'map');await mode(mp,'3d');}
+      await mp.locator('qa-map-scene').waitFor();await assertHolePins(mp,1);
+      assert.equal(await mp.locator('.cp-holes button[aria-current]').getAttribute('data-n'),'1');
+      assert.equal(await mp.locator('#cp-note').inputValue(),id==='pound-ridge'?'Pound Ridge plan stays here':'');
+      const fit=await mp.locator('#cp-courses').evaluate(e=>{const r=e.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&document.documentElement.scrollWidth<=innerWidth;});
+      assert.ok(fit,'course selector fits '+width);
+      await mp.screenshot({path:path.join(screens,'catalog-'+id+'-'+width+'.png'),fullPage:true});
+      if(id==='pound-ridge')continue;
+      await mp.locator('#cp-note').fill('Independent '+id+' plan');
+      await mp.locator('.cp-clubs [data-club="2-iron"]').click();await mp.locator('qa-map-scene').waitFor();
+      const point=await mp.evaluate(()=>CaddieCoursePrep.findCourse(CaddieCoursePrep.courseId).holes[0].path[1]);
+      await mp.locator('qa-map-scene').evaluate((e,point)=>{const evt=new Event('gmp-click');evt.position={lat:point[0],lng:point[1]};e.dispatchEvent(evt);},point);
+      await assertHolePins(mp,1);
+      assert.match(await mp.locator('.cp-map-summary').innerText(),/to your target/);
+      await mp.locator('[data-cp="locate"]').click();await mp.evaluate(point=>locationQA.fix(point),point);
+      assert.equal(await mp.locator('#cp-reference b').innerText(),'My location');
+      await mp.evaluate(()=>{window.lateFix=locationQA.last.success;});
+      await mp.locator('#cp-courses').selectOption('pound-ridge');
+      assert.equal(await mp.evaluate(()=>locationQA.active()),0,'course switch stops GPS');
+      await mp.evaluate(point=>lateFix({coords:{latitude:point[0],longitude:point[1],accuracy:5},timestamp:Date.now()}),point);
+      await mode(mp,'map');await mp.locator('qa-map-scene').waitFor();await assertHolePins(mp,1);
+      assert.equal(await mp.locator('#cp-reference b').innerText(),'Reference tee','old-course GPS callback ignored');
+      assert.deepEqual((await state(mp)).coursePrep.poundRidge,poundSaved);
+      await mp.locator('#cp-courses').selectOption(id);await mode(mp,'3d');await mp.locator('qa-map-scene').waitFor();
+      assert.equal(await mp.locator('#cp-note').inputValue(),'Independent '+id+' plan');await assertHolePins(mp,1);
+      for(const n of [2,9,12,18]){
+        await mp.locator('.cp-holes [data-n="'+n+'"]').click();if(id==='wianno'&&n===2){assert.match(await mp.locator('#cp-map-stage h3').innerText(),/Map under review/);assert.equal(await mp.locator('qa-map-scene').count(),0);assert.equal(await mp.locator('#cp-reference').isVisible(),false);assert.equal(await mp.locator('.cp-map-summary').count(),0);continue;}await mode(mp,'3d');await mp.locator('qa-map-scene').waitFor();await assertHolePins(mp,n);
+        await mp.waitForFunction(()=>{const c=CaddieCoursePrep.findCourse(CaddieCoursePrep.courseId),n=+document.querySelector('.cp-holes [aria-current]').dataset.n,h=c.holes[n-1],e=document.querySelector('qa-map-scene');return e?.lastFlight?.endCamera.heading===CaddieCoursePrep.geo.bearing(h.path[0],h.path.at(-1));});
+      }
+    }
+    const multiPlans=(await state(mp)).coursePrep,multiCalls=(await state(mp)).planCalls;
+    assert.deepEqual(multiPlans.poundRidge,poundSaved);
+    assert.equal(multiCalls['pound ridge golf club'][1].club[0],'5-wood');
+    for(const id of ['wianno','sterling-farms']){
+      // Start an actual live round through the UI; each popup resolves the live course.
+      const source=await mp.evaluate(id=>CaddieCoursePrep.findCourse(id),id);
+      await explore(mp,'[data-action="live-new"]');await mp.locator('#lvCourse').fill(source.name);await mp.locator('[data-action="live-start"]').click();await mp.locator('[data-action="live-card-play"]').click();
+      assert.ok((await state(mp)).live.holes.some(h=>h.par!==4),'new-course pars are sourced, not all default par 4');
+      await mp.locator('.holeintel .hi-head').click();assert.ok((await mp.locator('.holeintel .hi-grid').innerText()).includes('Independent '+id+' plan'));
+      const liveBefore=(await state(mp)).live;
+      await mp.locator('[data-action="live-hole-map"]').click();await mp.locator('#cp-live-map qa-map-scene').waitFor();await assertHolePins(mp,1);
+      assert.equal(await mp.locator('#cp-live-map header p').innerText(),source.name);
+      if(id==='wianno')assert.equal(await mp.locator('.cp-modes [data-mode="guide"]').count(),0);
+      else{await mode(mp,'guide');await mp.locator('#cp-live-guide img').waitFor();assert.match(await mp.locator('#cp-live-guide img').getAttribute('src'),/1928\/hole1\.jpg/);await mp.locator('[data-live-map]').click();await mp.locator('#cp-live-map qa-map-scene').waitFor();await assertHolePins(mp,1);}
+      await mp.evaluate(()=>window.gm_authFailure());
+      await Promise.all([mp.waitForEvent('load'),mp.locator('#cp-map-stage [data-cp="retry"]').click()]);
+      await mp.locator('#cp-live-map qa-map-scene').waitFor();assert.equal(await mp.evaluate(()=>CaddieCoursePrep.courseId),id);await assertHolePins(mp,1);
+      assert.deepEqual((await state(mp)).live,liveBefore,'retry preserves the entire live round');
+      await mp.keyboard.press('Escape');await mp.locator('#cp-live-map').waitFor({state:'detached'});
+      await mp.locator('#nav [data-view="rounds"]').click();
+      // Remove only this test's disposable unfinished round to start the next fixture.
+      await mp.evaluate(()=>{const s=JSON.parse(localStorage.caddiehq_v1);delete s.live;localStorage.caddiehq_v1=JSON.stringify(s);});await mp.reload();await ready(mp);
+    }
+    assert.deepEqual((await state(mp)).coursePrep,multiPlans);
+    for(const k of ['carries','clubs','rounds','bays','sessions'])assert.deepEqual((await state(mp))[k],multiInitial[k],k+' preserved across course changes');
+    await explore(mp,'[data-action="open-course-prep"][data-course="wianno"]');assert.equal(await mp.locator('#cp-courses').inputValue(),'wianno','Explorer opens selected course');
+    await explore(mp,'[data-action="go"][data-view="data"]');
+    const [multiDownload]=await Promise.all([mp.waitForEvent('download'),mp.locator('[data-action="export"]').click()]);const multiExport=JSON.parse(fs.readFileSync(await multiDownload.path(),'utf8'));
+    assert.deepEqual(multiExport.coursePrep,multiPlans);assert.ok(!JSON.stringify(multiExport).includes('AIza'+'m'.repeat(35)));
+    // The offline shell contains every onboarded course, including future source downloads.
+    await op.locator('#cp-courses').selectOption('wianno');await op.locator('#cp-route-map').waitFor();await op.locator('#cp-note').fill('Wianno offline');
+    await op.locator('#cp-courses').selectOption('sterling-farms');await mode(op,'route');await op.locator('#cp-route-map').waitFor();
+    await op.locator('#cp-courses').selectOption('wianno');assert.equal(await op.locator('#cp-note').inputValue(),'Wianno offline');
+    console.log('PASS multi-course: 54 holes, independent notes/targets/clubs, GPS cancellation, course-specific cameras/pins, live popup/retry, Explorer routes, backups and offline switching.');
     assert.deepEqual(errors,[]);console.log('PASS course prep browser: 320/390/1440 layouts, all holes/tees, saved plans, live guides, backup/import, offline reload, map yardage labels, native Geolocation movement, simulated GPS errors/staleness/lifecycle, no location persistence, mocked Google reuse/flyover/auth fallback. Live Google imagery requires a real key.');
   }finally{await browser.close();await new Promise(r=>server.close(r));}
 })().catch(e=>{console.error(e);process.exitCode=1;});
