@@ -143,7 +143,7 @@
     const el=root?.querySelector('#cp-tee-preview');if(!el)return;
     const preview=mode!=='guide'&&!overview&&(mode!=='3d'||!googleFailure)?teePreview():null;
     el.hidden=!preview;if(!preview){el.innerHTML='';return;}
-    el.innerHTML='<label for="cp-map-club">'+esc(preview.source)+'</label><div><select id="cp-map-club" aria-label="Tee shot club">'+measuredClubs().map(c=>'<option value="'+esc(c.key)+'" '+(c.key===preview.club.key?'selected':'')+'>'+esc(c.label)+' · '+yard(c.carry)+' yd carry</option>').join('')+'</select></div><span>Projected landing · '+yard(preview.left)+' yd left</span>';
+    el.innerHTML='<div><select id="cp-map-club" aria-label="Tee shot club and carry distance" title="'+esc(preview.source)+' · carry distance">'+measuredClubs().map(c=>'<option value="'+esc(c.key)+'" '+(c.key===preview.club.key?'selected':'')+'>'+esc(c.label)+' · '+yard(c.carry)+' yd</option>').join('')+'</select></div>';
   }
   const yard = n => Math.round(n).toLocaleString('en-US');
   const targetYardage = () => yard(distance(origin(),target()))+' yd · '+yard(distance(target(),green()))+' yd left';
@@ -632,7 +632,7 @@
     const stage = root.querySelector('#cp-map-stage'), width = stage.clientWidth || 400, height = stage.clientHeight || 500;
     const projected = points.map(xy), xs = projected.map(p => p[0]), ys = projected.map(p => p[1]);
     const left = Math.min(...xs), right = Math.max(...xs), top = Math.min(...ys), bottom = Math.max(...ys);
-    const padTop=!all&&teePreview()?145:65,centerY=(padTop+height-65)/2;
+    const padTop=!all&&teePreview()?90:65,centerY=(padTop+height-65)/2;
     const scale = Math.min((width-90)/Math.max(100,right-left), (height-padTop-65)/Math.max(80,bottom-top));
     const mx = (left+right)/2, my = (top+bottom)/2;
     return {scale,width,height,heading,

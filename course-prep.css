@@ -302,3 +302,7 @@ body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
 .cp-guide-zoom-tools button{padding:5px 8px;font-size:12px;flex-shrink:0}
 .cp-guide-zoom-tools output{min-width:34px;font-size:11px}
 .cp-guide-zoom-tools span{display:none}
+
+/* One small club/carry pill; full recommendation details remain below the map. */
+.cp-tee-preview{top:8px;left:8px;width:168px;max-width:calc(100% - 80px);padding:0 6px;border-radius:9px}
+.cp-tee-preview select{display:block;width:100%;min-height:40px;padding:4px 0;font-size:16px;text-overflow:ellipsis}
