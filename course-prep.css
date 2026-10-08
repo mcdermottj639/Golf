@@ -81,6 +81,7 @@ body.cp-guide-open{overflow:hidden}
 .cp-legend-tee{background:#204d3e}.cp-legend-target{background:#b77224}.cp-legend-green{background:#668a43}
 .cp-map-legend .cp-map-club{margin-left:auto;font-weight:600;color:var(--cp-ink)}
 .cp-camera-tools{padding-top:7px}
+.cp-camera-tools button[data-cp="shot-plan"]{min-height:44px;background:#eaf0df}
 .cp-camera-tools button{font-size:11px;background:#f4f6ef}
 .cp-club-compare{margin-top:14px;padding-top:15px;border-top:1px solid var(--cp-line)}
 .cp-club-compare h4{font-size:14px;letter-spacing:0;text-transform:none;margin:0 0 10px;color:var(--cp-ink)}

@@ -119,7 +119,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v209, October 8 2026)
+## Course Prep (v210, October 8 2026)
 
 Rounds leads with **Prepare Pound Ridge**; the same planner is in Round Prep,
 Explorer and the Pound Ridge live hole. `courseprep` maps back to Rounds in navigation.
@@ -196,6 +196,9 @@ its flyover. The selected target has a distance-to-target / distance-left-to-gre
 in all three mapped modes. Before a target is chosen, the mapped green shows its
 distance from the active reference. 3D uses only the existing Marker3DElement label;
 Satellite uses a standard Marker label with labelOrigin; no custom PinElement dependency.
+Satellite and 3D use greedy gesture handling for one-finger panning; pinch zoom remains
+available. The caption explains that swiping outside the map scrolls the page, and
+**Shot plan ↓** scrolls to club choices without changing map, target or location state.
 The controls also retain the numeric distances; carry rings can be hidden. Whole hole and
 Green close-up explicitly reframe existing map objects. Normal club changes retain
 the camera; first arrival on a different hole frames it. 3D uses terrain-clamped camera

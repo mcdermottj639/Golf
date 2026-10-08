@@ -255,6 +255,7 @@
       case 'locate': useLocation();break;
       case 'use-tee': stopLocation();updateMeasurements();break;
       case 'frame': frameGoogle(el.dataset.focus || 'hole');break;
+      case 'shot-plan': root.querySelector('.cp-plan').scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});break;
       case 'overview': overview = !overview; drawView(); break;
       case 'edit': edit = el.dataset.kind; if(edit==='tee')stopLocation();updateMeasurements(); break;
       case 'clear-target': saveHole({target: undefined}); drawView(); readout(); break;
@@ -390,10 +391,10 @@
       (mapped && !overview ? button('edit','Landing target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
       (mapped && !overview && selected()?.carry>0 ? button('rings','Carry rings','aria-pressed="'+showRings+'"'):'')+
       (savedHole().target ? button('clear-target','Clear target'):'') + (savedHole().tee ? button('reset-tee','Reset tee'):'') + '</div>';
-    if(mapped && ['satellite','3d'].includes(mode))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
+    if(mapped && ['satellite','3d'].includes(mode))el.innerHTML+='<div class="cp-map-tools cp-camera-tools">'+button('shot-plan','Shot plan ↓')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green close-up','data-focus="green"')+(mode==='3d'?button('fly','Fly this hole')+button('stop','Stop'):'')+'</div>';
     root.querySelector('#cp-map-caption').innerHTML = mode === 'guide'
       ? 'Official club illustration · not to scale. '+link(course.tour,'Open course guide ↗')
-      : (overview ? '18 mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
+      : (['satellite','3d'].includes(mode)?'One finger to move · pinch to zoom. Scroll outside the map to move the page. ':'')+(overview ? '18 mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
         '<span>Approximate routes · incomplete hazard coverage · '+link('https://www.openstreetmap.org/copyright','© OpenStreetMap contributors')+'</span>';
   }
   async function drawView() {
@@ -439,7 +440,7 @@
         if(token!==epoch||!root)return;
         if(!maps2d) {
           const div=document.createElement('div');div.className='cp-google-map';
-          maps2d=new lib.Map(div,{center:ll(course.center),zoom:16,mapTypeId:'satellite',gestureHandling:'cooperative',streetViewControl:false,mapTypeControl:false,fullscreenControl:true});
+          maps2d=new lib.Map(div,{center:ll(course.center),zoom:16,mapTypeId:'satellite',gestureHandling:'greedy',streetViewControl:false,mapTypeControl:false,fullscreenControl:true});
           maps2d.addListener('click',e=>{if(e.latLng)choosePoint([e.latLng.lat(),e.latLng.lng()]);});
         }
         stage.replaceChildren(maps2d.getDiv());
@@ -449,7 +450,7 @@
         if(token!==epoch||!root)return;
         stageName = 'starting the 3D viewer';
         if(!maps3d) {
-          maps3d=new lib.Map3DElement({center:ll(course.center),range:1600,tilt:55,mode:'SATELLITE',gestureHandling:'COOPERATIVE'});
+          maps3d=new lib.Map3DElement({center:ll(course.center),range:1600,tilt:55,mode:'SATELLITE',gestureHandling:'GREEDY'});
           maps3d.className='cp-google-map';
           maps3d.addEventListener('gmp-click',e=>{if(e.position)choosePoint([e.position.lat,e.position.lng]);});
           maps3d.addEventListener('gmp-error',()=>{if(root&&mode==='3d')mapError('3D could not initialize on this device. Try Satellite or the course map.','3d');});

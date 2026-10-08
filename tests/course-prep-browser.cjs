@@ -16,7 +16,7 @@ async function explore(p,selector){await p.locator('.hq-search-trigger:visible')
 const mode=(p,m)=>p.locator('.cp-modes [data-mode="'+m+'"]').click();
 function googleMock(){
   window.mapQA={maps:0,scenes:0,flights:0,stops:0,fits:0,markerImports:0,fail3dDraw:false,overlays:[]};
-  class Map{constructor(el,opts){this.el=el;this.opts=opts;this.listeners={};mapQA.maps++;}getDiv(){return this.el;}addListener(k,f){this.listeners[k]=f;}fitBounds(b){this.bounds=b;mapQA.fits++;}}
+  class Map{constructor(el,opts){this.el=el;this.opts=opts;this.listeners={};mapQA.maps++;mapQA.mapGesture=opts.gestureHandling;}getDiv(){return this.el;}addListener(k,f){this.listeners[k]=f;}fitBounds(b){this.bounds=b;mapQA.fits++;}}
   class Overlay{constructor(opts){this.opts=opts;mapQA.overlays.push(this);}setMap(map){this.opts.map=map;}}
   class Point{constructor(x,y){this.x=x;this.y=y;}}
   class Bounds{constructor(){this.points=[];}extend(p){this.points.push(p);}}
@@ -110,6 +110,8 @@ function locationMock(){
     await p.locator('[data-cp="map-setup"]').click();await p.locator('#cp-api-key').fill('invalid');await p.locator('[data-cp="key-save"]').click();assert.equal(googleRequests,0);
     await p.locator('#cp-api-key').fill('AIza'+'x'.repeat(35));await p.locator('[data-cp="key-save"]').click();await p.locator('qa-map-scene').waitFor();
     assert.equal(googleRequests,1);assert.ok(await p.locator('qa-map-line').count()>=3);
+    assert.equal(await p.locator('qa-map-scene').evaluate(e=>e.gestureHandling),'GREEDY');
+    const beforeJump=await state(p);await p.locator('[data-cp="shot-plan"]').click();assert.deepEqual(await state(p),beforeJump,'jumping to the plan preserves golf state');
     const initialLabels=await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>e.label));
     assert.deepEqual(initialLabels.slice(0,2),['Tee','Green']);assert.match(initialLabels[2],/^\d[\d,]* yd · \d[\d,]* yd left$/);
     assert.equal(await p.evaluate(()=>mapQA.markerImports),0,'3D has no optional marker-library startup dependency');
@@ -125,6 +127,7 @@ function locationMock(){
     await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true');await mode(p,'3d');await p.locator('qa-map-scene').waitFor();assert.equal(await p.evaluate(()=>mapQA.scenes),1,'reuse 3D map');
     await p.locator('qa-map-scene').dispatchEvent('gmp-error');assert.match(await p.locator('#cp-map-stage').innerText(),/3D could not initialize/);
     await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();await p.locator('[data-cp="next"]').click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true');await mode(p,'satellite');await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.maps),1,'reuse satellite map');
+    assert.equal(await p.evaluate(()=>mapQA.mapGesture),'greedy');
     const fits=await p.evaluate(()=>mapQA.fits);await p.locator('.cp-clubs [data-club="5-wood"]').click();await p.locator('.cp-google-map').waitFor();assert.equal(await p.evaluate(()=>mapQA.fits),fits,'club changes preserve satellite camera');
     await p.locator('[data-cp="frame"][data-focus="green"]').click();assert.equal(await p.evaluate(()=>mapQA.fits),fits+1);
     await p.evaluate(()=>window.gm_authFailure());assert.match(await p.locator('#cp-map-stage').innerText(),/Google rejected/);
