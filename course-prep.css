@@ -318,6 +318,6 @@ body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
 @media(min-width:600px){
  .cp-hole-heading:has(#cp-header-camera button){grid-template-columns:minmax(140px,1fr) minmax(220px,1fr) 93px}
  .cp-hole-heading:has(#cp-header-camera button) .cp-arrows{flex-direction:row}
- #cp-header-camera .cp-camera-tools{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #cp-header-camera .cp-camera-tools{grid-template-columns:repeat(2,minmax(0,1fr))}
  #cp-header-camera .cp-camera-tools button{font-size:11px}
 }

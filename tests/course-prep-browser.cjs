@@ -216,7 +216,7 @@ if(require.main===module)(async()=>{
       await assertHolePins(p,n);
     }
     await p.locator('[data-cp="frame"][data-focus="green"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.range===190);
-    await p.locator('[data-cp="frame"][data-focus="tee"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.tilt===58);
+    await p.locator('[data-cp="reset-view"]').click();await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight.endCamera.tilt===58);
     await p.locator('.cp-holes [data-n="2"]').click();await mode(p,'3d');
     await p.waitForFunction(cameraAtTee,{n:2});
     // An asynchronous animation failure must not remove a usable map or its yardages.

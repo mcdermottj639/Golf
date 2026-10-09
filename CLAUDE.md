@@ -125,9 +125,9 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v232, October 8 2026)
+## Course Prep (v233, October 8 2026)
 
-The six 3D camera/shot-plan controls sit in a compact grid beside the hole title and above the map; mobile hole arrows stack to preserve space. Live dialogs keep their existing control area.
+Four 3D camera/shot-plan controls sit in two compact rows beside the hole title and above the map; mobile hole arrows stack to preserve space. Stop sits below the map beside Clear target. There is no duplicate Tee camera button: Reset view returns to the starting tee view. Live dialogs keep their existing control area.
 
 Interactive maps distinguish the blue T tee icon (blue location dot when using GPS), green flag, and red target/club landing pin. Google 3D uses static SVG templates without importing the optional marker library; Simple map uses the same tee/flag artwork. Marker identities remain stable and geographic positions are unchanged.
 

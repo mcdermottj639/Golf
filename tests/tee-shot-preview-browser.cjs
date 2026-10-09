@@ -24,12 +24,14 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
 
   for(const width of [320,390,1440]){
    await p.setViewportSize({width,height:844});
-   assert.equal(await p.locator('#cp-header-camera button').count(),6);
+   assert.equal(await p.locator('#cp-header-camera button').count(),4);
    assert.ok(await p.evaluate(()=>document.querySelector('#cp-header-camera').getBoundingClientRect().bottom<document.querySelector('#cp-map-stage').getBoundingClientRect().top),'camera controls above map');
    assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'header fits '+width);
    await p.screenshot({path:'/tmp/map-header-'+width+'.png'});
   }
   await p.setViewportSize({width:390,height:844});
+  assert.equal(await p.locator('[data-cp="frame"][data-focus="tee"]').count(),0);
+  assert.equal(await p.locator('#cp-map-controls [data-cp="stop"]').count(),1);
   const projection=await p.evaluate(()=>{
    const geo=CaddieCoursePrep.geo,markers=Array.from(document.querySelectorAll('qa-map-marker'));
    const start=markers[0].position,landing=markers.find(m=>m.label.endsWith(' yd carry'));

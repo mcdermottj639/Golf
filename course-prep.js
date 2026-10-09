@@ -727,9 +727,9 @@
       (mapped && !overview ? '<div class="cp-map-legend"><span><i class="cp-legend-tee">'+(liveLocation()?'●':'T')+'</i> '+(liveLocation()?'You':'Tee')+'</span><span><i class="cp-legend-target">A</i> Aim</span><span><i class="cp-legend-green">G</i> Green</span>'+(selected()?.carry>0?'<span class="cp-map-club">'+esc(selected().label)+' · '+yard(selected().carry)+' yd carry</span>':'')+'</div>':'') + '<div class="cp-map-tools">' + (mode === 'route' && !liveDialog ? button('overview', overview ? 'Focus this hole' : 'All '+course.holes.length+' holes') : '') +
       (mapped && !overview ? button('edit','Landing target','data-kind="target" aria-pressed="'+(edit==='target')+'"')+button('edit','Set tee','data-kind="tee" aria-pressed="'+(edit==='tee')+'"') : '') +
       (mapped && !overview && selected()?.carry>0 ? button('rings','Carry rings','aria-pressed="'+showRings+'"'):'')+
-      (savedHole().target ? button('clear-target','Clear target'):'') + (savedHole().tee ? button('reset-tee','Reset tee'):'') + '</div>';
+      (savedHole().target ? button('clear-target','Clear target'):'') + (mapped && mode==='3d' ? button('stop','Stop'):'') + (savedHole().tee ? button('reset-tee','Reset tee'):'') + '</div>';
     if(mapped && mode==='3d') {
-      const controls='<div class="cp-map-tools cp-camera-tools">'+(!liveDialog?button('shot-plan','Shot plan ↓'):'')+button('frame','Tee','data-focus="tee" aria-label="Back to tee"')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green','data-focus="green" aria-label="Green close-up"')+button('fly','Fly hole','aria-label="Fly this hole"')+button('stop','Stop')+'</div>';
+      const controls='<div class="cp-map-tools cp-camera-tools">'+(!liveDialog?button('shot-plan','Shot plan ↓'):'')+button('frame','Whole hole','data-focus="hole"')+button('frame','Green','data-focus="green" aria-label="Green close-up"')+button('fly','Fly hole','aria-label="Fly this hole"')+'</div>';
       if(headerCamera)headerCamera.innerHTML=controls;
       else el.innerHTML+=controls;
     }

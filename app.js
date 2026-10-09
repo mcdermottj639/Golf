@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v232';
+const BUILD = 'v233';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v233', d:'2026-10-08', items:['SMALLER MAP HEADER: Four controls in two rows. Stop moves below the map beside Clear target; Reset view replaces the duplicate Tee button.'] },
   { b:'v232', d:'2026-10-08', items:['CLEAR MAP ICONS: A blue tee icon marks your start, a green flag marks the green, and the red pin marks your target or projected club landing. Compact map controls now sit beside the hole heading.'] },
   { b:'v231', d:'2026-10-08', items:['ONE LANDING PIN: Tee-shot preview shows only the selected club’s projected landing. Saved targets remain stored and available for planning without adding a second fairway pin.'] },
   { b:'v230', d:'2026-10-08', items:['SMALLER MAP CLUB PICKER: A compact club-and-carry selector replaces the large recommendation card so the hole stays visible. Landing markers and detailed yardages remain available.'] },
