@@ -142,7 +142,11 @@
   function drawTeePreview() {
     const el=root?.querySelector('#cp-tee-preview');if(!el)return;
     const preview=mode!=='guide'&&!overview&&(mode!=='3d'||!googleFailure)?teePreview():null;
-    el.hidden=!preview;if(!preview){el.innerHTML='';return;}
+    const reset=manualTarget&&mode!=='guide'&&!overview&&mapReady();
+    el.classList.toggle('cp-tee-preview-reset',reset);
+    el.hidden=!preview&&!reset;
+    if(reset){el.innerHTML=button('restart-shot','↺','aria-label="Reset shot and restore club selector" title="Reset shot and restore club selector"');return;}
+    if(!preview){el.innerHTML='';return;}
     el.innerHTML='<div><select id="cp-map-club" aria-label="Tee shot club and carry distance" title="'+esc(preview.source)+' · carry distance">'+measuredClubs().map(c=>'<option value="'+esc(c.key)+'" '+(c.key===preview.club.key?'selected':'')+'>'+esc(c.label)+' · '+yard(c.carry)+' yd</option>').join('')+'</select></div>';
   }
   const yard = n => Math.round(n).toLocaleString('en-US');
@@ -592,6 +596,7 @@
       case 'shot-plan': root.querySelector('.cp-plan').scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});break;
       case 'overview': overview = !overview; drawView(); break;
       case 'edit': edit = el.dataset.kind; if(edit==='tee')stopLocation();updateMeasurements(); break;
+      case 'restart-shot': stopFlyover();stopLocation();manualTarget=false;overview=false;edit='target';saveHole({target:undefined});framed3d=null;drawView();readout();break;
       case 'clear-target': manualTarget=false;saveHole({target: undefined}); drawView(); readout(); break;
       case 'reset-tee': stopLocation();saveHole({tee: undefined}); drawView(); readout(); break;
       case 'map-setup': root.querySelector('#cp-setup').open = true; root.querySelector('#cp-api-key').focus(); break;

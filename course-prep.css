@@ -374,3 +374,7 @@ body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
  .cp-guide-zoom-tools button { min-width:30px; padding-inline:5px; font-size:11px; }
  .cp-guide-zoom-tools output { min-width:30px; }
 }
+
+/* Keep a compact way back to the opening club shot after target measurement. */
+.cp-tee-preview.cp-tee-preview-reset { width:44px; max-width:none; padding:0; }
+.cp-tee-preview-reset button { display:grid; place-items:center; width:44px; height:44px; padding:0; border:0; border-radius:9px; color:inherit; background:transparent; font:700 28px var(--sans,sans-serif); cursor:pointer; }
