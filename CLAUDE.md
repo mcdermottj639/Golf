@@ -754,7 +754,11 @@ so a bag change means grepping the standing briefings for the retired key, not j
 v237: Card verification uses one compact panel for course, source, totals, editable
 pars and Play. Source explanation is expandable; guessed-card labels and counts stay
 visible. The heading opts out of section folding, avoiding an unnecessary Sections row.
-Mobile `lvcardfocus` compacts the shell only during the card stage.
+v239: Mobile `lvcardfocus` applies to both course selection and card verification.
+It uses one header row with back, title, search and theme. Both setup headings opt
+out of section folding. Course selection has a short introduction, native date and
+hole/routing controls, Check the card action, and expandable recording help. Date
+inputs have zero intrinsic minimum width to avoid iOS overlap.
 
 Home → **Play a live round** opens the hole-by-hole logger: one screen per hole, chips only,
 saving to `S.live` on every tap (iOS kills suspended PWAs, so nothing may live in memory).

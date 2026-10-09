@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v238';
+const BUILD = 'v239';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v239', d:'2026-10-08', items:['COMPACT ROUND SETUP: Both course selection and card checking now use a compact phone header. Removed the empty Sections row and long setup copy; date and hole controls fit without overlapping.'] },
   { b:'v238', d:'2026-10-08', items:['INTEGRATED ROUND PREP: Standing course strategy, rules and hole advice now appear alongside the guides and maps. Personal club calls and notes stay connected to the full standing plan and live prep.'] },
   { b:'v236', d:'2026-10-08', items:['CLEAN SHOT LINES: Removed the extra reference-route line from 3D maps. Only your active shot path and optional distance rings appear, including when you set your own tee.'] },
   { b:'v235', d:'2026-10-08', items:['TAP TO MEASURE: Your club landing is the starting suggestion. Tapping the map replaces it with one target pin and shows yardage to that spot and left to the green. Full-screen map fitting is included.'] },
@@ -2030,7 +2031,7 @@ function render(view, arg, keepScroll){
   document.body.classList.toggle('lvfocus',
     view === 'live' && !!S.live && S.live.stage === 'play');
   document.body.classList.toggle('cpfocus', view === 'courseprep');
-  document.body.classList.toggle('lvcardfocus', view === 'live' && S.live?.stage === 'card');
+  document.body.classList.toggle('lvcardfocus', view === 'live' && (!S.live || S.live.stage === 'card'));
   // The build chip, top right of Home. It reads BUILD out of the code that is actually
   // executing, which is the only honest answer to "did the update land?" — a published
   // version is not the same claim as an installed one, and the two have disagreed twice
@@ -9829,31 +9830,26 @@ function liveStart(){
   const soon = S.briefings.filter(b => b.date && b.date >= d)
     .sort((a, b) => (a.date || '').localeCompare(b.date || '')).slice(0, 3);
   const known = coursesWithLayout();
-  return `
-  <button class="backlink" data-action="go" data-view="home">← Home</button>
-  <div class="card">
-    <h2>Start a live round</h2>
-    <p class="sm">One screen per hole — tee club, fairway, green, putts, score. It saves after every tap, so you can lock the phone between shots and pick it up on the next tee. Nothing here needs the keyboard once you've started.</p>
-    <label>Course</label>
-    <input id="lvCourse" placeholder="Tap for your courses — or type…" autocomplete="off">
+  return `<section class="live-start-setup">
+  <div class="card live-start-panel">
+    <h2 data-no-fold>Start a live round</h2>
+    <p class="sm faint">Choose your course, check the card, then play. Saves after every tap.</p>
+    <label for="lvCourse">Course</label>
+    <input id="lvCourse" placeholder="Choose or type a course…" autocomplete="off">
     ${livePicker()}
     ${soon.length ? `<div class="chips">${soon.map(b =>
       `<span class="chip" data-action="live-pick" data-course="${esc(planPlayName(b))}">${
         esc(planPlayName(b))} · ${fmtDate(b.date)}</span>`).join('')}</div>` : ''}
     <div class="formrow">
-      <div><label>Date</label><input id="lvDate" type="date" value="${d}"></div>
-      <div><label>Holes</label><select id="lvNine">
+      <div><label for="lvDate">Date</label><input id="lvDate" type="date" value="${d}"></div>
+      <div><label for="lvNine">Holes</label><select id="lvNine">
         <option value="">Full 18</option><option value="F">Front 9</option><option value="B">Back 9</option>
       </select></div>
     </div>
-    <div id="lvRoutingWrap" hidden><label for="lvRouting">Which nines are you playing?</label><select id="lvRouting"></select><p class="sm faint">Course hole numbers stay 1–27 so your maps and saved plans match.</p></div>
-    <div style="margin-top:12px"><button class="btn" data-action="live-start">Start the round →</button></div>
-    ${known.length ? `<p class="sm faint" style="margin-top:10px">Par and stroke index prefill automatically at ${known.map(esc).join(' · ')} — you've played them with a full card before.</p>` : ''}
-  </div>
-
-  <div class="card flat">
-    <p class="sm"><b>What it records.</b> Which club you hit off every tee (and optionally into every green), whether you found the fairway and the green and where the miss went, putts, and the score. That's the input side of every number on the Rounds page — and the tee-club table can't exist without it.</p>
-  </div>`;
+    <div id="lvRoutingWrap" hidden><label for="lvRouting">Which nines?</label><select id="lvRouting"></select></div>
+    <button class="btn live-start-button" data-action="live-start">Check the card →</button>
+    <details class="live-start-help"><summary>What gets saved?</summary><p class="sm">Tee clubs, fairways, greens, putts and scores. Lock your phone between shots and pick up where you left off.</p>${known.length ? `<p class="sm">Saved scorecards prefill pars and stroke indexes. Check them before starting.</p>` : ''}</details>
+  </div></section>`;
 }
 
 // ---- Quick view: the whole hole as one-line rows, the open row full-size ----
