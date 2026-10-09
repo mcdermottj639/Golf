@@ -15,6 +15,8 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
   await p.route('https://maps.googleapis.com/maps/api/js*',r=>r.fulfill({contentType:'text/javascript',body:'('+googleMock.toString()+')()'}));
   await p.goto('http://127.0.0.1:'+server.address().port);await ready(p);
   await p.evaluate(()=>localStorage.setItem('caddiehq_google_maps_key_v1','AIza'+'x'.repeat(35)));
+  // Include iPhone standalone safe areas, which desktop Chromium does not provide.
+  await p.addStyleTag({content:'@media(max-width:760px){body.cpfocus .hero.hq-shell{padding-top:63px!important}#nav{padding-bottom:44px!important}}'});
   const baseline=await state(p);
   for(const width of [320,390,1440]){
    await p.setViewportSize({width,height:width===320?740:width===390?844:1000});
@@ -25,6 +27,7 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
     return {scroll:scrollY,width:innerWidth,content:document.documentElement.scrollWidth,height:innerHeight,art:box('.cp-guide-viewport'),map:box('.cp-map-panel'),settings:box('.cp-course-settings'),holes:box('.cp-hole-browser'),downloads:box('.cp-downloads'),nav:box('#nav')};
    });
    await p.screenshot({path:'/tmp/caddie-prep-first-'+width+'.png'});
+   assert.ok(layout.art.bottom<=Math.min(layout.height,width<761?layout.nav.top:layout.height)-7,'entire guide stays above navigation at '+width);
    assert.equal(layout.scroll,0,'opening prep stays at the top');
    assert.ok(layout.content<=width+1,'no page overflow at '+width);
    assert.ok(layout.art.top<layout.height*.5,'artwork starts in the first half of the viewport at '+width);
@@ -35,6 +38,21 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
    await mode(p,'3d');await p.locator('qa-map-scene').waitFor();
    await p.screenshot({path:'/tmp/header-layout-'+width+'.png'});
    assert.ok(await p.locator('#cp-map-stage').evaluate(e=>e.getBoundingClientRect().top<innerHeight*.5),'interactive map is also visible immediately');
+   assert.ok(await p.locator('#cp-map-stage').evaluate(e=>{
+    const nav=document.querySelector('#nav').getBoundingClientRect(),bottom=nav.width>innerWidth*.7?nav.top:innerHeight;
+    return e.getBoundingClientRect().bottom<=bottom-7;
+   }),'entire interactive map stays above navigation');
+   if(width===390){
+    const before=await p.locator('qa-map-scene').evaluate(e=>e.lastFlight);
+    await p.setViewportSize({width,height:700});
+    await p.waitForFunction(()=>document.querySelector('#cp-map-stage').getBoundingClientRect().bottom<=document.querySelector('#nav').getBoundingClientRect().top-7);
+    assert.deepEqual(await p.locator('qa-map-scene').evaluate(e=>e.lastFlight),before,'resizing keeps the camera position');
+    const height=await p.locator('#cp-map-stage').evaluate(e=>e.clientHeight);
+    await p.evaluate(()=>scrollTo(0,150));
+    assert.equal(await p.locator('#cp-map-stage').evaluate(e=>e.clientHeight),height,'scrolling preserves map size');
+    await p.evaluate(()=>scrollTo(0,0));
+    await p.setViewportSize({width,height:844});
+   }
    await p.evaluate(()=>{document.querySelector('qa-map-scene').range=50;});
    await p.locator('[data-cp="reset-view"]').click();
    await p.waitForFunction(()=>document.querySelector('qa-map-scene').lastFlight?.endCamera.range>50);

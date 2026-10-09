@@ -708,6 +708,7 @@
       '<g class="cp-map-scale"><path d="M18 '+(h-24)+'v6h'+scaleWidth+'v-6" fill="none" stroke="currentColor" stroke-width="2"/><text x="18" y="'+(h-31)+'">'+scaleYards+' yd</text></g></svg>';
   }
   function drawControls() {
+    requestAnimationFrame(fitPrepMap);
     if (!root) return;
     drawTeePreview();
     const headerCamera=root.querySelector('#cp-header-camera');
@@ -738,6 +739,28 @@
       : ((mode==='3d')?'One finger to move · pinch to zoom. Scroll outside the map to move the page. ':'')+(overview ? mappedHoles().length+' mapped routes. Select a hole to plan a shot.' : 'Tap to set your '+(edit==='target'?'landing target':'tee')+'. '+(liveLocation()?'Distances from your current location.':savedHole().tee?'Distances from your tee position.':'Mapped reference tee; set yours before comparing distances.'))+
         (teePreview()?'<span>Carry projection only · no rollout or dispersion assumed. Check hazards and actual tee position.</span>':'')+'<span>Approximate routes · incomplete hazard coverage · '+link('https://www.openstreetmap.org/copyright','© OpenStreetMap contributors')+'</span>';
   }
+  // Fit the entire opening visual above the bottom navigation, including iOS safe areas.
+  // Use document position so scrolling to the shot plan never grows/shrinks the map.
+  function fitPrepMap() {
+    if(!root || liveDialog || window.visualViewport?.scale>1)return;
+    const stage=root.querySelector('#cp-map-stage');if(!stage)return;
+    const viewport=window.visualViewport;
+    const bottom=(viewport?.height || innerHeight)+(viewport?.offsetTop || 0);
+    const nav=document.querySelector('#nav')?.getBoundingClientRect();
+    const edge=nav && nav.width>innerWidth*.7 ? Math.min(bottom,nav.top) : bottom;
+    const top=stage.getBoundingClientRect().top+scrollY;
+    const available=Math.max(80,Math.floor(edge-top-8));
+    stage.style.minHeight='0';
+    if(mode==='guide') {
+      stage.style.height='auto';
+      const wrap=stage.querySelector('.cp-guide-zoom');
+      if(wrap) {
+        const controls=wrap.querySelector('.cp-guide-zoom-tools').getBoundingClientRect().height;
+        const choices=wrap.querySelector('.cp-guide-styles')?.getBoundingClientRect().height || 0;
+        wrap.style.setProperty('--guide-height',Math.max(40,available-controls-choices)+'px');
+      }
+    } else stage.style.height=available+'px';
+  }
   async function drawView() {
     if (!root || !packReady()) return;
     const token=++epoch, stage=root.querySelector('#cp-map-stage');
@@ -747,8 +770,10 @@
     stage.dataset.view = mode;
     stage.replaceChildren();
     drawControls();
+    fitPrepMap();
     if (mode==='guide' && hasGuide(course,currentHole())) {
       stage.innerHTML = guideContent(course,currentHole());
+      fitPrepMap();
       setupGuideZoom(stage);
       stage.dataset.art = usesArt(course,currentHole()) ? 'true' : 'false';
       if(!usesArt(course,currentHole())){
@@ -971,7 +996,16 @@
     animationTimer=setTimeout(stopFlyover,30000);next();
   }
   window.addEventListener('course-downloads-change',downloadStatus);
-  window.addEventListener('resize',()=>{if(root && mode==='route')drawView();});
+  function resizePrepMap() {
+    fitPrepMap();
+    if(root && !liveDialog && mode==='route') {
+      const svg=root.querySelector('#cp-route-map');
+      if(svg)drawView();
+    }
+  }
+  window.addEventListener('resize',resizePrepMap);
+  window.visualViewport?.addEventListener('resize',resizePrepMap);
+  document.fonts?.ready.then(fitPrepMap);
   window.addEventListener('offline',()=>{
     if(root&&(mode==='3d')){stopFlyover();mode='route';overview=false;redraw();}
     else if(root&&mode==='route')redraw();

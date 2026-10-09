@@ -321,3 +321,27 @@ body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
  #cp-header-camera .cp-camera-tools{grid-template-columns:repeat(2,minmax(0,1fr))}
  #cp-header-camera .cp-camera-tools button{font-size:11px}
 }
+
+/* The complete visual fits the first screen; controls keep their own compact rows. */
+@media(max-width:760px){
+ body.cpfocus .hero.hq-shell{padding:calc(4px + env(safe-area-inset-top)) 0 5px}
+ body.cpfocus .hq-shell .hq-page-heading h1{font-size:20px}
+ #course-prep .cp-course-picker{gap:6px;margin:0 0 6px}
+ #course-prep .cp-course-picker label{font-size:10px;margin:0}
+ #course-prep .cp-course-picker select{min-height:36px;padding:5px 8px}
+ #course-prep .cp-course-picker [data-cp="nearby"]{min-height:36px;padding:4px}
+ #course-prep .cp-hole-heading{padding:6px 10px;gap:6px}
+ #course-prep .cp-hole-heading h3{font-size:21px;margin:1px 0 0}
+ #course-prep .cp-hole-heading h3 small{font-size:10px;margin-top:2px;line-height:1.25}
+ #course-prep .cp-hole-heading .cp-eyebrow{font-size:9px;letter-spacing:1px}
+ #course-prep .cp-arrows button{width:32px;min-height:30px}
+ #course-prep .cp-modes{padding:0 6px 5px}
+ #course-prep .cp-modes button{min-height:32px;padding:5px 3px}
+ #course-prep .cp-map-views{padding:4px 8px;gap:5px}
+ #course-prep .cp-map-views button{min-height:32px;padding:4px 8px;font-size:11px}
+ #course-prep .cp-guide-zoom-tools{padding:3px 8px}
+ #course-prep .cp-guide-zoom-tools button{min-height:30px;min-width:32px;padding:3px 7px;font-size:11px}
+ #course-prep .cp-guide-styles{padding:3px 6px}
+ #course-prep .cp-guide-styles button{min-height:30px;padding:4px 7px;font-size:11px}
+ #course-prep .cp-map-view-note{margin:0;padding:3px 8px;font-size:10px}
+}

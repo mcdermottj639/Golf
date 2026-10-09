@@ -125,7 +125,9 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v233, October 8 2026)
+## Course Prep (v234, October 8 2026)
+
+Course Prep measures available viewport space above the bottom navigation, including safe areas, and fits the complete map or full guide plus its zoom/style controls within it. Compact mobile headers retain all controls. Height uses document position so scrolling does not resize the visual; window/visual viewport resizing recalculates it. Live dialogs retain their independent sizing.
 
 Four 3D camera/shot-plan controls sit in two compact rows beside the hole title and above the map; mobile hole arrows stack to preserve space. Stop sits below the map beside Clear target. There is no duplicate Tee camera button: Reset view returns to the starting tee view. Live dialogs keep their existing control area.
 
