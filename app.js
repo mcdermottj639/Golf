@@ -99,7 +99,7 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v236';
+const BUILD = 'v237';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
@@ -2029,6 +2029,7 @@ function render(view, arg, keepScroll){
   document.body.classList.toggle('lvfocus',
     view === 'live' && !!S.live && S.live.stage === 'play');
   document.body.classList.toggle('cpfocus', view === 'courseprep');
+  document.body.classList.toggle('lvcardfocus', view === 'live' && S.live?.stage === 'card');
   // The build chip, top right of Home. It reads BUILD out of the code that is actually
   // executing, which is the only honest answer to "did the update land?" — a published
   // version is not the same claim as an installed one, and the two have disagreed twice
@@ -9715,31 +9716,23 @@ function liveCard(L){
     rows.push(`<div class="pgrid">${L.holes.slice(i, i + 9)
       .map((h, j) => cell(h, i + j)).join('')}</div>`);
 
-  return `
-  <button class="backlink" data-action="live-discard">← Not this course</button>
-  <div class="card">
-    <h2 style="margin-top:0">Check the card</h2>
+  return `<section class="live-card-setup">
+  <button class="backlink" data-action="live-discard">← Change course</button>
+  <div class="card live-card-panel">
+    <h2 data-no-fold>Check the card</h2>
     <h3>${esc(L.course)}</h3>
     <p class="sm faint">${fmtDate(L.date)}${L.routingLabel ? ' · '+esc(L.routingLabel) : L.nine ? ` · ${L.nine === 'F' ? 'front' : 'back'} nine` : ' · full 18'}</p>
-    <span class="flag ${SRC.cls || 'f-new'}" style="position:static;display:inline-block;margin-top:8px">${SRC.lab || ''}</span>
-    <p class="sm" style="margin-top:8px">${SRC.b || ''}</p>
-  </div>
-
-  <div class="card">
+    <details class="live-card-source"><summary><span class="flag ${SRC.cls || 'f-new'}">${SRC.lab || ''}</span><span>Details</span></summary><p class="sm">${SRC.b || ''}</p></details>
     <div class="ptot">
       <div><b>${tot}</b><span>Par</span></div>
-      ${L.holes.length!==18 ? '' : `<div><b>${half('out')}</b><span>Out</span></div>
-      <div><b>${half('in')}</b><span>In</span></div>`}
+      ${L.holes.length!==18 ? '' : `<div><b>${half('out')}</b><span>Out</span></div><div><b>${half('in')}</b><span>In</span></div>`}
       ${guesses ? `<div class="warnbox"><b>${guesses}</b><span>guessed</span></div>` : ''}
     </div>
     ${rows.join('')}
-    <p class="sm faint" style="margin-top:10px">Tap any hole to change its par — it cycles 3 · 4 · 5. ${
-      guesses ? 'The <b>dashed</b> ones are placeholders nobody has confirmed.' : 'Nothing here is a guess.'}</p>
-  </div>
-
-  <button class="btn" style="width:100%;padding:14px" data-action="live-card-play">${
-    guesses ? 'Pars are right — play →' : 'Play →'}</button>
-  <p class="sm faint" style="margin-top:10px">You can still change a hole's par while you play it — the card is on the hole screen too. This screen is here so a wrong one gets caught on the first tee instead of on the last.</p>`;
+    <p class="sm faint live-card-hint">Tap a hole to change par (3 · 4 · 5).${guesses ? ' <b>Dashed holes are unconfirmed guesses.</b>' : ''}</p>
+    <button class="btn live-card-play" data-action="live-card-play">${guesses ? 'Pars are right — play →' : 'Play →'}</button>
+    <p class="sm faint live-card-hint">You can also edit pars during your round.</p>
+  </div></section>`;
 }
 
 // ----- The course box offers what he has already prepped -----
