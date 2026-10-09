@@ -27,7 +27,7 @@ ODbL 1.0. Generated `packs/<id>.json` files contain the same coordinates for ind
 No Google imagery or Google-derived geometry is persisted in this dataset.
 
 Planning prompts are Caddie HQ preparation suggestions, not club-authored advice.
-Existing researched briefings remain accessible in the normal Round Prep list.
+Existing standing briefings are integrated into the map workspace: expandable course focus, rules and routine, plus current-hole advice and a full-plan link. Personal map notes remain separate and the whole-course table shows both research and personal notes.
 Playing distances read the current bag. The optional range source reads the latest
 available struck-shot batch for each club and labels its date, sample and setup;
 it never changes the playing carry. Rollout is an explicitly entered planning
