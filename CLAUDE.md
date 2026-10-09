@@ -125,7 +125,7 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v236, October 8 2026)
+## Course Prep (v238, October 8 2026)
 
 3D draws only the active shot/measurement path from the current tee or GPS origin. Do not add the original reference centerline underneath it: a custom tee otherwise produces a second crossing line. Optional carry/roll rings remain, and the original route geometry remains available to the simple map, guides, camera framing and landing calculation.
 
@@ -144,6 +144,8 @@ and 72 enabled measuring maps. Metedeconk 19–27 have no verified
 measuring route; club illustrations still work for all 27 Metedeconk holes. Individual standing plans and
 Explorer link directly to their course. Every supported live hole opens its own map
 in a popup over the scorecard. `courseprep` maps back to Rounds in navigation.
+Standing research is integrated through the read-only `standingPlan` callback: course focus, rules and routine expand in the workspace; the current physical hole shows its play, leaves, green, avoid, note and reasons. The full-hole plan combines standing advice with personal map notes and club overrides; live map popups show the current standing hole too. Exact course names win, with declared aliases as fallback. User club calls use the standing briefing’s course key so changes agree across maps, briefings and live prep. Opening maps does not copy or mutate research or golf state.
+
 `course-prep.js` receives narrow course-ID callbacks from `initCoursePrep()`; it must
 never replace the full player state. Course `storageKey` retains the legacy
 `S.coursePrep.poundRidge` unchanged; new records are `S.coursePrep.wianno` and

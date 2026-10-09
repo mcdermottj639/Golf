@@ -214,7 +214,10 @@
     bridge.save(course.id,clean(next));
     status('Saved on this device');
     const row = root?.querySelector('.cp-plan-table [data-n="' + hole + '"] > span:last-child');
-    if (row) row.textContent = next.holes[k].note || (next.holes[k].reviewed ? 'Reviewed' : 'Add a plan');
+    if (row) {
+      const researched=bridge.standingPlan?.(course.id)?.holes?.find(h=>h.n===hole);
+      row.textContent=[researched?.play,researched?.note,next.holes[k].note].filter(Boolean).join(' · ') || (next.holes[k].reviewed ? 'Reviewed' : 'Add a plan');
+    }
   }
   function status(text) { const el = root && root.querySelector('#cp-save-status'); if (el) el.textContent = text; }
   const button = (action, label, extra) => '<button type="button" data-cp="' + action + '" ' + (extra || '') + '>' + label + '</button>';
@@ -323,6 +326,23 @@
     const all=await Promise.all(courses.map(async c=>({c,s:await packs.status(c.id)})));if(root!==node)return;
     list.innerHTML=all.filter(({s})=>s.favorite||s.available).map(({c,s})=>'<div><b>'+esc(c.shortName)+'</b><span>'+(s.busy?'Downloading…':s.available?'Available offline':'Needs download')+(s.favorite?' · Favorite':'')+'</span></div>').join('');
   }
+  function standingPlanMarkup(summary = true) {
+    const p=bridge.standingPlan?.(course.id);if(!p)return '';
+    const h=p.holes?.find(h=>h.n===hole);
+    const prose=value=>esc(value).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<strong>$1</strong>');
+    const list=values=>'<ul>'+values.map(v=>'<li>'+prose(v)+'</li>').join('')+'</ul>';
+    const rows=h ? [['Plan',h.play],['Leaves',h.leaves],['Green',h.green],['Avoid',h.avoid]].filter(([,v])=>v) : [];
+    const club=bag().find(c=>c.key===bridge.club(course.id,hole));
+    return (summary ? '<details class="cp-standing-overview"><summary>Standing course plan <span>'+esc(p.focus||p.course)+'</span></summary>'+
+      (p.focus?'<p>'+prose(p.focus)+'</p>':'')+(p.rules?.length?'<h4>If you read nothing else</h4>'+list(p.rules):'')+
+      (p.steps?.length?'<h4>The routine</h4><ol>'+p.steps.map(v=>'<li>'+prose(v)+'</li>').join('')+'</ol>':'')+
+      '<button type="button" class="cp-full-plan" data-action="open-briefing" data-id="'+esc(p.id)+'">Read full standing plan →</button></details>' : '')+
+      '<section class="cp-plan-card cp-standing-hole"><span class="cp-eyebrow">HOLE '+hole+' · STANDING PLAN</span>'+
+      (club?'<p class="cp-standing-call"><b>Your club:</b> '+esc(club.label)+'</p>':'')+
+      (rows.length?'<dl>'+rows.map(([k,v])=>'<dt>'+k+'</dt><dd>'+prose(v)+'</dd>').join('')+'</dl>':'')+
+      (h?.note?'<p>'+prose(h.note)+'</p>':'')+(h?.why?.length?list(h.why):'')+
+      (!h?'<p class="cp-muted">No standing advice recorded for this hole yet.</p>':'')+'</section>';
+  }
   function render() {
     bagSnapshot = null;
     const m = model(), t = teeSet(), h = currentHole(), hs = savedHole();
@@ -335,7 +355,7 @@
       '<section class="cp-hole-browser" aria-label="Explore holes"><div class="cp-progress"><span><b id="cp-reviewed-count">' + count + '/'+course.holes.length+'</b> holes reviewed</span><span id="cp-save-status" role="status" aria-live="polite">Plans saved on this device</span></div>' +
       (course.nines ? '<div class="cp-nines" role="group" aria-label="Choose a nine">'+course.nines.map(n=>button('nine',esc(n.name)+'<span>'+n.holes[0]+'–'+n.holes.at(-1)+'</span>','data-n="'+n.holes[0]+'" aria-pressed="'+n.holes.includes(hole)+'"')).join('')+'</div>' : '')+
       '<div class="cp-holes" role="group" aria-label="Choose a hole">' + course.holes.filter(x=>!course.nines || course.nines.find(n=>n.holes.includes(hole)).holes.includes(x.n)).map(x => '<button type="button" data-cp="hole" data-n="' + x.n + '" aria-label="Hole ' + x.n + ', par ' + x.par + '" ' + (x.n === hole ? 'aria-current="step"' : '') + ' class="' + (m.holes[m.tee + ':' + x.n]?.reviewed ? 'reviewed' : '') + '"><b>' + x.n + '</b><span>Par ' + x.par + '</span></button>').join('') + '</div></section></div>' +
-      '<aside class="cp-plan"><section class="cp-course-settings"><h3>Course & tees</h3><p>'+esc(course.shortName)+' · '+course.holes.length+' holes · Par '+course.par+'<br>'+esc(course.place)+'</p>'+(mappedHoles().length<course.holes.length?'<p class="cp-coverage">'+mappedHoles().length+' of '+course.holes.length+' interactive hole maps ready</p>':'')+
+      '<aside class="cp-plan">'+standingPlanMarkup()+'<section class="cp-course-settings"><h3>Course & tees</h3><p>'+esc(course.shortName)+' · '+course.holes.length+' holes · Par '+course.par+'<br>'+esc(course.place)+'</p>'+(mappedHoles().length<course.holes.length?'<p class="cp-coverage">'+mappedHoles().length+' of '+course.holes.length+' interactive hole maps ready</p>':'')+
       '<div class="cp-tee-control"><label for="cp-tees">Explore from</label><select id="cp-tees">' + course.tees.map(x => '<option value="' + x.id + '" ' + (x.id === t.id ? 'selected' : '') + '>' + x.name + ' · ' + yard(x.total) + ' yd</option>').join('') +
       '</select><span>' + (t.rating ? t.rating.toFixed(1) + ' rating · ' + t.slope + ' slope · men' : 'Rating not verified for this tee') + '</span></div></section>' +
       '<section class="cp-plan-card"><span class="cp-eyebrow">HOLE '+hole+' · YOUR SHOT PLAN</span><h3>' + (h.par === 3 ? 'Choose the carry.' : h.par === 5 ? 'Build it shot by shot.' : 'Pick your landing area.') + '</h3><p class="cp-prompt">' + esc(h.prompt) + '</p>' +
@@ -352,8 +372,8 @@
       '<p class="cp-muted">Your tee-club choice and note also appear in the live-round prep for '+esc(course.shortName)+'.</p></section></aside></div>' +
       '<details class="cp-round-plan" id="cp-round-plan"><summary>Your '+course.holes.length+'-hole plan <span>Club choices & notes</span></summary><div class="cp-plan-table">' +
       course.holes.map(x => {
-        const s = m.holes[m.tee + ':' + x.n] || {}, c = bag().find(y => y.key === bridge.club(course.id,x.n));
-        return '<button type="button" data-cp="hole" data-n="' + x.n + '"><b>' + x.n + '</b><span>Par ' + x.par + ' · ' + t.yards[x.n - 1] + ' yd</span><strong>' + esc(c?.label || 'Choose club') + '</strong><span>' + esc(s.note || (s.reviewed ? 'Reviewed' : 'Add a plan')) + '</span></button>';
+        const s = m.holes[m.tee + ':' + x.n] || {}, p=bridge.standingPlan?.(course.id)?.holes?.find(h=>h.n===x.n), c = bag().find(y => y.key === (bridge.club(course.id,x.n)||p?.club?.[0]));
+        return '<button type="button" data-cp="hole" data-n="' + x.n + '"><b>' + x.n + '</b><span>Par ' + x.par + ' · ' + t.yards[x.n - 1] + ' yd</span><strong>' + esc(c?.label || 'Choose club') + '</strong><span>' + esc([p?.play,p?.note,s.note].filter(Boolean).join(' · ') || (s.reviewed ? 'Reviewed' : 'Add a plan')) + '</span></button>';
       }).join('') + '</div></details>' +
       downloads() + setup() +
       '<details class="cp-sources" id="cp-sources"><summary>Sources & map accuracy</summary><p>'+esc(course.cardNote)+' Tee selection changes the scorecard yardage; the route starts at an unspecified mapped tee until you set your own tee position.</p>' +
@@ -367,7 +387,7 @@
     bagSnapshot = null;
     const content = document.createElement('div');
     content.className = 'cp-workspace cp-live-map-content';
-    content.innerHTML = mapSurface() + setup();
+    content.innerHTML = mapSurface() + standingPlanMarkup(false) + setup();
     clearGoogle3d();
     liveDialog.querySelector('.cp-live-map-content').replaceWith(content);
     mount(content);

@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v237';
+const BUILD = 'v238';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v238', d:'2026-10-08', items:['INTEGRATED ROUND PREP: Standing course strategy, rules and hole advice now appear alongside the guides and maps. Personal club calls and notes stay connected to the full standing plan and live prep.'] },
   { b:'v236', d:'2026-10-08', items:['CLEAN SHOT LINES: Removed the extra reference-route line from 3D maps. Only your active shot path and optional distance rings appear, including when you set your own tee.'] },
   { b:'v235', d:'2026-10-08', items:['TAP TO MEASURE: Your club landing is the starting suggestion. Tapping the map replaces it with one target pin and shows yardage to that spot and left to the green. Full-screen map fitting is included.'] },
   { b:'v234', d:'2026-10-08', items:['FULL MAP ON OPEN: Course Prep fits the complete hole guide or interactive map above the bottom navigation. Compact headers retain every control, and map height adapts to your screen.'] },
@@ -11617,6 +11618,16 @@ function coursePrepNote(course, n){
   const p = window.CaddieCoursePrep.clean(S.coursePrep?.[source.storageKey],source.id);
   return p?.holes[p.tee + ':' + n]?.note || '';
 }
+// Resolve standing research by declared course identity; never copy it into map notes.
+function coursePrepStanding(id){
+  const source=window.CaddieCoursePrep?.findCourse(id);if(!source)return null;
+  const plans=S.briefings.filter(b=>b.course&&!b.date&&(
+    window.CaddieCoursePrep.findCourse(b.course)?.id===source.id || courseMatches(b.course,source.name)));
+  return preferExact(plans,source.name,b=>b.course)[0] || null;
+}
+function coursePrepCallCourse(id){
+  return coursePrepStanding(id)?.course || window.CaddieCoursePrep.findCourse(id)?.name;
+}
 function initCoursePrep(){
   window.CaddieCoursePrep?.init({
     here: () => S.here,
@@ -11640,17 +11651,18 @@ function initCoursePrep(){
         provenance:measured ? recent ? 'Range · ' + recent.date + ' · ' + (recent.values.carry.n || 'unknown') + ' shots · ' + (recent.setup || recent.label) : 'No range carry recorded' : provenance};
       });
     },
-    recommendedClub: (id,n) => {
-      const source=window.CaddieCoursePrep.findCourse(id);
-      const plans=preferExact(S.briefings.filter(b=>b.course&&!b.date&&courseMatches(b.course,source.name)),source.name,b=>b.course);
-      return plans.find(b=>b.holes?.some(h=>h.n===n&&h.club?.length))?.holes.find(h=>h.n===n)?.club?.[0]||'';
+    standingPlan: id => {
+      const b=coursePrepStanding(id);if(!b)return null;
+      return {id:b.id,course:b.course,focus:b.focus,rules:b.rules||[],steps:b.steps||[],
+        holes:(b.holes||[]).map(h=>({...h}))};
     },
-    club: (id,n) => (S.planCalls?.[planKey({course:window.CaddieCoursePrep.findCourse(id)?.name})]?.[n]?.club || [])[0] || '',
+    recommendedClub: (id,n) => coursePrepStanding(id)?.holes?.find(h=>h.n===n)?.club?.[0] || '',
+    club: (id,n) => (S.planCalls?.[planKey({course:coursePrepCallCourse(id)})]?.[n]?.club || [])[0] || '',
     setClub: (id,n, key) => {
       const source=window.CaddieCoursePrep.findCourse(id);
       if(!source?.holes.some(h=>h.n===n) || !S.carries.some(c => clubKey(c.club) === key)) return;
       S.planCalls = S.planCalls || {};
-      const courseKey=planKey({course:source.name});
+      const courseKey=planKey({course:coursePrepCallCourse(id)});
       const calls = S.planCalls[courseKey] = S.planCalls[courseKey] || {};
       calls[n] = {club:[key], ts:today()}; save();
     },

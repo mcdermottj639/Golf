@@ -345,3 +345,17 @@ body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
  #course-prep .cp-guide-styles button{min-height:30px;padding:4px 7px;font-size:11px}
  #course-prep .cp-map-view-note{margin:0;padding:3px 8px;font-size:10px}
 }
+
+/* Researched standing advice and personal map notes share the course workspace. */
+.cp-standing-overview { padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.cp-standing-overview summary { cursor: pointer; font-weight: 750; font-size: 14px; }
+.cp-standing-overview summary span { display: block; margin-top: 4px; font-weight: 450; font-size: 12px; line-height: 1.45; }
+.cp-standing-overview p, .cp-standing-overview li, .cp-standing-hole p, .cp-standing-hole li { font-size: 13px; line-height: 1.5; }
+.cp-standing-overview h4 { margin: 12px 0 4px; }
+.cp-standing-overview ul, .cp-standing-overview ol, .cp-standing-hole ul { padding-left: 19px; margin: 8px 0; }
+.cp-standing-hole dl { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 5px 10px; margin: 10px 0; font-size: 13px; line-height: 1.5; }
+.cp-standing-hole dt { font-weight: 750; }
+.cp-standing-hole dd { margin: 0; overflow-wrap: anywhere; }
+.cp-standing-hole .cp-standing-call { margin: 8px 0; }
+.cp-full-plan { margin-top: 8px; min-height: 40px; }
+.cp-live-map-content .cp-standing-hole { margin: 12px 0; }
