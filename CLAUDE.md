@@ -125,7 +125,9 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v235, October 8 2026)
+## Course Prep (v236, October 8 2026)
+
+3D draws only the active shot/measurement path from the current tee or GPS origin. Do not add the original reference centerline underneath it: a custom tee otherwise produces a second crossing line. Optional carry/roll rings remain, and the original route geometry remains available to the simple map, guides, camera framing and landing calculation.
 
 The club landing is an opening suggestion only. A valid target tap takes precedence immediately: one red pin at the tapped coordinate with distance to it and left to green. This manual-target mode survives redraws, map-style switches and camera reset; opening another hole/course, choosing a club or clearing the target restores the club preview. Saved targets remain intact on navigation.
 

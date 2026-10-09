@@ -38,7 +38,7 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
    return {yards:geo.distance([start.lat,start.lng],[landing.position.lat,landing.position.lng]),label:landing.label,choice:document.querySelector('#cp-map-club').selectedOptions[0].textContent,rings:document.querySelectorAll('qa-map-line').length};
   });
   assert.ok(Math.abs(projection.yards-Number(projection.label.match(/(\d+) yd/)[1]))<.51,'projected straight-line distance equals carry');
-  assert.ok(projection.rings>=3,'route, tee line and carry ring exist');
+  assert.equal(projection.rings,2,'only shot line and carry ring exist; no reference-route line');
   assert.deepEqual(await state(p),baseline,'opening suggestions does not save a club or target');
   const beforeCamera=await p.locator('qa-map-scene').evaluate(e=>e.lastFlight);
   const choices=await p.locator('#cp-map-club option').evaluateAll(es=>es.map(e=>e.value));
@@ -81,6 +81,24 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
   await p.context().setOffline(true);await p.locator('.cp-arrows [data-cp="next"]').click();await p.locator('#cp-route-map').waitFor();
   assert.ok(await p.locator('#cp-tee-preview').isVisible(),'downloaded map preview works offline');
   assert.deepEqual(await state(p),saved,'browsing, reset and offline preview preserve saved state');
+  await p.context().setOffline(false);
+  await open('sterling-farms',4);
+  const customTee=await p.evaluate(()=>{
+   const h=CaddieCoursePrep.findCourse('sterling-farms').holes[3];
+   return CaddieCoursePrep.geo.destination(h.path[0],15,90);
+  });
+  await p.locator('[data-cp="edit"][data-kind="tee"]').click();
+  await p.locator('qa-map-scene').evaluate((el,point)=>{const e=new Event('gmp-click');e.position={lat:point[0],lng:point[1]};el.dispatchEvent(e);},customTee);
+  const shot=await p.locator('qa-map-line').evaluateAll(ls=>ls.filter(l=>l.strokeWidth===4).map(l=>l.path));
+  assert.equal(shot.length,1,'custom tee has one shot line, no original green route');
+  assert.equal(shot[0].length,2,'preview line joins only tee and landing');
+  assert.ok(Math.abs(shot[0][0].lat-customTee[0])<.000001 && Math.abs(shot[0][0].lng-customTee[1])<.000001,'line begins at custom tee');
+  await p.locator('[data-cp="rings"]').click();
+  assert.equal(await p.locator('qa-map-line').count(),1,'hiding rings leaves only the active shot line');
+  await p.locator('[data-cp="edit"][data-kind="target"]').click();
+  await p.locator('qa-map-scene').evaluate((el,point)=>{const e=new Event('gmp-click');e.position={lat:point[0],lng:point[1]};el.dispatchEvent(e);},customTee);
+  assert.equal(await p.locator('qa-map-line').count(),1,'target tap replaces rather than accumulates shot lines');
+  assert.match(await p.locator('.cp-map-summary').innerText(),/to your target/);
   assert.deepEqual(errors,[]);
   console.log('PASS par 4/5 tee suggestions, carry projection, manual choices/targets, camera reset, par 3 cleanup, offline preview and mobile layouts');
  }finally{await browser.close();server.close();}

@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v235';
+const BUILD = 'v236';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v236', d:'2026-10-08', items:['CLEAN SHOT LINES: Removed the extra reference-route line from 3D maps. Only your active shot path and optional distance rings appear, including when you set your own tee.'] },
   { b:'v235', d:'2026-10-08', items:['TAP TO MEASURE: Your club landing is the starting suggestion. Tapping the map replaces it with one target pin and shows yardage to that spot and left to the green. Full-screen map fitting is included.'] },
   { b:'v234', d:'2026-10-08', items:['FULL MAP ON OPEN: Course Prep fits the complete hole guide or interactive map above the bottom navigation. Compact headers retain every control, and map height adapts to your screen.'] },
   { b:'v233', d:'2026-10-08', items:['SMALLER MAP HEADER: Four controls in two rows. Stop moves below the map beside Clear target; Reset view replaces the duplicate Tee button.'] },

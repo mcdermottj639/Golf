@@ -958,10 +958,12 @@
     lines3d.splice(0).forEach(line=>line.remove());
     const addLine=element=>{lines3d.push(element);maps3d.append(element);};
     const line=(path,color,width)=>new lib.Polyline3DElement({path:path.map(ll),strokeColor:color,strokeWidth:width,altitudeMode:'CLAMP_TO_GROUND',drawsOccludedSegments:true});
-    addLine(line(currentHole().path,'#c5e78a',4));
     const preview=teePreview();
+    // Draw only the active measurement path. The reference route can start at a
+    // different tee and otherwise crosses the shot line/ring as a stray green line.
     if(preview)addLine(line([preview.tee,preview.landing],'#49d4d0',4));
-    if(savedHole().target&&!preview)addLine(line([origin(),target(),green()],'#ffb766',3));
+    else if(savedHole().target)addLine(line([origin(),target(),green()],'#ffb766',3));
+    else addLine(line([origin(),green()],'#49d4d0',4));
     // Basic 3D markers need only maps3d. Optional PinElement customization must not
     // become a startup dependency: a customization failure must not hide the map.
     const points=[[origin(),liveLocation()?'You':'Tee',liveLocation()?'you':'tee'],[green(),savedHole().target?'Green':'Green · '+yard(distance(origin(),green()))+' yd','green'],...(savedHole().target&&!preview?[[target(),targetYardage()]]:[]),...(preview?[[preview.landing,landingLabel(preview)]]:[])];

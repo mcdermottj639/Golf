@@ -182,7 +182,7 @@ if(require.main===module)(async()=>{
     await mode(p,'3d');assert.match(await p.locator('#cp-map-stage').innerText(),/Connect your Google Maps key/);
     await p.locator('[data-cp="map-setup"]').click();await p.locator('#cp-api-key').fill('invalid');await p.locator('[data-cp="key-save"]').click();assert.equal(googleRequests,0);
     await p.locator('#cp-api-key').fill('AIza'+'x'.repeat(35));await p.locator('[data-cp="key-save"]').click();await p.locator('qa-map-scene').waitFor();
-    assert.equal(googleRequests,1);assert.ok(await p.locator('qa-map-line').count()>=3);
+    assert.equal(googleRequests,1);assert.ok(await p.locator('qa-map-line').count()>=2);
     assert.equal(await p.locator('qa-map-scene').evaluate(e=>e.gestureHandling),'GREEDY');
     const beforeJump=await state(p);await p.locator('[data-cp="shot-plan"]').click();assert.deepEqual(await state(p),beforeJump,'jumping to the plan preserves golf state');
     const initialLabels=await p.locator('qa-map-marker').evaluateAll(els=>els.map(e=>e.label));
