@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v245';
+const BUILD = 'v246';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v246', d:'2026-10-08', items:['EXPLORE COURSES SHORTCUT FIX: The Overview button now opens the same interactive course prep as Explore courses in Round prep, starting in 3D.'] },
   { b:'v245', d:'2026-10-08', items:['EXPLORE COURSES: The Overview header now has an Explore courses button beside Start a round, opening your course browser.'] },
   { b:'v244', d:'2026-10-08', items:['OPEN IN 3D: Course Prep now opens directly to Interactive map in 3D. Hole guide stays available in the second tab. Offline or without a Maps key, the interactive simple map opens instead.'] },
   { b:'v243', d:'2026-10-08', items:['MAP TAB FIRST: Interactive map is now the first tab and Hole guide the second in Course Prep and live-round popups.'] },
@@ -3025,7 +3026,7 @@ function hqOverview(){
       <div class="hq-kicker">JACK'S GOLF WORKSPACE <span class="hq-badge">PERSONAL</span></div>
       <h2 class="hq-title" data-no-fold>Your game.<br>A clearer picture.</h2>
       <p class="hq-subtitle">See what changed. Know what to practice. Take it to the course.</p>
-      <div class="hq-hero-actions"><button class="hq-btn" data-action="live-new">${hqIcon('range')}${S.live?'Resume your round':'Start a round'}</button><button class="hq-btn hq-btn-secondary" data-action="go" data-view="rounds" data-seg="courses">${hqIcon('round')}Explore courses</button></div>
+      <div class="hq-hero-actions"><button class="hq-btn" data-action="live-new">${hqIcon('range')}${S.live?'Resume your round':'Start a round'}</button><button class="hq-btn hq-btn-secondary" data-action="open-course-prep">${hqIcon('round')}Explore courses</button></div>
       <div class="hq-metrics">
         ${metric(S.profile.handicap??'—','Profile handicap',PROV[provOfProfile()]?.lab||'Profile record',{a:'go',v:'numbers'})}
         ${metric(rangeDay?.usable??'—','Usable range shots',range?`Latest: ${fmtDate(range.date)} · ${rangeDay?.clubs.length??0} clubs`:'No range day recorded',range?{a:'open-bay',i:range.i}:{a:'session-category',kind:'range'})}
