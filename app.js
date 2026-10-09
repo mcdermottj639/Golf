@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v240';
+const BUILD = 'v241';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v241', d:'2026-10-08', items:['CENTERED HOLE PLAN: The standing-plan popup is centered over both interactive maps and hole guides.'] },
   { b:'v240', d:'2026-10-08', items:['HOLE PLAN POPUP: Open the current hole’s standing advice directly beside 3D and Reset view, or beside Full hole in the guide. Closing the popup preserves your map and guide view.'] },
   { b:'v239', d:'2026-10-08', items:['COMPACT ROUND SETUP: Both course selection and card checking now use a compact phone header. Removed the empty Sections row and long setup copy; date and hole controls fit without overlapping.'] },
   { b:'v238', d:'2026-10-08', items:['INTEGRATED ROUND PREP: Standing course strategy, rules and hole advice now appear alongside the guides and maps. Personal club calls and notes stay connected to the full standing plan and live prep.'] },
