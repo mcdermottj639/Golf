@@ -322,8 +322,8 @@
     if(!packReady())return '<div class="cp-pack-loading" role="status"><h3>Course map</h3><p>'+esc(loadErrors.get(course.id)||'Loading your course…')+'</p><p>Your saved notes and club choices remain available below.</p>'+(loadErrors.has(course.id)?button('retry-pack','Retry download'):'')+'</div>';
 
     return '<div class="cp-modes'+(hasGuide(course,currentHole())?'':' cp-map-only')+'" role="group" aria-label="Hole view">'+
-      (hasGuide(course,currentHole()) ? button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"') : '')+
-      button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"')+'</div>'+mapViews()+
+      button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"')+
+      (hasGuide(course,currentHole()) ? button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"') : '')+'</div>'+mapViews()+
       '<div class="cp-map-canvas"><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-tee-preview" class="cp-tee-preview" hidden></div></div><div class="cp-reference" id="cp-reference" hidden></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div>';
   }
   function nearbyCourses() {
@@ -499,7 +499,7 @@
     const h = source?.holes.find(item => item.n === +n && hasGuide(source,item));
     if(!h)return false;
     const dialog = holeDialog(source,h,'cp-live-guide','Close hole guide',
-      (h.mapReady!==false?'<div class="cp-workspace"><div class="cp-modes" role="group" aria-label="Hole view"><button type="button" aria-pressed="true">Hole guide</button><button type="button" data-live-map aria-pressed="false">Interactive map</button></div></div>':'')+
+      (h.mapReady!==false?'<div class="cp-workspace"><div class="cp-modes" role="group" aria-label="Hole view"><button type="button" data-live-map aria-pressed="false">Interactive map</button><button type="button" aria-pressed="true">Hole guide</button></div></div>':'')+
       '<div class="cp-live-guide-body cp-workspace">'+guideContent(source,h,true)+'</div>'+
       '<footer>'+guideCaption(source,h)+'</footer>');
     dialog.querySelector('[data-live-map]')?.addEventListener('click',()=>openLiveMap(source.id,h.n));
