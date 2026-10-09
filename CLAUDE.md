@@ -103,6 +103,8 @@ request; keep each icon and label with its existing route. Retain these internal
 deep links use them. Activity is the day-by-day log; Progress & trends is the existing
 cumulative analysis. Four labs open in one tap. Overview adds a sourced digest and recent
 activity, followed by the **complete** original home content inside `.hq-legacy`.
+The Overview header pairs Start/Resume a round with Explore courses (v245), which
+opens Rounds with the Courses segment selected (`go`, `rounds`, `courses`).
 Bag presents the roster first; each carry-bearing club has a full-history link using its
 canonical club key and returns directly to My Bag (v219). Cumulative analysis history
 continues to return to Bag at a glance. Latest rounds and start/resume/log actions lead the Rounds scorecards.
