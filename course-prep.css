@@ -359,3 +359,18 @@ body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
 .cp-standing-hole .cp-standing-call { margin: 8px 0; }
 .cp-full-plan { margin-top: 8px; min-height: 40px; }
 .cp-live-map-content .cp-standing-hole { margin: 12px 0; }
+
+/* Hole advice opens over either map/guide without replacing its camera or zoom. */
+.cp-hole-plan-dialog { width:min(540px,calc(100vw - 24px)); max-height:calc(100dvh - 40px); padding:0; border:1px solid var(--line); border-radius:18px; background:var(--card); color:var(--ink); overflow:auto; }
+.cp-hole-plan-dialog::backdrop { background:rgba(0,0,0,.5); }
+.cp-hole-plan-dialog > header { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px; position:sticky; top:0; background:var(--card); z-index:1; }
+.cp-hole-plan-dialog header p { margin:0 0 4px; font-size:12px; }
+.cp-hole-plan-dialog header h2 { margin:0; font-size:19px; }
+.cp-hole-plan-dialog header button { min-width:44px; min-height:44px; font-size:24px; }
+.cp-hole-plan-body { padding:0 14px 14px; }
+.cp-map-views [data-hole-plan] { color:var(--cp-ink); font-weight:700; }
+@media(max-width:380px){
+ .cp-guide-zoom-tools { gap:3px; padding-inline:4px; }
+ .cp-guide-zoom-tools button { min-width:30px; padding-inline:5px; font-size:11px; }
+ .cp-guide-zoom-tools output { min-width:30px; }
+}
