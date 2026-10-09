@@ -724,3 +724,30 @@ html,body{touch-action:manipulation}
   body.lvcardfocus .hq-page-heading { margin-top: 6px; }
   body.lvcardfocus .hq-page-heading h1 { font-size: 24px; }
 }
+
+/* Both pre-play steps share a compact shell, not just the card-check stage. */
+.live-start-setup { max-width: 620px; margin: 0 auto; }
+.live-start-setup .live-start-panel { margin: 4px 0 12px; padding: 14px; }
+.live-start-panel h2 { margin: 0 0 6px; font-size: 18px; }
+.live-start-panel > p { margin: 0 0 10px; font-size: 12px; line-height: 1.45; }
+.live-start-panel label { margin-top: 10px; margin-bottom: 4px; }
+.live-start-panel .formrow { grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
+.live-start-panel .formrow > div { min-width: 0; }
+.live-start-panel input, .live-start-panel select { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; min-height: 44px; font-size: 16px; padding: 10px; }
+.live-start-panel input[type=date] { appearance: none; -webkit-appearance: none; }
+.live-start-panel input[type=date]::-webkit-date-and-time-value { min-width: 0; text-align: left; }
+.live-start-button { width: 100%; min-height: 46px; margin-top: 14px; }
+.live-start-help { margin-top: 10px; font-size: 12px; }
+.live-start-help summary { cursor: pointer; padding: 5px 0; }
+@media (max-width: 759px) {
+  body.lvcardfocus .hq-shell .hq-brand { display: none; }
+  body.lvcardfocus .hq-shell .hq-page-heading { grid-column: 1; grid-row: 1; margin: 0; gap: 7px; }
+  body.lvcardfocus .hq-shell .hq-page-heading h1 { font-size: 22px; white-space: nowrap; }
+  body.lvcardfocus .hq-shell .hq-back { width: 32px; min-height: 40px; }
+  body.lvcardfocus .hq-shell-actions { gap: 4px; }
+  body.lvcardfocus .hq-shell-actions > button { width: 36px; }
+}
+@media (max-width: 759px) and (max-height: 700px) {
+  .live-card-panel .ptot > div { display: flex; align-items: baseline; justify-content: center; gap: 5px; padding: 6px; }
+  .live-card-panel .ptot span { margin: 0; }
+}
