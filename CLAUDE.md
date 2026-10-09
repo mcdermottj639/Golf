@@ -125,7 +125,9 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v238, October 8 2026)
+## Course Prep (v240, October 8 2026)
+
+The map toolbar replaces its Simple map shortcut with Hole plan; the guide offers the same action beside Full hole. It opens a separate modal for the explicitly selected course and physical hole, with existing standing advice, club override and personal note. Close/Escape returns focus without replacing the map/guide or changing state. Simple map remains the automatic offline/no-key fallback.
 
 3D draws only the active shot/measurement path from the current tee or GPS origin. Do not add the original reference centerline underneath it: a custom tee otherwise produces a second crossing line. Optional carry/roll rings remain, and the original route geometry remains available to the simple map, guides, camera framing and landing calculation.
 

@@ -67,7 +67,7 @@
   const usesArt = (source,h) => canDrawGuide(source,h) && (guideStyle==='caddie' || !h.guide || navigator.onLine===false);
   const guideChoices = (source,h) => h.guide && canDrawGuide(source,h) ? '<div class="cp-guide-styles" role="group" aria-label="Guide style">'+button('guide-style','Club illustration','data-style="club" aria-pressed="'+!usesArt(source,h)+'"')+button('guide-style','Caddie HQ guide','data-style="caddie" aria-pressed="'+usesArt(source,h)+'"')+'</div>' : '';
   const guideCaption = (source,h) => usesArt(source,h) ? 'Illustrated overview · not to scale · incomplete hazard coverage. '+link('https://www.openstreetmap.org/copyright','© OpenStreetMap contributors') : 'Official club illustration · not to scale. '+link(source.tour,'Open course guide ↗');
-  const guideContent = (source,h,live=false) => '<div class="cp-guide-zoom" style="--guide-scale:1"><div class="cp-guide-zoom-tools" role="group" aria-label="Hole guide zoom"><button type="button" data-guide-zoom="out" aria-label="Zoom out hole guide" disabled>−</button><output aria-live="polite">100%</output><button type="button" data-guide-zoom="in" aria-label="Zoom in hole guide">+</button><button type="button" data-guide-zoom="full">Full hole</button><span>Zoom for detail</span></div><div class="cp-guide-viewport" tabindex="0" aria-label="Full hole guide"><div class="cp-guide-zoom-content">'+(usesArt(source,h) ? window.CaddieHoleGuide.render(source,h) : guideFigure(source,h,live))+'</div></div>'+guideChoices(source,h)+'</div>';
+  const guideContent = (source,h,live=false) => '<div class="cp-guide-zoom" style="--guide-scale:1"><div class="cp-guide-zoom-tools" role="group" aria-label="Hole guide zoom"><button type="button" data-guide-zoom="out" aria-label="Zoom out hole guide" disabled>−</button><output aria-live="polite">100%</output><button type="button" data-guide-zoom="in" aria-label="Zoom in hole guide">+</button><button type="button" data-guide-zoom="full">Full hole</button>'+holePlanButton(source,h.n)+'<span>Zoom for detail</span></div><div class="cp-guide-viewport" tabindex="0" aria-label="Full hole guide"><div class="cp-guide-zoom-content">'+(usesArt(source,h) ? window.CaddieHoleGuide.render(source,h) : guideFigure(source,h,live))+'</div></div>'+guideChoices(source,h)+'</div>';
   function setupGuideZoom(container) {
     const wrap=container.querySelector('.cp-guide-zoom');if(!wrap)return;
     const viewport=wrap.querySelector('.cp-guide-viewport');let zoom=1;
@@ -287,11 +287,31 @@
       button('key-save', 'Connect') + (key() ? button('key-clear', 'Disconnect') : '') + '</div>' +
       '<p class="cp-muted">Saved only on this device, outside golf backups. Restrict the website to https://mcdermottj639.github.io/* and set usage limits in Google Cloud. Maps need internet; course routes and your saved notes work offline after loading.</p></details>';
   }
+  function holePlanButton(source,n) {
+    return '<button type="button" data-hole-plan="'+esc(source.id)+'" data-hole="'+n+'" aria-haspopup="dialog">Hole plan</button>';
+  }
+  function closeHolePlan(){document.getElementById('cp-hole-plan-dialog')?.close();}
+  function openHolePlan(id,n){
+    const source=findCourse(id),h=source?.holes.find(h=>h.n===+n);if(!h)return;
+    closeHolePlan();
+    const trigger=document.activeElement,dialog=document.createElement('dialog');
+    dialog.id='cp-hole-plan-dialog';dialog.className='cp-hole-plan-dialog cp-workspace';
+    dialog.setAttribute('aria-labelledby','cp-hole-plan-title');
+    const state=clean(bridge.get(source.id),source.id),note=state.holes[state.tee+':'+h.n]?.note;
+    dialog.innerHTML='<header><div><p>'+esc(source.shortName)+'</p><h2 id="cp-hole-plan-title">Hole '+h.n+' · Standing plan</h2></div><button type="button" aria-label="Close hole plan" autofocus>×</button></header><div class="cp-hole-plan-body">'+
+      (standingPlanMarkup(false,source,h.n)||'<p>No standing plan is saved for this course yet.</p>')+
+      (note?'<section class="cp-plan-card"><h3>Your hole note</h3><p>'+esc(note)+'</p></section>':'')+'</div>';
+    dialog.querySelector('header button').addEventListener('click',()=>dialog.close());
+    dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
+    dialog.addEventListener('close',()=>{dialog.remove();if(trigger?.isConnected)trigger.focus({preventScroll:true});},{once:true});
+    document.body.append(dialog);dialog.showModal();
+  }
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-hole-plan]');if(b){e.preventDefault();openHolePlan(b.dataset.holePlan,+b.dataset.hole);}});
   function mapViews() {
     if(mode==='guide')return '';
     return '<div class="cp-map-views"><div class="cp-imagery-views" role="group" aria-label="Imagery view">'+
       [['3d','3D']].map(([k,label])=>button('mode',label,'data-mode="'+k+'" aria-pressed="'+(mode===k)+'"')).join('')+'</div>'+
-      button('mode','Simple map','class="cp-simple-view" data-mode="route" aria-pressed="'+(mode==='route')+'"')+button('reset-view','Reset view','title="Return to the starting hole view"')+'</div>'+
+      holePlanButton(course,hole)+button('reset-view','Reset view','title="Return to the starting hole view"')+'</div>'+
       (mode==='route'?'<p class="cp-map-view-note" role="status">'+(navigator.onLine===false?'You’re offline · using the simple map':'Simple map · works offline')+'</p>':'');
   }
   function mapSurface() {
@@ -326,18 +346,18 @@
     const all=await Promise.all(courses.map(async c=>({c,s:await packs.status(c.id)})));if(root!==node)return;
     list.innerHTML=all.filter(({s})=>s.favorite||s.available).map(({c,s})=>'<div><b>'+esc(c.shortName)+'</b><span>'+(s.busy?'Downloading…':s.available?'Available offline':'Needs download')+(s.favorite?' · Favorite':'')+'</span></div>').join('');
   }
-  function standingPlanMarkup(summary = true) {
-    const p=bridge.standingPlan?.(course.id);if(!p)return '';
-    const h=p.holes?.find(h=>h.n===hole);
+  function standingPlanMarkup(summary = true, source = course, n = hole) {
+    const p=bridge.standingPlan?.(source.id);if(!p)return '';
+    const h=p.holes?.find(h=>h.n===n);
     const prose=value=>esc(value).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<strong>$1</strong>');
     const list=values=>'<ul>'+values.map(v=>'<li>'+prose(v)+'</li>').join('')+'</ul>';
     const rows=h ? [['Plan',h.play],['Leaves',h.leaves],['Green',h.green],['Avoid',h.avoid]].filter(([,v])=>v) : [];
-    const club=bag().find(c=>c.key===bridge.club(course.id,hole));
+    const club=bridge.bag('playing').find(c=>c.key===bridge.club(source.id,n));
     return (summary ? '<details class="cp-standing-overview"><summary>Standing course plan <span>'+esc(p.focus||p.course)+'</span></summary>'+
       (p.focus?'<p>'+prose(p.focus)+'</p>':'')+(p.rules?.length?'<h4>If you read nothing else</h4>'+list(p.rules):'')+
       (p.steps?.length?'<h4>The routine</h4><ol>'+p.steps.map(v=>'<li>'+prose(v)+'</li>').join('')+'</ol>':'')+
       '<button type="button" class="cp-full-plan" data-action="open-briefing" data-id="'+esc(p.id)+'">Read full standing plan →</button></details>' : '')+
-      '<section class="cp-plan-card cp-standing-hole"><span class="cp-eyebrow">HOLE '+hole+' · STANDING PLAN</span>'+
+      '<section class="cp-plan-card cp-standing-hole"><span class="cp-eyebrow">HOLE '+n+' · STANDING PLAN</span>'+
       (club?'<p class="cp-standing-call"><b>Your club:</b> '+esc(club.label)+'</p>':'')+
       (rows.length?'<dl>'+rows.map(([k,v])=>'<dt>'+k+'</dt><dd>'+prose(v)+'</dd>').join('')+'</dl>':'')+
       (h?.note?'<p>'+prose(h.note)+'</p>':'')+(h?.why?.length?list(h.why):'')+
@@ -424,6 +444,7 @@
     epoch++; stopFlyover(); clearGoogle3d(); stopLocation(); root = null; liveDialog = null;
   }
   function closeGuide() {
+    closeHolePlan();
     const dialog = document.querySelector('dialog.cp-guide-dialog[open]');
     if(!dialog)return;
     stopGuideLoad(dialog);
