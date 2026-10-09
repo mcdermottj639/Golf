@@ -55,7 +55,17 @@ const {server,chromium,state,ready,mode,googleMock}=require('./course-prep-brows
   await p.locator('qa-map-scene').evaluate(el=>el.dispatchEvent(new CustomEvent('gmp-click',{detail:null}))); // no position: no write
   const aim=await p.evaluate(()=>CaddieCoursePrep.findCourse('sterling-farms').holes[1].path[1]);
   await p.locator('qa-map-scene').evaluate((el,aim)=>{const e=new Event('gmp-click');e.position={lat:aim[0],lng:aim[1]};el.dispatchEvent(e);},aim);
-  assert.equal(await p.locator('qa-map-marker').count(),3,'only tee, green and club landing pins appear despite a saved target');
+  assert.equal(await p.locator('qa-map-marker').count(),3,'tap replaces club landing with one target pin');
+  assert.equal(await p.locator('qa-map-marker').evaluateAll(ms=>ms.filter(m=>m.label.endsWith(' yd carry')).length),0,'no club landing pin after a tap');
+  const tapped=await p.locator('qa-map-marker').nth(2).evaluate(m=>({lat:m.position.lat,lng:m.position.lng,label:m.label}));
+  assert.ok(Math.abs(tapped.lat-aim[0])<.000001 && Math.abs(tapped.lng-aim[1])<.000001,'red pin is at tapped location');
+  assert.match(tapped.label,/yd · .*yd left/);
+  assert.match(await p.locator('.cp-map-summary').innerText(),/to your target[\s\S]*left to green/);
+  await mode(p,'route');
+  assert.equal(await p.locator('[data-point="target"]').count(),1);
+  assert.equal(await p.locator('[data-point="landing"]').count(),0);
+  await p.locator('[data-cp="reset-view"]').click();
+  assert.equal(await p.locator('[data-point="target"]').count(),1,'reset camera keeps tapped target');
   const saved=await state(p);
   await open('wianno',2);assert.ok(await p.locator('#cp-tee-preview').isVisible(),'par 4 gets preview');
   const par3=await p.evaluate(()=>CaddieCoursePrep.findCourse('wianno').holes.find(h=>h.par===3).n);

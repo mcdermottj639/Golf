@@ -125,7 +125,9 @@ search, full day/source/round/history paths, live-round resumption, zero-valued 
 results, fold persistence, exact export/import/reload and real offline reload. Neither
 test operates on the user's browser. Run the existing publish workflow suite as well.
 
-## Course Prep (v234, October 8 2026)
+## Course Prep (v235, October 8 2026)
+
+The club landing is an opening suggestion only. A valid target tap takes precedence immediately: one red pin at the tapped coordinate with distance to it and left to green. This manual-target mode survives redraws, map-style switches and camera reset; opening another hole/course, choosing a club or clearing the target restores the club preview. Saved targets remain intact on navigation.
 
 Course Prep measures available viewport space above the bottom navigation, including safe areas, and fits the complete map or full guide plus its zoom/style controls within it. Compact mobile headers retain all controls. Height uses document position so scrolling does not resize the visual; window/visual viewport resizing recalculates it. Live dialogs retain their independent sizing.
 
@@ -236,7 +238,7 @@ longest available carry at/below a saved target or 30 yards short of the mapped 
 not a hazard/dispersion/conditions optimizer. Unset saved club carries remain unset.
 Carry landing uses a straight shot aimed at the saved target or the first intersection
 of a carry-radius circle with the mapped route, never cumulative dogleg length.
-Show a compact single-row club/carry selector, carry circle and separate projected marker on opening. Keep recommendation source and yards-left details below the map; do not restore the large overlaid card. Retain saved targets in state, but hide their pin and aim line while the tee preview is active: exactly one fairway pin shows the club landing. The on-map summary prioritizes that landing; target details stay in the planning section. Par 3s and holes without verified geometry have no
+Show a compact single-row club/carry selector, carry circle and separate projected marker on opening. Keep recommendation source and yards-left details below the map; do not restore the large overlaid card. Retain saved targets in state, but hide their pin and aim line while the tee preview is active: exactly one fairway pin shows the club landing. The on-map summary starts with that landing. A new target tap ends the preview and replaces the landing marker/summary with the exact tapped target and both yardages. Par 3s and holes without verified geometry have no
 automatic tee preview. Active GPS measurement pauses it, preserving current-position
 yardages. The starting/Reset 3D camera frames the tee and projected landing; Whole hole
 still shows the full route. Club changes update overlays without resetting the camera.

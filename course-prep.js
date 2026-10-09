@@ -50,7 +50,7 @@
     }
     return out;
   }
-  let bridge, root, liveDialog, hole = 1, mode = 'guide', lastMapMode = '3d', overview = false, edit = 'target';
+  let bridge, root, liveDialog, hole = 1, mode = 'guide', lastMapMode = '3d', overview = false, edit = 'target', manualTarget = false;
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps3d;
   let lines3d = [], markers3d = [];
   let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
@@ -121,7 +121,7 @@
   }
   const selected = () => teeClub().club;
   function teePreview() {
-    if(!teePreviewReady())return null;
+    if(manualTarget || !teePreviewReady())return null;
     const {club,source}=teeClub();if(!club||!Number.isFinite(club.carry)||club.carry<=0)return null;
     const tee=teeOrigin();let aim=savedHole().target;
     if(!aim){
@@ -377,7 +377,7 @@
     const next=findCourse(id);if(!next)return false;
     if(next.id!==course.id){
       epoch++;stopFlyover();stopGuideLoad();clearGoogle3d();stopLocation();
-      course=next;hole=1;bagSnapshot=null;framed3d=null;
+      manualTarget=false;course=next;hole=1;bagSnapshot=null;framed3d=null;
       projection=null;overview=false;edit='target';guideStyle='auto';lastMapMode='3d';mode=initialMode();
       if(!googleAuthFailed){googleFailure='';googleFailureMode='';}
     }
@@ -385,7 +385,7 @@
   }
   function changeHole(n) {
     if (!course.holes.some(h=>h.n===n)) return;
-    stopFlyover();hole=n;if(!mapReady())stopLocation();framed3d=null;
+    manualTarget=false;stopFlyover();hole=n;if(!mapReady())stopLocation();framed3d=null;
     // Keep the chosen guide/map view and imagery style while browsing holes.
     if(mode==='guide'&&!hasGuide(course,currentHole()))mode=key()&&navigator.onLine!==false?lastMapMode:'route';
     imageError=false;overview=false;redraw();
@@ -470,7 +470,7 @@
     if(!h || h.mapReady===false || !bridge)return false;
     closeGuide();selectCourse(source.id);
     const dialog = holeDialog(course,h,'cp-live-map','Close interactive map','<div class="cp-live-map-content"></div>');
-    liveDialog = dialog; hole = h.n; framed3d = null;
+    manualTarget=false;liveDialog = dialog; hole = h.n; framed3d = null;
     mode = key() && navigator.onLine!==false && ['3d','route'].includes(start) ? start : 'route';
     lastMapMode = mode; overview = false; edit = 'target';
     if(!googleAuthFailed && googleFailureMode && googleFailureMode!==mode)googleFailure='';
@@ -537,7 +537,7 @@
         if(el.dataset.pickTarget)root?.querySelector('#cp-map-stage').scrollIntoView({block:'center',behavior:'smooth'});
         break;
       }
-      case 'club': bridge.setClub(course.id,hole, el.dataset.club); redraw(); break;
+      case 'club': manualTarget=false;bridge.setClub(course.id,hole, el.dataset.club); redraw(); break;
       case 'review-next': {
         saveHole({reviewed:true});
         const m=model(), next=Array.from({length:course.holes.length},(_,i)=>(hole+i)%course.holes.length+1).find(n=>!m.holes[m.tee+':'+n]?.reviewed);
@@ -551,7 +551,7 @@
       case 'shot-plan': root.querySelector('.cp-plan').scrollIntoView({block:'start',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});break;
       case 'overview': overview = !overview; drawView(); break;
       case 'edit': edit = el.dataset.kind; if(edit==='tee')stopLocation();updateMeasurements(); break;
-      case 'clear-target': saveHole({target: undefined}); drawView(); readout(); break;
+      case 'clear-target': manualTarget=false;saveHole({target: undefined}); drawView(); readout(); break;
       case 'reset-tee': stopLocation();saveHole({tee: undefined}); drawView(); readout(); break;
       case 'map-setup': root.querySelector('#cp-setup').open = true; root.querySelector('#cp-api-key').focus(); break;
       case 'key-save': {
@@ -580,9 +580,9 @@
     }
   }
   function onChange(e) {
-    if(e.target.id==='cp-map-club'){bridge.setClub(course.id,hole,e.target.value);redraw();return;}
+    if(e.target.id==='cp-map-club'){manualTarget=false;bridge.setClub(course.id,hole,e.target.value);redraw();return;}
     if (e.target.id === 'cp-courses') { if(selectCourse(e.target.value))redraw();return; }
-    if (e.target.id === 'cp-tees') { const m = model(); m.tee = e.target.value; bridge.save(course.id,clean(m)); redraw(); }
+    if (e.target.id === 'cp-tees') { manualTarget=false;const m = model(); m.tee = e.target.value; bridge.save(course.id,clean(m)); redraw(); }
     if (e.target.id === 'cp-basis') { const m = model(); m.basis = e.target.value; bridge.save(course.id,clean(m)); redraw(); }
     if (e.target.id === 'cp-reviewed') {
       saveHole({reviewed: e.target.checked});
@@ -874,6 +874,7 @@
   }
   function choosePoint(p) {
     if(!pointOK(p))return bridge.toast('Choose a point within the '+course.shortName+' course area');
+    if(edit==='target')manualTarget=true;
     saveHole({[edit]:p.map(x=>+x.toFixed(7))});readout();refreshOverlays();drawControls();
   }
   function refreshOverlays() {
@@ -1022,9 +1023,9 @@
   window.addEventListener('pagehide',()=>stopLocation());
   window.CaddieCoursePrep = Object.freeze({
     init: options => {bridge=options;packs?.start();}, render, mount, unmount, teaser, resumeAfterReload, openGuide, openLiveMap,
-    openNearest: () => selectCourse(nearbyCourses()[0].course.id),
+    openNearest: () => {manualTarget=false;return selectCourse(nearbyCourses()[0].course.id);},
     resumeLiveMap: () => openLiveMap(course.id,hole,mode),
-    openHole: (n,courseId) => {if(courseId&&!selectCourse(courseId))return false;hole=course.holes.some(h=>h.n===+n)?+n:1;framed3d=null;mode=initialMode();imageError=false;overview=false;return true;},
+    openHole: (n,courseId) => {manualTarget=false;if(courseId&&!selectCourse(courseId))return false;hole=course.holes.some(h=>h.n===+n)?+n:1;framed3d=null;mode=initialMode();imageError=false;overview=false;return true;},
     get courseName(){return course.name;}, get courseId(){return course.id;}, findCourse, clean, hasGuide,
     geo: Object.freeze({distance,destination,bearing,pointOK})
   });

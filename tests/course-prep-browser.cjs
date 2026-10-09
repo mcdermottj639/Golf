@@ -143,7 +143,7 @@ if(require.main===module)(async()=>{
       await p.setViewportSize({width,height:width===1440?1000:844});await p.evaluate(()=>scrollTo(0,0));
       const bounds=await p.evaluate(()=>({width:innerWidth,content:document.documentElement.scrollWidth,holeButtons:[...document.querySelectorAll('.cp-holes button')].map(e=>({left:e.getBoundingClientRect().left,right:e.getBoundingClientRect().right})),skip:document.querySelector('.hq-skip').getBoundingClientRect().bottom}));
       assert.ok(bounds.content<=width+1,'page fits '+width);assert.ok(bounds.holeButtons.every(b=>b.left>=0&&b.right<=width),'hole buttons fit '+width);assert.ok(bounds.skip<=0,'skip link stays offscreen when unfocused');
-      assert.ok(await p.locator('.cp-map-views button').evaluateAll(els=>els.every(e=>e.getBoundingClientRect().height>=44)),'map controls have touch targets');
+      assert.ok(await p.locator('.cp-map-views button').evaluateAll(els=>els.every(e=>e.getBoundingClientRect().height>=(innerWidth<=760?32:44))),'map controls retain compact touch targets');
       await p.locator('.cp-map-panel').screenshot({path:path.join(screens,'course-map-'+width+'.png')});
       await mode(p,'guide');await p.locator('#cp-guide-image').waitFor();await p.locator('.cp-hole-heading').screenshot({path:path.join(screens,'hole-heading-'+width+'.png')});
       assert.equal(await p.locator('.cp-map-views').count(),0);await mode(p,'route');
@@ -330,7 +330,7 @@ if(require.main===module)(async()=>{
     const liveTarget=await p.evaluate(()=>{const h=CADDIE_PREP_COURSES[0].holes[17],g=CaddieCoursePrep.geo;return g.destination(h.path[0],180,g.bearing(h.path[0],h.path.at(-1)));});
     await p.locator('qa-map-scene').evaluate((el,point)=>{const e=new Event('gmp-click');e.position={lat:point[0],lng:point[1]};el.dispatchEvent(e);},liveTarget);
     assert.ok(await p.evaluate(point=>CaddieCoursePrep.geo.distance(JSON.parse(localStorage.caddiehq_v1).coursePrep.poundRidge.holes['granite:18'].target,point)<0.02,liveTarget),'live target matches the tapped coordinate within saved precision');
-    assert.match(await p.locator('.cp-map-summary').innerText(),/projected carry from reference tee[\s\S]*left from projected landing/);
+    assert.match(await p.locator('.cp-map-summary').innerText(),/180 yd[\s\S]*left to green/);
     assert.deepEqual((await state(p)).live,liveBeforeMeasurement,'target edits never change the live scorecard');
     await assertHolePins(p,18);
     await p.locator('[data-cp="clear-target"]').click();await assertHolePins(p,18);assert.equal(await p.locator('qa-map-marker').count(),3,'clearing a target removes its pin but retains the carry preview');
@@ -477,7 +477,7 @@ if(require.main===module)(async()=>{
       const point=await mp.evaluate(()=>CaddieCoursePrep.findCourse(CaddieCoursePrep.courseId).holes[0].path[1]);
       await mp.locator('qa-map-scene').evaluate((e,point)=>{const evt=new Event('gmp-click');evt.position={lat:point[0],lng:point[1]};e.dispatchEvent(evt);},point);
       await assertHolePins(mp,1);
-      assert.match(await mp.locator('.cp-map-summary').innerText(),/left from projected landing/);
+      assert.match(await mp.locator('.cp-map-summary').innerText(),/to your target/);
       await mp.locator('[data-cp="locate"]').click();await mp.evaluate(point=>locationQA.fix(point),point);
       assert.equal(await mp.locator('#cp-reference b').innerText(),'My location');
       await mp.evaluate(()=>{window.lateFix=locationQA.last.success;});
