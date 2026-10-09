@@ -701,3 +701,26 @@ body.night .sheet.card { background: var(--card); border-radius: 22px 22px 0 0; 
 
 /* Suppress browser double-tap zoom without disabling pinch accessibility. */
 html,body{touch-action:manipulation}
+
+/* Card verification keeps all 18 pars and Play together on a phone. */
+.live-card-setup { max-width: 620px; margin: 0 auto; }
+.live-card-setup > .backlink { margin: 0; min-height: 36px; }
+.live-card-setup .live-card-panel { margin: 4px 0 12px; padding: 14px; }
+.live-card-panel h2 { margin: 0 0 6px; font-size: 18px; }
+.live-card-panel h3 { margin: 0 0 2px; font-size: 17px; line-height: 1.25; }
+.live-card-panel p { margin: 0; }
+.live-card-source { margin: 8px 0 10px; }
+.live-card-source summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px; cursor: pointer; font-size: 11px; color: var(--gtext); }
+.live-card-source .flag { position: static; display: inline-block; margin: 0; }
+.live-card-source p { padding: 6px 0; }
+.live-card-panel .ptot { margin-bottom: 10px; }
+.live-card-panel .ptot > div { padding: 8px; }
+.live-card-panel .pcell { min-height: 44px; justify-content: center; padding: 4px 0; }
+.live-card-panel .live-card-hint { font-size: 11px; line-height: 1.4; margin-top: 6px; }
+.live-card-panel .live-card-play { width: 100%; min-height: 46px; margin-top: 10px; }
+@media (max-width: 759px) {
+  body.lvcardfocus .hero.hq-shell { padding-top: calc(8px + env(safe-area-inset-top)); padding-bottom: 8px; }
+  body.lvcardfocus .hq-brand small, body.lvcardfocus #pageTag, body.lvcardfocus .hq-breadcrumb { display: none; }
+  body.lvcardfocus .hq-page-heading { margin-top: 6px; }
+  body.lvcardfocus .hq-page-heading h1 { font-size: 24px; }
+}

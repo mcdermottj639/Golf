@@ -749,6 +749,11 @@ so a bag change means grepping the standing briefings for the retired key, not j
 
 ### Live rounds (Jack logs these himself — do not feed them)
 
+v237: Card verification uses one compact panel for course, source, totals, editable
+pars and Play. Source explanation is expandable; guessed-card labels and counts stay
+visible. The heading opts out of section folding, avoiding an unnecessary Sections row.
+Mobile `lvcardfocus` compacts the shell only during the card stage.
+
 Home → **Play a live round** opens the hole-by-hole logger: one screen per hole, chips only,
 saving to `S.live` on every tap (iOS kills suspended PWAs, so nothing may live in memory).
 Finishing writes an ordinary round — same schema as above, plus `live:true`, which is what
