@@ -50,7 +50,7 @@
     }
     return out;
   }
-  let bridge, root, liveDialog, hole = 1, mode = 'guide', lastMapMode = '3d', overview = false, edit = 'target', manualTarget = false;
+  let bridge, root, liveDialog, hole = 1, mode = '3d', lastMapMode = '3d', overview = false, edit = 'target', manualTarget = false;
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps3d;
   let lines3d = [], markers3d = [];
   let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
@@ -416,7 +416,7 @@
     liveDialog.querySelector('.cp-live-map-content').replaceWith(content);
     mount(content);
   }
-  const initialMode = () => hasGuide(course,currentHole()) ? 'guide' : key() && navigator.onLine !== false ? '3d' : 'route';
+  const initialMode = () => key() && navigator.onLine !== false ? '3d' : 'route';
   function selectCourse(id) {
     const next=findCourse(id);if(!next)return false;
     if(next.id!==course.id){

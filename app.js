@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v243';
+const BUILD = 'v244';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v244', d:'2026-10-08', items:['OPEN IN 3D: Course Prep now opens directly to Interactive map in 3D. Hole guide stays available in the second tab. Offline or without a Maps key, the interactive simple map opens instead.'] },
   { b:'v243', d:'2026-10-08', items:['MAP TAB FIRST: Interactive map is now the first tab and Hole guide the second in Course Prep and live-round popups.'] },
   { b:'v242', d:'2026-10-08', items:['BACK TO YOUR CLUB: After tapping a map target, a compact reset icon stays where the club selector was. Tap it to clear the target, return to the tee view and restore your club shot.'] },
   { b:'v241', d:'2026-10-08', items:['CENTERED HOLE PLAN: The standing-plan popup is centered over both interactive maps and hole guides.'] },

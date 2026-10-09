@@ -212,10 +212,10 @@ timers/handlers on hole/view changes, navigation and popup close; late image cal
 must never replace a newer hole. Do not alter the illustration's aspect ratio. Zoomed portions must remain scroll-reachable;
 Full hole must show its complete tee-to-green extent. Validate delayed/chunked downloads, timeout/error recovery, rapid hole
 switches, and the full image in prep and live dialogs at 320/390 widths.
-Hole guide is the initial view whenever either official artwork or a usable mapped
-route is available. Official illustrations retain priority online where present; downloaded mapped guides take priority offline. A compact
+Interactive map is the initial view in v244: 3D with a configured key online,
+Simple map without a key or offline. Hole guide is the second tab. Within that tab, official illustrations retain priority online where present; downloaded mapped guides take priority offline. A compact
 Club illustration / Caddie HQ guide switch makes both available. Wianno's mapped
-holes and Sterling hole 12 now open the generated guide. The same renderer is used
+holes and Sterling hole 12 use the generated guide when Hole guide is selected. The same renderer is used
 in prep and the live dialog. `hole-guide.js` projects the source coordinates from
 tee (bottom) to green (top), expands cross-hole width for legibility (explicitly
 not to scale; never used for distance measurements), draws real fairway/green/bunker/water/tee outlines,
@@ -4012,4 +4012,4 @@ instead of 360 m for a closer view on every leg in both prep and live maps; reta
 
 **v213 camera correction:** Real Google SDK 3.66.7 was loaded without a key for API contract checks. It confirms v211 constructor rejection and rejects v212 flyCameraTo with `InvalidValueError: in property endCamera: Altitude mode CLAMP_TO_GROUND is not supported for camera animations.` Camera targets now explicitly use altitude 0 + RELATIVE_TO_GROUND; ground-clamped markers/lines remain correct. The real SDK accepts this request past validation; no licensed imagery or device rendering was certified. Never copy marker altitude modes into camera calls. Draw overlays before camera work. Catch asynchronous camera rejections locally, retaining map/markers/yardages with direct-property framing (preserve observed absolute center altitude) and a brief toast; do not call mapError for optional camera motion. Regression covers rejected animations at entry and via controls, data preservation and all 18 camera modes.
 
-**v214 map navigation:** Two main buttons (Interactive map / Hole guide; v243 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Preserve guide-first course entry, selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
+**v214 map navigation:** Two main buttons (Interactive map / Hole guide; v243 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Interactive map in 3D (v244), using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.

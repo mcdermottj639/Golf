@@ -20,7 +20,7 @@ const server=http.createServer((req,res)=>{
 });
 const state=p=>p.evaluate(()=>JSON.parse(localStorage.getItem('caddiehq_v1')));
 const ready=p=>p.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('pound-ridge-visual-prep-briefing-20261008-v1'));
-async function prep(p){await p.locator('#nav [data-view="rounds"]').click();await p.locator('[data-action="open-course-prep"]').first().click();assert.equal(await p.locator('.cp-modes [data-mode="guide"]').getAttribute('aria-pressed'),'true','guide opens first');assert.deepEqual(await p.locator('.cp-modes button').allTextContents(),['Interactive map','Hole guide']);assert.equal(await p.locator('.cp-map-views').count(),0,'map styles stay inside the map view');await p.locator('.cp-modes [data-mode="map"]').click();await mode(p,'route');await p.locator('#cp-route-map').waitFor();}
+async function prep(p){await p.locator('#nav [data-view="rounds"]').click();await p.locator('[data-action="open-course-prep"]').first().click();assert.equal(await p.locator('.cp-modes [data-mode="map"]').getAttribute('aria-pressed'),'true','interactive map opens first');assert.deepEqual(await p.locator('.cp-modes button').allTextContents(),['Interactive map','Hole guide']);assert.equal(await p.locator('.cp-map-views').count(),1,'map styles appear on entry');await p.locator('.cp-modes [data-mode="map"]').click();await mode(p,'route');await p.locator('#cp-route-map').waitFor();}
 async function explore(p,selector){await p.locator('.hq-search-trigger:visible').first().click();await p.locator('.hq-explorer-link'+selector).first().click();}
 const mode=async(p,m)=>{
   if(m==='guide'||m==='map')return p.locator('.cp-modes [data-mode="'+m+'"]').click();
