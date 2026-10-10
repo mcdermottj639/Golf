@@ -378,3 +378,16 @@ body.cpfocus .hq-shell .hq-page-heading h1{font-size:22px;letter-spacing:-.6px}
 /* Keep a compact way back to the opening club shot after target measurement. */
 .cp-tee-preview.cp-tee-preview-reset { width:44px; max-width:none; padding:0; }
 .cp-tee-preview-reset button { display:grid; place-items:center; width:44px; height:44px; padding:0; border:0; border-radius:9px; color:inherit; background:transparent; font:700 28px var(--sans,sans-serif); cursor:pointer; }
+
+/* v247 flyover captions. Top of the map, so Google's attribution along the bottom
+   edge stays visible; the club overlay steps aside while the tour runs. The caption
+   ignores pointer events so a touch reaches the map and stops the flyover. */
+.cp-fly-caption { position:absolute; top:8px; left:8px; right:8px; z-index:3; display:grid; gap:2px; max-height:45%; overflow:hidden; padding:9px 12px; border-radius:12px; background:rgba(14,38,29,.86); color:#f4f7ec; box-shadow:0 4px 14px rgba(0,0,0,.22); pointer-events:none; font:13px/1.35 var(--sans,sans-serif); }
+.cp-fly-caption[hidden] { display:none; }
+.cp-fly-eyebrow { font:700 10px/1.2 var(--sans,sans-serif); letter-spacing:.08em; color:#c5e78a; }
+.cp-fly-main { font-size:15px; line-height:1.3; overflow-wrap:anywhere; }
+.cp-fly-row { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere; }
+.cp-fly-row em { margin-right:4px; font-style:normal; font-weight:700; color:#c5e78a; }
+.cp-map-canvas.cp-flying .cp-tee-preview { display:none; }
+@media (prefers-reduced-motion: no-preference) { .cp-fly-caption:not([hidden]) { animation:cp-fly-in .25s ease-out; } }
+@keyframes cp-fly-in { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }

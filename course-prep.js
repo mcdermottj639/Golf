@@ -60,7 +60,11 @@
   // Device location is a foreground-only measuring reference, never a saved tee.
   const LOCATION_MAX_AGE = 45000, LOCATION_MAX_ACCURACY = 25;
   let liveFix = null, locationWatch = null, locationEpoch = 0, locationTimer, locationNotice = '';
-  let projection = null, imageError = false, animationHandler, animationTimer, bagSnapshot;
+  let projection = null, imageError = false, animationTimer, bagSnapshot;
+  // Flyover v247: a scripted tee → landing → green tour. Waiters let Stop/touch
+  // release a pending hold or flight immediately; captions live only in the DOM.
+  const FLYOVER_LIMIT = 75000, flyWaiters = new Set();
+  let flyActive = false, flyCaptionTimer, suppressMapTapUntil = 0;
   let guideLoad = null, guideStyle = 'auto';
   const canDrawGuide = (source,h) => !!window.CaddieHoleGuide && h?.mapReady!==false && h?.path?.length>1;
   const hasGuide = (source,h) => !!h && (!!h.guide || h.mappedGuide || canDrawGuide(source,h));
@@ -324,7 +328,7 @@
     return '<div class="cp-modes'+(hasGuide(course,currentHole())?'':' cp-map-only')+'" role="group" aria-label="Hole view">'+
       button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"')+
       (hasGuide(course,currentHole()) ? button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"') : '')+'</div>'+mapViews()+
-      '<div class="cp-map-canvas"><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-tee-preview" class="cp-tee-preview" hidden></div></div><div class="cp-reference" id="cp-reference" hidden></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div>';
+      '<div class="cp-map-canvas"><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-tee-preview" class="cp-tee-preview" hidden></div><div id="cp-fly-caption" class="cp-fly-caption" role="status" aria-live="polite" hidden></div></div><div class="cp-reference" id="cp-reference" hidden></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div>';
   }
   function nearbyCourses() {
     const here=bridge?.here?.();
@@ -353,7 +357,7 @@
   function standingPlanMarkup(summary = true, source = course, n = hole) {
     const p=bridge.standingPlan?.(source.id);if(!p)return '';
     const h=p.holes?.find(h=>h.n===n);
-    const prose=value=>esc(value).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<strong>$1</strong>');
+    const prose=planProse;
     const list=values=>'<ul>'+values.map(v=>'<li>'+prose(v)+'</li>').join('')+'</ul>';
     const rows=h ? [['Plan',h.play],['Leaves',h.leaves],['Green',h.green],['Avoid',h.avoid]].filter(([,v])=>v) : [];
     const club=bridge.bag('playing').find(c=>c.key===bridge.club(source.id,n));
@@ -435,9 +439,11 @@
     imageError=false;overview=false;redraw();
   }
   function stopFlyover() {
-    if (animationHandler && maps3d) maps3d.removeEventListener('gmp-animationend', animationHandler);
-    animationHandler = null;
+    flyActive = false;
+    for (const finish of [...flyWaiters]) finish();
     clearTimeout(animationTimer);
+    clearTimeout(flyCaptionTimer);
+    flyCaption(null);
     cameraRevision++;
     const scene = maps3d;
     return queueCamera(() => scene?.stopCameraAnimation()).catch(() => {});
@@ -864,7 +870,11 @@
           const {center,range,heading,tilt,roll}=teeCamera();
           maps3d=new lib.Map3DElement({center,range,heading,tilt,roll,mode:'SATELLITE',gestureHandling:'GREEDY'});
           maps3d.className='cp-google-map';
-          maps3d.addEventListener('gmp-click',e=>{if(e.position)choosePoint([e.position.lat,e.position.lng]);});
+          maps3d.addEventListener('gmp-click',e=>{if(Date.now()<suppressMapTapUntil)return;if(e.position)choosePoint([e.position.lat,e.position.lng]);});
+          // Any touch, drag or scroll on the map ends a running flyover. The touch that
+          // stops it must not also drop a target pin, so its click is ignored briefly.
+          maps3d.addEventListener('pointerdown',()=>{if(flyActive){stopFlyover();suppressMapTapUntil=Date.now()+800;}},true);
+          maps3d.addEventListener('wheel',()=>{if(flyActive)stopFlyover();},{capture:true,passive:true});
           maps3d.addEventListener('gmp-error',()=>{if(root&&mode==='3d')mapError('3D could not initialize on this device. Try the simple map.','3d');});
         }
         stage.replaceChildren(maps3d);
@@ -1028,21 +1038,121 @@
       addLine(line(circle,color,3));
     }
   }
+  // ---- Flyover (v247) ----
+  // Google's 3D camera only flies point to point (no waypoints or easing), so the
+  // tour is a few long legs with holds: behind the tee → the landing spot (saved
+  // target or the club preview) → any real dogleg bend → the green, then a partial
+  // fly-around of the green that is stopped in place. Captions only reuse data the
+  // app already shows: scorecard, club preview yardages and the standing plan rows.
+  function planProse(value) {
+    return esc(value).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<strong>$1</strong>');
+  }
+  const flyReduced = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const flyCam = (center,heading,range,tilt) => ({center:{...ll(center),altitude:0},altitudeMode:'RELATIVE_TO_GROUND',range,heading,tilt,roll:0});
+  const legMillis = yards => Math.round(Math.max(3500,Math.min(6000,yards*20)));
+  function bendAt(a,b,c) {
+    const d=Math.abs(bearing(a,b)-bearing(b,c))%360;
+    return d>180?360-d:d;
+  }
+  function flyWait(ms, animation = false) {
+    // A flight ends on Google's gmp-animationend, with a timer fallback in case the
+    // event never arrives. An end event in the first 60% of a flight belongs to the
+    // previous camera move and is ignored. Stop/touch release every waiter at once.
+    return new Promise(resolve => {
+      const scene=maps3d, started=Date.now();
+      let timer;
+      const onEnd=()=>{if(Date.now()-started>=ms*0.6)finish();};
+      const finish=()=>{
+        if(!flyWaiters.delete(finish))return;
+        clearTimeout(timer);scene?.removeEventListener('gmp-animationend',onEnd);resolve();
+      };
+      flyWaiters.add(finish);
+      if(animation&&ms>0)scene?.addEventListener('gmp-animationend',onEnd);
+      timer=setTimeout(finish,animation?(ms>0?ms+1200:80):ms);
+    });
+  }
+  function flyCaption(info) {
+    root?.querySelector('.cp-map-canvas')?.classList.toggle('cp-flying',!!info);
+    const el=root?.querySelector('#cp-fly-caption');if(!el)return;
+    if(!info){el.hidden=true;el.replaceChildren();return;}
+    el.innerHTML='<span class="cp-fly-eyebrow">'+esc(info.eyebrow)+'</span>'+(info.main?'<b class="cp-fly-main">'+esc(info.main)+'</b>':'')+
+      info.rows.map(([k,v])=>'<span class="cp-fly-row"><em>'+esc(k)+'</em> '+planProse(v)+'</span>').join('');
+    el.hidden=false;
+  }
+  function flyoverScript() {
+    const h=currentHole(), tee=teeOrigin(), g=green(), reduced=flyReduced();
+    const plan=bridge.standingPlan?.(course.id)?.holes?.find(x=>x.n===hole)||{};
+    const own=bag().find(c=>c.key===bridge.club(course.id,hole));
+    const holeYards=teeSet()?.yards?.[hole-1];
+    const preview=h.par===3?null:teePreview();
+    const target=h.par!==3&&!preview&&pointOK(savedHole().target)?savedHole().target:null;
+    const landing=preview?.landing||target, landingYards=landing?distance(tee,landing):0;
+    const route=[tee,...h.path.slice(1)];
+    // Interior route points are flown through only where the hole really bends.
+    const bends=route.slice(1,-1).filter((p,i)=>distance(p,g)>40&&distance(tee,p)>landingYards+30&&bendAt(route[i],p,route[i+2])>12);
+    const stops=[...(landing?[landing]:[]),...bends,g];
+    const say=(eyebrow,main,rows)=>({eyebrow,main,rows:rows.filter(([,v])=>v)});
+    const opening=bearing(tee,stops[0]);
+    const steps=[
+      {caption:say('HOLE '+hole+' · PAR '+h.par+(Number.isFinite(holeYards)?' · '+yard(holeYards)+' YD':''),'',[['Your club',own?.label],['Plan',plan.play]]),
+        fly:flyCam(destination(tee,70,opening),opening,150,66),ms:reduced?0:2500},
+      {hold:reduced?2000:1500}
+    ];
+    let prev=tee;
+    stops.forEach((p,i)=>{
+      const last=i===stops.length-1, heading=bearing(prev,p);
+      const camera=last?flyCam(p,heading,200,52):flyCam(p,heading,p===landing?185:190,60);
+      steps.push({fly:camera,ms:reduced?0:legMillis(distance(prev,p))});
+      if(p===landing)steps.push({hold:3000,caption:say('LANDING',preview
+        ?preview.club.label+' · '+yard(preview.club.carry)+' yd carry · '+yard(preview.left)+' left'
+        :'Your target · '+yard(landingYards)+' yd · '+yard(distance(landing,g))+' left',[['Leaves',plan.leaves]])});
+      if(last){
+        const caption=say('HOLE '+hole+' · GREEN','',[['Green',plan.green],['Avoid',plan.avoid]]);
+        steps.push(reduced?{hold:3000,caption}:{orbit:camera,ms:36000,stopAfter:h.par===3?13500:9000,caption});
+      }
+      prev=p;
+    });
+    return steps;
+  }
+  function orbitGoogleCamera(camera,durationMillis,revision) {
+    const scene=maps3d, current=()=>revision===cameraRevision&&root&&mode==='3d'&&maps3d===scene;
+    if(typeof scene?.flyCameraAround!=='function')return Promise.resolve(false);
+    // The sweep is decoration: if the SDK refuses it, the tour simply ends at the green.
+    return queueCamera(async()=>{
+      if(!current())return false;
+      try{await scene.flyCameraAround({camera,durationMillis,repeatCount:1});return current();}
+      catch{return false;}
+    });
+  }
   async function flyover() {
     if(mode!=='3d'||!maps3d)return;
     const stopped=stopFlyover(), revision=cameraRevision;
     await stopped;
     if(revision!==cameraRevision||!root||mode!=='3d')return;
-    const path=[teeOrigin(),...currentHole().path.slice(1)];
-    let i=0;
-    const next=()=>{
-      if(!root||mode!=='3d'||i>=path.length){stopFlyover();return;}
-      const p=path[i],heading=i<path.length-1?bearing(p,path[i+1]):bearing(path[i-1],p);
-      i++;
-      moveGoogleCamera({center:{...ll(p),altitude:0},altitudeMode:'RELATIVE_TO_GROUND',range:200,tilt:58,heading},window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:2800,revision);
-    };
-    animationHandler=next;maps3d.addEventListener('gmp-animationend',next);
-    animationTimer=setTimeout(stopFlyover,30000);next();
+    let steps;
+    try{steps=flyoverScript();}catch{return;}
+    const live=()=>revision===cameraRevision&&!!root&&mode==='3d';
+    flyActive=true;
+    animationTimer=setTimeout(stopFlyover,FLYOVER_LIMIT);
+    for(const step of steps){
+      if(!live())return;
+      if(step.caption)flyCaption(step.caption);
+      if(step.fly){
+        const ended=flyWait(step.ms,true);
+        if(!await moveGoogleCamera(step.fly,step.ms,revision)){if(live())stopFlyover();return;}
+        await ended;
+      }
+      if(step.hold&&live())await flyWait(step.hold);
+      if(step.orbit&&live()&&await orbitGoogleCamera(step.orbit,step.ms,revision)){
+        await flyWait(step.stopAfter);
+        if(!live())return;
+        const scene=maps3d;
+        await queueCamera(()=>scene?.stopCameraAnimation()).catch(()=>{});
+      }
+    }
+    if(!live())return;
+    flyActive=false;clearTimeout(animationTimer);
+    flyCaptionTimer=setTimeout(()=>{if(revision===cameraRevision)flyCaption(null);},5000);
   }
   window.addEventListener('course-downloads-change',downloadStatus);
   function resizePrepMap() {

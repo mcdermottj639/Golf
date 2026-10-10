@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v246';
+const BUILD = 'v247';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v247', d:'2026-10-09', items:['CINEMATIC FLY HOLE: Fly hole now starts low behind the tee, glides to your landing spot (saved target or club carry) and pauses with the club, carry and yards left, then flies to the green and slowly circles it. Your standing plan lines show along the way. Any touch on the map or Stop ends it, and the touch that stops it never drops a target pin.'] },
   { b:'v246', d:'2026-10-08', items:['EXPLORE COURSES SHORTCUT FIX: The Overview button now opens the same interactive course prep as Explore courses in Round prep, starting in 3D.'] },
   { b:'v245', d:'2026-10-08', items:['EXPLORE COURSES: The Overview header now has an Explore courses button beside Start a round, opening your course browser.'] },
   { b:'v244', d:'2026-10-08', items:['OPEN IN 3D: Course Prep now opens directly to Interactive map in 3D. Hole guide stays available in the second tab. Offline or without a Maps key, the interactive simple map opens instead.'] },
