@@ -45,6 +45,8 @@ async function captionState(p,scope='body'){
     const p=await context.newPage();p.setDefaultTimeout(20000);p.on('pageerror',e=>errors.push(e.message));
     await p.goto(url);await ready(p);
     await p.locator('#nav [data-view="rounds"]').click();await p.locator('[data-action="open-course-prep"]').first().click();
+    // v248: prep opens on Hole guide; Interactive map is the second tab.
+    await p.locator('[data-cp="mode"][data-mode="map"]').first().click();
     await p.locator('qa-map-scene').waitFor();await p.evaluate(patchScene);
     assert.equal(await p.evaluate(()=>CaddieCoursePrep.courseId),'pound-ridge');
     await p.waitForTimeout(300);
@@ -135,7 +137,7 @@ async function captionState(p,scope='body'){
     await p.waitForFunction(()=>document.querySelector('#cp-fly-caption .cp-fly-eyebrow')?.innerText.endsWith('GREEN'),null,{timeout:8000});
     await p.waitForFunction(()=>document.querySelector('#cp-fly-caption').hidden,null,{timeout:12000});
     L=await log(p);
-    assert.ok(tos(L).every(e=>e.ms===0),'reduced motion uses instant cuts');assert.ok(!L.some(e=>e.type==='around'),'reduced motion skips the sweep');
+    assert.ok(tos(L).every(e=>e.ms<=1),'reduced motion uses instant cuts (1 ms since v248, so Google waits for a ready scene)');assert.ok(!L.some(e=>e.type==='around'),'reduced motion skips the sweep');
     assert.ok(near(tos(L).at(-1).cam.center,par3.path.at(-1)));
     assert.ok(tos(L).slice(1,-1).every(e=>par3.path.some(q=>near(e.cam.center,q))),'a par 3 has no landing stop');
     await p.emulateMedia({reducedMotion:'no-preference'});

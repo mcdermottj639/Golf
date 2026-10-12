@@ -50,7 +50,7 @@
     }
     return out;
   }
-  let bridge, root, liveDialog, hole = 1, mode = '3d', lastMapMode = '3d', overview = false, edit = 'target', manualTarget = false;
+  let bridge, root, liveDialog, hole = 1, mode = 'guide', lastMapMode = '3d', overview = false, edit = 'target', manualTarget = false;
   let epoch = 0, googlePromise, googleKey, googleFailure = '', googleFailureMode = '', maps3d;
   let lines3d = [], markers3d = [];
   let googleAuthFailed = false, googleErrorCode = '', googleConsoleObserved = false;
@@ -326,8 +326,8 @@
     if(!packReady())return '<div class="cp-pack-loading" role="status"><h3>Course map</h3><p>'+esc(loadErrors.get(course.id)||'Loading your course…')+'</p><p>Your saved notes and club choices remain available below.</p>'+(loadErrors.has(course.id)?button('retry-pack','Retry download'):'')+'</div>';
 
     return '<div class="cp-modes'+(hasGuide(course,currentHole())?'':' cp-map-only')+'" role="group" aria-label="Hole view">'+
-      button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"')+
-      (hasGuide(course,currentHole()) ? button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"') : '')+'</div>'+mapViews()+
+      (hasGuide(course,currentHole()) ? button('mode','Hole guide','data-mode="guide" aria-pressed="'+(mode==='guide')+'"') : '')+
+      button('mode','Interactive map','data-mode="map" aria-pressed="'+(mode!=='guide')+'"')+'</div>'+mapViews()+
       '<div class="cp-map-canvas"><div class="cp-map-stage" id="cp-map-stage"></div><div id="cp-tee-preview" class="cp-tee-preview" hidden></div><div id="cp-fly-caption" class="cp-fly-caption" role="status" aria-live="polite" hidden></div></div><div class="cp-reference" id="cp-reference" hidden></div><div id="cp-map-controls"></div><div class="cp-map-caption" id="cp-map-caption"></div>';
   }
   function nearbyCourses() {
@@ -420,7 +420,7 @@
     liveDialog.querySelector('.cp-live-map-content').replaceWith(content);
     mount(content);
   }
-  const initialMode = () => key() && navigator.onLine !== false ? '3d' : 'route';
+  const initialMode = () => hasGuide(course,currentHole()) ? 'guide' : key() && navigator.onLine !== false ? '3d' : 'route';
   function selectCourse(id) {
     const next=findCourse(id);if(!next)return false;
     if(next.id!==course.id){
@@ -505,7 +505,7 @@
     const h = source?.holes.find(item => item.n === +n && hasGuide(source,item));
     if(!h)return false;
     const dialog = holeDialog(source,h,'cp-live-guide','Close hole guide',
-      (h.mapReady!==false?'<div class="cp-workspace"><div class="cp-modes" role="group" aria-label="Hole view"><button type="button" data-live-map aria-pressed="false">Interactive map</button><button type="button" aria-pressed="true">Hole guide</button></div></div>':'')+
+      (h.mapReady!==false?'<div class="cp-workspace"><div class="cp-modes" role="group" aria-label="Hole view"><button type="button" aria-pressed="true">Hole guide</button><button type="button" data-live-map aria-pressed="false">Interactive map</button></div></div>':'')+
       '<div class="cp-live-guide-body cp-workspace">'+guideContent(source,h,true)+'</div>'+
       '<footer>'+guideCaption(source,h)+'</footer>');
     dialog.querySelector('[data-live-map]')?.addEventListener('click',()=>openLiveMap(source.id,h.n));
@@ -881,12 +881,25 @@
         stageName = 'drawing the 3D hole';
         drawGoogle3d(lib);
         stageName = 'positioning the 3D camera';
-        if(framed3d!==hole){await frameGoogle('tee');if(token!==epoch||!root)return;framed3d=hole;}
+        if(framed3d!==hole){const asked=cameraRevision;await sceneSteady(maps3d);if(token!==epoch||!root)return;if(cameraRevision!==asked){framed3d=hole;return;}await frameGoogle('tee');if(token!==epoch||!root)return;framed3d=hole;}
     } catch {
       if(token===epoch&&root)mapError(googleFailure || 'The 3D view'+' could not finish '+stageName+'. Reload and retry, or choose another view.', mode);
     }
   }
   const ll = p => ({lat:p[0],lng:p[1]});
+  function sceneSteady(scene, limit = 3000) {
+    // First framing waits for Google's first steady scene (gmp-steadychange) so the
+    // camera call is not sent to a renderer still starting up. A timer caps the wait,
+    // and any camera action the player takes meanwhile (Fly hole, Reset) wins.
+    return new Promise(resolve => {
+      if(!scene)return resolve();
+      let done=false;
+      const finish=()=>{if(done)return;done=true;clearTimeout(timer);scene.removeEventListener('gmp-steadychange',onSteady);resolve();};
+      const onSteady=e=>{if(e?.isSteady!==false)finish();};
+      const timer=setTimeout(finish,limit);
+      scene.addEventListener('gmp-steadychange',onSteady);
+    });
+  }
   function teeCamera() {
     // Look along the hole from above/behind its tee, independent of GPS yardages.
     const tee=teeOrigin(), preview=teePreview(), heading=bearing(tee,preview?.landing||green());
@@ -908,13 +921,28 @@
     const scene=maps3d, current=()=>revision===cameraRevision&&root&&mode==='3d'&&maps3d===scene;
     return queueCamera(async()=>{
       if(!current())return false;
-      try {
-        // Google rejects CLAMP_TO_GROUND for camera animations (including 0 ms).
-        // RELATIVE_TO_GROUND + altitude 0 aims at the terrain without an elevation API.
-        await scene.flyCameraTo({endCamera,durationMillis});
-        return current();
-      } catch {
-        if(!current())return false;
+      // Google rejects CLAMP_TO_GROUND for camera animations (including 0 ms).
+      // RELATIVE_TO_GROUND + altitude 0 aims at the terrain without an elevation API.
+      // v248: SDK 3.66.8's flyCameraTo returns a promise and (per its shipped code)
+      // only waits for the 3D scene to be ready when durationMillis > 0, so an
+      // "instant" 0 ms move is sent as 1 ms. A rejection is retried once after a
+      // short pause before falling back, and its reason is logged rather than lost.
+      const ms=Math.max(1,durationMillis);
+      // A flight that never settles must not block every later camera call in the queue.
+      const fly=()=>Promise.race([scene.flyCameraTo({endCamera,durationMillis:ms}),new Promise(r=>setTimeout(r,ms+4000))]);
+      let failure;
+      for(let attempt=0;attempt<2;attempt++){
+        try { await fly(); return current(); }
+        catch(error) {
+          failure=error;
+          if(!current())return false;
+          if(attempt===0)await new Promise(r=>setTimeout(r,700));
+          if(!current())return false;
+        }
+      }
+      {
+        const reason=String(failure?.message||failure||scene.error?.message||'unknown').slice(0,80);
+        try{console.warn('Caddie HQ camera move failed:',reason,scene.error||'');}catch{}
         // Camera motion is optional: retain imagery, markers and tap yardages.
         // Direct properties use absolute altitude; retain the viewer's observed value.
         const {center,range,heading,tilt,roll=0}=endCamera;
@@ -923,7 +951,7 @@
           Object.assign(scene,{center:{lat:center.lat,lng:center.lng,...(Number.isFinite(altitude)?{altitude}:{})},range,heading,tilt,roll});
         } catch {}
         if(durationMillis>0)stopFlyover();
-        bridge.toast('Camera animation unavailable. You can still move the map and tap for yardages.');
+        bridge.toast('Camera animation unavailable ('+reason+'). You can still move the map and tap for yardages.');
         return false;
       }
     });
