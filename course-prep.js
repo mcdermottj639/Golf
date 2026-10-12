@@ -445,8 +445,15 @@
     clearTimeout(flyCaptionTimer);
     flyCaption(null);
     cameraRevision++;
-    const scene = maps3d;
-    return queueCamera(() => scene?.stopCameraAnimation()).catch(() => {});
+    return haltCamera(maps3d);
+  }
+  function haltCamera(scene) {
+    // v249: SDK 3.66.8 camera calls settle only when their motion ends, so a stop
+    // queued behind a running flight would wait out the whole leg. Stop NOW, then
+    // queue on that stop so no new flight starts before it has completed.
+    if(!scene)return Promise.resolve();
+    const now = Promise.resolve().then(() => scene.stopCameraAnimation()).catch(() => {});
+    return queueCamera(() => now).catch(() => {});
   }
   function unmount(keepLocation = false) { dialogRequest++; epoch++; stopFlyover(); clearGoogle3d(); stopGuideLoad(); closeGuide(); if(!keepLocation)stopLocation(); root = null; }
   function releaseLiveMap(dialog) {
@@ -867,8 +874,10 @@
         if(!maps3d) {
           // Map3DElementOptions does not accept CameraOptions.altitudeMode.
           // Terrain-relative altitude belongs to flyCameraTo, never the constructor.
-          const {center,range,heading,tilt,roll}=teeCamera();
-          maps3d=new lib.Map3DElement({center,range,heading,tilt,roll,mode:'SATELLITE',gestureHandling:'GREEDY'});
+          // v249: the constructor's center is ABSOLUTE altitude (0 = sea level), so a
+          // tilted tee view sits low over an inland course until framing lands. Start
+          // straight down from high up instead; framing then flies to the tee view.
+          maps3d=new lib.Map3DElement({...safeOverhead(teeCamera()),mode:'SATELLITE',gestureHandling:'GREEDY'});
           maps3d.className='cp-google-map';
           maps3d.addEventListener('gmp-click',e=>{if(Date.now()<suppressMapTapUntil)return;if(e.position)choosePoint([e.position.lat,e.position.lng]);});
           // Any touch, drag or scroll on the map ends a running flyover. The touch that
@@ -887,6 +896,7 @@
     }
   }
   const ll = p => ({lat:p[0],lng:p[1]});
+  const SAFE_RANGE = 900;
   function sceneSteady(scene, limit = 3000) {
     // First framing waits for Google's first steady scene (gmp-steadychange) so the
     // camera call is not sent to a renderer still starting up. A timer caps the wait,
@@ -899,6 +909,12 @@
       const timer=setTimeout(finish,limit);
       scene.addEventListener('gmp-steadychange',onSteady);
     });
+  }
+  function safeOverhead({center,heading}) {
+    // Looking straight down (tilt 0) keeps the camera directly above the point, so an
+    // unknown ground height cannot shift the view sideways, and 900 m clears any
+    // course in the catalog even when measured from sea level.
+    return {center:{lat:center.lat,lng:center.lng,altitude:0},range:SAFE_RANGE,heading,tilt:0,roll:0};
   }
   function teeCamera() {
     // Look along the hole from above/behind its tee, independent of GPS yardages.
@@ -944,11 +960,15 @@
         const reason=String(failure?.message||failure||scene.error?.message||'unknown').slice(0,80);
         try{console.warn('Caddie HQ camera move failed:',reason,scene.error||'');}catch{}
         // Camera motion is optional: retain imagery, markers and tap yardages.
-        // Direct properties use absolute altitude; retain the viewer's observed value.
+        // Direct properties use absolute altitude. Reuse a real observed ground height
+        // when the scene has one; otherwise (altitude 0 = sea level) go to the safe
+        // straight-down view rather than a tilted camera parked in the treetops.
         const {center,range,heading,tilt,roll=0}=endCamera;
         try {
           const altitude=scene.center?.altitude;
-          Object.assign(scene,{center:{lat:center.lat,lng:center.lng,...(Number.isFinite(altitude)?{altitude}:{})},range,heading,tilt,roll});
+          Object.assign(scene,Number.isFinite(altitude)&&altitude>0
+            ?{center:{lat:center.lat,lng:center.lng,altitude},range,heading,tilt,roll}
+            :safeOverhead(endCamera));
         } catch {}
         if(durationMillis>0)stopFlyover();
         bridge.toast('Camera animation unavailable ('+reason+'). You can still move the map and tap for yardages.');
@@ -1148,8 +1168,15 @@
     // The sweep is decoration: if the SDK refuses it, the tour simply ends at the green.
     return queueCamera(async()=>{
       if(!current())return false;
-      try{await scene.flyCameraAround({camera,durationMillis,repeatCount:1});return current();}
-      catch{return false;}
+      // v249: start the sweep and return; do not wait for its 36 s to finish, or the
+      // ~9 s stop timer only starts after the orbit is already over. A refusal shows
+      // up immediately, so a short race still catches it.
+      try{
+        const run=Promise.resolve(scene.flyCameraAround({camera,durationMillis,repeatCount:1}));
+        run.catch(()=>{});
+        const refused=await Promise.race([run.then(()=>false,()=>true),new Promise(r=>setTimeout(()=>r(false),250))]);
+        return !refused&&current();
+      }catch{return false;}
     });
   }
   async function flyover() {
@@ -1174,8 +1201,7 @@
       if(step.orbit&&live()&&await orbitGoogleCamera(step.orbit,step.ms,revision)){
         await flyWait(step.stopAfter);
         if(!live())return;
-        const scene=maps3d;
-        await queueCamera(()=>scene?.stopCameraAnimation()).catch(()=>{});
+        await haltCamera(maps3d);
       }
     }
     if(!live())return;
