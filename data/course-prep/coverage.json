@@ -75,5 +75,64 @@
         "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
       }
     ]
+  },
+  {
+    "id": "lakeside-penn-yan",
+    "verified": "2026-10-14",
+    "source": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+    "holes": 18,
+    "maps": 16,
+    "guides": 16,
+    "bytes": 41383,
+    "exceptions": [
+      {
+        "hole": 2,
+        "reason": "Numbered OSM route is about 285 yards, over 100 yards shorter than the shortest included official tee. Tee-to-green correspondence remains unverified; guide and interactive map withheld pending a current routing source."
+      },
+      {
+        "hole": 6,
+        "reason": "Numbered OSM route is about 325 yards, over 100 yards shorter than the shortest included official tee. Tee-to-green correspondence remains unverified; guide and interactive map withheld pending a current routing source."
+      }
+    ]
+  },
+  {
+    "id": "oak-hills-park",
+    "verified": "2026-10-14",
+    "source": "https://www.oakhillsgc.com/images/documents/OHPGC_Scorecard.pdf",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 97564,
+    "exceptions": []
+  },
+  {
+    "id": "richter-park",
+    "verified": "2026-10-14",
+    "source": "https://golftraxx.com/scorecard?course_name=Richter+Park+Golf+Course&static=true&zipcode=06811",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 131125,
+    "exceptions": []
+  },
+  {
+    "id": "fairchild-wheeler-black",
+    "verified": "2026-10-14",
+    "source": "https://www.fairchildwheelergolf.com/wp-content/uploads/sites/7522/2023/04/Black-Scorecard_1.jpg",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 121787,
+    "exceptions": []
+  },
+  {
+    "id": "fairchild-wheeler-red",
+    "verified": "2026-10-14",
+    "source": "https://www.fairchildwheelergolf.com/wp-content/uploads/sites/7522/2023/04/Red-Scorecard_1.jpg",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 121834,
+    "exceptions": []
   }
 ]

@@ -152,11 +152,12 @@ Captions (`#cp-fly-caption`) show only what the app already states — the score
 
 Interactive maps distinguish the blue T tee icon (blue location dot when using GPS), green flag, and red target/club landing pin. Google 3D uses static SVG templates without importing the optional marker library; Simple map uses the same tee/flag artwork. Marker identities remain stable and geographic positions are unchanged.
 
-Rounds leads with **Explore courses**. Generic entry opens the nearest supported course using the same saved `S.here` location as Live Round. The picker sorts by straight-line distance and labels miles. Explicit course links keep their intended course; hole navigation and redraws never auto-select another course. Use my location refreshes the shared fix on a deliberate tap; a late callback must not interrupt navigation. No location means stable catalog order. Reset view beside the map-style controls returns 3D to its starting tee camera and Simple map to the focused hole without clearing targets or notes. Browser double-tap zoom is disabled with `touch-action:manipulation`, retaining pinch zoom and scrolling. The picker contains Pound Ridge, Wianno and
-Sterling Farms plus Metedeconk. The first three have 18 holes each; Metedeconk has
-27 physical holes and three nine selectors. There are 81 scorecard holes, 81 guides
-and 72 enabled measuring maps. Metedeconk 19–27 have no verified
-measuring route; club illustrations still work for all 27 Metedeconk holes. Individual standing plans and
+Rounds leads with **Explore courses**. Generic entry opens the nearest supported course using the same saved `S.here` location as Live Round. The picker sorts by straight-line distance and labels miles. Explicit course links keep their intended course; hole navigation and redraws never auto-select another course. Use my location refreshes the shared fix on a deliberate tap; a late callback must not interrupt navigation. No location means stable catalog order. Reset view beside the map-style controls returns 3D to its starting tee camera and Simple map to the focused hole without clearing targets or notes. Browser double-tap zoom is disabled with `touch-action:manipulation`, retaining pinch zoom and scrolling. The picker contains nine courses: Pound Ridge, Wianno, Sterling Farms, Metedeconk,
+Lakeside (Penn Yan), Oak Hills Park, Richter Park and Fairchild Wheeler Black/Red.
+Metedeconk has 27 physical holes and three nine selectors; the others have 18.
+There are 171 scorecard holes, 169 guides and 160 enabled measuring maps.
+Metedeconk 19–27 have official illustrations but no verified measuring route.
+Lakeside 2 and 6 have neither guide nor map while route/card discrepancies are checked. Individual standing plans and
 Explorer link directly to their course. Every supported live hole opens its own map
 in a popup over the scorecard. `courseprep` maps back to Rounds in navigation.
 Standing research is integrated through the read-only `standingPlan` callback: course focus, rules and routine expand in the workspace; the current physical hole shows its play, leaves, green, avoid, note and reasons. The full-hole plan combines standing advice with personal map notes and club overrides; live map popups show the current standing hole too. Exact course names win, with declared aliases as fallback. User club calls use the standing briefing’s course key so changes agree across maps, briefings and live prep. Opening maps does not copy or mutate research or golf state.
@@ -262,7 +263,7 @@ yardages. The starting/Reset 3D camera frames the tee and projected landing; Who
 still shows the full route. Club changes update overlays without resetting the camera.
 Opening, navigation and suggestions never write `S.planCalls` or course notes/targets.
 
-The prep workspace is map-first: a compact app header and course picker, then the hole heading,
+The prep workspace is guide-first: a compact app header and course picker, then the hole heading,
 previous/next buttons and guide/map surface. Hole browsing and review progress sit
 below the map. Course/tee settings, shot planning and notes follow on phones and sit
 beside the map on desktop. Downloads, the full-round plan, Google setup and sources
@@ -362,6 +363,29 @@ the original log behavior, and retains/displays only the error-code token in mem
 generic callback remains a fallback. Global authorization failures persist across
 map modes and override later 3D initialization errors until a real page reload. Caddie HQ uses the Websites
 restriction even when installed on an iPhone home screen.
+
+**Course expansion (v250):** `onboarding-queue.json` is the durable played-course queue.
+Run `node scripts/reconcile-course-queue.cjs` after catalog/feed changes; it reconstructs
+seed plus ordered course-add/remove feeds, never the autocomplete database. Preserve
+bucket exclusions, explicit removals, simulator separation, exact course/nine identities,
+evidence, source gaps and completion commits. Bonita Bay's umbrella entry is grouped
+with Bay Island for onboarding only; historical records are untouched. Springfield's
+stored PA location is unverified; Shadow Wood's physical course is unresolved.
+Five courses per run is a cap. Repairs do not count as new courses. Review capacity
+after two successful batches; do not increase the cap without Jack's instruction.
+
+The October 14 batch adds 88 guides/maps from original OSM coordinates. Lakeside 2/6
+are withheld because route lengths differ from included official tees by over 100 yards.
+A numbered OSM route missing `par` must carry per-hole `parSource` equal to the card URL,
+a dated course verification and `mapVerification`; never add fabricated tags to raw OSM.
+Contradictory existing par tags still fail. Include only tee sets compatible with the
+shared per-hole par/handicap model. Source conflicts and omitted tees are in each card
+note and the queue. Richter's per-hole GolfTraxx yardages reconcile to official totals,
+but conflicting official ratings stay null. New courses are on-demand nonfavorites,
+never shell-cache assets. `tests/course-expansion.cjs` checks source endpoints, distinct
+Red/Black routing, withheld holes, queue exclusions and provenance rejection. The focused
+browser test checks mobile prep, offline packs and live-hole 9/10 linking using the
+existing renderer. It does not certify live Google imagery.
 
 **Adding courses:** author a `data/course-prep/<id>.json` pack and its corresponding
 `<id>-osm.json` source subset, then add its slug to `catalog.json`. Run

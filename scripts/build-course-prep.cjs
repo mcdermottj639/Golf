@@ -38,7 +38,15 @@ const courses=ids.map(id=>{
     if(h.mapReady===false&&!h.osmId){h.path=[];continue;}
     const way=raw.features.find(f=>f.id===h.osmId);
     assert.ok(way,id+': missing source way for hole '+h.n);
-    assert.equal(+way.tags.ref,h.n);assert.equal(+way.tags.par,h.par);
+    assert.equal(way.tags.golf,'hole');assert.equal(+way.tags.ref,h.n);
+    if(way.tags.par!==undefined)assert.equal(+way.tags.par,h.par);
+    else {
+      // Some numbered OSM routes omit par. Keep the raw tags unchanged and
+      // require explicit official-card provenance rather than synthesizing a tag.
+      assert.equal(h.parSource,c.source,id+': missing source for untagged route par');
+      assert.match(c.verified,/^\d{4}-\d{2}-\d{2}$/);
+      assert.ok(h.mapVerification,id+': untagged route requires verification note');
+    }
     assert.ok(way.path.length>=2&&way.path.every(inside),id+': route outside bounds');
     if(h.guide)assert.match(h.guide,/^https:\/\//);
     h.path=way.path;

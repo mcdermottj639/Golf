@@ -1,4 +1,6 @@
-# Pound Ridge course preparation sources
+# Course preparation sources
+
+## Pound Ridge
 
 Scorecard: https://www.poundridgegolf.com/golf/scorecard and the club's linked
 https://www.poundridgegolf.com/images/documents/00021.png, read October 8, 2026.
@@ -162,3 +164,44 @@ and Sterling. Official guides remain available alongside the generated option.
 The generated illustration works offline without Google. Never replace source
 geometry with the imaginary shape from the design mockup. Missing maps are shown as
 unavailable; absence of a hazard polygon never means absence of a hazard.
+
+
+## October 14, 2026 expansion (v250)
+
+Five new on-demand packs: Lakeside Country Club (Penn Yan), Oak Hills Park (Norwalk),
+Richter Park (Danbury), Fairchild Wheeler Black and Fairchild Wheeler Red (Fairfield,
+operated by Bridgeport). Every course keeps physical front 1–9, back 10–18 order.
+All map coordinates, way IDs, versions and tags are unchanged OSM subsets. Fairchild
+hole routes are filtered by `golf:course:name`, never by the duplicated hole numbers
+alone. Shared property polygons can appear in both packs; physical routes cannot.
+
+`batch-2026-10-14.json` records retrieval dates, source URLs, SHA-256 fingerprints and
+front/back tee sums. Official artwork is not vendored or added to offline downloads.
+The sources in each pack and its raw subset are the authoritative provenance links.
+All 88 released route endpoints fall inside mapped green polygons. Full map coverage
+means a verified route for every hole, not complete hazard or terrain coverage.
+Lakeside has sparse fairway outlines: show only the supplied outlines, never fill gaps.
+
+Lakeside's official card supplies Blue/White men's pars, indexes and ratings. Its OSM
+numbered routes have no `par` tags. Explicit per-hole `parSource` and `mapVerification`
+allow these without altering raw tags; conflicting source pars still fail validation.
+Holes 2 and 6 are withheld: route lengths about 285/325 yards versus shortest included
+card tees 387/439 yards. Their candidate way IDs remain in source metadata, but their
+playable paths are empty and both guide/map are unavailable. No inferred tee adjustment.
+
+Oak Hills includes Blue/White men's rows. Green's hole row totals 5,208 but its rating
+panel says 5,221; Green and combo sets are omitted. Women's pars differ. Richter uses
+GolfTraxx per-hole Blue/White/Gold yards checked against the official virtual book's
+6,547/6,119/5,335 totals and the official par 71; the provider's summary par 72 is wrong.
+Official Course Details ratings (Blue 71.3/130, White 69.2/128) conflict with Virtual
+Yardage Book (72.3/135, 70.0/132). All ratings/slopes remain null; Red has different
+stroke indexes and is omitted. Fairchild Black includes White men's only, as Blue
+has different indexes and Yellow/Red different pars. Fairchild Red includes Blue/White
+men's; Yellow indexes and Red tee pars differ. These limits appear in the user card notes.
+
+`onboarding-queue.json` retains canonical identities, saved aliases, routing, priority,
+evidence, gaps and completion commits. Reconcile with `node scripts/reconcile-course-queue.cjs`;
+`--check` is deterministic using the saved reconciliation date. Saved played list has
+49 entries; the Bonita Bay umbrella is a queue-only duplicate of Bay Island, leaving
+48 distinct onboarding entries. Nine are catalog-supported (seven fully mapped), 39
+remain. Lakeside 2/6 and Metedeconk 19–27 remain on the repair exception queue.

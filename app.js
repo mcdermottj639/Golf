@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v249';
+const BUILD = 'v250';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v250', d:'2026-10-14', items:['FIVE MORE COURSES: Lakeside (Penn Yan), Oak Hills Park, Richter Park and Fairchild Wheeler Black/Red now have on-demand course packs, with 88 new hole guides and interactive maps.','CLEAR COVERAGE: Lakeside holes 2 and 6 remain unavailable while routing discrepancies are checked. Course cards identify omitted tee sets and unverified ratings; your existing rounds, notes and downloads stay intact.'] },
   { b:'v249', d:'2026-10-12', items:['STOP MEANS STOP: Stop and touching the map now end a Fly hole tour at once instead of waiting for the current camera move to finish, and the green sweep stops after about nine seconds as designed.','NO MORE TREETOP VIEW: The 3D map starts looking straight down from high above, and if a camera move fails it falls back to that overhead view instead of a low camera in the trees.'] },
   { b:'v248', d:'2026-10-12', items:['HOLE GUIDE FIRST AGAIN: Course Prep and live-round popups open on Hole guide; Interactive map is the second tab.','STEADIER 3D CAMERA: The map now waits for Google’s 3D scene to be ready before framing the tee, retries a failed camera move once, and if it still fails the message names Google’s reason so it can be fixed.'] },
   { b:'v247', d:'2026-10-09', items:['CINEMATIC FLY HOLE: Fly hole now starts low behind the tee, glides to your landing spot (saved target or club carry) and pauses with the club, carry and yards left, then flies to the green and slowly circles it. Your standing plan lines show along the way. Any touch on the map or Stop ends it, and the touch that stops it never drops a target pin.'] },

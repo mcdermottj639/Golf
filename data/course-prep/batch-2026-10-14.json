@@ -1,0 +1,131 @@
+{
+  "retrieved": "2026-10-14",
+  "sourceFiles": [
+    {
+      "url": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "sha256": "478202d508dbe357cea5fdf7890306a3de4e80bef61e565af06826d26b7b5588"
+    },
+    {
+      "url": "https://www.oakhillsgc.com/images/documents/OHPGC_Scorecard.pdf",
+      "sha256": "466b2b8baacae54dc07c95cd72df45847f52996f2043f9254b1d337dc73d490c"
+    },
+    {
+      "url": "https://www.fairchildwheelergolf.com/wp-content/uploads/sites/7522/2023/04/Black-Scorecard_1.jpg",
+      "sha256": "f615cf1b4315f9d90c97d8a0c81f4465a0762968de6b40d5f68605b19a052ac5"
+    },
+    {
+      "url": "https://www.fairchildwheelergolf.com/wp-content/uploads/sites/7522/2023/04/Red-Scorecard_1.jpg",
+      "sha256": "c55c5820f3b743a6788eed9a0ba19bd28504f417d8eb7c9e3cf8f27b796686d8"
+    },
+    {
+      "url": "https://golftraxx.com/scorecard?course_name=Richter+Park+Golf+Course&static=true&zipcode=06811",
+      "sha256": "f539b182cec6e335bc284ecf10b49a23336f27881f8f6d521bf1c48217600495"
+    },
+    {
+      "url": "https://www.richterpark.com/course/",
+      "sha256": "46f269cc0cd38596d6f1dbed922a23b013c3fb7161f50514ad87bf95c4b22721"
+    },
+    {
+      "url": "https://www.richterpark.com/virtual_yardage_book/",
+      "sha256": "cac4c8b0c33268bc007757b245bb37858f822167a0471ecfeed0be88d1cab205"
+    }
+  ],
+  "teeChecks": [
+    {
+      "courseId": "lakeside-penn-yan",
+      "parFront": 36,
+      "parBack": 36,
+      "tees": [
+        {
+          "id": "blue",
+          "front": 3134,
+          "back": 3379,
+          "total": 6513
+        },
+        {
+          "id": "white",
+          "front": 3034,
+          "back": 3155,
+          "total": 6189
+        }
+      ]
+    },
+    {
+      "courseId": "oak-hills-park",
+      "parFront": 35,
+      "parBack": 36,
+      "tees": [
+        {
+          "id": "blue",
+          "front": 3013,
+          "back": 3304,
+          "total": 6317
+        },
+        {
+          "id": "white",
+          "front": 2803,
+          "back": 3117,
+          "total": 5920
+        }
+      ]
+    },
+    {
+      "courseId": "richter-park",
+      "parFront": 36,
+      "parBack": 35,
+      "tees": [
+        {
+          "id": "blue",
+          "front": 3345,
+          "back": 3202,
+          "total": 6547
+        },
+        {
+          "id": "white",
+          "front": 3113,
+          "back": 3006,
+          "total": 6119
+        },
+        {
+          "id": "gold",
+          "front": 2635,
+          "back": 2700,
+          "total": 5335
+        }
+      ]
+    },
+    {
+      "courseId": "fairchild-wheeler-black",
+      "parFront": 36,
+      "parBack": 35,
+      "tees": [
+        {
+          "id": "white",
+          "front": 3121,
+          "back": 3133,
+          "total": 6254
+        }
+      ]
+    },
+    {
+      "courseId": "fairchild-wheeler-red",
+      "parFront": 35,
+      "parBack": 37,
+      "tees": [
+        {
+          "id": "blue",
+          "front": 3136,
+          "back": 3337,
+          "total": 6473
+        },
+        {
+          "id": "white",
+          "front": 2979,
+          "back": 3268,
+          "total": 6247
+        }
+      ]
+    }
+  ],
+  "mapVerification": "All 88 released route endpoints are inside original mapped green polygons; numbered routes and pars reconcile to the included card. Original OSM way IDs, versions, tags and coordinates are retained. Unspecified reference tees are not selected-color tees. Shapes remain incomplete."
+}

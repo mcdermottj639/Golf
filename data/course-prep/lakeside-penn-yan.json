@@ -1,0 +1,249 @@
+{
+  "id": "lakeside-penn-yan",
+  "name": "Lakeside Country Club",
+  "shortName": "Lakeside",
+  "place": "Penn Yan, NY",
+  "aliases": [
+    "Lakeside Country Club (Penn Yan, NY)",
+    "Lakeside Penn Yan"
+  ],
+  "source": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+  "tour": "https://www.lccpy.com/golf/course",
+  "storageKey": "lakeside_penn_yan",
+  "bounds": [
+    42.6311029,
+    -77.071608,
+    42.6397713,
+    -77.0525402
+  ],
+  "center": [
+    42.635437100000004,
+    -77.06207409999999
+  ],
+  "par": 72,
+  "defaultTee": "white",
+  "verified": "2026-10-14",
+  "sourceLabel": "Official club scorecard",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-77.074,42.629,-77.050,42.641",
+  "cardNote": "Official club scorecard retrieved October 14, 2026. Blue and White men’s rows only: par 72, hole 13 par 5 and hole 16 par 4. Other tees and women’s pars/handicaps differ and are not represented. OSM numbered routes omit par; per-hole pars come from this official card without changing the original map tags. Holes 2 and 6 have no guide/map until route-versus-card discrepancies are resolved. All mapped starts are unspecified reference tees; selecting Blue/White does not move the tee.",
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6513,
+      "rating": 72.3,
+      "slope": 131,
+      "yards": [
+        501,
+        402,
+        411,
+        356,
+        155,
+        447,
+        281,
+        387,
+        194,
+        334,
+        405,
+        503,
+        501,
+        200,
+        401,
+        457,
+        151,
+        427
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 6189,
+      "rating": 70.5,
+      "slope": 129,
+      "yards": [
+        490,
+        387,
+        399,
+        345,
+        144,
+        439,
+        275,
+        378,
+        177,
+        327,
+        346,
+        482,
+        486,
+        158,
+        393,
+        441,
+        137,
+        385
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 5,
+      "si": 3,
+      "osmId": 615020402,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 1 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 5,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "candidateOsmId": 1192744625,
+      "mapReady": false,
+      "mapNote": "Numbered OSM route is about 285 yards, over 100 yards shorter than the shortest included official tee. Tee-to-green correspondence remains unverified; guide and interactive map withheld pending a current routing source."
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "si": 1,
+      "osmId": 1192744632,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 3 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 7,
+      "osmId": 615020406,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 4 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 5,
+      "par": 3,
+      "si": 17,
+      "osmId": 615020414,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 5 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 6,
+      "par": 5,
+      "si": 9,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "candidateOsmId": 615020352,
+      "mapReady": false,
+      "mapNote": "Numbered OSM route is about 325 yards, over 100 yards shorter than the shortest included official tee. Tee-to-green correspondence remains unverified; guide and interactive map withheld pending a current routing source."
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 15,
+      "osmId": 615020359,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 7 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 8,
+      "par": 4,
+      "si": 13,
+      "osmId": 615020346,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 8 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 9,
+      "par": 3,
+      "si": 11,
+      "osmId": 615020367,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 9 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 6,
+      "osmId": 615020392,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 10 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 8,
+      "osmId": 615020381,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 11 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 12,
+      "par": 5,
+      "si": 16,
+      "osmId": 1317380887,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 12 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 13,
+      "par": 5,
+      "si": 12,
+      "osmId": 1317380888,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 13 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 14,
+      "par": 3,
+      "si": 14,
+      "osmId": 1317380889,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 14 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "si": 4,
+      "osmId": 1317380890,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 15 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 2,
+      "osmId": 615020375,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 16 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 18,
+      "osmId": 615020400,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 17 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 10,
+      "osmId": 615020377,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.lccpy.com/images/pictures/scorecard.jpg",
+      "mapVerification": "Numbered OSM hole 18 lies inside Lakeside Country Club boundary way 137269063. Its original route coordinates and ref are retained; par is transcribed from the official Penn Yan club scorecard, retrieved 2026-10-14."
+    }
+  ]
+}

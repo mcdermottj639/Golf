@@ -1,0 +1,213 @@
+{
+  "id": "oak-hills-park",
+  "name": "Oak Hills Park Golf Course",
+  "shortName": "Oak Hills Park",
+  "place": "Norwalk, CT",
+  "aliases": [
+    "Oak Hills Park Golf Club",
+    "Oak Hills Park"
+  ],
+  "source": "https://www.oakhillsgc.com/images/documents/OHPGC_Scorecard.pdf",
+  "tour": "https://www.oakhillsgc.com/",
+  "storageKey": "oak_hills_park",
+  "bounds": [
+    41.1070786,
+    -73.4503363,
+    41.121001199999995,
+    -73.43672169999999
+  ],
+  "center": [
+    41.114039899999995,
+    -73.443529
+  ],
+  "par": 71,
+  "defaultTee": "white",
+  "verified": "2026-10-14",
+  "sourceLabel": "Official club scorecard",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.459,41.095,-73.432,41.120",
+  "cardNote": "Official scorecard retrieved October 14, 2026; Blue and White men’s pars, handicaps and ratings. Green omitted: its listed hole yards total 5,208 but the ratings panel says 5,221. Combo tees and women’s par-72 card are not represented. Confirm the current card at the course.",
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6317,
+      "rating": 70.4,
+      "slope": 132,
+      "yards": [
+        382,
+        338,
+        147,
+        345,
+        195,
+        304,
+        355,
+        491,
+        456,
+        547,
+        367,
+        516,
+        165,
+        406,
+        235,
+        366,
+        361,
+        341
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 5920,
+      "rating": 68.8,
+      "slope": 127,
+      "yards": [
+        374,
+        295,
+        109,
+        307,
+        174,
+        284,
+        336,
+        484,
+        440,
+        528,
+        365,
+        501,
+        154,
+        386,
+        205,
+        342,
+        336,
+        300
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 3,
+      "osmId": 1106207725,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 9,
+      "osmId": 1106207731,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 3,
+      "par": 3,
+      "si": 17,
+      "osmId": 1106207721,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 5,
+      "osmId": 1106207718,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 5,
+      "par": 3,
+      "si": 15,
+      "osmId": 1106207713,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 13,
+      "osmId": 1106207710,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 7,
+      "osmId": 1106207705,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 8,
+      "par": 5,
+      "si": 11,
+      "osmId": 1106207702,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 1,
+      "osmId": 1106207699,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 10,
+      "par": 5,
+      "si": 4,
+      "osmId": 1106207696,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 10,
+      "osmId": 1106207694,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 12,
+      "par": 5,
+      "si": 8,
+      "osmId": 1106207691,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 13,
+      "par": 3,
+      "si": 18,
+      "osmId": 1106207689,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 2,
+      "osmId": 1106207684,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 15,
+      "par": 3,
+      "si": 12,
+      "osmId": 1106207680,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 6,
+      "osmId": 1106207677,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 17,
+      "par": 4,
+      "si": 14,
+      "osmId": 1106207675,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 16,
+      "osmId": 1106207671,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    }
+  ]
+}

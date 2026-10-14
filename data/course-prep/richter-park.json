@@ -1,0 +1,244 @@
+{
+  "id": "richter-park",
+  "name": "Richter Park Golf Course",
+  "shortName": "Richter Park",
+  "place": "Danbury, CT",
+  "aliases": [
+    "Richter Park",
+    "Richter Park Golf Club"
+  ],
+  "source": "https://golftraxx.com/scorecard?course_name=Richter+Park+Golf+Course&static=true&zipcode=06811",
+  "tour": "https://www.richterpark.com/course-tour/",
+  "storageKey": "richter_park",
+  "bounds": [
+    41.406326,
+    -73.5296979,
+    41.418459,
+    -73.50852689999999
+  ],
+  "center": [
+    41.412392499999996,
+    -73.5191124
+  ],
+  "par": 71,
+  "defaultTee": "white",
+  "verified": "2026-10-14",
+  "sourceLabel": "Published scorecard · GolfTraxx; totals checked against club",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.535,41.395,-73.497,41.420",
+  "cardNote": "GolfTraxx per-hole yardages retrieved October 14, 2026; each tee total agrees with the official virtual yardage book (6,547/6,119/5,335/4,922). Hole pars sum to 71 and match the official par plus numbered OSM routes; the provider’s header incorrectly says 72. Stroke indexes use the published men’s row. Ratings/slopes are unset because the official Course Details and Virtual Yardage Book pages conflict. Confirm current card/tee markers on arrival. Red is omitted because its published stroke indexes differ from the shared men’s row.",
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6547,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        398,
+        518,
+        183,
+        430,
+        174,
+        413,
+        526,
+        359,
+        344,
+        185,
+        387,
+        527,
+        161,
+        417,
+        342,
+        580,
+        165,
+        438
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 6119,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        372,
+        495,
+        150,
+        386,
+        170,
+        387,
+        508,
+        337,
+        308,
+        160,
+        367,
+        479,
+        142,
+        395,
+        319,
+        570,
+        152,
+        422
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "total": 5335,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        350,
+        447,
+        137,
+        301,
+        100,
+        333,
+        367,
+        300,
+        300,
+        142,
+        340,
+        442,
+        120,
+        377,
+        263,
+        484,
+        130,
+        402
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 7,
+      "osmId": 680465646,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 5,
+      "si": 11,
+      "osmId": 680465647,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 3,
+      "par": 3,
+      "si": 15,
+      "osmId": 680465648,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 9,
+      "osmId": 680465649,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 5,
+      "par": 3,
+      "si": 17,
+      "osmId": 680465650,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 1,
+      "osmId": 680465651,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 5,
+      "si": 3,
+      "osmId": 680465652,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 8,
+      "par": 4,
+      "si": 5,
+      "osmId": 680465653,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 13,
+      "osmId": 680465654,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 10,
+      "par": 3,
+      "si": 14,
+      "osmId": 1209820457,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 10,
+      "osmId": 1209820456,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 12,
+      "par": 5,
+      "si": 6,
+      "osmId": 1209820455,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 13,
+      "par": 3,
+      "si": 16,
+      "osmId": 1209820454,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 8,
+      "osmId": 1209820453,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "si": 12,
+      "osmId": 1209820452,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 16,
+      "par": 5,
+      "si": 4,
+      "osmId": 1209820451,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 18,
+      "osmId": 1209820450,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 2,
+      "osmId": 1209820449,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    }
+  ],
+  "additionalSources": [
+    "https://www.richterpark.com/virtual_yardage_book/",
+    "https://www.richterpark.com/course/"
+  ]
+}

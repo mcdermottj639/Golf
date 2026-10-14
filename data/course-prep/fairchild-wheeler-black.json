@@ -1,0 +1,186 @@
+{
+  "id": "fairchild-wheeler-black",
+  "name": "Fairchild Wheeler Golf Course — Black",
+  "shortName": "Fairchild Black",
+  "place": "Fairfield, CT",
+  "aliases": [
+    "Fairchild Wheeler Black",
+    "Fairchild Wheeler Black Course"
+  ],
+  "source": "https://www.fairchildwheelergolf.com/wp-content/uploads/sites/7522/2023/04/Black-Scorecard_1.jpg",
+  "tour": "https://www.fairchildwheelergolf.com/aboutus/scorecard/",
+  "storageKey": "fairchild_wheeler_black",
+  "bounds": [
+    41.2067812,
+    -73.252481,
+    41.2232735,
+    -73.230757
+  ],
+  "center": [
+    41.21502735,
+    -73.241619
+  ],
+  "par": 71,
+  "defaultTee": "white",
+  "verified": "2026-10-14",
+  "sourceLabel": "Official club scorecard",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.254,41.206,-73.230,41.223",
+  "cardNote": "Official Black Course card retrieved October 14, 2026. White men’s row only (par 71, 6,254 yards); Blue has different back-nine stroke indexes, and Yellow/Red have different pars. Those tee sets are omitted until tee-specific pars/handicaps are supported. Black and Red are distinct physical 18-hole courses, not alternative tees.",
+  "tees": [
+    {
+      "id": "white",
+      "name": "White",
+      "total": 6254,
+      "rating": 70.5,
+      "slope": 122,
+      "yards": [
+        386,
+        372,
+        125,
+        369,
+        322,
+        437,
+        207,
+        444,
+        459,
+        411,
+        152,
+        401,
+        423,
+        312,
+        409,
+        502,
+        129,
+        394
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 5,
+      "osmId": 1211339257,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 7,
+      "osmId": 1211339256,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 3,
+      "par": 3,
+      "si": 17,
+      "osmId": 1211339255,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 3,
+      "osmId": 1211339250,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 15,
+      "osmId": 1211339249,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 1,
+      "osmId": 1211339248,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 3,
+      "si": 13,
+      "osmId": 1211339246,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 8,
+      "par": 5,
+      "si": 11,
+      "osmId": 1211339247,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 9,
+      "par": 5,
+      "si": 9,
+      "osmId": 1211339245,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 8,
+      "osmId": 1211559203,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 11,
+      "par": 3,
+      "si": 14,
+      "osmId": 1211559202,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 10,
+      "osmId": 1211559201,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": 2,
+      "osmId": 1211559200,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 16,
+      "osmId": 1211559188,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "si": 6,
+      "osmId": 1211559187,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 16,
+      "par": 5,
+      "si": 12,
+      "osmId": 1211559185,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 18,
+      "osmId": 1211559184,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 4,
+      "osmId": 1211559183,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    }
+  ]
+}

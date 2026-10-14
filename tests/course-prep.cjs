@@ -44,12 +44,12 @@ assert.equal(JSON.stringify(state.carries),JSON.stringify(before.carries));
 console.log('PASS course prep: 18 source routes, seven official tee totals/ratings, geometry math, input bounds, idempotent feed, preserved rounds/bag/calls and live prep note.');
 
 const catalog=ctx.window.CADDIE_PREP_COURSES;
-assert.equal(catalog.length,4);const stable=clone(state);
+assert.deepEqual(clone(catalog.map(c=>c.id)),JSON.parse(read('data/course-prep/catalog.json')));const stable=clone(state);
 for(const course of catalog){
   const raw=JSON.parse(read('data/course-prep/'+course.id+'-osm.json'));
   P.openHole(1,course.id);assert.equal(P.courseId,course.id);
   assert.ok(P.render().includes(course.shortName));
-  for(const h of course.holes){if(!h.osmId){assert.equal(h.mapReady,false);assert.ok(h.guide);continue;}const way=raw.features.find(f=>f.id===h.osmId);assert.deepEqual(clone(h.path),way.path);assert.ok(h.path.every(P.geo.pointOK));}
+  for(const h of course.holes){if(!h.osmId){assert.equal(h.mapReady,false);assert.ok(h.mapNote);assert.equal(P.hasGuide(course,h),!!h.guide);continue;}const way=raw.features.find(f=>f.id===h.osmId);assert.deepEqual(clone(h.path),way.path);assert.ok(h.path.every(P.geo.pointOK));}
   const other=catalog.find(c=>c.id!==course.id);
   assert.equal(P.geo.pointOK(other.center),false,'course-specific GPS boundary');
   const plan=P.clean({tee:course.defaultTee,holes:{[course.defaultTee+':1']:{note:course.id,target:course.center,tee:other.center}}},course.id);
@@ -62,7 +62,8 @@ assert.equal(T.coursePrepNote('Pound Ridge Golf Club',1),'Aim at my saved target
 assert.equal(P.openHole(1,'unknown-course'),false);assert.equal(P.findCourse('Sterling'),undefined,'no ambiguous partial course match');
 console.log('PASS multi-course data: original coordinates, isolated boundaries and notes, sourced live cards, exact aliases, no state writes during navigation.');
 
-assert.equal(catalog.flatMap(c=>c.holes).filter(h=>h.mapReady!==false).length,72);
+assert.equal(catalog.slice(0,4).flatMap(c=>c.holes).filter(h=>h.mapReady!==false).length,72,'original map coverage preserved');
+assert.equal(catalog.flatMap(c=>c.holes).filter(h=>h.mapReady!==false).length,JSON.parse(read('data/course-prep/coverage.json')).reduce((n,c)=>n+c.maps,0));
 const W=P.findCourse('wianno'),w2=W.holes[1],wraw=JSON.parse(read('data/course-prep/wianno-osm.json'));
 assert.notEqual(w2.mapReady,false);assert.ok(w2.mapVerification);
 assert.equal(wraw.features.find(f=>f.id===989266485).tags.golf,'tee','raw source remains unchanged');

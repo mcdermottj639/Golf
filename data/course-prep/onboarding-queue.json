@@ -1,0 +1,1775 @@
+{
+  "schemaVersion": 1,
+  "batchCap": 5,
+  "successfulBatches": 0,
+  "entries": [
+    {
+      "queueId": "lakeside-country-club",
+      "savedName": "Lakeside Country Club",
+      "canonicalName": "Lakeside Country Club",
+      "aliases": [
+        "Lakeside Country Club",
+        "Lakeside Country Club (Penn Yan, NY)",
+        "Lakeside Penn Yan"
+      ],
+      "region": "NY",
+      "priority": 1,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
+      "evidence": [
+        "coach-feed.json#add-lakeside-20260819"
+      ],
+      "status": "catalog-partial",
+      "coverageGaps": [
+        {
+          "hole": 2,
+          "reason": "Numbered OSM route is about 285 yards, over 100 yards shorter than the shortest included official tee. Tee-to-green correspondence remains unverified; guide and interactive map withheld pending a current routing source."
+        },
+        {
+          "hole": 6,
+          "reason": "Numbered OSM route is about 325 yards, over 100 yards shorter than the shortest included official tee. Tee-to-green correspondence remains unverified; guide and interactive map withheld pending a current routing source."
+        }
+      ],
+      "completionCommit": null,
+      "catalogId": "lakeside-penn-yan",
+      "coverage": {
+        "holes": 18,
+        "guides": 16,
+        "maps": 16
+      },
+      "sourceUrls": [
+        "https://www.lccpy.com/images/pictures/scorecard.jpg",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-77.074,42.629,-77.050,42.641"
+      ],
+      "retrieved": "2026-10-14",
+      "identityNote": "Penn Yan, NY; official address 145 East Lake Road. Not another Lakeside club.",
+      "teeCoverageGaps": [
+        "Other tees have different pars/stroke indexes; Blue/White men’s only."
+      ]
+    },
+    {
+      "queueId": "oak-hills-park-golf-club",
+      "savedName": "Oak Hills Park Golf Club",
+      "canonicalName": "Oak Hills Park Golf Course",
+      "aliases": [
+        "Oak Hills Park Golf Club",
+        "Oak Hills Park"
+      ],
+      "region": "CT",
+      "priority": 2,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
+      "evidence": [
+        "coach-feed.json#add-oakhillspark-20260729"
+      ],
+      "status": "catalog-complete",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "catalogId": "oak-hills-park",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.oakhillsgc.com/images/documents/OHPGC_Scorecard.pdf",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-73.459,41.095,-73.432,41.120"
+      ],
+      "retrieved": "2026-10-14",
+      "teeCoverageGaps": [
+        "Green: per-hole total 5208 differs from ratings panel 5221. Combo and women’s rows omitted."
+      ]
+    },
+    {
+      "queueId": "richter-park-golf-course",
+      "savedName": "Richter Park Golf Course",
+      "canonicalName": "Richter Park Golf Course",
+      "aliases": [
+        "Richter Park Golf Course",
+        "Richter Park",
+        "Richter Park Golf Club"
+      ],
+      "region": "CT",
+      "priority": 3,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
+      "evidence": [
+        "coach-feed.json#add-richterpark-20260729"
+      ],
+      "status": "catalog-complete",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "catalogId": "richter-park",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://golftraxx.com/scorecard?course_name=Richter+Park+Golf+Course&static=true&zipcode=06811",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-73.535,41.395,-73.497,41.420",
+        "https://www.richterpark.com/virtual_yardage_book/",
+        "https://www.richterpark.com/course/"
+      ],
+      "retrieved": "2026-10-14",
+      "teeCoverageGaps": [
+        "Ratings conflict across official pages; all unset. Red stroke indexes differ; tee omitted."
+      ]
+    },
+    {
+      "queueId": "fairchild-wheeler-golf-course-black",
+      "savedName": "Fairchild Wheeler Golf Course — Black",
+      "canonicalName": "Fairchild Wheeler Golf Course — Black",
+      "aliases": [
+        "Fairchild Wheeler Golf Course — Black",
+        "Fairchild Wheeler Black",
+        "Fairchild Wheeler Black Course"
+      ],
+      "region": "CT",
+      "priority": 4,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
+      "evidence": [
+        "coach-feed.json#add-fairchildwheeler-black-20260912"
+      ],
+      "status": "catalog-complete",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "catalogId": "fairchild-wheeler-black",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.fairchildwheelergolf.com/wp-content/uploads/sites/7522/2023/04/Black-Scorecard_1.jpg",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-73.254,41.206,-73.230,41.223"
+      ],
+      "retrieved": "2026-10-14",
+      "identityNote": "Black 18, Fairfield CT, operated by City of Bridgeport; separate from Red.",
+      "teeCoverageGaps": [
+        "White men’s only. Blue handicaps differ; Yellow/Red pars differ."
+      ]
+    },
+    {
+      "queueId": "fairchild-wheeler-golf-course-red",
+      "savedName": "Fairchild Wheeler Golf Course — Red",
+      "canonicalName": "Fairchild Wheeler Golf Course — Red",
+      "aliases": [
+        "Fairchild Wheeler Golf Course — Red",
+        "Fairchild Wheeler Red",
+        "Fairchild Wheeler Red Course"
+      ],
+      "region": "CT",
+      "priority": 5,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
+      "evidence": [
+        "coach-feed.json#add-fairchildwheeler-red-20260912"
+      ],
+      "status": "catalog-complete",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "catalogId": "fairchild-wheeler-red",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.fairchildwheelergolf.com/wp-content/uploads/sites/7522/2023/04/Red-Scorecard_1.jpg",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-73.254,41.206,-73.230,41.223"
+      ],
+      "retrieved": "2026-10-14",
+      "identityNote": "Red 18, Fairfield CT, operated by City of Bridgeport; separate from Black.",
+      "teeCoverageGaps": [
+        "Blue/White men’s only. Yellow handicaps and Red tee pars differ."
+      ]
+    },
+    {
+      "queueId": "hudson-hills-golf-course",
+      "savedName": "Hudson Hills Golf Course",
+      "canonicalName": "Hudson Hills Golf Course",
+      "aliases": [
+        "Hudson Hills Golf Course"
+      ],
+      "region": "NY",
+      "priority": 6,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-hudsonhills-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "beekman-golf-course",
+      "savedName": "Beekman Golf Course",
+      "canonicalName": "Beekman Golf Course",
+      "aliases": [
+        "Beekman Golf Course"
+      ],
+      "region": "NY",
+      "priority": 7,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-beekman-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "trump-links-at-ferry-point",
+      "savedName": "Trump Links at Ferry Point",
+      "canonicalName": "Trump Links at Ferry Point",
+      "aliases": [
+        "Trump Links at Ferry Point"
+      ],
+      "region": "NY",
+      "priority": 8,
+      "routing": null,
+      "evidence": [
+        "app.js#seed.courses"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "identityNote": "Resolve current official course name and preserve the saved Trump Links at Ferry Point alias without changing historical rounds."
+    },
+    {
+      "queueId": "saxon-woods-golf-course",
+      "savedName": "Saxon Woods Golf Course",
+      "canonicalName": "Saxon Woods Golf Course",
+      "aliases": [
+        "Saxon Woods Golf Course"
+      ],
+      "region": "NY",
+      "priority": 9,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-saxonwoods-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "van-cortlandt-park-golf-course",
+      "savedName": "Van Cortlandt Park Golf Course",
+      "canonicalName": "Van Cortlandt Park Golf Course",
+      "aliases": [
+        "Van Cortlandt Park Golf Course"
+      ],
+      "region": "NY",
+      "priority": 10,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-vancortlandt-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "granite-links-golf-club",
+      "savedName": "Granite Links Golf Club",
+      "canonicalName": "Granite Links Golf Club",
+      "aliases": [
+        "Granite Links Golf Club"
+      ],
+      "region": "MA",
+      "priority": 11,
+      "routing": {
+        "savedRouting": "Granite / Quincy",
+        "physicalNinesToVerify": [
+          "Granite",
+          "Quincy",
+          "Milton"
+        ]
+      },
+      "evidence": [
+        "coach-feed.json#add-granitelinks-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "identityNote": "Verify all physical nines. Preserve the user’s Granite/Quincy 18-hole routing; do not conflate it with Milton."
+    },
+    {
+      "queueId": "bass-river-golf-course",
+      "savedName": "Bass River Golf Course",
+      "canonicalName": "Bass River Golf Course",
+      "aliases": [
+        "Bass River Golf Course"
+      ],
+      "region": "MA",
+      "priority": 12,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-bassriver-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "islands-end-golf-and-country-club",
+      "savedName": "Islands End Golf and Country Club",
+      "canonicalName": "Islands End Golf and Country Club",
+      "aliases": [
+        "Islands End Golf and Country Club"
+      ],
+      "region": "NY",
+      "priority": 13,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-islandsend-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "new-york-country-club",
+      "savedName": "New York Country Club",
+      "canonicalName": "New York Country Club",
+      "aliases": [
+        "New York Country Club"
+      ],
+      "region": "NY",
+      "priority": 14,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-newyorkcc-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "metedeconk-national",
+      "savedName": "Metedeconk National",
+      "canonicalName": "Metedeconk National",
+      "aliases": [
+        "Metedeconk National",
+        "Metedeconk National Golf Club",
+        "Metedeconk National GC",
+        "Metedeconk",
+        "The Conk"
+      ],
+      "region": "NJ",
+      "priority": 23,
+      "routing": {
+        "nines": [
+          {
+            "id": "first",
+            "name": "First nine",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "id": "second",
+            "name": "Second nine",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          },
+          {
+            "id": "third",
+            "name": "Third nine",
+            "holes": [
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ]
+          }
+        ],
+        "routings": [
+          {
+            "id": "first-second",
+            "name": "First + Second · 1–18",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          },
+          {
+            "id": "second-third",
+            "name": "Second + Third · 10–27",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ]
+          },
+          {
+            "id": "third-first",
+            "name": "Third + First · 19–27, 1–9",
+            "holes": [
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "id": "first-third",
+            "name": "First + Third · 1–9, 19–27",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ]
+          },
+          {
+            "id": "second-first",
+            "name": "Second + First · 10–18, 1–9",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "id": "third-second",
+            "name": "Third + Second · 19–27, 10–18",
+            "holes": [
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          },
+          {
+            "id": "first",
+            "name": "First nine only",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "id": "second",
+            "name": "Second nine only",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          },
+          {
+            "id": "third",
+            "name": "Third nine only",
+            "holes": [
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ]
+          }
+        ]
+      },
+      "evidence": [
+        "app.js#seed.courses"
+      ],
+      "status": "catalog-partial",
+      "coverageGaps": [
+        {
+          "hole": 19,
+          "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+        },
+        {
+          "hole": 20,
+          "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+        },
+        {
+          "hole": 21,
+          "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+        },
+        {
+          "hole": 22,
+          "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+        },
+        {
+          "hole": 23,
+          "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+        },
+        {
+          "hole": 24,
+          "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+        },
+        {
+          "hole": 25,
+          "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+        },
+        {
+          "hole": 26,
+          "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+        },
+        {
+          "hole": 27,
+          "reason": "The club’s illustrated guide is available for this hole. Interactive yardages will follow once the tee-to-green coordinates are verified."
+        }
+      ],
+      "completionCommit": null,
+      "catalogId": "metedeconk",
+      "coverage": {
+        "holes": 27,
+        "guides": 27,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://tours.skyfoxgolf.com/360/metedeconk",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-74.367,40.143,-74.325,40.170"
+      ],
+      "retrieved": "2026-10-08",
+      "catalogObservedAtCommit": "195ec82184016f67fafb2bc0a4621d4a6cce52c0"
+    },
+    {
+      "queueId": "wianno-club",
+      "savedName": "Wianno Club",
+      "canonicalName": "Wianno Club",
+      "aliases": [
+        "Wianno Club",
+        "Wianno Golf Club",
+        "Wianno"
+      ],
+      "region": "MA",
+      "priority": 27,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
+      "evidence": [
+        "coach-feed.json#add-wianno-20260729"
+      ],
+      "status": "catalog-complete",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "catalogId": "wianno",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://18birdies.com/golf-courses/club/959eb2a0-86ac-11e4-8c28-020000005b00/wianno-club",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-70.395,41.614,-70.365,41.64"
+      ],
+      "retrieved": "2026-10-08",
+      "catalogObservedAtCommit": "195ec82184016f67fafb2bc0a4621d4a6cce52c0"
+    },
+    {
+      "queueId": "pound-ridge-golf-club",
+      "savedName": "Pound Ridge Golf Club",
+      "canonicalName": "Pound Ridge Golf Club",
+      "aliases": [
+        "Pound Ridge Golf Club",
+        "Pound Ridge"
+      ],
+      "region": "NY",
+      "priority": 28,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
+      "evidence": [
+        "coach-feed.json#add-poundridge-20260729"
+      ],
+      "status": "catalog-complete",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "catalogId": "pound-ridge",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.poundridgegolf.com/golf/scorecard",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-73.580,41.169,-73.557,41.189"
+      ],
+      "retrieved": "2026-10-08",
+      "catalogObservedAtCommit": "195ec82184016f67fafb2bc0a4621d4a6cce52c0"
+    },
+    {
+      "queueId": "basin-harbor-club",
+      "savedName": "Basin Harbor Club",
+      "canonicalName": "Basin Harbor Club",
+      "aliases": [
+        "Basin Harbor Club"
+      ],
+      "region": "VT",
+      "priority": 36,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-basinharbor-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "vermont-national-country-club",
+      "savedName": "Vermont National Country Club",
+      "canonicalName": "Vermont National Country Club",
+      "aliases": [
+        "Vermont National Country Club"
+      ],
+      "region": "VT",
+      "priority": 37,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-vermontnat-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "fox-hollow-golf-club",
+      "savedName": "Fox Hollow Golf Club",
+      "canonicalName": "Fox Hollow Golf Club",
+      "aliases": [
+        "Fox Hollow Golf Club"
+      ],
+      "region": "NJ",
+      "priority": 38,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-foxhollow-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "trenton-country-club",
+      "savedName": "Trenton Country Club",
+      "canonicalName": "Trenton Country Club",
+      "aliases": [
+        "Trenton Country Club"
+      ],
+      "region": "NJ",
+      "priority": 39,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-trentoncc-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "princeton-country-club",
+      "savedName": "Princeton Country Club",
+      "canonicalName": "Princeton Country Club",
+      "aliases": [
+        "Princeton Country Club"
+      ],
+      "region": "NJ",
+      "priority": 40,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-princetoncc-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "spring-lake-golf-club",
+      "savedName": "Spring Lake Golf Club",
+      "canonicalName": "Spring Lake Golf Club",
+      "aliases": [
+        "Spring Lake Golf Club"
+      ],
+      "region": "NJ",
+      "priority": 41,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-springlake-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "makefield-highlands-golf-club",
+      "savedName": "Makefield Highlands Golf Club",
+      "canonicalName": "Makefield Highlands Golf Club",
+      "aliases": [
+        "Makefield Highlands Golf Club"
+      ],
+      "region": "PA",
+      "priority": 42,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-makefield-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "sterling-farms-golf-course",
+      "savedName": "Sterling Farms Golf Course",
+      "canonicalName": "Sterling Farms Golf Course",
+      "aliases": [
+        "Sterling Farms Golf Course",
+        "Sterling Farms",
+        "Sterling Farms Golf Club"
+      ],
+      "region": "CT",
+      "priority": 44,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
+      "evidence": [
+        "coach-feed.json#add-sterlingfarms-20260812"
+      ],
+      "status": "catalog-complete",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "catalogId": "sterling-farms",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.grassy.golf/courses/sterling-farms-golf-course-us-ct/scorecard",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-73.532,41.100,-73.517,41.112"
+      ],
+      "retrieved": "2026-10-08",
+      "catalogObservedAtCommit": "195ec82184016f67fafb2bc0a4621d4a6cce52c0"
+    },
+    {
+      "queueId": "neshaminy-valley-golf-club",
+      "savedName": "Neshaminy Valley Golf Club",
+      "canonicalName": "Neshaminy Valley Golf Club",
+      "aliases": [
+        "Neshaminy Valley Golf Club"
+      ],
+      "region": "PA",
+      "priority": 46,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-neshaminyvalley-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "springfield-golf-center",
+      "savedName": "Springfield Golf Center",
+      "canonicalName": "Springfield Golf Center",
+      "aliases": [
+        "Springfield Golf Center"
+      ],
+      "region": "PA",
+      "priority": 47,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-springfieldgolfcenter-20260821"
+      ],
+      "status": "identity-needed",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "identityNote": "Stored PA location was inferred and is UNVERIFIED. Do not use it to identify the venue or geolocate holes."
+    },
+    {
+      "queueId": "westover-country-club",
+      "savedName": "Westover Country Club",
+      "canonicalName": "Westover Country Club",
+      "aliases": [
+        "Westover Country Club"
+      ],
+      "region": "PA",
+      "priority": 48,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-westover-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "green-knoll-golf-course",
+      "savedName": "Green Knoll Golf Course",
+      "canonicalName": "Green Knoll Golf Course",
+      "aliases": [
+        "Green Knoll Golf Course"
+      ],
+      "region": "NJ",
+      "priority": 49,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-greenknoll-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "weequahic-park-golf-course",
+      "savedName": "Weequahic Park Golf Course",
+      "canonicalName": "Weequahic Park Golf Course",
+      "aliases": [
+        "Weequahic Park Golf Course"
+      ],
+      "region": "NJ",
+      "priority": 50,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-weequahic-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "mountain-view-golf-course",
+      "savedName": "Mountain View Golf Course",
+      "canonicalName": "Mountain View Golf Course",
+      "aliases": [
+        "Mountain View Golf Course"
+      ],
+      "region": "NJ",
+      "priority": 51,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-mountainview-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "quail-brook-golf-course",
+      "savedName": "Quail Brook Golf Course",
+      "canonicalName": "Quail Brook Golf Course",
+      "aliases": [
+        "Quail Brook Golf Course"
+      ],
+      "region": "NJ",
+      "priority": 55,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-quailbrook-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "northampton-valley-country-club",
+      "savedName": "Northampton Valley Country Club",
+      "canonicalName": "Northampton Valley Country Club",
+      "aliases": [
+        "Northampton Valley Country Club"
+      ],
+      "region": "PA",
+      "priority": 56,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-northamptonvalley-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "concordia-golf-club",
+      "savedName": "Concordia Golf Club",
+      "canonicalName": "Concordia Golf Club",
+      "aliases": [
+        "Concordia Golf Club"
+      ],
+      "region": "NJ",
+      "priority": 57,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-concordia-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "middletown-country-club",
+      "savedName": "Middletown Country Club",
+      "canonicalName": "Middletown Country Club",
+      "aliases": [
+        "Middletown Country Club"
+      ],
+      "region": "PA",
+      "priority": 62,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-middletowncc-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "broad-run-golf-club",
+      "savedName": "Broad Run Golf Club",
+      "canonicalName": "Broad Run Golf Club",
+      "aliases": [
+        "Broad Run Golf Club"
+      ],
+      "region": "PA",
+      "priority": 63,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-broadrun-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "bonita-bay-club",
+      "savedName": "Bonita Bay Club",
+      "canonicalName": "Bonita Bay Club",
+      "aliases": [
+        "Bonita Bay Club"
+      ],
+      "region": "FL",
+      "priority": 133,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-bonitabay-20260729"
+      ],
+      "status": "duplicate-umbrella",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "duplicateOf": "bonita-bay-west-bay-island",
+      "identityNote": "Umbrella saved entry is grouped with the specific saved Bay Island course for onboarding only. Preserve both historical records; do not infer additional Bonita Bay courses played."
+    },
+    {
+      "queueId": "shadow-wood-country-club",
+      "savedName": "Shadow Wood Country Club",
+      "canonicalName": "Shadow Wood Country Club",
+      "aliases": [
+        "Shadow Wood Country Club"
+      ],
+      "region": "FL",
+      "priority": 134,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-shadowwood-20260729"
+      ],
+      "status": "identity-needed",
+      "coverageGaps": [],
+      "completionCommit": null,
+      "identityNote": "Specific North, South or Preserve course is unresolved. No geometry/card until evidence identifies the physical course."
+    },
+    {
+      "queueId": "old-corkscrew-golf-club",
+      "savedName": "Old Corkscrew Golf Club",
+      "canonicalName": "Old Corkscrew Golf Club",
+      "aliases": [
+        "Old Corkscrew Golf Club"
+      ],
+      "region": "FL",
+      "priority": 135,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-oldcorkscrew-20260729"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "quail-village-golf-course",
+      "savedName": "Quail Village Golf Course",
+      "canonicalName": "Quail Village Golf Course",
+      "aliases": [
+        "Quail Village Golf Course"
+      ],
+      "region": "FL",
+      "priority": 153,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-quailvillage-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "bonita-bay-west-bay-island",
+      "savedName": "Bonita Bay West — Bay Island",
+      "canonicalName": "Bonita Bay West — Bay Island",
+      "aliases": [
+        "Bonita Bay West — Bay Island"
+      ],
+      "region": "FL",
+      "priority": 154,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-bonitabaywest-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "arrowhead-golf-course-at-heritage-greens",
+      "savedName": "Arrowhead Golf Course at Heritage Greens",
+      "canonicalName": "Arrowhead Golf Course at Heritage Greens",
+      "aliases": [
+        "Arrowhead Golf Course at Heritage Greens"
+      ],
+      "region": "FL",
+      "priority": 160,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-arrowheadheritage-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "old-head",
+      "savedName": "Old Head",
+      "canonicalName": "Old Head",
+      "aliases": [
+        "Old Head"
+      ],
+      "region": "Ireland",
+      "priority": 220,
+      "routing": null,
+      "evidence": [
+        "app.js#seed.courses"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "waterville",
+      "savedName": "Waterville",
+      "canonicalName": "Waterville",
+      "aliases": [
+        "Waterville"
+      ],
+      "region": "Ireland",
+      "priority": 221,
+      "routing": null,
+      "evidence": [
+        "app.js#seed.courses"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "hogs-head",
+      "savedName": "Hogs Head",
+      "canonicalName": "Hogs Head",
+      "aliases": [
+        "Hogs Head"
+      ],
+      "region": "Ireland",
+      "priority": 222,
+      "routing": null,
+      "evidence": [
+        "app.js#seed.courses"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "the-golf-courses-of-lawsonia-links",
+      "savedName": "The Golf Courses of Lawsonia — Links",
+      "canonicalName": "The Golf Courses of Lawsonia — Links",
+      "aliases": [
+        "The Golf Courses of Lawsonia — Links"
+      ],
+      "region": "WI",
+      "priority": 259,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-lawsonia-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "whistling-straits-irish",
+      "savedName": "Whistling Straits — Irish",
+      "canonicalName": "Whistling Straits — Irish",
+      "aliases": [
+        "Whistling Straits — Irish"
+      ],
+      "region": "WI",
+      "priority": 264,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-whistlingstraits-irish-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "blackwolf-run-river",
+      "savedName": "Blackwolf Run — River",
+      "canonicalName": "Blackwolf Run — River",
+      "aliases": [
+        "Blackwolf Run — River"
+      ],
+      "region": "WI",
+      "priority": 265,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-blackwolfrun-river-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    },
+    {
+      "queueId": "whistling-straits-straits",
+      "savedName": "Whistling Straits — Straits",
+      "canonicalName": "Whistling Straits — Straits",
+      "aliases": [
+        "Whistling Straits — Straits"
+      ],
+      "region": "WI",
+      "priority": 266,
+      "routing": null,
+      "evidence": [
+        "coach-feed.json#add-whistlingstraits-straits-20260821"
+      ],
+      "status": "pending",
+      "coverageGaps": [],
+      "completionCommit": null
+    }
+  ],
+  "reconciled": "2026-10-14",
+  "sourcePolicy": "Frozen seed courses plus course-add/course-remove entries from the current ordered app feeds. Bucket-list and simulator-only records excluded; autocomplete is not play evidence.",
+  "excluded": [
+    {
+      "name": "Sand Valley",
+      "evidence": "app.js#seed.courses",
+      "reason": "bucket list"
+    },
+    {
+      "name": "Pebble Beach",
+      "evidence": "coach-feed.json#rm-pebble",
+      "reason": "explicit removal"
+    },
+    {
+      "name": "Spyglass Hill",
+      "evidence": "coach-feed.json#rm-spyglass",
+      "reason": "explicit removal"
+    },
+    {
+      "name": "Chambers Bay",
+      "evidence": "coach-feed.json#rm-chambers",
+      "reason": "explicit removal"
+    },
+    {
+      "name": "Sand Valley Golf Resort — Mammoth Dunes",
+      "evidence": "coach-feed.json#rm-sandvalley-mammoth-20260821",
+      "reason": "explicit removal"
+    }
+  ],
+  "progress": {
+    "savedPlayedEntries": 49,
+    "catalogSupportedEntries": 9,
+    "fullyMappedEntries": 7,
+    "remainingUniqueEntries": 39,
+    "duplicateUmbrellaEntries": 1
+  },
+  "exceptions": [
+    {
+      "catalogId": "metedeconk",
+      "physicalHoles": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "status": "map-source-needed",
+      "note": "Official guides available; no verified map geometry. Repair never counts as new course."
+    },
+    {
+      "catalogId": "lakeside-penn-yan",
+      "physicalHoles": [
+        2,
+        6
+      ],
+      "status": "routing-verification-needed",
+      "note": "Both guide and map unavailable until original route and official card discrepancies are resolved."
+    }
+  ],
+  "batchHistory": [
+    {
+      "date": "2026-10-14",
+      "courseIds": [
+        "lakeside-penn-yan",
+        "oak-hills-park",
+        "richter-park",
+        "fairchild-wheeler-black",
+        "fairchild-wheeler-red"
+      ],
+      "status": "validated-pending-publication",
+      "completionCommit": null,
+      "newCourses": 5,
+      "newGuides": 88,
+      "newMaps": 88
+    }
+  ]
+}
