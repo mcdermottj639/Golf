@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "batchCap": 5,
-  "successfulBatches": 0,
+  "successfulBatches": 1,
   "entries": [
     {
       "queueId": "lakeside-country-club",
@@ -81,7 +81,7 @@
           "reason": "Numbered OSM route is about 325 yards, over 100 yards shorter than the shortest included official tee. Tee-to-green correspondence remains unverified; guide and interactive map withheld pending a current routing source."
         }
       ],
-      "completionCommit": null,
+      "completionCommit": "4969322e51f11188a410e99dbb228693a0ab1d08",
       "catalogId": "lakeside-penn-yan",
       "coverage": {
         "holes": 18,
@@ -166,7 +166,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "4969322e51f11188a410e99dbb228693a0ab1d08",
       "catalogId": "oak-hills-park",
       "coverage": {
         "holes": 18,
@@ -251,7 +251,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "4969322e51f11188a410e99dbb228693a0ab1d08",
       "catalogId": "richter-park",
       "coverage": {
         "holes": 18,
@@ -338,7 +338,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "4969322e51f11188a410e99dbb228693a0ab1d08",
       "catalogId": "fairchild-wheeler-black",
       "coverage": {
         "holes": 18,
@@ -424,7 +424,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "4969322e51f11188a410e99dbb228693a0ab1d08",
       "catalogId": "fairchild-wheeler-red",
       "coverage": {
         "holes": 18,
@@ -1765,11 +1765,16 @@
         "fairchild-wheeler-black",
         "fairchild-wheeler-red"
       ],
-      "status": "validated-pending-publication",
-      "completionCommit": null,
+      "status": "deployed",
+      "completionCommit": "4969322e51f11188a410e99dbb228693a0ab1d08",
       "newCourses": 5,
       "newGuides": 88,
-      "newMaps": 88
+      "newMaps": 88,
+      "version": "v250",
+      "deploymentUrl": "https://github.com/mcdermottj639/Golf/actions/runs/38565401716",
+      "liveUrl": "https://mcdermottj639.github.io/Golf/",
+      "liveVerification": "Normal public app.js, sw.js, directory and all five pack URLs matched tested SHA-256 bytes on 2026-10-14; both publication and Pages workflows succeeded."
     }
-  ]
+  ],
+  "capacityReview": "One successful batch. Reassess efficiency after the second; configured cap remains five."
 }

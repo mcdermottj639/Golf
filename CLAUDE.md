@@ -364,7 +364,10 @@ generic callback remains a fallback. Global authorization failures persist acros
 map modes and override later 3D initialization errors until a real page reload. Caddie HQ uses the Websites
 restriction even when installed on an iPhone home screen.
 
-**Course expansion (v250):** `onboarding-queue.json` is the durable played-course queue.
+**Course expansion (v250):** The first batch is live at release commit
+`4969322e51f11188a410e99dbb228693a0ab1d08` (publication and Pages jobs succeeded;
+public app/directory/pack bytes matched the tested checkout on October 14).
+ `onboarding-queue.json` is the durable played-course queue.
 Run `node scripts/reconcile-course-queue.cjs` after catalog/feed changes; it reconstructs
 seed plus ordered course-add/remove feeds, never the autocomplete database. Preserve
 bucket exclusions, explicit removals, simulator separation, exact course/nine identities,
