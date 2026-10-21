@@ -1,0 +1,314 @@
+{
+  "id": "ballys-ferry-point",
+  "name": "Bally's Golf Links at Ferry Point",
+  "shortName": "Ferry Point",
+  "place": "Bronx, NY",
+  "aliases": [
+    "Trump Links at Ferry Point",
+    "Trump Golf Links at Ferry Point",
+    "Ferry Point Golf Course"
+  ],
+  "storageKey": "trump_links_at_ferry_point",
+  "bounds": [
+    40.808,
+    -73.837,
+    40.822,
+    -73.8225
+  ],
+  "center": [
+    40.815,
+    -73.82975
+  ],
+  "par": 71,
+  "defaultTee": "blue",
+  "verified": "2026-10-21",
+  "source": "https://casinos.ballys.com/golf-links-ferry-point/golf-course.htm",
+  "sourceLabel": "Official Bally's hole tour and card",
+  "tour": "https://casinos.ballys.com/golf-links-ferry-point/golf-course.htm",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.846,40.804,-73.818,40.826",
+  "cardNote": "The current operator identifies the course as Bally's Golf Links at Ferry Point; the saved Trump Links names remain aliases and the existing storage key is preserved for historical round matching. Five official tee rows, men’s pars and handicaps were read from the operator’s hole tour on October 21, 2026. Hole 2 is par 4 for the card used here; the page labels it 4/5 for different tees. Ratings and slopes are not published there.",
+  "tees": [
+    {
+      "id": "black",
+      "name": "Black",
+      "total": 7407,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        444,
+        518,
+        243,
+        561,
+        458,
+        468,
+        334,
+        214,
+        425,
+        460,
+        352,
+        166,
+        441,
+        471,
+        596,
+        487,
+        193,
+        576
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "total": 6837,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        409,
+        466,
+        226,
+        523,
+        436,
+        435,
+        298,
+        182,
+        401,
+        434,
+        335,
+        147,
+        418,
+        433,
+        570,
+        432,
+        165,
+        527
+      ]
+    },
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6404,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        376,
+        439,
+        210,
+        490,
+        406,
+        400,
+        279,
+        170,
+        372,
+        404,
+        302,
+        139,
+        391,
+        403,
+        545,
+        437,
+        142,
+        499
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 6036,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        363,
+        416,
+        180,
+        467,
+        374,
+        377,
+        269,
+        147,
+        372,
+        380,
+        292,
+        108,
+        368,
+        384,
+        529,
+        406,
+        123,
+        481
+      ]
+    },
+    {
+      "id": "green",
+      "name": "Green",
+      "total": 5227,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        319,
+        374,
+        130,
+        414,
+        290,
+        333,
+        219,
+        122,
+        352,
+        335,
+        247,
+        76,
+        313,
+        331,
+        434,
+        406,
+        107,
+        425
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 7,
+      "osmId": 743165233,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/getImage_17.gif"
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 5,
+      "osmId": 743165234,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/getImage_18.gif"
+    },
+    {
+      "n": 3,
+      "par": 3,
+      "si": 17,
+      "osmId": 743165235,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole3.gif",
+      "mapVerification": "The numbered hole 3 route agrees with the official par and illustrated hole tour; its endpoint is not contained by the mapped green polygon. Original route coordinates retained."
+    },
+    {
+      "n": 4,
+      "par": 5,
+      "si": 1,
+      "osmId": 743165236,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole4.gif"
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 9,
+      "osmId": 743165237,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole5.gif"
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 3,
+      "osmId": 743165238,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole6.gif"
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 13,
+      "osmId": 743165239,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole7.gif"
+    },
+    {
+      "n": 8,
+      "par": 3,
+      "si": 15,
+      "osmId": 743165240,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole8.gif"
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 11,
+      "osmId": 743165241,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole9.gif"
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 4,
+      "osmId": 743141336,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole10.gif"
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 6,
+      "osmId": 743141337,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole11.gif"
+    },
+    {
+      "n": 12,
+      "par": 3,
+      "si": 18,
+      "osmId": 743141338,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole12.gif"
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": 10,
+      "osmId": 743165242,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole13.gif"
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 14,
+      "osmId": 743165243,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole14.gif"
+    },
+    {
+      "n": 15,
+      "par": 5,
+      "si": 2,
+      "osmId": 743165244,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole15.gif"
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 8,
+      "osmId": 743165245,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole16.gif"
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 16,
+      "osmId": 743134193,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole17.gif"
+    },
+    {
+      "n": 18,
+      "par": 5,
+      "si": 12,
+      "osmId": 743165246,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions.",
+      "guide": "https://casinos.ballys.com/golf-links-ferry-point/files/7658/hole18.gif"
+    }
+  ]
+}

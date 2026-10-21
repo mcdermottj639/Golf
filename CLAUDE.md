@@ -377,6 +377,27 @@ stored PA location is unverified; Shadow Wood's physical course is unresolved.
 Five courses per run is a cap. Repairs do not count as new courses. Review capacity
 after two successful batches; do not increase the cap without Jack's instruction.
 
+**Course expansion (v251):** The October 21 batch adds Hudson Hills, Beekman, Bally's
+Golf Links at Ferry Point, Saxon Woods and Van Cortlandt as on-demand nonfavorites:
+99 new physical holes, 99 guides and 97 maps. Beekman is a 27-hole facility with exact
+Highland/Valley/Taconic nines, source refs 1–9 on each nine and all six ordered 18-hole
+routings. Physical IDs are Highland 1–9, Valley 10–18 and Taconic 19–27; never infer
+Jack's historical pairing from the saved name. Highland 4 and Valley 4 have official
+scorecard art but no source route, so they stay map-unavailable. The official Beekman
+Blue row is omitted because its Valley hole values disagree with the printed combination
+summary; White and Gold reconcile.
+
+Ferry Point's canonical identity is now Bally's, while exact Trump aliases and storage
+key `trump_links_at_ferry_point` preserve old joins. Hudson OSM hole 18 has an erroneous
+raw par 6 tag; two published scorecards say par 4 and the exact numbered route ends in
+its green. `routeTagCorrections` validates the original tag, source URL, date and note
+without changing raw OSM. `sourceRef` plus `sourceNine` validates 27-hole routes with
+repeated 1–9 refs. Four enabled routes with absent/non-containing green polygons carry
+explicit `mapVerification`; do not generalize that exception without card, route and
+course-placement evidence. `batch-2026-10-21.json` holds source hashes and arithmetic.
+The cap remains five after the second batch: retrieval parallelizes, but identity and
+map review are still judgment-bound.
+
 The October 14 batch adds 88 guides/maps from original OSM coordinates. Lakeside 2/6
 are withheld because route lengths differ from included official tees by over 100 yards.
 A numbered OSM route missing `par` must carry per-hole `parSource` equal to the card URL,

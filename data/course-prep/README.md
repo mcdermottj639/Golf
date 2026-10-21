@@ -117,8 +117,9 @@ classifies it as a green in generated data, with provenance. Raw source geometry
 and route coordinates remain unchanged. The guide and measuring maps are enabled.
 Use this explicit, validated correction mechanism for confirmed source label errors;
 never silently move endpoints to nearby greens.
-The catalog has 81 scorecard holes, 81 available guides and 72 enabled interactive
-maps (Metedeconk 19–27 still await checked route coordinates).
+The October 8 baseline had 81 scorecard holes, 81 available guides and 72 enabled
+interactive maps (Metedeconk 19–27 still await checked route coordinates). See the
+dated expansion sections below for the current catalog totals.
 
 
 ## Metedeconk — three physical nines
@@ -203,5 +204,56 @@ men's; Yellow indexes and Red tee pars differ. These limits appear in the user c
 evidence, gaps and completion commits. Reconcile with `node scripts/reconcile-course-queue.cjs`;
 `--check` is deterministic using the saved reconciliation date. Saved played list has
 49 entries; the Bonita Bay umbrella is a queue-only duplicate of Bay Island, leaving
-48 distinct onboarding entries. Nine are catalog-supported (seven fully mapped), 39
-remain. Lakeside 2/6 and Metedeconk 19–27 remain on the repair exception queue.
+48 distinct onboarding entries. Fourteen are catalog-supported (11 fully mapped), 34
+remain. Lakeside 2/6, Beekman Highland 4/Valley 4 and Metedeconk 19–27 remain on the
+repair exception queue.
+
+## October 21, 2026 expansion (v251)
+
+Five additional on-demand packs: Hudson Hills, Beekman, Bally's Golf Links at Ferry
+Point, Saxon Woods and Van Cortlandt. `batch-2026-10-21.json` records exact source URLs,
+retrieval-date SHA-256 fingerprints, tee arithmetic and map-review notes. The catalog
+now has 270 physical scorecard holes, 268 guides and 257 interactive maps. The five
+new packs contribute 99 holes, 99 guides and 97 maps; Beekman Highland 4 and Valley 4
+retain their official illustrated scorecards but have no mapped route.
+
+Beekman is one 27-hole facility with Highland, Valley and Taconic nines. Physical IDs
+1–9, 10–18 and 19–27 distinguish those nines while `sourceRef` preserves each card's
+displayed 1–9. `sourceNine` must match OSM's `golf:course:name`; duplicate refs alone
+never identify a route. All six ordered two-nine combinations are available in live
+setup. The saved feed does not name the historical combination, so no old round is
+assigned or rewritten. Official White and Gold rows reconcile to every printed nine
+and combination total. The Blue Valley hole row is omitted because its printed values
+sum to 3,224 while the card's combination summary implies 3,200.
+
+The current official Ferry Point identity is **Bally's Golf Links at Ferry Point**.
+`Trump Links at Ferry Point` and `Trump Golf Links at Ferry Point` remain exact aliases,
+and the existing `trump_links_at_ferry_point` storage key is deliberately retained for
+historical joins. Five official tee rows and per-hole tour illustrations are external;
+they are not copied into on-demand packs. Hole 2 is the card's par 4 even though the
+official page labels the hole 4/5 for different tees.
+
+Hudson's detailed Golfify card agrees with 18Birdies' Black row and the county's par-71
+description. OSM route 1049812263 is correctly numbered 18 and ends inside the mapped
+green, but its raw `par=6` tag conflicts with both published cards' par 4. The raw tag
+and coordinates remain intact. `routeTagCorrections` is a narrowly validated audit
+record: source ID, original tag, corrected card value, date, URL and note are required;
+only the generated consistency check uses it. Never use this mechanism without an
+independent card and exact route identity.
+
+Saxon's current 18Birdies summer Blue row totals 6,168 yards and par 71. The county page
+confirms summer par 71 and supplies official hole art but lists a different 6,293-yard
+overall distance, so ratings/slopes and other tee rows remain unset rather than mixing
+editions. Van Cortlandt's official GolfNYC image supplies Black, Blue and Red yards,
+ratings/slopes, pars and handicaps. All 18 routes reconcile. Four mapped routes across
+the batch lack a containing green polygon (Beekman Valley 3, Ferry Point 3, Van
+Cortlandt 4 and 16); their exact numbered route, official par and course placement are
+documented in `mapVerification`, with source coordinates unchanged.
+
+`scripts/import-osm-course.py` creates auditable course subsets from a retrieved OSM
+XML response while retaining original way IDs, versions, tags and coordinates. It
+filters by explicit bounds and never supplies identity, scorecard data or corrections;
+those still require the course pack and review. New packs remain nonfavorites and are
+never shell-cache assets. The second-batch capacity review keeps the cap at five:
+parallel retrieval helped, but identity, routing and missing-map review remain the
+limiting work and do not become safer in a larger batch.

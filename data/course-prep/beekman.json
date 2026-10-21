@@ -1,0 +1,553 @@
+{
+  "id": "beekman",
+  "name": "Beekman Golf Course",
+  "shortName": "Beekman",
+  "place": "Hopewell Junction, NY",
+  "aliases": [
+    "Beekman Golf Club"
+  ],
+  "storageKey": "beekman",
+  "bounds": [
+    41.591,
+    -73.781,
+    41.6055,
+    -73.763
+  ],
+  "center": [
+    41.59825,
+    -73.772
+  ],
+  "par": 108,
+  "defaultTee": "white",
+  "verified": "2026-10-21",
+  "source": "https://beekmangolf.com/course/",
+  "sourceLabel": "Official Beekman scorecards",
+  "tour": "https://beekmangolf.com/course/",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.790,41.582,-73.764,41.604",
+  "cardNote": "Official 2025 scorecard images provide the Highland, Valley and Taconic pars, yards and facility-wide 1–27 handicaps. White and Gold rows reconcile to every printed nine and combination total; the Blue Valley row is omitted because its printed hole values total 3,224 while the combination summary implies 3,200. Ratings and slopes are not printed. Physical IDs 1–9 are Highland, 10–18 Valley and 19–27 Taconic; the app offers every ordered 18-hole pairing. Retrieved October 21, 2026.",
+  "tees": [
+    {
+      "id": "white",
+      "name": "White",
+      "total": 9208,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        344,
+        297,
+        510,
+        172,
+        558,
+        302,
+        381,
+        162,
+        390,
+        365,
+        465,
+        330,
+        180,
+        450,
+        460,
+        175,
+        415,
+        173,
+        161,
+        446,
+        384,
+        160,
+        421,
+        465,
+        313,
+        348,
+        381
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "total": 7984,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        290,
+        240,
+        440,
+        140,
+        473,
+        251,
+        326,
+        140,
+        351,
+        300,
+        405,
+        236,
+        155,
+        409,
+        444,
+        145,
+        325,
+        149,
+        160,
+        410,
+        365,
+        155,
+        386,
+        399,
+        285,
+        330,
+        275
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 19,
+      "sourceRef": 1,
+      "sourceNine": "Highland",
+      "osmId": 1228877769,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 24,
+      "sourceRef": 2,
+      "sourceNine": "Highland",
+      "osmId": 1228877770,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 3,
+      "par": 5,
+      "si": 10,
+      "sourceRef": 3,
+      "sourceNine": "Highland",
+      "osmId": 1228877771,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 4,
+      "par": 3,
+      "si": 5,
+      "sourceRef": 4,
+      "sourceNine": "Highland",
+      "guide": "https://beekmangolf.com/wp-content/uploads/2025/05/Highland-scorecard-688x1024.png",
+      "mapReady": false,
+      "mapNote": "The official Highland scorecard and illustrated layout are available, but no original mapped route for Highland hole 4 was present on October 21, 2026.",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 5,
+      "par": 5,
+      "si": 3,
+      "sourceRef": 5,
+      "sourceNine": "Highland",
+      "osmId": 1228877773,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 25,
+      "sourceRef": 6,
+      "sourceNine": "Highland",
+      "osmId": 1228877774,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 8,
+      "sourceRef": 7,
+      "sourceNine": "Highland",
+      "osmId": 1228877793,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 8,
+      "par": 3,
+      "si": 17,
+      "sourceRef": 8,
+      "sourceNine": "Highland",
+      "osmId": 1228877794,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 13,
+      "sourceRef": 9,
+      "sourceNine": "Highland",
+      "osmId": 1228877795,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 9,
+      "sourceRef": 1,
+      "sourceNine": "Valley",
+      "osmId": 1228877784,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 11,
+      "par": 5,
+      "si": 21,
+      "sourceRef": 2,
+      "sourceNine": "Valley",
+      "osmId": 1228877785,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 18,
+      "sourceRef": 3,
+      "sourceNine": "Valley",
+      "osmId": 1228877786,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "The numbered Valley hole 3 route agrees with the official par and the surrounding Valley course features; its endpoint is not contained by the mapped green polygon. Original route coordinates retained."
+    },
+    {
+      "n": 13,
+      "par": 3,
+      "si": 12,
+      "sourceRef": 4,
+      "sourceNine": "Valley",
+      "guide": "https://beekmangolf.com/wp-content/uploads/2025/05/Valley-scorecard-686x1024.png",
+      "mapReady": false,
+      "mapNote": "The official Valley scorecard and illustrated layout are available, but no original mapped route for Valley hole 4 was present on October 21, 2026.",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 14,
+      "par": 5,
+      "si": 27,
+      "sourceRef": 5,
+      "sourceNine": "Valley",
+      "osmId": 1228877788,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 15,
+      "par": 5,
+      "si": 22,
+      "sourceRef": 6,
+      "sourceNine": "Valley",
+      "osmId": 1228877789,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 16,
+      "par": 3,
+      "si": 14,
+      "sourceRef": 7,
+      "sourceNine": "Valley",
+      "osmId": 1228877790,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 17,
+      "par": 4,
+      "si": 2,
+      "sourceRef": 8,
+      "sourceNine": "Valley",
+      "osmId": 1228877791,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 18,
+      "par": 3,
+      "si": 6,
+      "sourceRef": 9,
+      "sourceNine": "Valley",
+      "osmId": 1228877792,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 19,
+      "par": 3,
+      "si": 7,
+      "sourceRef": 1,
+      "sourceNine": "Taconic",
+      "osmId": 1228877775,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 20,
+      "par": 5,
+      "si": 23,
+      "sourceRef": 2,
+      "sourceNine": "Taconic",
+      "osmId": 1228877776,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 21,
+      "par": 4,
+      "si": 11,
+      "sourceRef": 3,
+      "sourceNine": "Taconic",
+      "osmId": 1228877777,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 22,
+      "par": 3,
+      "si": 20,
+      "sourceRef": 4,
+      "sourceNine": "Taconic",
+      "osmId": 1228877778,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 23,
+      "par": 4,
+      "si": 1,
+      "sourceRef": 5,
+      "sourceNine": "Taconic",
+      "osmId": 1228877779,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 24,
+      "par": 5,
+      "si": 16,
+      "sourceRef": 6,
+      "sourceNine": "Taconic",
+      "osmId": 1228877780,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 25,
+      "par": 4,
+      "si": 15,
+      "sourceRef": 7,
+      "sourceNine": "Taconic",
+      "osmId": 1228877781,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 26,
+      "par": 4,
+      "si": 26,
+      "sourceRef": 8,
+      "sourceNine": "Taconic",
+      "osmId": 1228877782,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 27,
+      "par": 4,
+      "si": 4,
+      "sourceRef": 9,
+      "sourceNine": "Taconic",
+      "osmId": 1228877783,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    }
+  ],
+  "nines": [
+    {
+      "id": "highland",
+      "name": "Highland",
+      "holes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "valley",
+      "name": "Valley",
+      "holes": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "taconic",
+      "name": "Taconic",
+      "holes": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    }
+  ],
+  "routings": [
+    {
+      "id": "highland-valley",
+      "name": "Highland + Valley",
+      "holes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "valley-highland",
+      "name": "Valley + Highland",
+      "holes": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "highland-taconic",
+      "name": "Highland + Taconic",
+      "holes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "id": "taconic-highland",
+      "name": "Taconic + Highland",
+      "holes": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "valley-taconic",
+      "name": "Valley + Taconic",
+      "holes": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "id": "taconic-valley",
+      "name": "Taconic + Valley",
+      "holes": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    }
+  ],
+  "additionalSources": [
+    "https://beekmangolf.com/highland-course/",
+    "https://beekmangolf.com/valley-course/",
+    "https://beekmangolf.com/taconic-course/",
+    "https://beekmangolf.com/wp-content/uploads/2025/05/Highland-scorecard-688x1024.png",
+    "https://beekmangolf.com/wp-content/uploads/2025/05/Valley-scorecard-686x1024.png",
+    "https://beekmangolf.com/wp-content/uploads/2025/05/Taconic-scorecard-684x1024.png"
+  ]
+}

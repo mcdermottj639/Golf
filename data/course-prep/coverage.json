@@ -134,5 +134,64 @@
     "guides": 18,
     "bytes": 121834,
     "exceptions": []
+  },
+  {
+    "id": "hudson-hills",
+    "verified": "2026-10-21",
+    "source": "https://www.golfify.io/courses/hudson-hills-golf-course",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 72539,
+    "exceptions": []
+  },
+  {
+    "id": "beekman",
+    "verified": "2026-10-21",
+    "source": "https://beekmangolf.com/course/",
+    "holes": 27,
+    "maps": 25,
+    "guides": 27,
+    "bytes": 81767,
+    "exceptions": [
+      {
+        "hole": 4,
+        "reason": "The official Highland scorecard and illustrated layout are available, but no original mapped route for Highland hole 4 was present on October 21, 2026."
+      },
+      {
+        "hole": 13,
+        "reason": "The official Valley scorecard and illustrated layout are available, but no original mapped route for Valley hole 4 was present on October 21, 2026."
+      }
+    ]
+  },
+  {
+    "id": "ballys-ferry-point",
+    "verified": "2026-10-21",
+    "source": "https://casinos.ballys.com/golf-links-ferry-point/golf-course.htm",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 212931,
+    "exceptions": []
+  },
+  {
+    "id": "saxon-woods",
+    "verified": "2026-10-21",
+    "source": "https://18birdies.com/golf-courses/club/9a2af180-86ac-11e4-8c28-020000005b00/saxon-woods-golf-course-summer",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 76036,
+    "exceptions": []
+  },
+  {
+    "id": "van-cortlandt",
+    "verified": "2026-10-21",
+    "source": "https://www.golfnyc.com/van-cortlandt-scorecard/",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 56955,
+    "exceptions": []
   }
 ]

@@ -1,0 +1,283 @@
+{
+  "id": "hudson-hills",
+  "name": "Hudson Hills Golf Course",
+  "shortName": "Hudson Hills",
+  "place": "Ossining, NY",
+  "aliases": [
+    "Hudson Hills"
+  ],
+  "storageKey": "hudson_hills",
+  "bounds": [
+    41.188,
+    -73.828,
+    41.2025,
+    -73.8175
+  ],
+  "center": [
+    41.19525,
+    -73.82275
+  ],
+  "par": 71,
+  "defaultTee": "green",
+  "verified": "2026-10-21",
+  "source": "https://www.golfify.io/courses/hudson-hills-golf-course",
+  "sourceLabel": "Published scorecard · Golfify; totals checked against county course page",
+  "tour": "https://golf.westchestercountyny.gov/hudson-hills/",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.840,41.185,-73.808,41.207",
+  "cardNote": "Black hole values and totals agree between Golfify and 18Birdies; the additional Green, Blue and Gold rows come from Golfify. The county course page confirms four tee sets and a par-71 championship layout. Ratings and slopes are omitted because they were not independently verified from an official card. Retrieved October 21, 2026. OSM hole 18 is mis-tagged par 6; the published cards identify it as par 4, while the original numbered route and coordinates remain unchanged.",
+  "tees": [
+    {
+      "id": "black",
+      "name": "Black",
+      "total": 6935,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        444,
+        530,
+        171,
+        456,
+        371,
+        155,
+        564,
+        389,
+        152,
+        521,
+        200,
+        435,
+        474,
+        187,
+        568,
+        407,
+        458,
+        453
+      ]
+    },
+    {
+      "id": "green",
+      "name": "Green",
+      "total": 6323,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        405,
+        502,
+        151,
+        423,
+        340,
+        127,
+        514,
+        368,
+        138,
+        491,
+        174,
+        400,
+        424,
+        163,
+        532,
+        375,
+        393,
+        403
+      ]
+    },
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 5755,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        372,
+        469,
+        135,
+        393,
+        285,
+        107,
+        490,
+        326,
+        122,
+        452,
+        151,
+        362,
+        380,
+        140,
+        502,
+        351,
+        348,
+        370
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "total": 5102,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        300,
+        427,
+        119,
+        324,
+        275,
+        85,
+        455,
+        287,
+        105,
+        413,
+        120,
+        313,
+        337,
+        97,
+        464,
+        324,
+        316,
+        341
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 7,
+      "osmId": 1049812246,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 5,
+      "si": 5,
+      "osmId": 1049812247,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 3,
+      "par": 3,
+      "si": 17,
+      "osmId": 1049812248,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 3,
+      "osmId": 1049812249,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 11,
+      "osmId": 1049812250,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 6,
+      "par": 3,
+      "si": 15,
+      "osmId": 1049812251,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 7,
+      "par": 5,
+      "si": 1,
+      "osmId": 1049812252,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 8,
+      "par": 4,
+      "si": 9,
+      "osmId": 1049812253,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 9,
+      "par": 3,
+      "si": 13,
+      "osmId": 1049812254,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 10,
+      "par": 5,
+      "si": 8,
+      "osmId": 1049812255,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 11,
+      "par": 3,
+      "si": 16,
+      "osmId": 1049812256,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 4,
+      "osmId": 1049812257,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": 6,
+      "osmId": 1049812258,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 14,
+      "par": 3,
+      "si": 18,
+      "osmId": 1049812259,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 15,
+      "par": 5,
+      "si": 2,
+      "osmId": 1049812260,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 14,
+      "osmId": 1049812261,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 17,
+      "par": 4,
+      "si": 12,
+      "osmId": 1049812262,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 10,
+      "osmId": 1049812263,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "parSource": "https://www.golfify.io/courses/hudson-hills-golf-course",
+      "mapVerification": "Published Golfify and 18Birdies cards both identify numbered hole 18 as par 4; original OSM route 1049812263 and coordinates retained despite its erroneous par=6 tag."
+    }
+  ],
+  "routeTagCorrections": [
+    {
+      "id": 1049812263,
+      "field": "par",
+      "from": "6",
+      "to": "4",
+      "confirmed": "2026-10-21",
+      "source": "https://www.golfify.io/courses/hudson-hills-golf-course",
+      "note": "Both detailed published cards list hole 18 as par 4; only the raw OSM par tag is wrong."
+    }
+  ],
+  "additionalSources": [
+    "https://18birdies.com/golf-courses/club/9a1609f0-86ac-11e4-8c28-020000005b00/hudson-hills-golf-course",
+    "https://golf.westchestercountyny.gov/hudson-hills/"
+  ]
+}

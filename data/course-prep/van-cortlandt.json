@@ -1,0 +1,245 @@
+{
+  "id": "van-cortlandt",
+  "name": "Van Cortlandt Park Golf Course",
+  "shortName": "Van Cortlandt",
+  "place": "Bronx, NY",
+  "aliases": [
+    "Van Cortlandt Golf Course",
+    "Van Cortlandt Park"
+  ],
+  "storageKey": "van_cortlandt_park_golf_course",
+  "bounds": [
+    40.884,
+    -73.895,
+    40.907,
+    -73.8825
+  ],
+  "center": [
+    40.8955,
+    -73.88875
+  ],
+  "par": 70,
+  "defaultTee": "blue",
+  "verified": "2026-10-21",
+  "source": "https://www.golfnyc.com/van-cortlandt-scorecard/",
+  "sourceLabel": "Official GolfNYC scorecard",
+  "tour": "https://www.golfnyc.com/van-cortlandt-course/",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.904,40.882,-73.878,40.905",
+  "cardNote": "Black, Blue and Red yardages, pars, handicaps, totals, ratings and slopes were read from the official GolfNYC scorecard image on October 21, 2026. The scorecard is credited 2024. Original numbered OSM routes reconcile to all 18 pars. External official artwork is not stored in the offline pack.",
+  "tees": [
+    {
+      "id": "black",
+      "name": "Black",
+      "total": 6002,
+      "rating": 69.8,
+      "slope": 120,
+      "yards": [
+        370,
+        619,
+        172,
+        364,
+        345,
+        295,
+        222,
+        318,
+        391,
+        475,
+        174,
+        572,
+        172,
+        391,
+        302,
+        292,
+        190,
+        338
+      ]
+    },
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 5558,
+      "rating": 67.3,
+      "slope": 118,
+      "yards": [
+        354,
+        559,
+        156,
+        350,
+        325,
+        279,
+        204,
+        304,
+        375,
+        452,
+        153,
+        550,
+        156,
+        353,
+        254,
+        282,
+        172,
+        280
+      ]
+    },
+    {
+      "id": "red",
+      "name": "Red",
+      "total": 4799,
+      "rating": 68.9,
+      "slope": 113,
+      "yards": [
+        329,
+        454,
+        134,
+        320,
+        285,
+        236,
+        178,
+        257,
+        302,
+        428,
+        125,
+        453,
+        141,
+        282,
+        207,
+        264,
+        132,
+        272
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 11,
+      "osmId": 927808319,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 5,
+      "si": 1,
+      "osmId": 927808320,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 3,
+      "par": 3,
+      "si": 17,
+      "osmId": 927808321,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 5,
+      "osmId": 927808322,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "The numbered hole 4 route agrees with the official scorecard and surrounding course features; no source green polygon was present in the retrieved OSM data. Original route coordinates retained."
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 9,
+      "osmId": 927808323,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 13,
+      "osmId": 927808324,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 3,
+      "si": 3,
+      "osmId": 927808325,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 8,
+      "par": 4,
+      "si": 15,
+      "osmId": 927808326,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 7,
+      "osmId": 927808327,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 10,
+      "par": 5,
+      "si": 6,
+      "osmId": 927808328,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 11,
+      "par": 3,
+      "si": 18,
+      "osmId": 927808329,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 12,
+      "par": 5,
+      "si": 2,
+      "osmId": 927808330,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 13,
+      "par": 3,
+      "si": 12,
+      "osmId": 927808331,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 4,
+      "osmId": 927808332,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "si": 14,
+      "osmId": 927808333,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 16,
+      "osmId": 927808334,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "The numbered hole 16 route agrees with the official scorecard and surrounding course features; no source green polygon was present in the retrieved OSM data. Original route coordinates retained."
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 8,
+      "osmId": 927808335,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 10,
+      "osmId": 927808336,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    }
+  ],
+  "additionalSources": [
+    "https://www.golfnyc.com/van-cortlandt-course/"
+  ]
+}

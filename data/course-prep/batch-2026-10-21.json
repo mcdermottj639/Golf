@@ -1,0 +1,177 @@
+{
+  "retrieved": "2026-10-21",
+  "sourceFiles": [
+    {
+      "url": "https://18birdies.com/golf-courses/club/9a1609f0-86ac-11e4-8c28-020000005b00/hudson-hills-golf-course",
+      "sha256": "32a717461d59f5a84ffa5a5a0d3dadbebe0e9edb914dfe7fc752ad948c78fa8e"
+    },
+    {
+      "url": "https://www.golfify.io/courses/hudson-hills-golf-course",
+      "sha256": "e9b7df0e2acf0d75dd937f8c21087774325d54703d3ef62d392bc2218c309ad8"
+    },
+    {
+      "url": "https://beekmangolf.com/course/",
+      "sha256": "371ad227c087e29d91e0892c1081f097e346cf07493a841a1bcd0ef108685cc6"
+    },
+    {
+      "url": "https://beekmangolf.com/wp-content/uploads/2025/05/Highland-scorecard-688x1024.png",
+      "sha256": "d9e336960261c572ab61a5af37ddf1ba0bd0ed13e555379eddadab27a848eb40"
+    },
+    {
+      "url": "https://beekmangolf.com/wp-content/uploads/2025/05/Valley-scorecard-686x1024.png",
+      "sha256": "40f9ab51ebd152eef4e0c7e8700874b6f5751fce6757c63f167aa93d7c362b72"
+    },
+    {
+      "url": "https://beekmangolf.com/wp-content/uploads/2025/05/Taconic-scorecard-684x1024.png",
+      "sha256": "544fbe0ee40857366970764d7971dad23d9cf2a2a8bab0b0bc294bc3f5faebdc"
+    },
+    {
+      "url": "https://casinos.ballys.com/golf-links-ferry-point/golf-course.htm",
+      "sha256": "c4f7c87d438461512fef32996bf21bb08411fbadecded9c0b518cd4dfa49d97e"
+    },
+    {
+      "url": "https://18birdies.com/golf-courses/club/9a2af180-86ac-11e4-8c28-020000005b00/saxon-woods-golf-course-summer",
+      "sha256": "ac6545115cacf9150d16aa4e079704eccefba5c187dee6fea0e0cfcb62c02de8"
+    },
+    {
+      "url": "https://golf.westchestercountyny.gov/saxon-woods/saxon_course-layout/",
+      "sha256": "0f0ff4de5f7f1b90339848e0f5548f960bc62a4d0b4924e520834a7e56118ba8"
+    },
+    {
+      "url": "https://www.golfnyc.com/van-cortlandt-scorecard/",
+      "sha256": "2d3ff67a391e16616d03ef5d0ec466563f409b71a5ee0d8cef477d82ec70a38e"
+    },
+    {
+      "url": "https://www.golfnyc.com/wp-content/uploads/sites/9076/2024/01/Van-Cortlandt-Park-Web-Scorecard.jpg",
+      "sha256": "0b10b3ff6970cc1869da0d538e42ac2b8c43ac1bf6fb4745e011e3266a694885"
+    }
+  ],
+  "teeChecks": [
+    {
+      "courseId": "hudson-hills",
+      "parFront": 35,
+      "parBack": 36,
+      "tees": [
+        {
+          "id": "black",
+          "front": 3232,
+          "back": 3703,
+          "total": 6935
+        },
+        {
+          "id": "green",
+          "front": 2968,
+          "back": 3355,
+          "total": 6323
+        },
+        {
+          "id": "blue",
+          "front": 2699,
+          "back": 3056,
+          "total": 5755
+        },
+        {
+          "id": "gold",
+          "front": 2377,
+          "back": 2725,
+          "total": 5102
+        }
+      ]
+    },
+    {
+      "courseId": "beekman",
+      "parFront": 36,
+      "parBack": 36,
+      "tees": [
+        {
+          "id": "white",
+          "front": 3116,
+          "back": 3013,
+          "total": 9208
+        },
+        {
+          "id": "gold",
+          "front": 2651,
+          "back": 2568,
+          "total": 7984
+        }
+      ]
+    },
+    {
+      "courseId": "ballys-ferry-point",
+      "parFront": 35,
+      "parBack": 36,
+      "tees": [
+        {
+          "id": "black",
+          "front": 3665,
+          "back": 3742,
+          "total": 7407
+        },
+        {
+          "id": "gold",
+          "front": 3376,
+          "back": 3461,
+          "total": 6837
+        },
+        {
+          "id": "blue",
+          "front": 3142,
+          "back": 3262,
+          "total": 6404
+        },
+        {
+          "id": "white",
+          "front": 2965,
+          "back": 3071,
+          "total": 6036
+        },
+        {
+          "id": "green",
+          "front": 2553,
+          "back": 2674,
+          "total": 5227
+        }
+      ]
+    },
+    {
+      "courseId": "saxon-woods",
+      "parFront": 35,
+      "parBack": 36,
+      "tees": [
+        {
+          "id": "blue",
+          "front": 2905,
+          "back": 3263,
+          "total": 6168
+        }
+      ]
+    },
+    {
+      "courseId": "van-cortlandt",
+      "parFront": 35,
+      "parBack": 35,
+      "tees": [
+        {
+          "id": "black",
+          "front": 3096,
+          "back": 2906,
+          "total": 6002
+        },
+        {
+          "id": "blue",
+          "front": 2906,
+          "back": 2652,
+          "total": 5558
+        },
+        {
+          "id": "red",
+          "front": 2495,
+          "back": 2304,
+          "total": 4799
+        }
+      ]
+    }
+  ],
+  "mapVerification": "All 97 published mapped routes retain original OSM way IDs, versions, tags and coordinates. Routes are matched by exact hole reference, and by physical nine name at Beekman. Ninety-three route endpoints fall inside mapped green polygons; the remaining four numbered routes agree with official pars and course position but their green polygons are absent or do not contain the endpoint. Beekman Highland 4 and Valley 4 have official illustrated scorecard coverage but no mapped route. Hudson Hills hole 18 retains the original route while documenting and validating its incorrect raw par tag against two published scorecards."
+}

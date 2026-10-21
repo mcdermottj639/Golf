@@ -32,14 +32,30 @@ const courses=ids.map(id=>{
   assert.ok(c.tees.some(t=>t.id===c.defaultTee));
   assert.equal(new Set(c.tees.map(t=>t.id)).size,c.tees.length);
   for(const t of c.tees){assert.equal(t.yards.length,c.holes.length);assert.ok(t.yards.every(y=>Number.isInteger(y)&&y>0));assert.equal(t.yards.reduce((a,b)=>a+b,0),t.total);}
+  const routeTagCorrections=new Map();
+  for(const correction of c.routeTagCorrections||[]){
+    assert.ok(!routeTagCorrections.has(correction.id),id+': duplicate route tag correction');
+    assert.equal(correction.field,'par',id+': unsupported route tag correction');
+    const source=raw.features.find(f=>f.id===correction.id);
+    assert.ok(source&&source.tags.golf==='hole',id+': route correction source mismatch');
+    assert.equal(source.tags[correction.field],correction.from,id+': route correction original tag mismatch');
+    assert.match(correction.source,/^https:\/\//);assert.match(correction.confirmed,/^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(correction.note,id+': route correction requires provenance');
+    routeTagCorrections.set(correction.id,correction);
+  }
   for(const h of c.holes){
     if(h.mapReady===false)assert.ok(h.mapNote,id+': explain unavailable hole map');
     if(h.guide)assert.match(h.guide,/^https:\/\//);
     if(h.mapReady===false&&!h.osmId){h.path=[];continue;}
     const way=raw.features.find(f=>f.id===h.osmId);
     assert.ok(way,id+': missing source way for hole '+h.n);
-    assert.equal(way.tags.golf,'hole');assert.equal(+way.tags.ref,h.n);
-    if(way.tags.par!==undefined)assert.equal(+way.tags.par,h.par);
+    assert.equal(way.tags.golf,'hole');assert.equal(+way.tags.ref,h.sourceRef||h.n);
+    if(h.sourceNine)assert.equal(way.tags['golf:course:name'],h.sourceNine,id+': wrong physical nine for hole '+h.n);
+    if(way.tags.par!==undefined){
+      const correction=routeTagCorrections.get(way.id);
+      if(correction)assert.equal(+correction.to,h.par,id+': corrected route par mismatch');
+      else assert.equal(+way.tags.par,h.par);
+    }
     else {
       // Some numbered OSM routes omit par. Keep the raw tags unchanged and
       // require explicit official-card provenance rather than synthesizing a tag.

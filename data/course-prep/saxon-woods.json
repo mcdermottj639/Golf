@@ -1,0 +1,207 @@
+{
+  "id": "saxon-woods",
+  "name": "Saxon Woods Golf Course",
+  "shortName": "Saxon Woods",
+  "place": "Scarsdale, NY",
+  "aliases": [
+    "Saxon Woods",
+    "Saxon Woods Golf Course (Summer)"
+  ],
+  "storageKey": "saxon_woods",
+  "bounds": [
+    40.9765,
+    -73.765,
+    40.9915,
+    -73.7515
+  ],
+  "center": [
+    40.984,
+    -73.75825
+  ],
+  "par": 71,
+  "defaultTee": "blue",
+  "verified": "2026-10-21",
+  "source": "https://18birdies.com/golf-courses/club/9a2af180-86ac-11e4-8c28-020000005b00/saxon-woods-golf-course-summer",
+  "sourceLabel": "Published summer scorecard · 18Birdies; official county tour",
+  "tour": "https://golf.westchestercountyny.gov/saxon-woods/saxon_course-layout/",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.770,40.972,-73.744,40.995",
+  "cardNote": "The current summer card’s Blue hole values, pars and handicaps were read from 18Birdies on October 21, 2026; its total is 6,168 yards. The county page confirms summer par 71 and supplies the official hole illustrations, but currently lists a different 6,293-yard overall distance. Ratings and slopes are unset rather than mixing those editions. Confirm tee markers and the current seasonal card on arrival.",
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6168,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        315,
+        175,
+        511,
+        168,
+        390,
+        311,
+        161,
+        508,
+        366,
+        460,
+        308,
+        380,
+        460,
+        366,
+        375,
+        152,
+        402,
+        360
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 11,
+      "osmId": 793297774,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-1.gif"
+    },
+    {
+      "n": 2,
+      "par": 3,
+      "si": 9,
+      "osmId": 793304980,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-2.gif"
+    },
+    {
+      "n": 3,
+      "par": 5,
+      "si": 3,
+      "osmId": 793304981,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-34.gif"
+    },
+    {
+      "n": 4,
+      "par": 3,
+      "si": 17,
+      "osmId": 793304982,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-34.gif"
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 1,
+      "osmId": 793304983,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-5.gif"
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 13,
+      "osmId": 793304984,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-6.gif"
+    },
+    {
+      "n": 7,
+      "par": 3,
+      "si": 15,
+      "osmId": 793304985,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-7.gif"
+    },
+    {
+      "n": 8,
+      "par": 5,
+      "si": 5,
+      "osmId": 793304986,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-8.gif"
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 7,
+      "osmId": 793304987,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-9.gif"
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 4,
+      "osmId": 793304988,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-10.gif"
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 14,
+      "osmId": 793304989,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-11.gif"
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 8,
+      "osmId": 793304990,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-1213.gif"
+    },
+    {
+      "n": 13,
+      "par": 5,
+      "si": 6,
+      "osmId": 793304991,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-1213.gif"
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 12,
+      "osmId": 793304992,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-14.gif"
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "si": 10,
+      "osmId": 793304993,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-15.gif"
+    },
+    {
+      "n": 16,
+      "par": 3,
+      "si": 18,
+      "osmId": 793304994,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-16.gif"
+    },
+    {
+      "n": 17,
+      "par": 4,
+      "si": 2,
+      "osmId": 793304995,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-17.gif"
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 16,
+      "osmId": 793304996,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "guide": "https://golf.westchestercountyny.gov/wp-content/uploads/2021/08/SaxonWoods_Hole-18.gif"
+    }
+  ],
+  "additionalSources": [
+    "https://golf.westchestercountyny.gov/saxon-woods/"
+  ]
+}
