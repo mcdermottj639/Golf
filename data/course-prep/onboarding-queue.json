@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "batchCap": 5,
-  "successfulBatches": 1,
+  "successfulBatches": 2,
   "entries": [
     {
       "queueId": "lakeside-country-club",
@@ -509,7 +509,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "8a444f5e3f8b07610bc86830ad3015bd0e887d00",
       "catalogId": "hudson-hills",
       "coverage": {
         "holes": 18,
@@ -744,7 +744,7 @@
           "reason": "The official Valley scorecard and illustrated layout are available, but no original mapped route for Valley hole 4 was present on October 21, 2026."
         }
       ],
-      "completionCommit": null,
+      "completionCommit": "8a444f5e3f8b07610bc86830ad3015bd0e887d00",
       "catalogId": "beekman",
       "coverage": {
         "holes": 27,
@@ -833,7 +833,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "8a444f5e3f8b07610bc86830ad3015bd0e887d00",
       "catalogId": "ballys-ferry-point",
       "coverage": {
         "holes": 18,
@@ -916,7 +916,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "8a444f5e3f8b07610bc86830ad3015bd0e887d00",
       "catalogId": "saxon-woods",
       "coverage": {
         "holes": 18,
@@ -1002,7 +1002,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "8a444f5e3f8b07610bc86830ad3015bd0e887d00",
       "catalogId": "van-cortlandt",
       "coverage": {
         "holes": 18,
@@ -2272,7 +2272,26 @@
       "deploymentUrl": "https://github.com/mcdermottj639/Golf/actions/runs/38565401716",
       "liveUrl": "https://mcdermottj639.github.io/Golf/",
       "liveVerification": "Normal public app.js, sw.js, directory and all five pack URLs matched tested SHA-256 bytes on 2026-10-14; both publication and Pages workflows succeeded."
+    },
+    {
+      "date": "2026-10-21",
+      "courseIds": [
+        "hudson-hills",
+        "beekman",
+        "ballys-ferry-point",
+        "saxon-woods",
+        "van-cortlandt"
+      ],
+      "status": "deployed",
+      "completionCommit": "8a444f5e3f8b07610bc86830ad3015bd0e887d00",
+      "newCourses": 5,
+      "newGuides": 99,
+      "newMaps": 97,
+      "version": "v251",
+      "deploymentUrl": "https://github.com/mcdermottj639/Golf/actions/runs/39609971814",
+      "liveUrl": "https://mcdermottj639.github.io/Golf/",
+      "liveVerification": "Publication workflow succeeded, gh-pages matched the v251 release tree, and the public app rendered v251 with the five-course release notes on 2026-10-21."
     }
   ],
-  "capacityReview": "The second five-course batch is validated. Source resolution and 27-hole routing still require course-specific judgment, so the configured cap remains five; parallel source retrieval was efficient, but a larger batch would increase review risk without reducing the critical identity and map checks."
+  "capacityReview": "The second five-course batch is deployed. Source resolution and 27-hole routing still require course-specific judgment, so the configured cap remains five; parallel source retrieval was efficient, but a larger batch would increase review risk without reducing the critical identity and map checks."
 }
