@@ -4083,7 +4083,7 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
-## Caddie HQ Links — the course game (v252–v253, October 22 2026)
+## Caddie HQ Links — the course game (v252–v254, October 22 2026)
 
 **What it is.** A top-down, Daily-Holes-style golf game played on every mapped course with Jack's own
 bag. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
@@ -4152,6 +4152,17 @@ drawn as downhill chevrons in a zoomed green view. The ball rolls with stimp-sty
 (1.9 ft/s²), slope acceleration (g × 5/7 × grade) and lip-outs above ~4.6 ft/s. The player sets the
 line (tap, or the pull direction) and sees the predicted path at perfect pace (binary-searched to
 finish 1.5 ft past); pull length (or the pace meter) scales that speed. Start line gets ~0.2° noise.
+
+**Camera (v254, Jack: "why so zoomed out… bring it right up close to the ball").** Two views,
+`camMode` in `chqlinks:cam`. *Shot* (default) frames from the ball out to roughly 1.22× the selected
+club's full carry (+15 yd, never past the pin +25), ball at 74% of the height in gesture modes (84%
+in meter) so there is room under it to pull back, laterally centred between ball and aim; the
+`lk-camtog` pill on the HUD flips to *Hole*, which fits the whole route from the air (the v252
+tee-shot framing). Both re-frame on every club change and line tap because `frame()` already ran
+there. On the green the zoomed putting view ignores the mode and the toggle hides. A true
+behind-the-ball perspective ("ground") view is NOT built: it needs a perspective projection with
+near-plane clipping through `toScreen/toWorld` and depth-sorted trees — a Links-improver item, not a
+tweak. v253 is purely layout.
 
 **Rendering.** Canvas 2D. The static layer (ground, mowing bands, features, trees from a spatial grid)
 is drawn once per camera pose into an offscreen canvas and reused every frame; only the ball, aim,

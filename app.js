@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v253';
+const BUILD = 'v254';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v254', d:'2026-10-22', items:['LINKS SHOT VIEW: The camera now sits close behind the ball and looks out to where your club lands, so each shot feels played rather than surveyed. Tap Hole view on the map for the whole hole from the air, Shot view to come back; the game remembers your choice. Putting is unchanged.'] },
   { b:'v253', d:'2026-10-22', items:['LINKS FITS THE PHONE: The hole and every control now fit one screen, sized to the visible viewport and clear of the home indicator; the page can scroll if a phone is short. The hole was being drawn 520 px wide and clipped on a 390 px phone — it is full width and centred now. Tee off sits at the top of the menu above a compact course grid, and the draw/fade slider has its own line.'] },
   { b:'v252', d:'2026-10-22', items:['CADDIE HQ LINKS: A top-down course game on every mapped course, with your own bag. Rounds → Play Links. Three swing styles (Slingshot pull-back, Trace your swing, Shape dial + strike), real left/right miss patterns from your measured clubs, wind, lies, water drops, sloped greens with a zoomed putting view and perfect-pace preview, gimmes inside 2 ft, and a scorecard with best scores per course.','YOUR COURSES, YOUR BAG: Holes are drawn from the same course packs as the interactive maps (downloaded on first play) and clubs come from your Bag ladder. Nothing in the game writes to your golf state.'] },
   { b:'v251', d:'2026-10-21', items:["FIVE MORE COURSES: Hudson Hills, Beekman, Bally's Ferry Point, Saxon Woods and Van Cortlandt now have on-demand course packs — 99 new hole guides and 97 interactive maps.",'EXACT NINES & HISTORY: Beekman includes Highland, Valley and Taconic with every two-nine order. Ferry Point keeps the old Trump name as an alias, so past rounds still connect. Beekman Highland 4 and Valley 4 have official guides while their maps await verified routes.'] },
