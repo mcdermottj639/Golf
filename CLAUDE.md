@@ -31,6 +31,7 @@ course-prep.js/.css   Shared course planner and live maps; lazy Google 3D views
 hole-guide.js        Sourced illustrated hole renderer; offline, tee-to-green
 course-prep-data.js   Generated lightweight directory; scorecards and coverage, no geometry
 course-packs.js       Versioned downloads, offline cache, favorites and recent-course limits
+links-game.js/.css    Caddie HQ Links — the top-down course game (v252); reads packs + bag, writes only chqlinks:* keys
 data/course-prep/    Per-course packs, catalog order and original-coordinate OSM subsets
 scripts/build-course-prep.cjs  Validates sources; generates directory, JSON packs and coverage report
 course-prep-feed.json Apply-once course card, mapped location and refreshed standing prep
@@ -49,6 +50,7 @@ committing:
 ```
 node --check app.js
 node --check explorer.js
+node --check links-game.js
 python3 -c "import json; json.load(open('coach-feed.json'))"
 ```
 
@@ -4080,3 +4082,81 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 **v213 camera correction:** Real Google SDK 3.66.7 was loaded without a key for API contract checks. It confirms v211 constructor rejection and rejects v212 flyCameraTo with `InvalidValueError: in property endCamera: Altitude mode CLAMP_TO_GROUND is not supported for camera animations.` Camera targets now explicitly use altitude 0 + RELATIVE_TO_GROUND; ground-clamped markers/lines remain correct. The real SDK accepts this request past validation; no licensed imagery or device rendering was certified. Never copy marker altitude modes into camera calls. Draw overlays before camera work. Catch asynchronous camera rejections locally, retaining map/markers/yardages with direct-property framing (preserve observed absolute center altitude) and a brief toast; do not call mapError for optional camera motion. Regression covers rejected animations at entry and via controls, data preservation and all 18 camera modes.
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
+
+## Caddie HQ Links — the course game (v252, October 22 2026)
+
+**What it is.** A top-down, Daily-Holes-style golf game played on every mapped course with Jack's own
+bag. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
+"Links". The view is `links` (parent `rounds`); it uses the compact `cpfocus` masthead like Course
+Prep, and while a round is on screen `body.lk-ingame` hides the masthead and bottom nav so the hole
+canvas and the control dock fit one phone screen (Quit inside the game restores them).
+
+**Module contract.** `links-game.js` exposes `window.CaddieLinks = {render, mount(node, bridge),
+unmount, debug}`. `render()` returns the markup; `render('links')` in app.js then calls
+`mount(document.getElementById('lk-root'), { state:()=>S, clubCanon, toast })`. Every other view
+calls `unmount()`, which cancels the animation frame, timers, listeners and the body class. The
+module never reads or writes golf state: it only READS `S.carries` through the bridge and writes its
+own `localStorage` keys `chqlinks:mode|course|len|boost|best`. Those keys are deliberately outside
+golf backups (game preferences, not golf data).
+
+**Courses.** The menu lists `window.CADDIE_PREP_COURSES` (the generated directory). On Tee off the
+game calls `CaddieCoursePacks.ensure(id)` — the same download/cache path as Course Prep — and
+converts the pack once per session (`convertPack`): lat/lon → local yards on a tangent plane at the
+course center, Ramer–Douglas–Peucker simplification (0.8 yd greens/bunkers/tees, 1.5 yd otherwise),
+and a tee snap: each hole's first route point moves to the centroid of the mapped tee polygon whose
+route length best matches the default-tee card yardage (within 35 yd and closer than the raw route).
+Holes with `mapReady:false` or no path are skipped; Front 9 / Back 9 / 18 filter by hole number, so
+Metedeconk 19–27 and Beekman's third nine are not playable until mapped. Where a pack has no green
+or fairway polygon the game draws one (a 13-yd green at the pin; a fairway strip along the route) and
+generates trees between holes; these are game art, never written back to packs.
+
+**Bag.** `liveBag()` builds the club list from `S.carries`: id = `clubCanon(club)`, carry =
+`meas.carry` when a TrackMan measurement is parked on the row, else the live `carry`; consistency =
+`meas.cons` or a category default. Left/right tendency, side spread and roll come from a built-in
+table of Jack's Map My Bag sessions (9/14 driver, 10/1 everything else) keyed by canon id, with
+category defaults for clubs that table lacks (marked `~` in the menu's bag table). A menu slider adds
+0–25% (default +10%) to every carry and roll because indoor Normalize-on readings run short of
+outdoor stock numbers — a starting guess, not a measurement. Editing carries belongs in Bag, not here.
+
+**Shot model.** Carry = club carry × lie factor (rough .92, bunker .80, trees .55) × shape/trajectory
+factor; wind adds ±0.5%/1% per mph along the line (×0.5 low, ×1.4 high) and a crosswind drift.
+Landing noise is Gaussian: long/short SD = consistency/2 × swing fraction × lie spread, lateral SD =
+measured side spread, both scaled by contact quality (pured ×0.45, solid ×1, struck ×1.7) and by
+over-swing. The club's average side bias is added every shot (the 4H starts right, the 50° left).
+Roll = measured roll × swing fraction² × surface (fairway .85, green .5, rough .3) × shape (draw +15%,
+fade −10%, low ×1.6, high ×0.5). Water = +1 and a drop behind the entry point; OB = stroke and
+distance. Gimmes inside 2 ft are conceded and counted.
+
+**Swing styles** (menu, remembered): *Slingshot* — pull back from the ball; length = power (ring =
+100%, beyond widens spread), direction = start line, second-finger twist or the slider = draw/fade,
+Low/Stock/High chips; release jitter grades contact. *Trace* — draw the swing: down = backswing
+(length = power), up through = path angle, finish x = face; face-to-path gives curve per ball-flight
+laws; a short follow-through is a punch. *Shape dial* — set draw/fade, trajectory and Full/¾/½, then
+Strike: a ring closes on the ball and the tap timing is contact (center/toe/heel). In all styles a
+tap on the hole sets the target line and the camera turns to it.
+
+**Putting.** Each hole's green has a seeded slope (overall tilt 0.4–1.8% plus a crown or bowl),
+drawn as downhill chevrons in a zoomed green view. The ball rolls with stimp-style deceleration
+(1.9 ft/s²), slope acceleration (g × 5/7 × grade) and lip-outs above ~4.6 ft/s. The player sets the
+line (tap, or the pull direction) and sees the predicted path at perfect pace (binary-searched to
+finish 1.5 ft past); pull length (or the pace meter) scales that speed. Start line gets ~0.2° noise.
+
+**Rendering.** Canvas 2D. The static layer (ground, mowing bands, features, trees from a spatial grid)
+is drawn once per camera pose into an offscreen canvas and reused every frame; only the ball, aim,
+previews and overlays redraw. Camera eases between poses; each hole opens with a glide from the green
+back to the tee. Course art colours are fixed (it is a map), UI colours use the app tokens so Night
+mode applies.
+
+**Tests.** `node --check links-game.js`. Browser checks used for v252 (Playwright, 400×860 and night
+mode): Rounds/Overview entry, 14 courses listed, Wianno pack load, slingshot shot, quit/remount, no
+console errors. There is no automated gesture suite in `tests/` yet — add one before changing the
+gesture thresholds.
+
+**Backlog (owned by the Jarvis "Links improver" scheduled task; see the Caddie HQ handoff in
+claudex).** Graphics: real tree canopies from OSM `wood` outlines, shadows by sun angle, bunker
+sand texture, water animation, ball trail. Game: per-club dispersion from every bay session instead of
+the built-in table; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry;
+course records and a shareable scorecard image; standing-plan tips on each tee from the briefings.
+Rules for that task: one improvement per run, feature-flag anything that changes scoring, never touch
+packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item and update this
+section, and log the run in the handoff.

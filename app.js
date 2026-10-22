@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v251';
+const BUILD = 'v252';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v252', d:'2026-10-22', items:['CADDIE HQ LINKS: A top-down course game on every mapped course, with your own bag. Rounds → Play Links. Three swing styles (Slingshot pull-back, Trace your swing, Shape dial + strike), real left/right miss patterns from your measured clubs, wind, lies, water drops, sloped greens with a zoomed putting view and perfect-pace preview, gimmes inside 2 ft, and a scorecard with best scores per course.','YOUR COURSES, YOUR BAG: Holes are drawn from the same course packs as the interactive maps (downloaded on first play) and clubs come from your Bag ladder. Nothing in the game writes to your golf state.'] },
   { b:'v251', d:'2026-10-21', items:["FIVE MORE COURSES: Hudson Hills, Beekman, Bally's Ferry Point, Saxon Woods and Van Cortlandt now have on-demand course packs — 99 new hole guides and 97 interactive maps.",'EXACT NINES & HISTORY: Beekman includes Highland, Valley and Taconic with every two-nine order. Ferry Point keeps the old Trump name as an alias, so past rounds still connect. Beekman Highland 4 and Valley 4 have official guides while their maps await verified routes.'] },
   { b:'v250', d:'2026-10-14', items:['FIVE MORE COURSES: Lakeside (Penn Yan), Oak Hills Park, Richter Park and Fairchild Wheeler Black/Red now have on-demand course packs, with 88 new hole guides and interactive maps.','CLEAR COVERAGE: Lakeside holes 2 and 6 remain unavailable while routing discrepancies are checked. Course cards identify omitted tee sets and unverified ratings; your existing rounds, notes and downloads stay intact.'] },
   { b:'v249', d:'2026-10-12', items:['STOP MEANS STOP: Stop and touching the map now end a Fly hole tour at once instead of waiting for the current camera move to finish, and the green sweep stops after about nine seconds as designed.','NO MORE TREETOP VIEW: The 3D map starts looking straight down from high above, and if a camera move fails it falls back to that overhead view instead of a low camera in the trees.'] },
@@ -1375,6 +1376,7 @@ const TITLES = {
   drills:['Drills','What you can actually do — with the kit you own.'],
   rounds:['Rounds','Your cards, the plans behind them, and the courses.'],
   courseprep:['Course Prep','Your courses · your bag, your targets, your plan.'],
+  links:['Links','Play your courses with your own bag.'],
   decisions:['Decisions','Equipment calls made with data, not vibes.'],
   data:['Data & Backup','Your data lives on this device — export it anywhere.'],
   session:['Film Breakdown','Frame-by-frame findings from this session.'],
@@ -2006,6 +2008,7 @@ let drillTag = null;
 let planPick = null;
 function render(view, arg, keepScroll){
   window.CaddieCoursePrep?.unmount(view === 'courseprep');
+  if(view !== 'links') window.CaddieLinks?.unmount();
   window.CaddieExplorer?.close();
   hqSearchCache=null;
   closeCheat();  // the cheat sheet overlay lives on <body>, so navigation must clear it
@@ -2042,7 +2045,7 @@ function render(view, arg, keepScroll){
   // hands roughly a fifth of the phone back to the rows he is actually tapping.
   document.body.classList.toggle('lvfocus',
     view === 'live' && !!S.live && S.live.stage === 'play');
-  document.body.classList.toggle('cpfocus', view === 'courseprep');
+  document.body.classList.toggle('cpfocus', view === 'courseprep' || view === 'links');
   document.body.classList.toggle('lvcardfocus', view === 'live' && (!S.live || S.live.stage === 'card'));
   // The build chip, top right of Home. It reads BUILD out of the code that is actually
   // executing, which is the only honest answer to "did the update land?" — a published
@@ -2055,11 +2058,11 @@ function render(view, arg, keepScroll){
   // view that hangs off Rounds: a round card, and a course plan you opened from one.
   const NAV_OF = { clubhistory:'game', sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
                    drills:'coach', shelf:'coach', lesson:'coach', landed:'home', numbers:'home', timeline:'home',
-                   round:'rounds', rounds:'rounds', courseprep:'rounds' };
+                   round:'rounds', rounds:'rounds', courseprep:'rounds', links:'rounds' };
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === navView));
-  const R = { home, bag, game, courseprep:coursePrepView, clubhistory:clubHistoryView, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
+  const R = { home, bag, game, courseprep:coursePrepView, links:linksView, clubhistory:clubHistoryView, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
@@ -2081,6 +2084,7 @@ function render(view, arg, keepScroll){
   buildJumpBar();
   hqUpdateShell();hqHasRendered=true;
   if(view === 'courseprep') window.CaddieCoursePrep?.mount(document.getElementById('course-prep'));
+  if(view === 'links') window.CaddieLinks?.mount(document.getElementById('lk-root'), { state:()=>S, clubCanon, toast });
   if(!keepScroll) window.scrollTo(0,0);
 }
 
@@ -2292,6 +2296,7 @@ function preps(){
   // you arrived at from somewhere — the segmented control above it is the way back out.
   return `
   ${window.CaddieCoursePrep?.teaser() || ''}
+  ${window.CaddieLinks ? '<section class="cp-entry"><div><span class="cp-eyebrow">LINKS · THE COURSE GAME</span><h2 data-no-fold>Play your courses with your own bag.</h2><p>Every mapped course, top-down. Your carries, your misses, sloped greens.</p></div><button class="hq-btn" data-action="open-links">Play Links <span aria-hidden="true">↗</span></button></section>' : ''}
   ${any ? cheatBtn('prep') : ''}
   ${!any ? `<div class="card"><p class="sm">No course plans yet. Tell Claude where you're playing and one lands here — tee strategy, the holes that cost you, lay-up numbers off your ladder, and a note on every hole the research can support.</p></div>` : ''}
   ${block('Coming up', p.up)}
@@ -3031,7 +3036,7 @@ function hqOverview(){
       <div class="hq-kicker">JACK'S GOLF WORKSPACE <span class="hq-badge">PERSONAL</span></div>
       <h2 class="hq-title" data-no-fold>Your game.<br>A clearer picture.</h2>
       <p class="hq-subtitle">See what changed. Know what to practice. Take it to the course.</p>
-      <div class="hq-hero-actions"><button class="hq-btn" data-action="live-new">${hqIcon('range')}${S.live?'Resume your round':'Start a round'}</button><button class="hq-btn hq-btn-secondary" data-action="open-course-prep">${hqIcon('round')}Explore courses</button></div>
+      <div class="hq-hero-actions"><button class="hq-btn" data-action="live-new">${hqIcon('range')}${S.live?'Resume your round':'Start a round'}</button><button class="hq-btn hq-btn-secondary" data-action="open-course-prep">${hqIcon('round')}Explore courses</button><button class="hq-btn hq-btn-secondary" data-action="open-links">${hqIcon('round')}Play Links</button></div>
       <div class="hq-metrics">
         ${metric(S.profile.handicap??'—','Profile handicap',PROV[provOfProfile()]?.lab||'Profile record',{a:'go',v:'numbers'})}
         ${metric(rangeDay?.usable??'—','Usable range shots',range?`Latest: ${fmtDate(range.date)} · ${rangeDay?.clubs.length??0} clubs`:'No range day recorded',range?{a:'open-bay',i:range.i}:{a:'session-category',kind:'range'})}
@@ -3085,6 +3090,7 @@ function hqExplore(){
     item('Your workspace','Activity log','Every range day, simulator round, course round and film',{a:'session-category',kind:'days'}),
     item('Play & improve','Start or resume a round','Live hole-by-hole logging and scoring',{a:'live-new'}),
     item('Play & improve','Rounds & scorecards','Your complete scoring record and analytics',{a:'go',v:'rounds',seg:'cards'}),
+    item('Play & improve','Links · the course game','Play any mapped course top-down with your own bag',{a:'open-links'}),
     ...(window.CADDIE_PREP_COURSES || []).map(c=>item('Play & improve',c.shortName+' · Course Prep',c.holes.length+' holes, Google 3D, targets and your club distances',{a:'open-course-prep',course:c.id})),
     item('Play & improve','Course plans','Personal tee strategy, holes and preparation',{a:'go',v:'rounds',seg:'prep'}),
     item('Play & improve','Courses','Every course, rating, record and bucket-list stop',{a:'go',v:'rounds',seg:'courses'}),
@@ -3135,7 +3141,7 @@ function hqSearch(query){
   }).sort((a,b)=>b._score-a._score).map(({_score,...row})=>({...row,description:row.description||(row.act?.value!=null?`${row.act.value}${row.act.unit?' '+row.act.unit:''} · ${row.act.prov||row.kind}`:row.kind+' · open the complete record')}));
 }
 function hqUpdateShell(){
-  let parent={home:'home',bag:'bag',clubhistory:'bag',game:'game',sessions:'game',bay:'game',swing:'game',shortgame:'game',putting:'game',mental:'game',positions:'game',session:'game',rounds:'rounds',round:'rounds',courseprep:'rounds',briefing:'rounds',live:'rounds',coach:'coach',drills:'coach',shelf:'coach',lesson:'coach'}[current.view]||'home';
+  let parent={home:'home',bag:'bag',clubhistory:'bag',game:'game',sessions:'game',bay:'game',swing:'game',shortgame:'game',putting:'game',mental:'game',positions:'game',session:'game',rounds:'rounds',round:'rounds',courseprep:'rounds',links:'rounds',briefing:'rounds',live:'rounds',coach:'coach',drills:'coach',shelf:'coach',lesson:'coach'}[current.view]||'home';
   if(current.view==='briefing'){
     const plan=S.briefings.find(b=>b.id===current.arg);
     const course=plan&&(S.courses.some(c=>c.name.toLowerCase()===String(plan.course||'').toLowerCase())||S.rounds.some(r=>courseMatches(r.course,plan.course)));
@@ -10315,6 +10321,7 @@ function bumpGearCounters(){
 const ACTIONS = {
   'live-hole-guide': el => window.CaddieCoursePrep?.openGuide(el.dataset.course,+el.dataset.n),
   'live-hole-map': el => window.CaddieCoursePrep?.openLiveMap(el.dataset.course,+el.dataset.n),
+  'open-links': () => render('links'),
   'open-course-prep': el => { if(!el?.dataset.course)window.CaddieCoursePrep?.openNearest(); window.CaddieCoursePrep?.openHole(el?.dataset.n || 1,el?.dataset.course); render('courseprep'); },
   'hq-explore': () => window.CaddieExplorer?.open(),
   'hq-back': () => {
@@ -11621,6 +11628,7 @@ function fetchFeed(){
 
 // Course Prep passes narrow read/write callbacks; it never owns or replaces golf state.
 function coursePrepView(){ return window.CaddieCoursePrep?.render() || '<div class="card"><p>Course Prep is unavailable. Refresh to load the current app.</p></div>'; }
+function linksView(){ return window.CaddieLinks?.render() || '<div class="card"><p>Links is unavailable. Refresh to load the current app.</p></div>'; }
 function coursePrepNote(course, n){
   const source=window.CaddieCoursePrep?.findCourse(course);if(!source)return '';
   const p = window.CaddieCoursePrep.clean(S.coursePrep?.[source.storageKey],source.id);
