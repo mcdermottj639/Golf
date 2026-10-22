@@ -4083,13 +4083,25 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
-## Caddie HQ Links — the course game (v252, October 22 2026)
+## Caddie HQ Links — the course game (v252–v253, October 22 2026)
 
 **What it is.** A top-down, Daily-Holes-style golf game played on every mapped course with Jack's own
 bag. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
 "Links". The view is `links` (parent `rounds`); it uses the compact `cpfocus` masthead like Course
 Prep, and while a round is on screen `body.lk-ingame` hides the masthead and bottom nav so the hole
 canvas and the control dock fit one phone screen (Quit inside the game restores them).
+
+**Sizing (v253, from Jack's first phone screenshot).** `.lk-game` is a flex column whose height is
+`100dvh − var(--lk-top) − env(safe-area-inset-bottom) − 10px` (fallback `--lk-vh` from
+`visualViewport.height`); `fit()` only measures the section's top. The stage is `flex:1` and the dock
+is `flex:0 0 auto`, so the canvas takes whatever the controls leave. v252 used `innerHeight` with no
+safe-area allowance and put `overflow:hidden` on the body, so on an iPhone the Strike button sat under
+the home indicator and could not be scrolled to — never lock page scroll in-game; the canvas already
+has `touch-action:none`. **The wider bug was `margin:0 auto` on a flex-column child**: it cancels
+stretch, so `.lk-game` and the menu `.wrap` laid out at max-content (520 px) and were clipped on a
+390 px phone — the hole was centred on a canvas the player could only see three quarters of. Both carry
+`width:100%` now. The menu leads with the picked course, Front 9 / Back 9 / 18 and **Tee off**, with a
+compact two-column course grid underneath (14 full-width cards had pushed Tee off ~800 px down).
 
 **Module contract.** `links-game.js` exposes `window.CaddieLinks = {render, mount(node, bridge),
 unmount, debug}`. `render()` returns the markup; `render('links')` in app.js then calls
@@ -4149,8 +4161,12 @@ mode applies.
 
 **Tests.** `node --check links-game.js`. Browser checks used for v252 (Playwright, 400×860 and night
 mode): Rounds/Overview entry, 14 courses listed, Wianno pack load, slingshot shot, quit/remount, no
-console errors. There is no automated gesture suite in `tests/` yet — add one before changing the
-gesture thresholds.
+console errors. v253 measured 320×568 · 375×667 · 390×844 · 430×932: Tee off above the fold on all
+four, `.lk-game` spanning the view width, dock bottom inside the viewport, shape row 80 px, no errors
+— but `env()` is 0 in Chromium, so the 34 px home-indicator margin is only proven by arithmetic until
+Jack's phone confirms it. The v252 check at 400×860 missed the clipping because the game section is
+`max-width:520px` and 400 px only clips 120 px of trees. There is no automated gesture suite in
+`tests/` yet — add one before changing the gesture thresholds.
 
 **Backlog (owned by the Jarvis "Links improver" scheduled task; see the Caddie HQ handoff in
 claudex).** Graphics: real tree canopies from OSM `wood` outlines, shadows by sun angle, bunker

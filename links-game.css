@@ -3,7 +3,8 @@
 .lk *{box-sizing:border-box}
 .lk [hidden]{display:none!important}
 .lk button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-body.lk-ingame{overflow:hidden;overscroll-behavior:none;padding-bottom:8px}
+/* In a round the masthead and tab bar hide; the page may still scroll (the canvas captures its own touches), so a short phone can always reach the dock. */
+body.lk-ingame{overscroll-behavior-y:none;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
 body.lk-ingame .hero.hq-shell,body.lk-ingame nav,body.lk-ingame #nav{display:none}
 
 
@@ -13,15 +14,15 @@ body.lk-ingame .hero.hq-shell,body.lk-ingame nav,body.lk-ingame #nav{display:non
 .lk input.cy{width:64px;font:inherit;font-size:16px;text-align:right;background:var(--sunk);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 4px}
 .lk .kick{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink62)}
 .lk h1{font-family:var(--serif);font-weight:700;font-size:26px;margin:0;text-wrap:balance;line-height:1.15}
-.lk .wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.lk .wrap{width:100%;max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 .lk .menu{display:flex;flex-direction:column;gap:12px}
-.lk .courses{display:grid;gap:8px}
-.lk .cpick{display:grid;grid-template-columns:1fr auto;gap:2px 10px;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px}
+.lk .courses{display:grid;gap:6px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.lk .cpick{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 6px;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;min-width:0}
 .lk .cpick[aria-pressed="true"]{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
-.lk .cpick .n{font-family:var(--serif);font-size:18px;font-weight:700}
-.lk .cpick .m{font-family:var(--mono);font-size:11px;color:var(--ink62);grid-column:1}
-.lk .cpick .best{grid-row:1/3;grid-column:2;align-self:center;font-family:var(--mono);font-size:11px;color:var(--ink62);text-align:right}
-.lk .cpick .best b{display:block;font-family:var(--serif);font-size:20px;color:var(--ink)}
+.lk .cpick .n{font-family:var(--serif);font-size:15px;font-weight:700;line-height:1.15;overflow-wrap:anywhere}
+.lk .cpick .m{font-family:var(--mono);font-size:9.5px;color:var(--ink62);grid-column:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lk .cpick .best{grid-row:1/3;grid-column:2;align-self:center;font-family:var(--mono);font-size:9px;color:var(--ink62);text-align:right}
+.lk .cpick .best b{display:block;font-family:var(--serif);font-size:15px;color:var(--ink)}
 .lk .lk-seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .lk .lk-seg button{flex:1;border:0;background:var(--card);padding:9px 4px;font-size:14px;border-left:1px solid var(--line)}
 .lk .lk-seg button:first-child{border-left:0}
@@ -37,7 +38,11 @@ body.lk-ingame .hero.hq-shell,body.lk-ingame nav,body.lk-ingame #nav{display:non
 .lk .go{width:100%;border:0;border-radius:12px;background:var(--green);color:var(--green-ink);font-weight:700;font-size:17px;padding:14px;box-shadow:0 2px 0 rgba(0,0,0,.18)}
 .lk .go:disabled{opacity:.55;cursor:default;box-shadow:none}
 .lk .lk-ghost{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 13px;font-size:13px}
-.lk .lk-game{display:flex;flex-direction:column;gap:6px;max-width:520px;margin:0 auto;height:var(--lk-h,70vh)}
+.lk .lk-game{display:flex;flex-direction:column;gap:6px;width:100%;max-width:520px;margin:0 auto;height:calc(var(--lk-vh,100vh) - var(--lk-top,0px) - env(safe-area-inset-bottom,0px) - 10px);min-height:420px}
+@supports (height:100dvh){.lk .lk-game{height:calc(100dvh - var(--lk-top,0px) - env(safe-area-inset-bottom,0px) - 10px)}}
+.lk .picked{display:flex;flex-direction:column;gap:2px;border:1px solid var(--green);border-radius:12px;padding:10px 14px;background:var(--card)}
+.lk .picked .n{font-family:var(--serif);font-size:20px;font-weight:700}
+.lk .picked .m{font-family:var(--mono);font-size:11px;color:var(--ink62)}
 .lk .lk-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .lk .lk-top h1{font-size:21px}
 .lk .topar{font-family:var(--serif);font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
@@ -89,7 +94,9 @@ body.lk-ingame .hero.hq-shell,body.lk-ingame nav,body.lk-ingame #nav{display:non
 .lk .shaperow{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-family:var(--mono);font-size:10.5px;color:var(--ink62);letter-spacing:.06em}
 .lk .shaperow .lk-seg{flex:0 0 auto}
 .lk .shaperow .lk-seg button{padding:5px 9px;font-size:11.5px;font-family:var(--mono)}
-.lk .shaperow input[type=range]{flex:1;min-width:60px}
+.lk .shaperow input[type=range]{flex:1 1 60px;width:auto;min-width:0}
+.lk .shaperow .lk-seg,.lk .shaperow span{flex:0 0 auto}
+.lk .shaperow .shp{display:flex;align-items:center;gap:8px;flex:1 1 100%;min-width:0}
 .lk .shaperow .val{min-width:56px;text-align:right;color:var(--ink)}
 .lk .instr{width:100%;border:1px dashed var(--line);border-radius:12px;background:var(--card);color:var(--ink62);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;padding:13px;text-align:center}
 .lk .final{display:flex;flex-direction:column;gap:12px}
