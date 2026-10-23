@@ -394,7 +394,7 @@ function boot(){
     let bp=S.h.ball,hgt=0;if(anim&&anim.pos){bp=anim.pos;hgt=anim.h||0}
     if(!(S.h.done&&S.h.holed)){
       const q=toScreen(bp);const hf=1/(1+hgt/45); // the shadow shrinks and fades as the ball climbs, so height reads without a side view
-      ctx.fillStyle='rgba(0,0,0,'+(0.3*hf).toFixed(3)+')';ctx.beginPath();ctx.ellipse(q[0]+hgt*.35,q[1]+hgt*.2,3.4*(0.6+0.4*hf)+hgt*0.05,2.2*(0.6+0.4*hf)+hgt*0.03,0,0,7);ctx.fill();
+      ctx.fillStyle='rgba(0,0,0,'+(0.3*hf).toFixed(3)+')';ctx.beginPath();ctx.ellipse(q[0]+hgt*.35,q[1]+hgt*.2,3.4*(0.6+0.4*hf),2.2*(0.6+0.4*hf),0,0,7);ctx.fill();
       const r=Math.max(3.6,Math.min(7,0.047*s))+hgt*0.06;ctx.fillStyle='#fff';ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(q[0],q[1]-hgt,r,0,7);ctx.fill();ctx.stroke();
     }
   }

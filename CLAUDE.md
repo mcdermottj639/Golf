@@ -4178,8 +4178,12 @@ arc as per-segment white strokes whose alpha and width grow toward the head, so 
 the ball lands, `A.landedAt` is stamped and `drawPuff()` spreads a ring there over `FX_MS` (1.5 s):
 sand-coloured with grains in a bunker, a double splash ring in water, plain elsewhere. `finishShot()`
 hands the trail and landing to the module variable `fx`, which `tick()` keeps animating (busy) until
-it expires, then nulls; `startHole()`, Quit and `unmount()` clear it. The in-flight shadow now shrinks
-and fades with height (`hf = 1/(1+h/45)`), which is the only cue a top-down view has for altitude.
+it expires, then nulls; `startHole()`, Quit and `unmount()` clear it. The in-flight shadow shrinks
+and fades with height (`hf = 1/(1+h/45)`): radii are `3.4*(0.6+0.4*hf)` and
+`2.2*(0.6+0.4*hf)`. Removed additive height terms during PR #79 review because they
+made the shadow grow despite the shrink wording. At heights 0/45/90, horizontal radii
+are 3.4/2.72/2.4933 pixels; opacity is 0.3/0.15/0.1. This complements the flight trail
+as an altitude cue.
 Reduced motion records no trail and no puff (the flight is 1 ms there anyway). Nothing in this touches
 `swing()`, `finishShot()`'s outcomes, roll or scoring, so it is not behind a flag. `debug()` now also
 reports `anim {kind, trail, landed}`, `fx {age, trail, lie}` and a `drawMs()` sampler (30 full
