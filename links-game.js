@@ -187,7 +187,8 @@ function boot(){
   let cv=$('cv'),ctx=cv.getContext('2d');
   $('stage').insertAdjacentHTML('beforeend',`<div id="lk-powerrail" class="lk-powerrail" hidden><strong id="lk-powerlabel">Pull down</strong><small id="lk-powercarry">Release to swing</small><div class="lk-powertrack"><i class="lk-powertick t50">50</i><i class="lk-powertick t75">75</i><i class="lk-powertick t100">100%</i><button id="lk-powerhandle" class="lk-powerhandle" type="button" aria-label="Swing power. Drag down, release to swing. Arrow keys adjust; Enter swings.">↓</button></div><small id="lk-powerhint">Slide away to cancel</small></div>`);
   $('instr').insertAdjacentHTML('afterend',`<div class="lk-tools"><button type="button" id="lk-retry" disabled>Try shot again</button><button type="button" id="lk-hand">Switch side</button><details class="lk-distance-note"><summary>Map distances ⓘ</summary><p id="lk-distance-info"></p></details></div>`);
-  let lastShot=null,rail=null,railPower=1;
+  let lastShot=null,rail=null,railPower=1,landingView=null;
+  $('stage').insertAdjacentHTML('beforeend','<button type="button" id="lk-landing" class="lk-landing" aria-pressed="false">Landing spot ↗</button>');
   $('stage').insertAdjacentHTML('beforeend','<div id="lk-pin" class="lk-pin" hidden></div>');
   rootNode.classList.toggle('lk-left-handed',store.get('hand','right')==='left');
   let scene=null,scenePromise=null,threeActive=false,sceneMoving=false,roundToken=0,gimmeTimer=0;
@@ -211,7 +212,7 @@ function boot(){
   }
   function holeObj(){return cur.holes.find(h=>h.n===S.holes[S.idx])}
   function startHole(){
-    lastShot=null;rail=null;
+    lastShot=null;rail=null;landingView=null;
     const h=holeObj();
     S.h={ball:h.tee.slice(),lie:'tee',strokes:0,putts:0,wind:windFor(S.seed,h),done:false,phase:'aim',history:[h.tee.slice()],club:null,aim:null,preview:null,vPerfect:0,shape:0,traj:0,power:null,lineAim:null,pw:1};
     clearTimeout(gimmeTimer);G=null;scene?.reset();$('clubbox').open=false;$('shapebox').open=false;fx=null;pickDefaultClub();defaultAim();introCam();renderUI();draw();
@@ -263,6 +264,10 @@ function boot(){
   /* ---------- camera ---------- */
   function frameTarget(){
     const h=holeObj(),b=S.h.ball,pin=h.pin;
+    if(landingView&&!onGreen()){
+      const {center:p,angle:ang}=landingView,u=[Math.sin(ang),Math.cos(ang)],r=[u[1],-u[0]];
+      return{mx:p[0]*r[0]+p[1]*r[1],my:p[0]*u[0]+p[1]*u[1],s:Math.min(cv.clientWidth/110,cv.clientHeight/145),ang};
+    }
     let fwd=[pin[0]-b[0],pin[1]-b[1]];
     if(dist(b,pin)<0.15||S.h.lie==='tee')fwd=[pin[0]-h.tee[0],pin[1]-h.tee[1]];
     if(mode!=='meter'&&!onGreen()&&S.h.lineAim&&dist(S.h.lineAim,b)>5)fwd=[S.h.lineAim[0]-b[0],S.h.lineAim[1]-b[1]];
@@ -315,7 +320,7 @@ function boot(){
     if(!cur||!S||!S.h||W<2||H<2){ctx.fillStyle=COL.rough;ctx.fillRect(0,0,W,H);return}
     threeActive=use3D();$('cv3').hidden=!threeActive;rootNode.classList.toggle('lk-perspective',threeActive);
     if(threeActive){
-      const result=scene.render({course:cur,h:holeObj(),ballState:S.h,anim,fx,forecast:S.h.club.putter?null:forecast(),angle:view.ang,reduced,pulling:!!G});
+      const result=scene.render({course:cur,h:holeObj(),ballState:S.h,anim,fx,forecast:S.h.club.putter?null:forecast(),angle:view.ang,reduced,pulling:!!G,landing:landingView});
       ctx.clearRect(0,0,W,H);if(result){sceneMoving=result.moving;drawSceneOverlay(result,W,H);if(sceneMoving)kick();}drawMini();return;
     }
     $('target').hidden=true;$('pin').hidden=true;$('flight-readout').hidden=true;
@@ -492,7 +497,7 @@ function boot(){
   /* ---------- shot ---------- */
   function grade(t){const a=Math.abs(t);return a<=0.08?'PURED':a<=0.25?'SOLID':'STRUCK'}
   function swing(gest){
-    if(!S?.h||!['aim','armed'].includes(S.h.phase))return;
+    if(!S?.h||landingView||!['aim','armed'].includes(S.h.phase))return;
     lastShot=JSON.parse(JSON.stringify(S));lastShot.h.power=null;lastShot.h.phase='aim';
     const now=performance.now();if(meterOn)S.h.needle=needleAt(now);meterOn=false;const t=gest?(gest.t||0):(S.h.needle||0);const g=gest?gest.g:grade(t);
     if(!gest){
@@ -598,7 +603,11 @@ function boot(){
   function renderUI(){$('maplabel').textContent=camMode==='shot'?'Hole map':'Shot view';$('camtog').hidden=onGreen();
     const h=holeObj();
     const flight=S.h.phase==='flight';rootNode.classList.toggle('lk-flying',flight);$('skip').hidden=!flight||!anim;
-    $('powerrail').hidden=S.h.phase!=='aim'||(mode!=='sling'&&!S.h.club.putter);
+    rootNode.classList.toggle('lk-landing-view',!!landingView);
+    $('landing').hidden=S.h.phase!=='aim'||onGreen();
+    $('landing').setAttribute('aria-pressed',String(!!landingView));
+    $('landing').textContent=landingView?(S.h.lie==='tee'?'← Back to tee':'← Back to ball'):'Landing spot ↗';
+    $('powerrail').hidden=!!landingView||S.h.phase!=='aim'||(mode!=='sling'&&!S.h.club.putter);
     $('retry').disabled=!lastShot||flight||S.daily;
     $('retry').title=S.daily?'Retry is unavailable in the daily challenge':'Return to the same lie and wind; switches this round to practice';
     $('distance-info').textContent='Scorecard: '+(h.yds||'unavailable')+' yd. Mapped tee to pin: '+Math.round(dist(h.tee,h.pin))+' yd. Card yardage is for '+cur.tee+' tees; mapped route endpoints are approximate and may use a different tee/pin position. Terrain elevation and green breaks are simulated, not surveyed. Course data has not been stretched to match the card.';
@@ -648,9 +657,10 @@ function boot(){
     act.textContent=S.h.phase==='done'?(S.idx+1<S.holes.length?'Next hole':'See your card'):S.h.phase==='armed'?(mode==='dial'?'Tap when the ring meets the ball':putting?'Putt':'Swing'):S.h.phase==='flight'?(putting?'Rolling…':'In the air…'):mode==='dial'?'Strike':'Lock the line';
     $('meter').style.opacity=S.h.phase==='armed'?1:.5;if(mode==='dial')$('shaperow').hidden=putting||S.h.done;
     if(S.h.phase==='done'||(S.h.phase==='aim'&&S.h.strokes===0)){$('needle').style.left='50%';$('hit').hidden=true;$('grade').hidden=true}
+    if(landingView){act.hidden=true;instr.hidden=false;instr.textContent='Tap or drag to adjust aim · return to swing';}
   }
   function act(){
-    if(!S||!S.h)return;
+    if(!S||!S.h||landingView)return;
     if(S.h.phase==='done'){nextHole();return}
     if(mode!=='meter'&&mode!=='dial'&&S.h.phase!=='done')return;
     if(mode==='dial'&&S.h.phase==='armed'){strike();return}
@@ -699,12 +709,19 @@ function boot(){
   $('hand').addEventListener('click',()=>{cancelRail();const left=rootNode.classList.toggle('lk-left-handed');store.set('hand',left?'left':'right');});
   $('retry').addEventListener('click',()=>{
     if(!lastShot||!S||S.daily||S.h.phase==='flight')return;
-    clearTimeout(gimmeTimer);clearTimeout(bannerTimer);anim=null;fx=null;meterOn=false;G=null;rail=null;
+    clearTimeout(gimmeTimer);clearTimeout(bannerTimer);anim=null;fx=null;meterOn=false;G=null;rail=null;landingView=null;
     S=JSON.parse(JSON.stringify(lastShot));S.practice=true;S.h.power=null;S.h.phase='aim';
     if(S.h.club.putter)updatePutt();scene?.reset();frame(true);renderUI();draw();banner('Practice shot','Same lie and wind · excluded from best rounds');
   });
-  $('instr').addEventListener('click',e=>{if(e.detail!==0||!S?.h||S.h.phase!=='aim'||mode==='trace')return;S.h.power=1;swing({g:'SOLID',t:0,...(S.h.club.putter?{v0:S.h.vPerfect}:{})});});
-  $('camtog').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();scene?.reset();camMode=camMode==='shot'?'hole':'shot';store.set('cam',camMode);$('maplabel').textContent=camMode==='shot'?'Hole map':'Shot view';if(S&&S.h)frame(false);draw()});
+  $('instr').addEventListener('click',e=>{if(e.detail!==0||!S?.h||landingView||S.h.phase!=='aim'||mode==='trace')return;S.h.power=1;swing({g:'SOLID',t:0,...(S.h.club.putter?{v0:S.h.vPerfect}:{})});});
+  $('landing').addEventListener('click',()=>{
+    if(!S?.h||S.h.phase!=='aim'||onGreen())return;
+    cancelRail();
+    if(landingView)landingView=null;
+    else {const F=forecast(),b=S.h.ball;landingView={center:[b[0]+F.u[0]*F.carryW+F.rgt[0]*F.lat,b[1]+F.u[1]*F.carryW+F.rgt[1]*F.lat],angle:frameTarget().ang};}
+    camMode='shot';scene?.reset();frame(true);renderUI();draw();
+  });
+  $('camtog').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();cancelRail();landingView=null;scene?.reset();camMode=camMode==='shot'?'hole':'shot';store.set('cam',camMode);if(S&&S.h)frame(false);renderUI();draw()});
   $('clubs').addEventListener('click',e=>{const b=e.target.closest('.lk-club');if(!b||S.h.phase!=='aim')return;cancelRail();const id=b.dataset.c;S.h.club=BAG.find(c=>c.id===id);
     const fc=fullCarry(S.h.club),d=dist(S.h.ball,S.h.aim);if(d>fc*1.05||d<fc*0.6)defaultAim();$('clubbox').open=false;scene?.reset();frame();renderUI();draw()});
   function maxPull(){return Math.min(220,cv.clientHeight*0.38)}
@@ -764,6 +781,7 @@ function boot(){
     if(S.h.club.putter){if(dist(p,S.h.ball)<0.3)return;S.h.aim=p;updatePutt()}else S.h.aim=p;renderUI();draw()}
   cv.addEventListener('pointerdown',e=>{
     if(rail)return;if(G?.kind==='pad')cancelRail();
+    if(landingView){if(!e.isPrimary||e.button!==0||S.h.phase!=='aim')return;e.preventDefault();cv.setPointerCapture(e.pointerId);G={id:e.pointerId,kind:'landing'};setLine(toWorld(...local(e)));return;}
     if(mode==='meter'){dragging=true;cv.setPointerCapture(e.pointerId);aimFrom(e);return}
     if(mode==='dial'&&S&&S.h&&S.h.phase==='armed'){strike();return}
     if(!S||!S.h||S.h.phase!=='aim')return;cv.setPointerCapture(e.pointerId);const pt=local(e);
@@ -774,6 +792,7 @@ function boot(){
     draw();
   });
   cv.addEventListener('pointermove',e=>{
+    if(G?.kind==='landing'){if(e.pointerId===G.id)setLine(toWorld(...local(e)));return;}
     if(mode==='meter'){if(dragging)aimFrom(e);return}
     if(!G)return;const pt=local(e);
     if(G.second&&e.pointerId===G.second.id){const a=Math.atan2(pt[1]-G.cur[1],pt[0]-G.cur[0]);let d=(a-G.second.a0)*180/Math.PI;while(d>180)d-=360;while(d<-180)d+=360;S.h.shape=Math.max(-3,Math.min(3,Math.round(G.second.shape0+d/15)));$('shape').value=S.h.shape;renderUI();draw();return}
@@ -785,6 +804,7 @@ function boot(){
     if(G.kind==='pull')pullUpdate();else if(G.kind==='trace'){const r=traceRead(G);if(r)S.h.power=r.power;draw()}
   });
   function endGesture(e){
+    if(G?.kind==='landing'){if(e.pointerId===G.id){G=null;setLine(toWorld(...local(e)));}return;}
     if(mode==='meter'){dragging=false;return}
     if(!G)return;
     if(G.second&&e.pointerId===G.second.id){G.second=null;return}
@@ -858,7 +878,7 @@ function boot(){
      visualViewport beats innerHeight on iOS, where the toolbar and the home indicator both eat space innerHeight still reports. */
   function fit(){const g=$('game');if(!g||g.hidden)return;const top=Math.max(0,g.getBoundingClientRect().top);const vv=window.visualViewport;const vh=vv&&vv.height?vv.height:window.innerHeight;R.style.setProperty('--lk-vh',Math.round(vh)+'px');R.style.setProperty('--lk-top',Math.round(top)+'px')}
   window.addEventListener('resize',fit);if(window.visualViewport)window.visualViewport.addEventListener('resize',fit);
-  dbgFn=()=>({renderer:threeActive?'3d':'map',scene:scene?.info(),course:S?.course,hole:S?.h?holeObj().n:null,aim:S?.h?.aim,worldBall:S?.h?.ball,pin:S?.h?holeObj().pin:null,lie:S?.h?.lie,ball:S&&S.h?toScreen(S.h.ball):null,phase:S&&S.h&&S.h.phase,mode,strokes:S&&S.h&&S.h.strokes,scores:S&&S.scores,anim:anim?{kind:anim.kind,trail:anim.trail?anim.trail.length:0,landed:!!anim.landedAt}:null,fx:fx?{age:Math.round(performance.now()-fx.t0),trail:fx.trail.length,lie:fx.lie}:null,drawMs:()=>{const t0=performance.now();for(let i=0;i<30;i++){staticKey='';draw()}return(performance.now()-t0)/30}});
+  dbgFn=()=>({landingView,camMode,renderer:threeActive?'3d':'map',scene:scene?.info(),course:S?.course,hole:S?.h?holeObj().n:null,aim:S?.h?.aim,worldBall:S?.h?.ball,pin:S?.h?holeObj().pin:null,lie:S?.h?.lie,ball:S&&S.h?toScreen(S.h.ball):null,phase:S&&S.h&&S.h.phase,mode,strokes:S&&S.h&&S.h.strokes,scores:S&&S.scores,anim:anim?{kind:anim.kind,trail:anim.trail?anim.trail.length:0,landed:!!anim.landedAt}:null,fx:fx?{age:Math.round(performance.now()-fx.t0),trail:fx.trail.length,lie:fx.lie}:null,drawMs:()=>{const t0=performance.now();for(let i=0;i<30;i++){staticKey='';draw()}return(performance.now()-t0)/30}});
   stopFn=()=>{stopped=true;S=null;roundToken++;clearTimeout(gimmeTimer);scene?.dispose();scene=null;if(raf)cancelAnimationFrame(raf);raf=0;anim=null;fx=null;meterOn=false;clearTimeout(bannerTimer);ro.disconnect();document.removeEventListener('keydown',onKey);window.removeEventListener('resize',fit);if(window.visualViewport)window.visualViewport.removeEventListener('resize',fit);document.body.classList.remove('lk-ingame')};
   renderMenu();draw();
 

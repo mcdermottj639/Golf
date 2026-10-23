@@ -4086,7 +4086,7 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
-## Caddie HQ Links — the course game (v258, October 23 2026)
+## Caddie HQ Links — the course game (v259, October 23 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own
 bag. Full shots use a behind-ball 3D view and a following camera; putting and the optional hole map remain 2D. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
@@ -4158,7 +4158,7 @@ drawn as downhill chevrons in a zoomed green view. The ball rolls with stimp-sty
 line by tapping and sees the predicted path at perfect pace (binary-searched to
 finish 1.5 ft past); the side rail scales that speed, with 100% ideal pace. Start line gets ~0.2° noise.
 
-**Camera and rendering (v257).** `links-scene.js` lazy-loads the local Three.js r186 ES module. It
+**Camera and rendering (v259).** `links-scene.js` lazy-loads the local Three.js r186 ES module. It
 renders the same local-yard polygons used by scoring, original simulated tree positions as instanced
 alpha-cutout billboards, a ball, club, flag, projected landing ring and flight trail. Perspective camera
 starts 14 yd behind / 8 yd above the ball, then follows full shots. Tap aiming raycasts against the
@@ -4169,6 +4169,13 @@ by surface. Idle frames stop after the camera settles. Context loss or module/te
 falls back to the existing Canvas 2D renderer. Unmount disposes GPU resources and guards late imports.
 The original Canvas static-layer cache and dynamic overlays remain the map/putting/fallback path.
 Reduced motion skips chase movement and flight effects.
+
+**Landing inspection.** Landing spot moves to an elevated close-up centered on the current
+predicted carry point. Its anchor and heading stay fixed during tap/drag aiming; it never moves
+the ball or takes a stroke. Back to tee/ball returns to the address view with aim/club/shape intact.
+Landing inspection hides swing input, works in all three styles and the map fallback, and resets
+on a new hole, replay or full-hole map selection. It is transient, not persisted with camera preference.
+The close-up uses existing game geometry, not a new Google map or surveyed terrain.
 
 **Phone controls (v258).** Header contains the accessible Caddie HQ exit, current hole and a scorecard
 toggle. Club and shape controls are collapsed drawers; Slingshot/putting use a vertical side rail whose
@@ -4203,6 +4210,15 @@ no surveyed elevations or real green breaks are available. The menu explicitly d
 from mapped routes/hazards. Do not describe this as a surveyed digital twin or photo-exact course.
 The renderer never changes pack files, collision/lie geometry, carry/dispersion, penalties or scores.
 
+**Google source boundary (checked October 23 2026).** The separate Course Prep Google viewer is
+not an export license for Links. Google Maps Platform Terms §3.2.3 restrict extracting content,
+creating derived content, and terrain models from Elevation API values:
+https://cloud.google.com/maps-platform/terms . Elevation responses also have variable/interpolated
+resolution: https://developers.google.com/maps/documentation/elevation/requests-elevation .
+Do not trace Google imagery into the offline game packs or treat imagery as proof of today's tees,
+pins or real green breaks. Use official club evidence and appropriately licensed reusable geography
+for persisted course facts; label coverage gaps. No Google content was imported for v259.
+
 **Ball flight trail (v255, PR #79).** During a full shot `stepAnim()` appends `{p, hy, worldHeight}` to
 `anim.trail` every frame (capped at `TRAIL_MAX` 110) — the ground position and the ball's height in
 map-derived yards (`A.h / view.s`); v257 also stores the unscaled physical arc in `worldHeight` for 3D, so a camera that re-frames after landing redraws the arc at the right
@@ -4229,6 +4245,14 @@ four, `.lk-game` spanning the view width, dock bottom inside the viewport, shape
 — but `env()` is 0 in Chromium, so the 34 px home-indicator margin is only proven by arithmetic until
 Jack's phone confirms it. The v252 check at 400×860 missed the clipping because the game section is
 `max-width:520px` and 400 px only clips 120 px of trees. The v257 browser suite exercises the new thumb pad and perspective aiming; keep tests around gesture changes.
+
+**v259 validation.** `tests/links-landing-browser.cjs` passed five cases: 320×568 Slingshot,
+390×844 touch/reduced-motion Slingshot with simulated top inset, Trace, Shape dial and no-WebGL
+fallback. Checks include a reachable 44 px button, fixed camera during tap/drag aiming, retained
+aim/club on return, no accidental stroke, full-hole-map reset, Back to ball after a shot, replay reset,
+no page errors and unchanged golf records. The full 3D suite, power/exit suites, practice-score check
+and complete Pages verification suite passed. The 3D harness now awaits dialog removal before
+asserting restored focus, avoiding a close-event race. Native iPhone Safari feel remains unverified.
 
 **v258 validation.** `tests/links-power-browser.cjs` passed 320×568, 390×844 with a simulated
 59 px top inset, and 430×932: contained 110% grip travel, partial-power carry, aim preservation,

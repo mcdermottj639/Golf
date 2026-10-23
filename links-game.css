@@ -201,3 +201,7 @@ body.lk-ingame #view{padding-bottom:0}
 .lk .readout{flex-wrap:wrap;gap:2px 8px;font-size:10px}
 .lk .lk-target{font-size:10px;padding:5px 8px;background:#fffcecdd}
 .lk .lk-pin{position:absolute;z-index:2;pointer-events:none;transform:translate(-50%,-100%);font:600 10px var(--sans);color:#fff;background:#912c24e8;border:1px solid #fff7;border-radius:7px;padding:4px 7px;white-space:nowrap}
+.lk .lk-landing{position:absolute;z-index:3;left:10px;top:60px;min-height:44px;max-width:calc(100% - 106px);padding:9px 11px;border:1px solid #fff8;border-radius:12px;background:#214d39ed;color:#fffbea;font:600 11px var(--sans);touch-action:manipulation;cursor:pointer;box-shadow:0 3px 10px #0002}
+.lk.lk-left-handed .lk-landing{left:auto;right:10px}
+.lk.lk-landing-view .lk-landing{background:#fff8dc;color:#173b2d}
+.lk .lk-landing:focus-visible{outline:3px solid #d8c16c;outline-offset:2px}

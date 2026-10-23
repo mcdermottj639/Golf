@@ -100,7 +100,7 @@ export async function create(canvas,onLost){
     for(const sign of [-1,1]){const marker=new T.Mesh(new T.BoxGeometry(.3,.22,.3),markerMat);marker.position.copy(V(h.tee,.2)).addScaledVector(side,sign*2.2);root.add(marker);}
     flag.position.copy(V(h.pin,.02));
   }
-  function render({course,h,ballState,anim,fx,forecast,angle,reduced,pulling}){
+  function render({course,h,ballState,anim,fx,forecast,angle,reduced,pulling,landing:scout}){
     if(disposed)return;setHole(course,h);
     const nw=canvas.clientWidth,nh=canvas.clientHeight;if(!nw||!nh)return;
     if(nw!==W||nh!==H){W=nw;H=nh;renderer.setSize(W,H,false);camera.aspect=W/H;camera.updateProjectionMatrix();}
@@ -111,6 +111,7 @@ export async function create(canvas,onLost){
     const bp=V(pos,height);
     const wanted=V(b).addScaledVector(u,-14);wanted.y=8;
     const look=V(b).addScaledVector(u,22);look.y=.3;
+    if(scout&&!flight){wanted.copy(V(scout.center)).addScaledVector(u,-38);wanted.y=55;look.copy(V(scout.center,.2));}
     if(flight&&!reduced){wanted.copy(bp).addScaledVector(u,-23);wanted.y+=9;look.copy(bp).addScaledVector(u,22);look.y=Math.max(.4,height*.55);}
     if(!valid||reduced){camera.position.copy(wanted);}else camera.position.lerp(wanted,flight?.18:.24);
     camera.lookAt(look);camera.updateMatrixWorld();valid=true;
@@ -120,7 +121,7 @@ export async function create(canvas,onLost){
     const id=ballState.club.id||'',wedge=/°|wedge|^[PAGSL]W$|^\d{2}$/i.test(id),blade=ballState.club.putter||wedge||/i$|putt/i.test(id);
     head.visible=!blade;iron.visible=blade;iron.rotation.x=wedge?-.65:-.3;
     head.scale.set(/^dr$/i.test(id)?.4:.29,.15,.26);
-    club.visible=(!flight||k<.12)&&!ballState.done;club.position.copy(V(b,.22)).addScaledVector(right,.6);club.rotation.y=-angle;
+    club.visible=!scout&&(!flight||k<.12)&&!ballState.done;club.position.copy(V(b,.22)).addScaledVector(right,.6);club.rotation.y=-angle;
     const load=clamp(ballState.power||0,0,1.1);
     club.rotation.z=flight?-.8+Math.min(1,k/.12)*2.2:pulling?-.15-load*.9:0;
     if(pulling)club.position.addScaledVector(u,-load*.75);
