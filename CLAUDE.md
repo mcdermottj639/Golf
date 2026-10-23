@@ -4170,7 +4170,7 @@ previews and overlays redraw. Camera eases between poses; each hole opens with a
 back to the tee. Course art colours are fixed (it is a map), UI colours use the app tokens so Night
 mode applies.
 
-**Ball flight trail (v255, PR pending).** During a full shot `stepAnim()` appends `{p, hy}` to
+**Ball flight trail (v255, PR #79).** During a full shot `stepAnim()` appends `{p, hy}` to
 `anim.trail` every frame (capped at `TRAIL_MAX` 110) — the ground position and the ball's height in
 WORLD yards (`A.h / view.s`), so a camera that re-frames after landing redraws the arc at the right
 height instead of in stale pixels. `drawTrail()` strokes the ground track as one soft dark line and the
@@ -4202,5 +4202,4 @@ course records and a shareable scorecard image; standing-plan tips on each tee f
 Rules for that task: one improvement per run, feature-flag anything that changes scoring, never touch
 packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item and update this
 section, and log the run in the handoff.
-Shipped by that task: ball trail + landing puff — v255, branch `links/20261023-ball-trail` (PR number
-recorded in the handoff; Jack merges).
+Shipped by that task: ball trail + landing puff — v255, PR #79 (`links/20261023-ball-trail`; Jack merges).
