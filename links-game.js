@@ -335,12 +335,36 @@ function boot(){
     const bs=result.ball,phase=S.h.phase,flight=phase==='flight';
     const target=$('target');target.hidden=flight||S.h.done;
     const pinBadge=$('pin');pinBadge.hidden=flight||S.h.done;
-    if(!pinBadge.hidden){const p=scene.project(holeObj().pin,3.1);pinBadge.textContent='⚑ Pin '+Math.round(remaining())+' yd';pinBadge.style.left=clamp(p[0],65,W-65)+'px';pinBadge.style.top=clamp(p[1]-52,58,H-150)+'px';}
-    if(!target.hidden&&result.target){const p=scene.project(result.target,.2);target.textContent='Carry '+Math.round(dist(S.h.ball,result.target))+' yd';target.style.left=clamp(p[0],65,W-65)+'px';target.style.top=clamp(p[1]-24,60,H-100)+'px';}
+    const labels=[];
+    if(!pinBadge.hidden){const p=scene.project(holeObj().pin,3.1);pinBadge.textContent='⚑ Pin '+Math.round(remaining())+' yd';labels.push({el:pinBadge,x:p[0],y:p[1]-52,anchor:1});}
+    if(!target.hidden&&result.target){const p=scene.project(result.target,.2);target.textContent='Carry '+Math.round(dist(S.h.ball,result.target))+' yd';labels.push({el:target,x:p[0],y:p[1]-24,anchor:.5});}
+    placeSceneLabels(labels,W,H);
     const read=$('flight-readout');read.hidden=!flight;
     if(flight){read.innerHTML='<span>'+(result.progress<1?'BALL IN FLIGHT':'ROLLING')+'</span><strong>'+result.carry+' <small>yd</small></strong><span>'+esc(anim?.club?.id||'')+' · '+(result.progress<1?'distance so far':'total distance')+'</span>';}
     if(G&&(G.kind==='pull'||G.kind==='trace')){ctx.strokeStyle='#fff9df';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bs[0],bs[1]);for(const p of G.pts)ctx.lineTo(p.x,p.y);ctx.stroke();label(clamp(G.cur[0]-20,8,W-95),clamp(G.cur[1]-20,60,H-25),Math.round((S.h.power||0)*100)+'%');}
     if(mode==='dial'&&phase==='armed'){const r=12+Math.abs(S.h.needle||0)*75;ctx.strokeStyle='#fff4bd';ctx.lineWidth=3;ctx.beginPath();ctx.arc(bs[0],bs[1],r,0,7);ctx.stroke();ctx.lineWidth=1;ctx.beginPath();ctx.arc(bs[0],bs[1],12,0,7);ctx.stroke();}
+  }
+  // Keep projected distances near their course position without covering HUD
+  // controls or each other. Measure the current layout so handedness, viewport,
+  // landing inspection and different button widths use the same safe placement.
+  function placeSceneLabels(labels,W,H){
+    if(!labels.length)return;
+    const base=$('stage').getBoundingClientRect(),gap=8;
+    const blocked=[...$('stage').querySelectorAll('.hud > *, .foot > *, .lk-landing, .lk-powerrail, .camrow, .lk-plan')]
+      .filter(el=>!el.hidden&&el.getClientRects().length).map(el=>{const r=el.getBoundingClientRect();return{x:r.left-base.left,y:r.top-base.top,w:r.width,h:r.height};});
+    const overlaps=(a,b)=>a.x<b.x+b.w+gap&&a.x+a.w+gap>b.x&&a.y<b.y+b.h+gap&&a.y+a.h+gap>b.y;
+    for(const {el,x,y,anchor} of labels){
+      const w=el.offsetWidth,h=el.offsetHeight,maxX=W-w-gap,maxY=H-h-gap;
+      const desired={x:clamp(x-w/2,gap,maxX),y:clamp(y-h*anchor,gap,maxY)};
+      const xs=[desired.x,gap,maxX],ys=[desired.y,gap,maxY];
+      for(const b of blocked){xs.push(clamp(b.x-w-gap,gap,maxX),clamp(b.x+b.w+gap,gap,maxX));ys.push(clamp(b.y-h-gap,gap,maxY),clamp(b.y+b.h+gap,gap,maxY));}
+      let best=null,cost=Infinity;
+      for(const px of xs)for(const py of ys){const box={x:px,y:py,w,h};if(blocked.some(b=>overlaps(box,b)))continue;const d=(px-desired.x)**2+(py-desired.y)**2;if(d<cost){best=box;cost=d;}}
+      // Extremely small stages can have no free label-sized area. The same
+      // distances remain in the dock rather than covering an interactive control.
+      el.style.visibility=best?'':'hidden';
+      if(best){el.style.left=best.x+'px';el.style.top=best.y+'px';blocked.push(best);}
+    }
   }
   function drawMini(){
     if(!S?.h||$('mini').hidden)return;const mc=$('mini'),c=mc.getContext('2d'),h=holeObj(),p=h.path;
@@ -706,7 +730,7 @@ function boot(){
   $('powerrail').addEventListener('lostpointercapture',()=>{if(rail)cancelRail();});
   $('powerhandle').addEventListener('keydown',e=>{if(!S?.h||S.h.phase!=='aim')return;if(['ArrowDown','ArrowUp','Escape'].includes(e.key)){e.preventDefault();if(e.key==='Escape'){cancelRail();return;}G={kind:'pad',pts:[],cur:[0,0]};railUpdate(Math.max(.15,Math.min(1.1,railPower+(e.key==='ArrowDown'?.05:-.05))));}});
   $('powerhandle').addEventListener('click',e=>{if(e.detail!==0||!S?.h||S.h.phase!=='aim')return;G={kind:'pad',pts:[],cur:[0,0]};railUpdate(railPower);firePull();G=null;renderUI();draw();});
-  $('hand').addEventListener('click',()=>{cancelRail();const left=rootNode.classList.toggle('lk-left-handed');store.set('hand',left?'left':'right');});
+  $('hand').addEventListener('click',()=>{cancelRail();const left=rootNode.classList.toggle('lk-left-handed');store.set('hand',left?'left':'right');draw();});
   $('retry').addEventListener('click',()=>{
     if(!lastShot||!S||S.daily||S.h.phase==='flight')return;
     clearTimeout(gimmeTimer);clearTimeout(bannerTimer);anim=null;fx=null;meterOn=false;G=null;rail=null;landingView=null;

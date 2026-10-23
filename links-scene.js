@@ -109,7 +109,10 @@ export async function create(canvas,onLost){
     const k=flight?clamp((performance.now()-anim.t0)/anim.dur,0,1):0;
     const height=flight&&k<1?4*anim.apex*k*(1-k):0;
     const bp=V(pos,height);
-    const wanted=V(b).addScaledVector(u,-14);wanted.y=8;
+    // A little higher and farther behind the tee exposes the landing area
+    // while retaining the ball/club in frame. Other lies keep their shot view.
+    const teeView=ballState.lie==='tee'&&!flight;
+    const wanted=V(b).addScaledVector(u,teeView?-18:-14);wanted.y=teeView?11:8;
     const look=V(b).addScaledVector(u,22);look.y=.3;
     if(scout&&!flight){wanted.copy(V(scout.center)).addScaledVector(u,-38);wanted.y=55;look.copy(V(scout.center,.2));}
     if(flight&&!reduced){wanted.copy(bp).addScaledVector(u,-23);wanted.y+=9;look.copy(bp).addScaledVector(u,22);look.y=Math.max(.4,height*.55);}

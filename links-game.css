@@ -205,3 +205,4 @@ body.lk-ingame #view{padding-bottom:0}
 .lk.lk-left-handed .lk-landing{left:auto;right:10px}
 .lk.lk-landing-view .lk-landing{background:#fff8dc;color:#173b2d}
 .lk .lk-landing:focus-visible{outline:3px solid #d8c16c;outline-offset:2px}
+.lk .lk-pin,.lk .lk-target{transform:none}

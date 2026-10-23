@@ -4086,7 +4086,7 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
-## Caddie HQ Links — the course game (v259, October 23 2026)
+## Caddie HQ Links — the course game (v260, October 23 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own
 bag. Full shots use a behind-ball 3D view and a following camera; putting and the optional hole map remain 2D. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
@@ -4245,6 +4245,10 @@ four, `.lk-game` spanning the view width, dock bottom inside the viewport, shape
 — but `env()` is 0 in Chromium, so the 34 px home-indicator margin is only proven by arithmetic until
 Jack's phone confirms it. The v252 check at 400×860 missed the clipping because the game section is
 `max-width:520px` and 400 px only clips 120 px of trees. The v257 browser suite exercises the new thumb pad and perspective aiming; keep tests around gesture changes.
+
+**v260 tee view.** At Jack’s request, the tee camera rises from 8 to 11 world yards and moves back from 14 to 18, preserving the behind-ball viewpoint and ball framing. Other lies, landing inspection (55), flight camera, aiming and physics are unchanged.
+
+**v260 HUD spacing.** Projected pin/carry labels use measured HUD rectangles to choose the nearest unobstructed placement, with an 8px gap from Landing spot, power rail, map, plan, wind/lie and distance/shot chips and from each other. Switching rail side immediately redraws labels. Extremely cramped stages hide an unplaceable label rather than cover a control; distances remain in the dock. No course geometry, physics, scoring or golf-record changes. `tests/links-hud-browser.cjs` covers 320/390/430px phones with a simulated safe-area inset, both rail sides, hole 10, landing aim, camera heights and return, and unchanged golf state. The 3D offline test reads the actual SW cache version instead of hard-coding v259.
 
 **v259 validation.** `tests/links-landing-browser.cjs` passed five cases: 320×568 Slingshot,
 390×844 touch/reduced-motion Slingshot with simulated top inset, Trace, Shape dial and no-WebGL
