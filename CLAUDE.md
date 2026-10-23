@@ -4198,6 +4198,10 @@ Jack's phone confirms it. The v252 check at 400×860 missed the clipping because
 `max-width:520px` and 400 px only clips 120 px of trees. There is no automated gesture suite in
 `tests/` yet — add one before changing the gesture thresholds.
 
+**v256 validation.** `node tests/links-exit-browser.cjs` checks 320×568 and 390×844, plus a simulated 59 px top inset: visible 45 px exit target, no horizontal overflow, dock reachable, Home/nav restored, repeat mount/exit, unchanged golf state and no page errors. The complete Pages verification suite passed. Native iPhone blur still needs device confirmation; Chromium only validates the inset layout.
+
+**v256 safe exit.** The in-game body supplies top safe-area padding because its normal masthead is hidden. A 44 px minimum Back to Caddie HQ button calls the app bridge to render Home; render unmounts Links and restores the masthead/navigation. Leaving discards the current game without changing golf records. Keep this exit visible when adjusting viewport sizing.
+
 **Backlog (owned by the Jarvis "Links improver" scheduled task; see the Caddie HQ handoff in
 claudex).** Graphics: real tree canopies from OSM `wood` outlines, shadows by sun angle, bunker
 sand texture, water animation. Game: per-club dispersion from every bay session instead of

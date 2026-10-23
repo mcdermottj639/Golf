@@ -4,7 +4,7 @@
 .lk [hidden]{display:none!important}
 .lk button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 /* In a round the masthead and tab bar hide; the page may still scroll (the canvas captures its own touches), so a short phone can always reach the dock. */
-body.lk-ingame{overscroll-behavior-y:none;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+body.lk-ingame{padding-top:calc(env(safe-area-inset-top,0px) + 8px);overscroll-behavior-y:none;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
 body.lk-ingame .hero.hq-shell,body.lk-ingame nav,body.lk-ingame #nav{display:none}
 
 
@@ -43,6 +43,7 @@ body.lk-ingame .hero.hq-shell,body.lk-ingame nav,body.lk-ingame #nav{display:non
 .lk .picked{display:flex;flex-direction:column;gap:2px;border:1px solid var(--green);border-radius:12px;padding:10px 14px;background:var(--card)}
 .lk .picked .n{font-family:var(--serif);font-size:20px;font-weight:700}
 .lk .picked .m{font-family:var(--mono);font-size:11px;color:var(--ink62)}
+.lk .lk-exit{flex-shrink:0;align-self:flex-start;min-height:44px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:15px;font-weight:700}
 .lk .lk-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .lk .lk-top h1{font-size:21px}
 .lk .topar{font-family:var(--serif);font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}

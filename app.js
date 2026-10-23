@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v255';
+const BUILD = 'v256';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v256', d:'2026-10-23', items:['LINKS EXIT: A clear Back to Caddie HQ button returns you to the app from a game. The game header now has its own top safe-area spacing for iPhone. Leaving ends the current game; your golf records stay unchanged.'] },
   { b:'v255', d:'2026-10-23', items:['LINKS BALL FLIGHT YOU CAN SEE: Every full shot now leaves a trail — a white arc through the air over its shadow track on the ground, fading behind the ball — and the shadow shrinks as the ball climbs so height reads at a glance. Where it lands, a ring spreads and fades: a sand puff in a bunker, a splash in water. Pure drawing; no shot, roll or score is any different.'] },
   { b:'v254', d:'2026-10-22', items:['LINKS SHOT VIEW: The camera now sits close behind the ball and looks out to where your club lands, so each shot feels played rather than surveyed. Tap Hole view on the map for the whole hole from the air, Shot view to come back; the game remembers your choice. Putting is unchanged.'] },
   { b:'v253', d:'2026-10-22', items:['LINKS FITS THE PHONE: The hole and every control now fit one screen, sized to the visible viewport and clear of the home indicator; the page can scroll if a phone is short. The hole was being drawn 520 px wide and clipped on a 390 px phone — it is full width and centred now. Tee off sits at the top of the menu above a compact course grid, and the draw/fade slider has its own line.'] },
@@ -2087,7 +2088,7 @@ function render(view, arg, keepScroll){
   buildJumpBar();
   hqUpdateShell();hqHasRendered=true;
   if(view === 'courseprep') window.CaddieCoursePrep?.mount(document.getElementById('course-prep'));
-  if(view === 'links') window.CaddieLinks?.mount(document.getElementById('lk-root'), { state:()=>S, clubCanon, toast });
+  if(view === 'links') window.CaddieLinks?.mount(document.getElementById('lk-root'), { state:()=>S, clubCanon, toast, onExit:()=>render('home') });
   if(!keepScroll) window.scrollTo(0,0);
 }
 
