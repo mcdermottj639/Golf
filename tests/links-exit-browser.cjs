@@ -16,7 +16,7 @@ const {server,chromium,state,ready}=require('./course-prep-browser.cjs');
  await p.locator('#lk-start').click();await p.locator('#lk-game').waitFor({state:'visible'});
  const before=await state(p);
  const b=await p.locator('#lk-quit').boundingBox();assert.ok(b.y>=inset+8,JSON.stringify(b));assert.ok(b.height>=44);assert.ok(b.x>=0&&b.x+b.width<=width);
- assert.equal(await p.locator('#lk-quit').textContent(),'← Back to Caddie HQ');
+ assert.equal(await p.locator('#lk-quit').getAttribute('aria-label'),'Back to Caddie HQ');
  assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no horizontal overflow');
  await p.locator('.lk .dock').scrollIntoViewIfNeeded();
  await p.locator('#lk-quit').click();assert.equal(await p.locator('#view').getAttribute('data-page'),'home');

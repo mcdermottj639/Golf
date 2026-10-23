@@ -1,10 +1,10 @@
-/* Caddie HQ Links — a top-down course game played on the app's own course packs with the player's own bag.
+/* Caddie HQ Links — a perspective course game played on the app's own course packs with the player's own bag.
    Self-contained module. Reads: window.CADDIE_PREP_COURSES (directory), window.CaddieCoursePacks.ensure(id) (geometry),
    and a bridge from app.js ({state, clubCanon, toast}) for the live carry ladder. Writes only its own localStorage keys
    (chqlinks:*: mode, course, length, distance boost, best scores). Never touches golf state, packs or feeds. */
 (function(){
 'use strict';
-const HTML='<div class="wrap" id="lk-menuwrap">\n  <section id="lk-menu" class="menu">\n    <div>\n      <div class="kick">Caddie HQ · course game</div>\n      <h1>Play your courses with your own bag</h1>\n    </div>\n    <p class="lk-note">Your mapped courses, your TrackMan carries, your measured misses. Every green has its own slope to read.</p>\n    <div class="picked" id="lk-picked"></div>\n    <div class="lk-seg" id="lk-lenseg" role="group" aria-label="Round length">\n      <button type="button" data-len="front" aria-pressed="false">Front 9</button>\n      <button type="button" data-len="back" aria-pressed="false">Back 9</button>\n      <button type="button" data-len="18" aria-pressed="true">18 holes</button>\n    </div>\n    <button class="go" id="lk-start" type="button">Tee off</button>\n    <button class="lk-ghost" id="lk-daily" type="button">Today\'s course: <span id="lk-dailyName"></span></button>\n    <div class="kick" style="margin-top:4px">Courses · tap to pick</div>\n    <div class="courses" id="lk-courses"></div>\n    <div class="kick">Swing style</div>\n    <div class="lk-seg" id="lk-modeseg" role="group" aria-label="Swing style">\n      <button type="button" data-mode="sling" aria-pressed="false">Slingshot</button>\n      <button type="button" data-mode="trace" aria-pressed="false">Trace</button>\n      <button type="button" data-mode="dial" aria-pressed="false">Shape dial</button>\n    </div>\n    <p class="lk-note" id="lk-modenote"></p>\n    <div class="row" style="justify-content:space-between"><span class="kick">Distance vs indoor numbers</span><span class="kick" id="lk-boostlab"></span></div>\n    <input type="range" id="lk-boost" min="0" max="25" step="1" aria-label="Distance adjustment percent">\n    <details class="lk-note"><summary>How it plays</summary>\n      <p><b>Swing styles.</b> Choose Slingshot, Trace or Shape dial on the menu. In Slingshot and Trace, tap anywhere on the hole to set your target line first; the view turns to face it.</p>\n      <p><b>Shape dial.</b> Tap the hole to set your line, choose draw/fade, trajectory and swing length, then tap Strike and tap again when the closing ring meets the ball. Older meter notes: pick a club, drag on the hole to aim. The shaded oval is where that club usually lands for you, wind included. Tap <b>Lock the line</b>, then tap <b>Swing</b> as the needle crosses center. Center is pured, the green band is solid, outside it is struck. Early pulls it left, late pushes it right.</p>\n      <p><b>Putting.</b> The view zooms to the green. Arrows point downhill; longer arrows mean more slope. Drag to set your line. The dotted preview shows where the ball rolls at perfect pace on that line, so move the line until the preview runs over the hole. Then the meter is pace: center is perfect, left is short, right is long. Anything inside 2 ft is a gimme.</p>\n      <p>Rough costs about 8% of carry, fairway bunkers 20%, trees force a punch-out. Water is a one-stroke penalty with a drop behind where the ball crossed.</p>\n    </details>\n    <details class="lk-note"><summary>Your bag in this game</summary>\n      <div class="tablewrap"><table class="lk-bag" id="lk-bagtable"></table></div>\n      <p id="lk-bagnote"></p>\n    </details>\n    <p class="lk-note" style="font-size:11px">Course shapes: © OpenStreetMap contributors (ODbL), from Caddie HQ\'s verified course packs. Pars and yardages from each course\'s published scorecard. Trees between holes and green slopes are generated for play.</p>\n  </section>\n\n  <section id="lk-end" class="final" hidden>\n    <div class="kick" id="lk-ecourse"></div>\n    <div class="row" style="justify-content:space-between;align-items:flex-end">\n      <div><h1 id="lk-etitle">Round complete</h1><div class="lk-note" id="lk-estrokes"></div></div>\n      <div class="bigscore" id="lk-escore"></div>\n    </div>\n    <div class="tablewrap"><table class="lk-bag" id="lk-etable"></table></div>\n    <div class="lk-stats" id="lk-estats"></div>\n    <button class="go" id="lk-again" type="button">Play it again</button>\n    <button class="lk-ghost" id="lk-menu2" type="button">Back to courses</button>\n  </section>\n</div>\n\n<section class="lk-game" id="lk-game" hidden>\n    <button class="lk-exit" id="lk-quit" type="button">← Back to Caddie HQ</button>\n  <div class="lk-top">\n    <div style="min-width:0">\n      <div class="row" style="gap:10px"><span class="kick" id="lk-gcourse"></span></div>\n      <div class="row" style="gap:12px;flex-wrap:nowrap"><h1 id="lk-ghole"></h1><div class="holeline" id="lk-gline"></div></div>\n    </div>\n    <div style="text-align:right"><div class="kick">To par</div><div class="topar" id="lk-gpar">E</div></div>\n  </div>\n  <div class="lk-card" id="lk-gcard"></div>\n  <div class="stage" id="lk-stage">\n    <canvas id="lk-cv"></canvas>\n    <div class="hud">\n      <div class="lk-pill wind" id="lk-wind"></div>\n      <div class="lk-pill" id="lk-lie"></div>\n    </div>\n    <div class="camrow"><button type="button" class="lk-pill lk-camtog" id="lk-camtog">Hole view</button>\n    </div>\n    <div class="banner" id="lk-banner"><div class="lk-big" id="lk-bbig"></div><div class="lk-sub" id="lk-bsub"></div></div>\n    <div class="hint" id="lk-hint" hidden></div>\n    <div class="foot"><div class="lk-pill" id="lk-topin"></div><div class="lk-pill" id="lk-shotno"></div></div>\n  </div>\n  <div class="dock">\n    <div class="lk-clubs" id="lk-clubs" role="group" aria-label="Clubs"></div>\n    <div class="readout" id="lk-readout"></div>\n    <div class="lk-meter" id="lk-meter" aria-hidden="true">\n      <div class="z solid"></div><div class="z pure"></div>\n      <span class="lk-lab" id="lk-labL" style="left:6px">EARLY · LEFT</span><span class="lk-lab" id="lk-labR" style="right:6px">LATE · RIGHT</span>\n      <div class="needle" id="lk-needle"></div><div class="lk-hit" id="lk-hit" hidden></div><div class="grade" id="lk-grade" hidden></div>\n    </div>\n    <div class="shaperow" id="lk-shaperow" hidden>\n      <div class="lk-seg" id="lk-trajseg" role="group" aria-label="Trajectory"><button type="button" data-t="-1" aria-pressed="false">Low</button><button type="button" data-t="0" aria-pressed="true">Stock</button><button type="button" data-t="1" aria-pressed="false">High</button></div>\n      <div class="lk-seg" id="lk-pwseg" role="group" aria-label="Swing length" hidden><button type="button" data-p="1" aria-pressed="true">Full</button><button type="button" data-p="0.75" aria-pressed="false">¾</button><button type="button" data-p="0.5" aria-pressed="false">½</button></div><span class="shp"><span id="lk-shapeL">Draw</span><input type="range" id="lk-shape" min="-3" max="3" step="1" value="0" aria-label="Shape"><span>Fade</span><span class="val" id="lk-shapeval">straight</span></span>\n    </div>\n    <button class="go" id="lk-act" type="button">Lock the line</button>\n    <div class="instr" id="lk-instr" hidden></div>\n  </div>\n</section>\n\n';
+const HTML="<div class=\"wrap\" id=\"lk-menuwrap\">\n  <section id=\"lk-menu\" class=\"menu\">\n    <div>\n      <div class=\"kick\">Caddie HQ · course game</div>\n      <h1>Play your courses with your own bag</h1>\n    </div>\n    <p class=\"lk-note\">Your mapped courses, your TrackMan carries, your measured misses. Play from behind the ball, follow your shot, and explore your mapped holes.</p>\n    <div class=\"picked\" id=\"lk-picked\"></div>\n    <div class=\"lk-seg\" id=\"lk-lenseg\" role=\"group\" aria-label=\"Round length\">\n      <button type=\"button\" data-len=\"front\" aria-pressed=\"false\">Front 9</button>\n      <button type=\"button\" data-len=\"back\" aria-pressed=\"false\">Back 9</button>\n      <button type=\"button\" data-len=\"18\" aria-pressed=\"true\">18 holes</button>\n    </div>\n    <button class=\"go\" id=\"lk-start\" type=\"button\">Tee off</button>\n    <button class=\"lk-ghost\" id=\"lk-daily\" type=\"button\">Today's course: <span id=\"lk-dailyName\"></span></button>\n    <div class=\"kick\" style=\"margin-top:4px\">Courses · tap to pick</div>\n    <div class=\"courses\" id=\"lk-courses\"></div>\n    <div class=\"kick\">Swing style</div>\n    <div class=\"lk-seg\" id=\"lk-modeseg\" role=\"group\" aria-label=\"Swing style\">\n      <button type=\"button\" data-mode=\"sling\" aria-pressed=\"false\">Slingshot</button>\n      <button type=\"button\" data-mode=\"trace\" aria-pressed=\"false\">Trace</button>\n      <button type=\"button\" data-mode=\"dial\" aria-pressed=\"false\">Shape dial</button>\n    </div>\n    <p class=\"lk-note\" id=\"lk-modenote\"></p>\n    <div class=\"row\" style=\"justify-content:space-between\"><span class=\"kick\">Distance vs indoor numbers</span><span class=\"kick\" id=\"lk-boostlab\"></span></div>\n    <input type=\"range\" id=\"lk-boost\" min=\"0\" max=\"25\" step=\"1\" aria-label=\"Distance adjustment percent\">\n    <details class=\"lk-note\"><summary>How it plays · course accuracy</summary><p><b>Course accuracy.</b> Routing and available hazards come from your course packs. The 3D scenery, tree shapes and green breaks are simulated; elevations are not surveyed. Use your saved Caddie plan for real-course advice. Missing mapped fairways/greens use the existing game approximations. This game does not measure real putting breaks.</p>\n      <p><b>Swing styles.</b> Choose Slingshot, Trace or Shape dial on the menu. In Slingshot and Trace, tap anywhere on the hole to set your target line first; the view turns to face it.</p>\n      <p><b>Shape dial.</b> Tap the hole to set your line, choose draw/fade, trajectory and swing length, then tap Strike and tap again when the closing ring meets the ball. Older meter notes: pick a club, drag on the hole to aim. The shaded oval is where that club usually lands for you, wind included. Tap <b>Lock the line</b>, then tap <b>Swing</b> as the needle crosses center. Center is pured, the green band is solid, outside it is struck. Early pulls it left, late pushes it right.</p>\n      <p><b>Putting.</b> The view zooms to the green. Arrows point downhill; longer arrows mean more slope. Drag to set your line. The dotted preview shows where the ball rolls at perfect pace on that line, so move the line until the preview runs over the hole. Then the meter is pace: center is perfect, left is short, right is long. Anything inside 2 ft is a gimme.</p>\n      <p>Rough costs about 8% of carry, fairway bunkers 20%, trees force a punch-out. Water is a one-stroke penalty with a drop behind where the ball crossed.</p>\n    </details>\n    <details class=\"lk-note\"><summary>Your bag in this game</summary>\n      <div class=\"tablewrap\"><table class=\"lk-bag\" id=\"lk-bagtable\"></table></div>\n      <p id=\"lk-bagnote\"></p>\n    </details>\n    <p class=\"lk-note\" style=\"font-size:11px\">Course shapes: © OpenStreetMap contributors (ODbL), from Caddie HQ's verified course packs. Pars and yardages from each course's published scorecard. Trees between holes and green slopes are generated for play.</p>\n  </section>\n\n  <section id=\"lk-end\" class=\"final\" hidden>\n    <div class=\"kick\" id=\"lk-ecourse\"></div>\n    <div class=\"row\" style=\"justify-content:space-between;align-items:flex-end\">\n      <div><h1 id=\"lk-etitle\">Round complete</h1><div class=\"lk-note\" id=\"lk-estrokes\"></div></div>\n      <div class=\"bigscore\" id=\"lk-escore\"></div>\n    </div>\n    <div class=\"tablewrap\"><table class=\"lk-bag\" id=\"lk-etable\"></table></div>\n    <div class=\"lk-stats\" id=\"lk-estats\"></div>\n    <button class=\"go\" id=\"lk-again\" type=\"button\">Play it again</button>\n    <button class=\"lk-ghost\" id=\"lk-menu2\" type=\"button\">Back to courses</button>\n  </section>\n</div>\n\n<section class=\"lk-game\" id=\"lk-game\" hidden>\n  <header class=\"lk-playhead\">\n    <button class=\"lk-exit\" id=\"lk-quit\" type=\"button\" aria-label=\"Back to Caddie HQ\">‹ <span>Caddie HQ</span></button>\n    <div class=\"lk-hole-title\"><div class=\"kick\" id=\"lk-gcourse\"></div><div class=\"row\"><h1 id=\"lk-ghole\"></h1><div class=\"holeline\" id=\"lk-gline\"></div></div></div>\n    <button class=\"lk-score-toggle\" id=\"lk-score-toggle\" type=\"button\" aria-label=\"Show scorecard\" aria-expanded=\"false\"><span id=\"lk-gpar\">E</span><small>Card</small></button>\n  </header>\n  <div class=\"lk-card\" id=\"lk-gcard\" hidden></div>\n  <div class=\"stage\" id=\"lk-stage\">\n    <canvas id=\"lk-cv3\" aria-hidden=\"true\" hidden></canvas><canvas id=\"lk-cv\"></canvas>\n    <div class=\"hud\">\n      <div class=\"lk-pill wind\" id=\"lk-wind\"></div>\n      <div class=\"lk-pill\" id=\"lk-lie\"></div>\n    </div>\n    <div class=\"lk-target\" id=\"lk-target\" hidden></div><button id=\"lk-skip\" class=\"lk-skip\" type=\"button\" hidden>Skip flight ›</button><div class=\"lk-flight-readout\" id=\"lk-flight-readout\" hidden></div><button class=\"lk-plan\" id=\"lk-plan\" type=\"button\" aria-haspopup=\"dialog\">Caddie plan ↗</button><div class=\"camrow\"><button type=\"button\" class=\"lk-pill lk-camtog\" id=\"lk-camtog\"><canvas id=\"lk-mini\" width=\"140\" height=\"180\" aria-hidden=\"true\"></canvas><span id=\"lk-maplabel\">Hole map</span></button>\n    </div>\n    <div class=\"banner\" id=\"lk-banner\"><div class=\"lk-big\" id=\"lk-bbig\"></div><div class=\"lk-sub\" id=\"lk-bsub\"></div></div>\n    <div class=\"hint\" id=\"lk-hint\" hidden></div>\n    <div class=\"foot\"><div class=\"lk-pill\" id=\"lk-topin\"></div><div class=\"lk-pill\" id=\"lk-shotno\"></div></div>\n  </div>\n  <div class=\"dock\">\n    <div class=\"lk-controlrow\"><details class=\"lk-clubbox\" id=\"lk-clubbox\"><summary id=\"lk-clubsummary\">Choose club</summary><div class=\"lk-clubs\" id=\"lk-clubs\" role=\"group\" aria-label=\"Clubs\"></div></details><details class=\"lk-shapebox\" id=\"lk-shapebox\"><summary id=\"lk-shapesummary\">Stock · Straight</summary>    <div class=\"shaperow\" id=\"lk-shaperow\" hidden>\n      <div class=\"lk-seg\" id=\"lk-trajseg\" role=\"group\" aria-label=\"Trajectory\"><button type=\"button\" data-t=\"-1\" aria-pressed=\"false\">Low</button><button type=\"button\" data-t=\"0\" aria-pressed=\"true\">Stock</button><button type=\"button\" data-t=\"1\" aria-pressed=\"false\">High</button></div>\n      <div class=\"lk-seg\" id=\"lk-pwseg\" role=\"group\" aria-label=\"Swing length\" hidden><button type=\"button\" data-p=\"1\" aria-pressed=\"true\">Full</button><button type=\"button\" data-p=\"0.75\" aria-pressed=\"false\">¾</button><button type=\"button\" data-p=\"0.5\" aria-pressed=\"false\">½</button></div><span class=\"shp\"><span id=\"lk-shapeL\">Draw</span><input type=\"range\" id=\"lk-shape\" min=\"-3\" max=\"3\" step=\"1\" value=\"0\" aria-label=\"Shape\"><span>Fade</span><span class=\"val\" id=\"lk-shapeval\">straight</span></span>\n    </div>\n</details></div>\n    <div class=\"readout\" id=\"lk-readout\"></div>\n    <div class=\"lk-meter\" id=\"lk-meter\" aria-hidden=\"true\">\n      <div class=\"z solid\"></div><div class=\"z pure\"></div>\n      <span class=\"lk-lab\" id=\"lk-labL\" style=\"left:6px\">EARLY · LEFT</span><span class=\"lk-lab\" id=\"lk-labR\" style=\"right:6px\">LATE · RIGHT</span>\n      <div class=\"needle\" id=\"lk-needle\"></div><div class=\"lk-hit\" id=\"lk-hit\" hidden></div><div class=\"grade\" id=\"lk-grade\" hidden></div>\n    </div>\n    <button class=\"go\" id=\"lk-act\" type=\"button\">Lock the line</button>\n    <button type=\"button\" class=\"instr\" id=\"lk-instr\" hidden></button>\n  </div>\n</section>\n\n";
 let R=null,bridge={},stopFn=null,dbgFn=null;
 function render(){return '<div class="lk" id="lk-root">'+HTML+'</div>';}
 function mount(node,b){unmount();R=node;bridge=b||{};if(!R)return;boot();}
@@ -37,7 +37,9 @@ function boot(){
   const GIMME_FT=2, HOLE_R_FT=0.177, FT=3; // yards→feet
 
   /* ---------- helpers ---------- */
-  const $=id=>R.querySelector('#lk-'+id);
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const rootNode=R;let stopped=false;
+  const $=id=>rootNode.querySelector('#lk-'+id);
   const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const store={get(k,d){try{const v=localStorage.getItem('chqlinks:'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('chqlinks:'+k,JSON.stringify(v))}catch(e){}}};
   function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -183,6 +185,13 @@ function boot(){
   let G=null; // active gesture
   const view={cx:0,cy:0,s:1,ang:0,tcx:0,tcy:0,ts:1,tang:0};
   let cv=$('cv'),ctx=cv.getContext('2d');
+  let scene=null,scenePromise=null,threeActive=false,sceneMoving=false,roundToken=0,gimmeTimer=0;
+  async function ensureScene(){
+    if(scene||scenePromise)return scenePromise;
+    scenePromise=import('./links-scene.js').then(async m=>{if(stopped)return;const candidate=await m.create($('cv3'),()=>{threeActive=false;scene?.dispose();scene=null;$('cv3').hidden=true;rootNode.classList.remove('lk-perspective');banner('Map view','3D unavailable on this device');draw()});if(stopped){candidate.dispose();return;}scene=candidate;}).catch(()=>{if(!stopped)banner('Map view','3D unavailable on this device');});
+    return scenePromise;
+  }
+  const use3D=()=>!!(scene&&S?.h&&camMode==='shot'&&!onGreen());
   let anim=null, meterT0=0, meterOn=false, raf=0;
   let fx=null; // after-shot effects: the flight trail fading out and the landing puff (v255); pure drawing, never scoring
   const FX_MS=1500, TRAIL_MAX=110;
@@ -199,7 +208,7 @@ function boot(){
   function startHole(){
     const h=holeObj();
     S.h={ball:h.tee.slice(),lie:'tee',strokes:0,putts:0,wind:windFor(S.seed,h),done:false,phase:'aim',history:[h.tee.slice()],club:null,aim:null,preview:null,vPerfect:0,shape:0,traj:0,power:null,lineAim:null,pw:1};
-    fx=null;pickDefaultClub();defaultAim();introCam();renderUI();draw();
+    clearTimeout(gimmeTimer);G=null;scene?.reset();$('clubbox').open=false;$('shapebox').open=false;fx=null;pickDefaultClub();defaultAim();introCam();renderUI();draw();
   }
   function remaining(){return dist(S.h.ball,holeObj().pin)}
   function onGreen(){return S.h.lie==='green'}
@@ -284,8 +293,9 @@ function boot(){
     const u=[Math.sin(t.ang),Math.cos(t.ang)],r=[u[1],-u[0]];
     view.ang=t.ang;view.cx=h.pin[0]*r[0]+h.pin[1]*r[1];view.cy=h.pin[0]*u[0]+h.pin[1]*u[1];view.s=t.s*2.6;camK=0.055;intro=true;kick();
   }
-  function toScreen(p){const u=[Math.sin(view.ang),Math.cos(view.ang)],r=[u[1],-u[0]];const x=p[0]*r[0]+p[1]*r[1]-view.cx,y=p[0]*u[0]+p[1]*u[1]-view.cy;return[cv.clientWidth/2+x*view.s,cv.clientHeight/2-y*view.s]}
-  function toWorld(sx,sy){const u=[Math.sin(view.ang),Math.cos(view.ang)],r=[u[1],-u[0]];const a=(sx-cv.clientWidth/2)/view.s+view.cx,b=-(sy-cv.clientHeight/2)/view.s+view.cy;return[a*r[0]+b*u[0],a*r[1]+b*u[1]]}
+  function toScreen(p){if(threeActive)return scene.project(p,.2);return flatScreen(p)}
+  function flatScreen(p){const u=[Math.sin(view.ang),Math.cos(view.ang)],r=[u[1],-u[0]];const x=p[0]*r[0]+p[1]*r[1]-view.cx,y=p[0]*u[0]+p[1]*u[1]-view.cy;return[cv.clientWidth/2+x*view.s,cv.clientHeight/2-y*view.s]}
+  function toWorld(sx,sy){if(threeActive)return scene.unproject(sx,sy)||S.h.lineAim||S.h.aim;const u=[Math.sin(view.ang),Math.cos(view.ang)],r=[u[1],-u[0]];const a=(sx-cv.clientWidth/2)/view.s+view.cx,b=-(sy-cv.clientHeight/2)/view.s+view.cy;return[a*r[0]+b*u[0],a*r[1]+b*u[1]]}
 
   /* ---------- drawing ---------- */
   const COL={rough:'#83A66C',rough2:'#7A9D63',fair:'#A9CC85',fair2:'#B3D48E',green:'#BFE09A',green2:'#B6D991',fringe:'#9FC77E',tee:'#A2C882',sand:'#EADBB0',sandE:'#C9B47E',sandIn:'rgba(120,95,40,.18)',water:'#6FAFC9',waterE:'#4D8FAE',waterHi:'rgba(255,255,255,.35)',wood:'#5E8A55',tree:'#3F6E3F',tree2:'#47764A',treeHi:'#5C8F55',shadow:'rgba(30,50,25,.28)'};
@@ -297,12 +307,45 @@ function boot(){
     if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr)}
     ctx.setTransform(dpr,0,0,dpr,0,0);
     if(!cur||!S||!S.h||W<2||H<2){ctx.fillStyle=COL.rough;ctx.fillRect(0,0,W,H);return}
+    threeActive=use3D();$('cv3').hidden=!threeActive;rootNode.classList.toggle('lk-perspective',threeActive);
+    if(threeActive){
+      const result=scene.render({course:cur,h:holeObj(),ballState:S.h,anim,fx,forecast:S.h.club.putter?null:forecast(),angle:view.ang,reduced,pulling:!!G});
+      ctx.clearRect(0,0,W,H);if(result){sceneMoving=result.moving;drawSceneOverlay(result,W,H);if(sceneMoving)kick();}drawMini();return;
+    }
+    $('target').hidden=true;$('flight-readout').hidden=true;
     const putting=onGreen()&&!S.h.done;
     const key=[view.cx.toFixed(2),view.cy.toFixed(2),view.s.toFixed(4),view.ang.toFixed(4),W,H,cur.id,putting?1:0,holeObj().n].join('|');
     if(staticKey!==key){staticKey=key;if(!off)off=document.createElement('canvas');if(off.width!==cv.width||off.height!==cv.height){off.width=cv.width;off.height=cv.height}
       const main=ctx;ctx=off.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);drawStatic(W,H,putting);ctx=main}
     ctx.drawImage(off,0,0,W,H);
-    drawDynamic(W,H,putting);
+    drawDynamic(W,H,putting);drawMini();
+  }
+  function drawSceneOverlay(result,W,H){
+    const bs=result.ball,phase=S.h.phase,flight=phase==='flight';
+    const target=$('target');target.hidden=flight||S.h.done;
+    if(!target.hidden&&result.target){const p=scene.project(result.target,.2);target.textContent=Math.round(dist(S.h.ball,result.target))+' yd target';target.style.left=clamp(p[0],65,W-65)+'px';target.style.top=clamp(p[1]-24,60,H-100)+'px';}
+    const read=$('flight-readout');read.hidden=!flight;
+    if(flight){read.innerHTML='<span>'+(result.progress<1?'BALL IN FLIGHT':'ROLLING')+'</span><strong>'+result.carry+' <small>yd</small></strong><span>'+esc(anim?.club?.id||'')+' · '+(result.progress<1?'distance so far':'total distance')+'</span>';}
+    if(G&&(G.kind==='pull'||G.kind==='trace')){ctx.strokeStyle='#fff9df';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bs[0],bs[1]);for(const p of G.pts)ctx.lineTo(p.x,p.y);ctx.stroke();label(clamp(G.cur[0]-20,8,W-95),clamp(G.cur[1]-20,60,H-25),Math.round((S.h.power||0)*100)+'%');}
+    if(mode==='dial'&&phase==='armed'){const r=12+Math.abs(S.h.needle||0)*75;ctx.strokeStyle='#fff4bd';ctx.lineWidth=3;ctx.beginPath();ctx.arc(bs[0],bs[1],r,0,7);ctx.stroke();ctx.lineWidth=1;ctx.beginPath();ctx.arc(bs[0],bs[1],12,0,7);ctx.stroke();}
+  }
+  function drawMini(){
+    if(!S?.h||$('mini').hidden)return;const mc=$('mini'),c=mc.getContext('2d'),h=holeObj(),p=h.path;
+    const dx=h.pin[0]-h.tee[0],dy=h.pin[1]-h.tee[1],ang=Math.atan2(dx,dy),u=[Math.sin(ang),Math.cos(ang)],r=[u[1],-u[0]];
+    const coords=q=>[(q[0]-h.tee[0])*r[0]+(q[1]-h.tee[1])*r[1],(q[0]-h.tee[0])*u[0]+(q[1]-h.tee[1])*u[1]];
+    const pts=p.map(coords),minX=Math.min(...pts.map(q=>q[0]))-32,maxX=Math.max(...pts.map(q=>q[0]))+32,minY=-20,maxY=Math.max(...pts.map(q=>q[1]))+24;
+    const scale=Math.min(140/(maxX-minX),180/(maxY-minY)),P=q=>{const v=coords(q);return[70+(v[0]-(minX+maxX)/2)*scale,170-(v[1]-minY)*scale]};
+    c.fillStyle='#284e3a';c.fillRect(0,0,140,180);
+    for(const f of cur.feats){
+      if(!['fairway','green','bunker','water'].includes(f.kind))continue;
+      const center=[(f.bb[0]+f.bb[2])/2,(f.bb[1]+f.bb[3])/2];
+      // The small map is a guide to this hole, not a thumbnail of the property.
+      if(['fairway','green'].includes(f.kind)&&cur.holes.some(other=>other!==h&&lineDist(center,other.path)+1<lineDist(center,h.path)))continue;
+      if(lineDist(center,h.path)>65)continue;
+      c.fillStyle={fairway:'#709956',green:'#a3bb71',bunker:'#e7d5ae',water:'#6ca5b2'}[f.kind];c.beginPath();for(let i=0;i<f.pts.length;i+=2){const q=P([f.pts[i],f.pts[i+1]]);i?c.lineTo(...q):c.moveTo(...q)}c.closePath();c.fill();
+    }
+    c.strokeStyle='rgba(255,255,238,.8)';c.lineWidth=1.5;c.setLineDash([3,3]);c.beginPath();p.forEach((q,i)=>{const a=P(q);i?c.lineTo(...a):c.moveTo(...a)});c.stroke();c.setLineDash([]);
+    for(const [q,color,size]of [[h.pin,'#f3d276',4],[anim?.pos||S.h.ball,'#fff',4]]){const a=P(q);c.fillStyle=color;c.beginPath();c.arc(...a,size,0,7);c.fill();}
   }
   function drawStatic(W,H,putting){
     const s=view.s;
@@ -432,7 +475,7 @@ function boot(){
     if(fx){if(ts-fx.t0<FX_MS)busy=true;else fx=null}
     if(meterOn){busy=true;updateNeedle(performance.now())}
     draw();
-    if(busy)raf=requestAnimationFrame(tick);
+    if(busy&&!raf)raf=requestAnimationFrame(tick);
   }
   function needleAt(now){if(mode==='dial'){const p=((now-meterT0)/meterPeriod())%2;return p<1?-(1-p):(p-1)}const t=(now-meterT0)/meterPeriod();return -Math.cos(t*Math.PI*2)}
   function updateNeedle(now){S.h.needle=needleAt(now);$('needle').style.left=(50+S.h.needle*50)+'%'}
@@ -472,7 +515,7 @@ function boot(){
     if(A.kind==='shot'){
       if(t<A.dur){const k=Math.max(0,t)/A.dur;const st=[A.land[0]-A.rgt[0]*A.curve,A.land[1]-A.rgt[1]*A.curve];const q=lerp(A.b,st,k);A.pos=[q[0]+A.rgt[0]*A.curve*k*k,q[1]+A.rgt[1]*A.curve*k*k];A.h=4*A.apex*k*(1-k)*Math.min(1,view.s*0.8);
         // trail: world position + height in yards (height is stored in world units so it scales with the camera like everything else)
-        if(!reduced){(A.trail||(A.trail=[])).push({p:A.pos,hy:A.h/Math.max(view.s,1e-6)});if(A.trail.length>TRAIL_MAX)A.trail.shift()}}
+        if(!reduced){(A.trail||(A.trail=[])).push({p:A.pos,hy:A.h/Math.max(view.s,1e-6),worldHeight:4*A.apex*k*(1-k)});if(A.trail.length>TRAIL_MAX)A.trail.shift()}}
       else if(t<A.dur+A.rollDur){const k=(t-A.dur)/A.rollDur;const e=1-(1-k)*(1-k);A.pos=lerp(A.land,A.end,e);A.h=0;if(!A.landedAt&&!reduced)A.landedAt=ts}
       else{if(!reduced)fx={t0:A.landedAt||ts,land:A.land,lie:A.lieLand,trail:A.trail||[]};anim=null;finishShot(A)}
     } else if(A.kind==='putt'){
@@ -500,7 +543,7 @@ function boot(){
     }
     S.h.history.push(S.h.ball.slice());
     if(S.h.lie==='green'&&!S.h.gir&&S.h.strokes<=h.par-2)S.h.gir=true;
-    if(S.h.lie==='green'&&remaining()*FT<=GIMME_FT){banner(msg,sub+' · tap-in',1200);S.h.phase='flight';renderUI();frame();setTimeout(gimme,900);return}
+    if(S.h.lie==='green'&&remaining()*FT<=GIMME_FT){banner(msg,sub+' · tap-in',1200);S.h.phase='flight';renderUI();frame();gimmeTimer=setTimeout(gimme,900);return}
     banner(msg,sub);
     S.h.phase='aim';S.h.pw=1;S.h.traj=0;pickDefaultClub();defaultAim();frame();renderUI();
   }
@@ -519,7 +562,7 @@ function boot(){
     if(A.res.holed){holeOut();return}
     S.h.lie=lieAt(cur,A.res.end);if(S.h.lie!=='green'&&S.h.lie!=='rough')S.h.lie='rough';
     const ft=remaining()*FT;
-    if(S.h.lie==='green'&&ft<=GIMME_FT){banner(A.res.lip?'LIP OUT':'CLOSE','tap-in',1100);setTimeout(gimme,800);return}
+    if(S.h.lie==='green'&&ft<=GIMME_FT){banner(A.res.lip?'LIP OUT':'CLOSE','tap-in',1100);gimmeTimer=setTimeout(gimme,800);return}
     banner(A.res.lip?'LIP OUT':A.t<-0.08?'SHORT':A.t>0.08?'RAN BY':'GOOD PACE',Math.round(ft)+' ft left');
     S.h.phase='aim';pickDefaultClub();defaultAim();frame();renderUI();
   }
@@ -539,13 +582,19 @@ function boot(){
   function toParStr(v){return v===0?'E':(v>0?'+':'')+v}
   function scoreClass(n,par){if(n==null)return'';const d=n-par;if(n===1)return'ace';return d<=-2?'u2':d===-1?'u1':d===1?'o1':d>=2?'o2':''}
   function sideStr(v){const a=Math.round(Math.abs(v));return a<1?'straight':a+(v>0?' R':' L')}
-  function renderUI(){$('camtog').textContent=camMode==='shot'?'Hole view':'Shot view';$('camtog').hidden=onGreen();
+  function renderUI(){$('maplabel').textContent=camMode==='shot'?'Hole map':'Shot view';$('camtog').hidden=onGreen();
     const h=holeObj();
+    const flight=S.h.phase==='flight';rootNode.classList.toggle('lk-flying',flight);$('skip').hidden=!flight||!anim;
+    $('clubsummary').innerHTML='<span>'+esc(S.h.club.putter?'Putter':S.h.club.id==='Dr'?'Driver':S.h.club.id)+'</span><small>'+(S.h.club.putter?'Read the green':Math.round(fullCarry(S.h.club))+' yd carry')+'</small><b>⌄</b>';
+    $('shapesummary').textContent=(S.h.traj<0?'Low':S.h.traj>0?'High':'Stock')+' · '+(S.h.shape<0?'Draw':S.h.shape>0?'Fade':'Straight');
+    $('shapebox').hidden=onGreen()||S.h.done;$('clubbox').hidden=onGreen()||S.h.done;
+    if(flight){$('clubbox').open=false;$('shapebox').open=false;}
+    $('plan').dataset.holePlan=cur.id;$('plan').dataset.hole=h.n;
     $('gcourse').textContent=cur.name+' · '+cur.tee;
     $('ghole').textContent='Hole '+h.n;
     const played=S.scores.reduce((a,n,i)=>a+(n!=null?n-cur.holes.find(x=>x.n===S.holes[i]).par:0),0);
     $('gpar').textContent=toParStr(played);
-    $('gline').innerHTML='<span>Par <b>'+h.par+'</b></span><span><b>'+(h.yds||Math.round(h.len))+'</b> yds</span><span>Hcp <b>'+(h.si??'–')+'</b></span>';
+    $('gline').innerHTML='<span>Par '+h.par+'</span><span>'+(h.yds||Math.round(h.len))+' yds</span>';
     const start=Math.floor(S.idx/9)*9,slice=S.holes.slice(start,start+9);
     let html='';for(let i=0;i<9;i++){const n=slice[i];if(n==null){html+='<div></div>';continue}const hh=cur.holes.find(x=>x.n===n),sc=S.scores[start+i];
       html+='<div class="'+(start+i===S.idx?'lk-cur':'')+'">'+n+'<b><span class="lk-sc '+scoreClass(sc,hh.par)+'">'+(sc??(start+i===S.idx&&S.h.strokes?S.h.strokes:''))+'</span></b>'+hh.par+'</div>'}
@@ -566,7 +615,7 @@ function boot(){
       hint.textContent=mode==='meter'?'DRAG TO SET YOUR LINE · DOTS = PERFECT PACE':'PULL BACK FROM THE BALL · RING = PERFECT PACE';hint.hidden=S.h.phase!=='aim'}
     else{const F=forecast();const leave=Math.round(dist([S.h.ball[0]+F.u[0]*F.carryW+F.rgt[0]*F.lat,S.h.ball[1]+F.u[1]*F.carryW+F.rgt[1]*F.lat],h.pin));
       $('readout').innerHTML='<span>'+S.h.club.id+' <b>'+Math.round(F.carry)+'</b>'+(F.want>F.fc+1?' (full)':F.frac<.9?' ('+Math.round(F.carry/F.fc*100)+'%)':'')+' · plays <b>'+Math.round(F.carryW)+'</b></span><span>leaves <b>'+leave+'</b> · miss <b>'+sideStr(F.lat)+'</b></span>';
-      hint.hidden=!(S.h.phase==='aim'&&S.h.strokes===0&&S.idx===0);hint.textContent=mode==='meter'?'DRAG ON THE HOLE TO AIM':mode==='dial'?'TAP THE HOLE TO SET YOUR LINE · SET SHAPE · STRIKE':'TAP THE HOLE TO SET YOUR LINE'}
+      hint.hidden=true;hint.textContent=mode==='meter'?'DRAG ON THE HOLE TO AIM':mode==='dial'?'TAP THE HOLE TO SET YOUR LINE · SET SHAPE · STRIKE':'TAP THE HOLE TO SET YOUR LINE'}
     const act=$('act');
     const gest=mode!=='meter';
     $('meter').hidden=true;$('shaperow').hidden=!gest||putting||S.h.done;
@@ -574,7 +623,7 @@ function boot(){
     const instr=$('instr');
     $('pwseg').hidden=mode!=='dial';
     const dialFull=mode==='dial'&&!putting;
-    if(gest&&S.h.phase==='aim'&&!dialFull){act.hidden=true;instr.hidden=false;instr.textContent=putting?'Pull back from the ball · release to putt':mode==='sling'?'Pull back from the ball · twist 2 fingers to shape':'Draw your swing: down, then up through the ball'}
+    if(gest&&S.h.phase==='aim'&&!dialFull){act.hidden=true;instr.hidden=false;instr.innerHTML=putting?'<b>Pull to putt</b><small>Drag left here · release</small>':mode==='sling'?'<b>◉ &nbsp; Pull back to swing</b><small>Tap course to aim · pull left here</small>':'<b>Trace your swing on the course</b><small>Down, then up through the ball</small>'}
     else if(gest&&S.h.phase==='flight'&&!dialFull){act.hidden=true;instr.hidden=false;instr.textContent=putting?'Rolling…':'In the air…'}
     else{act.hidden=false;instr.hidden=true}
     if(dialFull){for(const b of $('pwseg').children)b.setAttribute('aria-pressed',+b.dataset.p===(S.h.pw||1))}
@@ -596,10 +645,31 @@ function boot(){
   let lastPointer=0;
   $('act').addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;lastPointer=performance.now();act()});
   $('act').addEventListener('click',()=>{if(performance.now()-lastPointer<800)return;act()});
-  const onKey=e=>{if(!R)return;if((e.code==='Space'||e.code==='Enter')&&S&&S.h&&!$('game').hidden&&document.activeElement?.tagName!=='INPUT'){e.preventDefault();if(mode==='meter'||S.h.phase==='done')act()}};document.addEventListener('keydown',onKey);
-  $('camtog').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();camMode=camMode==='shot'?'hole':'shot';store.set('cam',camMode);$('camtog').textContent=camMode==='shot'?'Hole view':'Shot view';if(S&&S.h)frame(false);draw()});
-  $('clubs').addEventListener('pointerdown',e=>{const b=e.target.closest('.lk-club');if(!b||S.h.phase!=='aim')return;const id=b.dataset.c;S.h.club=BAG.find(c=>c.id===id);
-    const fc=fullCarry(S.h.club),d=dist(S.h.ball,S.h.aim);if(d>fc*1.05||d<fc*0.6)defaultAim();frame();renderUI();draw()});
+  const onKey=e=>{if(!R||e.target.closest?.('button,input,select,textarea,summary,a,[role="dialog"]'))return;if((e.code==='Space'||e.code==='Enter')&&S?.h&&!$('game').hidden&&(mode==='meter'||S.h.phase==='done')){e.preventDefault();act()}};document.addEventListener('keydown',onKey);
+  $('score-toggle').addEventListener('click',()=>{const open=$('gcard').hidden;$('gcard').hidden=!open;$('score-toggle').setAttribute('aria-expanded',String(open));$('score-toggle').setAttribute('aria-label',open?'Hide scorecard':'Show scorecard');});
+  $('skip').addEventListener('click',()=>{if(!anim)return;const A=anim;anim=null;fx=null;if(A.kind==='shot')finishShot(A);else finishPutt(A);scene?.reset();draw();});
+  // Separate thumb pad keeps the chosen target line: screen perspective must not
+  // turn a horizontal pull into an arbitrary direction in world coordinates.
+  let pad=null;
+  $('instr').addEventListener('pointerdown',e=>{
+    if(!S?.h||S.h.phase!=='aim'||(mode!=='sling'&&!S.h.club.putter))return;
+    e.preventDefault();$('instr').setPointerCapture(e.pointerId);pad={id:e.pointerId,x:e.clientX,y:e.clientY};
+    G={id:e.pointerId,kind:'pad',cur:[0,0],pts:[],t0:performance.now()};
+  });
+  $('instr').addEventListener('pointermove',e=>{
+    if(!pad||pad.id!==e.pointerId||!S?.h)return;
+    const dx=e.clientX-pad.x,dy=e.clientY-pad.y,L=Math.hypot(dx,dy),power=Math.min(1.1,L/Math.min(145,$('instr').clientWidth*.45));
+    G.pts.push({x:e.clientX,y:e.clientY,t:performance.now()});G.cur=[e.clientX,e.clientY];
+    if(S.h.club.putter){G.pace=power;G.v0=S.h.vPerfect*power;S.h.preview=simPutt(holeObj(),S.h.ball,S.h.dir,G.v0);}
+    else S.h.power=power;
+    $('instr').style.setProperty('--pull',Math.min(100,power*100)+'%');$('instr').innerHTML='<b>'+Math.round(power*100)+'% '+(S.h.club.putter?'pace':'power')+'</b><small>Release to '+(S.h.club.putter?'putt':'swing')+'</small>';draw();
+  });
+  $('instr').addEventListener('pointerup',e=>{if(!pad||pad.id!==e.pointerId)return;pad=null;$('instr').style.removeProperty('--pull');firePull();G=null;renderUI();draw();});
+  $('instr').addEventListener('pointercancel',()=>{pad=null;G=null;if(S?.h)S.h.power=null;$('instr').style.removeProperty('--pull');if(S?.h)renderUI();draw();});
+  $('instr').addEventListener('click',e=>{if(e.detail!==0||!S?.h||S.h.phase!=='aim'||mode==='trace')return;S.h.power=1;swing({g:'SOLID',t:0,...(S.h.club.putter?{v0:S.h.vPerfect}:{})});});
+  $('camtog').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();scene?.reset();camMode=camMode==='shot'?'hole':'shot';store.set('cam',camMode);$('maplabel').textContent=camMode==='shot'?'Hole map':'Shot view';if(S&&S.h)frame(false);draw()});
+  $('clubs').addEventListener('click',e=>{const b=e.target.closest('.lk-club');if(!b||S.h.phase!=='aim')return;const id=b.dataset.c;S.h.club=BAG.find(c=>c.id===id);
+    const fc=fullCarry(S.h.club),d=dist(S.h.ball,S.h.aim);if(d>fc*1.05||d<fc*0.6)defaultAim();$('clubbox').open=false;scene?.reset();frame();renderUI();draw()});
   function maxPull(){return Math.min(220,cv.clientHeight*0.38)}
   function local(e){const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
   function screenDirToWorld(bs,dx,dy){const w1=toWorld(bs[0],bs[1]),w2=toWorld(bs[0]+dx,bs[1]+dy);const d=[w2[0]-w1[0],w2[1]-w1[1]],L=Math.hypot(d[0],d[1])||1;return[d[0]/L,d[1]/L]}
@@ -713,19 +783,20 @@ function boot(){
     $('bagtable').innerHTML='<tr><th>Club</th><th>Carry</th><th>Consist.</th><th>Avg side</th><th>Side spread</th><th>Roll</th><th>Source</th></tr>'+rows;
     $('bagnote').innerHTML='Yards. Carries come from your Caddie HQ bag ladder (edit them in Bag). The slider adds a percentage on top of every carry and roll, since indoor Normalize-on readings run short of outdoor stock numbers; +10% is a starting guess, not a measurement. ~ marks spread and roll values the game estimates because no session measured them.';
   }
-  $('pwseg').addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b||!S||!S.h||S.h.phase!=='aim')return;S.h.pw=+b.dataset.p;renderUI();draw()});
-  $('trajseg').addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(!b||!S||!S.h||S.h.phase!=='aim')return;S.h.traj=+b.dataset.t;renderUI();draw()});
+  $('pwseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!S||!S.h||S.h.phase!=='aim')return;S.h.pw=+b.dataset.p;renderUI();draw()});
+  $('trajseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!S||!S.h||S.h.phase!=='aim')return;S.h.traj=+b.dataset.t;renderUI();draw()});
   $('shape').addEventListener('input',e=>{if(!S||!S.h||S.h.phase!=='aim')return;S.h.shape=+e.target.value;renderUI();draw()});
-  const MODENOTE={sling:'Pull back from the ball and release. Pull length is power, direction is your start line, a second finger twisting sets draw or fade. Putts work the same way with a perfect-pace ring.',trace:'Draw the swing with your thumb: down for the backswing, then up through the ball. Backswing length is power. Face (where you finish left or right) and path (the angle you come through) shape the ball like real flight laws.',dial:'Plan the shot, then execute it. Tap the hole to set your line, pick draw or fade, trajectory and swing length, then tap Strike. A ring closes on the ball; tap when it meets the ball for pure contact. Early is toe, late is heel.'};
+  const MODENOTE={sling:'Tap the course to aim, then pull the bottom pad left and release. Or pull back directly from the ball. Pull length is power, direction is your start line, a second finger twisting sets draw or fade. Putts work the same way with a perfect-pace ring.',trace:'Draw the swing with your thumb: down for the backswing, then up through the ball. Backswing length is power. Face (where you finish left or right) and path (the angle you come through) shape the ball like real flight laws.',dial:'Plan the shot, then execute it. Tap the hole to set your line, pick draw or fade, trajectory and swing length, then tap Strike. A ring closes on the ball; tap when it meets the ball for pure contact. Early is toe, late is heel.'};
   $('modeseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.mode;store.set('mode',mode);renderMenu()});
   $('boost').addEventListener('input',e=>{store.set('boost',+e.target.value);$('boostlab').textContent='+'+boost()+'% · driver plays '+Math.round(carryOf(BAG[0]))+' carry'});
   $('courses').addEventListener('click',e=>{const b=e.target.closest('.cpick');if(!b)return;pick=b.dataset.id;store.set('course',pick);renderMenu();$('picked').scrollIntoView({block:'start',behavior:'smooth'})});
   $('lenseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;plen=b.dataset.len;store.set('len',plen);renderMenu()});
   async function startRound(id,len,daily,btn){
     if(btn){btn.disabled=true;btn.dataset.label=btn.textContent;btn.textContent='Loading course…'}
-    try{await loadCourse(id);BAG=liveBag();newRound(id,len,daily)}
-    catch(err){(bridge.toast||(m=>console.warn(m)))('Could not load that course. Connect to the internet to download it, then try again.')}
-    finally{if(btn){btn.disabled=false;btn.textContent=btn.dataset.label}}
+    const token=++roundToken;
+    try{await Promise.all([loadCourse(id),ensureScene()]);if(stopped||token!==roundToken)return;BAG=liveBag();newRound(id,len,daily)}
+    catch(err){if(stopped)return;(bridge.toast||(m=>console.warn(m)))('Could not load that course. Connect to the internet to download it, then try again.')}
+    finally{if(btn&&btn.isConnected){btn.disabled=false;btn.textContent=btn.dataset.label}}
   }
   $('start').addEventListener('click',e=>startRound(pick,plen,false,e.currentTarget));
   $('daily').addEventListener('click',e=>startRound(dailyCourse(),'18',true,e.currentTarget));
@@ -749,8 +820,8 @@ function boot(){
      visualViewport beats innerHeight on iOS, where the toolbar and the home indicator both eat space innerHeight still reports. */
   function fit(){const g=$('game');if(!g||g.hidden)return;const top=Math.max(0,g.getBoundingClientRect().top);const vv=window.visualViewport;const vh=vv&&vv.height?vv.height:window.innerHeight;R.style.setProperty('--lk-vh',Math.round(vh)+'px');R.style.setProperty('--lk-top',Math.round(top)+'px')}
   window.addEventListener('resize',fit);if(window.visualViewport)window.visualViewport.addEventListener('resize',fit);
-  dbgFn=()=>({ball:S&&S.h?toScreen(S.h.ball):null,phase:S&&S.h&&S.h.phase,mode,strokes:S&&S.h&&S.h.strokes,scores:S&&S.scores,anim:anim?{kind:anim.kind,trail:anim.trail?anim.trail.length:0,landed:!!anim.landedAt}:null,fx:fx?{age:Math.round(performance.now()-fx.t0),trail:fx.trail.length,lie:fx.lie}:null,drawMs:()=>{const t0=performance.now();for(let i=0;i<30;i++){staticKey='';draw()}return(performance.now()-t0)/30}});
-  stopFn=()=>{if(raf)cancelAnimationFrame(raf);raf=0;anim=null;fx=null;meterOn=false;clearTimeout(bannerTimer);ro.disconnect();document.removeEventListener('keydown',onKey);window.removeEventListener('resize',fit);if(window.visualViewport)window.visualViewport.removeEventListener('resize',fit);document.body.classList.remove('lk-ingame')};
+  dbgFn=()=>({renderer:threeActive?'3d':'map',scene:scene?.info(),course:S?.course,hole:S?.h?holeObj().n:null,aim:S?.h?.aim,worldBall:S?.h?.ball,pin:S?.h?holeObj().pin:null,lie:S?.h?.lie,ball:S&&S.h?toScreen(S.h.ball):null,phase:S&&S.h&&S.h.phase,mode,strokes:S&&S.h&&S.h.strokes,scores:S&&S.scores,anim:anim?{kind:anim.kind,trail:anim.trail?anim.trail.length:0,landed:!!anim.landedAt}:null,fx:fx?{age:Math.round(performance.now()-fx.t0),trail:fx.trail.length,lie:fx.lie}:null,drawMs:()=>{const t0=performance.now();for(let i=0;i<30;i++){staticKey='';draw()}return(performance.now()-t0)/30}});
+  stopFn=()=>{stopped=true;S=null;roundToken++;clearTimeout(gimmeTimer);scene?.dispose();scene=null;if(raf)cancelAnimationFrame(raf);raf=0;anim=null;fx=null;meterOn=false;clearTimeout(bannerTimer);ro.disconnect();document.removeEventListener('keydown',onKey);window.removeEventListener('resize',fit);if(window.visualViewport)window.visualViewport.removeEventListener('resize',fit);document.body.classList.remove('lk-ingame')};
   renderMenu();draw();
 
 }

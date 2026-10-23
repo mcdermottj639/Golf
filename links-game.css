@@ -109,3 +109,66 @@ body.lk-ingame .hero.hq-shell,body.lk-ingame nav,body.lk-ingame #nav{display:non
 .lk .lk-stat b{display:block;font-family:var(--serif);font-size:20px;font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion: reduce){.lk .banner,.lk .lk-meter{transition:none}
 }
+
+/* v257: the shot owns the viewport. Extra controls open over it. */
+body.lk-ingame{background:var(--paper);padding-bottom:env(safe-area-inset-bottom,0px)}
+body.lk-ingame #view{padding-bottom:0}
+.lk .lk-game{gap:0;max-width:720px;min-height:460px}
+.lk .lk-playhead{display:grid;grid-template-columns:auto minmax(0,1fr) 44px;gap:8px;align-items:center;padding:2px 0 10px;flex-shrink:0}
+.lk .lk-exit{display:flex;align-items:center;gap:3px;padding:6px 8px 6px 0;min-height:44px;border:0;background:transparent;white-space:nowrap;font-size:22px}
+.lk .lk-exit span{font-size:12px;letter-spacing:-.02em}
+.lk .lk-hole-title{min-width:0}
+.lk .lk-hole-title .kick{font-family:var(--sans);font-size:12px;font-weight:650;letter-spacing:0;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.lk .lk-hole-title .row{gap:6px;flex-wrap:nowrap;margin-top:3px}
+.lk .lk-hole-title h1{font-family:var(--sans);font-size:14px;white-space:nowrap}
+.lk .lk-hole-title .holeline{font-family:var(--sans);font-size:10px;gap:5px}
+.lk .lk-score-toggle{height:44px;width:44px;border:1px solid var(--line);border-radius:11px;background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:650;font-size:18px}
+.lk .lk-score-toggle small{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink62)}
+.lk .lk-card{min-height:50px;margin-bottom:6px;flex-shrink:0}
+.lk .stage{border-radius:14px 14px 0 0;min-height:230px;isolation:isolate;background:#94b9c1}
+.lk #lk-cv{z-index:1}
+.lk #lk-cv3{z-index:0;pointer-events:none}
+.lk .hud,.lk .foot,.lk .camrow,.lk .banner,.lk .hint,.lk .lk-target,.lk .lk-plan,.lk .lk-skip,.lk .lk-flight-readout{z-index:2}
+.lk .hud{inset:12px 10px auto}
+.lk .lk-pill{padding:7px 11px;font:500 12px var(--sans);box-shadow:0 2px 9px #143c2822}
+.lk .wind svg{width:16px;height:16px}
+.lk .lk-target{position:absolute;transform:translate(-50%,-50%);pointer-events:none;padding:6px 10px;border-radius:8px;background:#fffcec;color:#193b2e;font-weight:650;font-size:12px;white-space:nowrap;box-shadow:0 2px 14px #122c3433}
+.lk .camrow{right:10px;bottom:46px}
+.lk .lk-camtog{display:flex;flex-direction:column;gap:0;padding:0;border-radius:12px;overflow:hidden;width:66px;background:#203d30d9;color:#fffbe9;border:1px solid #f8f7d870}
+.lk #lk-mini{position:static;width:64px;height:82px}
+.lk .lk-camtog span{padding:6px 3px;font-size:10px;min-height:24px}
+.lk .lk-plan{position:absolute;bottom:48px;left:10px;padding:9px 11px;min-height:40px;border:1px solid #ffffff60;border-radius:10px;background:#214d39dc;color:#fffbea;font-size:11px;font-weight:600}
+.lk .foot{inset:auto 10px 10px}
+.lk .foot .lk-pill{font-size:10px;padding:5px 8px}
+.lk .dock{position:relative;border-radius:18px 18px 0 0;margin-top:-10px;padding:12px 0 0;gap:6px;background:var(--card);z-index:3}
+.lk .lk-controlrow{display:flex;gap:8px;align-items:stretch}
+.lk .lk-clubbox{flex:1.1;min-width:0}
+.lk .lk-shapebox{flex:1;min-width:0}
+.lk .lk-controlrow summary{position:relative;list-style:none;border:1px solid var(--line);border-radius:11px;padding:9px 12px;cursor:pointer;min-height:46px;font-size:12px;display:flex;flex-direction:column;justify-content:center;line-height:1.3}
+.lk .lk-controlrow summary::-webkit-details-marker{display:none}
+.lk .lk-controlrow summary:focus-visible{outline:2px solid var(--green-accent);outline-offset:2px}
+.lk .lk-clubbox summary span{font-size:15px;font-weight:700}
+.lk .lk-clubbox summary small{font-size:10px;color:var(--ink62)}
+.lk .lk-clubbox summary b{position:absolute;right:10px;top:14px}
+.lk .lk-shapebox summary:after{content:'⌄';position:absolute;right:10px;top:14px}
+.lk .lk-shapebox summary{padding-right:24px}
+.lk .lk-clubbox[open] .lk-clubs,.lk .lk-shapebox[open] .shaperow{position:absolute;bottom:calc(100% - 5px);left:0;right:0;background:var(--card);border:1px solid var(--line);box-shadow:0 -6px 26px #132d3530;border-radius:14px;padding:14px;max-height:240px;overflow:auto;z-index:4}
+.lk .lk-clubbox[open] .lk-clubs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.lk .lk-club{min-width:0;min-height:48px}
+.lk .lk-club b{font-size:14px}
+.lk .shaperow .lk-seg button{min-height:40px}
+.lk .readout{font-family:var(--sans);font-size:10px;gap:5px;padding:0 4px;min-height:15px}
+.lk .instr{background:linear-gradient(100deg,#3c7752 var(--pull,0%),#194d3c var(--pull,0%));border:0;border-radius:14px;color:#fffbea;font-family:var(--sans);font-size:14px;letter-spacing:0;text-transform:none;padding:11px 10px;min-height:58px;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:inset 0 1px 0 #ffffff25}
+.lk .instr b,.lk .instr small{display:block}
+.lk .instr small{font-size:10px;font-weight:400;opacity:.72;margin-top:3px}
+.lk .lk-skip{position:absolute;bottom:20px;right:12px;border:1px solid #fff8;border-radius:25px;padding:10px 15px;min-height:44px;background:#183b30cc;color:#fffbed;font-size:13px}
+.lk .lk-flight-readout{position:absolute;left:14px;bottom:16px;color:#fffdeb;text-shadow:0 2px 8px #153524;display:flex;flex-direction:column;gap:1px}
+.lk .lk-flight-readout strong{font-size:37px;font-weight:600;line-height:1}
+.lk .lk-flight-readout strong small{font-size:15px}
+.lk .lk-flight-readout span{font-size:10px;letter-spacing:.03em}
+.lk.lk-flying .dock,.lk.lk-flying .camrow,.lk.lk-flying .lk-plan,.lk.lk-flying .foot{display:none}
+.lk .banner{top:19%;padding:0 15px}
+.lk .banner .lk-big{font-size:28px}
+.lk .banner .lk-sub{font-size:10px;letter-spacing:0}
+@media(max-width:350px){.lk .lk-exit span{font-size:10px}.lk .lk-playhead{gap:4px}.lk .lk-hole-title .kick{font-size:10px}.lk .lk-hole-title h1{font-size:12px}.lk .lk-hole-title .holeline{font-size:9px}.lk .lk-camtog{width:54px}.lk #lk-mini{width:52px;height:66px}.lk .lk-clubbox[open] .lk-clubs{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-height:650px){.lk #lk-mini{display:none}.lk .lk-camtog{width:auto;min-height:40px;padding:3px 8px}.lk .lk-controlrow summary{min-height:42px;padding:5px 9px}.lk .instr{min-height:48px;padding:7px}.lk .stage{min-height:205px}}

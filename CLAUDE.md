@@ -31,7 +31,10 @@ course-prep.js/.css   Shared course planner and live maps; lazy Google 3D views
 hole-guide.js        Sourced illustrated hole renderer; offline, tee-to-green
 course-prep-data.js   Generated lightweight directory; scorecards and coverage, no geometry
 course-packs.js       Versioned downloads, offline cache, favorites and recent-course limits
-links-game.js/.css    Caddie HQ Links — the top-down course game (v252+); reads packs + bag, writes only chqlinks:* keys
+links-game.js/.css    Caddie HQ Links — perspective course game; reads packs + bag, writes only chqlinks:* keys
+links-scene.js        Lazy Three.js renderer, camera, ray aiming; draws only, no scoring/state writes
+vendor/              Local Three.js r186 bundle and MIT license (no runtime build/CDN)
+assets/links/        Decorative tree texture, cached for offline play
 data/course-prep/    Per-course packs, catalog order and original-coordinate OSM subsets
 scripts/build-course-prep.cjs  Validates sources; generates directory, JSON packs and coverage report
 course-prep-feed.json Apply-once course card, mapped location and refreshed standing prep
@@ -4083,10 +4086,10 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
-## Caddie HQ Links — the course game (v252–v255, October 22–23 2026)
+## Caddie HQ Links — the course game (v257, October 23 2026)
 
-**What it is.** A top-down, Daily-Holes-style golf game played on every mapped course with Jack's own
-bag. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
+**What it is.** A perspective golf game played on the app's mapped courses with Jack's own
+bag. Full shots use a behind-ball 3D view and a following camera; putting and the optional hole map remain 2D. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
 "Links". The view is `links` (parent `rounds`); it uses the compact `cpfocus` masthead like Course
 Prep, and while a round is on screen `body.lk-ingame` hides the masthead and bottom nav so the hole
 canvas and the control dock fit one phone screen (Quit inside the game restores them).
@@ -4105,10 +4108,10 @@ compact two-column course grid underneath (14 full-width cards had pushed Tee of
 
 **Module contract.** `links-game.js` exposes `window.CaddieLinks = {render, mount(node, bridge),
 unmount, debug}`. `render()` returns the markup; `render('links')` in app.js then calls
-`mount(document.getElementById('lk-root'), { state:()=>S, clubCanon, toast })`. Every other view
+`mount(document.getElementById('lk-root'), { state:()=>S, clubCanon, toast, onExit })`. Every other view
 calls `unmount()`, which cancels the animation frame, timers, listeners and the body class. The
 module never reads or writes golf state: it only READS `S.carries` through the bridge and writes its
-own `localStorage` keys `chqlinks:mode|course|len|boost|best`. Those keys are deliberately outside
+own `localStorage` keys `chqlinks:mode|course|len|boost|best|cam`. Those keys are deliberately outside
 golf backups (game preferences, not golf data).
 
 **Courses.** The menu lists `window.CADDIE_PREP_COURSES` (the generated directory). On Tee off the
@@ -4153,26 +4156,35 @@ drawn as downhill chevrons in a zoomed green view. The ball rolls with stimp-sty
 line (tap, or the pull direction) and sees the predicted path at perfect pace (binary-searched to
 finish 1.5 ft past); pull length (or the pace meter) scales that speed. Start line gets ~0.2° noise.
 
-**Camera (v254, Jack: "why so zoomed out… bring it right up close to the ball").** Two views,
-`camMode` in `chqlinks:cam`. *Shot* (default) frames from the ball out to roughly 1.22× the selected
-club's full carry (+15 yd, never past the pin +25), ball at 74% of the height in gesture modes (84%
-in meter) so there is room under it to pull back, laterally centred between ball and aim; the
-`lk-camtog` pill on the HUD flips to *Hole*, which fits the whole route from the air (the v252
-tee-shot framing). Both re-frame on every club change and line tap because `frame()` already ran
-there. On the green the zoomed putting view ignores the mode and the toggle hides. A true
-behind-the-ball perspective ("ground") view is NOT built: it needs a perspective projection with
-near-plane clipping through `toScreen/toWorld` and depth-sorted trees — a Links-improver item, not a
-tweak. v253 is purely layout.
+**Camera and rendering (v257).** `links-scene.js` lazy-loads the local Three.js r186 ES module. It
+renders the same local-yard polygons used by scoring, original simulated tree positions as instanced
+alpha-cutout billboards, a ball, club, flag, projected landing ring and flight trail. Perspective camera
+starts 14 yd behind / 8 yd above the ball, then follows full shots. Tap aiming raycasts against the
+planar ground; sky/distant rays retain the last valid aim. `chqlinks:cam` remembers Shot / Hole;
+on the green the 2D putting view overrides it. The mini-map filters out fairways and greens assigned
+to other holes. DPR is capped at 1.5, trees at 1,100 near the active route, and geometries are merged
+by surface. Idle frames stop after the camera settles. Context loss or module/texture load failure
+falls back to the existing Canvas 2D renderer. Unmount disposes GPU resources and guards late imports.
+The original Canvas static-layer cache and dynamic overlays remain the map/putting/fallback path.
+Reduced motion skips chase movement and flight effects.
 
-**Rendering.** Canvas 2D. The static layer (ground, mowing bands, features, trees from a spatial grid)
-is drawn once per camera pose into an offscreen canvas and reused every frame; only the ball, aim,
-previews and overlays redraw. Camera eases between poses; each hole opens with a glide from the green
-back to the tee. Course art colours are fixed (it is a map), UI colours use the app tokens so Night
-mode applies.
+**Phone controls (v257).** Header contains the accessible Caddie HQ exit, current hole and a scorecard
+toggle. Club and shape controls are collapsed drawers; Slingshot adds a horizontal thumb pad whose
+pull sets power without changing the selected aim. Direct ball pulls, Trace and Shape dial still work.
+Native buttons/summary controls retain keyboard operation. Flight hides the dock and adds distance
+so far plus Skip flight; skipping resolves the existing shot exactly once. Caddie plan opens the existing
+read-only standing-plan dialog. The stage, dock and safe areas share the visible viewport at 320/390 px.
 
-**Ball flight trail (v255, PR #79).** During a full shot `stepAnim()` appends `{p, hy}` to
+**Accuracy.** Geometry coverage varies. Pound Ridge's current pack contains routes but only two
+fairways, one green, five bunkers and three water features. Missing surfaces are the existing game's
+approximations. Tree silhouettes, tee address mat, sky and breaks are simulated. Ground stays planar:
+no surveyed elevations or real green breaks are available. The menu explicitly distinguishes these
+from mapped routes/hazards. Do not describe this as a surveyed digital twin or photo-exact course.
+The renderer never changes pack files, collision/lie geometry, carry/dispersion, penalties or scores.
+
+**Ball flight trail (v255, PR #79).** During a full shot `stepAnim()` appends `{p, hy, worldHeight}` to
 `anim.trail` every frame (capped at `TRAIL_MAX` 110) — the ground position and the ball's height in
-WORLD yards (`A.h / view.s`), so a camera that re-frames after landing redraws the arc at the right
+map-derived yards (`A.h / view.s`); v257 also stores the unscaled physical arc in `worldHeight` for 3D, so a camera that re-frames after landing redraws the arc at the right
 height instead of in stale pixels. `drawTrail()` strokes the ground track as one soft dark line and the
 arc as per-segment white strokes whose alpha and width grow toward the head, so the tail fades. When
 the ball lands, `A.landedAt` is stamped and `drawPuff()` spreads a ring there over `FX_MS` (1.5 s):
@@ -4195,19 +4207,28 @@ console errors. v253 measured 320×568 · 375×667 · 390×844 · 430×932: Tee 
 four, `.lk-game` spanning the view width, dock bottom inside the viewport, shape row 80 px, no errors
 — but `env()` is 0 in Chromium, so the 34 px home-indicator margin is only proven by arithmetic until
 Jack's phone confirms it. The v252 check at 400×860 missed the clipping because the game section is
-`max-width:520px` and 400 px only clips 120 px of trees. There is no automated gesture suite in
-`tests/` yet — add one before changing the gesture thresholds.
+`max-width:520px` and 400 px only clips 120 px of trees. The v257 browser suite exercises the new thumb pad and perspective aiming; keep tests around gesture changes.
+
+**v257 validation.** `node tests/links-3d-browser.cjs` passed real WebGL at 320×568 and 390×844
+(including a simulated 59 px top inset), perspective aim, club/shape selection, current-hole map toggle,
+standing-plan dialog/focus, one-stroke flight/skip, keyboard controls and exit during flight. Touch
+input, Night mode and reduced motion completed a scored hole through putting into hole 2. Wianno
+also rendered; initial WebGL failure and context loss stayed playable in the map. Cold offline startup
+loaded the renderer, vendor module and texture from the installed cache. Golf state was unchanged.
+`tests/links-exit-browser.cjs` and the complete Pages data verification suite passed. Native iPhone
+Safari GPU performance and safe-area rendering still require device confirmation; these are Chromium
+browser checks, not a claim of an on-device Safari test.
 
 **v256 validation.** `node tests/links-exit-browser.cjs` checks 320×568 and 390×844, plus a simulated 59 px top inset: visible 45 px exit target, no horizontal overflow, dock reachable, Home/nav restored, repeat mount/exit, unchanged golf state and no page errors. The complete Pages verification suite passed. Native iPhone blur still needs device confirmation; Chromium only validates the inset layout.
 
 **v256 safe exit.** The in-game body supplies top safe-area padding because its normal masthead is hidden. A 44 px minimum Back to Caddie HQ button calls the app bridge to render Home; render unmounts Links and restores the masthead/navigation. Leaving discards the current game without changing golf records. Keep this exit visible when adjusting viewport sizing.
 
-**Backlog (owned by the Jarvis "Links improver" scheduled task; see the Caddie HQ handoff in
-claudex).** Graphics: real tree canopies from OSM `wood` outlines, shadows by sun angle, bunker
-sand texture, water animation. Game: per-club dispersion from every bay session instead of
+**Backlog.** Surveyed terrain elevations and fuller feature coverage are needed for faithful course
+rehearsal. Graphics: improved canopies/shadows, water animation, 3D putting when it can preserve
+readability. The current renderer already includes textured surfaces and decorative trees. Game: per-club dispersion from every bay session instead of
 the built-in table; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry;
-course records and a shareable scorecard image; standing-plan tips on each tee from the briefings.
+course records and a shareable scorecard image. Standing plans are now available from each hole.
 Rules for that task: one improvement per run, feature-flag anything that changes scoring, never touch
 packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item and update this
 section, and log the run in the handoff.
-Shipped by that task: ball trail + landing puff — v255, PR #79 (`links/20261023-ball-trail`; Jack merges).
+History: ball trail + landing puff — v255, PR #79, already merged; v256 exit/safe area also on main.
