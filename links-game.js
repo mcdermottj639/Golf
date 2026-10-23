@@ -184,6 +184,8 @@ function boot(){
   const view={cx:0,cy:0,s:1,ang:0,tcx:0,tcy:0,ts:1,tang:0};
   let cv=$('cv'),ctx=cv.getContext('2d');
   let anim=null, meterT0=0, meterOn=false, raf=0;
+  let fx=null; // after-shot effects: the flight trail fading out and the landing puff (v255); pure drawing, never scoring
+  const FX_MS=1500, TRAIL_MAX=110;
 
   function holesFor(len){const H=cur.holes;if(len==='front')return H.filter(h=>h.n<=9);if(len==='back')return H.filter(h=>h.n>=10&&h.n<=18);return H.filter(h=>h.n<=18)}
   function windFor(seed,h){const r=mulberry(hashStr(seed+':'+h.n));return{mph:Math.round(2+r()*14),from:r()*Math.PI*2}}
@@ -197,7 +199,7 @@ function boot(){
   function startHole(){
     const h=holeObj();
     S.h={ball:h.tee.slice(),lie:'tee',strokes:0,putts:0,wind:windFor(S.seed,h),done:false,phase:'aim',history:[h.tee.slice()],club:null,aim:null,preview:null,vPerfect:0,shape:0,traj:0,power:null,lineAim:null,pw:1};
-    pickDefaultClub();defaultAim();introCam();renderUI();draw();
+    fx=null;pickDefaultClub();defaultAim();introCam();renderUI();draw();
   }
   function remaining(){return dist(S.h.ball,holeObj().pin)}
   function onGreen(){return S.h.lie==='green'}
@@ -384,11 +386,35 @@ function boot(){
       ctx.strokeStyle='rgba(251,247,236,.55)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(bs[0],bs[1],rb,0,7);ctx.stroke();
       ctx.strokeStyle='rgba(251,247,236,.5)';ctx.beginPath();ctx.arc(bs[0],bs[1],rb+RM*0.08,0,7);ctx.stroke();
       const r=rb+RM*Math.abs(t);ctx.strokeStyle=Math.abs(t)<=0.08?'#F2C14E':'#FBF7EC';ctx.lineWidth=3;ctx.beginPath();ctx.arc(bs[0],bs[1],r,0,7);ctx.stroke()}
+    // flight trail (v255): the ground track in shadow and the arc the ball flew in white, both fading toward the tail
+    const now=performance.now();
+    if(anim&&anim.kind==='shot'&&anim.trail)drawTrail(anim.trail,1);
+    else if(fx){const e=Math.min(1,(now-fx.t0)/FX_MS);drawTrail(fx.trail,1-e);drawPuff(fx,e)}
+    if(anim&&anim.kind==='shot'&&anim.landedAt)drawPuff({t0:anim.landedAt,land:anim.land,lie:anim.lieLand},Math.min(1,(now-anim.landedAt)/FX_MS));
     let bp=S.h.ball,hgt=0;if(anim&&anim.pos){bp=anim.pos;hgt=anim.h||0}
     if(!(S.h.done&&S.h.holed)){
-      const q=toScreen(bp);ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(q[0]+hgt*.35,q[1]+hgt*.2,3.4,2.2,0,0,7);ctx.fill();
+      const q=toScreen(bp);const hf=1/(1+hgt/45); // the shadow shrinks and fades as the ball climbs, so height reads without a side view
+      ctx.fillStyle='rgba(0,0,0,'+(0.3*hf).toFixed(3)+')';ctx.beginPath();ctx.ellipse(q[0]+hgt*.35,q[1]+hgt*.2,3.4*(0.6+0.4*hf),2.2*(0.6+0.4*hf),0,0,7);ctx.fill();
       const r=Math.max(3.6,Math.min(7,0.047*s))+hgt*0.06;ctx.fillStyle='#fff';ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(q[0],q[1]-hgt,r,0,7);ctx.fill();ctx.stroke();
     }
+  }
+  function drawTrail(T,alphaMul){
+    if(!T||T.length<2||alphaMul<=0)return;
+    const s=view.s;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';
+    const pts=T.map(t=>{const q=toScreen(t.p);return[q[0],q[1],t.hy*s]});
+    // ground track: a soft dark line under the flight
+    ctx.strokeStyle='rgba(20,30,15,'+(0.16*alphaMul).toFixed(3)+')';ctx.lineWidth=2;ctx.beginPath();pts.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();
+    // the arc, drawn in short segments so the tail fades and the head stays bright
+    const n=pts.length;for(let i=1;i<n;i++){const k=i/n;ctx.strokeStyle='rgba(255,255,255,'+(0.85*k*alphaMul).toFixed(3)+')';ctx.lineWidth=1+2.2*k;ctx.beginPath();ctx.moveTo(pts[i-1][0],pts[i-1][1]-pts[i-1][2]);ctx.lineTo(pts[i][0],pts[i][1]-pts[i][2]);ctx.stroke()}
+    ctx.restore();
+  }
+  function drawPuff(F,e){ // a ring that spreads and fades where the ball landed; sand-coloured in a bunker, a splash ring in water
+    if(e>=1)return;const q=toScreen(F.land),s=view.s;const ease=1-(1-e)*(1-e);const R=(3+14*ease)*Math.max(0.35,Math.min(1.2,s/3));const a=(1-e)*(F.lie==='water'?0.8:0.55);
+    ctx.save();ctx.lineWidth=F.lie==='bunker'?3:2;ctx.strokeStyle=F.lie==='bunker'?'rgba(201,180,126,'+a.toFixed(3)+')':F.lie==='water'?'rgba(255,255,255,'+a.toFixed(3)+')':'rgba(255,255,255,'+(a*0.8).toFixed(3)+')';
+    ctx.beginPath();ctx.ellipse(q[0],q[1],R,R*0.62,0,0,7);ctx.stroke();
+    if(F.lie==='water'){ctx.lineWidth=1.2;ctx.beginPath();ctx.ellipse(q[0],q[1],R*0.55,R*0.34,0,0,7);ctx.stroke()}
+    else if(F.lie==='bunker'){ctx.fillStyle='rgba(234,219,176,'+(a*0.9).toFixed(3)+')';for(let i=0;i<5;i++){const an=i/5*Math.PI*2+0.4;const d=R*(0.7+0.4*ease);ctx.beginPath();ctx.arc(q[0]+Math.cos(an)*d,q[1]+Math.sin(an)*d*0.62-ease*6,1.6+ease,0,7);ctx.fill()}}
+    ctx.restore();
   }
   function label(x,y,t){ctx.font='600 11px ui-monospace,SFMono-Regular,Menlo,monospace';const w=ctx.measureText(t).width+10;ctx.fillStyle='rgba(251,247,236,.94)';ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y-9,w,18,9):ctx.rect(x,y-9,w,18);ctx.fill();ctx.fillStyle='#23201A';ctx.fillText(t,x+5,y+4)}
 
@@ -403,6 +429,7 @@ function boot(){
       view.cx+=(view.tcx-view.cx)*k;view.cy+=(view.tcy-view.cy)*k;view.s+=(view.ts-view.s)*k;view.ang+=da*k;busy=true}
     else{camK=0.14;intro=false}
     if(anim){busy=true;stepAnim(ts)}
+    if(fx){if(ts-fx.t0<FX_MS)busy=true;else fx=null}
     if(meterOn){busy=true;updateNeedle(performance.now())}
     draw();
     if(busy)raf=requestAnimationFrame(tick);
@@ -443,9 +470,11 @@ function boot(){
   function stepAnim(ts){
     const A=anim;const t=(ts-A.t0);
     if(A.kind==='shot'){
-      if(t<A.dur){const k=Math.max(0,t)/A.dur;const st=[A.land[0]-A.rgt[0]*A.curve,A.land[1]-A.rgt[1]*A.curve];const q=lerp(A.b,st,k);A.pos=[q[0]+A.rgt[0]*A.curve*k*k,q[1]+A.rgt[1]*A.curve*k*k];A.h=4*A.apex*k*(1-k)*Math.min(1,view.s*0.8)}
-      else if(t<A.dur+A.rollDur){const k=(t-A.dur)/A.rollDur;const e=1-(1-k)*(1-k);A.pos=lerp(A.land,A.end,e);A.h=0}
-      else{anim=null;finishShot(A)}
+      if(t<A.dur){const k=Math.max(0,t)/A.dur;const st=[A.land[0]-A.rgt[0]*A.curve,A.land[1]-A.rgt[1]*A.curve];const q=lerp(A.b,st,k);A.pos=[q[0]+A.rgt[0]*A.curve*k*k,q[1]+A.rgt[1]*A.curve*k*k];A.h=4*A.apex*k*(1-k)*Math.min(1,view.s*0.8);
+        // trail: world position + height in yards (height is stored in world units so it scales with the camera like everything else)
+        if(!reduced){(A.trail||(A.trail=[])).push({p:A.pos,hy:A.h/Math.max(view.s,1e-6)});if(A.trail.length>TRAIL_MAX)A.trail.shift()}}
+      else if(t<A.dur+A.rollDur){const k=(t-A.dur)/A.rollDur;const e=1-(1-k)*(1-k);A.pos=lerp(A.land,A.end,e);A.h=0;if(!A.landedAt&&!reduced)A.landedAt=ts}
+      else{if(!reduced)fx={t0:A.landedAt||ts,land:A.land,lie:A.lieLand,trail:A.trail||[]};anim=null;finishShot(A)}
     } else if(A.kind==='putt'){
       const P=A.res.path,sec=Math.max(0,t)/1000*A.speed;const i=sec/0.1;
       if(i<P.length-1){const k=Math.floor(i);A.i=k;A.pos=lerp(P[k],P[k+1],i-k)}
@@ -700,7 +729,7 @@ function boot(){
   }
   $('start').addEventListener('click',e=>startRound(pick,plen,false,e.currentTarget));
   $('daily').addEventListener('click',e=>startRound(dailyCourse(),'18',true,e.currentTarget));
-  $('quit').addEventListener('click',()=>{S=null;anim=null;meterOn=false;renderMenu();show('menu')});
+  $('quit').addEventListener('click',()=>{S=null;anim=null;fx=null;meterOn=false;renderMenu();show('menu')});
   $('menu2').addEventListener('click',()=>{S=null;renderMenu();show('menu')});
   $('again').addEventListener('click',e=>startRound(S.course,S.len,false,e.currentTarget));
   function finish(){
@@ -720,8 +749,8 @@ function boot(){
      visualViewport beats innerHeight on iOS, where the toolbar and the home indicator both eat space innerHeight still reports. */
   function fit(){const g=$('game');if(!g||g.hidden)return;const top=Math.max(0,g.getBoundingClientRect().top);const vv=window.visualViewport;const vh=vv&&vv.height?vv.height:window.innerHeight;R.style.setProperty('--lk-vh',Math.round(vh)+'px');R.style.setProperty('--lk-top',Math.round(top)+'px')}
   window.addEventListener('resize',fit);if(window.visualViewport)window.visualViewport.addEventListener('resize',fit);
-  dbgFn=()=>({ball:S&&S.h?toScreen(S.h.ball):null,phase:S&&S.h&&S.h.phase,mode,strokes:S&&S.h&&S.h.strokes,scores:S&&S.scores});
-  stopFn=()=>{if(raf)cancelAnimationFrame(raf);raf=0;anim=null;meterOn=false;clearTimeout(bannerTimer);ro.disconnect();document.removeEventListener('keydown',onKey);window.removeEventListener('resize',fit);if(window.visualViewport)window.visualViewport.removeEventListener('resize',fit);document.body.classList.remove('lk-ingame')};
+  dbgFn=()=>({ball:S&&S.h?toScreen(S.h.ball):null,phase:S&&S.h&&S.h.phase,mode,strokes:S&&S.h&&S.h.strokes,scores:S&&S.scores,anim:anim?{kind:anim.kind,trail:anim.trail?anim.trail.length:0,landed:!!anim.landedAt}:null,fx:fx?{age:Math.round(performance.now()-fx.t0),trail:fx.trail.length,lie:fx.lie}:null,drawMs:()=>{const t0=performance.now();for(let i=0;i<30;i++){staticKey='';draw()}return(performance.now()-t0)/30}});
+  stopFn=()=>{if(raf)cancelAnimationFrame(raf);raf=0;anim=null;fx=null;meterOn=false;clearTimeout(bannerTimer);ro.disconnect();document.removeEventListener('keydown',onKey);window.removeEventListener('resize',fit);if(window.visualViewport)window.visualViewport.removeEventListener('resize',fit);document.body.classList.remove('lk-ingame')};
   renderMenu();draw();
 
 }

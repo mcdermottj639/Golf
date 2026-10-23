@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v254';
+const BUILD = 'v255';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v255', d:'2026-10-23', items:['LINKS BALL FLIGHT YOU CAN SEE: Every full shot now leaves a trail — a white arc through the air over its shadow track on the ground, fading behind the ball — and the shadow shrinks as the ball climbs so height reads at a glance. Where it lands, a ring spreads and fades: a sand puff in a bunker, a splash in water. Pure drawing; no shot, roll or score is any different.'] },
   { b:'v254', d:'2026-10-22', items:['LINKS SHOT VIEW: The camera now sits close behind the ball and looks out to where your club lands, so each shot feels played rather than surveyed. Tap Hole view on the map for the whole hole from the air, Shot view to come back; the game remembers your choice. Putting is unchanged.'] },
   { b:'v253', d:'2026-10-22', items:['LINKS FITS THE PHONE: The hole and every control now fit one screen, sized to the visible viewport and clear of the home indicator; the page can scroll if a phone is short. The hole was being drawn 520 px wide and clipped on a 390 px phone — it is full width and centred now. Tee off sits at the top of the menu above a compact course grid, and the draw/fade slider has its own line.'] },
   { b:'v252', d:'2026-10-22', items:['CADDIE HQ LINKS: A top-down course game on every mapped course, with your own bag. Rounds → Play Links. Three swing styles (Slingshot pull-back, Trace your swing, Shape dial + strike), real left/right miss patterns from your measured clubs, wind, lies, water drops, sloped greens with a zoomed putting view and perfect-pace preview, gimmes inside 2 ft, and a scorecard with best scores per course.','YOUR COURSES, YOUR BAG: Holes are drawn from the same course packs as the interactive maps (downloaded on first play) and clubs come from your Bag ladder. Nothing in the game writes to your golf state.'] },
