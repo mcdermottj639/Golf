@@ -4,7 +4,7 @@
    (chqlinks:*: mode, course, length, distance boost, best scores). Never touches golf state, packs or feeds. */
 (function(){
 'use strict';
-const HTML="<div class=\"wrap\" id=\"lk-menuwrap\">\n  <section id=\"lk-menu\" class=\"menu\">\n    <div>\n      <div class=\"kick\">Caddie HQ · course game</div>\n      <h1>Play your courses with your own bag</h1>\n    </div>\n    <p class=\"lk-note\">Your mapped courses, your TrackMan carries, your measured misses. Play from behind the ball, follow your shot, and explore your mapped holes.</p>\n    <div class=\"picked\" id=\"lk-picked\"></div>\n    <div class=\"lk-seg\" id=\"lk-lenseg\" role=\"group\" aria-label=\"Round length\">\n      <button type=\"button\" data-len=\"front\" aria-pressed=\"false\">Front 9</button>\n      <button type=\"button\" data-len=\"back\" aria-pressed=\"false\">Back 9</button>\n      <button type=\"button\" data-len=\"18\" aria-pressed=\"true\">18 holes</button>\n    </div>\n    <button class=\"go\" id=\"lk-start\" type=\"button\">Tee off</button>\n    <button class=\"lk-ghost\" id=\"lk-daily\" type=\"button\">Today's course: <span id=\"lk-dailyName\"></span></button>\n    <div class=\"kick\" style=\"margin-top:4px\">Courses · tap to pick</div>\n    <div class=\"courses\" id=\"lk-courses\"></div>\n    <div class=\"kick\">Swing style</div>\n    <div class=\"lk-seg\" id=\"lk-modeseg\" role=\"group\" aria-label=\"Swing style\">\n      <button type=\"button\" data-mode=\"sling\" aria-pressed=\"false\">Slingshot</button>\n      <button type=\"button\" data-mode=\"trace\" aria-pressed=\"false\">Trace</button>\n      <button type=\"button\" data-mode=\"dial\" aria-pressed=\"false\">Shape dial</button>\n    </div>\n    <p class=\"lk-note\" id=\"lk-modenote\"></p>\n    <div class=\"row\" style=\"justify-content:space-between\"><span class=\"kick\">Distance vs indoor numbers</span><span class=\"kick\" id=\"lk-boostlab\"></span></div>\n    <input type=\"range\" id=\"lk-boost\" min=\"0\" max=\"25\" step=\"1\" aria-label=\"Distance adjustment percent\">\n    <details class=\"lk-note\"><summary>How it plays · course accuracy</summary><p><b>Course accuracy.</b> Routing and available hazards come from your course packs. The 3D scenery, tree shapes and green breaks are simulated; elevations are not surveyed. Use your saved Caddie plan for real-course advice. Missing mapped fairways/greens use the existing game approximations. This game does not measure real putting breaks.</p>\n      <p><b>Swing styles.</b> Choose Slingshot, Trace or Shape dial on the menu. In Slingshot and Trace, tap anywhere on the hole to set your target line first; the view turns to face it.</p>\n      <p><b>Shape dial.</b> Tap the hole to set your line, choose draw/fade, trajectory and swing length, then tap Strike and tap again when the closing ring meets the ball. Older meter notes: pick a club, drag on the hole to aim. The shaded oval is where that club usually lands for you, wind included. Tap <b>Lock the line</b>, then tap <b>Swing</b> as the needle crosses center. Center is pured, the green band is solid, outside it is struck. Early pulls it left, late pushes it right.</p>\n      <p><b>Putting.</b> The view zooms to the green. Arrows point downhill; longer arrows mean more slope. Drag to set your line. The dotted preview shows where the ball rolls at perfect pace on that line, so move the line until the preview runs over the hole. Then the meter is pace: center is perfect, left is short, right is long. Anything inside 2 ft is a gimme.</p>\n      <p>Rough costs about 8% of carry, fairway bunkers 20%, trees force a punch-out. Water is a one-stroke penalty with a drop behind where the ball crossed.</p>\n    </details>\n    <details class=\"lk-note\"><summary>Your bag in this game</summary>\n      <div class=\"tablewrap\"><table class=\"lk-bag\" id=\"lk-bagtable\"></table></div>\n      <p id=\"lk-bagnote\"></p>\n    </details>\n    <p class=\"lk-note\" style=\"font-size:11px\">Course shapes: © OpenStreetMap contributors (ODbL), from Caddie HQ's verified course packs. Pars and yardages from each course's published scorecard. Trees between holes and green slopes are generated for play.</p>\n  </section>\n\n  <section id=\"lk-end\" class=\"final\" hidden>\n    <div class=\"kick\" id=\"lk-ecourse\"></div>\n    <div class=\"row\" style=\"justify-content:space-between;align-items:flex-end\">\n      <div><h1 id=\"lk-etitle\">Round complete</h1><div class=\"lk-note\" id=\"lk-estrokes\"></div></div>\n      <div class=\"bigscore\" id=\"lk-escore\"></div>\n    </div>\n    <div class=\"tablewrap\"><table class=\"lk-bag\" id=\"lk-etable\"></table></div>\n    <div class=\"lk-stats\" id=\"lk-estats\"></div>\n    <button class=\"go\" id=\"lk-again\" type=\"button\">Play it again</button>\n    <button class=\"lk-ghost\" id=\"lk-menu2\" type=\"button\">Back to courses</button>\n  </section>\n</div>\n\n<section class=\"lk-game\" id=\"lk-game\" hidden>\n  <header class=\"lk-playhead\">\n    <button class=\"lk-exit\" id=\"lk-quit\" type=\"button\" aria-label=\"Back to Caddie HQ\">‹ <span>Caddie HQ</span></button>\n    <div class=\"lk-hole-title\"><div class=\"kick\" id=\"lk-gcourse\"></div><div class=\"row\"><h1 id=\"lk-ghole\"></h1><div class=\"holeline\" id=\"lk-gline\"></div></div></div>\n    <button class=\"lk-score-toggle\" id=\"lk-score-toggle\" type=\"button\" aria-label=\"Show scorecard\" aria-expanded=\"false\"><span id=\"lk-gpar\">E</span><small>Card</small></button>\n  </header>\n  <div class=\"lk-card\" id=\"lk-gcard\" hidden></div>\n  <div class=\"stage\" id=\"lk-stage\">\n    <canvas id=\"lk-cv3\" aria-hidden=\"true\" hidden></canvas><canvas id=\"lk-cv\"></canvas>\n    <div class=\"hud\">\n      <div class=\"lk-pill wind\" id=\"lk-wind\"></div>\n      <div class=\"lk-pill\" id=\"lk-lie\"></div>\n    </div>\n    <div class=\"lk-target\" id=\"lk-target\" hidden></div><button id=\"lk-skip\" class=\"lk-skip\" type=\"button\" hidden>Skip flight ›</button><div class=\"lk-flight-readout\" id=\"lk-flight-readout\" hidden></div><button class=\"lk-plan\" id=\"lk-plan\" type=\"button\" aria-haspopup=\"dialog\">Caddie plan ↗</button><div class=\"camrow\"><button type=\"button\" class=\"lk-pill lk-camtog\" id=\"lk-camtog\"><canvas id=\"lk-mini\" width=\"140\" height=\"180\" aria-hidden=\"true\"></canvas><span id=\"lk-maplabel\">Hole map</span></button>\n    </div>\n    <div class=\"banner\" id=\"lk-banner\"><div class=\"lk-big\" id=\"lk-bbig\"></div><div class=\"lk-sub\" id=\"lk-bsub\"></div></div>\n    <div class=\"hint\" id=\"lk-hint\" hidden></div>\n    <div class=\"foot\"><div class=\"lk-pill\" id=\"lk-topin\"></div><div class=\"lk-pill\" id=\"lk-shotno\"></div></div>\n  </div>\n  <div class=\"dock\">\n    <div class=\"lk-controlrow\"><details class=\"lk-clubbox\" id=\"lk-clubbox\"><summary id=\"lk-clubsummary\">Choose club</summary><div class=\"lk-clubs\" id=\"lk-clubs\" role=\"group\" aria-label=\"Clubs\"></div></details><details class=\"lk-shapebox\" id=\"lk-shapebox\"><summary id=\"lk-shapesummary\">Stock · Straight</summary>    <div class=\"shaperow\" id=\"lk-shaperow\" hidden>\n      <div class=\"lk-seg\" id=\"lk-trajseg\" role=\"group\" aria-label=\"Trajectory\"><button type=\"button\" data-t=\"-1\" aria-pressed=\"false\">Low</button><button type=\"button\" data-t=\"0\" aria-pressed=\"true\">Stock</button><button type=\"button\" data-t=\"1\" aria-pressed=\"false\">High</button></div>\n      <div class=\"lk-seg\" id=\"lk-pwseg\" role=\"group\" aria-label=\"Swing length\" hidden><button type=\"button\" data-p=\"1\" aria-pressed=\"true\">Full</button><button type=\"button\" data-p=\"0.75\" aria-pressed=\"false\">¾</button><button type=\"button\" data-p=\"0.5\" aria-pressed=\"false\">½</button></div><span class=\"shp\"><span id=\"lk-shapeL\">Draw</span><input type=\"range\" id=\"lk-shape\" min=\"-3\" max=\"3\" step=\"1\" value=\"0\" aria-label=\"Shape\"><span>Fade</span><span class=\"val\" id=\"lk-shapeval\">straight</span></span>\n    </div>\n</details></div>\n    <div class=\"readout\" id=\"lk-readout\"></div>\n    <div class=\"lk-meter\" id=\"lk-meter\" aria-hidden=\"true\">\n      <div class=\"z solid\"></div><div class=\"z pure\"></div>\n      <span class=\"lk-lab\" id=\"lk-labL\" style=\"left:6px\">EARLY · LEFT</span><span class=\"lk-lab\" id=\"lk-labR\" style=\"right:6px\">LATE · RIGHT</span>\n      <div class=\"needle\" id=\"lk-needle\"></div><div class=\"lk-hit\" id=\"lk-hit\" hidden></div><div class=\"grade\" id=\"lk-grade\" hidden></div>\n    </div>\n    <button class=\"go\" id=\"lk-act\" type=\"button\">Lock the line</button>\n    <button type=\"button\" class=\"instr\" id=\"lk-instr\" hidden></button>\n  </div>\n</section>\n\n";
+const HTML="<div class=\"wrap\" id=\"lk-menuwrap\">\n  <section id=\"lk-menu\" class=\"menu\">\n    <div>\n      <div class=\"kick\">Caddie HQ · course game</div>\n      <h1>Play your courses with your own bag</h1>\n    </div>\n    <p class=\"lk-note\">Your mapped courses, your TrackMan carries, your measured misses. Play from behind the ball, follow your shot, and explore your mapped holes.</p>\n    <div class=\"picked\" id=\"lk-picked\"></div>\n    <div class=\"lk-seg\" id=\"lk-lenseg\" role=\"group\" aria-label=\"Round length\">\n      <button type=\"button\" data-len=\"front\" aria-pressed=\"false\">Front 9</button>\n      <button type=\"button\" data-len=\"back\" aria-pressed=\"false\">Back 9</button>\n      <button type=\"button\" data-len=\"18\" aria-pressed=\"true\">18 holes</button>\n    </div>\n    <button class=\"go\" id=\"lk-start\" type=\"button\">Tee off</button>\n    <button class=\"lk-ghost\" id=\"lk-daily\" type=\"button\">Today's course: <span id=\"lk-dailyName\"></span></button>\n    <div class=\"kick\" style=\"margin-top:4px\">Courses · tap to pick</div>\n    <div class=\"courses\" id=\"lk-courses\"></div>\n    <div class=\"kick\">Swing style</div>\n    <div class=\"lk-seg\" id=\"lk-modeseg\" role=\"group\" aria-label=\"Swing style\">\n      <button type=\"button\" data-mode=\"sling\" aria-pressed=\"false\">Slingshot</button>\n      <button type=\"button\" data-mode=\"trace\" aria-pressed=\"false\">Trace</button>\n      <button type=\"button\" data-mode=\"dial\" aria-pressed=\"false\">Shape dial</button>\n    </div>\n    <p class=\"lk-note\" id=\"lk-modenote\"></p>\n    <div class=\"row\" style=\"justify-content:space-between\"><span class=\"kick\">Distance vs indoor numbers</span><span class=\"kick\" id=\"lk-boostlab\"></span></div>\n    <input type=\"range\" id=\"lk-boost\" min=\"0\" max=\"25\" step=\"1\" aria-label=\"Distance adjustment percent\">\n    <details class=\"lk-note\"><summary>How it plays · course accuracy</summary><p><b>Course accuracy.</b> Routing and available hazards come from your course packs. The 3D scenery, tree shapes and green breaks are simulated; elevations are not surveyed. Use your saved Caddie plan for real-course advice. Missing mapped fairways/greens use the existing game approximations. This game does not measure real putting breaks.</p>\n      <p><b>Swing styles.</b> Choose Slingshot, Trace or Shape dial on the menu. In Slingshot, tap the hole to aim, pull the side grip down and release. Slide away to cancel; Switch side changes hands. Trace remains an optional down-and-up swing on the course.</p>\n      <p><b>Shape dial.</b> Tap the hole to set your line, choose draw/fade, trajectory and swing length, then tap Strike and tap again when the closing ring meets the ball. Older meter notes: pick a club, drag on the hole to aim. The shaded oval is where that club usually lands for you, wind included. Tap <b>Lock the line</b>, then tap <b>Swing</b> as the needle crosses center. Center is pured, the green band is solid, outside it is struck. Early pulls it left, late pushes it right.</p>\n      <p><b>Putting.</b> The view zooms to the green. Arrows point downhill; longer arrows mean more slope. Drag to set your line. The dotted preview shows where the ball rolls at perfect pace on that line, so move the line until the preview runs over the hole. Then use the side grip for pace: 100% is ideal, less runs shorter, more runs farther. Anything inside 2 ft is a gimme.</p>\n      <p>Rough costs about 8% of carry, fairway bunkers 20%, trees force a punch-out. Water is a one-stroke penalty with a drop behind where the ball crossed.</p>\n    </details>\n    <details class=\"lk-note\"><summary>Your bag in this game</summary>\n      <div class=\"tablewrap\"><table class=\"lk-bag\" id=\"lk-bagtable\"></table></div>\n      <p id=\"lk-bagnote\"></p>\n    </details>\n    <p class=\"lk-note\" style=\"font-size:11px\">Course shapes: © OpenStreetMap contributors (ODbL), from Caddie HQ's verified course packs. Pars and yardages from each course's published scorecard. Trees between holes and green slopes are generated for play.</p>\n  </section>\n\n  <section id=\"lk-end\" class=\"final\" hidden>\n    <div class=\"kick\" id=\"lk-ecourse\"></div>\n    <div class=\"row\" style=\"justify-content:space-between;align-items:flex-end\">\n      <div><h1 id=\"lk-etitle\">Round complete</h1><div class=\"lk-note\" id=\"lk-estrokes\"></div></div>\n      <div class=\"bigscore\" id=\"lk-escore\"></div>\n    </div>\n    <div class=\"tablewrap\"><table class=\"lk-bag\" id=\"lk-etable\"></table></div>\n    <div class=\"lk-stats\" id=\"lk-estats\"></div>\n    <button class=\"go\" id=\"lk-again\" type=\"button\">Play it again</button>\n    <button class=\"lk-ghost\" id=\"lk-menu2\" type=\"button\">Back to courses</button>\n  </section>\n</div>\n\n<section class=\"lk-game\" id=\"lk-game\" hidden>\n  <header class=\"lk-playhead\">\n    <button class=\"lk-exit\" id=\"lk-quit\" type=\"button\" aria-label=\"Back to Caddie HQ\">‹ <span>Caddie HQ</span></button>\n    <div class=\"lk-hole-title\"><div class=\"kick\" id=\"lk-gcourse\"></div><div class=\"row\"><h1 id=\"lk-ghole\"></h1><div class=\"holeline\" id=\"lk-gline\"></div></div></div>\n    <button class=\"lk-score-toggle\" id=\"lk-score-toggle\" type=\"button\" aria-label=\"Show scorecard\" aria-expanded=\"false\"><span id=\"lk-gpar\">E</span><small>Card</small></button>\n  </header>\n  <div class=\"lk-card\" id=\"lk-gcard\" hidden></div>\n  <div class=\"stage\" id=\"lk-stage\">\n    <canvas id=\"lk-cv3\" aria-hidden=\"true\" hidden></canvas><canvas id=\"lk-cv\"></canvas>\n    <div class=\"hud\">\n      <div class=\"lk-pill wind\" id=\"lk-wind\"></div>\n      <div class=\"lk-pill\" id=\"lk-lie\"></div>\n    </div>\n    <div class=\"lk-target\" id=\"lk-target\" hidden></div><button id=\"lk-skip\" class=\"lk-skip\" type=\"button\" hidden>Skip flight ›</button><div class=\"lk-flight-readout\" id=\"lk-flight-readout\" hidden></div><button class=\"lk-plan\" id=\"lk-plan\" type=\"button\" aria-haspopup=\"dialog\">Caddie plan ↗</button><div class=\"camrow\"><button type=\"button\" class=\"lk-pill lk-camtog\" id=\"lk-camtog\"><canvas id=\"lk-mini\" width=\"140\" height=\"180\" aria-hidden=\"true\"></canvas><span id=\"lk-maplabel\">Hole map</span></button>\n    </div>\n    <div class=\"banner\" id=\"lk-banner\"><div class=\"lk-big\" id=\"lk-bbig\"></div><div class=\"lk-sub\" id=\"lk-bsub\"></div></div>\n    <div class=\"hint\" id=\"lk-hint\" hidden></div>\n    <div class=\"foot\"><div class=\"lk-pill\" id=\"lk-topin\"></div><div class=\"lk-pill\" id=\"lk-shotno\"></div></div>\n  </div>\n  <div class=\"dock\">\n    <div class=\"lk-controlrow\"><details class=\"lk-clubbox\" id=\"lk-clubbox\"><summary id=\"lk-clubsummary\">Choose club</summary><div class=\"lk-clubs\" id=\"lk-clubs\" role=\"group\" aria-label=\"Clubs\"></div></details><details class=\"lk-shapebox\" id=\"lk-shapebox\"><summary id=\"lk-shapesummary\">Stock · Straight</summary>    <div class=\"shaperow\" id=\"lk-shaperow\" hidden>\n      <div class=\"lk-seg\" id=\"lk-trajseg\" role=\"group\" aria-label=\"Trajectory\"><button type=\"button\" data-t=\"-1\" aria-pressed=\"false\">Low</button><button type=\"button\" data-t=\"0\" aria-pressed=\"true\">Stock</button><button type=\"button\" data-t=\"1\" aria-pressed=\"false\">High</button></div>\n      <div class=\"lk-seg\" id=\"lk-pwseg\" role=\"group\" aria-label=\"Swing length\" hidden><button type=\"button\" data-p=\"1\" aria-pressed=\"true\">Full</button><button type=\"button\" data-p=\"0.75\" aria-pressed=\"false\">¾</button><button type=\"button\" data-p=\"0.5\" aria-pressed=\"false\">½</button></div><span class=\"shp\"><span id=\"lk-shapeL\">Draw</span><input type=\"range\" id=\"lk-shape\" min=\"-3\" max=\"3\" step=\"1\" value=\"0\" aria-label=\"Shape\"><span>Fade</span><span class=\"val\" id=\"lk-shapeval\">straight</span></span>\n    </div>\n</details></div>\n    <div class=\"readout\" id=\"lk-readout\"></div>\n    <div class=\"lk-meter\" id=\"lk-meter\" aria-hidden=\"true\">\n      <div class=\"z solid\"></div><div class=\"z pure\"></div>\n      <span class=\"lk-lab\" id=\"lk-labL\" style=\"left:6px\">EARLY · LEFT</span><span class=\"lk-lab\" id=\"lk-labR\" style=\"right:6px\">LATE · RIGHT</span>\n      <div class=\"needle\" id=\"lk-needle\"></div><div class=\"lk-hit\" id=\"lk-hit\" hidden></div><div class=\"grade\" id=\"lk-grade\" hidden></div>\n    </div>\n    <button class=\"go\" id=\"lk-act\" type=\"button\">Lock the line</button>\n    <button type=\"button\" class=\"instr\" id=\"lk-instr\" hidden></button>\n  </div>\n</section>\n\n";
 let R=null,bridge={},stopFn=null,dbgFn=null;
 function render(){return '<div class="lk" id="lk-root">'+HTML+'</div>';}
 function mount(node,b){unmount();R=node;bridge=b||{};if(!R)return;boot();}
@@ -185,6 +185,11 @@ function boot(){
   let G=null; // active gesture
   const view={cx:0,cy:0,s:1,ang:0,tcx:0,tcy:0,ts:1,tang:0};
   let cv=$('cv'),ctx=cv.getContext('2d');
+  $('stage').insertAdjacentHTML('beforeend',`<div id="lk-powerrail" class="lk-powerrail" hidden><strong id="lk-powerlabel">Pull down</strong><small id="lk-powercarry">Release to swing</small><div class="lk-powertrack"><i class="lk-powertick t50">50</i><i class="lk-powertick t75">75</i><i class="lk-powertick t100">100%</i><button id="lk-powerhandle" class="lk-powerhandle" type="button" aria-label="Swing power. Drag down, release to swing. Arrow keys adjust; Enter swings.">↓</button></div><small id="lk-powerhint">Slide away to cancel</small></div>`);
+  $('instr').insertAdjacentHTML('afterend',`<div class="lk-tools"><button type="button" id="lk-retry" disabled>Try shot again</button><button type="button" id="lk-hand">Switch side</button><details class="lk-distance-note"><summary>Map distances ⓘ</summary><p id="lk-distance-info"></p></details></div>`);
+  let lastShot=null,rail=null,railPower=1;
+  $('stage').insertAdjacentHTML('beforeend','<div id="lk-pin" class="lk-pin" hidden></div>');
+  rootNode.classList.toggle('lk-left-handed',store.get('hand','right')==='left');
   let scene=null,scenePromise=null,threeActive=false,sceneMoving=false,roundToken=0,gimmeTimer=0;
   async function ensureScene(){
     if(scene||scenePromise)return scenePromise;
@@ -206,6 +211,7 @@ function boot(){
   }
   function holeObj(){return cur.holes.find(h=>h.n===S.holes[S.idx])}
   function startHole(){
+    lastShot=null;rail=null;
     const h=holeObj();
     S.h={ball:h.tee.slice(),lie:'tee',strokes:0,putts:0,wind:windFor(S.seed,h),done:false,phase:'aim',history:[h.tee.slice()],club:null,aim:null,preview:null,vPerfect:0,shape:0,traj:0,power:null,lineAim:null,pw:1};
     clearTimeout(gimmeTimer);G=null;scene?.reset();$('clubbox').open=false;$('shapebox').open=false;fx=null;pickDefaultClub();defaultAim();introCam();renderUI();draw();
@@ -312,7 +318,7 @@ function boot(){
       const result=scene.render({course:cur,h:holeObj(),ballState:S.h,anim,fx,forecast:S.h.club.putter?null:forecast(),angle:view.ang,reduced,pulling:!!G});
       ctx.clearRect(0,0,W,H);if(result){sceneMoving=result.moving;drawSceneOverlay(result,W,H);if(sceneMoving)kick();}drawMini();return;
     }
-    $('target').hidden=true;$('flight-readout').hidden=true;
+    $('target').hidden=true;$('pin').hidden=true;$('flight-readout').hidden=true;
     const putting=onGreen()&&!S.h.done;
     const key=[view.cx.toFixed(2),view.cy.toFixed(2),view.s.toFixed(4),view.ang.toFixed(4),W,H,cur.id,putting?1:0,holeObj().n].join('|');
     if(staticKey!==key){staticKey=key;if(!off)off=document.createElement('canvas');if(off.width!==cv.width||off.height!==cv.height){off.width=cv.width;off.height=cv.height}
@@ -323,7 +329,9 @@ function boot(){
   function drawSceneOverlay(result,W,H){
     const bs=result.ball,phase=S.h.phase,flight=phase==='flight';
     const target=$('target');target.hidden=flight||S.h.done;
-    if(!target.hidden&&result.target){const p=scene.project(result.target,.2);target.textContent=Math.round(dist(S.h.ball,result.target))+' yd target';target.style.left=clamp(p[0],65,W-65)+'px';target.style.top=clamp(p[1]-24,60,H-100)+'px';}
+    const pinBadge=$('pin');pinBadge.hidden=flight||S.h.done;
+    if(!pinBadge.hidden){const p=scene.project(holeObj().pin,3.1);pinBadge.textContent='⚑ Pin '+Math.round(remaining())+' yd';pinBadge.style.left=clamp(p[0],65,W-65)+'px';pinBadge.style.top=clamp(p[1]-52,58,H-150)+'px';}
+    if(!target.hidden&&result.target){const p=scene.project(result.target,.2);target.textContent='Carry '+Math.round(dist(S.h.ball,result.target))+' yd';target.style.left=clamp(p[0],65,W-65)+'px';target.style.top=clamp(p[1]-24,60,H-100)+'px';}
     const read=$('flight-readout');read.hidden=!flight;
     if(flight){read.innerHTML='<span>'+(result.progress<1?'BALL IN FLIGHT':'ROLLING')+'</span><strong>'+result.carry+' <small>yd</small></strong><span>'+esc(anim?.club?.id||'')+' · '+(result.progress<1?'distance so far':'total distance')+'</span>';}
     if(G&&(G.kind==='pull'||G.kind==='trace')){ctx.strokeStyle='#fff9df';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(bs[0],bs[1]);for(const p of G.pts)ctx.lineTo(p.x,p.y);ctx.stroke();label(clamp(G.cur[0]-20,8,W-95),clamp(G.cur[1]-20,60,H-25),Math.round((S.h.power||0)*100)+'%');}
@@ -484,6 +492,8 @@ function boot(){
   /* ---------- shot ---------- */
   function grade(t){const a=Math.abs(t);return a<=0.08?'PURED':a<=0.25?'SOLID':'STRUCK'}
   function swing(gest){
+    if(!S?.h||!['aim','armed'].includes(S.h.phase))return;
+    lastShot=JSON.parse(JSON.stringify(S));lastShot.h.power=null;lastShot.h.phase='aim';
     const now=performance.now();if(meterOn)S.h.needle=needleAt(now);meterOn=false;const t=gest?(gest.t||0):(S.h.needle||0);const g=gest?gest.g:grade(t);
     if(!gest){
     $('needle').style.left=(50+t*50)+'%';const hit=$('hit');hit.style.left=(50+t*50)+'%';hit.hidden=false;
@@ -582,9 +592,17 @@ function boot(){
   function toParStr(v){return v===0?'E':(v>0?'+':'')+v}
   function scoreClass(n,par){if(n==null)return'';const d=n-par;if(n===1)return'ace';return d<=-2?'u2':d===-1?'u1':d===1?'o1':d>=2?'o2':''}
   function sideStr(v){const a=Math.round(Math.abs(v));return a<1?'straight':a+(v>0?' R':' L')}
+  function shotReadout(){const F=forecast(),h=holeObj(),pinAlong=(h.pin[0]-S.h.ball[0])*F.u[0]+(h.pin[1]-S.h.ball[1])*F.u[1],delta=Math.round(F.carryW-pinAlong);
+    $('readout').innerHTML='<span>Pin <b>'+Math.round(remaining())+' yd</b> · Carry <b>'+Math.round(F.carryW)+' yd</b></span><span>'+(Math.abs(delta)<2?'Pin distance':Math.abs(delta)+' yd '+(delta>0?'long':'short'))+' · Expected drift <b>'+sideStr(F.lat)+'</b></span>';
+  }
   function renderUI(){$('maplabel').textContent=camMode==='shot'?'Hole map':'Shot view';$('camtog').hidden=onGreen();
     const h=holeObj();
     const flight=S.h.phase==='flight';rootNode.classList.toggle('lk-flying',flight);$('skip').hidden=!flight||!anim;
+    $('powerrail').hidden=S.h.phase!=='aim'||(mode!=='sling'&&!S.h.club.putter);
+    $('retry').disabled=!lastShot||flight||S.daily;
+    $('retry').title=S.daily?'Retry is unavailable in the daily challenge':'Return to the same lie and wind; switches this round to practice';
+    $('distance-info').textContent='Scorecard: '+(h.yds||'unavailable')+' yd. Mapped tee to pin: '+Math.round(dist(h.tee,h.pin))+' yd. Card yardage is for '+cur.tee+' tees; mapped route endpoints are approximate and may use a different tee/pin position. Terrain elevation and green breaks are simulated, not surveyed. Course data has not been stretched to match the card.';
+    if(!rail)resetRail();
     $('clubsummary').innerHTML='<span>'+esc(S.h.club.putter?'Putter':S.h.club.id==='Dr'?'Driver':S.h.club.id)+'</span><small>'+(S.h.club.putter?'Read the green':Math.round(fullCarry(S.h.club))+' yd carry')+'</small><b>⌄</b>';
     $('shapesummary').textContent=(S.h.traj<0?'Low':S.h.traj>0?'High':'Stock')+' · '+(S.h.shape<0?'Draw':S.h.shape>0?'Fade':'Straight');
     $('shapebox').hidden=onGreen()||S.h.done;$('clubbox').hidden=onGreen()||S.h.done;
@@ -594,7 +612,7 @@ function boot(){
     $('ghole').textContent='Hole '+h.n;
     const played=S.scores.reduce((a,n,i)=>a+(n!=null?n-cur.holes.find(x=>x.n===S.holes[i]).par:0),0);
     $('gpar').textContent=toParStr(played);
-    $('gline').innerHTML='<span>Par '+h.par+'</span><span>'+(h.yds||Math.round(h.len))+' yds</span>';
+    $('gline').innerHTML='<span>Par '+h.par+'</span><span>'+(h.yds||Math.round(h.len))+' yd card</span>';
     const start=Math.floor(S.idx/9)*9,slice=S.holes.slice(start,start+9);
     let html='';for(let i=0;i<9;i++){const n=slice[i];if(n==null){html+='<div></div>';continue}const hh=cur.holes.find(x=>x.n===n),sc=S.scores[start+i];
       html+='<div class="'+(start+i===S.idx?'lk-cur':'')+'">'+n+'<b><span class="lk-sc '+scoreClass(sc,hh.par)+'">'+(sc??(start+i===S.idx&&S.h.strokes?S.h.strokes:''))+'</span></b>'+hh.par+'</div>'}
@@ -604,7 +622,7 @@ function boot(){
     $('lie').innerHTML=S.h.done?'<b>Holed</b>':'Lie <b>'+(S.h.lie==='tee'?'Tee':LIE[S.h.lie]?.name||S.h.lie)+'</b>';
     const putting=onGreen()&&!S.h.done;
     $('topin').innerHTML=S.h.done?'In the hole':putting?'<b>'+Math.round(remaining()*FT)+'</b> ft':'<b>'+Math.round(remaining())+'</b> yds to pin';
-    $('shotno').innerHTML='Shot <b>'+(S.h.strokes+(S.h.done||S.h.phase==='flight'?0:1))+'</b>';
+    $('shotno').innerHTML=(S.practice?'Practice · ':'')+'Shot <b>'+(S.h.strokes+(S.h.done||S.h.phase==='flight'?0:1))+'</b>';
     $('clubs').hidden=putting;
     if(!putting)$('clubs').innerHTML=BAG.map(cb=>'<button type="button" class="lk-club" data-c="'+cb.id+'" aria-pressed="'+(S.h.club&&S.h.club.id===cb.id)+'"'+(S.h.phase!=='aim'?' disabled':'')+'><b>'+cb.id+'</b><span>'+Math.round(fullCarry(cb))+'</span></button>').join('');
     $('labL').textContent=putting?'SHORT':'EARLY · LEFT';$('labR').textContent=putting?'LONG':'LATE · RIGHT';
@@ -612,9 +630,8 @@ function boot(){
     if(S.h.done){$('readout').innerHTML='<span>'+(S.idx+1<S.holes.length?'On to hole '+S.holes[S.idx+1]:'Last hole done')+'</span>';hint.hidden=true}
     else if(putting&&S.h.preview){const ft=remaining()*FT,P=S.h.preview;const brk=((P.end[0]-S.h.ball[0])*S.h.dir[1]-(P.end[1]-S.h.ball[1])*S.h.dir[0])*FT*12;const sl=slopeAt(h,lerp(S.h.ball,h.pin,.5));const up=-(sl[0]*S.h.dir[0]+sl[1]*S.h.dir[1]);
       $('readout').innerHTML='<span>Putt <b>'+Math.round(ft)+' ft</b> · '+(Math.abs(up)<0.004?'flat':up>0?'uphill':'downhill')+'</span><span>breaks <b>'+(Math.abs(brk)<1?'straight':Math.round(Math.abs(brk))+' in '+(brk>0?'R':'L'))+'</b>'+(P.holed?' · <b>on line</b>':'')+'</span>';
-      hint.textContent=mode==='meter'?'DRAG TO SET YOUR LINE · DOTS = PERFECT PACE':'PULL BACK FROM THE BALL · RING = PERFECT PACE';hint.hidden=S.h.phase!=='aim'}
-    else{const F=forecast();const leave=Math.round(dist([S.h.ball[0]+F.u[0]*F.carryW+F.rgt[0]*F.lat,S.h.ball[1]+F.u[1]*F.carryW+F.rgt[1]*F.lat],h.pin));
-      $('readout').innerHTML='<span>'+S.h.club.id+' <b>'+Math.round(F.carry)+'</b>'+(F.want>F.fc+1?' (full)':F.frac<.9?' ('+Math.round(F.carry/F.fc*100)+'%)':'')+' · plays <b>'+Math.round(F.carryW)+'</b></span><span>leaves <b>'+leave+'</b> · miss <b>'+sideStr(F.lat)+'</b></span>';
+      hint.textContent=mode==='meter'?'DRAG TO SET YOUR LINE · DOTS = PERFECT PACE':'PULL THE SIDE GRIP DOWN · 100% = IDEAL PACE';hint.hidden=S.h.phase!=='aim'}
+    else{shotReadout();
       hint.hidden=true;hint.textContent=mode==='meter'?'DRAG ON THE HOLE TO AIM':mode==='dial'?'TAP THE HOLE TO SET YOUR LINE · SET SHAPE · STRIKE':'TAP THE HOLE TO SET YOUR LINE'}
     const act=$('act');
     const gest=mode!=='meter';
@@ -623,7 +640,7 @@ function boot(){
     const instr=$('instr');
     $('pwseg').hidden=mode!=='dial';
     const dialFull=mode==='dial'&&!putting;
-    if(gest&&S.h.phase==='aim'&&!dialFull){act.hidden=true;instr.hidden=false;instr.innerHTML=putting?'<b>Pull to putt</b><small>Drag left here · release</small>':mode==='sling'?'<b>◉ &nbsp; Pull back to swing</b><small>Tap course to aim · pull left here</small>':'<b>Trace your swing on the course</b><small>Down, then up through the ball</small>'}
+    if(gest&&S.h.phase==='aim'&&!dialFull){act.hidden=true;instr.hidden=false;instr.innerHTML=putting?'<b>Pull the side grip down to putt</b>':mode==='sling'?'<b>Tap course to aim · pull side grip ↓</b>':'<b>Trace: down, then up through the ball</b>';}
     else if(gest&&S.h.phase==='flight'&&!dialFull){act.hidden=true;instr.hidden=false;instr.textContent=putting?'Rolling…':'In the air…'}
     else{act.hidden=false;instr.hidden=true}
     if(dialFull){for(const b of $('pwseg').children)b.setAttribute('aria-pressed',+b.dataset.p===(S.h.pw||1))}
@@ -650,25 +667,45 @@ function boot(){
   $('skip').addEventListener('click',()=>{if(!anim)return;const A=anim;anim=null;fx=null;if(A.kind==='shot')finishShot(A);else finishPutt(A);scene?.reset();draw();});
   // Separate thumb pad keeps the chosen target line: screen perspective must not
   // turn a horizontal pull into an arbitrary direction in world coordinates.
-  let pad=null;
-  $('instr').addEventListener('pointerdown',e=>{
-    if(!S?.h||S.h.phase!=='aim'||(mode!=='sling'&&!S.h.club.putter))return;
-    e.preventDefault();$('instr').setPointerCapture(e.pointerId);pad={id:e.pointerId,x:e.clientX,y:e.clientY};
-    G={id:e.pointerId,kind:'pad',cur:[0,0],pts:[],t0:performance.now()};
-  });
-  $('instr').addEventListener('pointermove',e=>{
-    if(!pad||pad.id!==e.pointerId||!S?.h)return;
-    const dx=e.clientX-pad.x,dy=e.clientY-pad.y,L=Math.hypot(dx,dy),power=Math.min(1.1,L/Math.min(145,$('instr').clientWidth*.45));
-    G.pts.push({x:e.clientX,y:e.clientY,t:performance.now()});G.cur=[e.clientX,e.clientY];
+  function resetRail(){railPower=1;$('powerrail').style.setProperty('--power','0');$('powerlabel').textContent='Pull down';$('powercarry').textContent=S?.h?.club.putter?'100% = ideal pace':'Release to swing';$('powerhint').textContent='Slide away to cancel';}
+  function railUpdate(power){
+    railPower=power;
     if(S.h.club.putter){G.pace=power;G.v0=S.h.vPerfect*power;S.h.preview=simPutt(holeObj(),S.h.ball,S.h.dir,G.v0);}
-    else S.h.power=power;
-    $('instr').style.setProperty('--pull',Math.min(100,power*100)+'%');$('instr').innerHTML='<b>'+Math.round(power*100)+'% '+(S.h.club.putter?'pace':'power')+'</b><small>Release to '+(S.h.club.putter?'putt':'swing')+'</small>';draw();
+    else {S.h.power=power;shotReadout();}
+    $('powerrail').style.setProperty('--power',String(power/1.1));
+    $('powerlabel').textContent=Math.round(power*100)+'%';
+    $('powercarry').textContent=S.h.club.putter?'putt pace':Math.round(forecast().carryW)+' yd carry';
+    draw();
+  }
+  function cancelRail(){rail=null;G=null;if(S?.h){S.h.power=null;if(S.h.club.putter)updatePutt();renderUI();draw();}}
+  $('powerhandle').addEventListener('pointerdown',e=>{
+    if(e.button!==0||G||!S?.h||S.h.phase!=='aim')return;
+    e.preventDefault();e.stopPropagation();$('powerrail').setPointerCapture(e.pointerId);
+    rail={id:e.pointerId,x:e.clientX,y:e.clientY,travel:$('powerrail').querySelector('.lk-powertrack').clientHeight-44};
+    G={id:e.pointerId,kind:'pad',cur:[e.clientX,e.clientY],pts:[],t0:performance.now()};railUpdate(0);
   });
-  $('instr').addEventListener('pointerup',e=>{if(!pad||pad.id!==e.pointerId)return;pad=null;$('instr').style.removeProperty('--pull');firePull();G=null;renderUI();draw();});
-  $('instr').addEventListener('pointercancel',()=>{pad=null;G=null;if(S?.h)S.h.power=null;$('instr').style.removeProperty('--pull');if(S?.h)renderUI();draw();});
+  $('powerrail').addEventListener('pointermove',e=>{
+    if(!rail||rail.id!==e.pointerId)return;
+    rail.cancel=Math.abs(e.clientX-rail.x)>65;
+    G.pts.push({x:e.clientX,y:e.clientY,t:performance.now()});G.cur=[e.clientX,e.clientY];
+    railUpdate(Math.max(0,Math.min(1.1,(e.clientY-rail.y)/rail.travel*1.1)));
+    $('powerhint').textContent=rail.cancel?'Release to cancel':'Release to '+(S.h.club.putter?'putt':'swing');
+  });
+  $('powerrail').addEventListener('pointerup',e=>{if(!rail||rail.id!==e.pointerId)return;if(rail.cancel||railPower<.15){cancelRail();return;}rail=null;firePull();G=null;if(S?.h){renderUI();draw();}});
+  $('powerrail').addEventListener('pointercancel',cancelRail);
+  $('powerrail').addEventListener('lostpointercapture',()=>{if(rail)cancelRail();});
+  $('powerhandle').addEventListener('keydown',e=>{if(!S?.h||S.h.phase!=='aim')return;if(['ArrowDown','ArrowUp','Escape'].includes(e.key)){e.preventDefault();if(e.key==='Escape'){cancelRail();return;}G={kind:'pad',pts:[],cur:[0,0]};railUpdate(Math.max(.15,Math.min(1.1,railPower+(e.key==='ArrowDown'?.05:-.05))));}});
+  $('powerhandle').addEventListener('click',e=>{if(e.detail!==0||!S?.h||S.h.phase!=='aim')return;G={kind:'pad',pts:[],cur:[0,0]};railUpdate(railPower);firePull();G=null;renderUI();draw();});
+  $('hand').addEventListener('click',()=>{cancelRail();const left=rootNode.classList.toggle('lk-left-handed');store.set('hand',left?'left':'right');});
+  $('retry').addEventListener('click',()=>{
+    if(!lastShot||!S||S.daily||S.h.phase==='flight')return;
+    clearTimeout(gimmeTimer);clearTimeout(bannerTimer);anim=null;fx=null;meterOn=false;G=null;rail=null;
+    S=JSON.parse(JSON.stringify(lastShot));S.practice=true;S.h.power=null;S.h.phase='aim';
+    if(S.h.club.putter)updatePutt();scene?.reset();frame(true);renderUI();draw();banner('Practice shot','Same lie and wind · excluded from best rounds');
+  });
   $('instr').addEventListener('click',e=>{if(e.detail!==0||!S?.h||S.h.phase!=='aim'||mode==='trace')return;S.h.power=1;swing({g:'SOLID',t:0,...(S.h.club.putter?{v0:S.h.vPerfect}:{})});});
   $('camtog').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();scene?.reset();camMode=camMode==='shot'?'hole':'shot';store.set('cam',camMode);$('maplabel').textContent=camMode==='shot'?'Hole map':'Shot view';if(S&&S.h)frame(false);draw()});
-  $('clubs').addEventListener('click',e=>{const b=e.target.closest('.lk-club');if(!b||S.h.phase!=='aim')return;const id=b.dataset.c;S.h.club=BAG.find(c=>c.id===id);
+  $('clubs').addEventListener('click',e=>{const b=e.target.closest('.lk-club');if(!b||S.h.phase!=='aim')return;cancelRail();const id=b.dataset.c;S.h.club=BAG.find(c=>c.id===id);
     const fc=fullCarry(S.h.club),d=dist(S.h.ball,S.h.aim);if(d>fc*1.05||d<fc*0.6)defaultAim();$('clubbox').open=false;scene?.reset();frame();renderUI();draw()});
   function maxPull(){return Math.min(220,cv.clientHeight*0.38)}
   function local(e){const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
@@ -726,13 +763,14 @@ function boot(){
   function aimFrom(e){if(!S||!S.h||S.h.phase!=='aim')return;const r=cv.getBoundingClientRect();const p=toWorld(e.clientX-r.left,e.clientY-r.top);
     if(S.h.club.putter){if(dist(p,S.h.ball)<0.3)return;S.h.aim=p;updatePutt()}else S.h.aim=p;renderUI();draw()}
   cv.addEventListener('pointerdown',e=>{
+    if(rail)return;if(G?.kind==='pad')cancelRail();
     if(mode==='meter'){dragging=true;cv.setPointerCapture(e.pointerId);aimFrom(e);return}
     if(mode==='dial'&&S&&S.h&&S.h.phase==='armed'){strike();return}
     if(!S||!S.h||S.h.phase!=='aim')return;cv.setPointerCapture(e.pointerId);const pt=local(e);
     if(G&&G.id!==e.pointerId){if(!G.second){G.second={id:e.pointerId,a0:Math.atan2(pt[1]-G.cur[1],pt[0]-G.cur[0]),shape0:S.h.shape}}return}
     G={id:e.pointerId,start:pt,cur:pt,pts:[{x:pt[0],y:pt[1],t:performance.now()}],t0:performance.now(),kind:'tap',second:null};
     const bs=toScreen(S.h.ball);const near=Math.hypot(pt[0]-bs[0],pt[1]-bs[1])<52;
-    if(mode==='sling'){G.kind=near?'pull':'tap'}else{G.kind=(S.h.club.putter&&near)?'pull':'maybe'}
+    if(mode==='sling'||S.h.club.putter){G.kind='tap'}else{G.kind='maybe'}
     draw();
   });
   cv.addEventListener('pointermove',e=>{
@@ -786,7 +824,7 @@ function boot(){
   $('pwseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!S||!S.h||S.h.phase!=='aim')return;S.h.pw=+b.dataset.p;renderUI();draw()});
   $('trajseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!S||!S.h||S.h.phase!=='aim')return;S.h.traj=+b.dataset.t;renderUI();draw()});
   $('shape').addEventListener('input',e=>{if(!S||!S.h||S.h.phase!=='aim')return;S.h.shape=+e.target.value;renderUI();draw()});
-  const MODENOTE={sling:'Tap the course to aim, then pull the bottom pad left and release. Or pull back directly from the ball. Pull length is power, direction is your start line, a second finger twisting sets draw or fade. Putts work the same way with a perfect-pace ring.',trace:'Draw the swing with your thumb: down for the backswing, then up through the ball. Backswing length is power. Face (where you finish left or right) and path (the angle you come through) shape the ball like real flight laws.',dial:'Plan the shot, then execute it. Tap the hole to set your line, pick draw or fade, trajectory and swing length, then tap Strike. A ring closes on the ball; tap when it meets the ball for pure contact. Early is toe, late is heel.'};
+  const MODENOTE={sling:'Tap the course to aim. Pull the side grip down and release to swing; 100% is full power, 110% adds spread. Slide sideways away from the rail to cancel. Switch side suits either hand. Choose draw/fade in the shot drawer. Putting uses the same rail, with 100% indicating ideal pace. Try shot again restores the same lie/wind and makes the round practice-only; unavailable in the daily challenge.',trace:'Draw the swing with your thumb: down for the backswing, then up through the ball. Backswing length is power. Face (where you finish left or right) and path (the angle you come through) shape the ball like real flight laws.',dial:'Plan the shot, then execute it. Tap the hole to set your line, pick draw or fade, trajectory and swing length, then tap Strike. A ring closes on the ball; tap when it meets the ball for pure contact. Early is toe, late is heel.'};
   $('modeseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;mode=b.dataset.mode;store.set('mode',mode);renderMenu()});
   $('boost').addEventListener('input',e=>{store.set('boost',+e.target.value);$('boostlab').textContent='+'+boost()+'% · driver plays '+Math.round(carryOf(BAG[0]))+' carry'});
   $('courses').addEventListener('click',e=>{const b=e.target.closest('.cpick');if(!b)return;pick=b.dataset.id;store.set('course',pick);renderMenu();$('picked').scrollIntoView({block:'start',behavior:'smooth'})});
@@ -806,10 +844,10 @@ function boot(){
   function finish(){
     const holes=S.holes.map(n=>cur.holes.find(h=>h.n===n));
     const par=holes.reduce((a,h)=>a+h.par,0),tot=S.scores.reduce((a,b)=>a+b,0),tp=tot-par;
-    const key=S.course+':'+S.len,best=store.get('best',{});const isBest=best[key]==null||tp<best[key];if(isBest){best[key]=tp;store.set('best',best)}
+    const key=S.course+':'+S.len,best=store.get('best',{});const isBest=!S.practice&&(best[key]==null||tp<best[key]);if(isBest){best[key]=tp;store.set('best',best)}
     $('ecourse').textContent=cur.name+' · '+(S.len==='18'?'18 holes':S.len==='front'?'Front 9':'Back 9')+(S.daily?' · today\'s course':'');
-    $('escore').textContent=toParStr(tp);$('etitle').textContent=isBest?'New best round':'Round complete';
-    $('estrokes').textContent=tot+' strokes on a par '+par+(isBest?'':' · best '+toParStr(best[key]));
+    $('escore').textContent=toParStr(tp);$('etitle').textContent=S.practice?'Practice complete':isBest?'New best round':'Round complete';
+    $('estrokes').textContent=tot+' strokes on a par '+par+(S.practice?' · practice, excluded from best rounds':isBest||best[key]==null?'':' · best '+toParStr(best[key]));
     let t='';for(let i=0;i<holes.length;i+=9){const part=holes.slice(i,i+9);t+='<tr><th>Hole</th>'+part.map(h=>'<th>'+h.n+'</th>').join('')+'<th>Tot</th></tr><tr><td>Par</td>'+part.map(h=>'<td>'+h.par+'</td>').join('')+'<td>'+part.reduce((a,h)=>a+h.par,0)+'</td></tr><tr><td>You</td>'+part.map((h,j)=>'<td><span class="lk-sc '+scoreClass(S.scores[i+j],h.par)+'">'+S.scores[i+j]+'</span></td>').join('')+'<td><b>'+S.scores.slice(i,i+9).reduce((a,b)=>a+b,0)+'</b></td></tr>'}
     $('etable').innerHTML=t;
     const putts=S.putts.reduce((a,b)=>a+b,0);

@@ -4086,7 +4086,7 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
-## Caddie HQ Links — the course game (v257, October 23 2026)
+## Caddie HQ Links — the course game (v258, October 23 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own
 bag. Full shots use a behind-ball 3D view and a following camera; putting and the optional hole map remain 2D. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
@@ -4111,7 +4111,7 @@ unmount, debug}`. `render()` returns the markup; `render('links')` in app.js the
 `mount(document.getElementById('lk-root'), { state:()=>S, clubCanon, toast, onExit })`. Every other view
 calls `unmount()`, which cancels the animation frame, timers, listeners and the body class. The
 module never reads or writes golf state: it only READS `S.carries` through the bridge and writes its
-own `localStorage` keys `chqlinks:mode|course|len|boost|best|cam`. Those keys are deliberately outside
+own `localStorage` keys `chqlinks:mode|course|len|boost|best|cam|hand`. Those keys are deliberately outside
 golf backups (game preferences, not golf data).
 
 **Courses.** The menu lists `window.CADDIE_PREP_COURSES` (the generated directory). On Tee off the
@@ -4142,9 +4142,11 @@ Roll = measured roll × swing fraction² × surface (fairway .85, green .5, roug
 fade −10%, low ×1.6, high ×0.5). Water = +1 and a drop behind the entry point; OB = stroke and
 distance. Gimmes inside 2 ft are conceded and counted.
 
-**Swing styles** (menu, remembered): *Slingshot* — pull back from the ball; length = power (ring =
-100%, beyond widens spread), direction = start line, second-finger twist or the slider = draw/fade,
-Low/Stock/High chips; release jitter grades contact. *Trace* — draw the swing: down = backswing
+**Swing styles** (menu, remembered): *Slingshot* — tap the course to aim, pull the side grip down
+and release. The rail fits 0–110% power inside the stage; slide more than 65 px sideways to cancel.
+The aim stays fixed while loading power. Use the drawer for draw/fade and Low/Stock/High;
+release jitter grades contact. Arrow keys adjust rail power and Enter/Space swings; Escape cancels.
+*Trace* — draw the swing: down = backswing
 (length = power), up through = path angle, finish x = face; face-to-path gives curve per ball-flight
 laws; a short follow-through is a punch. *Shape dial* — set draw/fade, trajectory and Full/¾/½, then
 Strike: a ring closes on the ball and the tap timing is contact (center/toe/heel). In all styles a
@@ -4153,8 +4155,8 @@ tap on the hole sets the target line and the camera turns to it.
 **Putting.** Each hole's green has a seeded slope (overall tilt 0.4–1.8% plus a crown or bowl),
 drawn as downhill chevrons in a zoomed green view. The ball rolls with stimp-style deceleration
 (1.9 ft/s²), slope acceleration (g × 5/7 × grade) and lip-outs above ~4.6 ft/s. The player sets the
-line (tap, or the pull direction) and sees the predicted path at perfect pace (binary-searched to
-finish 1.5 ft past); pull length (or the pace meter) scales that speed. Start line gets ~0.2° noise.
+line by tapping and sees the predicted path at perfect pace (binary-searched to
+finish 1.5 ft past); the side rail scales that speed, with 100% ideal pace. Start line gets ~0.2° noise.
 
 **Camera and rendering (v257).** `links-scene.js` lazy-loads the local Three.js r186 ES module. It
 renders the same local-yard polygons used by scoring, original simulated tree positions as instanced
@@ -4168,12 +4170,31 @@ falls back to the existing Canvas 2D renderer. Unmount disposes GPU resources an
 The original Canvas static-layer cache and dynamic overlays remain the map/putting/fallback path.
 Reduced motion skips chase movement and flight effects.
 
-**Phone controls (v257).** Header contains the accessible Caddie HQ exit, current hole and a scorecard
-toggle. Club and shape controls are collapsed drawers; Slingshot adds a horizontal thumb pad whose
-pull sets power without changing the selected aim. Direct ball pulls, Trace and Shape dial still work.
+**Phone controls (v258).** Header contains the accessible Caddie HQ exit, current hole and a scorecard
+toggle. Club and shape controls are collapsed drawers; Slingshot/putting use a vertical side rail whose
+pull sets power without changing the selected aim. Switch side mirrors rail, map and plan placement.
+Direct ball slingshots are retired; Trace and Shape dial remain optional menu choices.
 Native buttons/summary controls retain keyboard operation. Flight hides the dock and adds distance
 so far plus Skip flight; skipping resolves the existing shot exactly once. Caddie plan opens the existing
 read-only standing-plan dialog. The stage, dock and safe areas share the visible viewport at 320/390 px.
+
+**Shot rehearsal.** Try shot again snapshots round state before each swing, restores the same ball,
+lie, wind, hole scores and round counters, cancels gimme/animation timers, and marks the entire round
+as practice. Practice completion never writes best scores; daily challenges cannot retry. The next
+hole clears the retry snapshot. No golf records are read for writes or restored by this feature.
+
+**Distance audit (v258).** Pound Ridge hole 1's source route endpoints measure 399.3854 yd; Granite
+card yardage is 380 and the pack contains zero tee polygons. There is insufficient geometry to locate
+the exact Granite tee. Keep the source route unchanged; label the header as card distance and explain
+mapped endpoint uncertainty in Map distances. Predicted landing is labeled Carry, pin is separately
+marked, and the readout gives carry short/long along the aim line plus expected lateral drift.
+Distances during the pull update with power. Do not rescale routes to force agreement with a card.
+
+**Visual polish (v258).** Separate metal iron/wedge blades with grooves versus wood heads, grip and
+power-linked club animation. Bunker lips have decorative relief within/at polygon borders, while
+scoring polygons stay unchanged. Pin badge and red flag improve visibility. The 3D ball shadow now
+shrinks/fades with altitude using its own material, without affecting tree shadows. Bunker lip depth
+is illustrative, not a surveyed measurement; ground remains planar.
 
 **Accuracy.** Geometry coverage varies. Pound Ridge's current pack contains routes but only two
 fairways, one green, five bunkers and three water features. Missing surfaces are the existing game's
@@ -4208,6 +4229,15 @@ four, `.lk-game` spanning the view width, dock bottom inside the viewport, shape
 — but `env()` is 0 in Chromium, so the 34 px home-indicator margin is only proven by arithmetic until
 Jack's phone confirms it. The v252 check at 400×860 missed the clipping because the game section is
 `max-width:520px` and 400 px only clips 120 px of trees. The v257 browser suite exercises the new thumb pad and perspective aiming; keep tests around gesture changes.
+
+**v258 validation.** `tests/links-power-browser.cjs` passed 320×568, 390×844 with a simulated
+59 px top inset, and 430×932: contained 110% grip travel, partial-power carry, aim preservation,
+pointer cancellation, lateral cancellation, handedness, same-lie replay, keyboard swing, daily
+replay exclusion, no page errors and unchanged golf records. `tests/links-practice.cjs` checks the
+actual finish function excludes practice scores while saving eligible best rounds. The exit suite,
+full 3D suite (touch, putting/next hole, Night/reduced motion, WebGL fallback/context loss and cold
+offline) and complete Pages verification suite passed. Native iPhone Safari performance/gesture
+feel is still unverified; simulated safe-area checks are not on-device tests.
 
 **v257 validation.** `node tests/links-3d-browser.cjs` passed real WebGL at 320×568 and 390×844
 (including a simulated 59 px top inset), perspective aim, club/shape selection, current-hole map toggle,

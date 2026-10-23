@@ -172,3 +172,32 @@ body.lk-ingame #view{padding-bottom:0}
 .lk .banner .lk-sub{font-size:10px;letter-spacing:0}
 @media(max-width:350px){.lk .lk-exit span{font-size:10px}.lk .lk-playhead{gap:4px}.lk .lk-hole-title .kick{font-size:10px}.lk .lk-hole-title h1{font-size:12px}.lk .lk-hole-title .holeline{font-size:9px}.lk .lk-camtog{width:54px}.lk #lk-mini{width:52px;height:66px}.lk .lk-clubbox[open] .lk-clubs{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-height:650px){.lk #lk-mini{display:none}.lk .lk-camtog{width:auto;min-height:40px;padding:3px 8px}.lk .lk-controlrow summary{min-height:42px;padding:5px 9px}.lk .instr{min-height:48px;padding:7px}.lk .stage{min-height:205px}}
+
+/* Contained swing rail: every pull, including 110%, stays inside the stage. */
+.lk .lk-powerrail{position:absolute;z-index:3;right:8px;top:60px;bottom:48px;max-height:250px;width:76px;display:flex;flex-direction:column;align-items:center;padding:9px 5px 7px;border:1px solid #fff4bc80;border-radius:18px;background:#153f32e8;color:#fffbea;box-shadow:0 5px 18px #112c2833;touch-action:none;user-select:none;-webkit-user-select:none}
+.lk .lk-powerrail strong{font-size:13px;line-height:18px}
+.lk .lk-powerrail small{font-size:9px;text-align:center;line-height:13px;min-height:13px}
+.lk .lk-powertrack{position:relative;flex:1;width:64px;margin:5px 0;min-height:48px}
+.lk .lk-powertrack:before{content:'';position:absolute;top:22px;bottom:22px;left:20px;width:6px;border-radius:6px;background:linear-gradient(#8daea0 0 90.9%,#e1b65e 90.9%)}
+.lk .lk-powerhandle{position:absolute;left:1px;top:calc((100% - 44px)*var(--power,0));width:44px;height:44px;border-radius:50%;border:2px solid #fff7d6;background:#e9dc9c;color:#143b2c;font:bold 24px var(--sans);box-shadow:0 2px 8px #0005;touch-action:none;cursor:grab}
+.lk .lk-powerhandle:active{cursor:grabbing;background:#fff4c0}
+.lk .lk-powertick{position:absolute;right:0;font:9px var(--sans);color:#fff9dd;transform:translateY(-50%)}
+.lk .t50{top:calc(22px + (100% - 44px)*.4545)}
+.lk .t75{top:calc(22px + (100% - 44px)*.6818)}
+.lk .t100{top:calc(22px + (100% - 44px)*.9091)}
+.lk .camrow{left:10px;right:auto}
+.lk .lk-plan{left:86px;max-width:calc(100% - 184px);padding:7px;font-size:10px}
+.lk.lk-left-handed .lk-powerrail{left:8px;right:auto}
+.lk.lk-left-handed .camrow{left:auto;right:10px}
+.lk.lk-left-handed .lk-plan{left:auto;right:86px}
+.lk .instr{min-height:28px;padding:5px 8px;background:transparent;color:var(--ink62);box-shadow:none;font-size:10px}
+.lk .lk-tools{display:flex;gap:4px;align-items:center}
+.lk .lk-tools>button,.lk .lk-tools summary{font:10px var(--sans);min-height:36px;padding:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px;cursor:pointer;text-align:center;display:flex;align-items:center;justify-content:center}
+.lk .lk-tools>button{flex:1}
+.lk .lk-tools>button:disabled{opacity:.45;cursor:default}
+.lk .lk-distance-note{flex:1}
+.lk .lk-distance-note summary{list-style:none}
+.lk .lk-distance-note p{position:absolute;bottom:40px;left:0;right:0;margin:0;padding:16px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 -5px 24px #0003;font-size:12px;line-height:1.5;z-index:6}
+.lk .readout{flex-wrap:wrap;gap:2px 8px;font-size:10px}
+.lk .lk-target{font-size:10px;padding:5px 8px;background:#fffcecdd}
+.lk .lk-pin{position:absolute;z-index:2;pointer-events:none;transform:translate(-50%,-100%);font:600 10px var(--sans);color:#fff;background:#912c24e8;border:1px solid #fff7;border-radius:7px;padding:4px 7px;white-space:nowrap}

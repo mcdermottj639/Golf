@@ -11,8 +11,8 @@ async function enter(p,course){
  await p.waitForFunction(()=>CaddieLinks.debug()?.phase==='aim');
 }
 async function pull(p,fraction=1){
- const b=await p.locator('#lk-instr').boundingBox(),x=b.x+b.width*.8,y=b.y+b.height/2;
- await p.mouse.move(x,y);await p.mouse.down();await p.mouse.move(x-Math.min(145,b.width*.45)*fraction,y,{steps:15});await p.waitForTimeout(140);await p.mouse.up();
+ const b=await p.locator('#lk-powerhandle').boundingBox(),t=await p.locator('.lk-powertrack').boundingBox(),x=b.x+b.width/2,y=b.y+b.height/2;
+ await p.mouse.move(x,y);await p.mouse.down();await p.mouse.move(x,y+(t.height-44)*fraction/1.1,{steps:15});await p.waitForTimeout(140);await p.mouse.up();
 }
 async function within(p,selector,width,height){const b=await p.locator(selector).boundingBox();assert.ok(b&&b.x>=0&&b.y>=0&&b.x+b.width<=width+.5&&b.y+b.height<=height+.5,selector+': '+JSON.stringify(b));}
 (async()=>{
@@ -58,10 +58,10 @@ async function within(p,selector,width,height){const b=await p.locator(selector)
    const remaining=Math.hypot(d.pin[0]-d.worldBall[0],d.pin[1]-d.worldBall[1]);let fraction=1;
    if(d.lie==='green'){putted=true;assert.equal(d.renderer,'map','putting keeps the close slope view');}
    else {const carry=Number((await tp.locator('#lk-clubsummary small').innerText()).match(/\d+/)[0]);fraction=Math.min(1,remaining/carry);}
-   const b=await tp.locator('#lk-instr').boundingBox(),x=b.x+b.width*.8,y=b.y+b.height/2;
+   const b=await tp.locator('#lk-powerhandle').boundingBox(),track=await tp.locator('.lk-powertrack').boundingBox(),x=b.x+b.width/2,y=b.y+b.height/2;
    const point=(x,y)=>[{x,y,id:1,radiusX:5,radiusY:5,force:1}];
    await session.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:point(x,y)});
-   for(let j=1;j<=8;j++)await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:point(x-Math.min(145,b.width*.45)*fraction*j/8,y)});
+   for(let j=1;j<=8;j++)await session.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:point(x,y+(track.height-44)*fraction*j/8/1.1)});
    await tp.waitForTimeout(150);await session.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
    await tp.waitForFunction(n=>CaddieLinks.debug()?.strokes>n,d.strokes);await tp.waitForTimeout(950);
   }
@@ -76,7 +76,7 @@ async function within(p,selector,width,height){const b=await p.locator(selector)
   await p.evaluate(()=>document.querySelector('#lk-cv3').getContext('webgl2').getExtension('WEBGL_lose_context').loseContext());await p.waitForFunction(()=>CaddieLinks.debug()?.renderer==='map');await pull(p);assert.equal((await debug(p)).strokes,1);await p.locator('#lk-skip').click();await p.locator('#lk-quit').click();assert.deepEqual(errors,[]);console.log('PASS second course and context-loss fallback');await c.close();
   // Fresh installed shell: load a course once, then cold-start the game offline.
   const off=await browser.newContext({viewport:{width:390,height:844}}),op=await off.newPage(),oe=[];op.on('pageerror',e=>oe.push(e.message));await op.goto(url);await ready(op);await op.evaluate(()=>navigator.serviceWorker.ready);await op.reload();await ready(op);await enter(op);
-  const assets=await op.evaluate(async()=>{const c=await caches.open('caddiehq-v257');return(await c.keys()).map(r=>new URL(r.url).pathname);});for(const f of ['links-scene.js','vendor/three-r186.js','assets/links/oak.webp'])assert.ok(assets.includes('/'+f),'precache '+f);
+  const assets=await op.evaluate(async()=>{const c=await caches.open('caddiehq-v258');return(await c.keys()).map(r=>new URL(r.url).pathname);});for(const f of ['links-scene.js','vendor/three-r186.js','assets/links/oak.webp'])assert.ok(assets.includes('/'+f),'precache '+f);
   await off.setOffline(true);await op.reload();await ready(op);await enter(op);assert.equal((await debug(op)).renderer,'3d','cold 3D module/texture load works offline');await pull(op);assert.equal((await debug(op)).strokes,1);await op.locator('#lk-quit').click();assert.deepEqual(oe,[]);console.log('PASS cold offline 3D game');await off.close();
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;server.close();});

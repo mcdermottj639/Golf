@@ -40,10 +40,15 @@ export async function create(canvas,onLost){
   leafMat.onBeforeCompile=shader=>{shader.vertexShader=shader.vertexShader.replace('#include <project_vertex>',`vec4 mvPosition=modelViewMatrix*instanceMatrix*vec4(0.,0.,0.,1.);mvPosition.xy+=position.xy*vec2(length(instanceMatrix[0].xyz),length(instanceMatrix[1].xyz));gl_Position=projectionMatrix*mvPosition;`);};
   const markerMat=new T.MeshStandardMaterial({color:'#244c69',roughness:.8});
   const ball=new T.Mesh(new T.SphereGeometry(.15,24,16),new T.MeshStandardMaterial({color:'#fffef4',roughness:.35}));scene.add(ball);
-  const ballShadow=new T.Mesh(new T.PlaneGeometry(1,1),shadowMat);ballShadow.rotation.x=-Math.PI/2;scene.add(ballShadow);
+  const ballShadow=new T.Mesh(new T.PlaneGeometry(1,1),shadowMat.clone());ballShadow.rotation.x=-Math.PI/2;scene.add(ballShadow);
   const club=new T.Group();scene.add(club);
   const head=new T.Mesh(new T.SphereGeometry(1,20,12),new T.MeshStandardMaterial({color:'#253c40',metalness:.75,roughness:.25}));head.scale.set(.4,.19,.3);club.add(head);
   const shaft=new T.Mesh(new T.CylinderGeometry(.018,.024,2.1,8),new T.MeshStandardMaterial({color:'#d7dfe0',metalness:.8,roughness:.2}));shaft.position.set(.22,.98,.08);shaft.rotation.z=-.23;club.add(shaft);
+  const iron=new T.Mesh(new T.BoxGeometry(.58,.26,.09),new T.MeshStandardMaterial({color:'#cbd3cd',metalness:.85,roughness:.24}));iron.rotation.x=-.3;club.add(iron);
+  const grooves=new T.Group();iron.add(grooves);
+  const grooveMat=new T.MeshBasicMaterial({color:'#52645f'});
+  for(let i=0;i<5;i++){const line=new T.Mesh(new T.BoxGeometry(.46,.008,.004),grooveMat);line.position.set(0,-.085+i*.04,.047);grooves.add(line);}
+  const grip=new T.Mesh(new T.CylinderGeometry(.037,.03,.55,10),new T.MeshStandardMaterial({color:'#21372d',roughness:1}));grip.position.set(.43,1.73,.08);grip.rotation.z=-.23;club.add(grip);
   const ring=new T.Mesh(new T.RingGeometry(.96,1,80),new T.MeshBasicMaterial({color:'#fff9cd',transparent:true,opacity:.9,side:T.DoubleSide,depthWrite:false}));ring.rotation.x=-Math.PI/2;scene.add(ring);
   const disk=new T.Mesh(new T.CircleGeometry(1,64),new T.MeshBasicMaterial({color:'#eddf9b',transparent:true,opacity:.13,depthWrite:false}));disk.rotation.x=-Math.PI/2;scene.add(disk);
   const aimGeom=new T.BufferGeometry().setFromPoints([new T.Vector3(),new T.Vector3()]);
@@ -51,7 +56,7 @@ export async function create(canvas,onLost){
   const traceGeom=new T.BufferGeometry();traceGeom.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(330),3));traceGeom.setDrawRange(0,0);
   const trace=new T.Line(traceGeom,new T.LineBasicMaterial({color:'#ffffff',transparent:true,opacity:.9}));trace.frustumCulled=false;scene.add(trace);
   const flag=new T.Group();scene.add(flag);const pole=new T.Mesh(new T.CylinderGeometry(.035,.035,3,8),new T.MeshStandardMaterial({color:'#faf8e8'}));pole.position.y=1.5;flag.add(pole);
-  const cloth=new T.Mesh(new T.PlaneGeometry(1.15,.65),new T.MeshStandardMaterial({color:'#dfbd55',side:T.DoubleSide}));cloth.position.set(.57,2.65,0);flag.add(cloth);
+  const cloth=new T.Mesh(new T.PlaneGeometry(1.45,.85),new T.MeshStandardMaterial({color:'#e94c3b',side:T.DoubleSide}));cloth.position.set(.72,2.65,0);flag.add(cloth);
   const cup=new T.Mesh(new T.CircleGeometry(.12,16),new T.MeshBasicMaterial({color:'#172b20'}));cup.rotation.x=-Math.PI/2;cup.position.y=.14;flag.add(cup);
   const landing=new T.Mesh(new T.RingGeometry(.85,1,40),new T.MeshBasicMaterial({color:'#fff6d4',side:T.DoubleSide,transparent:true,depthWrite:false}));landing.rotation.x=-Math.PI/2;scene.add(landing);
   const V=(p,y=0)=>new T.Vector3(p[0]-origin[0],y,-p[1]+origin[1]);
@@ -64,6 +69,15 @@ export async function create(canvas,onLost){
     for(const f of course.feats){const center=[(f.bb[0]+f.bb[2])/2,(f.bb[1]+f.bb[3])/2];if(nearest(center,h.path)>220)continue;
       const shape=new T.Shape();for(let i=0;i<f.pts.length;i+=2){const x=f.pts[i]-origin[0],y=f.pts[i+1]-origin[1];i?shape.lineTo(x,y):shape.moveTo(x,y);}shape.closePath();
       const g=new T.ShapeGeometry(shape);g.rotateX(-Math.PI/2);const lift={wood:.01,fairway:.035,tee:.05,water:.06,bunker:.075,green:.09}[f.kind]||.02;g.translate(0,lift,0);
+      // Raised grass lip follows the mapped polygon, with a small decorative bevel.
+      // Visual relief only: collision geometry and surveyed terrain are unchanged.
+      if(f.kind==='bunker'){
+        const edge=new T.ExtrudeGeometry(shape,{depth:.38,bevelEnabled:true,bevelThickness:.12,bevelSize:.16,bevelSegments:2,steps:1});
+        edge.rotateX(-Math.PI/2);edge.translate(0,.035,0);
+        (byKind['rough']||(byKind['rough']=[])).push(edge.index?edge:(()=>{const n=edge.attributes.position.count;edge.setIndex(Array.from({length:n},(_,i)=>i));return edge;})());
+        // Lift the sand surface just above the base; the lip remains visible around it.
+        g.translate(0,.40,0);
+      }
       for(let i=0;i<g.attributes.uv.count;i++)g.attributes.uv.setXY(i,g.attributes.position.getX(i)/9,g.attributes.position.getZ(i)/9);
       (byKind[f.kind]||(byKind[f.kind]=[])).push(g);
     }
@@ -102,8 +116,14 @@ export async function create(canvas,onLost){
     camera.lookAt(look);camera.updateMatrixWorld();valid=true;
     ball.position.copy(bp);ball.position.y+=ballState.lie==='tee'&&!flight?.25:.21;ball.visible=!ballState.holed;
     ball.scale.setScalar(flight?Math.max(1,camera.position.distanceTo(ball.position)*.012):1);
-    ballShadow.position.copy(V(pos,.12));ballShadow.scale.setScalar(1.05+height*.008);ballShadow.visible=ball.visible;
-    club.visible=(!flight||k<.07)&&!ballState.done;club.position.copy(V(b,.22)).addScaledVector(right,.6);club.rotation.y=-angle;head.scale.set(ballState.club.carry>170?.4:.23,.15,.26);club.rotation.z=flight?k*12:pulling?-.35-(ballState.power||0)*.4:0;
+    ballShadow.position.copy(V(pos,.12));ballShadow.scale.setScalar(.65+.4/(1+height/45));ballShadow.material.opacity=.65/(1+height/45);ballShadow.visible=ball.visible;
+    const id=ballState.club.id||'',wedge=/°|wedge|^[PAGSL]W$|^\d{2}$/i.test(id),blade=ballState.club.putter||wedge||/i$|putt/i.test(id);
+    head.visible=!blade;iron.visible=blade;iron.rotation.x=wedge?-.65:-.3;
+    head.scale.set(/^dr$/i.test(id)?.4:.29,.15,.26);
+    club.visible=(!flight||k<.12)&&!ballState.done;club.position.copy(V(b,.22)).addScaledVector(right,.6);club.rotation.y=-angle;
+    const load=clamp(ballState.power||0,0,1.1);
+    club.rotation.z=flight?-.8+Math.min(1,k/.12)*2.2:pulling?-.15-load*.9:0;
+    if(pulling)club.position.addScaledVector(u,-load*.75);
     flag.rotation.y=-angle;
     ring.visible=disk.visible=aimLine.visible=!flight&&!ballState.done&&!!forecast;
     let target=null;

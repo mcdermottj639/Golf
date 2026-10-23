@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v257';
+const BUILD = 'v258';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v258', d:'2026-10-23', items:['LINKS SWING RAIL: Pull the side grip down for power, watch the club load, and release. Full power stays on screen; switch sides or slide away to cancel. Pin distance, predicted carry and short/long feedback are clearer.','PRACTISE THE SAME SHOT: Try shot again restores your lie and wind for club comparisons; practice rounds do not replace best scores and daily challenges stay scored. Irons and wedges have distinct heads, bunkers have visible lips, and flags are easier to see. Scorecard and mapped distances are identified separately; terrain remains approximate.'] },
   { b:'v257', d:'2026-10-23', items:['LINKS IN 3D: Play from behind the ball, pull the thumb pad to swing, and follow your ball through the air to its landing. Club and shot-shape controls open over the course; the mini-map focuses on your current hole. Your Caddie plan and a clear exit stay close at hand.','MAPPED ROUTES, SIMULATED SCENERY: The game uses your course packs and bag. Trees, green breaks and missing fairways remain game approximations; terrain elevations are not surveyed. The map and putting views remain available, with an automatic map fallback if 3D is unavailable. Download a course once to play offline.'] },
   { b:'v256', d:'2026-10-23', items:['LINKS EXIT: A clear Back to Caddie HQ button returns you to the app from a game. The game header now has its own top safe-area spacing for iPhone. Leaving ends the current game; your golf records stay unchanged.'] },
   { b:'v255', d:'2026-10-23', items:['LINKS BALL FLIGHT YOU CAN SEE: Every full shot now leaves a trail — a white arc through the air over its shadow track on the ground, fading behind the ball — and the shadow shrinks as the ball climbs so height reads at a glance. Where it lands, a ring spreads and fades: a sand puff in a bunker, a splash in water. Pure drawing; no shot, roll or score is any different.'] },
