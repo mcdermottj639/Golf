@@ -31,7 +31,7 @@ course-prep.js/.css   Shared course planner and live maps; lazy Google 3D views
 hole-guide.js        Sourced illustrated hole renderer; offline, tee-to-green
 course-prep-data.js   Generated lightweight directory; scorecards and coverage, no geometry
 course-packs.js       Versioned downloads, offline cache, favorites and recent-course limits
-links-game.js/.css    Caddie HQ Links — the top-down course game (v252); reads packs + bag, writes only chqlinks:* keys
+links-game.js/.css    Caddie HQ Links — the top-down course game (v252+); reads packs + bag, writes only chqlinks:* keys
 data/course-prep/    Per-course packs, catalog order and original-coordinate OSM subsets
 scripts/build-course-prep.cjs  Validates sources; generates directory, JSON packs and coverage report
 course-prep-feed.json Apply-once course card, mapped location and refreshed standing prep
@@ -4083,7 +4083,7 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
-## Caddie HQ Links — the course game (v252–v254, October 22 2026)
+## Caddie HQ Links — the course game (v252–v255, October 22–23 2026)
 
 **What it is.** A top-down, Daily-Holes-style golf game played on every mapped course with Jack's own
 bag. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
@@ -4170,6 +4170,21 @@ previews and overlays redraw. Camera eases between poses; each hole opens with a
 back to the tee. Course art colours are fixed (it is a map), UI colours use the app tokens so Night
 mode applies.
 
+**Ball flight trail (v255, PR pending).** During a full shot `stepAnim()` appends `{p, hy}` to
+`anim.trail` every frame (capped at `TRAIL_MAX` 110) — the ground position and the ball's height in
+WORLD yards (`A.h / view.s`), so a camera that re-frames after landing redraws the arc at the right
+height instead of in stale pixels. `drawTrail()` strokes the ground track as one soft dark line and the
+arc as per-segment white strokes whose alpha and width grow toward the head, so the tail fades. When
+the ball lands, `A.landedAt` is stamped and `drawPuff()` spreads a ring there over `FX_MS` (1.5 s):
+sand-coloured with grains in a bunker, a double splash ring in water, plain elsewhere. `finishShot()`
+hands the trail and landing to the module variable `fx`, which `tick()` keeps animating (busy) until
+it expires, then nulls; `startHole()`, Quit and `unmount()` clear it. The in-flight shadow now shrinks
+and fades with height (`hf = 1/(1+h/45)`), which is the only cue a top-down view has for altitude.
+Reduced motion records no trail and no puff (the flight is 1 ms there anyway). Nothing in this touches
+`swing()`, `finishShot()`'s outcomes, roll or scoring, so it is not behind a flag. `debug()` now also
+reports `anim {kind, trail, landed}`, `fx {age, trail, lie}` and a `drawMs()` sampler (30 full
+static+dynamic draws, mean ms) for frame-time comparisons.
+
 **Tests.** `node --check links-game.js`. Browser checks used for v252 (Playwright, 400×860 and night
 mode): Rounds/Overview entry, 14 courses listed, Wianno pack load, slingshot shot, quit/remount, no
 console errors. v253 measured 320×568 · 375×667 · 390×844 · 430×932: Tee off above the fold on all
@@ -4181,9 +4196,11 @@ Jack's phone confirms it. The v252 check at 400×860 missed the clipping because
 
 **Backlog (owned by the Jarvis "Links improver" scheduled task; see the Caddie HQ handoff in
 claudex).** Graphics: real tree canopies from OSM `wood` outlines, shadows by sun angle, bunker
-sand texture, water animation, ball trail. Game: per-club dispersion from every bay session instead of
+sand texture, water animation. Game: per-club dispersion from every bay session instead of
 the built-in table; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry;
 course records and a shareable scorecard image; standing-plan tips on each tee from the briefings.
 Rules for that task: one improvement per run, feature-flag anything that changes scoring, never touch
 packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item and update this
 section, and log the run in the handoff.
+Shipped by that task: ball trail + landing puff — v255, branch `links/20261023-ball-trail` (PR number
+recorded in the handoff; Jack merges).
