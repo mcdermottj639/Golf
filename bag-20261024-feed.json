@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "updated": "2026-10-24",
   "entries": [
     {
@@ -34,6 +34,40 @@
       "type": "history",
       "date": "2026-10-24",
       "text": "PING G440 3H Hybrid (Regular, ALTA CB Blue 70 Graphite, right hand) replaces Cobra KING TEC Utility 2-iron. 2i benched with saved carries and historical shots retained. Existing PING G440 4H remains active. 3H carry/total and adapter setting unmeasured/unconfirmed."
+    },
+    {
+      "id": "return-dsadapt-3w-20261024",
+      "type": "club-remove",
+      "target": "add-dsadapt-3w-20260918"
+    },
+    {
+      "id": "return-hitoe58-20261024",
+      "type": "club-remove",
+      "target": "bag-hitoe5-58-20260924"
+    },
+    {
+      "id": "return-carry-3w-20261024",
+      "type": "carry-update",
+      "target": "3-wood",
+      "remove": true
+    },
+    {
+      "id": "return-carry-58-20261024",
+      "type": "carry-update",
+      "target": "58\u00b0 wedge",
+      "remove": true
+    },
+    {
+      "id": "return-carry-3wood-20261024",
+      "type": "carry-update",
+      "target": "3 wood",
+      "remove": true
+    },
+    {
+      "id": "returned-clubs-history-20261024",
+      "type": "history",
+      "date": "2026-10-24",
+      "text": "Cobra DS-ADAPT X 3-wood and TaylorMade Hi-Toe 5 58\u00b0 returned. Removed from owned equipment and active carry selectors, not moved to bench. Historical shots and sessions retained. No replacement clubs activated."
     }
   ]
 }

@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v262';
+const BUILD = 'v263';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v263', d:'2026-10-24', items:['BAG: Returned DS-ADAPT 3-wood and Hi-Toe 58° removed from owned equipment and playing selectors. Past shots remain in history.'] },
   { b:'v262', d:'2026-10-24', items:['BAG: PING G440 3H joins the bag; Cobra Utility 2i moves to the bench with its saved carries and history. Existing 4H retained; 3H distances await measurement.'] },
   { b:'v261', d:'2026-10-23', items:['EVERY HOLE GETS A RECAP: Hole out to see your score, putts, fairway, green in regulation, penalties and shot-by-shot story. Chip-ins, bunker hole-outs, aces and long putts get a special callout. Next hole and Try shot again stay within reach.','SMOOTHER FLIGHT AND PUTTING: Course surfaces draw in a stable order to prevent overlapping fairway colors during flight. The follow camera adapts to frame rate, putts show distance to the cup and finish sooner, the green is easier on the eyes, and old shot banners clear before the next swing or hole.'] },
   { b:'v260', d:'2026-10-23', items:['CLEAR SHOT LABELS: Pin and carry distances stay clear of Landing spot, the swing rail and other course controls. Labels adjust when switching sides or inspecting your landing area. The tee view is a little higher and farther back so you can see more of the landing area while keeping the ball in view.'] },
