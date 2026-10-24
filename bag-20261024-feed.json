@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "updated": "2026-10-24",
+  "entries": [
+    {
+      "id": "bag-bench-cobra-2i-20261024",
+      "type": "club-bench",
+      "target": "add-kingtec-2i"
+    },
+    {
+      "id": "bag-ping-g440-3h-20261024",
+      "type": "club-add",
+      "club": {
+        "name": "PING G440 3H Hybrid",
+        "cat": "hybrid",
+        "status": "gaming",
+        "playingClub": "3-hybrid",
+        "spec": "3H \u00b7 Regular Flex \u00b7 Right Hand \u00b7 ALTA CB Blue 70 Graphite",
+        "note": "Added October 24, 2026, replacing Cobra KING TEC Utility 2-iron. Specs from Jack's purchase screenshot (SKU 26763310). Loft degrees and adapter setting not confirmed. Carry and total pending measurement; no 2i or 4H distances transferred."
+      }
+    },
+    {
+      "id": "bag-carry-ping-3h-20261024",
+      "type": "carry-update",
+      "target": "3-hybrid",
+      "after": "5-wood",
+      "club": {
+        "loft": "",
+        "carry": null
+      }
+    },
+    {
+      "id": "bag-ping-3h-history-20261024",
+      "type": "history",
+      "date": "2026-10-24",
+      "text": "PING G440 3H Hybrid (Regular, ALTA CB Blue 70 Graphite, right hand) replaces Cobra KING TEC Utility 2-iron. 2i benched with saved carries and historical shots retained. Existing PING G440 4H remains active. 3H carry/total and adapter setting unmeasured/unconfirmed."
+    }
+  ]
+}

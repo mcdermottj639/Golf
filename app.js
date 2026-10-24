@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v261';
+const BUILD = 'v262';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v262', d:'2026-10-24', items:['BAG: PING G440 3H joins the bag; Cobra Utility 2i moves to the bench with its saved carries and history. Existing 4H retained; 3H distances await measurement.'] },
   { b:'v261', d:'2026-10-23', items:['EVERY HOLE GETS A RECAP: Hole out to see your score, putts, fairway, green in regulation, penalties and shot-by-shot story. Chip-ins, bunker hole-outs, aces and long putts get a special callout. Next hole and Try shot again stay within reach.','SMOOTHER FLIGHT AND PUTTING: Course surfaces draw in a stable order to prevent overlapping fairway colors during flight. The follow camera adapts to frame rate, putts show distance to the cup and finish sooner, the green is easier on the eyes, and old shot banners clear before the next swing or hole.'] },
   { b:'v260', d:'2026-10-23', items:['CLEAR SHOT LABELS: Pin and carry distances stay clear of Landing spot, the swing rail and other course controls. Labels adjust when switching sides or inspecting your landing area. The tee view is a little higher and farther back so you can see more of the landing area while keeping the ball in view.'] },
   { b:'v259', d:'2026-10-23', items:['SCOUT YOUR LANDING: In Links, tap Landing spot to move above your predicted landing area. Tap or drag to adjust your aim with a steady camera, then Back to tee or Back to ball to swing. Your club, shot shape and aim stay selected; inspecting a landing never takes a stroke. Works in the offline map fallback too.'] },
@@ -4614,7 +4615,7 @@ function clubCanonLabel(canon){
   const fromBag = (S.carries || []).find(c => clubCanon(c.club) === canon);
   if(fromBag) return fromBag.club;
   const map = { Dr:'Driver', Mini:'Mini Driver', '3W':'3-wood', '5W':'5-wood',
-    '2i':'2-iron', '4H':'4-hybrid', '4i':'4-iron', '5i':'5-iron', '6i':'6-iron', '7i':'7-iron', '8i':'8-iron', '9i':'9-iron',
+    '2i':'2-iron', '3H':'3-hybrid', '4H':'4-hybrid', '4i':'4-iron', '5i':'5-iron', '6i':'6-iron', '7i':'7-iron', '8i':'8-iron', '9i':'9-iron',
     PW:'PW', '50°':'50°', '56°':'56°', '58°':'58°', '60°':'60°' };
   return map[canon] || canon;
 }
@@ -4657,7 +4658,7 @@ function fillMetrics(c){
     total: num1(c && c.total, 1)
   };
 }
-const BAG_CANON = ['Dr','Mini','3W','5W','2i','4H','4i','5i','6i','7i','8i','9i','PW','50°','56°','58°','60°'];
+const BAG_CANON = ['Dr','Mini','3W','5W','2i','3H','4H','4i','5i','6i','7i','8i','9i','PW','50°','56°','58°','60°'];
 function deliveryMatch(dels, club){
   const k = clubCanon(club), phase = clubPhaseOf(club);
   return (dels || []).find(d => d.club === club)
@@ -11403,6 +11404,7 @@ function applyFeed(feed){
         return !duplicate;
       });
     }
+    else if(e.type === 'club-bench' && e.target) benchClub(e.target);
     else if(e.type === 'club-update'){
       const c = S.clubs.find(x => x.id === e.target || x.name === e.target);
       if(c) Object.assign(c, e.club || {});
@@ -11631,7 +11633,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json','bag-20261024-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 

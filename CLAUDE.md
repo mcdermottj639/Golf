@@ -3,6 +3,10 @@
 Personal golf command center for **Jack McDermott** — bag, stroke diagnosis, coaching,
 and courses in one installable web app. This file is the guide for keeping it current.
 
+## Current bag update (v262, October 24, 2026)
+
+The final apply-once feed, bag-20261024-feed.json, adds the screenshot-confirmed PING G440 3H (Regular, ALTA CB Blue 70 Graphite, right hand), retaining the existing 4H. New club-bench feed entries call the normal benchClub helper so Cobra Utility 2i saved carries remain recoverable and historical shots are untouched. New 3H distances and adapter/degree setting are deliberately unconfirmed. Feed runs after prior bag/range feeds and is cached offline.
+
 ## What it is
 
 A **static, offline-first PWA** — no backend, no build step, no framework. Plain
