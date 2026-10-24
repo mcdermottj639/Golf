@@ -23,15 +23,21 @@ export async function create(canvas,onLost){
   const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
   const scene=new T.Scene();scene.background=new T.Color('#bdd8e5');scene.fog=new T.FogExp2('#bfd3cb',.0013);
-  const camera=new T.PerspectiveCamera(49,1,.08,1800),ray=new T.Raycaster(),plane=new T.Plane(new T.Vector3(0,1,0),0);
+  const camera=new T.PerspectiveCamera(49,1,.5,1800),ray=new T.Raycaster(),plane=new T.Plane(new T.Vector3(0,1,0),0);
   const hemi=new T.HemisphereLight('#eaf4ff','#4a542a',1.6);scene.add(hemi);
   const sun=new T.DirectionalLight('#fff1cc',2.0);sun.position.set(-120,170,80);scene.add(sun);
-  let root=new T.Group();scene.add(root);let key='',origin=[0,0],W=1,H=1,disposed=false,valid=false;
+  let root=new T.Group();scene.add(root);let key='',origin=[0,0],W=1,H=1,disposed=false,valid=false,lastRender=0;
   const temp=new T.Vector3(),dummy=new T.Object3D(),col=new T.Color();
   const materials={},textures=[foliage];
   for(const kind of ['rough','fairway','green','sand']){const tex=texture(kind);textures.push(tex);materials[kind]=new T.MeshStandardMaterial({map:tex,roughness:1,color:kind==='fairway'?'#c3d6a2':'#ffffff'});}
   materials.tee=materials.fairway;materials.bunker=materials.sand;materials.wood=materials.rough;
   materials.water=new T.MeshStandardMaterial({color:'#3b8896',roughness:.3,metalness:.35});
+  // Planar course surfaces are a paint stack, not competing depth layers.
+  // Tiny height offsets alone flicker at shallow flight angles on mobile GPUs.
+  // The base still writes depth; objects, shadows and the ball keep normal depth tests.
+  const groundOrder={wood:-90,fairway:-80,tee:-70,water:-60,rough:-51,bunker:-50,green:-40};
+  const groundMaterials={};
+  for(const kind of Object.keys(groundOrder)){const mat=materials[kind].clone();mat.depthTest=false;mat.depthWrite=false;groundMaterials[kind]=mat;}
   // Sky is decorative; the playable ground stays planar until elevation is sourced.
   const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,vertexShader:'varying vec3 v;void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:`varying vec3 v;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}void main(){vec3 d=normalize(v);float h=d.y;vec3 c=mix(vec3(.83,.88,.82),vec3(.24,.55,.80),smoothstep(-.04,.65,h));vec2 p=d.xz/max(.12,h)*1.5;float n=noise(p)*.55+noise(p*2.03)*.27+noise(p*4.13)*.12+noise(p*8.17)*.06;float cloud=smoothstep(.48,.73,n)*smoothstep(.015,.22,h);c=mix(c,vec3(.96,.97,.92),cloud*.8);gl_FragColor=vec4(c,1.);}`}));scene.add(sky);
   const shadowTex=radial();textures.push(shadowTex);
@@ -64,7 +70,7 @@ export async function create(canvas,onLost){
   function setHole(course,h){
     const next=course.id+':'+h.n;if(key===next)return;key=next;origin=h.tee.slice();valid=false;releaseRoot();
     const base=new T.PlaneGeometry(2400,2400);base.rotateX(-Math.PI/2);const uv=base.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,base.attributes.position.getX(i)/9,base.attributes.position.getZ(i)/9);
-    root.add(new T.Mesh(base,materials.rough));
+    const ground=new T.Mesh(base,materials.rough);ground.renderOrder=-100;root.add(ground);
     const byKind={};
     for(const f of course.feats){const center=[(f.bb[0]+f.bb[2])/2,(f.bb[1]+f.bb[3])/2];if(nearest(center,h.path)>220)continue;
       const shape=new T.Shape();for(let i=0;i<f.pts.length;i+=2){const x=f.pts[i]-origin[0],y=f.pts[i+1]-origin[1];i?shape.lineTo(x,y):shape.moveTo(x,y);}shape.closePath();
@@ -81,7 +87,7 @@ export async function create(canvas,onLost){
       for(let i=0;i<g.attributes.uv.count;i++)g.attributes.uv.setXY(i,g.attributes.position.getX(i)/9,g.attributes.position.getZ(i)/9);
       (byKind[f.kind]||(byKind[f.kind]=[])).push(g);
     }
-    for(const [kind,geoms]of Object.entries(byKind)){root.add(new T.Mesh(combine(geoms),materials[kind]||materials.rough));}
+    for(const [kind,geoms]of Object.entries(byKind)){const mesh=new T.Mesh(combine(geoms),groundMaterials[kind]||groundMaterials.rough);mesh.renderOrder=groundOrder[kind]??-51;root.add(mesh);}
     // Every tree uses the existing simulated tree position/radius, preserving lies.
     // Shared geometry + instancing keeps the cost bounded even for larger courses.
     const trees=course.trees.filter(t=>nearest(t.p,h.path)<180).slice(0,1100);
@@ -94,7 +100,7 @@ export async function create(canvas,onLost){
     });
     for(const m of [shade,crowns]){m.instanceMatrix.needsUpdate=true;m.computeBoundingSphere();root.add(m);}if(crowns.instanceColor)crowns.instanceColor.needsUpdate=true;
     // An address mat and markers make the playable tee legible; decorative only.
-    const address=new T.Mesh(new T.CircleGeometry(1,48),materials.fairway);
+    const address=new T.Mesh(new T.CircleGeometry(1,48),groundMaterials.tee);address.renderOrder=-30;
     address.rotation.x=-Math.PI/2;address.scale.set(4,7,1);address.position.copy(V(h.tee,.045));root.add(address);
     const direction=V(h.path[1]).sub(V(h.tee)).normalize(),side=new T.Vector3(-direction.z,0,direction.x);
     for(const sign of [-1,1]){const marker=new T.Mesh(new T.BoxGeometry(.3,.22,.3),markerMat);marker.position.copy(V(h.tee,.2)).addScaledVector(side,sign*2.2);root.add(marker);}
@@ -116,7 +122,8 @@ export async function create(canvas,onLost){
     const look=V(b).addScaledVector(u,22);look.y=.3;
     if(scout&&!flight){wanted.copy(V(scout.center)).addScaledVector(u,-38);wanted.y=55;look.copy(V(scout.center,.2));}
     if(flight&&!reduced){wanted.copy(bp).addScaledVector(u,-23);wanted.y+=9;look.copy(bp).addScaledVector(u,22);look.y=Math.max(.4,height*.55);}
-    if(!valid||reduced){camera.position.copy(wanted);}else camera.position.lerp(wanted,flight?.18:.24);
+    const now=performance.now(),dt=lastRender?clamp((now-lastRender)/1000,0,.1):1/60;lastRender=now;
+    if(!valid||reduced){camera.position.copy(wanted);}else camera.position.lerp(wanted,1-Math.exp(-dt*(flight?12:16)));
     camera.lookAt(look);camera.updateMatrixWorld();valid=true;
     ball.position.copy(bp);ball.position.y+=ballState.lie==='tee'&&!flight?.25:.21;ball.visible=!ballState.holed;
     ball.scale.setScalar(flight?Math.max(1,camera.position.distanceTo(ball.position)*.012):1);
@@ -148,6 +155,6 @@ export async function create(canvas,onLost){
   function project(p,height=0){temp.copy(V(p,height)).project(camera);return[(temp.x+1)*W/2,(1-temp.y)*H/2,temp.z];}
   function unproject(x,y){ray.setFromCamera(new T.Vector2(x/W*2-1,1-y/H*2),camera);const hit=ray.ray.intersectPlane(plane,temp);if(!hit||hit.distanceTo(camera.position)>650)return null;return[hit.x+origin[0],origin[1]-hit.z];}
   function lost(e){e.preventDefault();if(!disposed)onLost?.();}canvas.addEventListener('webglcontextlost',lost);
-  function dispose(){if(disposed)return;disposed=true;canvas.removeEventListener('webglcontextlost',lost);const geoms=new Set(),mats=new Set();scene.traverse(o=>{if(o.geometry)geoms.add(o.geometry);if(o.material){for(const m of(Array.isArray(o.material)?o.material:[o.material]))mats.add(m);}if(o.isInstancedMesh)o.dispose();});for(const g of geoms)g.dispose();for(const m of mats)m.dispose();for(const t of textures)t.dispose();renderer.dispose();renderer.forceContextLoss();}
+  function dispose(){if(disposed)return;disposed=true;canvas.removeEventListener('webglcontextlost',lost);const geoms=new Set(),mats=new Set([...Object.values(materials),...Object.values(groundMaterials)]);scene.traverse(o=>{if(o.geometry)geoms.add(o.geometry);if(o.material){for(const m of(Array.isArray(o.material)?o.material:[o.material]))mats.add(m);}if(o.isInstancedMesh)o.dispose();});for(const g of geoms)g.dispose();for(const m of mats)m.dispose();for(const t of textures)t.dispose();renderer.dispose();renderer.forceContextLoss();}
   return{render,project,unproject,dispose,reset:()=>{valid=false;},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,camera:camera.position.toArray()})};
 }

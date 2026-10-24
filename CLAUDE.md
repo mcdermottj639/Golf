@@ -4086,7 +4086,7 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
-## Caddie HQ Links — the course game (v260, October 23 2026)
+## Caddie HQ Links — the course game (v261, October 23 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own
 bag. Full shots use a behind-ball 3D view and a following camera; putting and the optional hole map remain 2D. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
@@ -4157,11 +4157,15 @@ drawn as downhill chevrons in a zoomed green view. The ball rolls with stimp-sty
 (1.9 ft/s²), slope acceleration (g × 5/7 × grade) and lip-outs above ~4.6 ft/s. The player sets the
 line by tapping and sees the predicted path at perfect pace (binary-searched to
 finish 1.5 ft past); the side rail scales that speed, with 100% ideal pace. Start line gets ~0.2° noise.
+The sage green palette and lighter, more widely spaced slope arrows keep the ball readable.
+Playback now samples the unchanged simulated path over a distance-based 1–3.2 seconds (120 ms
+with reduced motion). It never changes the final ball position, lip-out or score. During playback,
+the readout shows feet/inches to the cup and the original putt length; Finish putt resolves it once.
 
-**Camera and rendering (v259).** `links-scene.js` lazy-loads the local Three.js r186 ES module. It
+**Camera and rendering (v261).** `links-scene.js` lazy-loads the local Three.js r186 ES module. It
 renders the same local-yard polygons used by scoring, original simulated tree positions as instanced
 alpha-cutout billboards, a ball, club, flag, projected landing ring and flight trail. Perspective camera
-starts 14 yd behind / 8 yd above the ball, then follows full shots. Tap aiming raycasts against the
+starts 18 yd behind / 11 yd above the tee ball (14 / 8 on other lies), then follows full shots. Tap aiming raycasts against the
 planar ground; sky/distant rays retain the last valid aim. `chqlinks:cam` remembers Shot / Hole;
 on the green the 2D putting view overrides it. The mini-map filters out fairways and greens assigned
 to other holes. DPR is capped at 1.5, trees at 1,100 near the active route, and geometries are merged
@@ -4169,6 +4173,12 @@ by surface. Idle frames stop after the camera settles. Context loss or module/te
 falls back to the existing Canvas 2D renderer. Unmount disposes GPU resources and guards late imports.
 The original Canvas static-layer cache and dynamic overlays remain the map/putting/fallback path.
 Reduced motion skips chase movement and flight effects.
+Camera easing uses elapsed time, not a fixed fraction per frame. Planar surfaces draw as an ordered
+paint stack (wood, fairway, tee, water, bunker lip, sand, green, address mat) with depth tests/writes
+disabled only for those overlays. The rough base still writes depth and objects keep normal depth
+tests. Tiny height offsets alone allowed competing ground surfaces at shallow camera angles;
+the stack removes that conflict without changing course geometry or scoring. Near clip is 0.5 yd.
+This addresses Jack's recorded fairway flicker; native iPhone GPU reproduction/confirmation is pending.
 
 **Landing inspection.** Landing spot moves to an elevated close-up centered on the current
 predicted carry point. Its anchor and heading stay fixed during tap/drag aiming; it never moves
@@ -4182,13 +4192,24 @@ toggle. Club and shape controls are collapsed drawers; Slingshot/putting use a v
 pull sets power without changing the selected aim. Switch side mirrors rail, map and plan placement.
 Direct ball slingshots are retired; Trace and Shape dial remain optional menu choices.
 Native buttons/summary controls retain keyboard operation. Flight hides the dock and adds distance
-so far plus Skip flight; skipping resolves the existing shot exactly once. Caddie plan opens the existing
+so far plus Skip flight (Finish putt on the green); skipping resolves the existing shot exactly once. Caddie plan opens the existing
 read-only standing-plan dialog. The stage, dock and safe areas share the visible viewport at 320/390 px.
 
 **Shot rehearsal.** Try shot again snapshots round state before each swing, restores the same ball,
 lie, wind, hole scores and round counters, cancels gimme/animation timers, and marks the entire round
 as practice. Practice completion never writes best scores; daily challenges cannot retry. The next
 hole clears the retry snapshot. No golf records are read for writes or restored by this feature.
+
+**Hole recap (v261).** Every hole-out opens a persistent, focusable recap in the stage, with hole/par,
+score name, strokes, round-to-par, putts, fairway, GIR, penalties and the actual shot log. On short
+phones the recap scrolls while Next hole/See your card and Try shot again stay in the dock. It does
+not fade with the shot banner. Only the in-memory round gets `h.shots`, `h.penalties`, `h.fairway`
+and `h.recap`; no new storage keys or golf-record writes. Retry restores the log/counters as well as
+the ball and makes the round practice-only. Direct hole-outs within par minus two now count GIR;
+stroke totals and the existing gimme/penalty rules are unchanged. A special callout comes from the
+last actual shot: ace, bunker hole-out, chip-in within 50 yd, other hole-out, or holed putt at least
+15 ft. A gimme gets a Tap-in row and never a special-shot claim. Old result banners are cleared
+on the next swing and new hole.
 
 **Distance audit (v258).** Pound Ridge hole 1's source route endpoints measure 399.3854 yd; Granite
 card yardage is 380 and the pack contains zero tee polygons. There is insufficient geometry to locate
@@ -4249,6 +4270,17 @@ Jack's phone confirms it. The v252 check at 400×860 missed the clipping because
 **v260 tee view.** At Jack’s request, the tee camera rises from 8 to 11 world yards and moves back from 14 to 18, preserving the behind-ball viewpoint and ball framing. Other lies, landing inspection (55), flight camera, aiming and physics are unchanged.
 
 **v260 HUD spacing.** Projected pin/carry labels use measured HUD rectangles to choose the nearest unobstructed placement, with an 8px gap from Landing spot, power rail, map, plan, wind/lie and distance/shot chips and from each other. Switching rail side immediately redraws labels. Extremely cramped stages hide an unplaceable label rather than cover a control; distances remain in the dock. No course geometry, physics, scoring or golf-record changes. `tests/links-hud-browser.cjs` covers 320/390/430px phones with a simulated safe-area inset, both rail sides, hole 10, landing aim, camera heights and return, and unchanged golf state. The 3D offline test reads the actual SW cache version instead of hard-coding v259.
+
+**v261 validation.** `tests/links-terrain-browser.cjs` checks actual rendered pixels across 12 flight
+camera positions/heights: fairway, green, sand and water remain distinct. It isolates the renderer
+instead of replacing an active app's DOM (which left pending app callbacks targeting removed nodes).
+`tests/links-recap-browser.cjs` drives deterministic shots through the real finish/recap UI at
+320×568 reduced-motion and 390×844 animated, both with a simulated 67 px inset: chip-in, bunker,
+ace, gimme, long putt, penalty, retry, next hole and final card. It checks stroke/putt/penalty totals,
+unchanged putt endpoint, persistent recap/focus, reachable Next, log rollback, cleared banners and
+unchanged golf records. Test-only fixtures are injected into served source, never a production API.
+Keep the 3D, HUD, landing, power, practice and Pages verification checks around these changes.
+Browser rendering is Chromium/SwiftShader, not a physical iPhone Safari certification.
 
 **v259 validation.** `tests/links-landing-browser.cjs` passed five cases: 320×568 Slingshot,
 390×844 touch/reduced-motion Slingshot with simulated top inset, Trace, Shape dial and no-WebGL

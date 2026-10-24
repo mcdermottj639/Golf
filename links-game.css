@@ -206,3 +206,32 @@ body.lk-ingame #view{padding-bottom:0}
 .lk.lk-landing-view .lk-landing{background:#fff8dc;color:#173b2d}
 .lk .lk-landing:focus-visible{outline:3px solid #d8c16c;outline-offset:2px}
 .lk .lk-pin,.lk .lk-target{transform:none}
+
+/* A completed hole stays on its recap until the player continues. */
+.lk .lk-recap{position:absolute;inset:0;z-index:6;overflow:auto;overscroll-behavior:contain;touch-action:pan-y;padding:22px 18px 24px;background:linear-gradient(145deg,#153f31,#264c3c);color:#f6f5e9;outline:none}
+.lk .lk-recap-kicker{font-size:11px;letter-spacing:.05em;color:#c4d7c8}
+.lk .lk-recap-score{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:20px 0}
+.lk .lk-recap h2{font:700 clamp(25px,7vw,38px)/1.1 var(--sans);letter-spacing:-.04em;margin:0;text-transform:capitalize;color:#fffbea}
+.lk .lk-recap-score p{font-size:11px;color:#c4d7c8;margin:8px 0 0}
+.lk .lk-stroke-total{display:flex;flex-direction:column;align-items:center;flex-shrink:0;min-width:72px;padding:9px 12px;border:1px solid #c5d8bd55;border-radius:16px;background:#ffffff0c}
+.lk .lk-stroke-total strong{font:600 45px/1 var(--sans);color:#e5d995}
+.lk .lk-stroke-total span{font-size:10px;margin-top:4px;color:#c4d7c8}
+.lk .lk-special{display:flex;flex-direction:column;gap:5px;margin-top:18px;padding:13px;border:1px solid #e6d28e88;border-radius:12px;background:#e5cf7f15}
+.lk .lk-special strong{font:700 21px/1.15 var(--sans);color:#f2dc8e}
+.lk .lk-special span{font-size:12px;line-height:1.4;color:#f1eacb}
+.lk .lk-recap-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 22px;padding:14px 0;border-top:1px solid #ffffff26;border-bottom:1px solid #ffffff26}
+.lk .lk-recap-stats>div{display:flex;flex-direction:column;gap:6px;text-align:center}
+.lk .lk-recap-stats dt{font-size:10px;color:#c4d7c8}
+.lk .lk-recap-stats dd{margin:0;font-size:17px;font-weight:650}
+.lk .lk-recap h3{font-size:12px;font-weight:600;color:#d4e0d6;margin:0 0 10px}
+.lk .lk-shot-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.lk .lk-shot-list li{display:flex;align-items:center;gap:10px;min-height:48px;padding:9px 10px;border-radius:10px;background:#ffffff08}
+.lk .lk-shot-index{display:grid;place-items:center;flex-shrink:0;width:25px;height:25px;border:1px solid #d2dfc94d;border-radius:50%;font-size:11px;color:#c4d7c8}
+.lk .lk-shot-list b,.lk .lk-shot-list small{display:block;font-size:12px;line-height:1.4}
+.lk .lk-shot-list small{font-size:10px;color:#c4d7c8}
+.lk .lk-shot-list em{margin-left:auto;font-size:11px;font-style:normal;text-align:right;color:#e5d995}
+.lk.lk-hole-complete .stage>.hud,.lk.lk-hole-complete .stage>.foot,.lk.lk-hole-complete .camrow,.lk.lk-hole-complete .lk-plan,.lk.lk-hole-complete .hint,.lk.lk-hole-complete .banner{display:none}
+.lk.lk-hole-complete #lk-hand,.lk.lk-hole-complete .lk-distance-note,.lk.lk-hole-complete .readout{display:none}
+.lk .lk-flight-readout{max-width:calc(100% - 142px);padding:9px 11px;background:#153f32db;border:1px solid #fff4bc40;border-radius:12px;text-shadow:none}
+.lk .lk-flight-readout strong{font-size:30px}
+@media(max-width:350px){.lk .lk-recap{padding:16px 12px}.lk .lk-recap-stats{gap:3px}.lk .lk-recap-stats dt{font-size:9px}.lk .lk-recap-stats dd{font-size:15px}.lk .lk-special strong{font-size:18px}}
