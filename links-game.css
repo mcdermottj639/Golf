@@ -235,3 +235,12 @@ body.lk-ingame #view{padding-bottom:0}
 .lk .lk-flight-readout{max-width:calc(100% - 142px);padding:9px 11px;background:#153f32db;border:1px solid #fff4bc40;border-radius:12px;text-shadow:none}
 .lk .lk-flight-readout strong{font-size:30px}
 @media(max-width:350px){.lk .lk-recap{padding:16px 12px}.lk .lk-recap-stats{gap:3px}.lk .lk-recap-stats dt{font-size:9px}.lk .lk-recap-stats dd{font-size:15px}.lk .lk-special strong{font-size:18px}}
+
+/* v264: course record line and the shareable scorecard image on the round-complete screen. */
+.lk .lk-record{margin:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink62);font-size:12.5px;line-height:1.5}
+.lk .lk-record b{color:var(--ink);font-variant-numeric:tabular-nums}
+.lk .lk-share{display:flex;flex-direction:column;gap:8px}
+.lk .lk-cardimg{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card);box-shadow:0 4px 18px #0002;max-width:360px}
+.lk .lk-cardimg img{display:block;width:100%;height:auto}
+.lk .lk-sharerow{gap:6px}
+.lk .lk-sharerow .lk-ghost{min-height:40px;display:inline-flex;align-items:center;text-decoration:none;color:var(--ink)}

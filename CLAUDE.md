@@ -4115,7 +4115,7 @@ unmount, debug}`. `render()` returns the markup; `render('links')` in app.js the
 `mount(document.getElementById('lk-root'), { state:()=>S, clubCanon, toast, onExit })`. Every other view
 calls `unmount()`, which cancels the animation frame, timers, listeners and the body class. The
 module never reads or writes golf state: it only READS `S.carries` through the bridge and writes its
-own `localStorage` keys `chqlinks:mode|course|len|boost|best|cam|hand`. Those keys are deliberately outside
+own `localStorage` keys `chqlinks:mode|course|len|boost|best|cam|hand|records`. Those keys are deliberately outside
 golf backups (game preferences, not golf data).
 
 **Courses.** The menu lists `window.CADDIE_PREP_COURSES` (the generated directory). On Tee off the
@@ -4203,6 +4203,32 @@ read-only standing-plan dialog. The stage, dock and safe areas share the visible
 lie, wind, hole scores and round counters, cancels gimme/animation timers, and marks the entire round
 as practice. Practice completion never writes best scores; daily challenges cannot retry. The next
 hole clears the retry snapshot. No golf records are read for writes or restored by this feature.
+
+**Course records and the shareable scorecard (v264, PR #TBD).** `finish()` now does three things it
+did not: it appends the round to `chqlinks:records[course:len]` (`{d, tp, tot, par, holes, fir, gir,
+putts, longest, daily}`, newest first, capped at `RECORD_MAX` 20), renders a record line on the
+round-complete screen (first round here · practice not added · or `N rounds · best · average · previous
+up to five`), and draws a **scorecard PNG** with `scorecardCanvas()` — 1080 px wide, 1350 tall for 18
+holes and 1190 for nine, fixed palette (`CARD`) because the picture leaves the app and cannot lean on
+Night-mode tokens: pine header with course, place, tees and the local date (`localDay()`, never
+`toISOString()`), score to par, one Hole/Par/Score block per nine with birdie circles (double for
+eagle), bogey squares (double for double) and a gold disc for an ace, four stat tiles, a legend and a
+footer saying it is a simulated game, so the image cannot pass for a real-course card. The preview
+`<img>` is a data URL (long-press saves it on iPhone); **Share scorecard** uses `navigator.share` with
+the PNG `File` where `canShare` allows it (an `AbortError` counts as handled), otherwise it clicks the
+hidden **Save image** `<a download>` whose blob URL is revoked on the next card and on unmount.
+Practice rounds reach neither best scores nor records — the rule best already followed. The course
+picker reads `Best of N` once `records[id:18]` holds more than one round, else `Best 18`; 9-hole records
+never touch that label. Same commit fixed a startup bug: `pick` was validated against `COURSES`, the
+in-memory geometry cache that is always empty at boot, so the remembered course was silently reset to
+the first in the directory on every re-entry; it is checked against the directory now. `debug()` gained
+`records` and `card {w, h, save, href}`. Verified by `tests/links-scorecard-browser.cjs` (390×844 and
+320×690: 14 courses, 3D triangles, one rail stroke, map canvas painted, both card sizes with pixel
+colours, the download fallback, records 1→2 with a practice round skipped, the Best of N label, the
+remembered course, Night mode, unchanged golf state, zero errors) and `tests/links-practice.cjs`, which
+runs the real `finish()` in a VM and now asserts records as well as best. Two older suites fail on
+main a14c2c1 before this change and were left alone: `links-power-browser` waits for a `2i` club chip
+that left the bag in v262, and `links-recap-browser` reads a putt `anim` that has already finished.
 
 **Hole recap (v261).** Every hole-out opens a persistent, focusable recap in the stage, with hole/par,
 score name, strokes, round-to-par, putts, fairway, GIR, penalties and the actual shot log. On short
@@ -4320,9 +4346,10 @@ browser checks, not a claim of an on-device Safari test.
 **Backlog.** Surveyed terrain elevations and fuller feature coverage are needed for faithful course
 rehearsal. Graphics: improved canopies/shadows, water animation, 3D putting when it can preserve
 readability. The current renderer already includes textured surfaces and decorative trees. Game: per-club dispersion from every bay session instead of
-the built-in table; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry;
-course records and a shareable scorecard image. Standing plans are now available from each hole.
+the built-in table; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry.
+Standing plans are now available from each hole.
 Rules for that task: one improvement per run, feature-flag anything that changes scoring, never touch
 packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item and update this
 section, and log the run in the handoff.
 History: ball trail + landing puff — v255, PR #79, already merged; v256 exit/safe area also on main.
+Shipped: course records + shareable scorecard image — v264, PR #TBD (branch links/20261026-scorecard-share, awaiting Jack's merge).
