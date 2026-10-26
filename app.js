@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v263';
+const BUILD = 'v264';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v264', d:'2026-10-26', items:['LINKS SCORECARD YOU CAN SHARE: Finish a round and the screen now shows a scorecard image — course, date, tees, your score to par, every hole with birdie circles and bogey squares, fairways, greens, putts and longest drive. Share scorecard opens your phone\'s share sheet (or saves the PNG); long-press the picture to save it too. The card says it is a simulated game, so it cannot pass for a real-course score.','YOUR RECORD AT EACH COURSE: Links keeps your last 20 completed rounds per course and length. The round-complete screen shows rounds played, best, average and your previous scores there; the course picker reads Best of N once you have played a course more than once. Practice rounds are not recorded, the same rule best scores already follow. Game preferences only — nothing touches your golf records.'] },
   { b:'v263', d:'2026-10-24', items:['BAG: Returned DS-ADAPT 3-wood and Hi-Toe 58° removed from owned equipment and playing selectors. Past shots remain in history.'] },
   { b:'v262', d:'2026-10-24', items:['BAG: PING G440 3H joins the bag; Cobra Utility 2i moves to the bench with its saved carries and history. Existing 4H retained; 3H distances await measurement.'] },
   { b:'v261', d:'2026-10-23', items:['EVERY HOLE GETS A RECAP: Hole out to see your score, putts, fairway, green in regulation, penalties and shot-by-shot story. Chip-ins, bunker hole-outs, aces and long putts get a special callout. Next hole and Try shot again stay within reach.','SMOOTHER FLIGHT AND PUTTING: Course surfaces draw in a stable order to prevent overlapping fairway colors during flight. The follow camera adapts to frame rate, putts show distance to the cup and finish sooner, the green is easier on the eyes, and old shot banners clear before the next swing or hole.'] },
