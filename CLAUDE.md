@@ -4204,7 +4204,7 @@ lie, wind, hole scores and round counters, cancels gimme/animation timers, and m
 as practice. Practice completion never writes best scores; daily challenges cannot retry. The next
 hole clears the retry snapshot. No golf records are read for writes or restored by this feature.
 
-**Course records and the shareable scorecard (v264, PR #TBD).** `finish()` now does three things it
+**Course records and the shareable scorecard (v264, PR #80).** `finish()` now does three things it
 did not: it appends the round to `chqlinks:records[course:len]` (`{d, tp, tot, par, holes, fir, gir,
 putts, longest, daily}`, newest first, capped at `RECORD_MAX` 20), renders a record line on the
 round-complete screen (first round here · practice not added · or `N rounds · best · average · previous
@@ -4352,4 +4352,4 @@ Rules for that task: one improvement per run, feature-flag anything that changes
 packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item and update this
 section, and log the run in the handoff.
 History: ball trail + landing puff — v255, PR #79, already merged; v256 exit/safe area also on main.
-Shipped: course records + shareable scorecard image — v264, PR #TBD (branch links/20261026-scorecard-share, awaiting Jack's merge).
+Shipped: course records + shareable scorecard image — v264, PR #80 (branch links/20261026-scorecard-share, awaiting Jack's merge).
