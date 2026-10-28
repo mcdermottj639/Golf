@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "batchCap": 5,
-  "successfulBatches": 2,
+  "successfulBatches": 3,
   "entries": [
     {
       "queueId": "lakeside-country-club",
@@ -1227,7 +1227,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "eb9d46cfeb9a49d92d77d05b085d9dd3185cb00f",
       "identityNote": "Verify all physical nines. Preserve the user’s Granite/Quincy 18-hole routing; do not conflate it with Milton.",
       "catalogId": "granite-links",
       "coverage": {
@@ -1313,7 +1313,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "eb9d46cfeb9a49d92d77d05b085d9dd3185cb00f",
       "catalogId": "bass-river",
       "coverage": {
         "holes": 18,
@@ -1931,7 +1931,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "eb9d46cfeb9a49d92d77d05b085d9dd3185cb00f",
       "catalogId": "basin-harbor",
       "coverage": {
         "holes": 18,
@@ -2014,7 +2014,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "eb9d46cfeb9a49d92d77d05b085d9dd3185cb00f",
       "catalogId": "vermont-national",
       "coverage": {
         "holes": 18,
@@ -2097,7 +2097,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null,
+      "completionCommit": "eb9d46cfeb9a49d92d77d05b085d9dd3185cb00f",
       "catalogId": "fox-hollow",
       "coverage": {
         "holes": 18,
@@ -2785,6 +2785,25 @@
       "deploymentUrl": "https://github.com/mcdermottj639/Golf/actions/runs/39609971814",
       "liveUrl": "https://mcdermottj639.github.io/Golf/",
       "liveVerification": "Publication workflow succeeded, gh-pages matched the v251 release tree, and the public app rendered v251 with the five-course release notes on 2026-10-21."
+    },
+    {
+      "date": "2026-10-28",
+      "courseIds": [
+        "granite-links",
+        "bass-river",
+        "basin-harbor",
+        "vermont-national",
+        "fox-hollow"
+      ],
+      "status": "deployed",
+      "completionCommit": "eb9d46cfeb9a49d92d77d05b085d9dd3185cb00f",
+      "newCourses": 5,
+      "newGuides": 99,
+      "newMaps": 99,
+      "version": "v266",
+      "deploymentUrl": "https://github.com/mcdermottj639/Golf/actions/runs/40690103200",
+      "liveUrl": "https://mcdermottj639.github.io/Golf/",
+      "liveVerification": "Publication workflow succeeded; the public app.js, sw.js, course directory and all five course-pack URLs matched the tested v266 bytes on 2026-10-28. The live UI loaded Granite's guide, interactive map, all three physical nines and the Granite + Quincy live-round card."
     }
   ],
   "capacityReview": "The second five-course batch is deployed. Source resolution and 27-hole routing still require course-specific judgment, so the configured cap remains five; parallel source retrieval was efficient, but a larger batch would increase review risk without reducing the critical identity and map checks."
