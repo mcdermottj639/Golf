@@ -204,7 +204,7 @@ men's; Yellow indexes and Red tee pars differ. These limits appear in the user c
 evidence, gaps and completion commits. Reconcile with `node scripts/reconcile-course-queue.cjs`;
 `--check` is deterministic using the saved reconciliation date. Saved played list has
 49 entries; the Bonita Bay umbrella is a queue-only duplicate of Bay Island, leaving
-48 distinct onboarding entries. Fourteen are catalog-supported (11 fully mapped), 34
+48 distinct onboarding entries. Nineteen are catalog-supported (16 fully mapped), 29
 remain. Lakeside 2/6, Beekman Highland 4/Valley 4 and Metedeconk 19–27 remain on the
 repair exception queue.
 
@@ -257,3 +257,36 @@ those still require the course pack and review. New packs remain nonfavorites an
 never shell-cache assets. The second-batch capacity review keeps the cap at five:
 parallel retrieval helped, but identity, routing and missing-map review remain the
 limiting work and do not become safer in a larger batch.
+
+## October 28, 2026 expansion (v266)
+
+Five additional on-demand packs: Granite Links, Bass River, The Golf Club at Basin
+Harbor, Vermont National and Fox Hollow (Branchburg, NJ). `batch-2026-10-28.json`
+records exact retrieved-source hashes, tee arithmetic, deferred research and the map
+review. The catalog now has 369 physical scorecard holes, 367 guides and 356 interactive
+maps. This batch contributes 99 holes with full guide/map coverage; every original
+route endpoint is inside a mapped green polygon.
+
+Granite Links is one 27-hole facility. Physical IDs 1–9 are Granite, 10–18 Quincy and
+19–27 Milton. Each source route repeats 1–9 and uses OSM's `golf:links` tag for its
+physical nine, so `sourceNineTag` is required in addition to `sourceRef`. All six ordered
+18-hole combinations are available; Granite + Quincy is first to preserve the saved
+routing. Two exact OSM API responses were merged without changing way IDs, versions,
+tags or coordinates because no single bounded response contained the entire property.
+
+Bass River's official 2026 card and detailed tour agree on hole 9 as par 4 and hole 15
+as the 169-yard par 3; the introductory page sentence that reverses them is not used.
+Six conflicting OSM par tags are preserved and audited through `routeTagCorrections`.
+The Red tee row is withheld because its displayed holes do not match its printed total.
+Basin Harbor's current official site confirms the 18-hole identity but supplies no card;
+one internally consistent Golfify edition matches all 18 route pars, while conflicting
+public editions remain out. Vermont National's official Gold/Blue row is omitted because
+its hole values total 6,342 while the printed total says 6,292. Fox Hollow's club image
+supplies four tee rows; ratings/slopes remain null because current USGA lengths conflict.
+
+Islands End and New York Country Club retain dated `source-gap` findings in the queue.
+No reusable original hole routes were found during the bounded pass, and New York Country
+Club also has a scorecard/USGA length conflict. Proprietary flyovers are not repurposed.
+The queue has 19 supported saved entries (16 fully mapped), 29 remaining unique entries
+and one Bonita Bay onboarding duplicate. The batch cap stays five after the third successful
+batch because route identity, card editions and licensing still require manual judgment.

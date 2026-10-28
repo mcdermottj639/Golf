@@ -1,0 +1,132 @@
+{
+  "retrieved": "2026-10-28",
+  "sourceFiles": [
+    {
+      "url": "https://offcourse.co/courses/scorecard/granite-links-golf-club/",
+      "sha256": "ae6128e19d08a70b54eb5fe607f6e404a9b8052ef44cb9b7b74f4689f93f21d7"
+    },
+    {
+      "url": "https://www.golfyarmouth.com/bass-river",
+      "sha256": "8f90bf867db707a461510b1719e07049a50ec5d69f33d2efdee6cbe59657f05b"
+    },
+    {
+      "url": "https://zommagolf.com/courses/ma/bass-river-golf-course",
+      "sha256": "9bf1c813cbe4c4c5bd15a923cd9dd9ccb8a279f1fe4191091aba20c9fd6f201b"
+    },
+    {
+      "url": "https://www.golfify.io/courses/basin-harbor-club",
+      "sha256": "390cde72999f5b1b5ba430926ad2650cbad58bbe3b8179fa600fcfc8e2fe0662"
+    },
+    {
+      "url": "https://basinharborgolfclub.com/course-details/",
+      "sha256": "99711ea6668363fcb1cb5e7e6d80382fc742f479f33689f86a391951fa79196a"
+    },
+    {
+      "url": "https://www.vermontnational.com/Golf/Vermont_National_Country_Club",
+      "sha256": "edc1bae91ce907a727b4f5cd045f4b57bcb17070155022f0390c68d0f7ba1117"
+    },
+    {
+      "url": "https://www.foxhollowgc.com/golf/course",
+      "sha256": "df43a159c82888c47de43b8e622dbd82f7996dac7d55bd3c155b78b1c85b4a71"
+    },
+    {
+      "url": "https://www.foxhollowgc.com/templates/yootheme/cache/04/scorecard-04304a50.jpeg",
+      "sha256": "9184b2d93e57209eda77cc8f02e473ce968c84700f8221b7aa142c706d946a2c"
+    },
+    {
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-71.060,42.236,-71.038,42.252",
+      "sha256": "3cf3331418eff73ea77cac598baf71bc456981965e9be279fbc5aea8980a4a6a"
+    },
+    {
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-71.075,42.240,-71.055,42.252",
+      "sha256": "d34a52d7d3df1a83783e111ca6c2ea5dfda3e8a0e6e70730a6a685d9403879af"
+    },
+    {
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-70.190,41.664,-70.162,41.687",
+      "sha256": "b13b213bf780de551cd154eedec034d066efd4d92aa38077bedb40aa02bc87ef"
+    },
+    {
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.373,44.182,-73.356,44.198",
+      "sha256": "09ab7493a2991da7a208bcaa899dc61962313fccf77fc1167b365089399a02cf"
+    },
+    {
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.205,44.415,-73.165,44.445",
+      "sha256": "e3a5b9698b4673d9486195b1468d9128b4d2c3638bbad8945505b8f125874e37"
+    },
+    {
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.725,40.605,-74.690,40.632",
+      "sha256": "598b9549bc4f62325e8c78e2f63f7f15cebf7e04b073800a18632c17006d44a8"
+    }
+  ],
+  "teeChecks": [
+    {
+      "courseId": "granite-links",
+      "parNines": [36, 35, 36],
+      "tees": [
+        { "id": "black", "nines": [3340, 3395, 3478], "total": 10213 },
+        { "id": "blue", "nines": [3084, 3163, 3216], "total": 9463 },
+        { "id": "white", "nines": [2654, 2865, 2893], "total": 8412 },
+        { "id": "red", "nines": [2372, 2334, 2629], "total": 7335 }
+      ]
+    },
+    {
+      "courseId": "bass-river",
+      "parFront": 36,
+      "parBack": 36,
+      "tees": [
+        { "id": "back", "front": 3409, "back": 2729, "total": 6138 },
+        { "id": "white", "front": 3195, "back": 2521, "total": 5716 },
+        { "id": "silver", "front": 2727, "back": 2378, "total": 5105 }
+      ]
+    },
+    {
+      "courseId": "basin-harbor",
+      "parFront": 36,
+      "parBack": 36,
+      "tees": [
+        { "id": "blue", "front": 3107, "back": 3467, "total": 6574 },
+        { "id": "white", "front": 2969, "back": 3259, "total": 6228 },
+        { "id": "gold", "front": 2699, "back": 2888, "total": 5587 },
+        { "id": "red", "front": 2498, "back": 2588, "total": 5086 }
+      ]
+    },
+    {
+      "courseId": "vermont-national",
+      "parFront": 36,
+      "parBack": 36,
+      "omittedConflict": "Gold/Blue displayed holes total 6,342 while the official page prints 6,292.",
+      "tees": [
+        { "id": "black", "front": 3548, "back": 3519, "total": 7067 },
+        { "id": "black-gold", "front": 3429, "back": 3397, "total": 6826 },
+        { "id": "gold", "front": 3318, "back": 3305, "total": 6623 },
+        { "id": "blue", "front": 3011, "back": 3117, "total": 6128 },
+        { "id": "blue-white", "front": 2853, "back": 2988, "total": 5841 },
+        { "id": "white", "front": 2746, "back": 2814, "total": 5560 },
+        { "id": "white-green", "front": 2593, "back": 2644, "total": 5237 },
+        { "id": "green", "front": 2541, "back": 2457, "total": 4998 }
+      ]
+    },
+    {
+      "courseId": "fox-hollow",
+      "parFront": 35,
+      "parBack": 35,
+      "tees": [
+        { "id": "blue", "front": 3144, "back": 3259, "total": 6403 },
+        { "id": "white", "front": 3020, "back": 3122, "total": 6142 },
+        { "id": "green", "front": 2667, "back": 2687, "total": 5354 },
+        { "id": "red", "front": 2602, "back": 2614, "total": 5216 }
+      ]
+    }
+  ],
+  "mapVerification": "All 99 published routes retain original OSM way IDs, versions, tags and coordinates. Routes match exact hole references; Granite Links additionally matches the physical nine in golf:links. Every route endpoint falls inside a mapped green polygon. Bass River's six conflicting raw par tags remain unchanged and are covered by source-specific audit corrections against the official 2026 card.",
+  "deferredResearch": [
+    {
+      "queueId": "islands-end-golf-and-country-club",
+      "reason": "Identity and scorecard found, but no original reusable hole geometry."
+    },
+    {
+      "queueId": "new-york-country-club",
+      "reason": "No original reusable hole geometry and published scorecard lengths conflict with current USGA totals."
+    }
+  ]
+}

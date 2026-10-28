@@ -27,7 +27,7 @@ assert.deepEqual([correction.id,correction.from,correction.to],[1049812263,'6','
 const ctx={window:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'course-prep-data.js'),'utf8'),ctx);
 const added=ctx.window.CADDIE_PREP_COURSES.filter(c=>ids.includes(c.id));assert.equal(added.length,5);assert.ok(added.every(c=>!c.defaultFavorite&&!c.features&&c.holes.every(h=>!h.path)));
 assert.ok(!fs.readFileSync(path.join(root,'sw.js'),'utf8').match(/const ASSETS = ([\s\S]+?);/)[1].includes('data/course-prep/'),'packs are not shell assets');
-const q=read('onboarding-queue');assert.deepEqual(q.progress,{savedPlayedEntries:49,catalogSupportedEntries:14,fullyMappedEntries:11,remainingUniqueEntries:34,duplicateUmbrellaEntries:1});
+const q=read('onboarding-queue');assert.equal(q.progress.savedPlayedEntries,49);assert.equal(q.progress.duplicateUmbrellaEntries,1);assert.ok(q.progress.catalogSupportedEntries>=14&&q.progress.fullyMappedEntries>=11&&q.progress.remainingUniqueEntries<=34);
 assert.ok(ids.every(id=>q.entries.some(e=>e.catalogId===id&&e.status.startsWith('catalog-'))));assert.equal(q.batchCap,5);
 const batch=read('batch-2026-10-21');assert.equal(batch.sourceFiles.length,11);assert.ok(batch.sourceFiles.every(s=>/^https:\/\//.test(s.url)&&/^[a-f0-9]{64}$/.test(s.sha256)));
 console.log('PASS expansion 2: five distinct courses, 99 guides, 97 maps, exact Beekman nines, Ferry Point alias continuity, audited Hudson tag correction and on-demand packs.');

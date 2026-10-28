@@ -1,0 +1,271 @@
+{
+  "id": "fox-hollow",
+  "name": "Fox Hollow Golf Club",
+  "shortName": "Fox Hollow",
+  "place": "Branchburg, NJ",
+  "aliases": [
+    "Fox Hollow Golf Club (NJ)",
+    "Fox Hollow (NJ)"
+  ],
+  "storageKey": "fox_hollow_golf_club",
+  "bounds": [
+    40.6115,
+    -74.7122,
+    40.6226,
+    -74.6988
+  ],
+  "center": [
+    40.61705,
+    -74.7055
+  ],
+  "par": 70,
+  "defaultTee": "white",
+  "verified": "2026-10-28",
+  "source": "https://www.foxhollowgc.com/golf/course",
+  "sourceLabel": "Official club scorecard image",
+  "tour": "https://www.foxhollowgc.com/golf/course",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.725,40.605,-74.690,40.632",
+  "cardNote": "Blue, White, Green and Red hole yardages, pars and handicaps were read from the scorecard image currently embedded on the official club course page. Current USGA rating lengths conflict materially with that posted card, so ratings and slopes are omitted rather than mixed across editions. All 18 original numbered routes reconcile to the official posted pars. Retrieved October 28, 2026.",
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6403,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        350,
+        174,
+        535,
+        179,
+        432,
+        547,
+        395,
+        351,
+        181,
+        584,
+        348,
+        200,
+        434,
+        210,
+        565,
+        352,
+        381,
+        185
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 6142,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        343,
+        151,
+        525,
+        165,
+        421,
+        540,
+        379,
+        341,
+        155,
+        565,
+        341,
+        170,
+        421,
+        185,
+        555,
+        344,
+        365,
+        176
+      ]
+    },
+    {
+      "id": "green",
+      "name": "Green",
+      "total": 5354,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        312,
+        120,
+        500,
+        108,
+        331,
+        504,
+        368,
+        313,
+        111,
+        490,
+        305,
+        146,
+        328,
+        135,
+        483,
+        334,
+        351,
+        115
+      ]
+    },
+    {
+      "id": "red",
+      "name": "Red",
+      "total": 5216,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        301,
+        115,
+        495,
+        105,
+        320,
+        490,
+        359,
+        309,
+        108,
+        480,
+        299,
+        140,
+        320,
+        127,
+        472,
+        326,
+        342,
+        108
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 9,
+      "osmId": 901835175,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 3,
+      "si": 17,
+      "osmId": 901835176,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 3,
+      "par": 5,
+      "si": 3,
+      "osmId": 901835177,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 4,
+      "par": 3,
+      "si": 13,
+      "osmId": 901835178,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 1,
+      "osmId": 901835179,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 6,
+      "par": 5,
+      "si": 5,
+      "osmId": 901835180,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 7,
+      "osmId": 901838295,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 8,
+      "par": 4,
+      "si": 15,
+      "osmId": 901838296,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 9,
+      "par": 3,
+      "si": 11,
+      "osmId": 901838298,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 10,
+      "par": 5,
+      "si": 4,
+      "osmId": 901838301,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 12,
+      "osmId": 901842762,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 12,
+      "par": 3,
+      "si": 8,
+      "osmId": 901842765,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": 2,
+      "osmId": 901842766,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 14,
+      "par": 3,
+      "si": 18,
+      "osmId": 901842767,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 15,
+      "par": 5,
+      "si": 6,
+      "osmId": 901846517,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 14,
+      "osmId": 901846518,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 17,
+      "par": 4,
+      "si": 10,
+      "osmId": 901846519,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 18,
+      "par": 3,
+      "si": 16,
+      "osmId": 901846520,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    }
+  ],
+  "scorecard": "https://www.foxhollowgc.com/templates/yootheme/cache/04/scorecard-04304a50.jpeg",
+  "additionalSources": [
+    "https://ncrdb.usga.org/courseTeeInfo?CourseID=13407"
+  ]
+}

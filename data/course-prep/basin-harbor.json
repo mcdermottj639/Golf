@@ -1,0 +1,272 @@
+{
+  "id": "basin-harbor",
+  "name": "The Golf Club at Basin Harbor",
+  "shortName": "Basin Harbor",
+  "place": "Vergennes, VT",
+  "aliases": [
+    "Basin Harbor Club",
+    "Basin Harbor Golf Course",
+    "The Golf Club At Basin Harbor"
+  ],
+  "storageKey": "basin_harbor_club",
+  "bounds": [
+    44.1821,
+    -73.3698,
+    44.1961,
+    -73.359
+  ],
+  "center": [
+    44.1891,
+    -73.3644
+  ],
+  "par": 72,
+  "defaultTee": "white",
+  "verified": "2026-10-28",
+  "source": "https://www.golfify.io/courses/basin-harbor-club",
+  "sourceLabel": "Published scorecard · Golfify",
+  "tour": "https://basinharborgolfclub.com/course-details/",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.373,44.182,-73.356,44.198",
+  "cardNote": "The current club site confirms the 18-hole Basin Harbor identity but does not publish a scorecard. Golfify’s complete card is internally consistent and all 18 pars agree with the original numbered OSM routes. Other public cards conflict materially, so only this single reconciled edition is used. Retrieved October 28, 2026.",
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6574,
+      "rating": 71.6,
+      "slope": 126,
+      "yards": [
+        367,
+        379,
+        410,
+        313,
+        107,
+        376,
+        165,
+        480,
+        510,
+        401,
+        389,
+        523,
+        175,
+        363,
+        436,
+        215,
+        527,
+        438
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 6228,
+      "rating": 70,
+      "slope": 123,
+      "yards": [
+        350,
+        360,
+        395,
+        308,
+        100,
+        345,
+        156,
+        457,
+        498,
+        391,
+        379,
+        495,
+        150,
+        344,
+        418,
+        172,
+        509,
+        401
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "total": 5587,
+      "rating": 66.7,
+      "slope": 118,
+      "yards": [
+        330,
+        318,
+        355,
+        306,
+        98,
+        313,
+        145,
+        378,
+        456,
+        325,
+        330,
+        470,
+        120,
+        290,
+        357,
+        160,
+        470,
+        366
+      ]
+    },
+    {
+      "id": "red",
+      "name": "Red",
+      "total": 5086,
+      "rating": 64,
+      "slope": 113,
+      "yards": [
+        298,
+        289,
+        327,
+        301,
+        93,
+        306,
+        139,
+        375,
+        370,
+        310,
+        310,
+        410,
+        115,
+        235,
+        312,
+        146,
+        425,
+        325
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 9,
+      "osmId": 1227658887,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 7,
+      "osmId": 1227658886,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "si": 1,
+      "osmId": 1227658885,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 11,
+      "osmId": 1227658884,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 5,
+      "par": 3,
+      "si": 17,
+      "osmId": 1227658881,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 13,
+      "osmId": 1227658880,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 3,
+      "si": 15,
+      "osmId": 1227658879,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 8,
+      "par": 5,
+      "si": 3,
+      "osmId": 1227658878,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 9,
+      "par": 5,
+      "si": 5,
+      "osmId": 1227658877,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 16,
+      "osmId": 1227658876,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 10,
+      "osmId": 1227658875,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 12,
+      "par": 5,
+      "si": 6,
+      "osmId": 1227658874,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 13,
+      "par": 3,
+      "si": 18,
+      "osmId": 1227658873,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 8,
+      "osmId": 1227658872,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "si": 2,
+      "osmId": 1227658871,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 16,
+      "par": 3,
+      "si": 14,
+      "osmId": 1227658870,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 17,
+      "par": 5,
+      "si": 4,
+      "osmId": 1227658869,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 12,
+      "osmId": 1227658868,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    }
+  ],
+  "additionalSources": [
+    "https://basinharborgolfclub.com/",
+    "https://www.basinharbor.com/golf/"
+  ]
+}

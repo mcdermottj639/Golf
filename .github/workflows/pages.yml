@@ -57,6 +57,7 @@ jobs:
           node tests/course-packs.cjs
           node tests/course-expansion.cjs
           node tests/course-expansion-2.cjs
+          node tests/course-expansion-3.cjs
           node scripts/reconcile-course-queue.cjs --check
       - name: Mirror main to gh-pages
         run: |

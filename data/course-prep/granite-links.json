@@ -1,0 +1,593 @@
+{
+  "id": "granite-links",
+  "name": "Granite Links Golf Club",
+  "shortName": "Granite Links",
+  "place": "Quincy, MA",
+  "aliases": [
+    "Granite Links",
+    "Granite Links Golf Club at Quarry Hills"
+  ],
+  "storageKey": "granite_links_golf_club",
+  "bounds": [
+    42.236,
+    -71.075,
+    42.252,
+    -71.038
+  ],
+  "center": [
+    42.244,
+    -71.0565
+  ],
+  "par": 107,
+  "defaultTee": "blue",
+  "verified": "2026-10-28",
+  "source": "https://offcourse.co/courses/scorecard/granite-links-golf-club/",
+  "sourceLabel": "Published scorecards reconciled to USGA ratings",
+  "tour": "https://www.granitelinksgolfclub.com/golf",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-71.060,42.236,-71.038,42.252",
+  "sourceNineTag": "golf:links",
+  "cardNote": "Granite, Quincy and Milton are three distinct physical nines. Published Granite/Milton, Granite/Quincy and Milton/Quincy scorecards provide the per-nine pars and yardages; the Granite/Quincy totals reconcile to the current USGA rating database. Physical IDs 1–9 are Granite, 10–18 Quincy and 19–27 Milton. The saved Granite/Quincy routing is first and remains the default. Ratings and slopes are omitted from the 27-hole pack because they apply to specific 18-hole combinations, not the aggregate. Retrieved October 28, 2026.",
+  "tees": [
+    {
+      "id": "black",
+      "name": "Black",
+      "total": 10213,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        513,
+        402,
+        443,
+        199,
+        398,
+        353,
+        218,
+        504,
+        310,
+        551,
+        242,
+        515,
+        499,
+        474,
+        163,
+        327,
+        239,
+        385,
+        483,
+        179,
+        457,
+        514,
+        387,
+        219,
+        364,
+        354,
+        521
+      ]
+    },
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 9463,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        488,
+        375,
+        399,
+        154,
+        353,
+        331,
+        187,
+        499,
+        298,
+        518,
+        220,
+        481,
+        489,
+        439,
+        140,
+        296,
+        220,
+        360,
+        454,
+        171,
+        411,
+        486,
+        364,
+        188,
+        323,
+        335,
+        484
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 8412,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        453,
+        325,
+        352,
+        124,
+        302,
+        253,
+        160,
+        407,
+        278,
+        491,
+        180,
+        434,
+        430,
+        410,
+        116,
+        277,
+        182,
+        345,
+        415,
+        150,
+        380,
+        425,
+        341,
+        159,
+        276,
+        305,
+        442
+      ]
+    },
+    {
+      "id": "red",
+      "name": "Red",
+      "total": 7335,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        436,
+        296,
+        305,
+        95,
+        232,
+        225,
+        114,
+        401,
+        268,
+        432,
+        96,
+        367,
+        356,
+        370,
+        88,
+        220,
+        120,
+        285,
+        399,
+        116,
+        365,
+        405,
+        324,
+        125,
+        245,
+        250,
+        400
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 5,
+      "sourceRef": 1,
+      "sourceNine": "Granite",
+      "osmId": 720590809,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "sourceRef": 2,
+      "sourceNine": "Granite",
+      "osmId": 720590810,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "sourceRef": 3,
+      "sourceNine": "Granite",
+      "osmId": 720590811,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 4,
+      "par": 3,
+      "sourceRef": 4,
+      "sourceNine": "Granite",
+      "osmId": 720590812,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "sourceRef": 5,
+      "sourceNine": "Granite",
+      "osmId": 720590813,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "sourceRef": 6,
+      "sourceNine": "Granite",
+      "osmId": 720590814,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 3,
+      "sourceRef": 7,
+      "sourceNine": "Granite",
+      "osmId": 720590815,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 8,
+      "par": 5,
+      "sourceRef": 8,
+      "sourceNine": "Granite",
+      "osmId": 720590816,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "sourceRef": 9,
+      "sourceNine": "Granite",
+      "osmId": 720590817,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 10,
+      "par": 5,
+      "sourceRef": 1,
+      "sourceNine": "Quincy",
+      "osmId": 684264828,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 11,
+      "par": 3,
+      "sourceRef": 2,
+      "sourceNine": "Quincy",
+      "osmId": 684288209,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 12,
+      "par": 5,
+      "sourceRef": 3,
+      "sourceNine": "Quincy",
+      "osmId": 684491376,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "sourceRef": 4,
+      "sourceNine": "Quincy",
+      "osmId": 684641839,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "sourceRef": 5,
+      "sourceNine": "Quincy",
+      "osmId": 684699245,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 15,
+      "par": 3,
+      "sourceRef": 6,
+      "sourceNine": "Quincy",
+      "osmId": 684826155,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "sourceRef": 7,
+      "sourceNine": "Quincy",
+      "osmId": 685155350,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "sourceRef": 8,
+      "sourceNine": "Quincy",
+      "osmId": 685301599,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "sourceRef": 9,
+      "sourceNine": "Quincy",
+      "osmId": 715567619,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 19,
+      "par": 4,
+      "sourceRef": 1,
+      "sourceNine": "Milton",
+      "osmId": 1268702576,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 20,
+      "par": 3,
+      "sourceRef": 2,
+      "sourceNine": "Milton",
+      "osmId": 1268702575,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 21,
+      "par": 4,
+      "sourceRef": 3,
+      "sourceNine": "Milton",
+      "osmId": 1268702574,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 22,
+      "par": 5,
+      "sourceRef": 4,
+      "sourceNine": "Milton",
+      "osmId": 1268702573,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 23,
+      "par": 4,
+      "sourceRef": 5,
+      "sourceNine": "Milton",
+      "osmId": 1268702572,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 24,
+      "par": 3,
+      "sourceRef": 6,
+      "sourceNine": "Milton",
+      "osmId": 1268702571,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 25,
+      "par": 4,
+      "sourceRef": 7,
+      "sourceNine": "Milton",
+      "osmId": 1268702570,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 26,
+      "par": 4,
+      "sourceRef": 8,
+      "sourceNine": "Milton",
+      "osmId": 1268702569,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 27,
+      "par": 5,
+      "sourceRef": 9,
+      "sourceNine": "Milton",
+      "osmId": 1268702568,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    }
+  ],
+  "nines": [
+    {
+      "id": "granite",
+      "name": "Granite",
+      "holes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "quincy",
+      "name": "Quincy",
+      "holes": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "milton",
+      "name": "Milton",
+      "holes": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    }
+  ],
+  "routings": [
+    {
+      "id": "granite-quincy",
+      "name": "Granite + Quincy",
+      "holes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    },
+    {
+      "id": "quincy-granite",
+      "name": "Quincy + Granite",
+      "holes": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "granite-milton",
+      "name": "Granite + Milton",
+      "holes": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "id": "milton-granite",
+      "name": "Milton + Granite",
+      "holes": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "quincy-milton",
+      "name": "Quincy + Milton",
+      "holes": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ]
+    },
+    {
+      "id": "milton-quincy",
+      "name": "Milton + Quincy",
+      "holes": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    }
+  ],
+  "additionalSources": [
+    "https://www.openstreetmap.org/api/0.6/map?bbox=-71.075,42.240,-71.055,42.252",
+    "https://ncrdb.usga.org/courseTeeInfo?CourseID=29626",
+    "https://ncrdb.usga.org/courseTeeInfo?CourseID=29627",
+    "https://ncrdb.usga.org/courseTeeInfo?CourseID=29628"
+  ]
+}

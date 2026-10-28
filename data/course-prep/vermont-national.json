@@ -1,0 +1,377 @@
+{
+  "id": "vermont-national",
+  "name": "Vermont National Country Club",
+  "shortName": "Vermont National",
+  "place": "South Burlington, VT",
+  "aliases": [
+    "Vermont National"
+  ],
+  "storageKey": "vermont_national_country_club",
+  "bounds": [
+    44.428,
+    -73.185,
+    44.443,
+    -73.164
+  ],
+  "center": [
+    44.4355,
+    -73.1745
+  ],
+  "par": 72,
+  "defaultTee": "blue",
+  "verified": "2026-10-28",
+  "source": "https://www.vermontnational.com/Golf/Vermont_National_Country_Club",
+  "sourceLabel": "Official course tour and scorecard",
+  "tour": "https://www.vermontnational.com/Golf/Vermont_National_Country_Club",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-73.205,44.415,-73.165,44.445",
+  "cardNote": "Eight internally consistent official tee and combo rows, pars, men’s handicaps, totals, ratings and slopes were read from the club’s course-tour scorecard. Gold/Blue is omitted because the displayed hole values total 6,342 while the page prints 6,292. The generated pack stores men’s ratings where printed; women’s alternate ratings are documented by the official source but are not mixed into the same tee objects. All 18 numbered OSM routes reconcile to the official pars. Retrieved October 28, 2026.",
+  "tees": [
+    {
+      "id": "black",
+      "name": "Black",
+      "total": 7067,
+      "rating": 74.5,
+      "slope": 142,
+      "yards": [
+        336,
+        553,
+        357,
+        188,
+        580,
+        469,
+        427,
+        227,
+        411,
+        441,
+        607,
+        400,
+        197,
+        417,
+        207,
+        495,
+        198,
+        557
+      ]
+    },
+    {
+      "id": "black-gold",
+      "name": "Black/Gold Combo",
+      "total": 6826,
+      "rating": 73.3,
+      "slope": 140,
+      "yards": [
+        336,
+        553,
+        334,
+        188,
+        549,
+        427,
+        427,
+        204,
+        411,
+        421,
+        607,
+        375,
+        168,
+        396,
+        207,
+        495,
+        198,
+        530
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "total": 6623,
+      "rating": 72.4,
+      "slope": 137,
+      "yards": [
+        326,
+        525,
+        334,
+        177,
+        549,
+        427,
+        403,
+        204,
+        373,
+        421,
+        573,
+        375,
+        168,
+        396,
+        178,
+        478,
+        186,
+        530
+      ]
+    },
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6128,
+      "rating": 69.8,
+      "slope": 134,
+      "yards": [
+        305,
+        504,
+        277,
+        157,
+        503,
+        397,
+        372,
+        153,
+        343,
+        396,
+        543,
+        354,
+        151,
+        373,
+        165,
+        465,
+        167,
+        503
+      ]
+    },
+    {
+      "id": "blue-white",
+      "name": "Blue/White Combo",
+      "total": 5841,
+      "rating": 68.4,
+      "slope": 129,
+      "yards": [
+        272,
+        478,
+        277,
+        157,
+        484,
+        339,
+        372,
+        131,
+        343,
+        365,
+        487,
+        336,
+        151,
+        349,
+        165,
+        465,
+        167,
+        503
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 5560,
+      "rating": 67,
+      "slope": 124,
+      "yards": [
+        272,
+        478,
+        251,
+        144,
+        484,
+        339,
+        344,
+        131,
+        303,
+        365,
+        487,
+        336,
+        129,
+        349,
+        141,
+        445,
+        145,
+        417
+      ]
+    },
+    {
+      "id": "white-green",
+      "name": "White/Green Combo",
+      "total": 5237,
+      "rating": 65.6,
+      "slope": 115,
+      "yards": [
+        272,
+        451,
+        251,
+        115,
+        414,
+        339,
+        317,
+        131,
+        303,
+        301,
+        487,
+        302,
+        129,
+        277,
+        141,
+        445,
+        145,
+        417
+      ]
+    },
+    {
+      "id": "green",
+      "name": "Green",
+      "total": 4998,
+      "rating": 64.4,
+      "slope": 114,
+      "yards": [
+        233,
+        451,
+        251,
+        115,
+        414,
+        339,
+        317,
+        118,
+        303,
+        301,
+        430,
+        302,
+        109,
+        277,
+        117,
+        397,
+        107,
+        417
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 9,
+      "osmId": 1229085695,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 5,
+      "si": 13,
+      "osmId": 1229085694,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "si": 7,
+      "osmId": 1229085693,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 4,
+      "par": 3,
+      "si": 15,
+      "osmId": 1229085692,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 5,
+      "par": 5,
+      "si": 5,
+      "osmId": 1229085691,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 1,
+      "osmId": 1229085690,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 3,
+      "osmId": 1229085689,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 8,
+      "par": 3,
+      "si": 17,
+      "osmId": 1229085688,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 11,
+      "osmId": 1229085687,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 2,
+      "osmId": 1229085686,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 11,
+      "par": 5,
+      "si": 10,
+      "osmId": 1229085685,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 4,
+      "osmId": 1229085684,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 13,
+      "par": 3,
+      "si": 18,
+      "osmId": 1229085683,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 6,
+      "osmId": 1229085682,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 15,
+      "par": 3,
+      "si": 14,
+      "osmId": 1229085681,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 16,
+      "par": 5,
+      "si": 12,
+      "osmId": 1229085680,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 16,
+      "osmId": 1229085679,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 18,
+      "par": 5,
+      "si": 8,
+      "osmId": 1229085678,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    }
+  ],
+  "additionalSources": [
+    "https://www.vermontnational.com/Golf/Vermont_National_Country_Club_Womens"
+  ]
+}

@@ -1021,42 +1021,310 @@
       "savedName": "Granite Links Golf Club",
       "canonicalName": "Granite Links Golf Club",
       "aliases": [
-        "Granite Links Golf Club"
+        "Granite Links Golf Club",
+        "Granite Links",
+        "Granite Links Golf Club at Quarry Hills"
       ],
       "region": "MA",
       "priority": 11,
       "routing": {
-        "savedRouting": "Granite / Quincy",
-        "physicalNinesToVerify": [
-          "Granite",
-          "Quincy",
-          "Milton"
+        "nines": [
+          {
+            "id": "granite",
+            "name": "Granite",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "id": "quincy",
+            "name": "Quincy",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          },
+          {
+            "id": "milton",
+            "name": "Milton",
+            "holes": [
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ]
+          }
+        ],
+        "routings": [
+          {
+            "id": "granite-quincy",
+            "name": "Granite + Quincy",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          },
+          {
+            "id": "quincy-granite",
+            "name": "Quincy + Granite",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "id": "granite-milton",
+            "name": "Granite + Milton",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ]
+          },
+          {
+            "id": "milton-granite",
+            "name": "Milton + Granite",
+            "holes": [
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "id": "quincy-milton",
+            "name": "Quincy + Milton",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27
+            ]
+          },
+          {
+            "id": "milton-quincy",
+            "name": "Milton + Quincy",
+            "holes": [
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
         ]
       },
       "evidence": [
         "coach-feed.json#add-granitelinks-20260729"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
       "completionCommit": null,
-      "identityNote": "Verify all physical nines. Preserve the user’s Granite/Quincy 18-hole routing; do not conflate it with Milton."
+      "identityNote": "Verify all physical nines. Preserve the user’s Granite/Quincy 18-hole routing; do not conflate it with Milton.",
+      "catalogId": "granite-links",
+      "coverage": {
+        "holes": 27,
+        "guides": 27,
+        "maps": 27
+      },
+      "sourceUrls": [
+        "https://offcourse.co/courses/scorecard/granite-links-golf-club/",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-71.060,42.236,-71.038,42.252",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-71.075,42.240,-71.055,42.252",
+        "https://ncrdb.usga.org/courseTeeInfo?CourseID=29626",
+        "https://ncrdb.usga.org/courseTeeInfo?CourseID=29627",
+        "https://ncrdb.usga.org/courseTeeInfo?CourseID=29628"
+      ],
+      "retrieved": "2026-10-28"
     },
     {
       "queueId": "bass-river-golf-course",
       "savedName": "Bass River Golf Course",
       "canonicalName": "Bass River Golf Course",
       "aliases": [
-        "Bass River Golf Course"
+        "Bass River Golf Course",
+        "Bass River"
       ],
       "region": "MA",
       "priority": 12,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-bassriver-20260821"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null
+      "completionCommit": null,
+      "catalogId": "bass-river",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.golfyarmouth.com/bass-river",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-70.190,41.664,-70.162,41.687"
+      ],
+      "retrieved": "2026-10-28"
     },
     {
       "queueId": "islands-end-golf-and-country-club",
@@ -1071,9 +1339,21 @@
       "evidence": [
         "coach-feed.json#add-islandsend-20260821"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "source-gap",
+      "coverageGaps": [
+        {
+          "scope": "interactive-map",
+          "reason": "No original hole routes were present in OpenStreetMap and no official source supplied reusable hole geometry during the bounded October 28 research pass. Scorecard findings retained; onboarding deferred rather than inventing coordinates."
+        }
+      ],
+      "completionCommit": null,
+      "sourceUrls": [
+        "https://islandsendgolf.com/course/",
+        "https://zommagolf.com/courses/ny/islands-end-golf-and-country-club",
+        "https://openyardage.com/en/course/islands-end-golf-and-country-club.html"
+      ],
+      "retrieved": "2026-10-28",
+      "identityNote": "Greenport, NY identity confirmed. Full scorecard found; original hole geometry remains unavailable."
     },
     {
       "queueId": "new-york-country-club",
@@ -1088,9 +1368,25 @@
       "evidence": [
         "coach-feed.json#add-newyorkcc-20260821"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "source-gap",
+      "coverageGaps": [
+        {
+          "scope": "interactive-map",
+          "reason": "The OSM course outline has no original hole routes. Proprietary third-party flyovers were not repurposed as offline geometry during the bounded October 28 research pass. Scorecard findings retained; onboarding deferred."
+        },
+        {
+          "scope": "scorecard",
+          "reason": "Published per-hole yardages conflict with current USGA total lengths, so no edition was silently mixed or selected."
+        }
+      ],
+      "completionCommit": null,
+      "sourceUrls": [
+        "https://zommagolf.com/courses/ny/new-york-country-club",
+        "https://ncrdb.usga.org/",
+        "https://openyardage.com/en/course/new-york-country-club.html"
+      ],
+      "retrieved": "2026-10-28",
+      "identityNote": "New Hempstead, NY identity confirmed; map licensing and current-card reconciliation remain unresolved."
     },
     {
       "queueId": "metedeconk-national",
@@ -1569,53 +1865,251 @@
     {
       "queueId": "basin-harbor-club",
       "savedName": "Basin Harbor Club",
-      "canonicalName": "Basin Harbor Club",
+      "canonicalName": "The Golf Club at Basin Harbor",
       "aliases": [
-        "Basin Harbor Club"
+        "Basin Harbor Club",
+        "Basin Harbor Golf Course",
+        "The Golf Club At Basin Harbor"
       ],
       "region": "VT",
       "priority": 36,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-basinharbor-20260729"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null
+      "completionCommit": null,
+      "catalogId": "basin-harbor",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.golfify.io/courses/basin-harbor-club",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-73.373,44.182,-73.356,44.198",
+        "https://basinharborgolfclub.com/",
+        "https://www.basinharbor.com/golf/"
+      ],
+      "retrieved": "2026-10-28"
     },
     {
       "queueId": "vermont-national-country-club",
       "savedName": "Vermont National Country Club",
       "canonicalName": "Vermont National Country Club",
       "aliases": [
-        "Vermont National Country Club"
+        "Vermont National Country Club",
+        "Vermont National"
       ],
       "region": "VT",
       "priority": 37,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-vermontnat-20260729"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null
+      "completionCommit": null,
+      "catalogId": "vermont-national",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.vermontnational.com/Golf/Vermont_National_Country_Club",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-73.205,44.415,-73.165,44.445",
+        "https://www.vermontnational.com/Golf/Vermont_National_Country_Club_Womens"
+      ],
+      "retrieved": "2026-10-28"
     },
     {
       "queueId": "fox-hollow-golf-club",
       "savedName": "Fox Hollow Golf Club",
       "canonicalName": "Fox Hollow Golf Club",
       "aliases": [
-        "Fox Hollow Golf Club"
+        "Fox Hollow Golf Club",
+        "Fox Hollow Golf Club (NJ)",
+        "Fox Hollow (NJ)"
       ],
       "region": "NJ",
       "priority": 38,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-foxhollow-20260729"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null
+      "completionCommit": null,
+      "catalogId": "fox-hollow",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.foxhollowgc.com/golf/course",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-74.725,40.605,-74.690,40.632",
+        "https://ncrdb.usga.org/courseTeeInfo?CourseID=13407"
+      ],
+      "retrieved": "2026-10-28"
     },
     {
       "queueId": "trenton-country-club",
@@ -2181,7 +2675,7 @@
       "completionCommit": null
     }
   ],
-  "reconciled": "2026-10-21",
+  "reconciled": "2026-10-28",
   "sourcePolicy": "Frozen seed courses plus course-add/course-remove entries from the current ordered app feeds. Bucket-list and simulator-only records excluded; autocomplete is not play evidence.",
   "excluded": [
     {
@@ -2212,9 +2706,9 @@
   ],
   "progress": {
     "savedPlayedEntries": 49,
-    "catalogSupportedEntries": 14,
-    "fullyMappedEntries": 11,
-    "remainingUniqueEntries": 34,
+    "catalogSupportedEntries": 19,
+    "fullyMappedEntries": 16,
+    "remainingUniqueEntries": 29,
     "duplicateUmbrellaEntries": 1
   },
   "exceptions": [

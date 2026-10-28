@@ -1,0 +1,295 @@
+{
+  "id": "bass-river",
+  "name": "Bass River Golf Course",
+  "shortName": "Bass River",
+  "place": "South Yarmouth, MA",
+  "aliases": [
+    "Bass River"
+  ],
+  "storageKey": "bass_river_golf_course",
+  "bounds": [
+    41.6705,
+    -70.1822,
+    41.6808,
+    -70.1712
+  ],
+  "center": [
+    41.67565,
+    -70.1767
+  ],
+  "par": 72,
+  "defaultTee": "white",
+  "verified": "2026-10-28",
+  "source": "https://www.golfyarmouth.com/bass-river",
+  "sourceLabel": "Official 2026 scorecard and course tour",
+  "tour": "https://www.golfyarmouth.com/bass-river",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-70.190,41.664,-70.162,41.687",
+  "cardNote": "The official 2026 downloadable scorecard and hole tour provide the pars, yardages and handicaps. The course page’s introductory sentence incorrectly calls hole 9 a 169-yard par 3; its detailed hole 9 tour and scorecard show 355 yards and par 4, while hole 15 is the 169-yard par 3. The published Red row is omitted because its displayed hole values do not reconcile to its printed total. All 18 numbered routes lie inside the Bass River boundary. Six raw OSM par tags conflict with the official card and are preserved with explicit audit corrections. Retrieved October 28, 2026.",
+  "tees": [
+    {
+      "id": "back",
+      "name": "Back",
+      "total": 6138,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        258,
+        406,
+        510,
+        525,
+        170,
+        350,
+        485,
+        350,
+        355,
+        356,
+        358,
+        290,
+        129,
+        488,
+        169,
+        204,
+        310,
+        425
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 5716,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        247,
+        380,
+        440,
+        495,
+        151,
+        333,
+        470,
+        340,
+        339,
+        340,
+        348,
+        275,
+        120,
+        460,
+        150,
+        143,
+        285,
+        400
+      ]
+    },
+    {
+      "id": "silver",
+      "name": "Silver",
+      "total": 5105,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        205,
+        275,
+        422,
+        420,
+        140,
+        285,
+        360,
+        300,
+        320,
+        335,
+        341,
+        272,
+        110,
+        425,
+        150,
+        135,
+        280,
+        330
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 15,
+      "osmId": 1222219723,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 1,
+      "osmId": 1222219722,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 3,
+      "par": 5,
+      "si": 5,
+      "osmId": 1222219721,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 4,
+      "par": 5,
+      "si": 3,
+      "osmId": 1222219720,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 5,
+      "par": 3,
+      "si": 17,
+      "osmId": 1222219719,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 7,
+      "osmId": 1222219718,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 5,
+      "si": 9,
+      "osmId": 1222219717,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 8,
+      "par": 4,
+      "si": 11,
+      "osmId": 1222219716,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 13,
+      "osmId": 1222219715,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 8,
+      "osmId": 1222219714,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 6,
+      "osmId": 1222219713,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 10,
+      "osmId": 1222219712,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 13,
+      "par": 3,
+      "si": 18,
+      "osmId": 1222219711,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 14,
+      "par": 5,
+      "si": 4,
+      "osmId": 1222219710,
+      "prompt": "Build a three-shot route first, then compare the aggressive option with your own carry distances and the day’s conditions."
+    },
+    {
+      "n": 15,
+      "par": 3,
+      "si": 16,
+      "osmId": 1222219709,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 16,
+      "par": 3,
+      "si": 14,
+      "osmId": 1222219708,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 17,
+      "par": 4,
+      "si": 12,
+      "osmId": 1222219707,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 2,
+      "osmId": 1222219706,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    }
+  ],
+  "routeTagCorrections": [
+    {
+      "id": 1222219714,
+      "field": "par",
+      "from": "3",
+      "to": "4",
+      "source": "https://www.golfyarmouth.com/bass-river",
+      "confirmed": "2026-10-28",
+      "note": "Original numbered route retained; official 2026 scorecard and detailed course tour establish the current par."
+    },
+    {
+      "id": 1222219711,
+      "field": "par",
+      "from": "4",
+      "to": "3",
+      "source": "https://www.golfyarmouth.com/bass-river",
+      "confirmed": "2026-10-28",
+      "note": "Original numbered route retained; official 2026 scorecard and detailed course tour establish the current par."
+    },
+    {
+      "id": 1222219710,
+      "field": "par",
+      "from": "4",
+      "to": "5",
+      "source": "https://www.golfyarmouth.com/bass-river",
+      "confirmed": "2026-10-28",
+      "note": "Original numbered route retained; official 2026 scorecard and detailed course tour establish the current par."
+    },
+    {
+      "id": 1222219709,
+      "field": "par",
+      "from": "4",
+      "to": "3",
+      "source": "https://www.golfyarmouth.com/bass-river",
+      "confirmed": "2026-10-28",
+      "note": "Original numbered route retained; official 2026 scorecard and detailed course tour establish the current par."
+    },
+    {
+      "id": 1222219707,
+      "field": "par",
+      "from": "5",
+      "to": "4",
+      "source": "https://www.golfyarmouth.com/bass-river",
+      "confirmed": "2026-10-28",
+      "note": "Original numbered route retained; official 2026 scorecard and detailed course tour establish the current par."
+    },
+    {
+      "id": 1222219706,
+      "field": "par",
+      "from": "3",
+      "to": "4",
+      "source": "https://www.golfyarmouth.com/bass-river",
+      "confirmed": "2026-10-28",
+      "note": "Original numbered route retained; official 2026 scorecard and detailed course tour establish the current par."
+    }
+  ]
+}

@@ -161,10 +161,9 @@ Captions (`#cp-fly-caption`) show only what the app already states — the score
 
 Interactive maps distinguish the blue T tee icon (blue location dot when using GPS), green flag, and red target/club landing pin. Google 3D uses static SVG templates without importing the optional marker library; Simple map uses the same tee/flag artwork. Marker identities remain stable and geographic positions are unchanged.
 
-Rounds leads with **Explore courses**. Generic entry opens the nearest supported course using the same saved `S.here` location as Live Round. The picker sorts by straight-line distance and labels miles. Explicit course links keep their intended course; hole navigation and redraws never auto-select another course. Use my location refreshes the shared fix on a deliberate tap; a late callback must not interrupt navigation. No location means stable catalog order. Reset view beside the map-style controls returns 3D to its starting tee camera and Simple map to the focused hole without clearing targets or notes. Browser double-tap zoom is disabled with `touch-action:manipulation`, retaining pinch zoom and scrolling. The picker contains nine courses: Pound Ridge, Wianno, Sterling Farms, Metedeconk,
-Lakeside (Penn Yan), Oak Hills Park, Richter Park and Fairchild Wheeler Black/Red.
-Metedeconk has 27 physical holes and three nine selectors; the others have 18.
-There are 171 scorecard holes, 169 guides and 160 enabled measuring maps.
+Rounds leads with **Explore courses**. Generic entry opens the nearest supported course using the same saved `S.here` location as Live Round. The picker sorts by straight-line distance and labels miles. Explicit course links keep their intended course; hole navigation and redraws never auto-select another course. Use my location refreshes the shared fix on a deliberate tap; a late callback must not interrupt navigation. No location means stable catalog order. Reset view beside the map-style controls returns 3D to its starting tee camera and Simple map to the focused hole without clearing targets or notes. Browser double-tap zoom is disabled with `touch-action:manipulation`, retaining pinch zoom and scrolling. The picker contains 19 catalog courses and 369 physical scorecard holes.
+Metedeconk, Beekman and Granite Links each have 27 physical holes with explicit nine selectors and ordered routings; the others have 18.
+There are 367 guides and 356 enabled measuring maps.
 Metedeconk 19–27 have official illustrations but no verified measuring route.
 Lakeside 2 and 6 have neither guide nor map while route/card discrepancies are checked. Individual standing plans and
 Explorer link directly to their course. Every supported live hole opens its own map
@@ -406,6 +405,35 @@ explicit `mapVerification`; do not generalize that exception without card, route
 course-placement evidence. `batch-2026-10-21.json` holds source hashes and arithmetic.
 The cap remains five after the second batch: retrieval parallelizes, but identity and
 map review are still judgment-bound.
+
+**Course expansion (v266):** The October 28 batch adds Granite Links, Bass River,
+The Golf Club at Basin Harbor, Vermont National and Fox Hollow (Branchburg, NJ) as
+on-demand nonfavorites: 99 new physical holes, 99 guides and 99 interactive maps.
+Granite is one 27-hole facility with Granite, Quincy and Milton nines. Physical IDs
+1–9, 10–18 and 19–27 distinguish them; `sourceRef` remains 1–9 on each nine and
+`sourceNineTag:"golf:links"` validates the original OSM physical-nine tag. All six
+ordered combinations are available, with Jack's saved Granite/Quincy routing first.
+Do not collapse or rewrite the historical Granite Links round.
+
+Bass River uses the official 2026 card and detailed course tour. The page's introductory
+hole-9 sentence conflicts with its own detailed tour/card; hole 9 remains the card's
+355-yard par 4 and hole 15 is the 169-yard par 3. Six raw OSM par tags are preserved
+under explicit `routeTagCorrections`. The Red row is omitted because its hole values
+do not reconcile to its printed total. Basin Harbor uses one internally consistent
+published card because the new official site has identity/course details but no card;
+other public editions conflict and are not mixed. Vermont National omits Gold/Blue
+because displayed holes total 6,342 while the official page prints 6,292. Fox Hollow
+uses the club's posted image but omits rating/slope because the current USGA lengths
+conflict materially with that image. `batch-2026-10-28.json` records source hashes,
+tee arithmetic and the 99/99 route-to-green review.
+
+Islands End and New York Country Club remain `source-gap` queue entries after a bounded
+pass: neither exposes reusable original hole routes, and New York Country Club also has
+unreconciled scorecard/USGA lengths. Do not substitute proprietary flyovers or town pins.
+The queue now has 19 supported saved entries (16 fully mapped), 29 remaining unique
+entries and one onboarding-only Bonita Bay duplicate. After three successful five-course
+batches, the cap remains five: the latest run reached full coverage, but scorecard edition,
+licensing and physical-route review remain judgment-bound.
 
 The October 14 batch adds 88 guides/maps from original OSM coordinates. Lakeside 2/6
 are withheld because route lengths differ from included official tees by over 100 yards.
@@ -4352,4 +4380,6 @@ Rules for that task: one improvement per run, feature-flag anything that changes
 packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item and update this
 section, and log the run in the handoff.
 History: ball trail + landing puff — v255, PR #79, already merged; v256 exit/safe area also on main.
-Shipped: course records + shareable scorecard image — v264, PR #80 (branch links/20261026-scorecard-share, awaiting Jack's merge).
+Shipped: course records + shareable scorecard image — v264, PR #80, merged. PR #81 owns
+the Links sun-shadow change and was authored as v265; the course batch reserves v266 so
+the branches do not publish the same release number. Preserve both release entries when rebasing.

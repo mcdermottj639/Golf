@@ -193,5 +193,55 @@
     "guides": 18,
     "bytes": 56955,
     "exceptions": []
+  },
+  {
+    "id": "granite-links",
+    "verified": "2026-10-28",
+    "source": "https://offcourse.co/courses/scorecard/granite-links-golf-club/",
+    "holes": 27,
+    "maps": 27,
+    "guides": 27,
+    "bytes": 247248,
+    "exceptions": []
+  },
+  {
+    "id": "bass-river",
+    "verified": "2026-10-28",
+    "source": "https://www.golfyarmouth.com/bass-river",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 101695,
+    "exceptions": []
+  },
+  {
+    "id": "basin-harbor",
+    "verified": "2026-10-28",
+    "source": "https://www.golfify.io/courses/basin-harbor-club",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 132717,
+    "exceptions": []
+  },
+  {
+    "id": "vermont-national",
+    "verified": "2026-10-28",
+    "source": "https://www.vermontnational.com/Golf/Vermont_National_Country_Club",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 210334,
+    "exceptions": []
+  },
+  {
+    "id": "fox-hollow",
+    "verified": "2026-10-28",
+    "source": "https://www.foxhollowgc.com/golf/course",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 126516,
+    "exceptions": []
   }
 ]

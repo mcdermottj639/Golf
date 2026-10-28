@@ -50,7 +50,7 @@ const courses=ids.map(id=>{
     const way=raw.features.find(f=>f.id===h.osmId);
     assert.ok(way,id+': missing source way for hole '+h.n);
     assert.equal(way.tags.golf,'hole');assert.equal(+way.tags.ref,h.sourceRef||h.n);
-    if(h.sourceNine)assert.equal(way.tags['golf:course:name'],h.sourceNine,id+': wrong physical nine for hole '+h.n);
+    if(h.sourceNine)assert.equal(way.tags[c.sourceNineTag||'golf:course:name'],h.sourceNine,id+': wrong physical nine for hole '+h.n);
     if(way.tags.par!==undefined){
       const correction=routeTagCorrections.get(way.id);
       if(correction)assert.equal(+correction.to,h.par,id+': corrected route par mismatch');
