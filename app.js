@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v266';
+const BUILD = 'v267';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v267', d:'2026-10-30', items:['SHADOWS FALL AWAY FROM THE SUN IN LINKS: In the 3D view every tree now throws a long shadow across the ground away from the afternoon sun instead of a round blob parked beside its trunk, the flagstick casts a thin strip on the green, and your ball\'s shadow slides along the ground under it as the ball climbs, so you can read how high a shot is from behind. Scenery only: no lie, bounce, score or course data changes.'] },
   { b:'v266', d:'2026-10-28', items:['FIVE MORE COURSES: Granite Links, Bass River, Basin Harbor, Vermont National and Fox Hollow (NJ) now have on-demand packs — 99 new hole guides and 99 interactive maps.','EXACT ROUTES & HONEST CARDS: Granite keeps Granite, Quincy and Milton distinct and defaults to your Granite/Quincy routing. Conflicting scorecard rows and ratings are omitted instead of blended; Islands End and New York Country Club stay queued until reusable hole geometry is available. Existing rounds, notes, targets and downloads are unchanged.'] },
   { b:'v264', d:'2026-10-26', items:['LINKS SCORECARD YOU CAN SHARE: Finish a round and the screen now shows a scorecard image — course, date, tees, your score to par, every hole with birdie circles and bogey squares, fairways, greens, putts and longest drive. Share scorecard opens your phone\'s share sheet (or saves the PNG); long-press the picture to save it too. The card says it is a simulated game, so it cannot pass for a real-course score.','YOUR RECORD AT EACH COURSE: Links keeps your last 20 completed rounds per course and length. The round-complete screen shows rounds played, best, average and your previous scores there; the course picker reads Best of N once you have played a course more than once. Practice rounds are not recorded, the same rule best scores already follow. Game preferences only — nothing touches your golf records.'] },
   { b:'v263', d:'2026-10-24', items:['BAG: Returned DS-ADAPT 3-wood and Hi-Toe 58° removed from owned equipment and playing selectors. Past shots remain in history.'] },

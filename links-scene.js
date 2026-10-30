@@ -26,6 +26,13 @@ export async function create(canvas,onLost){
   const camera=new T.PerspectiveCamera(49,1,.5,1800),ray=new T.Raycaster(),plane=new T.Plane(new T.Vector3(0,1,0),0);
   const hemi=new T.HemisphereLight('#eaf4ff','#4a542a',1.6);scene.add(hemi);
   const sun=new T.DirectionalLight('#fff1cc',2.0);sun.position.set(-120,170,80);scene.add(sun);
+  // Sun-cast shadows (PR #81, v267): every ground shadow is thrown from the one light above, so trees, the flag and the
+  // ball all shade the same way. dir = the sun's ground direction away from it; stretch = cot(elevation), how far
+  // a point at height 1 throws its shadow; along = 1/sin(elevation), how much a round shape lengthens on the ground.
+  // The light sits south-west and ~50° up, a fixed afternoon; shadows never change a lie, a bounce or a score.
+  const SUN=(()=>{const d=sun.position.clone().normalize(),horiz=Math.hypot(d.x,d.z);const dir=new T.Vector3(-d.x/horiz,0,-d.z/horiz);
+    const flat=new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),Math.atan2(-dir.x,-dir.z)).multiply(new T.Quaternion().setFromAxisAngle(new T.Vector3(1,0,0),-Math.PI/2));
+    return{dir,stretch:horiz/d.y,along:1/d.y,flat,elevation:Math.asin(d.y)};})();
   let root=new T.Group();scene.add(root);let key='',origin=[0,0],W=1,H=1,disposed=false,valid=false,lastRender=0;
   const temp=new T.Vector3(),dummy=new T.Object3D(),col=new T.Color();
   const materials={},textures=[foliage];
@@ -46,7 +53,7 @@ export async function create(canvas,onLost){
   leafMat.onBeforeCompile=shader=>{shader.vertexShader=shader.vertexShader.replace('#include <project_vertex>',`vec4 mvPosition=modelViewMatrix*instanceMatrix*vec4(0.,0.,0.,1.);mvPosition.xy+=position.xy*vec2(length(instanceMatrix[0].xyz),length(instanceMatrix[1].xyz));gl_Position=projectionMatrix*mvPosition;`);};
   const markerMat=new T.MeshStandardMaterial({color:'#244c69',roughness:.8});
   const ball=new T.Mesh(new T.SphereGeometry(.15,24,16),new T.MeshStandardMaterial({color:'#fffef4',roughness:.35}));scene.add(ball);
-  const ballShadow=new T.Mesh(new T.PlaneGeometry(1,1),shadowMat.clone());ballShadow.rotation.x=-Math.PI/2;scene.add(ballShadow);
+  const ballShadow=new T.Mesh(new T.PlaneGeometry(1,1),shadowMat.clone());ballShadow.quaternion.copy(SUN.flat);scene.add(ballShadow);
   const club=new T.Group();scene.add(club);
   const head=new T.Mesh(new T.SphereGeometry(1,20,12),new T.MeshStandardMaterial({color:'#253c40',metalness:.75,roughness:.25}));head.scale.set(.4,.19,.3);club.add(head);
   const shaft=new T.Mesh(new T.CylinderGeometry(.018,.024,2.1,8),new T.MeshStandardMaterial({color:'#d7dfe0',metalness:.8,roughness:.2}));shaft.position.set(.22,.98,.08);shaft.rotation.z=-.23;club.add(shaft);
@@ -64,6 +71,9 @@ export async function create(canvas,onLost){
   const flag=new T.Group();scene.add(flag);const pole=new T.Mesh(new T.CylinderGeometry(.035,.035,3,8),new T.MeshStandardMaterial({color:'#faf8e8'}));pole.position.y=1.5;flag.add(pole);
   const cloth=new T.Mesh(new T.PlaneGeometry(1.45,.85),new T.MeshStandardMaterial({color:'#e94c3b',side:T.DoubleSide}));cloth.position.set(.72,2.65,0);flag.add(cloth);
   const cup=new T.Mesh(new T.CircleGeometry(.12,16),new T.MeshBasicMaterial({color:'#172b20'}));cup.rotation.x=-Math.PI/2;cup.position.y=.14;flag.add(cup);
+  // the flagstick's shadow: a thin dark strip on the green, thrown from the 3-yd pole along the sun's ground direction
+  const poleShadow=new T.Mesh(new T.PlaneGeometry(.12,1),new T.MeshBasicMaterial({color:'#0b1a10',transparent:true,opacity:.32,depthWrite:false}));
+  poleShadow.quaternion.copy(SUN.flat);poleShadow.scale.set(1,3*SUN.stretch,1);scene.add(poleShadow);
   const landing=new T.Mesh(new T.RingGeometry(.85,1,40),new T.MeshBasicMaterial({color:'#fff6d4',side:T.DoubleSide,transparent:true,depthWrite:false}));landing.rotation.x=-Math.PI/2;scene.add(landing);
   const V=(p,y=0)=>new T.Vector3(p[0]-origin[0],y,-p[1]+origin[1]);
   function releaseRoot(){root.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.isInstancedMesh)o.dispose();});scene.remove(root);root=new T.Group();scene.add(root);}
@@ -96,7 +106,10 @@ export async function create(canvas,onLost){
     trees.forEach((t,i)=>{
       const p=V(t.p),height=t.r*(2.8+t.s*.8);
       dummy.position.set(p.x,height/2,p.z);dummy.rotation.set(0,0,0);dummy.scale.set(height*.72,height,1);dummy.updateMatrix();crowns.setMatrixAt(i,dummy.matrix);crowns.setColorAt(i,col.setHSL(.12+t.s*.08,.08+t.s*.1,.7+t.s*.16));
-      dummy.position.set(p.x+t.r*.7,.11,p.z+t.r*.6);dummy.rotation.set(-Math.PI/2,0,0);dummy.scale.set(t.r*3.5,t.r*2.5,1);dummy.updateMatrix();shade.setMatrixAt(i,dummy.matrix);
+      // the canopy's shadow: a soft ellipse thrown from the crown's centre (about 62% of the way up) away from the sun,
+      // longer along that line than across it. v255–v264 parked a round blob beside every trunk on the same side whatever the light.
+      const cr=height*.34,hc=height*.62;
+      dummy.position.set(p.x+SUN.dir.x*hc*SUN.stretch,.11,p.z+SUN.dir.z*hc*SUN.stretch);dummy.quaternion.copy(SUN.flat);dummy.scale.set(cr*2.6,cr*2.6*SUN.along,1);dummy.updateMatrix();shade.setMatrixAt(i,dummy.matrix);
     });
     for(const m of [shade,crowns]){m.instanceMatrix.needsUpdate=true;m.computeBoundingSphere();root.add(m);}if(crowns.instanceColor)crowns.instanceColor.needsUpdate=true;
     // An address mat and markers make the playable tee legible; decorative only.
@@ -104,7 +117,7 @@ export async function create(canvas,onLost){
     address.rotation.x=-Math.PI/2;address.scale.set(4,7,1);address.position.copy(V(h.tee,.045));root.add(address);
     const direction=V(h.path[1]).sub(V(h.tee)).normalize(),side=new T.Vector3(-direction.z,0,direction.x);
     for(const sign of [-1,1]){const marker=new T.Mesh(new T.BoxGeometry(.3,.22,.3),markerMat);marker.position.copy(V(h.tee,.2)).addScaledVector(side,sign*2.2);root.add(marker);}
-    flag.position.copy(V(h.pin,.02));
+    flag.position.copy(V(h.pin,.02));poleShadow.position.copy(V(h.pin,.03)).addScaledVector(SUN.dir,1.5*SUN.stretch);
   }
   function render({course,h,ballState,anim,fx,forecast,angle,reduced,pulling,landing:scout}){
     if(disposed)return;setHole(course,h);
@@ -127,7 +140,9 @@ export async function create(canvas,onLost){
     camera.lookAt(look);camera.updateMatrixWorld();valid=true;
     ball.position.copy(bp);ball.position.y+=ballState.lie==='tee'&&!flight?.25:.21;ball.visible=!ballState.holed;
     ball.scale.setScalar(flight?Math.max(1,camera.position.distanceTo(ball.position)*.012):1);
-    ballShadow.position.copy(V(pos,.12));ballShadow.scale.setScalar(.65+.4/(1+height/45));ballShadow.material.opacity=.65/(1+height/45);ballShadow.visible=ball.visible;
+    // the ball's shadow sits under it on the ground and slides away from the sun as the ball climbs (height × cot elevation),
+    // so a high shot reads as high from behind; it still shrinks and fades with height as before
+    const sz=.65+.4/(1+height/45);ballShadow.position.copy(V(pos,.12)).addScaledVector(SUN.dir,height*SUN.stretch);ballShadow.scale.set(sz,sz*SUN.along,1);ballShadow.material.opacity=.65/(1+height/90);ballShadow.visible=ball.visible; // fades half as fast as v258 so the sliding shadow stays readable at apex
     const id=ballState.club.id||'',wedge=/°|wedge|^[PAGSL]W$|^\d{2}$/i.test(id),blade=ballState.club.putter||wedge||/i$|putt/i.test(id);
     head.visible=!blade;iron.visible=blade;iron.rotation.x=wedge?-.65:-.3;
     head.scale.set(/^dr$/i.test(id)?.4:.29,.15,.26);
@@ -156,5 +171,5 @@ export async function create(canvas,onLost){
   function unproject(x,y){ray.setFromCamera(new T.Vector2(x/W*2-1,1-y/H*2),camera);const hit=ray.ray.intersectPlane(plane,temp);if(!hit||hit.distanceTo(camera.position)>650)return null;return[hit.x+origin[0],origin[1]-hit.z];}
   function lost(e){e.preventDefault();if(!disposed)onLost?.();}canvas.addEventListener('webglcontextlost',lost);
   function dispose(){if(disposed)return;disposed=true;canvas.removeEventListener('webglcontextlost',lost);const geoms=new Set(),mats=new Set([...Object.values(materials),...Object.values(groundMaterials)]);scene.traverse(o=>{if(o.geometry)geoms.add(o.geometry);if(o.material){for(const m of(Array.isArray(o.material)?o.material:[o.material]))mats.add(m);}if(o.isInstancedMesh)o.dispose();});for(const g of geoms)g.dispose();for(const m of mats)m.dispose();for(const t of textures)t.dispose();renderer.dispose();renderer.forceContextLoss();}
-  return{render,project,unproject,dispose,reset:()=>{valid=false;},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,camera:camera.position.toArray()})};
+  return{render,project,unproject,dispose,reset:()=>{valid=false;},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,camera:camera.position.toArray(),sun:{dir:[SUN.dir.x,SUN.dir.z],elevationDeg:Math.round(SUN.elevation*180/Math.PI*10)/10,stretch:SUN.stretch},ballShadow:ballShadow.position.toArray(),ballPos:ball.position.toArray(),poleShadow:poleShadow.position.toArray()})};
 }

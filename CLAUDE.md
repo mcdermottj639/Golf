@@ -4118,7 +4118,7 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
-## Caddie HQ Links — the course game (v261, October 23 2026)
+## Caddie HQ Links — the course game (v267, October 30 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own
 bag. Full shots use a behind-ball 3D view and a following camera; putting and the optional hole map remain 2D. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
@@ -4212,6 +4212,28 @@ tests. Tiny height offsets alone allowed competing ground surfaces at shallow ca
 the stack removes that conflict without changing course geometry or scoring. Near clip is 0.5 yd.
 This addresses Jack's recorded fairway flicker; native iPhone GPU reproduction/confirmation is pending.
 
+**Sun-cast shadows (v267, PR #81; authored as v265).** One `SUN` record in `links-scene.js`, derived from the existing
+directional light (south-west, 49.7° up — a fixed afternoon), drives every ground shadow in the 3D view:
+`dir` is the light's ground direction away from the sun, `stretch` = cot(elevation) is how far a point
+at height 1 throws its shadow, `along` = 1/sin(elevation) is how much a round shape lengthens, and
+`flat` is the quaternion that lays a unit plane on the ground pointing along `dir`. A tree's canopy
+shadow is an ellipse thrown from the crown's centre (62% of the tree's height) by `hc × stretch`,
+`0.88 × height` across and `along` times that lengthwise — v255–v264 parked a round blob beside every
+trunk on the same side whatever the light. The flagstick throws a 0.12-yd strip `3 × stretch` long from
+the pin. The ball's shadow sits under a resting ball and slides along `dir` by `height × stretch` in
+flight, still shrinking with height but fading half as fast as v258 (`.65/(1+h/90)`) so it stays
+readable at apex. Shadows are the same `shadowMat` radial texture as before (instanced for trees), so
+the frame cost is unchanged: `debug().drawMs()` measured 4.24 → 2.46 ms at 390 and 2.31 → 1.36 ms at
+320 in headless SwiftShader, the same 27–28 draw calls, which is noise either way. The 2D hole map and
+putting view keep their stylised fixed-offset blobs; `scene.info()` now reports `sun`, `ballShadow`,
+`ballPos` and `poleShadow` so a test can assert where a shadow went. Verified by
+`tests/links-shadows-browser.cjs`: an isolated-renderer fixture reads WebGL pixels (ground under the thrown
+shadow darker than the mirrored point and open fairway; the sun side of the trunk unshaded; flight offset
+16.97 yd at 20 yd up along `dir`; the pole strip 1.5 × stretch from the pin), then the real app at
+390×844 and 320×690 (14 courses, Wianno, 3D triangles, slingshot flight → aim, map paints, Night mode,
+Quit and re-enter, golf state unchanged, zero errors). Nothing about a lie, bounce, score or pack changes,
+so it is not behind a flag.
+
 **Landing inspection.** Landing spot moves to an elevated close-up centered on the current
 predicted carry point. Its anchor and heading stay fixed during tap/drag aiming; it never moves
 the ball or takes a stroke. Back to tee/ball returns to the address view with aim/club/shape intact.
@@ -4278,8 +4300,9 @@ Distances during the pull update with power. Do not rescale routes to force agre
 
 **Visual polish (v258).** Separate metal iron/wedge blades with grooves versus wood heads, grip and
 power-linked club animation. Bunker lips have decorative relief within/at polygon borders, while
-scoring polygons stay unchanged. Pin badge and red flag improve visibility. The 3D ball shadow now
-shrinks/fades with altitude using its own material, without affecting tree shadows. Bunker lip depth
+scoring polygons stay unchanged. Pin badge and red flag improve visibility. The 3D ball shadow
+shrinks/fades with altitude using its own material, without affecting tree shadows (the PR #81 shadow change keeps the
+shrink, halves the fade and moves it with the sun — see *Sun-cast shadows*). Bunker lip depth
 is illustrative, not a surveyed measurement; ground remains planar.
 
 **Accuracy.** Geometry coverage varies. Pound Ridge's current pack contains routes but only two
@@ -4372,14 +4395,16 @@ browser checks, not a claim of an on-device Safari test.
 **v256 safe exit.** The in-game body supplies top safe-area padding because its normal masthead is hidden. A 44 px minimum Back to Caddie HQ button calls the app bridge to render Home; render unmounts Links and restores the masthead/navigation. Leaving discards the current game without changing golf records. Keep this exit visible when adjusting viewport sizing.
 
 **Backlog.** Surveyed terrain elevations and fuller feature coverage are needed for faithful course
-rehearsal. Graphics: improved canopies/shadows, water animation, 3D putting when it can preserve
-readability. The current renderer already includes textured surfaces and decorative trees. Game: per-club dispersion from every bay session instead of
+rehearsal. Graphics: improved canopies (the shadows half of that item is in PR #81, v267), water animation,
+3D putting when it can preserve readability. The current renderer already includes textured surfaces and decorative trees. Game: per-club dispersion from every bay session instead of
 the built-in table; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry.
 Standing plans are now available from each hole.
 Rules for that task: one improvement per run, feature-flag anything that changes scoring, never touch
 packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item and update this
 section, and log the run in the handoff.
 History: ball trail + landing puff — v255, PR #79, already merged; v256 exit/safe area also on main.
-Shipped: course records + shareable scorecard image — v264, PR #80, merged. PR #81 owns
-the Links sun-shadow change and was authored as v265; the course batch reserves v266 so
-the branches do not publish the same release number. Preserve both release entries when rebasing.
+Shipped: course records + shareable scorecard image — v264, PR #80, merged to main as da3ab17 on October 26.
+Shipped: sun-cast shadows for trees, flagstick and ball — PR #81 (branch links/20261028-sun-shadows, awaiting
+Jack's merge). Authored as v265 on October 28; the course batch took v266 on main the same day, so the branch
+was rebased onto v266 on October 30 and renumbered v267 (BUILD = CACHE = next integer after main). Both release
+entries are preserved. If main moves again before the merge, rebase and renumber the same way.
