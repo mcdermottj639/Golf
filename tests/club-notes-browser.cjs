@@ -11,13 +11,14 @@ const {server,chromium,state,ready}=require('./course-prep-browser.cjs');
   const ctx=await browser.newContext({viewport:{width,height},serviceWorkers:'block'}),p=await ctx.newPage(),errors=[];
   p.on('pageerror',e=>errors.push(e.message));
   await p.goto('http://127.0.0.1:'+server.address().port);await ready(p);
-  await p.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('link21-note-scan-20261031'));
+  await p.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')||'{}').feedApplied?.includes('spider-tourx-bench-20261031'));
   const st=await state(p);const link=st.clubs.find(c=>/LINK\.2\.1/.test(c.name));
   await p.locator('#nav button[data-view="bag"]').click();
   const item=p.locator('details.bag-item',{hasText:'LINK.2.1'}).first();
   await item.scrollIntoViewIfNeeded();await item.locator('summary').first().click();
   const det=item.locator('.bag-detail');
-  assert.equal(await det.locator('.clubkeys .ck').count(),4,'four fact tiles');
+  assert.equal(await det.locator('.clubkeys .ck').count(),5,'five fact tiles');
+  assert.match(await item.locator('summary small').first().innerText(),/34″|34"/,'LINK length in spec line');
   const more=det.locator('details.more');assert.equal(await more.count(),1,'history folded');
   assert.equal(await more.evaluate(e=>e.open),false,'folded by default');
   const visible=(await det.innerText()).length;console.log('visible chars',visible);
@@ -31,7 +32,24 @@ const {server,chromium,state,ready}=require('./course-prep-browser.cjs');
   assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'no sideways scroll');
   assert.deepEqual(errors,[]);
   if(width===320){await more.locator('summary').click();await item.screenshot({path:'/tmp/link320.png'});}
-  console.log('PASS club notes',width);await ctx.close();
+  // v272 putter lengths: Newport 35", Spider added to the bench at 34" on a fresh install.
+  const s2=await state(p);
+  assert.equal(s2.clubs.find(c=>c.name==='Scotty Newport 2').length,'35"');
+  const sp=s2.clubs.filter(c=>/spider\s*tour\s*x/i.test(c.name));assert.equal(sp.length,1,'one spider');
+  assert.equal(sp[0].status,'backup');assert.equal(sp[0].length,'34"');
+  const bf=p.locator('details#bag-bench');
+  if(await bf.count() && !(await bf.evaluate(e=>e.open))) await bf.locator('summary').first().click();
+  assert.match(await p.locator(`.bench-item[data-club-id="${sp[0].id}"]`).innerText(),/34"/,'bench shows 34"');
+  // A Spider he added by hand (own id/spelling) is patched in place, not duplicated.
+  await p.evaluate(()=>{const s=JSON.parse(localStorage.getItem('caddiehq_v1'));
+    s.clubs=s.clubs.filter(c=>!/spider/i.test(c.name));s.clubs.push({id:'manual-x',name:'Spider Tour X 2024',cat:'putter',status:'backup',spec:'Mallet',rounds:0});
+    s.feedApplied=s.feedApplied.filter(i=>i!=='spider-tourx-bench-20261031');localStorage.setItem('caddiehq_v1',JSON.stringify(s));});
+  await p.reload();await ready(p);
+  await p.waitForFunction(()=>JSON.parse(localStorage.getItem('caddiehq_v1')).feedApplied.includes('spider-tourx-bench-20261031'));
+  const s3=(await state(p)).clubs.filter(c=>/spider/i.test(c.name));
+  assert.equal(s3.length,1);assert.equal(s3[0].id,'manual-x');assert.equal(s3[0].length,'34"');assert.equal(s3[0].name,'Spider Tour X 2024');
+  assert.deepEqual(errors,[]);
+  console.log('PASS club notes + putter lengths',width);await ctx.close();
  }
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);process.exit(1)});

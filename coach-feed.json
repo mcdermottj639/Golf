@@ -51604,6 +51604,75 @@
           }
         ]
       }
+    },
+    {
+      "id": "link21-length-20261031",
+      "type": "club-update",
+      "target": "L.A.B. Golf LINK.2.1",
+      "club": {
+        "length": "34\"",
+        "noteGist": "Kept for good since Aug 12. Only head weight is still unknown.",
+        "noteKeys": [
+          {
+            "k": "Loft",
+            "v": "2° effective ✓",
+            "n": "L.A.B. custom spec panel"
+          },
+          {
+            "k": "Lie",
+            "v": "69° (70° target)",
+            "n": "in tolerance; 1° moves aim 0.07\" at 10 ft"
+          },
+          {
+            "k": "Length",
+            "v": "34\" ✓",
+            "n": "Jack, Oct 31"
+          },
+          {
+            "k": "Grip",
+            "v": "Lamkin Deep Etched",
+            "n": "0° lean · shaft vertical"
+          },
+          {
+            "k": "Unknown",
+            "v": "Head weight",
+            "n": "needs L.A.B. or a scale",
+            "s": "warn"
+          }
+        ]
+      }
+    },
+    {
+      "id": "newport2-length-20261031",
+      "type": "club-update",
+      "target": "Scotty Newport 2",
+      "club": {
+        "length": "35\""
+      }
+    },
+    {
+      "id": "spider-tourx-bench-20261031",
+      "type": "club-patch",
+      "match": {
+        "nameIncludes": "spider tour x",
+        "cat": "putter"
+      },
+      "club": {
+        "length": "34\""
+      },
+      "addIfMissing": {
+        "name": "TaylorMade Spider Tour X",
+        "cat": "putter",
+        "status": "backup",
+        "spec": "Mallet · standard lie",
+        "note": "On the bench (Jack, Oct 31). Oct 30 shootout: tightest start line of the three, 3/5 holed from about five feet."
+      }
+    },
+    {
+      "id": "putter-lengths-history-20261031",
+      "type": "history",
+      "date": "2026-10-31",
+      "text": "Putter lengths confirmed by Jack: LINK.2.1 34\", Spider Tour X 34\" (on the bench), Newport 2 35\"."
     }
   ]
 }

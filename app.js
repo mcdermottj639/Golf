@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v271';
+const BUILD = 'v272';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v272', d:'2026-10-31', items:['PUTTER LENGTHS: Your LINK.2.1 and Spider Tour X are 34″ and the Newport 2 is 35″ — each putter now shows its length beside its name in Bag. The LINK’s only open spec is head weight.'] },
   { b:'v271', d:'2026-10-31', items:['CLUB NOTES YOU CAN SCAN: A club in your bag now shows one summary line under its specs, with the long history folded under Full notes, split into short paragraphs. The LINK.2.1 also gets four fact tiles: loft, lie, grip and what is still unknown.'] },
   { b:'v270', d:'2026-10-30', items:['PUTT ROLL PATHS: The Oct 30 putter shootout now draws how every ball actually rolled — one top-down panel per putter, ball at the bottom, cup on top, solid green for holed and dashed for missed. You can see the Spider misses sliding right and the two LINK misses breaking left. The putter head\'s own path is not on it: that camera sits behind the ball, so the head\'s arc needs an overhead or face-on clip.'] },
   { b:'v269', d:'2026-10-30', items:['PUTTER SHOOTOUT AS A PICTURE: The Oct 30 session now opens on a chart — one row per putter, a dot for every putt where it started at the cup, filled when it went in. The long write-up is cut to four lines; how it was measured sits folded underneath.'] },
@@ -2452,7 +2453,7 @@ const UP_TYPE = {
   'lesson-add':['LESSON','u-k'], 'lesson-update':['LESSON','u-k'], 'lesson-remove':['LESSON','u-k'],
   kit:['KIT','u-k'],
   stats:['GHIN','u-u'], carries:['CARRY','u-u'], 'carry-update':['CARRY','u-u'],
-  'club-add':['BAG',''], 'club-update':['BAG',''], history:['BAG',''], 'history-edit':['BAG',''],
+  'club-add':['BAG',''], 'club-patch':['BAG',''], 'club-update':['BAG',''], history:['BAG',''], 'history-edit':['BAG',''],
   briefing:['PLAN',''], 'briefing-remove':['PLAN',''],
   action:['TO-DO',''], 'action-done':['TO-DO',''], 'action-update':['TO-DO',''],
   'course-add':['COURSE',''], 'course-remove':['COURSE',''], geo:['GEO',''],
@@ -3308,7 +3309,7 @@ function clubSpecLine(c){
   const head = () => (c.spec || '').split('·')[0].replace(/\(.*?\)/g, '').trim().toUpperCase();
   const w = wedgeSpec(c);
   if(w) return w;
-  if(c.cat === 'putter') return head() || 'PUTTER';
+  if(c.cat === 'putter') return [head() || 'PUTTER', c.length || ''].filter(Boolean).join(' · ');
   if(typeof c.loft === 'number') return `${c.loft}°`;
   const deg = ((c.spec || '') + ' ' + (c.name || '')).match(/(\d+(?:\.\d+)?)\s*°/);
   if(deg && clubType(c) !== 'IRONS') return `${deg[1]}°`;
@@ -11334,6 +11335,7 @@ function updateLine(e){
     return t.length > n ? t.slice(0, n - 1).trimEnd() + '…' : t; };
   const club = e.club || {}, br = e.briefing || {}, ls = e.lesson || {}, rd = e.round || {};
   switch(e.type){
+    case 'club-patch':    return { h:`Bag update · ${(e.addIfMissing && e.addIfMissing.name) || e.match.nameIncludes}`, s:clip(e.club.note || e.club.length || '', 96), act:go('bag') };
     case 'club-add':      return { h:`New club · ${nm(club) || 'in the bag'}`, s:clip(club.spec || club.note, 96), act:go('bag') };
     // `target` is a club id OR a name, and an id is what most entries carry — so read the
     // NAME back off the club the entry just patched rather than printing "Bag update · c6".
@@ -11524,6 +11526,18 @@ function applyFeed(feed){
       S.grids[e.discipline || 'putting'] = e.evolution;
     }
     else if(e.type === 'club-add' && e.club) S.clubs.push({ id:e.id, rounds:0, ...e.club });
+    // v272: patch a club whose id we cannot know — one he added by hand on the phone gets a
+    // device-generated id and his own spelling. Matches on a normalised name fragment (+cat),
+    // skipping returned/sold clubs; with no match, `addIfMissing` adds it. A new TYPE on
+    // purpose: builds older than v272 leave it unapplied and pick it up after updating.
+    else if(e.type === 'club-patch' && e.match && e.club){
+      const norm = v => String(v || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const want = norm(e.match.nameIncludes);
+      const hits = want ? S.clubs.filter(x => norm(x.name).includes(want) && (!e.match.cat || x.cat === e.match.cat)
+        && !['returned','sold'].includes(x.status)) : [];
+      if(hits.length) hits.forEach(x => Object.assign(x, e.club));
+      else if(e.addIfMissing) S.clubs.push({ id:e.id, rounds:0, ...e.addIfMissing, ...e.club });
+    }
     else if(e.type === 'club-remove'){
       // Manual clubs have device-generated IDs. A scoped match can remove a reported
       // duplicate without touching active equipment or the separate carry/history stores.

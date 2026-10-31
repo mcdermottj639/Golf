@@ -631,6 +631,7 @@ State comes from **two layers merged at runtime**, plus the user's own local edi
 |------------------|--------|
 | `club-add`       | Add a club (`club` object; the entry `id` becomes the club id) |
 | `club-update`    | Patch a club matched by `target` (club `id` **or** `name`); `Object.assign` of `club` |
+| `club-patch`     | (v272) Patch a club whose id is unknown — e.g. one Jack added by hand on the phone — by `match:{nameIncludes, cat}` (normalised substring; returned/sold skipped); with no hit, `addIfMissing` adds it. A NEW type on purpose, so pre-v272 builds leave it unapplied instead of losing it |
 | `history`        | Prepend a bag change-history row (`date`, `text`) |
 | `history-edit`   | Rewrite a history row containing `match` |
 | `session`        | Add a filmed putting session (`date`, `setup`, `finding`, `detail`) |
@@ -760,7 +761,7 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
 | 5-wood | **Cobra Darkspeed X · 19.5°** | **re-lofted Sep 8 2026** from 16.5°, still the green-holding club in the slot the 4-iron vacated. The fairway-finder job moved off it on Sep 8 (to the mini), off the mini on Sep 18 (to the new 3-wood), then to the **2-iron the same night**. With the 3-wood, it is the high-or-draw option off the tee. This head did not change on Sep 18. **Carry still unmeasured.** **Sep 18 after slot:** path **−4.7° → −2.1°** n=8; struck carry 167.4 (first block 179.1) — path improved, distance did not. Open: 16.5 → 19.5 is a 3° move, the full sweep of a typical fairway sleeve, so **read the hosel stamp** |
 | Irons | Cobra KING TEC **5–PW** | **the 4-iron came out Sep 8 2026** to hold the bag at 14 when the mini went back in, and **stays out Sep 18** now the 3-wood is in — kept with the set, not sold. **44° PW** anchors the wedge ladder. **Sep 18 bay:** first-block 7-iron **131.7 n=11** cons 12.4, best 5 **141.8**, path −6.9°, face-to-path **+6.4°**. Later 7-iron (30-shot table) is a window, not a slot baseline: open **113.5 n=2**; run **138.2 n=5** in an 11-yard band, F–P **+3.1°**; rest **128.9 n=20** / best 5 **146.6**, F–P back to **+6.5°**. Path never to −2°. Sep 14 was 135.9 / 12.5. |
 | Wedges | **Vokey 50.08F · TaylorMade Hi-Toe 5 58.10 ATS** | 58° replaced 56° and 60° Sep24; both Vokeys are benched. Sep25 retained 58° batches carry 75.2/75.5 yd. A 54° is only a proposed demo, not owned or added. |
-| Putter | **L.A.B. Golf LINK.2.1** | the only zero-torque head left. Narrow blade, gamed Jul 30 – Aug 1 and again from **Aug 10, 2026**. **KEPT for good Aug 12, 2026** — Jack closed the return window by decision, so `returnWindow:false` and `pendingReturn()` is empty: the Home return-window card is gone and Decisions reads DECIDED. The putter search is over; every remaining explanation for the left miss is aim or stroke, not gear. Carries a **Lamkin Deep Etched** grip (the app said *Pistol 0* Jul 30 – Aug 14; corrected by looking at it — both are 0° lean, so no cue changed): zero built-in lean, shaft vertical, hands ~1.35" behind the ball — that's the live cue. **Loft confirmed 2° effective** (Aug 14, L.A.B.'s spec panel on the *custom* build page — the stock page and every retailer omit it). Still unknown: **as-built length** (34" targeted, never confirmed) and **head weight** (never known on any putter Jack has owned) — both build-order facts, so they need L.A.B., not a website. Its column holds the only two reds on the evolution grid (face at impact, 1.5–1.7° left start line, both measured Jul 30) |
+| Putter | **L.A.B. Golf LINK.2.1** | the only zero-torque head left. Narrow blade, gamed Jul 30 – Aug 1 and again from **Aug 10, 2026**. **KEPT for good Aug 12, 2026** — Jack closed the return window by decision, so `returnWindow:false` and `pendingReturn()` is empty: the Home return-window card is gone and Decisions reads DECIDED. The putter search is over; every remaining explanation for the left miss is aim or stroke, not gear. Carries a **Lamkin Deep Etched** grip (the app said *Pistol 0* Jul 30 – Aug 14; corrected by looking at it — both are 0° lean, so no cue changed): zero built-in lean, shaft vertical, hands ~1.35" behind the ball — that's the live cue. **Loft confirmed 2° effective** (Aug 14, L.A.B.'s spec panel on the *custom* build page — the stock page and every retailer omit it). Still unknown: **as-built length** (34", confirmed by Jack Oct 31) and **head weight** (never known on any putter Jack has owned) — both build-order facts, so they need L.A.B., not a website. Its column holds the only two reds on the evolution grid (face at impact, 1.5–1.7° left start line, both measured Jul 30) |
 | Bullpen | Titleist TSR2 7-wood | used demo · HZRDUS Red CB regular · picked up Aug 12 2026, **owned not gamed**. Stock is around 21°, which since Sep 8 sits just behind the re-lofted 5-wood (19.5°) rather than the 4-iron that has left the bag — so it is still not in the 14 and still not on the carry ladder |
 | Backup | **TaylorMade r7 Quad Mini Driver · 15.5°** | **OUT of the 14 Sep 18 2026**, replaced by the DS-ADAPT X 3-wood. Kept, not sold. Was back in Sep 8 at 15.5° (up 2° from the 13.5° it played until Aug 12). Its Off-the-tee record stays as history. **The Sep 14 TrackMan `3w` 182.4 and the Sep 15 3w groups belong to this club, not the new 3-wood** |
 | Backup putter | Scotty Newport 2 | arc-suited toe-hang blade — renders a **MISMATCH** flag against the SBST stroke. If the LINK goes back this is all that's left, i.e. the mismatch the whole saga opened with |
@@ -4395,7 +4396,7 @@ Shipped: course records + shareable scorecard image — v264, PR #80, merged. PR
 the Links sun-shadow change and was authored as v265; the course batch reserves v266 so
 the branches do not publish the same release number. Preserve both release entries when rebasing.
 v267–v269 (Oct 30 2026: the putter-shootout session, bench *Mark as sold*, and the shootout layout
-and chart) also took numbers after v266, so PR #81's v265 metadata now has to rebase past v271.
+and chart) also took numbers after v266, so PR #81's v265 metadata now has to rebase past v272.
 
 ## Oct 30 putter shootout (v267)
 
@@ -4410,8 +4411,9 @@ What it deliberately did NOT push, and why — keep it that way unless Jack deci
 - **No faults, evolution or test entry.** `test` is a 10-ball make count; five balls is not one. The tempo
   number conflicts with the grid's 2.0:1 and the earlier 1.79:1, all three are film, so the session states
   the conflict and the grid is untouched. **The call is Jack's.**
-- **No bag change.** The Spider Tour X is not on the bag record and ownership is his to state. The app holds
-  the LINK at **69°**; he described it as **70°** for this test — not reconciled.
+- **Bag (updated Oct 31):** Jack says the Spider Tour X is his, on the bench, 34"; the LINK is 34" and the
+  Newport 2 35" (`length` field, shown beside a putter's type). The app holds the LINK at **69°**; he
+  described it as **70°** for this test — not reconciled.
 - **No mat-break comparison.** Whether this is the same mat and lay as the earlier ~4.9" measurement was not
   confirmed.
 
