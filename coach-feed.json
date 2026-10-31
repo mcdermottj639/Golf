@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-09-24",
+  "updated": "2026-10-30",
   "entries": [
     {
       "id": "s4-session",
@@ -50193,6 +50193,57 @@
         "spec": "4–PW · Right · Steel Regular · official lofts 21–44°",
         "status": "gaming",
         "note": "Complete seven-club set: 4i, 5i, 6i, 7i, 8i, 9i and PW. The 4-iron returned Sep 24 with the move to 50° and 58° wedges. The KING TEC Utility 2-iron is a separate club. Standard KING TEC; PW 44°."
+      }
+    },
+    {
+      "id": "s20-putter-shootout-20261030",
+      "type": "session",
+      "date": "2026-10-30",
+      "src": "drive:1nuqY_l2MB7wZHlOIzFKXUm78-6hxXV3ro6EFnZp396Y",
+      "setup": "3 clips · PUTTER SHOOTOUT, 5 putts each · Spider Tour X 34\" standard lie (IMG_4874) · L.A.B. LINK.2.1 34\" at 70° lie as Jack described it (IMG_4875) · Scotty Newport 2 35\" standard lie (IMG_4876) · same lie, same 5 balls, about 5 ft (58–60 in) to the MIDDLE cup on the indoor mat · 119.5 fps, 1080×1920, phone behind the ball and ELEVATED, static",
+      "finding": "THE SPIDER TOUR X CAME OUT ON TOP, AND FIVE PUTTS A PUTTER CANNOT PROVE IT. Makes: Spider 3/5, Newport 2 3/5, LINK.2.1 2/5 — read by watching the cup fill on every one of the 15, not off a tracker. A 3/5 against a 2/5 is well inside chance, so the ranking leans on start line, which is measured on all 15.\n\nSTART LINE, projected to the cup (inches right of the hole, looking down the line — from BEHIND the ball image-right is Jack's RIGHT, the push side): Spider 1.92\" mean with 0.53\" spread · LINK 0.90\" with 0.62\" · Newport 2.13\" with 1.50\". The Spider and the LINK repeat; the Newport scatters about three times as much — its makes started anywhere from 2.0\" to 4.0\" right, and one miss started dead centre and broke about 6\" left.\n\nTHE LINK STARTS IT CLOSEST TO THE HOLE AND THE MAT PUNISHED IT. Two of its three misses started only 0.4–0.6\" right and then broke 3.8–5.0\" LEFT [OBSERVED]. Putts started near the centre broke hard left on this mat; putts started about 2\" right mostly held — which is the line the Spider and the Newport happened to be on. So the LINK's lower make count is at least partly the mat, not the putter. Both Spider misses are the opposite case: they started on its usual line (~2.1\" right) and held straight past the right edge — an aim/read miss, not scatter.\n\nSPEED off the face (first 12\" of roll): Spider 64 in/s ±3.9 · LINK 61 ±2.2 · Newport 62 ±2.7. All close; the LINK is the most even.\n\nTEMPO is the same stroke on all three: Spider 1.48 ±0.07 · LINK 1.53 ±0.11 · Newport 1.46 ±0.06, about 0.37 s back and 0.25 s through. Pooled 1.49:1, n=15. That does NOT agree with the 2.0:1 the app holds (n=8, LINK film Jul 30 / Aug 10) or the 1.79:1 from the earlier pipeline (n=6) — see limits. Not resolved here; Jack's call.\n\nWHAT THIS FILM CANNOT ANSWER IS THE QUESTION THE 70° LINK WAS FOR. Lie angle at address and impact (toe or heel up), face angle, strike location and shaft lean need a face-on camera at hand height; a behind-and-above view cannot see them.",
+      "detail": {
+        "gist": "Spider Tour X tops a 5-putt shootout on start line; LINK starts it closest but the mat broke it; tempo 1.49:1.",
+        "metrics": [
+          {
+            "k": "Makes (5 each)",
+            "v": "3 · 2 · 3",
+            "s": "mid",
+            "n": "Spider · LINK · Newport — inside chance at n=5"
+          },
+          {
+            "k": "Start line at the cup",
+            "v": "1.9\" · 0.9\" · 2.1\" R",
+            "s": "mid",
+            "n": "mean, right of the hole (push side)"
+          },
+          {
+            "k": "Start-line spread",
+            "v": "0.53\" · 0.62\" · 1.50\"",
+            "s": "mid",
+            "n": "SD n=5 — Newport ~3× the others"
+          },
+          {
+            "k": "Ball speed off the face",
+            "v": "64 · 61 · 62 in/s",
+            "s": "mid",
+            "n": "first 12 in of roll; LINK steadiest (±2.2)"
+          },
+          {
+            "k": "Tempo back:through",
+            "v": "1.49:1 pooled",
+            "s": "warn",
+            "n": "n=15 — conflicts with app 2.0:1 (n=8)"
+          },
+          {
+            "k": "Lie / face / strike",
+            "v": "Not measurable",
+            "s": "warn",
+            "n": "behind-and-above camera; needs face-on"
+          }
+        ],
+        "story": "HOW IT WAS READ. Each clip's mat edges were fitted as straight lines (about 1 px residual, so the lens is treated as 1×), and the perspective scale came from the ball's own 1.68\" diameter at two depths. The ball was tracked frame by frame from address; impact is the first frame of sustained ball motion, and the putter head's trace agrees with it to within one frame on all 15 strokes. Start line is a straight-line fit to the first 25–30 tracked roll points, extended to the cup. Makes were NOT taken from the tracker — balls already sitting in the cup contaminate a tracked end point — they were read by watching the cup fill. Jack confirmed the target was the middle cup; the ring to its right was unused.",
+        "limits": "TEMPO — THREE FILM NUMBERS, NONE ARBITRATED. 2.0:1 (n=8, two methods, LINK, Jul 30 / Aug 10), 1.79:1 (n=6, earlier pipeline) and now 1.49:1 (n=15, this camera). All three are film, so film-is-king cannot pick, and newest-wins would be the wrong rule. This one used an elevated behind-the-ball camera and a backstroke onset at 8% of backswing amplitude, and that threshold choice moves the ratio. The Aug 27 session already showed a behind-the-ball camera under-reports the ratio, so read 1.49 as possibly low, not as a new fault.\n\nTHE MAT. Its break here is a property of how it is laid TODAY. Whether this is the same mat and lay as the earlier ~4.9\" mat measurement was not confirmed, so the two are not compared. Re-laying the mat invalidates this.\n\nSTART LINE IS RELATIVE. The camera was above the ball, not at ground level, and the depth scale is approximate (±15%), so the inches compare these three putters on this setup and are not absolute angles. The view shifted slightly between clips.\n\nTRACKING GAPS. LINK putts 4–5 and Newport putt 5 lost the ball before the cup row; their outcomes still come from the cup-fill read.\n\nBAG RECORD. The app holds the LINK at 69° lie; Jack described it as 70° for this test. Not reconciled here. The Spider Tour X is not on the bag record and nothing here adds it — ownership is his to state."
       }
     }
   ]

@@ -756,7 +756,7 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
 | Returned | ~~L.A.B. Golf DF3i · 34"~~ | **returned Aug 10, 2026 — distance control.** Gamed Jul 18–30 and Aug 1–10. Its Press Pistol 2° went with it, so the "hands even with the ball" cue is **retired** — don't carry it to the LINK. Lost with it: the only measured scoreboard in the project (8/10 from four feet, Jul 20) and the high-MOI control head |
 | Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** |
 
-**Live putting priority: distance control.** Pace has now decided the fate of two putters (DF3i benched Jul 30, reprieved Aug 1, returned Aug 10) and had never been measured once until the live logger started recording putt distances (Aug 20) — the share of lags that finish inside three feet is the on-course version of it, so check that row before repeating "unmeasured". The grind is the 30-ft ladder twice a week on the LINK, logging *shorts · spread · green speed*, plus the unrun tape test — an off-centre strike bleeds ball speed, so it's a distance fault before it's a line fault. Tempo is **not** the problem (2.0:1 on this head vs a 2:1 target).
+**Live putting priority: distance control.** Pace has now decided the fate of two putters (DF3i benched Jul 30, reprieved Aug 1, returned Aug 10) and had never been measured once until the live logger started recording putt distances (Aug 20) — the share of lags that finish inside three feet is the on-course version of it, so check that row before repeating "unmeasured". The grind is the 30-ft ladder twice a week on the LINK, logging *shorts · spread · green speed*, plus the unrun tape test — an off-centre strike bleeds ball speed, so it's a distance fault before it's a line fault. Tempo was read as **not** the problem (2.0:1 on this head vs a 2:1 target) — but as of Oct 30 2026 three film numbers disagree (2.0:1 n=8 · 1.79:1 n=6 · 1.49:1 n=15) and Jack has not chosen; see *Oct 30 putter shootout (v267)*. Do not quote any one of them as settled.
 
 Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 · 60° 80.
 
@@ -4383,3 +4383,28 @@ History: ball trail + landing puff — v255, PR #79, already merged; v256 exit/s
 Shipped: course records + shareable scorecard image — v264, PR #80, merged. PR #81 owns
 the Links sun-shadow change and was authored as v265; the course batch reserves v266 so
 the branches do not publish the same release number. Preserve both release entries when rebasing.
+v267 (Oct 30 2026, the putter-shootout session below) also took a number after v266, so PR #81's
+v265 metadata now has to rebase past v267 as well.
+
+## Oct 30 putter shootout (v267)
+
+`s20-putter-shootout-20261030` is a putting `session` (src `drive:1nuqY_l2MB7wZHlOIzFKXUm78-6hxXV3ro6EFnZp396Y`,
+report in `Golf/Putting/Analysis Reports/`). Three clips, five putts each, about five feet, same lie and balls:
+Spider Tour X 34" standard lie, LINK.2.1 34" at 70° as Jack described it, Newport 2 35" standard lie. Makes
+3 · 2 · 3; start line projected to the cup 1.92" · 0.90" · 2.13" right with SDs 0.53" · 0.62" · 1.50"; tempo
+1.49:1 pooled (n=15). It was analysed in a Claude chat session rather than the separate analysis project,
+under the same evidence tags and geometry gate.
+
+What it deliberately did NOT push, and why — keep it that way unless Jack decides otherwise:
+- **No faults, evolution or test entry.** `test` is a 10-ball make count; five balls is not one. The tempo
+  number conflicts with the grid's 2.0:1 and the earlier 1.79:1, all three are film, so the session states
+  the conflict and the grid is untouched. **The call is Jack's.**
+- **No bag change.** The Spider Tour X is not on the bag record and ownership is his to state. The app holds
+  the LINK at **69°**; he described it as **70°** for this test — not reconciled.
+- **No mat-break comparison.** Whether this is the same mat and lay as the earlier ~4.9" measurement was not
+  confirmed.
+
+Two method lessons from it. **Read makes off the cup, not off a tracker's last point**: once a ball sits in
+the cup, the next putt's track snaps onto it and reports a make that never happened. And the behind-the-ball
+sign convention (image-right = Jack's RIGHT) applies to every number in this session's text.
+
