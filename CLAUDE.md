@@ -669,7 +669,10 @@ does nothing — double-check against `applyFeed()`.
 ### Club status values
 
 `gaming` (in the bag), `ordered` (on order), `backup` (owned, not in the 14),
-`wishlist` (scouting), and `returned` (sent back — drops out of every bag list).
+`wishlist` (scouting), `returned` (sent back — drops out of every bag list), and `sold`
+(v268 — gone for good by Jack's own tap on the bench: off every bag list, `soldDate` on the record,
+one Bag history line; *Move back to bench* in the Sold list undoes it exactly, history row included).
+A sold club keeps `savedCarries` and every shot it hit; only a `backup` club can be sold.
 `clubRow()` also renders a **MISMATCH** flag for a `flow:'toe'` putter against an
 `SBST` stroke. Its other status pills are read off the club's own record and nothing else
 (Aug 27 2026): `DECIDED` is `returnWindow:false`, `IN RETURN WINDOW` is `returnWindow:true`,
@@ -4383,8 +4386,8 @@ History: ball trail + landing puff — v255, PR #79, already merged; v256 exit/s
 Shipped: course records + shareable scorecard image — v264, PR #80, merged. PR #81 owns
 the Links sun-shadow change and was authored as v265; the course batch reserves v266 so
 the branches do not publish the same release number. Preserve both release entries when rebasing.
-v267 (Oct 30 2026, the putter-shootout session below) also took a number after v266, so PR #81's
-v265 metadata now has to rebase past v267 as well.
+v267 (Oct 30 2026, the putter-shootout session below) and v268 (bench *Mark as sold* + the shootout
+layout fix) also took numbers after v266, so PR #81's v265 metadata now has to rebase past v268.
 
 ## Oct 30 putter shootout (v267)
 
@@ -4407,4 +4410,12 @@ What it deliberately did NOT push, and why — keep it that way unless Jack deci
 Two method lessons from it. **Read makes off the cup, not off a tracker's last point**: once a ball sits in
 the cup, the next putt's track snaps onto it and reports a make that never happened. And the behind-the-ball
 sign convention (image-right = Jack's RIGHT) applies to every number in this session's text.
+
+**v268 layout fix, and the rule it taught.** `sessionView()` renders `setup` as the card's `h3` and
+`detail.story` under *What the film showed* — it does **not** render `finding` at all. v267 put the
+ranking in `finding` and a 300-character setup in the header, so on Jack's phone the page opened on a
+wall of heading text with no ranking anywhere. `s20-putter-shootout-layout-20261030` (`session-update`)
+shortened `setup` and re-sent `detail` with one metric tile per putter in rank order (`#1`–`#3`) and the
+ranking leading `story`. **Write a session's conclusion into `metrics` and the top of `story`; keep
+`setup` to one line.** `tests/bench-sold-browser.cjs` asserts the tiles lead and sit above the fold at 390.
 

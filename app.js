@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v267';
+const BUILD = 'v268';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v268', d:'2026-10-30', items:['MARK A CLUB SOLD: Every club on the bench now has Mark as sold. Confirm it and the club leaves the bench and every club list for good; its shots, rounds and saved carries stay in your history, and a line goes in Bag history. Sold clubs sit in a small Sold list at the bottom of the bench with Move back to bench, in case you tapped the wrong one.'] },
   { b:'v267', d:'2026-10-30', items:['PUTTER SHOOTOUT ON FILM: Your Oct 30 test — Spider Tour X, LINK.2.1 at 70° and Newport 2, five putts each from about five feet — is in the Putting film room. Spider and Newport made 3, the LINK 2; the Spider started the ball most consistently, the LINK closest to the hole before the mat broke two of its misses left, and the Newport scattered most. Five putts a putter cannot separate make rates, and nothing in your bag changed.','TEMPO, FLAGGED NOT CHANGED: This film reads 1.49:1 on all three putters. That disagrees with the 2.0:1 the app holds, so both stand side by side until you decide; lie angle, face and strike need a face-on camera and are marked not measurable.'] },
   { b:'v266', d:'2026-10-28', items:['FIVE MORE COURSES: Granite Links, Bass River, Basin Harbor, Vermont National and Fox Hollow (NJ) now have on-demand packs — 99 new hole guides and 99 interactive maps.','EXACT ROUTES & HONEST CARDS: Granite keeps Granite, Quincy and Milton distinct and defaults to your Granite/Quincy routing. Conflicting scorecard rows and ratings are omitted instead of blended; Islands End and New York Country Club stay queued until reusable hole geometry is available. Existing rounds, notes, targets and downloads are unchanged.'] },
   { b:'v264', d:'2026-10-26', items:['LINKS SCORECARD YOU CAN SHARE: Finish a round and the screen now shows a scorecard image — course, date, tees, your score to par, every hole with birdie circles and bogey squares, fairways, greens, putts and longest drive. Share scorecard opens your phone\'s share sheet (or saves the PNG); long-press the picture to save it too. The card says it is a simulated game, so it cannot pass for a real-course score.','YOUR RECORD AT EACH COURSE: Links keeps your last 20 completed rounds per course and length. The round-complete screen shows rounds played, best, average and your previous scores there; the course picker reads Best of N once you have played a course more than once. Practice rounds are not recorded, the same rule best scores already follow. Game preferences only — nothing touches your golf records.'] },
@@ -1715,7 +1716,7 @@ function searchIndex(state){
   numbersCatalog(state).forEach(n => add('Numbers', n.label,
     `${n.label} ${n.value} ${n.id} ${n.metric||''} ${n.unit||''}`,
     { a:'open-number', metric:n.metric, view:n.view, seg:n.seg, i:n.i, prov:n.prov, value:n.value, unit:n.unit }));
-  (state.clubs || []).forEach(c => add('Bag', c.name,
+  (state.clubs || []).forEach(c => add('Bag', c.name + (c.status === 'sold' ? ' (sold)' : ''),
     `${c.name} ${c.spec||''} ${c.note||''} ${c.cat||''} club`,
     { a:'go', v:'bag' }));
   (state.carries || []).forEach(c => add('Bag', c.club + ' (ladder)',
@@ -3420,7 +3421,35 @@ function benchRow(c){
     ${physical && full ? `<details class="bench-swap"><summary>Swap into bag</summary><div class="bench-swap-fields"><label for="restore-${esc(c.id)}">Replace a club</label><select id="restore-${esc(c.id)}"><option value="">Choose a starter</option>${replacementOptions().map(o=>`<option value="${esc(o.value)}">${esc(o.label)}</option>`).join('')}</select>${button}</div></details>` : ''}
     ${physical ? `<div class="bench-label" id="restore-label-wrap-${esc(c.id)}" hidden><label for="restore-label-${esc(c.id)}">Club label for shot tracking</label><input id="restore-label-${esc(c.id)}" placeholder="e.g. 4H or 7-iron"></div><p class="sm warn bench-error" id="restore-error-${esc(c.id)}" role="status" hidden></p>` : ''}
     ${details ? `<details class="bench-notes"><summary>Club details${mismatch ? ' · stroke fit note' : ''}</summary>${details}</details>` : ''}
+    <details class="bench-sold" id="sell-${esc(c.id)}"><summary>Mark as sold</summary>
+      <p class="sm">Gone for good? It leaves the bench and every club list. Its shots, rounds and saved carries stay in your history, and you can undo this below.</p>
+      <button class="btn bench-sell" data-action="sell-club" data-id="${esc(c.id)}">Sold — remove for good</button></details>
   </div>`;
+}
+// Sold is a fact he states (v268): the record leaves every club list, the history it made stays.
+const soldText = c => `Sold ${c.name} — off the bench for good. Its shots, rounds and saved carries stay in the history.`;
+function sellClub(id){
+  const c = S.clubs.find(x => x.id === id && x.status === 'backup');
+  if(!c) return false;
+  c.status = 'sold'; c.soldDate = today();
+  S.bagHistory.unshift({ date: today().slice(0,7).replace('-','–'), text: soldText(c) });
+  return true;
+}
+function unsellClub(id){
+  const c = S.clubs.find(x => x.id === id && x.status === 'sold');
+  if(!c) return false;
+  const i = S.bagHistory.findIndex(h => h.text === soldText(c));
+  if(i >= 0) S.bagHistory.splice(i, 1);
+  c.status = 'backup'; delete c.soldDate;
+  return true;
+}
+function soldList(sold){
+  if(!sold.length) return '';
+  return `<details class="bench-soldlist" id="bag-sold"><summary>Sold · ${sold.length}</summary>
+    ${sold.map(c => `<div class="bench-solditem"><div class="bench-name"><div class="cn">${esc(c.name)}</div>
+      <div class="cs">${c.soldDate ? 'Sold ' + esc(fmtDate(c.soldDate)) : 'Sold'}</div></div>
+      <button class="btn ghost tiny" data-action="unsell-club" data-id="${esc(c.id)}">Move back to bench</button></div>`).join('')}
+  </details>`;
 }
 // ----- Grinds & bounce -----
 // The one explanatory block in the bag, and it is here because the three wedges are three
@@ -3704,6 +3733,7 @@ function bag(){
   const clubCount = activeBagCount();
   const bullpen = S.clubs.filter(c => c.status === 'backup').sort(bagSort);
   const wishlist = S.clubs.filter(c => c.status === 'wishlist').sort(bagSort);
+  const sold = S.clubs.filter(c => c.status === 'sold').sort((a, b) => (b.soldDate || '').localeCompare(a.soldDate || ''));
   const wedges = S.clubs.filter(c => c.cat === 'wedge' && c.loft && (c.status === 'gaming' || c.status === 'ordered')).sort((a, b) => a.loft - b.loft);
   return `
   ${hqBagIntro()}
@@ -3717,13 +3747,14 @@ function bag(){
     ${fold('bag-grinds', 'Grinds & bounce', `${wedges.length} WEDGES`, grindsCard(wedges), false)}
   </div>` : ''}
 
-  ${bullpen.length || wishlist.length ? `<div class="card bench">
+  ${bullpen.length || wishlist.length || sold.length ? `<div class="card bench">
     ${fold('bag-bench', 'On the bench', `${bullpen.length + wishlist.length} OWNED, NOT IN THE 14`, `
       ${bullpen.map(clubRow).join('')}
       ${wishlist.length ? `<div class="cgrp">Scouting list</div>${wishlist.map(clubRow).join('')}` : ''}
       <p class="rdf">Kept, not gone. What a benched club did is still true — its tee-shot
         record stays in the off-the-tee table as history, it just stops accumulating. Nothing
-        here is sold, and a club has come back off this shelf before.</p>`, false)}
+        here is sold, and a club has come back off this shelf before.</p>
+      ${soldList(sold)}`, false)}
   </div>` : ''}
   <div class="formrow" style="margin-top:6px">
     <button class="btn" data-action="show-add-club">+ Add a club</button>
@@ -7680,7 +7711,7 @@ function putterSince(){
 // countdown follows the gear rather than one hardcoded head — the gamer itself can be
 // the thing on the clock, which is exactly the case the old Phantom-only check missed.
 function pendingReturn(){
-  return S.clubs.find(c => c.returnWindow && c.status !== 'returned') || null;
+  return S.clubs.find(c => c.returnWindow && !['returned','sold'].includes(c.status)) || null;
 }
 // A snapshot's `coversThrough` is the last round it includes — NOT the day it was
 // read off the phone, which is why the read date can't be used for this.
@@ -10679,6 +10710,12 @@ const ACTIONS = {
   'bench-club': el => {
     const select = document.getElementById('bench-' + el.dataset.id);
     if(benchClub(el.dataset.id, el.dataset.member || select?.value)){ save(); rerender(); toast('Moved to bench · history kept'); }
+  },
+  'sell-club': el => {
+    if(sellClub(el.dataset.id)){ save(); rerender(); toast('Marked sold · history kept'); }
+  },
+  'unsell-club': el => {
+    if(unsellClub(el.dataset.id)){ save(); rerender(); toast('Back on the bench'); }
   },
   'start-club': el => {
     const replacement = document.getElementById('restore-' + el.dataset.id)?.value || '';

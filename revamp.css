@@ -751,3 +751,16 @@ html,body{touch-action:manipulation}
   .live-card-panel .ptot > div { display: flex; align-items: baseline; justify-content: center; gap: 5px; padding: 6px; }
   .live-card-panel .ptot span { margin: 0; }
 }
+
+/* v268 — Mark as sold on bench rows, and the Sold list under the bench. A sale costs the
+   club, so the summary and confirm button use the burgundy cost colour; the list is quiet. */
+.bench-sold { margin-top: 2px; }
+.bench-sold > summary { cursor: pointer; padding: 8px 0; font-size: 12px; font-weight: 700; color: var(--burg); }
+.bench-sold .sm { font-size: 12px; margin: 2px 0 8px; }
+.bench-item .bench-sell { min-height: 44px; padding: 9px 12px; font-size: 12px; background: var(--burg); border-color: var(--burg); color: #fff; }
+.bench-soldlist { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 4px; }
+.bench-soldlist > summary { cursor: pointer; padding: 10px 0; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint, var(--gtext)); }
+.bench-solditem { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.bench-solditem .bench-name { min-width: 0; }
+.bench-solditem .cn { overflow-wrap: anywhere; }
+.bench-solditem .btn { flex: none; min-height: 44px; white-space: nowrap; }
