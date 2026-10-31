@@ -764,3 +764,11 @@ html,body{touch-action:manipulation}
 .bench-solditem .bench-name { min-width: 0; }
 .bench-solditem .cn { overflow-wrap: anywhere; }
 .bench-solditem .btn { flex: none; min-height: 44px; white-space: nowrap; }
+
+/* v271 club notes: fact tiles + one line, history folded */
+.clubkeys{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:8px 0}
+.clubkeys .ck{border:1px solid var(--line);border-radius:10px;padding:6px 8px;min-width:0}
+.clubkeys .ck.warn{border-color:var(--burg)}
+.clubkeys .ckl{display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+.clubkeys b{display:block;font-size:14px;overflow-wrap:anywhere}
+.clubkeys .ckn{display:block;font-size:11px;color:var(--faint);overflow-wrap:anywhere}

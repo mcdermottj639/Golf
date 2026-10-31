@@ -51573,6 +51573,37 @@
           }
         ]
       }
+    },
+    {
+      "id": "link21-note-scan-20261031",
+      "type": "club-update",
+      "target": "L.A.B. Golf LINK.2.1",
+      "club": {
+        "noteGist": "Kept for good since Aug 12. Specs settled except length and head weight.",
+        "noteKeys": [
+          {
+            "k": "Loft",
+            "v": "2° effective ✓",
+            "n": "L.A.B. custom spec panel"
+          },
+          {
+            "k": "Lie",
+            "v": "69° (70° target)",
+            "n": "in tolerance; 1° moves aim 0.07\" at 10 ft"
+          },
+          {
+            "k": "Grip",
+            "v": "Lamkin Deep Etched",
+            "n": "0° lean · shaft vertical"
+          },
+          {
+            "k": "Unknown",
+            "v": "Length · head weight",
+            "n": "needs L.A.B. or a scale",
+            "s": "warn"
+          }
+        ]
+      }
     }
   ]
 }

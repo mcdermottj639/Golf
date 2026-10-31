@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v270';
+const BUILD = 'v271';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v271', d:'2026-10-31', items:['CLUB NOTES YOU CAN SCAN: A club in your bag now shows one summary line under its specs, with the long history folded under Full notes, split into short paragraphs. The LINK.2.1 also gets four fact tiles: loft, lie, grip and what is still unknown.'] },
   { b:'v270', d:'2026-10-30', items:['PUTT ROLL PATHS: The Oct 30 putter shootout now draws how every ball actually rolled — one top-down panel per putter, ball at the bottom, cup on top, solid green for holed and dashed for missed. You can see the Spider misses sliding right and the two LINK misses breaking left. The putter head\'s own path is not on it: that camera sits behind the ball, so the head\'s arc needs an overhead or face-on clip.'] },
   { b:'v269', d:'2026-10-30', items:['PUTTER SHOOTOUT AS A PICTURE: The Oct 30 session now opens on a chart — one row per putter, a dot for every putt where it started at the cup, filled when it went in. The long write-up is cut to four lines; how it was measured sits folded underneath.'] },
   { b:'v268', d:'2026-10-30', items:['MARK A CLUB SOLD: Every club on the bench now has Mark as sold. Confirm it and the club leaves the bench and every club list for good; its shots, rounds and saved carries stay in your history, and a line goes in Bag history. Sold clubs sit in a small Sold list at the bottom of the bench with Move back to bench, in case you tapped the wrong one.'] },
@@ -3387,7 +3388,7 @@ function clubRow(c){
       <div class="cs">${esc(clubSpecLine(c))}${row && row.carry != null ? ` · carries ${row.carry}` : ''}${
         row && row.carry == null ? ' · carry unmeasured' : ''}</div>
       ${Array.isArray(c.activeMembers) ? `<p class="sm">Active: ${c.activeMembers.map(esc).join(', ')}</p>` : ''}
-      ${c.note ? expandable(c.note) : ''}
+      ${clubNote(c)}
       ${['gaming','ordered'].includes(c.status) && physicalClubCount(c)>0 ? `<div class="formrow" style="margin-top:8px">${rosterMembers(c) ? `<select aria-label="Iron to remove" id="bench-${esc(c.id)}">${rosterMembers(c).map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select>` : ''}<button class="btn" data-action="bench-club" data-id="${esc(c.id)}">Remove from bag</button></div>` : ''}
 
       ${c.futureFit ? futureFitReference(c.futureFit) : ''}
@@ -3410,7 +3411,7 @@ function benchRow(c){
   const physical=physicalClubCount(c)>0;
   const full=activeBagCount()+physicalClubCount(c)>14;
   const mismatch=c.cat==='putter' && c.flow==='toe' && S.profile.stroke==='SBST';
-  const details=[c.note ? expandable(c.note) : '',
+  const details=[clubNote(c),
     c.futureFit ? futureFitReference(c.futureFit) : '',
     c.pingAdapter ? pingHybridReference(c.pingAdapter) : '',
     mismatch ? '<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>' : '',
@@ -3692,6 +3693,24 @@ function startClub(id, replacement = '', playingLabel = ''){
   return null;
 }
 // One physical club per scan row, joined to the existing saved carry (never a copy).
+// ----- Club notes (v271) -----
+// Notes are the paper trail of a club and run to paragraphs. The scan shows: optional
+// fact tiles (`noteKeys`), ONE summary line (`noteGist`, else the opening sentence,
+// clipped), and the full text folded under "Full notes" — split into short paragraphs at
+// each ALL-CAPS lead-in. Nothing is dropped; the note itself is never rewritten.
+function clubNote(c){
+  const t = String(c.note || '').trim();
+  const keys = Array.isArray(c.noteKeys) ? c.noteKeys.filter(k => k && k.k && k.v) : [];
+  if(!t && !keys.length) return '';
+  let line = c.noteGist || splitLead(t)[0];
+  if(!c.noteGist && line.length > 150) line = line.slice(0, 140).replace(/\s+\S*$/, '') + '…';
+  const tiles = keys.length ? `<div class="clubkeys">${keys.map(k => `<div class="ck${k.s === 'warn' ? ' warn' : ''}">
+      <span class="ckl">${esc(k.k)}</span><b>${esc(k.v)}</b>${k.n ? `<span class="ckn">${esc(k.n)}</span>` : ''}</div>`).join('')}</div>` : '';
+  const paras = t.replace(/([.!?])\s+(?=(?:[A-Z][A-Z0-9'’.]+\s+)+[A-Z][A-Z0-9'’.]*[\s:])/g, '$1\n\n');
+  const more = t && (c.noteGist || t.length > line.length + 2)
+    ? `<details class="more" id="clubnote-${esc(c.id)}"><summary>Full notes</summary>${prose(paras, 'sm')}</details>` : '';
+  return `${tiles}${line ? `<p class="sm">${esc(line)}</p>` : ''}${more}`;
+}
 function compactBag(lineup){
   const entries = lineup.flatMap(c => {
     const members = rosterMembers(c);
@@ -3720,7 +3739,7 @@ function compactBag(lineup){
           ${ladderBadge(row)}${ladderOffer(row,i)}` : ''}
           ${row || member ? `<button class="btn ghost tiny" data-action="club-history" data-club="${esc(clubCanon(member || row.club))}" data-from="bag">Full ${esc(label)} history →</button>` : ''}
           <p class="sm">${esc(c.spec || '')}</p>
-          ${c.note ? `<p class="sm">${esc(c.note)}</p>` : ''}
+          ${clubNote(c)}
           ${c.futureFit ? futureFitReference(c.futureFit) : ''}
           ${c.pingAdapter ? pingHybridReference(c.pingAdapter) : ''}
           ${c.cat==='putter' && c.flow==='toe' && S.profile.stroke==='SBST' ? '<p class="sm warn">Toe-flow head on your straight (SBST) stroke — see Decisions.</p>' : ''}

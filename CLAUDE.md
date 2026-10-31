@@ -668,6 +668,14 @@ does nothing — double-check against `applyFeed()`.
 
 ### Club status values
 
+**Club notes render scannable (v271).** A club's `note` is its paper trail and runs to paragraphs, so
+`clubNote(c)` (Bag rows, the roster row and bench rows) shows optional fact tiles from `noteKeys`
+(`[{k, v, n, s:'warn'}]`), ONE line from `noteGist` (else the opening sentence, clipped), and folds the
+whole note under *Full notes*, split into paragraphs at each ALL-CAPS lead-in. The note text is never
+rewritten — add `noteGist`/`noteKeys` with a `club-update` instead (`link21-note-scan-20261031` is the
+model; old builds ignore the new fields, so it is safe to ship ahead of the code). Write a gist for any
+club whose note grows past a few lines.
+
 `gaming` (in the bag), `ordered` (on order), `backup` (owned, not in the 14),
 `wishlist` (scouting), `returned` (sent back — drops out of every bag list), and `sold`
 (v268 — gone for good by Jack's own tap on the bench: off every bag list, `soldDate` on the record,
@@ -4387,7 +4395,7 @@ Shipped: course records + shareable scorecard image — v264, PR #80, merged. PR
 the Links sun-shadow change and was authored as v265; the course batch reserves v266 so
 the branches do not publish the same release number. Preserve both release entries when rebasing.
 v267–v269 (Oct 30 2026: the putter-shootout session, bench *Mark as sold*, and the shootout layout
-and chart) also took numbers after v266, so PR #81's v265 metadata now has to rebase past v270.
+and chart) also took numbers after v266, so PR #81's v265 metadata now has to rebase past v271.
 
 ## Oct 30 putter shootout (v267)
 
