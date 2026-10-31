@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v268';
+const BUILD = 'v269';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v269', d:'2026-10-30', items:['PUTTER SHOOTOUT AS A PICTURE: The Oct 30 session now opens on a chart — one row per putter, a dot for every putt where it started at the cup, filled when it went in. The long write-up is cut to four lines; how it was measured sits folded underneath.'] },
   { b:'v268', d:'2026-10-30', items:['MARK A CLUB SOLD: Every club on the bench now has Mark as sold. Confirm it and the club leaves the bench and every club list for good; its shots, rounds and saved carries stay in your history, and a line goes in Bag history. Sold clubs sit in a small Sold list at the bottom of the bench with Move back to bench, in case you tapped the wrong one.'] },
   { b:'v267', d:'2026-10-30', items:['PUTTER SHOOTOUT ON FILM: Your Oct 30 test — Spider Tour X, LINK.2.1 at 70° and Newport 2, five putts each from about five feet — is in the Putting film room. Spider and Newport made 3, the LINK 2; the Spider started the ball most consistently, the LINK closest to the hole before the mat broke two of its misses left, and the Newport scattered most. Five putts a putter cannot separate make rates, and nothing in your bag changed.','TEMPO, FLAGGED NOT CHANGED: This film reads 1.49:1 on all three putters. That disagrees with the 2.0:1 the app holds, so both stand side by side until you decide; lie angle, face and strike need a face-on camera and are marked not measurable.'] },
   { b:'v266', d:'2026-10-28', items:['FIVE MORE COURSES: Granite Links, Bass River, Basin Harbor, Vermont National and Fox Hollow (NJ) now have on-demand packs — 99 new hole guides and 99 interactive maps.','EXACT ROUTES & HONEST CARDS: Granite keeps Granite, Quincy and Milton distinct and defaults to your Granite/Quincy routing. Conflicting scorecard rows and ratings are omitted instead of blended; Islands End and New York Country Club stay queued until reusable hole geometry is available. Existing rounds, notes, targets and downloads are unchanged.'] },
@@ -7064,6 +7065,36 @@ function drills(){
   <p class="sm faint" style="margin:10px 0">Every drill here belongs to a lesson in the library — this page is the same shelf sorted by what you can actually do today. A drill drops off the shortlist when you log it, and comes back when it goes stale; close the fault it trains in a lab and it stops being flagged at all.</p>`;
 }
 
+// ----- Putter shootout chart (v269) -----
+// One row per putter, one dot per putt at its start line (inches right of the cup centre,
+// looking down the line). Filled green = holed, open burgundy = missed. The cup band is the
+// measured cup width, so a glance says which head starts it inside the hole and how tightly.
+function shootoutViz(rows){
+  const lo = -2, hi = 4.5, W = 340, L = 8, R = 332, cupW = 4.1;
+  const x = v => L + (Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo) * (R - L);
+  const rowH = 46, top = 10, H = top + rows.length * rowH + 24;
+  const ticks = [-2,-1,0,1,2,3,4];
+  const body = rows.map((r, i) => {
+    const y = top + i * rowH, cy = y + 28;
+    const made = r.putts.filter(p => p.made).length;
+    const dots = r.putts.map(p => p.made
+      ? `<circle cx="${x(p.start).toFixed(1)}" cy="${cy}" r="6" style="fill:var(--green)"/>`
+      : `<circle cx="${x(p.start).toFixed(1)}" cy="${cy}" r="5.2" style="fill:none;stroke:var(--burg)" stroke-width="2"/>`).join('');
+    return `<text x="${L}" y="${y + 11}" font-size="12" font-weight="700" style="fill:var(--ink)">${esc(r.label)}</text>
+      <text x="${R}" y="${y + 11}" font-size="12" font-weight="700" text-anchor="end" style="fill:var(--ink)">${made}/${r.putts.length}</text>
+      <line x1="${L}" x2="${R}" y1="${cy}" y2="${cy}" style="stroke:var(--line)" stroke-width="1"/>${dots}`;
+  }).join('');
+  const axisY = top + rows.length * rowH + 4;
+  return `<div class="shoot" role="img" aria-label="Start line of every putt by putter">
+    <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;max-width:520px">
+      <rect x="${x(-cupW/2).toFixed(1)}" y="${top + 14}" width="${(x(cupW/2) - x(-cupW/2)).toFixed(1)}" height="${rows.length * rowH - 10}" rx="6" style="fill:var(--green)" opacity=".10"/>
+      <line x1="${x(0)}" x2="${x(0)}" y1="${top + 14}" y2="${axisY}" style="stroke:var(--green)" stroke-dasharray="3 3" opacity=".6"/>
+      ${body}
+      ${ticks.map(t => `<text x="${x(t).toFixed(1)}" y="${axisY + 14}" font-size="10" text-anchor="middle" style="fill:var(--faint)">${t === 0 ? 'cup' : (t > 0 ? t + '″ R' : -t + '″ L')}</text>`).join('')}
+    </svg>
+    <p class="sm faint" style="margin:4px 0 0">Where each putt started, at the cup. <b style="color:var(--green)">●</b> holed · <b style="color:var(--burg)">○</b> missed · shaded = cup width.</p>
+  </div>`;
+}
 // ----- Session deep-dive -----
 function sessionView(i){
   const s = S.sessions[+i];
@@ -7079,6 +7110,7 @@ function sessionView(i){
     <h3>${esc(s.setup)}</h3>
     ${!d ? `<p class="sm" style="margin-top:8px">${esc(s.finding)}</p>
       <p class="sm faint">No deep-dive attached — sessions you log yourself carry the summary only. Filmed sessions analyzed by Claude arrive with the full breakdown.</p>` : `
+    ${Array.isArray(d.shootout) && d.shootout.length ? `<div style="margin:12px 0 4px">${shootoutViz(d.shootout)}</div>` : ''}
     <div class="rowgrid g3" style="margin:12px 0 4px">
       ${d.metrics.map(m => `<div class="stat" style="border-top-color:${sc[m.s]||'var(--green)'}">
         <div class="v" style="font-size:13px;color:${sc[m.s]||'var(--green)'}">${esc(m.v)}</div>

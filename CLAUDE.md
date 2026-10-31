@@ -4386,8 +4386,8 @@ History: ball trail + landing puff — v255, PR #79, already merged; v256 exit/s
 Shipped: course records + shareable scorecard image — v264, PR #80, merged. PR #81 owns
 the Links sun-shadow change and was authored as v265; the course batch reserves v266 so
 the branches do not publish the same release number. Preserve both release entries when rebasing.
-v267 (Oct 30 2026, the putter-shootout session below) and v268 (bench *Mark as sold* + the shootout
-layout fix) also took numbers after v266, so PR #81's v265 metadata now has to rebase past v268.
+v267–v269 (Oct 30 2026: the putter-shootout session, bench *Mark as sold*, and the shootout layout
+and chart) also took numbers after v266, so PR #81's v265 metadata now has to rebase past v269.
 
 ## Oct 30 putter shootout (v267)
 
@@ -4418,4 +4418,14 @@ wall of heading text with no ranking anywhere. `s20-putter-shootout-layout-20261
 shortened `setup` and re-sent `detail` with one metric tile per putter in rank order (`#1`–`#3`) and the
 ranking leading `story`. **Write a session's conclusion into `metrics` and the top of `story`; keep
 `setup` to one line.** `tests/bench-sold-browser.cjs` asserts the tiles lead and sit above the fold at 390.
+
+**v269 — a picture, not paragraphs (Jack: "I hate word bombs and love visuals. This is no good ever").**
+v268's ranking was still a paragraph. `sessionView()` now renders an optional `detail.shootout`
+(`[{label, putts:[{start, made}]}]`) through `shootoutViz()` directly under the header, ABOVE the tiles:
+one row per putter, one dot per putt at its start line (inches right of the cup centre), filled green =
+holed, open burgundy = missed, shaded band = the measured ~4.1" cup. `story` is four one-line paragraphs;
+the method moved into the collapsed `limits`. Entry: `s20-putter-shootout-chart-20261030`. **Standing
+rule for every session or report written for this app: lead with a chart or tiles, keep prose to a few
+one-line paragraphs, fold the method.** SVG colours use `style="fill:var(--x)"`, not presentation
+attributes. `tests/bench-sold-browser.cjs` asserts the chart, 15 dots and that it fits the width.
 
