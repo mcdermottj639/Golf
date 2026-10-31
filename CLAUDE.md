@@ -4387,7 +4387,7 @@ Shipped: course records + shareable scorecard image — v264, PR #80, merged. PR
 the Links sun-shadow change and was authored as v265; the course batch reserves v266 so
 the branches do not publish the same release number. Preserve both release entries when rebasing.
 v267–v269 (Oct 30 2026: the putter-shootout session, bench *Mark as sold*, and the shootout layout
-and chart) also took numbers after v266, so PR #81's v265 metadata now has to rebase past v269.
+and chart) also took numbers after v266, so PR #81's v265 metadata now has to rebase past v270.
 
 ## Oct 30 putter shootout (v267)
 
@@ -4428,4 +4428,13 @@ the method moved into the collapsed `limits`. Entry: `s20-putter-shootout-chart-
 rule for every session or report written for this app: lead with a chart or tiles, keep prose to a few
 one-line paragraphs, fold the method.** SVG colours use `style="fill:var(--x)"`, not presentation
 attributes. `tests/bench-sold-browser.cjs` asserts the chart, 15 dots and that it fits the width.
+
+**v270 — roll paths.** `detail.paths` (`[{label, len, putts:[{made, lost, pts:[[depthIn, lateralIn],…]}]}]`)
+renders through `rollPathViz()` under the ranking tiles as *How each putt rolled*: one top-down panel per
+putter, ball at the bottom, cup on top, solid green holed / dashed burgundy missed, sideways stretched about
+2× and the caption says so. Points are the tracked ball centre, median per 4-inch bin; holed lines end at the
+cup. A lost track (`lost:true`, LINK putts 4–5) stops where tracking stopped with an open ring — never
+extended. **Putter-head path is not drawn and cannot be from this camera**: it is behind and above the ball,
+so the arc is foreshortened into the line. Entry `s20-putter-shootout-paths-20261030` re-sends the full detail.
+The chart sits BELOW the tiles so the ranking stays above the fold at 390.
 

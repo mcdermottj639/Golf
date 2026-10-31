@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v269';
+const BUILD = 'v270';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v270', d:'2026-10-30', items:['PUTT ROLL PATHS: The Oct 30 putter shootout now draws how every ball actually rolled — one top-down panel per putter, ball at the bottom, cup on top, solid green for holed and dashed for missed. You can see the Spider misses sliding right and the two LINK misses breaking left. The putter head\'s own path is not on it: that camera sits behind the ball, so the head\'s arc needs an overhead or face-on clip.'] },
   { b:'v269', d:'2026-10-30', items:['PUTTER SHOOTOUT AS A PICTURE: The Oct 30 session now opens on a chart — one row per putter, a dot for every putt where it started at the cup, filled when it went in. The long write-up is cut to four lines; how it was measured sits folded underneath.'] },
   { b:'v268', d:'2026-10-30', items:['MARK A CLUB SOLD: Every club on the bench now has Mark as sold. Confirm it and the club leaves the bench and every club list for good; its shots, rounds and saved carries stay in your history, and a line goes in Bag history. Sold clubs sit in a small Sold list at the bottom of the bench with Move back to bench, in case you tapped the wrong one.'] },
   { b:'v267', d:'2026-10-30', items:['PUTTER SHOOTOUT ON FILM: Your Oct 30 test — Spider Tour X, LINK.2.1 at 70° and Newport 2, five putts each from about five feet — is in the Putting film room. Spider and Newport made 3, the LINK 2; the Spider started the ball most consistently, the LINK closest to the hole before the mat broke two of its misses left, and the Newport scattered most. Five putts a putter cannot separate make rates, and nothing in your bag changed.','TEMPO, FLAGGED NOT CHANGED: This film reads 1.49:1 on all three putters. That disagrees with the 2.0:1 the app holds, so both stand side by side until you decide; lie angle, face and strike need a face-on camera and are marked not measurable.'] },
@@ -7095,6 +7096,45 @@ function shootoutViz(rows){
     <p class="sm faint" style="margin:4px 0 0">Where each putt started, at the cup. <b style="color:var(--green)">●</b> holed · <b style="color:var(--burg)">○</b> missed · shaded = cup width.</p>
   </div>`;
 }
+// ----- Putt roll paths (v270) -----
+// Top-down: one panel per putter, ball at the bottom, cup at the top. Each line is the
+// tracked ball centre. Solid green = holed, dashed burgundy = missed, open ring = track
+// lost before the cup (never extended — missing stays missing). Sideways is stretched
+// against the length so a 2-inch break is visible; the caption says so.
+function rollPathViz(rows){
+  const n = rows.length, gap = 10, W = 340, pw = (W - gap * (n - 1)) / n;
+  const lat = 8, top = 34, ph = 230, H = top + ph + 14;
+  const maxL = Math.max(...rows.map(r => +r.len || 60)) + 10;
+  const panels = rows.map((r, i) => {
+    const x0 = i * (pw + gap), cx = x0 + pw / 2, sx = (pw / 2 - 4) / lat;
+    const y = d => top + ph - Math.max(0, Math.min(maxL, d)) / maxL * ph;
+    const X = v => cx + Math.max(-lat, Math.min(lat, v)) * sx;
+    const cupY = y(+r.len), made = r.putts.filter(p => p.made).length;
+    const m = String(r.label).match(/^(.*?)\s+((?:at\s+)?\S+)$/), name = m ? m[1] : r.label, spec = m ? m[2] : '';
+    const lines = r.putts.map(p => {
+      if(!Array.isArray(p.pts) || p.pts.length < 2) return '';
+      const d = p.pts.map((q, k) => `${k ? 'L' : 'M'}${X(q[1]).toFixed(1)} ${y(q[0]).toFixed(1)}`).join(' ');
+      const st = p.made ? 'stroke:var(--green)' : 'stroke:var(--burg)';
+      const end = p.pts[p.pts.length - 1];
+      const lost = p.lost ? `<circle cx="${X(end[1]).toFixed(1)}" cy="${y(end[0]).toFixed(1)}" r="3" style="fill:var(--card,#fff);${st}" stroke-width="1.5"/>` : '';
+      return `<path d="${d}" style="fill:none;${st}" stroke-width="1.8" ${p.made ? '' : 'stroke-dasharray="4 3"'} stroke-linecap="round" opacity=".9"/>${lost}`;
+    }).join('');
+    return `<rect x="${x0}" y="${top - 6}" width="${pw}" height="${ph + 12}" rx="8" style="fill:var(--green)" opacity=".05"/>
+      <text x="${cx}" y="12" font-size="11" font-weight="700" text-anchor="middle" style="fill:var(--ink)">${esc(name)}</text>
+      <text x="${cx}" y="25" font-size="10" text-anchor="middle" style="fill:var(--faint)">${esc(spec ? spec + ' · ' : '')}${made}/${r.putts.length} holed</text>
+      <line x1="${cx}" x2="${cx}" y1="${cupY}" y2="${y(0)}" style="stroke:var(--line)" stroke-dasharray="2 3"/>
+      <ellipse cx="${cx}" cy="${cupY.toFixed(1)}" rx="${(2.05 * sx).toFixed(1)}" ry="${(2.05 / maxL * ph).toFixed(1)}" style="fill:var(--ink)" opacity=".85"/>
+      <circle cx="${cx}" cy="${y(0).toFixed(1)}" r="3.5" style="fill:var(--faint)"/>
+      ${lines}`;
+  }).join('');
+  return `<div class="shoot" role="img" aria-label="Top-down roll path of every putt by putter">
+    <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;max-width:520px">${panels}
+      <text x="0" y="${H - 1}" font-size="9" style="fill:var(--faint)">← L</text>
+      <text x="${W}" y="${H - 1}" font-size="9" text-anchor="end" style="fill:var(--faint)">R →</text>
+    </svg>
+    <p class="sm faint" style="margin:4px 0 0">How each ball rolled, ball at the bottom, cup on top. <b style="color:var(--green)">—</b> holed · <b style="color:var(--burg)">- -</b> missed · ○ track lost. Sideways stretched to show break.</p>
+  </div>`;
+}
 // ----- Session deep-dive -----
 function sessionView(i){
   const s = S.sessions[+i];
@@ -7118,6 +7158,7 @@ function sessionView(i){
         <div class="n" style="font-size:9px;color:var(--faint);font-family:var(--sans);margin-top:2px">${esc(m.n||'')}</div>
       </div>`).join('')}
     </div>
+    ${Array.isArray(d.paths) && d.paths.length ? `<h2 style="margin-top:14px">How each putt rolled</h2>${rollPathViz(d.paths)}` : ''}
     <h2 style="margin-top:14px">What the film showed</h2>
     ${prose(d.story)}
     ${d.compare ? `<details class="sect"><summary><b>Versus prior sessions</b><span class="gist">${esc(splitLead(d.compare)[0])}</span></summary>${prose(d.compare)}</details>` : ''}
