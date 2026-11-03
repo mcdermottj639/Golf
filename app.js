@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v272';
+const BUILD = 'v273';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v273', d:'2026-11-02', items:['SHADOWS FALL AWAY FROM THE SUN IN LINKS: In the 3D view every tree now throws a long shadow across the ground away from the afternoon sun instead of a round blob parked beside its trunk, the flagstick casts a thin strip on the green, and your ball\'s shadow slides along the ground under it as the ball climbs, so you can read how high a shot is from behind. Scenery only: no lie, bounce, score or course data changes.'] },
   { b:'v272', d:'2026-10-31', items:['PUTTER LENGTHS: Your LINK.2.1 and Spider Tour X are 34″ and the Newport 2 is 35″ — each putter now shows its length beside its name in Bag. The LINK’s only open spec is head weight.'] },
   { b:'v271', d:'2026-10-31', items:['CLUB NOTES YOU CAN SCAN: A club in your bag now shows one summary line under its specs, with the long history folded under Full notes, split into short paragraphs. The LINK.2.1 also gets four fact tiles: loft, lie, grip and what is still unknown.'] },
   { b:'v270', d:'2026-10-30', items:['PUTT ROLL PATHS: The Oct 30 putter shootout now draws how every ball actually rolled — one top-down panel per putter, ball at the bottom, cup on top, solid green for holed and dashed for missed. You can see the Spider misses sliding right and the two LINK misses breaking left. The putter head\'s own path is not on it: that camera sits behind the ball, so the head\'s arc needs an overhead or face-on clip.'] },
