@@ -4437,6 +4437,11 @@ What it deliberately did NOT push, and why — keep it that way unless Jack deci
 - **No faults, evolution or test entry.** `test` is a 10-ball make count; five balls is not one. The tempo
   number conflicts with the grid's 2.0:1 and the earlier 1.79:1, all three are film, so the session states
   the conflict and the grid is untouched. **The call is Jack's.**
+  **Decided Nov 3 (v274):** Jack picked **1.79:1** as the tempo of record (Jarvis decision
+  `d-pick-a-putting-tempo-in-caddie-hq-mw0oamed`). Applied as `evolution-tempo-call-20261103` (full putting
+  grid, Tempo row state "1.79:1 · your call", prior verdict kept underneath) and session-update
+  `s20-putter-shootout-tempo-call-20261103`. 2.0:1 (n=8) and 1.49:1 (n=15) are superseded, not deleted. No
+  tempo fault added — 1.79 vs the 2:1 target is shown as "mid", not a new fault, unless Jack says otherwise.
 - **Bag (updated Oct 31):** Jack says the Spider Tour X is his, on the bench, 34"; the LINK is 34" and the
   Newport 2 35" (`length` field, shown beside a putter's type). The app holds the LINK at **69°**; he
   described it as **70°** for this test — not reconciled.

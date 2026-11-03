@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v273';
+const BUILD = 'v274';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v274', d:'2026-11-03', items:['PUTTING TEMPO SET TO 1.79:1: Your call from Jarvis. The Putting stroke evolution grid now reads Tempo as 1.79:1 against the 2:1 target — a touch quick. The 2.0 and 1.49 readings stay in the record as superseded, and the Oct 30 shootout no longer says the tempo question is open.'] },
   { b:'v273', d:'2026-11-02', items:['SHADOWS FALL AWAY FROM THE SUN IN LINKS: In the 3D view every tree now throws a long shadow across the ground away from the afternoon sun instead of a round blob parked beside its trunk, the flagstick casts a thin strip on the green, and your ball\'s shadow slides along the ground under it as the ball climbs, so you can read how high a shot is from behind. Scenery only: no lie, bounce, score or course data changes.'] },
   { b:'v272', d:'2026-10-31', items:['PUTTER LENGTHS: Your LINK.2.1 and Spider Tour X are 34″ and the Newport 2 is 35″ — each putter now shows its length beside its name in Bag. The LINK’s only open spec is head weight.'] },
   { b:'v271', d:'2026-10-31', items:['CLUB NOTES YOU CAN SCAN: A club in your bag now shows one summary line under its specs, with the long history folded under Full notes, split into short paragraphs. The LINK.2.1 also gets four fact tiles: loft, lie, grip and what is still unknown.'] },
