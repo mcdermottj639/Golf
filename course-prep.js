@@ -420,7 +420,12 @@
     liveDialog.querySelector('.cp-live-map-content').replaceWith(content);
     mount(content);
   }
-  const initialMode = () => hasGuide(course,currentHole()) ? 'guide' : key() && navigator.onLine !== false ? '3d' : 'route';
+  // v275 (Jack, Nov 3 2026): the guide opens first only where the club publishes its own
+  // illustration (Pound Ridge, Metedeconk…). A Caddie HQ drawing is only as good as the OSM
+  // behind it — Lakeside maps 2 fairways for 18 holes — so a mapped hole without club art
+  // opens on the interactive map instead. The guide tab stays one tap away.
+  const mapFirst = h => !!h && !h.guide && h.mapReady!==false && (h.mappedGuide || h.path?.length>1); // directory flag before the pack hydrates
+  const initialMode = () => { const h=currentHole(); return hasGuide(course,h) && !mapFirst(h) ? 'guide' : key() && navigator.onLine !== false ? '3d' : 'route'; };
   function selectCourse(id) {
     const next=findCourse(id);if(!next)return false;
     if(next.id!==course.id){
