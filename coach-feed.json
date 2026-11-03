@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated": "2026-10-30",
+  "updated": "2026-11-03",
   "entries": [
     {
       "id": "s4-session",
@@ -51673,6 +51673,1264 @@
       "type": "history",
       "date": "2026-10-31",
       "text": "Putter lengths confirmed by Jack: LINK.2.1 34\", Spider Tour X 34\" (on the bench), Newport 2 35\"."
+    },
+    {
+      "id": "evolution-tempo-call-20261103",
+      "type": "evolution",
+      "src": "jarvis:d-pick-a-putting-tempo-in-caddie-hq-mw0oamed",
+      "evolution": {
+        "sessions": [
+          "Jul 30",
+          "Aug 10 pm",
+          "Aug 10 mat",
+          "Aug 24"
+        ],
+        "notes": [
+          "23 clips and 4 stills, every angle — the first full day on the LINK.2.1",
+          "Outdoor practice green, ~20 putts scored for pace. Direction unscored: every clip was oblique",
+          "Indoor mat with a printed centre line, 3 putts. Direction only",
+          "10 clips — 7 putts at a PuttOut trainer on the BREAKING AirBreak mat, two batches on one tilt, plus 3 ball-height stroke clips"
+        ],
+        "foot": "A curving mat can score the line a putt LEAVES on, never whether you aimed it there — which is why Aug 24 moves Start line without closing it. Pre-LINK film was cleared on Aug 14; every number it produced is kept in the Workshop Log.",
+        "metrics": [
+          {
+            "name": "Path",
+            "state": "Settled",
+            "s": "good",
+            "marks": [
+              "✓",
+              "—",
+              "—",
+              "✓"
+            ],
+            "verdict": "SETTLED — straight back, straight through, and now confirmed twice by unrelated methods. Jul 30, three overhead clips: a quarter to a half inch inside at the top, back on line by impact. Aug 24, the ball-height stroke clips: the head travels a straight line back AND through and essentially retraces it, by a test that needs no scale — residuals under 1% of its own lateral excursion. Two caveats on that second one: it is not free of the principal point, and barrel distortion bends straight lines if it was shot on the ultra-wide. Neither Aug 10 batch could see this row. It is the finding the whole zero-torque case rests on, and nothing has argued with it."
+          },
+          {
+            "name": "Tempo / load",
+            "state": "1.79:1 · your call",
+            "s": "mid",
+            "marks": [
+              "✓",
+              "—",
+              "~",
+              "~"
+            ],
+            "verdict": "TEMPO OF RECORD: 1.79:1 — your call, Nov 3. Three film readings disagreed: 2.0:1 (n=8, Jul 30 / Aug 10), 1.79:1 (n=6, Aug 24 pooled) and 1.49:1 (n=15, Oct 30 shootout). Film could not pick between them, so the number is yours: the app now reads your stroke as 1.79:1 against the 2:1 target — a little quick. 2.0 and 1.49 stay in the record as superseded readings, not deleted.\n\nHOLDING, BUT RUNNING QUICK. Jul 30 measured 2.0:1, with 7 of 8 clips landing 1.9–2.1. Aug 24 measured six strokes across two mats and two cameras: 1.56 to 2.13, mean about 1.79, five of six under 2:1. The direction is consistent enough to be a finding. The number is not — both analyses detect the start of the backswing as a departure from a plateau, which clips the slow first inches of the takeaway and shortens the ratio in ONE direction. If it is real the mechanism is a short backswing rather than a fast downswing, because the down-stroke durations cluster tightly and the backswings do not. ONE HAND-COUNTED STROKE calibrates the method against Jul 30's and settles this.\n\nAUG 26 RE-ANALYSIS of the Aug 10 mat film (IMG_3475, 240 fps) turns that column from a dash into a partial. It gives the first absolute stroke durations in the record: downstroke 0.200 s and 0.221 s, impact pinned to a single frame on both — brisk against the 0.23–0.30 s of Sessions 4 and 5, but inside his own range. The RATIO from it is only a bound, because a camera down the target line cannot see the takeaway begin: ≥1.90:1 and ≥1.51:1, both true values higher by an unknown amount. Putt 1's floor already clears 1.79. That is n=2 of bounds against 2.0 at n=8 and 1.79 at n=6, so it arbitrates nothing — and note a ratio is scale-free, so the 8x time-base error in that file does not touch any tempo number, only the absolute durations."
+          },
+          {
+            "name": "Early lift",
+            "state": "Closed",
+            "s": "good",
+            "marks": [
+              "✓",
+              "—",
+              "—",
+              "?"
+            ],
+            "verdict": "CLOSED Jul 30 — at 120 fps the sole held within 0.05–0.08 inches of its address height for the full 83 ms into impact, flat across ten consecutive frames. CHALLENGED Aug 24, AND THE CHALLENGE DID NOT SURVIVE, which is why that column is a question mark rather than a dash: the angle was tried and could not settle it. Comparing the head at matched depth reported it coming through up to half an inch higher — the exact shape lift has — but an independent replication using a different edge threshold returns the OPPOSITE sign, because the head is about 1.7× faster coming down and therefore more motion-blurred. Two methods, opposite signs, each in the direction its own bias predicts. Stays on the grid as maintenance; this is the fault that comes back quietly."
+          },
+          {
+            "name": "Start line / aim",
+            "state": "Open",
+            "s": "warn",
+            "marks": [
+              "✗",
+              "—",
+              "~",
+              "~"
+            ],
+            "verdict": "THE BIAS IS GONE. THE SCATTER IS NOT. Jul 30: 1.5° and 1.7° LEFT plus one straight — three putts pulling the same way, which is what an AIM error looks like, because aim does not vary between reps. Aug 10 against a printed line: 0.8° right, 1.0° left, 0.6° right, mean bias about 0.1°, and the one-way pull did not reproduce once. Aug 24 splits the row in two, and the split is the finding: on a BREAKING mat the start line IS measurable, to about ±0.3°, but aim ERROR is not, because nothing in the picture supplies intent — a 2.9° right start is either a perfect allowance or a shove. Four putts spread 3.0°, roughly 4 in at the hole, and THE ONLY MISS IS THE ONE THAT STARTED AT THE TARGET. Moving this row to AIM takes a FLAT mat with a printed line."
+          },
+          {
+            "name": "Face at impact",
+            "state": "Never measured",
+            "s": "warn",
+            "marks": [
+              "✗",
+              "—",
+              "?",
+              "—"
+            ],
+            "verdict": "NEVER DIRECTLY MEASURED — every reading here is inferred. Jul 30 was a red by deduction: neutral path, square stance, and the ball still starting left, so the face was pointing left at impact. Aug 10 could not resolve it — the head spans about 70 pixels in those clips and 1.5° is under two of them. Aug 24 could not either: all ten clips were shot along the target line, none overhead, none face-on. On a zero-torque head this is the same question as AIM, since the face you set is the face you deliver. An OVERHEAD set is the only realistic route, and it pays this row and Path at the same time."
+          },
+          {
+            "name": "Strike location",
+            "state": "Never measured",
+            "s": "warn",
+            "marks": [
+              "?",
+              "?",
+              "?",
+              "?"
+            ],
+            "verdict": "NEVER MEASURED, on any of the four putters owned this month, and still the leading candidate for what is left. Heel and toe contact rotate the face in opposite directions, which produces scatter with NO bias — the exact shape the Aug 10 mat set came back in. That is an inference, not a finding. Aug 24 added the first thing in the record that POINTS at it rather than inferring it: at address the ball sits toward the TOE side of the head, read by eye at roughly 7% of head width, ±4%. That is address position, not strike, and it proves nothing. The foot-powder or impact-tape test settles the whole row in twelve minutes and has been owed since Jul 30."
+          },
+          {
+            "name": "Pace / distance",
+            "state": "The open fault",
+            "s": "warn",
+            "marks": [
+              "—",
+              "~",
+              "—",
+              "~"
+            ],
+            "verdict": "THE OPEN FAULT, and still the least-measured thing on this page — it has decided the fate of two putters. Aug 10 afternoon: about 20 putts off above-ground cups, nine finishing dead, the worst about 4 ft, nothing long all day. Aug 24 on the AirBreak: seven putts, the first batch dying at five to six inches past and the second keeping 80–95% of its speed over six feet with one running into the bumper. TWO PACE BANDS IN ONE SESSION is itself the finding — pace is not repeatable enough yet to carry a single number. On that mat it also decides LINE, because the break is monotonic in speed. The 30-ft ladder is what turns this row into a number, and it has still never been run."
+          }
+        ]
+      }
+    },
+    {
+      "id": "s20-putter-shootout-tempo-call-20261103",
+      "type": "session-update",
+      "target": "s20-putter-shootout-20261030",
+      "detail": {
+        "gist": "Spider Tour X tops a 5-putt shootout on start line; LINK starts it closest but the mat broke it; tempo 1.49:1.",
+        "metrics": [
+          {
+            "k": "#1 · Spider Tour X 34\"",
+            "v": "3/5 made",
+            "s": "good",
+            "n": "start 1.9\" R · spread 0.53\" — tightest line"
+          },
+          {
+            "k": "#2 · LINK 2.1 at 70°",
+            "v": "2/5 made",
+            "s": "mid",
+            "n": "start 0.9\" R · spread 0.62\" — closest to the hole; mat broke 2 left"
+          },
+          {
+            "k": "#3 · Newport 2 35\"",
+            "v": "3/5 made",
+            "s": "warn",
+            "n": "start 2.1\" R · spread 1.50\" — ~3× the scatter"
+          },
+          {
+            "k": "Ball speed off the face",
+            "v": "64 · 61 · 62 in/s",
+            "s": "mid",
+            "n": "Spider · LINK · Newport — LINK steadiest (±2.2)"
+          },
+          {
+            "k": "Tempo back:through",
+            "v": "1.49:1",
+            "s": "warn",
+            "n": "same on all three, n=15 — app tempo of record is 1.79:1 (your call, Nov 3)"
+          },
+          {
+            "k": "Lie / face / strike",
+            "v": "Not measurable",
+            "s": "warn",
+            "n": "behind-and-above camera; needs face-on"
+          }
+        ],
+        "story": "Spider Tour X — tightest start line. Both misses started on its line and stayed right.\n\nLINK 2.1 — started closest to the hole. Two misses then broke left on the mat.\n\nNewport 2 — same makes as the Spider, about 3× the scatter.\n\nFive putts each can't separate make rates, so the order leans on start line.",
+        "limits": "HOW IT WAS READ. Each clip's mat edges were fitted as straight lines (about 1 px residual, so the lens is treated as 1×), and the perspective scale came from the ball's own 1.68\" diameter at two depths. The ball was tracked frame by frame from address; impact is the first frame of sustained ball motion, and the putter head's trace agrees with it to within one frame on all 15 strokes. Start line is a straight-line fit to the first 25–30 tracked roll points, extended to the cup. Makes were NOT taken from the tracker — balls already sitting in the cup contaminate a tracked end point — they were read by watching the cup fill. Jack confirmed the target was the middle cup; the ring to its right was unused.\n\nTEMPO — THREE FILM NUMBERS; YOU PICKED 1.79:1 ON NOV 3 AS THE TEMPO OF RECORD. 2.0:1 (n=8, two methods, LINK, Jul 30 / Aug 10), 1.79:1 (n=6, earlier pipeline) and now 1.49:1 (n=15, this camera). All three are film, so film-is-king cannot pick, and newest-wins would be the wrong rule. This one used an elevated behind-the-ball camera and a backstroke onset at 8% of backswing amplitude, and that threshold choice moves the ratio. The Aug 27 session already showed a behind-the-ball camera under-reports the ratio, so read 1.49 as possibly low, not as a new fault.\n\nTHE MAT. Its break here is a property of how it is laid TODAY. Whether this is the same mat and lay as the earlier ~4.9\" mat measurement was not confirmed, so the two are not compared. Re-laying the mat invalidates this.\n\nSTART LINE IS RELATIVE. The camera was above the ball, not at ground level, and the depth scale is approximate (±15%), so the inches compare these three putters on this setup and are not absolute angles. The view shifted slightly between clips.\n\nTRACKING GAPS. LINK putts 4–5 and Newport putt 5 lost the ball before the cup row; their outcomes still come from the cup-fill read.\n\nBAG RECORD. The app holds the LINK at 69° lie; Jack described it as 70° for this test. Not reconciled here. The Spider Tour X is not on the bag record and nothing here adds it — ownership is his to state.\n\nROLL PATHS. Each line is the tracked ball centre, binned every 4 inches of roll (median per bin), drawn top-down from the ball to the cup. Holed putts end at the cup. LINK putts 4 and 5 lost the track about a third of the way out (ball under the putter's shadow), so those lines stop short; putt 4 was still holed, read off the cup. The sideways scale is stretched about 2× against the length so the break is visible. Putter-head path cannot be read from this camera: it sits behind and above the ball, so the head's arc is foreshortened into the line. That needs an overhead or face-on clip.",
+        "shootout": [
+          {
+            "label": "#1 Spider Tour X 34\"",
+            "putts": [
+              {
+                "start": 2.25,
+                "made": true
+              },
+              {
+                "start": 0.97,
+                "made": true
+              },
+              {
+                "start": 2.1,
+                "made": false
+              },
+              {
+                "start": 2.09,
+                "made": false
+              },
+              {
+                "start": 2.19,
+                "made": true
+              }
+            ]
+          },
+          {
+            "label": "#2 LINK 2.1 at 70°",
+            "putts": [
+              {
+                "start": 1.29,
+                "made": true
+              },
+              {
+                "start": 0.36,
+                "made": false
+              },
+              {
+                "start": 0.6,
+                "made": false
+              },
+              {
+                "start": 1.79,
+                "made": true
+              },
+              {
+                "start": 0.43,
+                "made": false
+              }
+            ]
+          },
+          {
+            "label": "#3 Newport 2 35\"",
+            "putts": [
+              {
+                "start": -0.16,
+                "made": false
+              },
+              {
+                "start": 2.55,
+                "made": false
+              },
+              {
+                "start": 4.02,
+                "made": true
+              },
+              {
+                "start": 2.01,
+                "made": true
+              },
+              {
+                "start": 2.25,
+                "made": true
+              }
+            ]
+          }
+        ],
+        "paths": [
+          {
+            "label": "#1 Spider Tour X 34\"",
+            "len": 59.8,
+            "putts": [
+              {
+                "made": true,
+                "lost": false,
+                "pts": [
+                  [
+                    2.5,
+                    -0.54
+                  ],
+                  [
+                    6.3,
+                    -0.31
+                  ],
+                  [
+                    10.3,
+                    -0.1
+                  ],
+                  [
+                    14.2,
+                    0.07
+                  ],
+                  [
+                    18.1,
+                    0.19
+                  ],
+                  [
+                    22.1,
+                    0.29
+                  ],
+                  [
+                    25.8,
+                    0.34
+                  ],
+                  [
+                    29.9,
+                    0.4
+                  ],
+                  [
+                    33.9,
+                    0.53
+                  ],
+                  [
+                    38.3,
+                    0.66
+                  ],
+                  [
+                    42.0,
+                    0.79
+                  ],
+                  [
+                    46.2,
+                    0.94
+                  ],
+                  [
+                    50.2,
+                    1.13
+                  ],
+                  [
+                    54.0,
+                    1.34
+                  ],
+                  [
+                    58.7,
+                    1.43
+                  ],
+                  [
+                    59.8,
+                    0.0
+                  ]
+                ]
+              },
+              {
+                "made": true,
+                "lost": false,
+                "pts": [
+                  [
+                    1.9,
+                    -1.13
+                  ],
+                  [
+                    6.1,
+                    -0.85
+                  ],
+                  [
+                    10.2,
+                    -0.61
+                  ],
+                  [
+                    14.1,
+                    -0.5
+                  ],
+                  [
+                    18.8,
+                    -1.08
+                  ],
+                  [
+                    22.7,
+                    -0.98
+                  ],
+                  [
+                    26.3,
+                    -0.93
+                  ],
+                  [
+                    29.0,
+                    -0.99
+                  ],
+                  [
+                    33.9,
+                    0.79
+                  ],
+                  [
+                    38.0,
+                    0.93
+                  ],
+                  [
+                    42.1,
+                    1.06
+                  ],
+                  [
+                    46.1,
+                    1.11
+                  ],
+                  [
+                    50.0,
+                    1.16
+                  ],
+                  [
+                    53.6,
+                    1.23
+                  ],
+                  [
+                    57.9,
+                    1.31
+                  ],
+                  [
+                    59.8,
+                    0.0
+                  ]
+                ]
+              },
+              {
+                "made": false,
+                "lost": false,
+                "pts": [
+                  [
+                    2.2,
+                    -1.45
+                  ],
+                  [
+                    6.1,
+                    -1.11
+                  ],
+                  [
+                    10.3,
+                    -0.93
+                  ],
+                  [
+                    14.2,
+                    -0.71
+                  ],
+                  [
+                    18.0,
+                    -0.57
+                  ],
+                  [
+                    22.0,
+                    -1.14
+                  ],
+                  [
+                    26.1,
+                    -1.03
+                  ],
+                  [
+                    31.8,
+                    0.2
+                  ],
+                  [
+                    34.3,
+                    0.26
+                  ],
+                  [
+                    38.1,
+                    0.46
+                  ],
+                  [
+                    42.2,
+                    0.7
+                  ],
+                  [
+                    45.9,
+                    0.94
+                  ],
+                  [
+                    50.3,
+                    1.27
+                  ],
+                  [
+                    54.2,
+                    1.6
+                  ],
+                  [
+                    58.6,
+                    1.91
+                  ],
+                  [
+                    62.2,
+                    2.15
+                  ],
+                  [
+                    66.0,
+                    3.45
+                  ],
+                  [
+                    70.3,
+                    3.6
+                  ]
+                ]
+              },
+              {
+                "made": false,
+                "lost": false,
+                "pts": [
+                  [
+                    2.1,
+                    -1.87
+                  ],
+                  [
+                    5.8,
+                    -1.63
+                  ],
+                  [
+                    9.8,
+                    -1.28
+                  ],
+                  [
+                    13.9,
+                    -1.03
+                  ],
+                  [
+                    18.2,
+                    -0.74
+                  ],
+                  [
+                    22.1,
+                    -0.46
+                  ],
+                  [
+                    26.1,
+                    -0.17
+                  ],
+                  [
+                    29.9,
+                    0.11
+                  ],
+                  [
+                    33.9,
+                    0.48
+                  ],
+                  [
+                    37.9,
+                    0.86
+                  ],
+                  [
+                    42.0,
+                    1.26
+                  ],
+                  [
+                    45.9,
+                    1.63
+                  ],
+                  [
+                    50.2,
+                    2.06
+                  ],
+                  [
+                    53.9,
+                    2.52
+                  ],
+                  [
+                    58.2,
+                    2.93
+                  ],
+                  [
+                    60.9,
+                    3.19
+                  ],
+                  [
+                    67.8,
+                    3.57
+                  ],
+                  [
+                    68.2,
+                    3.68
+                  ]
+                ]
+              },
+              {
+                "made": true,
+                "lost": false,
+                "pts": [
+                  [
+                    2.3,
+                    -2.14
+                  ],
+                  [
+                    6.4,
+                    -1.82
+                  ],
+                  [
+                    10.3,
+                    -1.52
+                  ],
+                  [
+                    14.1,
+                    -1.22
+                  ],
+                  [
+                    18.1,
+                    -0.95
+                  ],
+                  [
+                    22.0,
+                    -0.69
+                  ],
+                  [
+                    25.9,
+                    -0.44
+                  ],
+                  [
+                    29.8,
+                    -0.16
+                  ],
+                  [
+                    34.1,
+                    0.21
+                  ],
+                  [
+                    38.1,
+                    0.64
+                  ],
+                  [
+                    42.0,
+                    1.05
+                  ],
+                  [
+                    46.0,
+                    1.47
+                  ],
+                  [
+                    49.9,
+                    1.79
+                  ],
+                  [
+                    54.0,
+                    2.28
+                  ],
+                  [
+                    57.8,
+                    2.59
+                  ],
+                  [
+                    59.8,
+                    0.0
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "label": "#2 LINK 2.1 at 70°",
+            "len": 60.1,
+            "putts": [
+              {
+                "made": true,
+                "lost": false,
+                "pts": [
+                  [
+                    2.2,
+                    -1.74
+                  ],
+                  [
+                    6.2,
+                    -1.48
+                  ],
+                  [
+                    10.2,
+                    -1.26
+                  ],
+                  [
+                    14.1,
+                    -1.09
+                  ],
+                  [
+                    18.3,
+                    -0.86
+                  ],
+                  [
+                    22.2,
+                    -0.64
+                  ],
+                  [
+                    26.2,
+                    -0.5
+                  ],
+                  [
+                    30.2,
+                    -0.38
+                  ],
+                  [
+                    34.2,
+                    -0.22
+                  ],
+                  [
+                    38.1,
+                    -0.01
+                  ],
+                  [
+                    41.9,
+                    0.18
+                  ],
+                  [
+                    46.1,
+                    0.49
+                  ],
+                  [
+                    50.3,
+                    0.86
+                  ],
+                  [
+                    54.5,
+                    1.04
+                  ],
+                  [
+                    58.3,
+                    1.24
+                  ],
+                  [
+                    60.4,
+                    1.19
+                  ],
+                  [
+                    60.1,
+                    0.0
+                  ]
+                ]
+              },
+              {
+                "made": false,
+                "lost": false,
+                "pts": [
+                  [
+                    2.2,
+                    -2.68
+                  ],
+                  [
+                    5.9,
+                    -2.51
+                  ],
+                  [
+                    10.1,
+                    -2.27
+                  ],
+                  [
+                    13.9,
+                    -2.07
+                  ],
+                  [
+                    17.7,
+                    -1.9
+                  ],
+                  [
+                    22.1,
+                    -1.8
+                  ],
+                  [
+                    26.2,
+                    -1.59
+                  ],
+                  [
+                    30.2,
+                    -1.45
+                  ],
+                  [
+                    34.3,
+                    -1.47
+                  ],
+                  [
+                    38.1,
+                    -1.56
+                  ],
+                  [
+                    41.8,
+                    -1.7
+                  ],
+                  [
+                    46.0,
+                    -1.92
+                  ],
+                  [
+                    50.2,
+                    -2.13
+                  ],
+                  [
+                    54.2,
+                    -2.45
+                  ],
+                  [
+                    57.9,
+                    -2.92
+                  ],
+                  [
+                    62.3,
+                    -3.77
+                  ],
+                  [
+                    66.1,
+                    -5.54
+                  ],
+                  [
+                    69.1,
+                    -6.99
+                  ]
+                ]
+              },
+              {
+                "made": false,
+                "lost": false,
+                "pts": [
+                  [
+                    2.1,
+                    -2.5
+                  ],
+                  [
+                    6.1,
+                    -2.24
+                  ],
+                  [
+                    10.1,
+                    -2.04
+                  ],
+                  [
+                    14.0,
+                    -1.85
+                  ],
+                  [
+                    18.2,
+                    -1.7
+                  ],
+                  [
+                    22.0,
+                    -1.58
+                  ],
+                  [
+                    26.0,
+                    -1.52
+                  ],
+                  [
+                    30.1,
+                    -1.55
+                  ],
+                  [
+                    34.1,
+                    -1.66
+                  ],
+                  [
+                    38.1,
+                    -1.81
+                  ],
+                  [
+                    41.9,
+                    -2.01
+                  ],
+                  [
+                    46.1,
+                    -2.27
+                  ],
+                  [
+                    50.2,
+                    -2.65
+                  ],
+                  [
+                    54.3,
+                    -3.15
+                  ],
+                  [
+                    57.9,
+                    -3.79
+                  ],
+                  [
+                    61.7,
+                    -4.75
+                  ],
+                  [
+                    67.3,
+                    -7.37
+                  ],
+                  [
+                    68.1,
+                    -7.1
+                  ]
+                ]
+              },
+              {
+                "made": true,
+                "lost": true,
+                "pts": [
+                  [
+                    2.2,
+                    -2.84
+                  ],
+                  [
+                    5.9,
+                    -2.5
+                  ],
+                  [
+                    9.9,
+                    -2.17
+                  ],
+                  [
+                    13.8,
+                    -1.92
+                  ],
+                  [
+                    18.1,
+                    -1.63
+                  ],
+                  [
+                    20.1,
+                    -1.54
+                  ]
+                ]
+              },
+              {
+                "made": false,
+                "lost": true,
+                "pts": [
+                  [
+                    2.1,
+                    -2.82
+                  ],
+                  [
+                    5.9,
+                    -2.65
+                  ],
+                  [
+                    10.0,
+                    -2.39
+                  ],
+                  [
+                    13.3,
+                    -2.2
+                  ],
+                  [
+                    16.3,
+                    -2.12
+                  ]
+                ]
+              }
+            ]
+          },
+          {
+            "label": "#3 Newport 2 35\"",
+            "len": 58.9,
+            "putts": [
+              {
+                "made": false,
+                "lost": false,
+                "pts": [
+                  [
+                    1.9,
+                    -1.59
+                  ],
+                  [
+                    6.0,
+                    -1.47
+                  ],
+                  [
+                    10.2,
+                    -1.33
+                  ],
+                  [
+                    14.0,
+                    -1.27
+                  ],
+                  [
+                    18.1,
+                    -1.17
+                  ],
+                  [
+                    22.0,
+                    -1.09
+                  ],
+                  [
+                    26.3,
+                    -1.06
+                  ],
+                  [
+                    30.3,
+                    -1.05
+                  ],
+                  [
+                    34.2,
+                    -1.09
+                  ],
+                  [
+                    38.2,
+                    -1.17
+                  ],
+                  [
+                    42.1,
+                    -1.28
+                  ],
+                  [
+                    46.2,
+                    -1.52
+                  ],
+                  [
+                    50.0,
+                    -1.86
+                  ],
+                  [
+                    54.2,
+                    -2.53
+                  ],
+                  [
+                    58.6,
+                    -3.68
+                  ],
+                  [
+                    60.8,
+                    -6.37
+                  ]
+                ]
+              },
+              {
+                "made": false,
+                "lost": false,
+                "pts": [
+                  [
+                    2.0,
+                    -2.64
+                  ],
+                  [
+                    6.1,
+                    -2.28
+                  ],
+                  [
+                    10.0,
+                    -1.87
+                  ],
+                  [
+                    14.1,
+                    -1.53
+                  ],
+                  [
+                    18.0,
+                    -1.17
+                  ],
+                  [
+                    21.9,
+                    -0.83
+                  ],
+                  [
+                    26.1,
+                    -0.52
+                  ],
+                  [
+                    29.9,
+                    -0.25
+                  ],
+                  [
+                    33.9,
+                    0.03
+                  ],
+                  [
+                    37.9,
+                    0.39
+                  ],
+                  [
+                    41.8,
+                    0.81
+                  ],
+                  [
+                    45.9,
+                    1.37
+                  ],
+                  [
+                    50.3,
+                    1.98
+                  ],
+                  [
+                    53.9,
+                    2.59
+                  ],
+                  [
+                    58.6,
+                    3.05
+                  ],
+                  [
+                    62.0,
+                    3.34
+                  ],
+                  [
+                    67.1,
+                    1.83
+                  ]
+                ]
+              },
+              {
+                "made": true,
+                "lost": false,
+                "pts": [
+                  [
+                    2.2,
+                    -2.42
+                  ],
+                  [
+                    6.2,
+                    -1.97
+                  ],
+                  [
+                    10.2,
+                    -1.54
+                  ],
+                  [
+                    14.3,
+                    -1.08
+                  ],
+                  [
+                    18.0,
+                    -0.66
+                  ],
+                  [
+                    22.0,
+                    -0.26
+                  ],
+                  [
+                    25.9,
+                    0.15
+                  ],
+                  [
+                    29.9,
+                    0.59
+                  ],
+                  [
+                    34.1,
+                    1.04
+                  ],
+                  [
+                    38.1,
+                    1.51
+                  ],
+                  [
+                    42.0,
+                    1.92
+                  ],
+                  [
+                    46.0,
+                    2.34
+                  ],
+                  [
+                    50.1,
+                    2.66
+                  ],
+                  [
+                    54.0,
+                    2.89
+                  ],
+                  [
+                    57.6,
+                    2.85
+                  ],
+                  [
+                    58.9,
+                    0.0
+                  ]
+                ]
+              },
+              {
+                "made": true,
+                "lost": false,
+                "pts": [
+                  [
+                    1.9,
+                    -2.43
+                  ],
+                  [
+                    5.8,
+                    -2.12
+                  ],
+                  [
+                    10.1,
+                    -1.82
+                  ],
+                  [
+                    14.1,
+                    -1.52
+                  ],
+                  [
+                    18.0,
+                    -1.22
+                  ],
+                  [
+                    21.9,
+                    -0.96
+                  ],
+                  [
+                    25.9,
+                    -0.72
+                  ],
+                  [
+                    29.9,
+                    -0.54
+                  ],
+                  [
+                    34.1,
+                    -0.42
+                  ],
+                  [
+                    38.2,
+                    -0.3
+                  ],
+                  [
+                    42.2,
+                    -0.13
+                  ],
+                  [
+                    46.0,
+                    0.08
+                  ],
+                  [
+                    49.8,
+                    0.26
+                  ],
+                  [
+                    54.1,
+                    0.37
+                  ],
+                  [
+                    59.6,
+                    0.49
+                  ],
+                  [
+                    58.9,
+                    0.0
+                  ]
+                ]
+              },
+              {
+                "made": true,
+                "lost": false,
+                "pts": [
+                  [
+                    2.3,
+                    -1.16
+                  ],
+                  [
+                    6.3,
+                    -0.93
+                  ],
+                  [
+                    10.2,
+                    -0.64
+                  ],
+                  [
+                    14.0,
+                    -0.44
+                  ],
+                  [
+                    18.0,
+                    -0.28
+                  ],
+                  [
+                    22.2,
+                    -0.12
+                  ],
+                  [
+                    26.1,
+                    -0.03
+                  ],
+                  [
+                    30.1,
+                    -0.01
+                  ],
+                  [
+                    34.2,
+                    -0.0
+                  ],
+                  [
+                    38.2,
+                    0.13
+                  ],
+                  [
+                    42.0,
+                    0.41
+                  ],
+                  [
+                    46.2,
+                    0.65
+                  ],
+                  [
+                    50.3,
+                    0.94
+                  ],
+                  [
+                    53.3,
+                    0.97
+                  ],
+                  [
+                    59.0,
+                    1.14
+                  ],
+                  [
+                    58.9,
+                    0.0
+                  ]
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "finding": "THE SPIDER TOUR X CAME OUT ON TOP, AND FIVE PUTTS A PUTTER CANNOT PROVE IT. Makes: Spider 3/5, Newport 2 3/5, LINK.2.1 2/5 — read by watching the cup fill on every one of the 15, not off a tracker. A 3/5 against a 2/5 is well inside chance, so the ranking leans on start line, which is measured on all 15.\n\nSTART LINE, projected to the cup (inches right of the hole, looking down the line — from BEHIND the ball image-right is Jack's RIGHT, the push side): Spider 1.92\" mean with 0.53\" spread · LINK 0.90\" with 0.62\" · Newport 2.13\" with 1.50\". The Spider and the LINK repeat; the Newport scatters about three times as much — its makes started anywhere from 2.0\" to 4.0\" right, and one miss started dead centre and broke about 6\" left.\n\nTHE LINK STARTS IT CLOSEST TO THE HOLE AND THE MAT PUNISHED IT. Two of its three misses started only 0.4–0.6\" right and then broke 3.8–5.0\" LEFT [OBSERVED]. Putts started near the centre broke hard left on this mat; putts started about 2\" right mostly held — which is the line the Spider and the Newport happened to be on. So the LINK's lower make count is at least partly the mat, not the putter. Both Spider misses are the opposite case: they started on its usual line (~2.1\" right) and held straight past the right edge — an aim/read miss, not scatter.\n\nSPEED off the face (first 12\" of roll): Spider 64 in/s ±3.9 · LINK 61 ±2.2 · Newport 62 ±2.7. All close; the LINK is the most even.\n\nTEMPO is the same stroke on all three: Spider 1.48 ±0.07 · LINK 1.53 ±0.11 · Newport 1.46 ±0.06, about 0.37 s back and 0.25 s through. Pooled 1.49:1, n=15. That does NOT agree with the 2.0:1 the app holds (n=8, LINK film Jul 30 / Aug 10) or the 1.79:1 from the earlier pipeline (n=6) — see limits. Resolved Nov 3: you set 1.79:1 as the tempo of record.\n\nWHAT THIS FILM CANNOT ANSWER IS THE QUESTION THE 70° LINK WAS FOR. Lie angle at address and impact (toe or heel up), face angle, strike location and shaft lean need a face-on camera at hand height; a behind-and-above view cannot see them."
     }
   ]
 }

@@ -768,7 +768,7 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
 | Returned | ~~L.A.B. Golf DF3i · 34"~~ | **returned Aug 10, 2026 — distance control.** Gamed Jul 18–30 and Aug 1–10. Its Press Pistol 2° went with it, so the "hands even with the ball" cue is **retired** — don't carry it to the LINK. Lost with it: the only measured scoreboard in the project (8/10 from four feet, Jul 20) and the high-MOI control head |
 | Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** |
 
-**Live putting priority: distance control.** Pace has now decided the fate of two putters (DF3i benched Jul 30, reprieved Aug 1, returned Aug 10) and had never been measured once until the live logger started recording putt distances (Aug 20) — the share of lags that finish inside three feet is the on-course version of it, so check that row before repeating "unmeasured". The grind is the 30-ft ladder twice a week on the LINK, logging *shorts · spread · green speed*, plus the unrun tape test — an off-centre strike bleeds ball speed, so it's a distance fault before it's a line fault. Tempo was read as **not** the problem (2.0:1 on this head vs a 2:1 target) — but as of Oct 30 2026 three film numbers disagree (2.0:1 n=8 · 1.79:1 n=6 · 1.49:1 n=15) and Jack has not chosen; see *Oct 30 putter shootout (v267)*. Do not quote any one of them as settled.
+**Live putting priority: distance control.** Pace has now decided the fate of two putters (DF3i benched Jul 30, reprieved Aug 1, returned Aug 10) and had never been measured once until the live logger started recording putt distances (Aug 20) — the share of lags that finish inside three feet is the on-course version of it, so check that row before repeating "unmeasured". The grind is the 30-ft ladder twice a week on the LINK, logging *shorts · spread · green speed*, plus the unrun tape test — an off-centre strike bleeds ball speed, so it's a distance fault before it's a line fault. Tempo was read as **not** the problem (2.0:1 on this head vs a 2:1 target) — but three film numbers disagreed (2.0:1 n=8 · 1.79:1 n=6 · 1.49:1 n=15), and on **Nov 3 2026 Jack chose 1.79:1** as the tempo of record (v274; see *Oct 30 putter shootout (v267)*). Quote 1.79:1 against the 2:1 target; the other two are superseded, not deleted.
 
 Wedge ladder behind the 44° PW carries roughly: PW 122 · 50° 108 · 56° 95 · 60° 80.
 
@@ -4437,6 +4437,11 @@ What it deliberately did NOT push, and why — keep it that way unless Jack deci
 - **No faults, evolution or test entry.** `test` is a 10-ball make count; five balls is not one. The tempo
   number conflicts with the grid's 2.0:1 and the earlier 1.79:1, all three are film, so the session states
   the conflict and the grid is untouched. **The call is Jack's.**
+  **Decided Nov 3 (v274):** Jack picked **1.79:1** as the tempo of record (Jarvis decision
+  `d-pick-a-putting-tempo-in-caddie-hq-mw0oamed`). Applied as `evolution-tempo-call-20261103` (full putting
+  grid, Tempo row state "1.79:1 · your call", prior verdict kept underneath) and session-update
+  `s20-putter-shootout-tempo-call-20261103`. 2.0:1 (n=8) and 1.49:1 (n=15) are superseded, not deleted. No
+  tempo fault added — 1.79 vs the 2:1 target is shown as "mid", not a new fault, unless Jack says otherwise.
 - **Bag (updated Oct 31):** Jack says the Spider Tour X is his, on the bench, 34"; the LINK is 34" and the
   Newport 2 35" (`length` field, shown beside a putter's type). The app holds the LINK at **69°**; he
   described it as **70°** for this test — not reconciled.
