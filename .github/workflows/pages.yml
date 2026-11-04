@@ -50,6 +50,7 @@ jobs:
           node tests/all-indoor-profiles.cjs
           node tests/round-takeaways.cjs
           node tests/bay-takeaways.cjs
+          node tests/range-nov04-hybrids.cjs
           node tests/range-sep22-batch1.cjs
           node tests/round-identity.cjs
           node tests/round-review-import.cjs
