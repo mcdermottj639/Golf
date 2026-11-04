@@ -131,6 +131,20 @@ def main():
                  f"{a3['total'] - a4['total']:.0f} yd further. Mishits held out: 3H {a3['held']}, 4H {a4['held']}. "
                  "Parked as carry offers; live playing carries unchanged."),
     })
+    # v279 — Jack, Nov 4 2026, 16:25 ET: "Make sure carries are updated with these new distances."
+    # His explicit instruction promotes the offers to the live playing carries. Same effect as tapping
+    # "use" on each row (row.carry = meas.carry); no meas key here, so the parked provenance stays intact.
+    for club, a in (('3-hybrid', a3), ('4-hybrid', a4)):
+        entries.append({
+            'id': f"carry-live-{club}-20261104-v1", 'type': 'carry-update', 'target': club, 'force': True,
+            'src': 'Jack in chat, 2026-11-04: make sure carries are updated with these new distances',
+            'club': {'carry': round(a['carry'])},  # whole yards, like every other ladder row
+        })
+    entries.append({
+        'id': 'history-hybrid-carries-live-20261104-v1', 'type': 'history', 'date': '2026-11-04',
+        'text': (f"Playing carries set from the Nov 4 range session at Jack's instruction: 3H {a3['carry']:.1f}, "
+                 f"4H {a4['carry']:.1f} (mishits held out). Indoor TrackMan numbers; normalization not shown."),
+    })
     feed = {'updated': '2026-11-04', 'entries': entries}
     (ROOT / 'range-20261104-feed.json').write_text(json.dumps(feed, indent=1, ensure_ascii=False) + '\n')
     for b in (h3, h4):

@@ -1279,6 +1279,32 @@
    "type": "history",
    "date": "2026-11-04",
    "text": "First full PING G440 3H range session. Clean carry 3H 187.3 (n=16, ±7.1) vs 4H 178.5 (n=6, ±5.4): 8.8 yd gap. 3H launches lower (10.2° vs 13.3°) with less spin (3,313 vs 3,906) and rolls 23 yd further. Mishits held out: 3H 16, 4H 6. Parked as carry offers; live playing carries unchanged."
+  },
+  {
+   "id": "carry-live-3-hybrid-20261104-v1",
+   "type": "carry-update",
+   "target": "3-hybrid",
+   "force": true,
+   "src": "Jack in chat, 2026-11-04: make sure carries are updated with these new distances",
+   "club": {
+    "carry": 187
+   }
+  },
+  {
+   "id": "carry-live-4-hybrid-20261104-v1",
+   "type": "carry-update",
+   "target": "4-hybrid",
+   "force": true,
+   "src": "Jack in chat, 2026-11-04: make sure carries are updated with these new distances",
+   "club": {
+    "carry": 178
+   }
+  },
+  {
+   "id": "history-hybrid-carries-live-20261104-v1",
+   "type": "history",
+   "date": "2026-11-04",
+   "text": "Playing carries set from the Nov 4 range session at Jack's instruction: 3H 187.3, 4H 178.5 (mishits held out). Indoor TrackMan numbers; normalization not shown."
   }
  ]
 }

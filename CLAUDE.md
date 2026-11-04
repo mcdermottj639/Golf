@@ -5,7 +5,7 @@ and courses in one installable web app. This file is the guide for keeping it cu
 
 ## Current bag update (v263, October 24, 2026)
 
-The final apply-once feed, bag-20261024-feed.json, adds the screenshot-confirmed PING G440 3H (Regular, ALTA CB Blue 70 Graphite, right hand), retaining the existing 4H. New club-bench feed entries call the normal benchClub helper so Cobra Utility 2i saved carries remain recoverable and historical shots are untouched. New 3H distances and adapter/degree setting are deliberately unconfirmed. Feed runs after prior bag/range feeds and is cached offline. Version 2 additionally removes the returned DS-ADAPT X 3-wood and Hi-Toe 58° by their exact owned-club IDs and removes their carry rows. Past shot/session records remain unchanged; neither returned club is on the bench and no replacement is automatically activated. Active bag count is now 12.
+The final apply-once feed, bag-20261024-feed.json, adds the screenshot-confirmed PING G440 3H (Regular, ALTA CB Blue 70 Graphite, right hand), retaining the existing 4H. New club-bench feed entries call the normal benchClub helper so Cobra Utility 2i saved carries remain recoverable and historical shots are untouched. The 3H adapter/degree setting is still unconfirmed; its carry was first measured Nov 4 (187, set live by Jack in v279 — see *November 4 hybrid range session*). Feed runs after prior bag/range feeds and is cached offline. Version 2 additionally removes the returned DS-ADAPT X 3-wood and Hi-Toe 58° by their exact owned-club IDs and removes their carry rows. Past shot/session records remain unchanged; neither returned club is on the bench and no replacement is automatically activated. Active bag count is now 12.
 
 ## What it is
 
@@ -4150,8 +4150,12 @@ session; it holds out several low 1.50-smash bullets that still carried 170+. 3H
 
 Clean reads: 3H 187.3 carry ±7.1 / 223.3 total, 87.6 club / 128.1 ball, 10.2°, 3,313 rpm, apex 53 ft;
 4H 178.5 ±5.4 / 200.2, 83.3 / 120.5, 13.3°, 3,906 rpm, apex 67 ft. Gap ≈ 9 yd carry, 23 yd total.
-Both park as `meas` offers on the `3-hybrid` / `4-hybrid` carry rows; live carries unchanged
-(normalization, ball and venue not shown). Two early-session recordings (6 × 3H, 6 × 4H) are
+Both park as `meas` offers on the `3-hybrid` / `4-hybrid` carry rows (v278). **v279: Jack then said
+"make sure carries are updated with these new distances"**, so two more apply-once `carry-update`s
+set the LIVE carry to the offer in whole yards (3H 187, 4H 178 — every ladder row is whole yards;
+`meas.carry` keeps 187.3 / 178.5). They send `carry` with no `meas`, so the parked provenance stays on the row. This is his
+explicit call overriding the standing "don't promote an indoor number" rule for these two rows only;
+normalization, ball and venue were not shown, and a later outdoor number of his still wins. Two early-session recordings (6 × 3H, 6 × 4H) are
 warm-ups by Jack's word: kept in the source record only, not on any card or average.
 Path stays out-to-in (3H −2.7°, 4H −1.7°) with face-to-path +4.1° / +2.9°: same fade pattern.
 
