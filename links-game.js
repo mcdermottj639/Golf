@@ -202,6 +202,11 @@ function boot(){
   let anim=null, meterT0=0, meterOn=false, raf=0;
   let fx=null; // after-shot effects: the flight trail fading out and the landing puff (v255); pure drawing, never scoring
   const FX_MS=1500, TRAIL_MAX=110;
+  // water ripples (v277): the 3D water moves whenever anything else does (camera, flight, a pull) and for RIPPLE_MS after,
+  // then rests, so the idle-frame stop still saves the phone's battery. sceneWater = the renderer saw mapped water on this hole.
+  const RIPPLE_MS=4000;let rippleUntil=0,sceneWater=false,inTick=false;
+  const rippling=()=>!reduced&&threeActive&&sceneWater&&performance.now()<rippleUntil;
+  function wakeWater(){if(reduced||!threeActive||!sceneWater)return;rippleUntil=performance.now()+RIPPLE_MS;kick()}
 
   function holesFor(len){const H=cur.holes;if(len==='front')return H.filter(h=>h.n<=9);if(len==='back')return H.filter(h=>h.n>=10&&h.n<=18);return H.filter(h=>h.n<=18)}
   function windFor(seed,h){const r=mulberry(hashStr(seed+':'+h.n));return{mph:Math.round(2+r()*14),from:r()*Math.PI*2}}
@@ -321,8 +326,8 @@ function boot(){
     if(!cur||!S||!S.h||W<2||H<2){ctx.fillStyle=COL.rough;ctx.fillRect(0,0,W,H);return}
     threeActive=use3D();$('cv3').hidden=!threeActive;rootNode.classList.toggle('lk-perspective',threeActive);
     if(threeActive){
-      const result=scene.render({course:cur,h:holeObj(),ballState:S.h,anim,fx,forecast:S.h.club.putter?null:forecast(),angle:view.ang,reduced,pulling:!!G,landing:landingView});
-      ctx.clearRect(0,0,W,H);if(result){sceneMoving=result.moving;drawSceneOverlay(result,W,H);if(sceneMoving)kick();}drawMini();return;
+      const result=scene.render({course:cur,h:holeObj(),ballState:S.h,anim,fx,forecast:S.h.club.putter?null:forecast(),angle:view.ang,reduced,pulling:!!G,landing:landingView,ripple:rippling()});
+      ctx.clearRect(0,0,W,H);if(result){sceneMoving=result.moving;sceneWater=!!result.water;drawSceneOverlay(result,W,H);if(sceneMoving)kick();if(!inTick)wakeWater();}drawMini();return;
     }
     $('target').hidden=true;$('pin').hidden=true;
     const putting=onGreen()&&!S.h.done;
@@ -522,7 +527,9 @@ function boot(){
     if(anim){busy=true;stepAnim(ts)}
     if(fx){if(ts-fx.t0<FX_MS)busy=true;else fx=null}
     if(meterOn){busy=true;updateNeedle(performance.now())}
-    draw();
+    if(busy)rippleUntil=ts+RIPPLE_MS; // motion of any kind keeps the water alive, and for a few seconds after it settles
+    inTick=true;try{draw()}finally{inTick=false}
+    if(!busy&&rippling())busy=true; // ripples alone keep frames going only until rippleUntil, then the loop stops as before
     if(busy&&!raf)raf=requestAnimationFrame(tick);
   }
   function needleAt(now){if(mode==='dial'){const p=((now-meterT0)/meterPeriod())%2;return p<1?-(1-p):(p-1)}const t=(now-meterT0)/meterPeriod();return -Math.cos(t*Math.PI*2)}
@@ -1032,7 +1039,7 @@ function boot(){
      visualViewport beats innerHeight on iOS, where the toolbar and the home indicator both eat space innerHeight still reports. */
   function fit(){const g=$('game');if(!g||g.hidden)return;const top=Math.max(0,g.getBoundingClientRect().top);const vv=window.visualViewport;const vh=vv&&vv.height?vv.height:window.innerHeight;R.style.setProperty('--lk-vh',Math.round(vh)+'px');R.style.setProperty('--lk-top',Math.round(top)+'px')}
   window.addEventListener('resize',fit);if(window.visualViewport)window.visualViewport.addEventListener('resize',fit);
-  dbgFn=()=>({landingView,camMode,records:store.get('records',{}),card:(()=>{const im=$('cardimg')?.querySelector('img');return im?{w:im.naturalWidth,h:im.naturalHeight,save:!$('savecard').hidden,href:$('savecard').getAttribute('download')}:null})(),renderer:threeActive?'3d':'map',scene:scene?.info(),course:S?.course,hole:S?.h?holeObj().n:null,aim:S?.h?.aim,worldBall:S?.h?.ball,pin:S?.h?holeObj().pin:null,lie:S?.h?.lie,ball:S&&S.h?toScreen(S.h.ball):null,phase:S&&S.h&&S.h.phase,mode,strokes:S&&S.h&&S.h.strokes,scores:S&&S.scores,anim:anim?{kind:anim.kind,trail:anim.trail?anim.trail.length:0,landed:!!anim.landedAt}:null,fx:fx?{age:Math.round(performance.now()-fx.t0),trail:fx.trail.length,lie:fx.lie}:null,drawMs:()=>{const t0=performance.now();for(let i=0;i<30;i++){staticKey='';draw()}return(performance.now()-t0)/30}});
+  dbgFn=()=>({landingView,camMode,water:{has:sceneWater,rippling:rippling(),msLeft:Math.max(0,Math.round(rippleUntil-performance.now())),loop:!!raf},records:store.get('records',{}),card:(()=>{const im=$('cardimg')?.querySelector('img');return im?{w:im.naturalWidth,h:im.naturalHeight,save:!$('savecard').hidden,href:$('savecard').getAttribute('download')}:null})(),renderer:threeActive?'3d':'map',scene:scene?.info(),course:S?.course,hole:S?.h?holeObj().n:null,aim:S?.h?.aim,worldBall:S?.h?.ball,pin:S?.h?holeObj().pin:null,lie:S?.h?.lie,ball:S&&S.h?toScreen(S.h.ball):null,phase:S&&S.h&&S.h.phase,mode,strokes:S&&S.h&&S.h.strokes,scores:S&&S.scores,anim:anim?{kind:anim.kind,trail:anim.trail?anim.trail.length:0,landed:!!anim.landedAt}:null,fx:fx?{age:Math.round(performance.now()-fx.t0),trail:fx.trail.length,lie:fx.lie}:null,drawMs:()=>{const t0=performance.now();for(let i=0;i<30;i++){staticKey='';draw()}return(performance.now()-t0)/30}});
   stopFn=()=>{stopped=true;S=null;roundToken++;if(cardURL){URL.revokeObjectURL(cardURL);cardURL=null}clearTimeout(gimmeTimer);scene?.dispose();scene=null;if(raf)cancelAnimationFrame(raf);raf=0;anim=null;fx=null;meterOn=false;clearTimeout(bannerTimer);ro.disconnect();document.removeEventListener('keydown',onKey);window.removeEventListener('resize',fit);if(window.visualViewport)window.visualViewport.removeEventListener('resize',fit);document.body.classList.remove('lk-ingame')};
   renderMenu();draw();
 

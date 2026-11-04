@@ -4131,7 +4131,7 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
-## Caddie HQ Links — the course game (v267, October 30 2026)
+## Caddie HQ Links — the course game (v277, November 4 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own
 bag. Full shots use a behind-ball 3D view and a following camera; putting and the optional hole map remain 2D. Entry: Rounds → Round prep → *Play Links*, the Overview hero's *Play Links* button, or search
@@ -4214,7 +4214,8 @@ starts 18 yd behind / 11 yd above the tee ball (14 / 8 on other lies), then foll
 planar ground; sky/distant rays retain the last valid aim. `chqlinks:cam` remembers Shot / Hole;
 on the green the 2D putting view overrides it. The mini-map filters out fairways and greens assigned
 to other holes. DPR is capped at 1.5, trees at 1,100 near the active route, and geometries are merged
-by surface. Idle frames stop after the camera settles. Context loss or module/texture load failure
+by surface. Idle frames stop after the camera settles (water ripples hold them ~4 s longer — see *Water
+ripples*). Context loss or module/texture load failure
 falls back to the existing Canvas 2D renderer. Unmount disposes GPU resources and guards late imports.
 The original Canvas static-layer cache and dynamic overlays remain the map/putting/fallback path.
 Reduced motion skips chase movement and flight effects.
@@ -4246,6 +4247,31 @@ shadow darker than the mirrored point and open fairway; the sun side of the trun
 390×844 and 320×690 (14 courses, Wianno, 3D triangles, slingshot flight → aim, map paints, Night mode,
 Quit and re-enter, golf state unchanged, zero errors). Nothing about a lie, bounce, score or pack changes,
 so it is not behind a flag.
+
+**Water ripples (v277, PR #84, branch links/20261104-water-ripples).** The 3D water was a flat `MeshStandardMaterial`
+teal (v252–v275). `waterMat` in `links-scene.js` is now one `ShaderMaterial` shared by every water polygon
+(`groundMaterials.water` is the same object, not a clone, so one clock drives every pond): three sine wave
+trains cross the surface in world yards (wavelengths ~11 / 5 / 2 yd), their analytic slope is the normal, and
+the fragment mixes a deep and a shallow teal by wave height, a sky tint by Fresnel (so the surface turns pale
+and bluer along a glancing look from the low tee camera), and a specular glint from the same `sun` light.
+It includes three's fog, tone-mapping and colour-space chunks so it sits in the scene like the standard
+materials; it keeps the paint-stack rules (depthTest/depthWrite off, renderOrder −60). **The clock only runs
+when asked**: `render({ripple})` adds the frame's own `dt` to `waterTime` while `ripple` is true, so waking
+never jumps the pattern, and `info()` reports `water` (mapped water near this hole, set in `setHole`) and
+`waterTime`. On the game side `RIPPLE_MS` (4 s): any motion in `tick()` (camera, flight, fx, meter) sets
+`rippleUntil = ts + RIPPLE_MS`; a `draw()` from outside the loop (a tap, a pull, a club change) calls
+`wakeWater()`, which does the same and kicks the loop; and `tick()` stays busy on ripples alone only until
+`rippleUntil`, so the idle-frame stop still holds — the water rests ~4 s after the last thing moved. Reduced
+motion never ripples (clock stays 0). `debug().water` is `{has, rippling, msLeft, loop}`. Scenery only: a
+water lie is the mapped polygon's call, and no shot, roll, penalty or score changes, so it is not behind a
+flag. The 2D hole map and putting view keep their static stripe highlight. Verified by
+`tests/links-water-browser.cjs`: an isolated-renderer fixture with a pond 48–72 yd out (the clock advances by
+the frames' elapsed time while rippling and holds at rest; the surface pixels change while rippling and are
+identical between two resting frames; a dry hole reports no water), then the real app at 390×844 and 320×690
+on Wianno front 9 (hole 1 has mapped water in range: ripples alive right after the intro camera, asleep with
+the loop stopped after the window, alive through a slingshot flight, asleep again; map paints; Night; Quit and
+re-enter; golf state unchanged; zero errors) and a reduced-motion context (water present, still, clock 0).
+Frame time is in the PR; the shader covers a few small polygons, so no measurable change was expected.
 
 **Landing inspection.** Landing spot moves to an elevated close-up centered on the current
 predicted carry point. Its anchor and heading stay fixed during tap/drag aiming; it never moves
@@ -4408,8 +4434,9 @@ browser checks, not a claim of an on-device Safari test.
 **v256 safe exit.** The in-game body supplies top safe-area padding because its normal masthead is hidden. A 44 px minimum Back to Caddie HQ button calls the app bridge to render Home; render unmounts Links and restores the masthead/navigation. Leaving discards the current game without changing golf records. Keep this exit visible when adjusting viewport sizing.
 
 **Backlog.** Surveyed terrain elevations and fuller feature coverage are needed for faithful course
-rehearsal. Graphics: improved canopies (the shadows half of that item is in PR #81, now v273), water animation,
-3D putting when it can preserve readability. The current renderer already includes textured surfaces and decorative trees. Game: per-club dispersion from every bay session instead of
+rehearsal. Graphics: improved canopies (the shadows half of that item shipped as v273), 3D putting when it
+can preserve readability. The current renderer already includes textured surfaces, decorative trees, sun-cast
+shadows and rippling water. Game: per-club dispersion from every bay session instead of
 the built-in table; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry.
 Standing plans are now available from each hole.
 Rules for that task: one improvement per run, feature-flag anything that changes scoring, never touch
@@ -4417,13 +4444,14 @@ packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item
 section, and log the run in the handoff.
 History: ball trail + landing puff — v255, PR #79, already merged; v256 exit/safe area also on main.
 Shipped: course records + shareable scorecard image — v264, PR #80, merged to main as da3ab17 on October 26.
-Shipped: sun-cast shadows for trees, flagstick and ball — PR #81 (branch links/20261028-sun-shadows, awaiting
-Jack's merge). Authored as v265 on October 28; the course batch took v266 on main the same day, so the branch
-was rebased and renumbered v267 on October 30 — and v267–v272 then landed on main (the putter shootout, bench
-*Mark as sold*, shootout chart and roll paths, scannable club notes, putter lengths), so the November 2 run
-rebased it again onto e2449cf and renumbered it **v273** (BUILD = CACHE = next integer after main). Every
-release entry on main is preserved under it. If main moves again before the merge, rebase and renumber the
-same way.
+Shipped: sun-cast shadows for trees, flagstick and ball — PR #81 (branch links/20261028-sun-shadows), merged by
+Jack on November 3 as v273 (main 7441a68). Authored as v265 on October 28; the course batch took v266 on main the
+same day, so the branch was rebased and renumbered v267 on October 30 — and v267–v272 then landed on main, so
+the November 2 run rebased it again onto e2449cf and renumbered it v273 (BUILD = CACHE = next integer after
+main). The rule stands for every links/ PR: if main moves before the merge, rebase and renumber the same way.
+Shipped: water ripples in the 3D view — PR #84, branch links/20261104-water-ripples, awaiting Jack's merge.
+Authored as v276 on November 4 (main 2733fe9); the fourth course batch took v276 on main the same morning, so
+the midday run rebased it onto 52b7144 and renumbered it v277.
 
 ## Oct 30 putter shootout (v267)
 
