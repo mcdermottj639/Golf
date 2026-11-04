@@ -38,13 +38,46 @@ export async function create(canvas,onLost){
   const materials={},textures=[foliage];
   for(const kind of ['rough','fairway','green','sand']){const tex=texture(kind);textures.push(tex);materials[kind]=new T.MeshStandardMaterial({map:tex,roughness:1,color:kind==='fairway'?'#c3d6a2':'#ffffff'});}
   materials.tee=materials.fairway;materials.bunker=materials.sand;materials.wood=materials.rough;
-  materials.water=new T.MeshStandardMaterial({color:'#3b8896',roughness:.3,metalness:.35});
+  // Water ripples (v277): one flat shader instead of the v252–v275 solid teal. Three wave trains cross the surface
+  // in world yards; their analytic slope is the normal, so the sun glint and the sky reflection move with the
+  // waves. The clock (uTime) only advances when the game asks for ripples — see render({ripple}) — so a resting
+  // phone shows a still surface and the idle-frame stop keeps working. Scenery only: a water lie is decided by
+  // the mapped polygon, never by the picture.
+  const waterMat=new T.ShaderMaterial({
+    uniforms:T.UniformsUtils.merge([T.UniformsLib.fog,{uTime:{value:0},uSun:{value:sun.position.clone().normalize()}}]),
+    fog:true,depthTest:false,depthWrite:false,
+    vertexShader:`#include <fog_pars_vertex>
+varying vec3 vW;
+void main(){vec4 wp=modelMatrix*vec4(position,1.);vW=wp.xyz;vec4 mvPosition=viewMatrix*wp;gl_Position=projectionMatrix*mvPosition;
+#include <fog_vertex>
+}`,
+    fragmentShader:`#include <fog_pars_fragment>
+uniform float uTime;uniform vec3 uSun;varying vec3 vW;
+float wave(vec2 p,vec2 d,float k,float w,float t,out vec2 g){float ph=dot(p,d)*k+t*w;g=d*k*cos(ph);return sin(ph);}
+void main(){
+  vec2 p=vW.xz;float t=uTime;vec2 g,gs=vec2(0.);float h=0.;
+  h+=.55*wave(p,normalize(vec2(1.,.35)),.55,1.1,t,g);gs+=.55*g;
+  h+=.30*wave(p,normalize(vec2(-.4,1.)),1.3,1.7,t,g);gs+=.30*g;
+  h+=.15*wave(p,normalize(vec2(.7,-.8)),2.9,2.6,t,g);gs+=.15*g;
+  vec3 n=normalize(vec3(-gs.x*.5,1.,-gs.y*.5));
+  vec3 v=normalize(cameraPosition-vW);
+  float fr=pow(1.-max(dot(n,v),0.),3.);
+  vec3 deep=vec3(.02,.10,.14),shallow=vec3(.07,.26,.30),sky=vec3(.26,.44,.56);
+  vec3 col=mix(deep,shallow,.5+.5*h);col=mix(col,sky,.12+.5*fr);
+  vec3 hv=normalize(uSun+v);float spec=pow(max(dot(n,hv),0.),120.);
+  col+=vec3(1.,.96,.85)*spec*.9;
+  gl_FragColor=vec4(col,1.);
+#include <tonemapping_fragment>
+#include <colorspace_fragment>
+#include <fog_fragment>
+}`});
+  materials.water=waterMat;let waterTime=0,hasWater=false;
   // Planar course surfaces are a paint stack, not competing depth layers.
   // Tiny height offsets alone flicker at shallow flight angles on mobile GPUs.
   // The base still writes depth; objects, shadows and the ball keep normal depth tests.
   const groundOrder={wood:-90,fairway:-80,tee:-70,water:-60,rough:-51,bunker:-50,green:-40};
-  const groundMaterials={};
-  for(const kind of Object.keys(groundOrder)){const mat=materials[kind].clone();mat.depthTest=false;mat.depthWrite=false;groundMaterials[kind]=mat;}
+  const groundMaterials={water:waterMat}; // the water shader is shared, not cloned, so one clock drives every pond
+  for(const kind of Object.keys(groundOrder)){if(kind==='water')continue;const mat=materials[kind].clone();mat.depthTest=false;mat.depthWrite=false;groundMaterials[kind]=mat;}
   // Sky is decorative; the playable ground stays planar until elevation is sourced.
   const sky=new T.Mesh(new T.SphereGeometry(1500,24,12),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,vertexShader:'varying vec3 v;void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:`varying vec3 v;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}void main(){vec3 d=normalize(v);float h=d.y;vec3 c=mix(vec3(.83,.88,.82),vec3(.24,.55,.80),smoothstep(-.04,.65,h));vec2 p=d.xz/max(.12,h)*1.5;float n=noise(p)*.55+noise(p*2.03)*.27+noise(p*4.13)*.12+noise(p*8.17)*.06;float cloud=smoothstep(.48,.73,n)*smoothstep(.015,.22,h);c=mix(c,vec3(.96,.97,.92),cloud*.8);gl_FragColor=vec4(c,1.);}`}));scene.add(sky);
   const shadowTex=radial();textures.push(shadowTex);
@@ -98,6 +131,7 @@ export async function create(canvas,onLost){
       (byKind[f.kind]||(byKind[f.kind]=[])).push(g);
     }
     for(const [kind,geoms]of Object.entries(byKind)){const mesh=new T.Mesh(combine(geoms),groundMaterials[kind]||groundMaterials.rough);mesh.renderOrder=groundOrder[kind]??-51;root.add(mesh);}
+    hasWater=!!byKind.water; // mapped water near this hole: the game only keeps frames alive for ripples where there is some
     // Every tree uses the existing simulated tree position/radius, preserving lies.
     // Shared geometry + instancing keeps the cost bounded even for larger courses.
     const trees=course.trees.filter(t=>nearest(t.p,h.path)<180).slice(0,1100);
@@ -119,7 +153,7 @@ export async function create(canvas,onLost){
     for(const sign of [-1,1]){const marker=new T.Mesh(new T.BoxGeometry(.3,.22,.3),markerMat);marker.position.copy(V(h.tee,.2)).addScaledVector(side,sign*2.2);root.add(marker);}
     flag.position.copy(V(h.pin,.02));poleShadow.position.copy(V(h.pin,.03)).addScaledVector(SUN.dir,1.5*SUN.stretch);
   }
-  function render({course,h,ballState,anim,fx,forecast,angle,reduced,pulling,landing:scout}){
+  function render({course,h,ballState,anim,fx,forecast,angle,reduced,pulling,landing:scout,ripple}){
     if(disposed)return;setHole(course,h);
     const nw=canvas.clientWidth,nh=canvas.clientHeight;if(!nw||!nh)return;
     if(nw!==W||nh!==H){W=nw;H=nh;renderer.setSize(W,H,false);camera.aspect=W/H;camera.updateProjectionMatrix();}
@@ -136,6 +170,8 @@ export async function create(canvas,onLost){
     if(scout&&!flight){wanted.copy(V(scout.center)).addScaledVector(u,-38);wanted.y=55;look.copy(V(scout.center,.2));}
     if(flight&&!reduced){wanted.copy(bp).addScaledVector(u,-23);wanted.y+=9;look.copy(bp).addScaledVector(u,22);look.y=Math.max(.4,height*.55);}
     const now=performance.now(),dt=lastRender?clamp((now-lastRender)/1000,0,.1):1/60;lastRender=now;
+    // the water clock runs only while ripples are wanted, and by the frame's own elapsed time, so waking it never jumps the pattern
+    if(ripple&&hasWater){waterTime+=dt;waterMat.uniforms.uTime.value=waterTime;}
     if(!valid||reduced){camera.position.copy(wanted);}else camera.position.lerp(wanted,1-Math.exp(-dt*(flight?12:16)));
     camera.lookAt(look);camera.updateMatrixWorld();valid=true;
     ball.position.copy(bp);ball.position.y+=ballState.lie==='tee'&&!flight?.25:.21;ball.visible=!ballState.holed;
@@ -165,11 +201,11 @@ export async function create(canvas,onLost){
     const puff=flight&&anim.landedAt?{land:anim.land,t0:anim.landedAt}:fx;
     landing.visible=!!puff&&performance.now()-puff.t0<1500;if(landing.visible){const age=(performance.now()-puff.t0)/1500;landing.position.copy(V(puff.land,.17));landing.scale.setScalar(1+age*8);landing.material.opacity=1-age;}
     renderer.render(scene,camera);
-    return{target,flight,height,progress:k,carry:flight?Math.round(Math.hypot(pos[0]-anim.b[0],pos[1]-anim.b[1])):0,ball:project(b,.25),moving:camera.position.distanceTo(wanted)>.02};
+    return{target,flight,height,progress:k,carry:flight?Math.round(Math.hypot(pos[0]-anim.b[0],pos[1]-anim.b[1])):0,ball:project(b,.25),moving:camera.position.distanceTo(wanted)>.02,water:hasWater};
   }
   function project(p,height=0){temp.copy(V(p,height)).project(camera);return[(temp.x+1)*W/2,(1-temp.y)*H/2,temp.z];}
   function unproject(x,y){ray.setFromCamera(new T.Vector2(x/W*2-1,1-y/H*2),camera);const hit=ray.ray.intersectPlane(plane,temp);if(!hit||hit.distanceTo(camera.position)>650)return null;return[hit.x+origin[0],origin[1]-hit.z];}
   function lost(e){e.preventDefault();if(!disposed)onLost?.();}canvas.addEventListener('webglcontextlost',lost);
   function dispose(){if(disposed)return;disposed=true;canvas.removeEventListener('webglcontextlost',lost);const geoms=new Set(),mats=new Set([...Object.values(materials),...Object.values(groundMaterials)]);scene.traverse(o=>{if(o.geometry)geoms.add(o.geometry);if(o.material){for(const m of(Array.isArray(o.material)?o.material:[o.material]))mats.add(m);}if(o.isInstancedMesh)o.dispose();});for(const g of geoms)g.dispose();for(const m of mats)m.dispose();for(const t of textures)t.dispose();renderer.dispose();renderer.forceContextLoss();}
-  return{render,project,unproject,dispose,reset:()=>{valid=false;},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,camera:camera.position.toArray(),sun:{dir:[SUN.dir.x,SUN.dir.z],elevationDeg:Math.round(SUN.elevation*180/Math.PI*10)/10,stretch:SUN.stretch},ballShadow:ballShadow.position.toArray(),ballPos:ball.position.toArray(),poleShadow:poleShadow.position.toArray()})};
+  return{render,project,unproject,dispose,reset:()=>{valid=false;},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,camera:camera.position.toArray(),sun:{dir:[SUN.dir.x,SUN.dir.z],elevationDeg:Math.round(SUN.elevation*180/Math.PI*10)/10,stretch:SUN.stretch},ballShadow:ballShadow.position.toArray(),ballPos:ball.position.toArray(),poleShadow:poleShadow.position.toArray(),water:hasWater,waterTime})};
 }
