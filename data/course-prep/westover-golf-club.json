@@ -1,0 +1,263 @@
+{
+  "id": "westover-golf-club",
+  "name": "Westover Golf Club",
+  "shortName": "Westover",
+  "place": "Jeffersonville, PA",
+  "aliases": [
+    "Westover Country Club",
+    "Westover Golf & Country Club"
+  ],
+  "source": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+  "tour": "https://westovergc.com/course-layout/",
+  "storageKey": "westover_country_club",
+  "bounds": [
+    40.118,
+    -75.397,
+    40.132,
+    -75.372
+  ],
+  "center": [
+    40.1250421,
+    -75.3885772
+  ],
+  "par": 70,
+  "defaultTee": "white",
+  "verified": "2026-11-04",
+  "sourceLabel": "Published detailed card checked against current USGA totals and club course page",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-75.397,40.118,-75.372,40.132",
+  "cardNote": "The detailed Blue, White and Gold per-hole rows reconcile exactly to the current USGA lengths, ratings and slopes (5,982; 5,602; 4,931) and the club’s current page links a scorecard. Stroke indexes are omitted because current secondary reproductions disagree. Red is omitted because the current USGA row has a different par. All 18 numbered OSM routes are inside the club boundary; raw routes omit par, so each map records explicit card provenance.",
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 5982,
+      "rating": 69.2,
+      "slope": 125,
+      "yards": [
+        329,
+        507,
+        415,
+        181,
+        457,
+        344,
+        481,
+        192,
+        374,
+        363,
+        162,
+        397,
+        191,
+        347,
+        377,
+        330,
+        132,
+        403
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 5602,
+      "rating": 67.5,
+      "slope": 122,
+      "yards": [
+        317,
+        486,
+        406,
+        155,
+        420,
+        295,
+        451,
+        175,
+        360,
+        338,
+        156,
+        379,
+        165,
+        332,
+        370,
+        321,
+        122,
+        354
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "total": 4931,
+      "rating": 64.9,
+      "slope": 116,
+      "yards": [
+        302,
+        471,
+        397,
+        113,
+        377,
+        281,
+        391,
+        150,
+        281,
+        303,
+        125,
+        360,
+        113,
+        207,
+        335,
+        296,
+        111,
+        318
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "osmId": 1553244494,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244494 is inside the Westover course boundary and matches the published hole 1 sequence; raw OSM par is absent, so par 4 is sourced from the current published card."
+    },
+    {
+      "n": 2,
+      "par": 5,
+      "osmId": 1553244495,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244495 is inside the Westover course boundary and matches the published hole 2 sequence; raw OSM par is absent, so par 5 is sourced from the current published card."
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "osmId": 1553244496,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244496 is inside the Westover course boundary and matches the published hole 3 sequence; raw OSM par is absent, so par 4 is sourced from the current published card."
+    },
+    {
+      "n": 4,
+      "par": 3,
+      "osmId": 1553244497,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "mapVerification": "Numbered OSM route 1553244497 is inside the Westover course boundary and matches the published hole 4 sequence; raw OSM par is absent, so par 3 is sourced from the current published card."
+    },
+    {
+      "n": 5,
+      "par": 5,
+      "osmId": 1553244498,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244498 is inside the Westover course boundary and matches the published hole 5 sequence; raw OSM par is absent, so par 5 is sourced from the current published card."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "osmId": 1553244499,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244499 is inside the Westover course boundary and matches the published hole 6 sequence; raw OSM par is absent, so par 4 is sourced from the current published card."
+    },
+    {
+      "n": 7,
+      "par": 5,
+      "osmId": 1553244500,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244500 is inside the Westover course boundary and matches the published hole 7 sequence; raw OSM par is absent, so par 5 is sourced from the current published card."
+    },
+    {
+      "n": 8,
+      "par": 3,
+      "osmId": 1553244501,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "mapVerification": "Numbered OSM route 1553244501 is inside the Westover course boundary and matches the published hole 8 sequence; raw OSM par is absent, so par 3 is sourced from the current published card."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "osmId": 1553244502,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244502 is inside the Westover course boundary and matches the published hole 9 sequence; raw OSM par is absent, so par 4 is sourced from the current published card."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "osmId": 1553244503,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244503 is inside the Westover course boundary and matches the published hole 10 sequence; raw OSM par is absent, so par 4 is sourced from the current published card."
+    },
+    {
+      "n": 11,
+      "par": 3,
+      "osmId": 1553244504,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "mapVerification": "Numbered OSM route 1553244504 is inside the Westover course boundary and matches the published hole 11 sequence; raw OSM par is absent, so par 3 is sourced from the current published card."
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "osmId": 1553244505,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244505 is inside the Westover course boundary and matches the published hole 12 sequence; raw OSM par is absent, so par 4 is sourced from the current published card."
+    },
+    {
+      "n": 13,
+      "par": 3,
+      "osmId": 1553244506,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "mapVerification": "Numbered OSM route 1553244506 is inside the Westover course boundary and matches the published hole 13 sequence; raw OSM par is absent, so par 3 is sourced from the current published card."
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "osmId": 1553244507,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244507 is inside the Westover course boundary and matches the published hole 14 sequence; raw OSM par is absent, so par 4 is sourced from the current published card."
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "osmId": 1553244508,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244508 is inside the Westover course boundary and matches the published hole 15 sequence; raw OSM par is absent, so par 4 is sourced from the current published card."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "osmId": 1553244509,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244509 is inside the Westover course boundary and matches the published hole 16 sequence; raw OSM par is absent, so par 4 is sourced from the current published card."
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "osmId": 1553244510,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course.",
+      "mapVerification": "Numbered OSM route 1553244510 is inside the Westover course boundary and matches the published hole 17 sequence; raw OSM par is absent, so par 3 is sourced from the current published card."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "osmId": 1553244511,
+      "parSource": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapVerification": "Numbered OSM route 1553244511 is inside the Westover course boundary and matches the published hole 18 sequence; raw OSM par is absent, so par 4 is sourced from the current published card."
+    }
+  ],
+  "additionalSources": [
+    "https://westovergc.com/course-layout/",
+    "https://ncrdb.usga.org/courseTeeInfo?CourseID=3241",
+    "https://gapgolf.org/play/club-directory/westover-golf-club/"
+  ]
+}

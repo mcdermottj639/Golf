@@ -243,5 +243,274 @@
     "guides": 18,
     "bytes": 126516,
     "exceptions": []
+  },
+  {
+    "id": "princeton-country-club",
+    "verified": "2026-11-04",
+    "source": "https://golfmercercounty.com/wp-content/uploads/2025/03/196191_proofV1.pdf",
+    "holes": 18,
+    "maps": 0,
+    "guides": 0,
+    "bytes": 7600,
+    "exceptions": [
+      {
+        "hole": 1,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 2,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 3,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 4,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 5,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 6,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 7,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 8,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 9,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 10,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 11,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 12,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 13,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 14,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 15,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 16,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 17,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 18,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      }
+    ]
+  },
+  {
+    "id": "makefield-highlands",
+    "verified": "2026-11-04",
+    "source": "https://makefieldhighlandsgolf.com/wp-content/uploads/2021/07/makefiled-highlands-5-12-Scorecard.pdf",
+    "holes": 18,
+    "maps": 0,
+    "guides": 0,
+    "bytes": 8010,
+    "exceptions": [
+      {
+        "hole": 1,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 2,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 3,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 4,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 5,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 6,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 7,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 8,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 9,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 10,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 11,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 12,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 13,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 14,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 15,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 16,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 17,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 18,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      }
+    ]
+  },
+  {
+    "id": "mountain-view-nj",
+    "verified": "2026-11-04",
+    "source": "https://golfmercercounty.com/wp-content/uploads/2025/03/194353_proofV7.pdf",
+    "holes": 18,
+    "maps": 0,
+    "guides": 0,
+    "bytes": 7737,
+    "exceptions": [
+      {
+        "hole": 1,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 2,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 3,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 4,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 5,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 6,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 7,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 8,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 9,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 10,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 11,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 12,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 13,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 14,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 15,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 16,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 17,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      },
+      {
+        "hole": 18,
+        "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+      }
+    ]
+  },
+  {
+    "id": "northampton-valley",
+    "verified": "2026-11-04",
+    "source": "https://www.northamptonvalleycountryclub.com/course-overview/",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 86475,
+    "exceptions": []
+  },
+  {
+    "id": "westover-golf-club",
+    "verified": "2026-11-04",
+    "source": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 13251,
+    "exceptions": []
   }
 ]

@@ -1,0 +1,140 @@
+{
+  "retrieved": "2026-11-04",
+  "courseIds": [
+    "princeton-country-club",
+    "makefield-highlands",
+    "mountain-view-nj",
+    "northampton-valley",
+    "westover-golf-club"
+  ],
+  "sourceFiles": [
+    {
+      "courseId": "princeton-country-club",
+      "url": "https://golfmercercounty.com/wp-content/uploads/2025/03/196191_proofV1.pdf",
+      "kind": "official-scorecard"
+    },
+    {
+      "courseId": "makefield-highlands",
+      "url": "https://makefieldhighlandsgolf.com/wp-content/uploads/2021/07/makefiled-highlands-5-12-Scorecard.pdf",
+      "kind": "official-scorecard"
+    },
+    {
+      "courseId": "mountain-view-nj",
+      "url": "https://golfmercercounty.com/wp-content/uploads/2025/03/194353_proofV7.pdf",
+      "kind": "official-scorecard"
+    },
+    {
+      "courseId": "northampton-valley",
+      "url": "https://www.northamptonvalleycountryclub.com/course-overview/",
+      "kind": "official-scorecard-and-tour"
+    },
+    {
+      "courseId": "westover-golf-club",
+      "url": "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+      "kind": "published-detailed-scorecard"
+    },
+    {
+      "courseId": "westover-golf-club",
+      "url": "https://westovergc.com/course-layout/",
+      "kind": "official-course-page"
+    },
+    {
+      "courseId": "westover-golf-club",
+      "url": "https://ncrdb.usga.org/courseTeeInfo?CourseID=3241",
+      "kind": "current-rating-and-length-check"
+    },
+    {
+      "courseId": "princeton-country-club",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.680,40.305,-74.665,40.321",
+      "kind": "original-map-data"
+    },
+    {
+      "courseId": "makefield-highlands",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.874,40.253,-74.857,40.269",
+      "kind": "original-map-data"
+    },
+    {
+      "courseId": "mountain-view-nj",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.838,40.276,-74.817,40.291",
+      "kind": "original-map-data"
+    },
+    {
+      "courseId": "northampton-valley",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-75.006,40.216,-74.988,40.232",
+      "kind": "original-map-data"
+    },
+    {
+      "courseId": "westover-golf-club",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-75.397,40.118,-75.372,40.132",
+      "kind": "original-map-data"
+    }
+  ],
+  "teeChecks": [
+    {
+      "courseId": "princeton-country-club",
+      "parFront": 35,
+      "parBack": 35,
+      "tees": [
+        { "id": "blue", "front": 2965, "back": 3040, "total": 6005 },
+        { "id": "white", "front": 2855, "back": 2910, "total": 5765 }
+      ]
+    },
+    {
+      "courseId": "makefield-highlands",
+      "parFront": 36,
+      "parBack": 36,
+      "tees": [
+        { "id": "black", "front": 3543, "back": 3515, "total": 7058 },
+        { "id": "blue", "front": 3320, "back": 3299, "total": 6619 },
+        { "id": "white", "front": 3069, "back": 3088, "total": 6157 },
+        { "id": "gold", "front": 2833, "back": 2820, "total": 5653 },
+        { "id": "red", "front": 2562, "back": 2503, "total": 5065 }
+      ]
+    },
+    {
+      "courseId": "mountain-view-nj",
+      "parFront": 37,
+      "parBack": 35,
+      "tees": [
+        { "id": "back", "front": 3415, "back": 3196, "total": 6611 },
+        { "id": "middle", "front": 3176, "back": 3006, "total": 6182 },
+        { "id": "mid-seniors", "front": 3034, "back": 2735, "total": 5769 },
+        { "id": "seniors", "front": 2846, "back": 2590, "total": 5436 }
+      ]
+    },
+    {
+      "courseId": "northampton-valley",
+      "parFront": 35,
+      "parBack": 35,
+      "tees": [
+        { "id": "blue", "front": 3122, "back": 3280, "total": 6402 },
+        { "id": "white", "front": 2986, "back": 3116, "total": 6102 },
+        { "id": "gold", "front": 2601, "back": 2654, "total": 5255 },
+        { "id": "red", "front": 2511, "back": 2572, "total": 5083 }
+      ]
+    },
+    {
+      "courseId": "westover-golf-club",
+      "parFront": 37,
+      "parBack": 33,
+      "tees": [
+        { "id": "blue", "front": 3280, "back": 2702, "total": 5982 },
+        { "id": "white", "front": 3065, "back": 2537, "total": 5602 },
+        { "id": "gold", "front": 2763, "back": 2168, "total": 4931 }
+      ]
+    }
+  ],
+  "mapVerification": {
+    "mappedRoutes": 36,
+    "unavailableRoutes": 54,
+    "note": "Northampton Valley and Westover retain all 18 original numbered OSM routes. Every Northampton route starts inside a mapped tee polygon, ends inside a mapped green polygon and has a raw par tag matching the official card. Westover raw routes omit par, so each hole records explicit published-card provenance. Princeton, Makefield Highlands and Mountain View had no numbered source routes inside their verified boundaries; every hole is explicitly mapReady=false and no coordinate was inferred."
+  },
+  "deferredAfterBoundedReview": [
+    "trenton-country-club",
+    "spring-lake-golf-club",
+    "neshaminy-valley-golf-club",
+    "green-knoll-golf-course",
+    "weequahic-park-golf-course",
+    "concordia-golf-club"
+  ]
+}

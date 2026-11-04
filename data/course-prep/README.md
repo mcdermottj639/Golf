@@ -290,3 +290,33 @@ Club also has a scorecard/USGA length conflict. Proprietary flyovers are not rep
 The queue has 19 supported saved entries (16 fully mapped), 29 remaining unique entries
 and one Bonita Bay onboarding duplicate. The batch cap stays five after the third successful
 batch because route identity, card editions and licensing still require manual judgment.
+
+## November 4, 2026 expansion (v276)
+
+Five additional on-demand packs: Princeton Country Club, Makefield Highlands,
+Mountain View (Ewing, NJ), Northampton Valley and Westover. The batch contributes
+90 physical scorecard holes, 36 generated guides and 36 interactive maps. Northampton
+and Westover have all 18 numbered routes. Princeton, Makefield and Mountain View have
+complete scorecard/live-round cards but no numbered source routes; every one of their
+54 holes is explicitly `mapReady=false`, with no inferred tee, green, route or hazard.
+
+Princeton and Mountain View use Mercer County's official 02/24 cards. Princeton includes
+Blue and White men's rows; its forward row is omitted because the card prints different
+pars. Mountain View includes Back, Middle, Mid/Seniors and Seniors; Forward is omitted
+for the same reason. Makefield's club-linked scorecard supplies five complete tee rows
+and shared pars/indexes; combo ratings without per-hole combo sequences remain out.
+Northampton's current club page supplies four exact rows, pars and indexes but no printed
+ratings/slopes, so none are invented.
+
+Westover's three men's rows reconcile exactly to current USGA totals and ratings. Its
+raw OSM routes are numbered but omit par, so each hole records the published card as
+`parSource` plus an explicit route verification note. Current scorecard reproductions
+disagree on stroke indexes, so Westover indexes are withheld. The Red USGA row uses a
+different par and is also withheld.
+
+`batch-2026-11-04.json` records exact source URLs, retrieval date, front/back arithmetic,
+36 mapped routes and 54 explicit map-source gaps. Trenton, Spring Lake, Neshaminy Valley,
+Green Knoll, Weequahic and Concordia retain dated `source-gap` findings rather than
+mixing conflicting card editions or pre-renovation data. The queue now has 24 supported
+saved entries, 18 fully mapped entries, 24 remaining unique entries and one Bonita Bay
+onboarding duplicate. New packs remain nonfavorites and outside shell-cache assets.

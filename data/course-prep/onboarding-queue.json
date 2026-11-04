@@ -2124,26 +2124,180 @@
       "evidence": [
         "coach-feed.json#add-trentoncc-20260729"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "source-gap",
+      "coverageGaps": [
+        {
+          "scope": "scorecard",
+          "reason": "The current club site confirms the renovated 18-hole course but does not publish a readable current card; the available detailed third-party card may predate the Tyler Rae renovation and was not treated as current truth."
+        },
+        {
+          "scope": "interactive-map",
+          "reason": "No numbered OSM hole routes were present in the bounded November 4 retrieval."
+        }
+      ],
+      "completionCommit": null,
+      "sourceUrls": [
+        "https://www.trentoncc.com/golf",
+        "https://golftraxx.com/scorecard?course_name=Trenton+Country+Club&static=true&zipcode=08628"
+      ],
+      "retrieved": "2026-11-04",
+      "identityNote": "West Trenton, NJ identity confirmed. Current scorecard edition and original hole routes remain unresolved."
     },
     {
       "queueId": "princeton-country-club",
       "savedName": "Princeton Country Club",
       "canonicalName": "Princeton Country Club",
       "aliases": [
-        "Princeton Country Club"
+        "Princeton Country Club",
+        "Princeton CC"
       ],
       "region": "NJ",
       "priority": 40,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-princetoncc-20260729"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "catalog-partial",
+      "coverageGaps": [
+        {
+          "hole": 1,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 2,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 3,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 4,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 5,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 6,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 7,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 8,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 9,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 10,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 11,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 12,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 13,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 14,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 15,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 16,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 17,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 18,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        }
+      ],
+      "completionCommit": null,
+      "catalogId": "princeton-country-club",
+      "coverage": {
+        "holes": 18,
+        "guides": 0,
+        "maps": 0
+      },
+      "sourceUrls": [
+        "https://golfmercercounty.com/wp-content/uploads/2025/03/196191_proofV1.pdf",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-74.680,40.305,-74.665,40.321",
+        "https://golfmercercounty.com/princeton-country-club/",
+        "https://ncrdb.usga.org/courseTeeInfo?CourseID=13358"
+      ],
+      "retrieved": "2026-11-04"
     },
     {
       "queueId": "spring-lake-golf-club",
@@ -2158,26 +2312,181 @@
       "evidence": [
         "coach-feed.json#add-springlake-20260729"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "source-gap",
+      "coverageGaps": [
+        {
+          "scope": "scorecard",
+          "reason": "Published detailed cards disagree on current tee yardages/ratings, while the club scorecard URL was not independently retrievable. No edition was silently mixed."
+        },
+        {
+          "scope": "interactive-map",
+          "reason": "Only hole 3 had a numbered OSM route in the bounded November 4 retrieval; full routing is not available."
+        }
+      ],
+      "completionCommit": null,
+      "sourceUrls": [
+        "https://www.springlakegolfclub.net/scorecard",
+        "https://golftraxx.com/scorecard?course_name=Spring+Lake+Golf+Club&fulladdress=Warren+Ave+Spring+Lake+Heights+NJ&static=true&zipcode=07762",
+        "https://www.golfify.io/courses/spring-lake-golf-club"
+      ],
+      "retrieved": "2026-11-04",
+      "identityNote": "901 Warren Avenue, Spring Lake Heights, NJ identity confirmed; do not conflate with the Long Island facility."
     },
     {
       "queueId": "makefield-highlands-golf-club",
       "savedName": "Makefield Highlands Golf Club",
       "canonicalName": "Makefield Highlands Golf Club",
       "aliases": [
-        "Makefield Highlands Golf Club"
+        "Makefield Highlands Golf Club",
+        "Makefield Highlands"
       ],
       "region": "PA",
       "priority": 42,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-makefield-20260729"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "catalog-partial",
+      "coverageGaps": [
+        {
+          "hole": 1,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 2,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 3,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 4,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 5,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 6,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 7,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 8,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 9,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 10,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 11,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 12,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 13,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 14,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 15,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 16,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 17,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 18,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        }
+      ],
+      "completionCommit": null,
+      "catalogId": "makefield-highlands",
+      "coverage": {
+        "holes": 18,
+        "guides": 0,
+        "maps": 0
+      },
+      "sourceUrls": [
+        "https://makefieldhighlandsgolf.com/wp-content/uploads/2021/07/makefiled-highlands-5-12-Scorecard.pdf",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-74.874,40.253,-74.857,40.269",
+        "https://makefieldhighlandsgolf.com/makefield-best-golf-course/",
+        "https://ncrdb.usga.org/courseTeeInfo?CourseID=23582"
+      ],
+      "retrieved": "2026-11-04"
     },
     {
       "queueId": "sterling-farms-golf-course",
@@ -2275,9 +2584,25 @@
       "evidence": [
         "coach-feed.json#add-neshaminyvalley-20260821"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "source-gap",
+      "coverageGaps": [
+        {
+          "scope": "scorecard",
+          "reason": "Current USGA lengths/par and published per-hole cards conflict, so tee rows were not mixed or guessed."
+        },
+        {
+          "scope": "interactive-map",
+          "reason": "Eighteen numbered OSM routes exist, but raw hole 6 is incorrectly tagged par 6 and the unresolved current-card conflict prevents a safe correction/release."
+        }
+      ],
+      "completionCommit": null,
+      "sourceUrls": [
+        "https://gapgolf.org/play/club-directory/neshaminy-valley-golf-club/",
+        "https://ncrdb.usga.org/",
+        "https://www.golfify.io/courses/neshaminy-valley-golf-club"
+      ],
+      "retrieved": "2026-11-04",
+      "identityNote": "Jamison, PA identity confirmed. Current card reconciliation is required before the otherwise available mapped routing can ship."
     },
     {
       "queueId": "springfield-golf-center",
@@ -2300,19 +2625,86 @@
     {
       "queueId": "westover-country-club",
       "savedName": "Westover Country Club",
-      "canonicalName": "Westover Country Club",
+      "canonicalName": "Westover Golf Club",
       "aliases": [
-        "Westover Country Club"
+        "Westover Country Club",
+        "Westover Golf & Country Club"
       ],
       "region": "PA",
       "priority": 48,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-westover-20260821"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null
+      "completionCommit": null,
+      "catalogId": "westover-golf-club",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.hitthepin.com/courses/westover-golf-club-norristown-pa",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-75.397,40.118,-75.372,40.132",
+        "https://westovergc.com/course-layout/",
+        "https://ncrdb.usga.org/courseTeeInfo?CourseID=3241",
+        "https://gapgolf.org/play/club-directory/westover-golf-club/"
+      ],
+      "retrieved": "2026-11-04"
     },
     {
       "queueId": "green-knoll-golf-course",
@@ -2327,9 +2719,20 @@
       "evidence": [
         "coach-feed.json#add-greenknoll-20260821"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "source-gap",
+      "coverageGaps": [
+        {
+          "scope": "scorecard",
+          "reason": "Current USGA tee lengths differ from detailed published per-hole cards; the county did not expose a current official per-hole card during the bounded pass."
+        }
+      ],
+      "completionCommit": null,
+      "sourceUrls": [
+        "https://ncrdb.usga.org/courseTeeInfo?CourseID=6749",
+        "https://www.somersetcountyparks.org/"
+      ],
+      "retrieved": "2026-11-04",
+      "identityNote": "Bridgewater, NJ identity confirmed; current per-hole tee rows remain unresolved."
     },
     {
       "queueId": "weequahic-park-golf-course",
@@ -2344,26 +2747,181 @@
       "evidence": [
         "coach-feed.json#add-weequahic-20260821"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "source-gap",
+      "coverageGaps": [
+        {
+          "scope": "scorecard",
+          "reason": "The county page still links a pre-renovation scorecard after the course reopened with a refined routing in Summer 2025. That legacy card was not published as the renovated layout."
+        },
+        {
+          "scope": "interactive-map",
+          "reason": "Renovated hole geometry requires a new verified source; legacy routing was not repurposed."
+        }
+      ],
+      "completionCommit": null,
+      "sourceUrls": [
+        "https://essexcountyparks.org/golf/weequahic-golf-course",
+        "https://essexcountyparks.org/_media/weeq%20scorecard.pdf"
+      ],
+      "retrieved": "2026-11-04",
+      "identityNote": "Newark, NJ identity confirmed. The 2025 Stephen Kay renovation changed tees, greens, bunkers and routing; pre-renovation data is excluded."
     },
     {
       "queueId": "mountain-view-golf-course",
       "savedName": "Mountain View Golf Course",
       "canonicalName": "Mountain View Golf Course",
       "aliases": [
-        "Mountain View Golf Course"
+        "Mountain View Golf Course",
+        "Mountain View Golf Course (NJ)",
+        "Mountain View (NJ)"
       ],
       "region": "NJ",
       "priority": 51,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-mountainview-20260821"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "catalog-partial",
+      "coverageGaps": [
+        {
+          "hole": 1,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 2,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 3,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 4,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 5,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 6,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 7,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 8,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 9,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 10,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 11,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 12,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 13,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 14,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 15,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 16,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 17,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        },
+        {
+          "hole": 18,
+          "reason": "No verified numbered OpenStreetMap hole route was present in the retrieved course boundary on November 4, 2026. Scorecard and live-round data are available; the illustrated guide and interactive map are withheld rather than inferred."
+        }
+      ],
+      "completionCommit": null,
+      "catalogId": "mountain-view-nj",
+      "coverage": {
+        "holes": 18,
+        "guides": 0,
+        "maps": 0
+      },
+      "sourceUrls": [
+        "https://golfmercercounty.com/wp-content/uploads/2025/03/194353_proofV7.pdf",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-74.838,40.276,-74.817,40.291",
+        "https://golfmercercounty.com/mountain-view/",
+        "https://ncrdb.usga.org/courseTeeInfo?CourseID=13360"
+      ],
+      "retrieved": "2026-11-04"
     },
     {
       "queueId": "quail-brook-golf-course",
@@ -2387,17 +2945,82 @@
       "savedName": "Northampton Valley Country Club",
       "canonicalName": "Northampton Valley Country Club",
       "aliases": [
-        "Northampton Valley Country Club"
+        "Northampton Valley Country Club",
+        "Northampton Valley"
       ],
       "region": "PA",
       "priority": 56,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-northamptonvalley-20260821"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null
+      "completionCommit": null,
+      "catalogId": "northampton-valley",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.northamptonvalleycountryclub.com/course-overview/",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-75.006,40.216,-74.988,40.232",
+        "https://www.openstreetmap.org/way/417607536"
+      ],
+      "retrieved": "2026-11-04"
     },
     {
       "queueId": "concordia-golf-club",
@@ -2412,9 +3035,21 @@
       "evidence": [
         "coach-feed.json#add-concordia-20260821"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "source-gap",
+      "coverageGaps": [
+        {
+          "scope": "scorecard",
+          "reason": "The club-linked legacy card totals do not match current USGA tee lengths. No current per-hole edition was selected without reconciliation."
+        }
+      ],
+      "completionCommit": null,
+      "sourceUrls": [
+        "https://www.concordiagolfclub.com/",
+        "https://www.concordiagolfclub.com/_files/ugd/794e26_cdbd99891de34e1f95e54a0f8e9dc7e6.pdf",
+        "https://ncrdb.usga.org/courseTeeInfo?CourseID=13370"
+      ],
+      "retrieved": "2026-11-04",
+      "identityNote": "Monroe Township, NJ identity confirmed; current per-hole tee rows remain unresolved."
     },
     {
       "queueId": "middletown-country-club",
@@ -2675,7 +3310,7 @@
       "completionCommit": null
     }
   ],
-  "reconciled": "2026-10-28",
+  "reconciled": "2026-11-04",
   "sourcePolicy": "Frozen seed courses plus course-add/course-remove entries from the current ordered app feeds. Bucket-list and simulator-only records excluded; autocomplete is not play evidence.",
   "excluded": [
     {
@@ -2706,9 +3341,9 @@
   ],
   "progress": {
     "savedPlayedEntries": 49,
-    "catalogSupportedEntries": 19,
-    "fullyMappedEntries": 16,
-    "remainingUniqueEntries": 29,
+    "catalogSupportedEntries": 24,
+    "fullyMappedEntries": 18,
+    "remainingUniqueEntries": 24,
     "duplicateUmbrellaEntries": 1
   },
   "exceptions": [
@@ -2745,6 +3380,81 @@
       ],
       "status": "map-source-needed",
       "note": "Official Highland 4 and Valley 4 illustrated scorecards are available; no original mapped routes were present. Repair never counts as a new course."
+    },
+    {
+      "catalogId": "princeton-country-club",
+      "physicalHoles": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "status": "map-source-needed",
+      "note": "Official scorecard and live-round card available; no numbered source routes, so all 18 illustrated guides/maps are unavailable."
+    },
+    {
+      "catalogId": "makefield-highlands",
+      "physicalHoles": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "status": "map-source-needed",
+      "note": "Official scorecard and live-round card available; no numbered source routes, so all 18 illustrated guides/maps are unavailable."
+    },
+    {
+      "catalogId": "mountain-view-nj",
+      "physicalHoles": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "status": "map-source-needed",
+      "note": "Official scorecard and live-round card available; no numbered source routes, so all 18 illustrated guides/maps are unavailable."
     }
   ],
   "batchHistory": [

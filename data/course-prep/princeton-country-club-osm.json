@@ -1,0 +1,8 @@
+{
+  "source": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.680,40.305,-74.665,40.321",
+  "retrieved": "2026-11-04",
+  "license": "ODbL-1.0",
+  "attribution": "© OpenStreetMap contributors",
+  "courseBoundaryId": 18280915,
+  "features": []
+}

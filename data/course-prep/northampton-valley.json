@@ -1,0 +1,269 @@
+{
+  "id": "northampton-valley",
+  "name": "Northampton Valley Country Club",
+  "shortName": "Northampton Valley",
+  "place": "Richboro, PA",
+  "aliases": [
+    "Northampton Valley"
+  ],
+  "source": "https://www.northamptonvalleycountryclub.com/course-overview/",
+  "tour": "https://www.northamptonvalleycountryclub.com/course-overview/",
+  "storageKey": "northampton_valley",
+  "bounds": [
+    40.216,
+    -75.006,
+    40.232,
+    -74.988
+  ],
+  "center": [
+    40.223298,
+    -74.9984978
+  ],
+  "par": 70,
+  "defaultTee": "white",
+  "verified": "2026-11-04",
+  "sourceLabel": "Official Northampton Valley course overview and scorecard",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-75.006,40.216,-74.988,40.232",
+  "cardNote": "The club’s current course overview supplies four tee rows, par, stroke indexes and hole-by-hole descriptions. Every front, back and total sum reconciles. Ratings/slopes are not printed on that source and are left unset. All 18 numbered mapped routes match the official par sequence; confirm the day’s tee markers and flag positions on arrival.",
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6402,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        328,
+        338,
+        218,
+        410,
+        185,
+        388,
+        530,
+        410,
+        315,
+        366,
+        433,
+        422,
+        400,
+        545,
+        170,
+        388,
+        349,
+        207
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 6102,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        316,
+        333,
+        192,
+        398,
+        170,
+        367,
+        500,
+        405,
+        305,
+        357,
+        415,
+        395,
+        372,
+        530,
+        161,
+        362,
+        340,
+        184
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "total": 5255,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        303,
+        328,
+        172,
+        332,
+        156,
+        310,
+        369,
+        361,
+        270,
+        325,
+        382,
+        305,
+        298,
+        416,
+        158,
+        272,
+        340,
+        158
+      ]
+    },
+    {
+      "id": "red",
+      "name": "Red",
+      "total": 5083,
+      "rating": null,
+      "slope": null,
+      "yards": [
+        293,
+        318,
+        162,
+        322,
+        146,
+        300,
+        359,
+        351,
+        260,
+        315,
+        372,
+        295,
+        288,
+        406,
+        156,
+        262,
+        330,
+        148
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 17,
+      "osmId": 1026470451,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 13,
+      "osmId": 1026470452,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 3,
+      "par": 3,
+      "si": 9,
+      "osmId": 1026470453,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 3,
+      "osmId": 1026470454,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 5,
+      "par": 3,
+      "si": 15,
+      "osmId": 1026470455,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 7,
+      "osmId": 1026470456,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 7,
+      "par": 5,
+      "si": 5,
+      "osmId": 1026470457,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 8,
+      "par": 4,
+      "si": 1,
+      "osmId": 1026470458,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 11,
+      "osmId": 1026470459,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 12,
+      "osmId": 1026470460,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 4,
+      "osmId": 1026470461,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 10,
+      "osmId": 1026480071,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": 6,
+      "osmId": 1026480072,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 14,
+      "par": 5,
+      "si": 2,
+      "osmId": 1026480073,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 15,
+      "par": 3,
+      "si": 18,
+      "osmId": 1026480075,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 14,
+      "osmId": 1026480076,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 17,
+      "par": 4,
+      "si": 16,
+      "osmId": 1026480077,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing."
+    },
+    {
+      "n": 18,
+      "par": 3,
+      "si": 8,
+      "osmId": 1026480078,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee and flag at the course."
+    }
+  ],
+  "additionalSources": [
+    "https://www.openstreetmap.org/way/417607536"
+  ]
+}

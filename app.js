@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v275';
+const BUILD = 'v276';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v276', d:'2026-11-04', items:['FIVE MORE PLAYED COURSES: Princeton Country Club, Makefield Highlands, Mountain View (NJ), Northampton Valley and Westover are now downloadable on demand with exact tee cards and clean front-nine/back-nine live-round order.','MAPS ONLY WHERE THE ROUTES ARE REAL: Northampton Valley and Westover add 36 hole guides and 36 interactive maps. Princeton, Makefield and Mountain View still give you their scorecards and live-round setup, but clearly mark all 54 maps under review because no verified numbered routes were available. Nothing was guessed, and existing rounds, notes, clubs and downloads stay untouched.'] },
   { b:'v275', d:'2026-11-03', items:['COURSES OPEN ON THE MAP: A course without the club’s own hole illustrations, like Lakeside, now opens on the Interactive map instead of a sketchy drawn guide. Pound Ridge, Metedeconk and other courses with club art still open on Hole guide, and the guide tab is one tap away everywhere.'] },
   { b:'v274', d:'2026-11-03', items:['PUTTING TEMPO SET TO 1.79:1: Your call from Jarvis. The Putting stroke evolution grid now reads Tempo as 1.79:1 against the 2:1 target — a touch quick. The 2.0 and 1.49 readings stay in the record as superseded, and the Oct 30 shootout no longer says the tempo question is open.'] },
   { b:'v273', d:'2026-11-02', items:['SHADOWS FALL AWAY FROM THE SUN IN LINKS: In the 3D view every tree now throws a long shadow across the ground away from the afternoon sun instead of a round blob parked beside its trunk, the flagstick casts a thin strip on the green, and your ball\'s shadow slides along the ground under it as the ball climbs, so you can read how high a shot is from behind. Scenery only: no lie, bounce, score or course data changes.'] },
