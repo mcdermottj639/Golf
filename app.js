@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v277';
+const BUILD = 'v278';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v278', d:'2026-11-04', items:['3H VS 4H ON THE RANGE: Your Nov 4 hybrid session is in Swing — 32 shots with the new PING 3H and 12 with the 4H, every row from your recordings. With the mishits held out (no club read, smash under 1.40 or apex under 40 ft), the 3H carried 187 (16 clean) and the 4H 178 (6 clean): about a 9-yard gap. The 3H launches lower with less spin and rolls out about 23 yards more. Both numbers sit on the Bag rows as offers to tap; your playing carries did not change. The two early warm-up batches are kept in the source file only.'] },
   { b:'v277', d:'2026-11-04', items:['WATER MOVES IN LINKS: In the 3D view every pond and inlet now ripples — crossing waves, a sun glint and a sky reflection that turns bluer as you look along the surface — instead of the flat teal sheet. It moves whenever anything else does (the camera, your pull, the ball in flight) and for about four seconds after, then holds still so the game keeps saving your battery when you leave it idle; Reduce Motion keeps it still throughout. Scenery only: a water lie is still decided by the mapped polygon, so no shot, bounce, penalty or score changes.'] },
   { b:'v276', d:'2026-11-04', items:['FIVE MORE PLAYED COURSES: Princeton Country Club, Makefield Highlands, Mountain View (NJ), Northampton Valley and Westover are now downloadable on demand with exact tee cards and clean front-nine/back-nine live-round order.','MAPS ONLY WHERE THE ROUTES ARE REAL: Northampton Valley and Westover add 36 hole guides and 36 interactive maps. Princeton, Makefield and Mountain View still give you their scorecards and live-round setup, but clearly mark all 54 maps under review because no verified numbered routes were available. Nothing was guessed, and existing rounds, notes, clubs and downloads stay untouched.'] },
   { b:'v275', d:'2026-11-03', items:['COURSES OPEN ON THE MAP: A course without the club’s own hole illustrations, like Lakeside, now opens on the Interactive map instead of a sketchy drawn guide. Pound Ridge, Metedeconk and other courses with club art still open on Hole guide, and the guide tab is one tap away everywhere.'] },
@@ -11785,7 +11786,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json','bag-20261024-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json','bag-20261024-feed.json','range-20261104-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 

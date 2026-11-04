@@ -4131,6 +4131,30 @@ accessible. Conditions and the focus card participate in section shortcuts and m
 
 **v214 map navigation:** Two main buttons (Hole guide / Interactive map; v248 order in prep and live popups), 3D controls (Overhead removed in v224) and secondary Simple map. Course entry opens Hole guide (v248); Interactive map opens 3D, using Simple map offline or without a key. Preserve selected-view retention between holes, API retry view restoration, camera reuse, shared coordinates and yardages. Planner target CTA opens the current interactive style. Real browser QA must cover 320/390 widths, selected/hidden control states, style switches, keyless entry and actual offline fallback with a configured key. As of v224, modes are guide/route/3d; legacy satellite resumes map to 3D; map is a navigation action only.
 
+## November 4 hybrid range session (v278)
+
+Source: two TrackMan Range-mode screen recordings (3 Hybrid filter, 32 rows; 4 Hybrid
+filter, 12 rows), transcribed into `data/range-2026-11-04-hybrids.json`;
+`scripts/import-nov04-hybrids.py` emits the apply-once `range-20261104-feed.json`
+(fetched after `bag-20261024-feed.json`, cached in sw.js). Both row sets re-average to
+the app's own header carry (165.3 / 153.4), and every row passes face − path = face-to-path
+and ball ÷ club = smash (`tests/range-nov04-hybrids.cjs`, in the publish workflow).
+Cells that never scrolled on screen are null, never guessed: 3H #8 (carry/total/apex only)
+and 3H #18 (club speed + an 11-yard top).
+
+**Mishits — Jack's chat instruction, Nov 4: "remove the mishits".** The rule shown to him and
+applied as `mishit:true` + `mishitReason`: no club read, smash < 1.40, or apex < 40 ft. It is
+stricter than `isClearMishit()` (which would only drop the tops) and deliberately so for this
+session; it holds out several low 1.50-smash bullets that still carried 170+. 3H keeps 16 of 32,
+4H 6 of 12. Do not re-derive these averages with the carry-only rule.
+
+Clean reads: 3H 187.3 carry ±7.1 / 223.3 total, 87.6 club / 128.1 ball, 10.2°, 3,313 rpm, apex 53 ft;
+4H 178.5 ±5.4 / 200.2, 83.3 / 120.5, 13.3°, 3,906 rpm, apex 67 ft. Gap ≈ 9 yd carry, 23 yd total.
+Both park as `meas` offers on the `3-hybrid` / `4-hybrid` carry rows; live carries unchanged
+(normalization, ball and venue not shown). Two early-session recordings (6 × 3H, 6 × 4H) are
+warm-ups by Jack's word: kept in the source record only, not on any card or average.
+Path stays out-to-in (3H −2.7°, 4H −1.7°) with face-to-path +4.1° / +2.9°: same fade pattern.
+
 ## Caddie HQ Links — the course game (v277, November 4 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own
