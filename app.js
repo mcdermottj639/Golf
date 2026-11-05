@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v286';
+const BUILD = 'v287';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v287', d:'2026-11-04', items:['ONE CARD PER FINDING: When the same takeaway fits several clubs, the bay day now shows it once as a small table instead of a card per club. Nov 4 reads: 4 clubs, how far each rolls after landing — most 3-hybrid (+36 yd), least driver (+21 yd).'] },
   { b:'v286', d:'2026-11-04', items:['LONGEST CLUB FIRST: A range day now lists clubs in bag order, longest at the top: Driver, Mini, then the hybrids and down through the irons and wedges. That applies to the charts, Exact club data and the shot tables.'] },
   { b:'v285', d:'2026-11-04', items:['TEE SHOTS FROM TONIGHT\'S SIM: Just the tee-shot numbers, no round. Stealth driver: 3 clean of 5 at 215 carry (2 under 1.40 smash held out). Mini off a tee: 5 of 5 at 205 carry, 217 total. Both sit in Swing on Nov 4. The driver 215 is parked on the Driver row as an offer to tap; no playing carry changed.'] },
   { b:'v284', d:'2026-11-04', items:['SEP 15 MINI, SECOND SET: The other 7-shot mini table from Sep 15 is in, on the same day as the first. Same mishit rule as today: 5 clean at 180 carry. Sep 15 now reads 177 over 9 clean shots from both sets, and the Bag tile shows it.'] },
