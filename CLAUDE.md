@@ -4177,6 +4177,8 @@ as the last reported 15.5° — not re-read.
 
 **v283 — Sep 15 mini table (Jack's recordings, Nov 4).** Two screen recordings of the same 10-row TrackMan "3 Wood" table (screen order differs from the stored order; matched by carry) — transcript `data/range-2026-09-15-mini.json`, all 12 header averages re-derive. Every stored value agreed; the update only fills blanks (smash, launch, launch dir, attack angle, apex and the missing speeds/delivery) and applies the same Nov 4 rule as today: 4 clean at 173.5 carry / 204.5 total. Sep 14 has no shot table (Jack couldn't find one).
 
+**v284 — second Sep 15 mini table.** Jack's 19:34 recording is a separate 7-row TrackMan "3 Wood" (= mini) table from Sep 15 (his date; none on screen), not on file before — new bay `bay-20260915-mini-b-v1` dated 2026-09-15 so it joins that day. Transcript `data/range-2026-09-15-mini-b.json`; all 13 Avg-row figures re-derive within display rounding. Nov 4 rule holds #2 (apex 39) and #5 (top): 5 clean at 179.9. Sep 15 combined: 177.1 over 9 of 17. His earlier 19:22 video was a duplicate of 19:20 (same 10 rows).
+
 ## Caddie HQ Links — the course game (v277, November 4 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own
