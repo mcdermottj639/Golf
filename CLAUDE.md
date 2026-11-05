@@ -4181,6 +4181,8 @@ as the last reported 15.5° — not re-read.
 
 **v285 — Nov 4 sim tee shots (Jack, 20:07–20:08).** From a TrackMan sim recording (Tiburón Gold, two sets) Jack wanted the tee-shot stats only, NOT the round: TrackMan `Dr` = Stealth 2 Plus driver, `3w` = the mini, all off a tee; the one 3h tee shot (a top) is out. Transcript `data/sim-2026-11-04-tee-shots.json` (carry, total-to-finish, club speed, smash, F-P, spin, apex — ball speed/launch/path/face not on those tiles). Two bays on Nov 4: driver 3 clean of 5 at 215.1 (smash 1.38 and 1.35 held), mini 5 of 5 at 205.3 / 217.1. Driver offer parked as `meas` on the Driver row (live 235 unchanged); mini gets a `Nov 4 · teed` note tile only, its live 201 (deck) unchanged. Sim totals are distance to where the ball finished on the course, not range totals.
 
+**v286 — range days list longest club first (Jack, Nov 4).** `bayView()` sorts the combined day's clubs by `bagRank()` (index in `BAG_CANON` via `clubCanon`, unknown last, stable) before building the charts, Exact club data and the per-club shot tables. Presentation only: `bayDayData()` and the takeaways keep source order.
+
 ## Caddie HQ Links — the course game (v277, November 4 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own

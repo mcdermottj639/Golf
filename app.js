@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v285';
+const BUILD = 'v286';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v286', d:'2026-11-04', items:['LONGEST CLUB FIRST: A range day now lists clubs in bag order, longest at the top: Driver, Mini, then the hybrids and down through the irons and wedges. That applies to the charts, Exact club data and the shot tables.'] },
   { b:'v285', d:'2026-11-04', items:['TEE SHOTS FROM TONIGHT\'S SIM: Just the tee-shot numbers, no round. Stealth driver: 3 clean of 5 at 215 carry (2 under 1.40 smash held out). Mini off a tee: 5 of 5 at 205 carry, 217 total. Both sit in Swing on Nov 4. The driver 215 is parked on the Driver row as an offer to tap; no playing carry changed.'] },
   { b:'v284', d:'2026-11-04', items:['SEP 15 MINI, SECOND SET: The other 7-shot mini table from Sep 15 is in, on the same day as the first. Same mishit rule as today: 5 clean at 180 carry. Sep 15 now reads 177 over 9 clean shots from both sets, and the Bag tile shows it.'] },
   { b:'v283', d:'2026-11-04', items:['SEP 15 MINI, FULL TABLE: Your two recordings filled in every column for the 10 mini shots (TrackMan 3 Wood, 15.5° then). Same mishit rule as today: 4 clean at 174 carry, 205 total. The Bag row now reads Nov 4 201 · Sep 15 174 · Sep 14 182.'] },
@@ -4795,6 +4796,10 @@ function cumulativeClubSeries(){
   });
   return by;
 }
+function bagRank(club){
+  const k = BAG_CANON.indexOf(clubCanon(club));
+  return k < 0 ? BAG_CANON.length : k;
+}
 function cumulativeClubKeys(by){
   return BAG_CANON.filter(k => by.has(k)).concat([...by.keys()].filter(k => !BAG_CANON.includes(k)));
 }
@@ -5199,7 +5204,9 @@ function bayView(i){
   if(!b) return game();
   const day=sourceOnly ? null : bayDayData(b);
   const sources=day ? (S.bays||[]).map((x,index)=>({b:x,i:index})).filter(x=>x.b.date===b.date&&BAY_DISC(x.b)==='swing') : [];
-  const d = day?.usable ? {combinedDay:true,clubs:day.clubs.map(g=>({club:g.club,n:g.shots.length})),rangeShots:day.clubs,
+  // Longest club first (Jack, Nov 4 2026): the day view follows bag order, not upload order.
+  const dayClubs = day?.usable ? [...day.clubs].sort((x,y)=>bagRank(x.club)-bagRank(y.club)) : null;
+  const d = day?.usable ? {combinedDay:true,clubs:dayClubs.map(g=>({club:g.club,n:g.shots.length})),rangeShots:dayClubs,
     rangeCaption:'One combined full-day set per club. Missing-distance rows and clear mishits excluded in their original source blocks.'} : b.detail || {};
   if(day?.usable)b={...b,detail:d,mode:'Range day',setup:'All range and Map My Bag sessions combined',sessionKind:'range-day',venue:'Full-day range review',ball:'See source notes',norm:'See source notes',spin:'See source notes',
     finding:`${day.usable} usable shots across ${day.clubs.length} clubs. All same-club blocks combined; averages are calculated from individual retained readings, not averages of block averages.`};
