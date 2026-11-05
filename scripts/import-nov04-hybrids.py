@@ -182,6 +182,25 @@ def main():
     })
     print('mini n', am['n'], 'held', am['held'], mini['excludedShotNumbers'], 'carry', am['carry'], 'sd', am['carrySd'], 'total', am['total'],
           'cs', am['cs'], 'bs', am['bs'], 'smash', am['smash'], 'la', am['la'], 'spin', am['spin'], 'apex', am['apex'], 'path', am['path'], 'ftp', am['ftp'])
+    # v281 — Jack, Nov 4 2026: "These are off the deck numbers too fyi". Every Nov 4 shot (3H, 4H, mini)
+    # was hit off the ground, not a tee. Label it; no number changes. Earlier entries stay byte-identical.
+    DECK = 'Hit off the deck (no tee), per Jack. '
+    byid = {e['id']: e for e in entries}
+    for lab in ('3h', '4h', 'mini'):
+        b = byid[f'bay-20261104-{lab}-v1']['bay']
+        entries.append({'id': f'bay-offdeck-{lab}-20261104-v1', 'type': 'bay-update', 'target': f'bay-20261104-{lab}-v1',
+                        'bay': {'setup': b['setup'] + ' · off the deck', 'detail': {'limits': DECK + b['detail']['limits']}}})
+    for row, src in (('3-hybrid', 'carry-meas-3-hybrid-20261104-v1'), ('4-hybrid', 'carry-meas-4-hybrid-20261104-v1'),
+                     ('Mini Driver', 'carry-meas-minidriver-20261104-v1')):
+        meas = dict(byid[src]['club']['meas']); meas['how'] = 'off the deck (no tee) · ' + meas['how']
+        entries.append({'id': f"carry-offdeck-{row.lower().replace(' ', '')}-20261104-v1", 'type': 'carry-update',
+                        'target': row, 'club': {'meas': meas}})
+    mc = byid['club-minidriver-back-20261104-v1']['club']
+    entries.append({'id': 'club-minidriver-offdeck-20261104-v1', 'type': 'club-update', 'target': 'add-minidriver',
+                    'club': {'noteGist': 'Back in the bag Nov 4 2026 · 201 carry off the deck (no tee) on TrackMan · off a tee likely longer, unmeasured.',
+                             'note': mc['note'] + ' OFF THE DECK: all Nov 4 shots were hit off the ground, not a tee (Jack); a teed carry is unmeasured.'}})
+    entries.append({'id': 'history-offdeck-20261104-v1', 'type': 'history', 'date': '2026-11-04',
+                    'text': 'Nov 4 TrackMan numbers (3H, 4H, mini driver) labelled off the deck (no tee). Carries unchanged: 187 / 178 / 201.'})
     feed = {'updated': '2026-11-04', 'entries': entries}
     (ROOT / 'range-20261104-feed.json').write_text(json.dumps(feed, indent=1, ensure_ascii=False) + '\n')
     for b in (h3, h4):
