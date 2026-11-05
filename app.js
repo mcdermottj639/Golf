@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v280';
+const BUILD = 'v281';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v281', d:'2026-11-04', items:['OFF THE DECK: Today\'s 3H, 4H and mini driver numbers are now labelled as hit off the ground, not a tee — on each range session and on the Bag rows. Carries stay 187 / 178 / 201. Off a tee the mini will likely carry farther; that is not measured yet.'] },
   { b:'v280', d:'2026-11-04', items:['MINI DRIVER IS BACK: The TaylorMade r7 Quad mini is in the bag again (13 clubs) and plays 201. That comes from today\'s range session — 8 shots, 2 low ones held out by the same rule as the hybrids, so 6 clean at 201 carry and 229 total. TrackMan filed them as 3 Wood; they are on the mini. The session sits in Swing with the hybrids.'] },
   { b:'v279', d:'2026-11-04', items:['HYBRID CARRIES ARE LIVE: At your call, the 3H now plays 187 and the 4H 178 everywhere a carry is used — the Bag, the live-round club chips and Course Prep. They come straight from the Nov 4 range session with the mishits held out, the same numbers that were sitting there as offers.'] },
   { b:'v278', d:'2026-11-04', items:['3H VS 4H ON THE RANGE: Your Nov 4 hybrid session is in Swing — 32 shots with the new PING 3H and 12 with the 4H, every row from your recordings. With the mishits held out (no club read, smash under 1.40 or apex under 40 ft), the 3H carried 187 (16 clean) and the 4H 178 (6 clean): about a 9-yard gap. The 3H launches lower with less spin and rolls out about 23 yards more. Both numbers sit on the Bag rows as offers to tap; your playing carries did not change. The two early warm-up batches are kept in the source file only.'] },

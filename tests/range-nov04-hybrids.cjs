@@ -4,7 +4,7 @@ const source = require('../data/range-2026-11-04-hybrids.json');
 
 const ids = feed.entries.map(e => e.id);
 assert.equal(new Set(ids).size, ids.length, 'apply-once ids must be unique');
-assert.deepEqual(feed.entries.map(e => e.type), ['bay', 'bay', 'carry-update', 'carry-update', 'history', 'carry-update', 'carry-update', 'history', 'bay', 'club-update', 'carry-update', 'carry-update', 'history']);
+assert.deepEqual(feed.entries.map(e => e.type), ['bay', 'bay', 'carry-update', 'carry-update', 'history', 'carry-update', 'carry-update', 'history', 'bay', 'club-update', 'carry-update', 'carry-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'carry-update', 'carry-update', 'club-update', 'history']);
 
 const mains = source.sources.filter(s => s.role === 'main');
 assert.deepEqual(mains.map(s => [s.club, s.shots.length]), [['3-hybrid', 32], ['4-hybrid', 12]]);
@@ -51,7 +51,7 @@ assert.deepEqual(h3.excludedShotNumbers, [1, 2, 5, 6, 7, 9, 11, 12, 15, 18, 19, 
 assert.deepEqual(h4.excludedShotNumbers, [1, 2, 4, 5, 9, 12]);
 
 // v278 entries park offers only; v279 entries (Jack's instruction) set the live carry to exactly the offer.
-const offers = feed.entries.filter(e => e.type === 'carry-update' && e.club.meas);
+const offers = feed.entries.filter(e => e.type === 'carry-update' && e.club.meas && !e.id.startsWith('carry-offdeck-'));
 const live = feed.entries.filter(e => e.type === 'carry-update' && !e.club.meas);
 assert.equal(offers.length, 3); assert.equal(live.length, 3);
 for (const e of live) {
@@ -66,3 +66,12 @@ for (const e of offers) {
   assert.ok(e.club.meas && e.club.meas.carry > 0 && e.club.meas.n > 0);
 }
 console.log('PASS Nov4 hybrids: 44 rows, header averages, column alignment, Jack-rule exclusions, offers + live carries (v279), warm-ups held back.');
+
+// v281: off the deck. Labels only — no live carry moves, every bay says so.
+const deckBays = feed.entries.filter(e => e.type === 'bay-update' && e.id.startsWith('bay-offdeck-'));
+assert.equal(deckBays.length, 3);
+for (const e of deckBays) { assert.ok(e.bay.setup.endsWith('· off the deck')); assert.ok(e.bay.detail.limits.startsWith('Hit off the deck')); assert.ok(feed.entries.some(b => b.id === e.target)); }
+const deckRows = feed.entries.filter(e => e.id.startsWith('carry-offdeck-'));
+assert.deepEqual(deckRows.map(e => e.target), ['3-hybrid', '4-hybrid', 'Mini Driver']);
+for (const e of deckRows) { assert.ok(!('carry' in e.club), 'off-deck label never sets a live carry'); assert.ok(e.club.meas.how.startsWith('off the deck')); }
+console.log('off-deck labels ok');

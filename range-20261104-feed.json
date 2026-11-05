@@ -1639,6 +1639,105 @@
    "type": "history",
    "date": "2026-11-04",
    "text": "TaylorMade r7 Quad Mini Driver back in the bag (13 clubs). Nov 4 TrackMan: 201.1 carry (n=6 clean of 8, ±15.8), 229.5 total; playing carry set to 201."
+  },
+  {
+   "id": "bay-offdeck-3h-20261104-v1",
+   "type": "bay-update",
+   "target": "bay-20261104-3h-v1",
+   "bay": {
+    "setup": "Nov 4 · PING G440 3H · 32 shots · off the deck",
+    "detail": {
+     "limits": "Hit off the deck (no tee), per Jack. Indoor/outdoor, normalization, ball and sleeve setting are not shown in the recording. Mishit rule is the one Jack approved in chat on Nov 4 (stricter than isClearMishit). Two early-session warm-up recordings (6 × 3H, 6 × 4H) are kept in the source record only, at Jack's direction. Averages are a bay offer, not a 70°F course carry."
+    }
+   }
+  },
+  {
+   "id": "bay-offdeck-4h-20261104-v1",
+   "type": "bay-update",
+   "target": "bay-20261104-4h-v1",
+   "bay": {
+    "setup": "Nov 4 · PING G440 4H · 12 shots · off the deck",
+    "detail": {
+     "limits": "Hit off the deck (no tee), per Jack. Indoor/outdoor, normalization, ball and sleeve setting are not shown in the recording. Mishit rule is the one Jack approved in chat on Nov 4 (stricter than isClearMishit). Two early-session warm-up recordings (6 × 3H, 6 × 4H) are kept in the source record only, at Jack's direction. Averages are a bay offer, not a 70°F course carry."
+    }
+   }
+  },
+  {
+   "id": "bay-offdeck-mini-20261104-v1",
+   "type": "bay-update",
+   "target": "bay-20261104-mini-v1",
+   "bay": {
+    "setup": "Nov 4 · TaylorMade r7 Quad Mini · 8 shots · off the deck",
+    "detail": {
+     "limits": "Hit off the deck (no tee), per Jack. Indoor/outdoor, normalization, ball and sleeve setting are not shown in the recording. Mishit rule is the one Jack approved in chat on Nov 4 (stricter than isClearMishit). Two early-session warm-up recordings (6 × 3H, 6 × 4H) are kept in the source record only, at Jack's direction. Averages are a bay offer, not a 70°F course carry. TrackMan labelled these shots \"3 Wood\"; Jack identified them as the mini driver. Its Avg row never scrolled into view."
+    }
+   }
+  },
+  {
+   "id": "carry-offdeck-3-hybrid-20261104-v1",
+   "type": "carry-update",
+   "target": "3-hybrid",
+   "club": {
+    "meas": {
+     "src": "tm:2026-11-04-range-3-hybrid",
+     "n": 16,
+     "sd": 7.1,
+     "date": "2026-11-04",
+     "ball": "not shown",
+     "norm": "not shown",
+     "carry": 187.3,
+     "how": "off the deck (no tee) · TrackMan Range mode · screen recording · normalization, ball and venue not shown · mishits held out (Nov 4 rule)"
+    }
+   }
+  },
+  {
+   "id": "carry-offdeck-4-hybrid-20261104-v1",
+   "type": "carry-update",
+   "target": "4-hybrid",
+   "club": {
+    "meas": {
+     "src": "tm:2026-11-04-range-4-hybrid",
+     "n": 6,
+     "sd": 5.4,
+     "date": "2026-11-04",
+     "ball": "not shown",
+     "norm": "not shown",
+     "carry": 178.5,
+     "how": "off the deck (no tee) · TrackMan Range mode · screen recording · normalization, ball and venue not shown · mishits held out (Nov 4 rule)"
+    }
+   }
+  },
+  {
+   "id": "carry-offdeck-minidriver-20261104-v1",
+   "type": "carry-update",
+   "target": "Mini Driver",
+   "club": {
+    "meas": {
+     "src": "tm:2026-11-04-range-mini",
+     "n": 6,
+     "sd": 15.8,
+     "date": "2026-11-04",
+     "ball": "not shown",
+     "norm": "not shown",
+     "carry": 201.1,
+     "how": "off the deck (no tee) · TrackMan Range mode · screen recording · normalization, ball and venue not shown · mishits held out (Nov 4 rule) · TrackMan label \"3 Wood\""
+    }
+   }
+  },
+  {
+   "id": "club-minidriver-offdeck-20261104-v1",
+   "type": "club-update",
+   "target": "add-minidriver",
+   "club": {
+    "noteGist": "Back in the bag Nov 4 2026 · 201 carry off the deck (no tee) on TrackMan · off a tee likely longer, unmeasured.",
+    "note": "BACK IN THE BAG Nov 4 2026 (Jack). First measured carry for this head: 201.1 yd, n=6 clean of 8 on TrackMan Range (filed under the '3 Wood' label), 229.5 total, 93.0 club / 134.5 ball mph. Loft carried forward as the last reported 15.5°; shaft still unrecorded. Earlier: out Aug 12, back Sep 8 at 15.5°, out Sep 18 for the DS-ADAPT X 3-wood (since returned Oct 24). OFF THE DECK: all Nov 4 shots were hit off the ground, not a tee (Jack); a teed carry is unmeasured."
+   }
+  },
+  {
+   "id": "history-offdeck-20261104-v1",
+   "type": "history",
+   "date": "2026-11-04",
+   "text": "Nov 4 TrackMan numbers (3H, 4H, mini driver) labelled off the deck (no tee). Carries unchanged: 187 / 178 / 201."
   }
  ]
 }
