@@ -772,3 +772,23 @@ html,body{touch-action:manipulation}
 .clubkeys .ckl{display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
 .clubkeys b{display:block;font-size:14px;overflow-wrap:anywhere}
 .clubkeys .ckn{display:block;font-size:11px;color:var(--faint);overflow-wrap:anywhere}
+/* v288 — Compare clubs (Bag) */
+.cmp-chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.cmp-chips .chip,.cmp-src .chip{min-height:36px;min-width:44px}
+.cmp-chip.on,.cmp-src .chip.on{background:var(--pine,#1f4d3a);color:#fff;border-color:var(--pine,#1f4d3a)}
+.cmp-src{display:flex;gap:6px;margin-bottom:10px}
+.cmp-bars{margin:4px 0 10px}
+.cmp-bar{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:8px;align-items:center;margin:5px 0;font-size:13px}
+.cmp-lab{font-weight:700}
+.cmp-track{display:flex;height:12px;border-radius:6px;background:var(--line,#e5e2da);overflow:hidden}
+.cmp-c{display:inline-block;background:var(--pine,#1f4d3a);height:100%}
+.cmp-r{display:inline-block;background:var(--lime,#b8d86b);height:100%}
+.cmp-bar b{font:600 12px ui-monospace,monospace;white-space:nowrap}
+.cmp-key{font-size:11px;color:var(--soft,#777);margin:2px 0 0}
+.cmp-key i{display:inline-block;width:10px;height:8px;border-radius:2px;margin:0 3px 0 6px;vertical-align:middle}
+.cmp-table{width:100%;border-collapse:collapse;font-size:13px}
+.cmp-table th,.cmp-table td{padding:5px 6px;text-align:right;border-bottom:1px solid var(--line,#e5e2da);white-space:nowrap;font-family:ui-monospace,monospace}
+.cmp-table th:first-child,.cmp-table td:first-child{text-align:left;font-family:inherit;position:sticky;left:0;background:var(--card,#fff)}
+.cmp-table td small{color:var(--soft,#777)}
+.cmp-table .cmp-meta td{font-size:11px;color:var(--soft,#777)}
+@media (max-width:400px){.cmp-table{font-size:12px}.cmp-table th,.cmp-table td{padding:5px 3px}.cmp-table td:first-child{white-space:normal;min-width:0;width:30%}.cmp-table td small{display:none}}

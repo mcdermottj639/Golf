@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v287';
+const BUILD = 'v288';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v288', d:'2026-11-04', items:['COMPARE CLUBS: Bag now has a Compare clubs card. Tap any clubs with sim data and see carry + roll bars and a side-by-side table: carry, roll, total, peak height, speeds, smash, launch, spin, path and face-to-path. Switch between each club\'s latest day and all sessions. Mishits stay out, and returned clubs like the 3W still show.'] },
   { b:'v287', d:'2026-11-04', items:['ONE CARD PER FINDING: When the same takeaway fits several clubs, the bay day now shows it once as a small table instead of a card per club. Nov 4 reads: 4 clubs, how far each rolls after landing — most 3-hybrid (+36 yd), least driver (+21 yd).'] },
   { b:'v286', d:'2026-11-04', items:['LONGEST CLUB FIRST: A range day now lists clubs in bag order, longest at the top: Driver, Mini, then the hybrids and down through the irons and wedges. That applies to the charts, Exact club data and the shot tables.'] },
   { b:'v285', d:'2026-11-04', items:['TEE SHOTS FROM TONIGHT\'S SIM: Just the tee-shot numbers, no round. Stealth driver: 3 clean of 5 at 215 carry (2 under 1.40 smash held out). Mini off a tee: 5 of 5 at 205 carry, 217 total. Both sit in Swing on Nov 4. The driver 215 is parked on the Driver row as an offer to tap; no playing carry changed.'] },
@@ -3765,6 +3766,71 @@ function compactBag(lineup){
       </details>`;
     }).join('')}</div>`;
 }
+// v288 — Compare clubs (Jack, Nov 4: "pull up multiple clubs to compare the sim stats").
+// A READER over swingEvolutionRows(): the same retained-shot blocks as Swing evolution and
+// club history (mishits and distance-dash rows already out). Shot blocks only; summary-only
+// records are not averaged in. Teed blocks count only for the driver (everything else is
+// hit off the deck at the sim). The picked clubs are a UI choice in their own key.
+const CMP_KEY = 'caddiehq_compare_v1';
+function cmpPrefs(){
+  try{ const v = JSON.parse(localStorage.getItem(CMP_KEY) || 'null'); if(v && Array.isArray(v.clubs)) return v; }catch(e){}
+  return null;
+}
+function cmpSave(v){ try{ localStorage.setItem(CMP_KEY, JSON.stringify(v)); }catch(e){} }
+const CMP_ROWS = [['carry','Carry','yd',0],['roll','Roll','yd',0],['total','Total','yd',0],['apex','Peak height','ft',0],
+  ['bs','Ball speed','mph',1],['cs','Club speed','mph',1],['smash','Smash','',2],['la','Launch','°',1],
+  ['spin','Spin','rpm',0],['path','Club path','°',1],['ftp','Face to path','°',1]];
+function compareClubData(src){
+  const all = swingEvolutionRows(), out = new Map();
+  for(const [club, rows] of all){
+    let shot = rows.filter(r => !r.summary && (club === 'Dr' || !/teed/i.test((r.label||'')+' '+(r.setup||''))));
+    if(!shot.length) continue;
+    const latest = shot[0].date;
+    if(src !== 'all') shot = shot.filter(r => r.date === latest);
+    const v = {};
+    for(const [k] of CMP_ROWS){
+      if(k === 'roll') continue;
+      let sum = 0, n = 0;
+      for(const r of shot){ const m = r.values[k]; if(m && m.n){ sum += m.value * m.n; n += m.n; } }
+      if(n) v[k] = {value:sum/n, n};
+    }
+    if(v.carry && v.total) v.roll = {value:v.total.value - v.carry.value, n:Math.min(v.carry.n, v.total.n)};
+    const dates = [...new Set(shot.map(r => r.date))].sort();
+    out.set(club, {v, dates, n:v.carry?.n || 0, index:shot[0].index});
+  }
+  return out;
+}
+function compareCard(){
+  const pref = cmpPrefs() || {};
+  const src = pref.src === 'all' ? 'all' : 'latest';
+  const data = compareClubData(src);
+  const keys = cumulativeClubKeys(data);
+  if(keys.length < 2) return '';
+  let pick = (pref.clubs || []).filter(k => data.has(k));
+  if(!pref.clubs) pick = keys.filter(k => ['3H','5W'].includes(k)).length === 2 ? ['3H','5W'] : keys.slice(0,2);
+  pick = keys.filter(k => pick.includes(k));
+  const inBag = k => (S.carries || []).some(c => clubCanon(c.club) === k);
+  const chips = keys.map(k => `<button class="chip cmp-chip${pick.includes(k)?' on':''}" data-action="cmp-toggle" data-club="${esc(k)}" aria-pressed="${pick.includes(k)}">${esc(k)}${inBag(k)?'':' ·out'}</button>`).join('');
+  const seg = `<div class="cmp-src">${[['latest','Latest day'],['all','All sessions']].map(([v,l])=>`<button class="chip${src===v?' on':''}" data-action="cmp-src" data-src="${v}" aria-pressed="${src===v}">${l}</button>`).join('')}</div>`;
+  let body = '<p class="sm faint">Tap two or more clubs.</p>';
+  if(pick.length){
+    const rows = pick.map(k => ({k, ...data.get(k)}));
+    const maxT = Math.max(...rows.map(r => (r.v.total||r.v.carry||{value:0}).value), 1);
+    const bars = rows.map(r => {
+      const c = r.v.carry?.value, t = r.v.total?.value;
+      const cw = c ? c/maxT*100 : 0, rw = (t && c) ? Math.max(t-c,0)/maxT*100 : 0;
+      return `<div class="cmp-bar"><span class="cmp-lab">${esc(r.k)}</span><span class="cmp-track"><i class="cmp-c" style="width:${cw.toFixed(1)}%"></i><i class="cmp-r" style="width:${rw.toFixed(1)}%"></i></span><b>${c!=null?Math.round(c):'—'}${t!=null?' / '+Math.round(t):''}</b></div>`;
+    }).join('');
+    const fmtv = (k,m,unit,dec) => m ? `${['path','ftp'].includes(k)&&m.value>0?'+':''}${k==='roll'&&m.value>0?'+':''}${m.value.toFixed(dec)}` : '—';
+    const table = `<div class="tscroll"><table class="cmp-table"><thead><tr><th></th>${rows.map(r=>`<th>${esc(r.k)}</th>`).join('')}</tr></thead><tbody>${
+      CMP_ROWS.filter(([k]) => rows.some(r => r.v[k])).map(([k,l,u,d]) => `<tr><td>${esc(l)}${u?` <small>${esc(u)}</small>`:''}</td>${rows.map(r=>`<td>${fmtv(k,r.v[k],u,d)}</td>`).join('')}</tr>`).join('')
+    }<tr class="cmp-meta"><td>Shots · days</td>${rows.map(r=>`<td>${r.n} · ${r.dates.length===1?esc(fmtDate(r.dates[0]).replace(/,? \d{4}$/,'')):r.dates.length+'d'}</td>`).join('')}</tr></tbody></table></div>`;
+    body = `<div class="cmp-bars" aria-label="Carry and roll by club">${bars}<p class="cmp-key"><i class="cmp-c"></i>carry <i class="cmp-r"></i>roll · yd</p></div>${table}`;
+  }
+  return `<div class="card cmp-card">${fold('bag-compare','Compare clubs · sim',`${pick.length} PICKED`,`
+    <div class="cmp-chips">${chips}</div>${seg}${body}
+    <details class="more"><summary>Where these come from</summary><p class="sm">Every TrackMan range shot on file, clear mishits and rows missing both carry and total held out, the same cohort as each club's history. Off the deck at the sim for everything but driver; teed sim tee shots count for the driver only. Latest day uses each club's own most recent day, so two clubs can be from different days. Totals are simulated roll, not an outdoor forecast. "·out" means the club is not on your ladder now.</p></details>`, true)}</div>`;
+}
 function bag(){
   const lineup = S.clubs.filter(c => c.status === 'gaming' || c.status === 'ordered').sort(bagSort);
   const clubCount = activeBagCount();
@@ -3777,6 +3843,7 @@ function bag(){
   <div class="card">
     ${fold('bag-roster', 'In the bag', `${clubCount}/14 CLUBS`, compactBag(lineup))}
   </div>
+  ${compareCard()}
   ${hqBagLinks()}
   ${sessionShortcuts()}
 
@@ -10982,6 +11049,8 @@ const ACTIONS = {
     el.textContent = opening ? 'Collapse all' : 'Expand all';
   },
   'open-session': el => render('session', el.dataset.i),
+  'cmp-toggle': el => { const p = cmpPrefs() || {src:'latest'}; const cur = p.clubs || [...document.querySelectorAll('.cmp-chip.on')].map(b=>b.dataset.club); const k = el.dataset.club; p.clubs = cur.includes(k) ? cur.filter(x=>x!==k) : cur.concat(k); cmpSave(p); rerender(); },
+  'cmp-src': el => { const p = cmpPrefs() || {clubs:[...document.querySelectorAll('.cmp-chip.on')].map(b=>b.dataset.club)}; p.src = el.dataset.src; cmpSave(p); rerender(); },
   'club-history': el => render('clubhistory', {club:el.dataset.club, from:el.dataset.from}),
   'club-history-back': el => el.dataset.from === 'bag' ? render('bag') : render('sessions', 'cumulative'),
   'open-bay': el => render('bay', el.dataset.i),
