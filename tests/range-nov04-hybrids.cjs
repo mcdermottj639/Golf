@@ -6,7 +6,7 @@ const source = require('../data/range-2026-11-04-hybrids.json');
 
 const ids = feed.entries.map(e => e.id);
 assert.equal(new Set(ids).size, ids.length, 'apply-once ids must be unique');
-assert.deepEqual(feed.entries.map(e => e.type), ['bay', 'bay', 'carry-update', 'carry-update', 'history', 'carry-update', 'carry-update', 'history', 'bay', 'club-update', 'carry-update', 'carry-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'carry-update', 'carry-update', 'club-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'club-update', 'history', 'bay-update', 'club-update', 'history']);
+assert.deepEqual(feed.entries.map(e => e.type), ['bay', 'bay', 'carry-update', 'carry-update', 'history', 'carry-update', 'carry-update', 'history', 'bay', 'club-update', 'carry-update', 'carry-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'carry-update', 'carry-update', 'club-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'club-update', 'history', 'bay-update', 'club-update', 'history', 'bay', 'club-update', 'history']);
 
 const mains = source.sources.filter(s => s.role === 'main');
 assert.deepEqual(mains.map(s => [s.club, s.shots.length]), [['3-hybrid', 32], ['4-hybrid', 12]]);
@@ -96,3 +96,12 @@ const g15 = feed.entries.find(e => e.id === 'bay-minishots-20260915-20261104-v1'
 assert.equal(g15.shots.length, 10); assert.deepEqual(g15.excludedShotNumbers, [3, 4, 6, 8, 9, 10]);
 const k15 = g15.shots.filter(s => !s.mishit); assert.equal(+(k15.reduce((a, s) => a + s.carry, 0) / k15.length).toFixed(1), 173.5);
 console.log('sep15 mini table ok');
+
+// v284: second Sep 15 mini table — 7 rows, header averages, Nov 4 rule.
+const sepB = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data/range-2026-09-15-mini-b.json'), 'utf8'));
+for (const [k, h] of Object.entries(sepB.appHeader)) { const v = sepB.shots.map(s => s[k]); const m = v.reduce((a, b) => a + b, 0) / v.length; assert.ok(Math.abs(m - h) <= (k === 'spin' ? 1 : k === 'height' ? 0.5 : 0.1), `sep15b ${k}`); }
+for (const s of sepB.shots) { assert.ok(Math.abs(s.face - s.path - s.ftp) <= 0.11); assert.ok(Math.abs(s.bs / s.cs - s.smash) < 0.015); }
+const bB = feed.entries.find(e => e.id === 'bay-20260915-mini-b-v1').bay;
+assert.equal(bB.date, '2026-09-15'); assert.deepEqual(bB.detail.rangeShots[0].excludedShotNumbers, [2, 5]);
+assert.equal(+bB.detail.clubs[0].carry.toFixed(1), 179.9); assert.ok(bB.detail.rangeShots[0].club.startsWith('Mini Driver'));
+console.log('sep15 second mini table ok');

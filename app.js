@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v283';
+const BUILD = 'v284';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v284', d:'2026-11-04', items:['SEP 15 MINI, SECOND SET: The other 7-shot mini table from Sep 15 is in, on the same day as the first. Same mishit rule as today: 5 clean at 180 carry. Sep 15 now reads 177 over 9 clean shots from both sets, and the Bag tile shows it.'] },
   { b:'v283', d:'2026-11-04', items:['SEP 15 MINI, FULL TABLE: Your two recordings filled in every column for the 10 mini shots (TrackMan 3 Wood, 15.5° then). Same mishit rule as today: 4 clean at 174 carry, 205 total. The Bag row now reads Nov 4 201 · Sep 15 174 · Sep 14 182.'] },
   { b:'v282', d:'2026-11-04', items:['MINI DRIVER HISTORY: The mini is 13.5° now. Its September numbers (at 15.5°) were filed by TrackMan as 3w and sat under the 3-wood; they now sit under the mini: Sep 14 Map My Bag 182 and Sep 15 range 168 (2 tops held out). With today\'s 201 they show on the mini\'s Bag row and in its club history. All three were off the deck.'] },
   { b:'v281', d:'2026-11-04', items:['OFF THE DECK: Today\'s 3H, 4H and mini driver numbers are now labelled as hit off the ground, not a tee — on each range session and on the Bag rows. Carries stay 187 / 178 / 201. Off a tee the mini will likely carry farther; that is not measured yet.'] },

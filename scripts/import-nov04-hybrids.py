@@ -270,6 +270,37 @@ def main():
                              'note': note2}})
     entries.append({'id': 'history-minidriver-sep15-20261104-v1', 'type': 'history', 'date': '2026-11-04',
                     'text': f"Sep 15 mini driver table added from your recordings: {sum(x['carry'] for x in kept)/len(kept):.1f} carry by the Nov 4 rule (n={len(kept)} of 10)."})
+    # v284 — Jack, Nov 4 2026 19:34: "Here's the other from 9/15" — a second Sep 15 mini table (7 shots,
+    # TrackMan "3 Wood"), not on file anywhere. New bay on Sep 15 so it joins that day; same Nov 4 rule.
+    srcb = json.loads((ROOT / 'data' / 'range-2026-09-15-mini-b.json').read_text())
+    blkb = build(srcb)
+    blkb['club'] = MINI
+    eb = bay_entry(blkb, 'Mini', model='TaylorMade r7 Quad')
+    eb['id'] = 'bay-20260915-mini-b-v1'; eb['src'] = srcb['file']
+    eb['bay']['date'] = '2026-09-15'
+    eb['bay']['setup'] = 'Sep 15 · TaylorMade r7 Quad Mini 15.5° · second set · 7 shots · off the deck'
+    eb['bay']['detail']['clubs'][0]['club'] = MINI
+    eb['bay']['detail']['sourceRecord'] = 'data/range-2026-09-15-mini-b.json'
+    eb['bay']['detail']['limits'] = ("Hit off the deck (sim rule: everything but driver), per Jack. No date on screen; Sep 15 is Jack's. "
+        'Normalization and ball not shown. Mishit rule is the one Jack approved in chat on Nov 4 (stricter than isClearMishit). '
+        'A second Sep 15 set, separate from the 10-shot range table on bay-20260915-range-54.')
+    entries.append(eb)
+    ab = blkb['avg']
+    k15 = [x for x in g['shots'] if not x.get('mishit')] + [x for x in blkb['shots'] if not x.get('mishit')]
+    c15 = sum(x['carry'] for x in k15) / len(k15)
+    print('sep15b kept', ab['n'], ab['carry'], 'held', blkb['excludedShotNumbers'], '| day', len(k15), round(c15, 2))
+    note3 = byid['club-minidriver-loft-20261104-v1']['club']['note'].replace(
+        "Sep 15 range 145.5 on screen with two tops in it, 167.5 with the 15.5 and 99.1 held out (n=8 of 10), best 5 176.1.",
+        f"Sep 15, two tables, same Nov 4 rule as today: {c15:.1f} carry, n={len(k15)} of 17 (range set {sum(x['carry'] for x in kept)/len(kept):.1f} n={len(kept)} of 10; second set {ab['carry']:.1f} n={ab['n']} of 7).")
+    assert note3 != byid['club-minidriver-loft-20261104-v1']['club']['note']
+    entries.append({'id': 'club-minidriver-sep15b-20261104-v1', 'type': 'club-update', 'target': 'add-minidriver',
+                    'club': {'noteGist': f"Back in the bag Nov 4 2026 at 13.5° · 201 carry off the deck (Sep at 15.5°: 182 map, {round(c15)} range).",
+                             'noteKeys': [{'k': 'Nov 4 · 13.5°', 'v': '201', 'n': '6 of 8 · off the deck'},
+                                          {'k': 'Sep 15 · 15.5°', 'v': str(round(c15)), 'n': f"{len(k15)} of 17 · two sets · deck"},
+                                          {'k': 'Sep 14 · 15.5°', 'v': '182', 'n': '6 · Map My Bag · deck'}],
+                             'note': note3}})
+    entries.append({'id': 'history-minidriver-sep15b-20261104-v1', 'type': 'history', 'date': '2026-11-04',
+                    'text': f"Second Sep 15 mini table added (7 shots): {ab['carry']:.1f} carry by the Nov 4 rule (n={ab['n']}). Sep 15 total {c15:.1f}, n={len(k15)} of 17."})
     feed = {'updated': '2026-11-04', 'entries': entries}
     (ROOT / 'range-20261104-feed.json').write_text(json.dumps(feed, indent=1, ensure_ascii=False) + '\n')
     for b in (h3, h4):
