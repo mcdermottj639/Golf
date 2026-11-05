@@ -301,6 +301,44 @@ def main():
                              'note': note3}})
     entries.append({'id': 'history-minidriver-sep15b-20261104-v1', 'type': 'history', 'date': '2026-11-04',
                     'text': f"Second Sep 15 mini table added (7 shots): {ab['carry']:.1f} carry by the Nov 4 rule (n={ab['n']}). Sep 15 total {c15:.1f}, n={len(k15)} of 17."})
+    # v285 — Jack, Nov 4 2026 20:07–20:08: tee shots from a TrackMan sim recording. "Dr" = Stealth driver, "3w" = the
+    # mini, both off a tee. Driver/mini stats only — no round data. Same Nov 4 mishit rule (smash < 1.40 held).
+    srct = json.loads((ROOT / 'data' / 'sim-2026-11-04-tee-shots.json').read_text())
+    LIM = ("Tee shots from a TrackMan sim round (Tiburón Gold), at Jack's direction; no round or score data kept. Off a tee. "
+           "Ball speed, launch, path and face are not on these tiles. Total is the sim distance to where the ball finished "
+           "(fairway/rough), not a range total. Mishit rule is Jack's Nov 4 rule (smash < 1.40 held). Normalization and ball not shown.")
+    sim = {}
+    for key, lab, club, model, setup in (
+            ('driver', 'Dr', 'Driver', 'TaylorMade Stealth 2 Plus', 'Nov 4 · TaylorMade Stealth 2 Plus Driver · 5 sim tee shots · off a tee'),
+            ('mini', '3w', MINI.replace('15.5°', '13.5°').replace('TrackMan 3w label', 'TrackMan 3w label · teed'), 'TaylorMade r7 Quad Mini', 'Nov 4 · TaylorMade r7 Quad Mini 13.5° · 5 sim tee shots · off a tee')):
+        sh = [dict(x) for x in srct['shots'] if x['tmLabel'] == lab]
+        for i, x in enumerate(sh, 1): x['shot'] = i
+        src = dict(srct, club=club, shots=sh, sourceShotCount=len(sh))
+        blk = build(src)
+        a = blk['avg']
+        e = {'id': f'bay-20261104-{key}-sim-v1', 'type': 'bay', 'src': srct['file'], 'bay': {
+            'date': '2026-11-04', 'venue': 'TrackMan · sim round tee shots', 'mode': 'Sim', 'unit': 'yd', 'discipline': 'swing',
+            'norm': 'not shown in the recording', 'ball': 'not shown', 'setup': setup,
+            'finding': (f"{r(a['carry'])} carry / {r(a['total'])} total · {r(a['cs'])} mph club · smash {a['smash']:.2f} · "
+                        f"F-P {a['ftp']:+.1f}° · {a['spin']:,.0f} rpm · apex {a['apex']:.0f}′ ({a['n']} clean of {len(sh)})"),
+            'detail': {'gist': f"{club.split(' ·')[0]}: {a['n']} clean of {len(sh)} · {r(a['carry'])} carry · off a tee",
+                       'rangeCaption': f"{srct['file']} · sim tee shots · mishits held out by Jack's Nov 4 rule",
+                       'clubs': [a], 'rangeShots': [blk], 'sourceRecord': 'data/sim-2026-11-04-tee-shots.json',
+                       'rangeSource': {'source': srct['file'], 'alias': lab, 'coverage': srct['check']},
+                       'limits': LIM}}}
+        entries.append(e); sim[key] = a
+        print('sim', key, 'kept', a['n'], a['carry'], 'held', blk['excludedShotNumbers'], 'total', a['total'], 'cs', a['cs'], 'smash', a['smash'], 'ftp', a['ftp'], 'spin', a['spin'], 'apex', a['apex'], 'sd', a['carrySd'])
+    ad, am = sim['driver'], sim['mini']
+    entries.append({'id': 'carry-meas-driver-sim-20261104-v1', 'type': 'carry-update', 'target': 'Driver',
+                    'club': {'meas': {'src': 'tm:2026-11-04-sim-driver', 'n': ad['n'], 'sd': ad['carrySd'], 'date': '2026-11-04',
+                                      'ball': 'not shown', 'norm': 'not shown', 'carry': round(ad['carry'], 1),
+                                      'how': f"off a tee · TrackMan sim tee shots (Tiburón Gold) · {ad['n']} clean of 5 by the Nov 4 rule · total {ad['total']:.1f} is sim distance to the finish"}}})
+    mc = {e['id']: e for e in entries}['club-minidriver-sep15b-20261104-v1']['club']
+    entries.append({'id': 'club-minidriver-teed-20261104-v1', 'type': 'club-update', 'target': 'add-minidriver',
+                    'club': {'noteKeys': [{'k': 'Nov 4 · teed', 'v': str(round(am['carry'])), 'n': f"{am['n']} of 5 · sim tee shots"}] + mc['noteKeys'],
+                             'note': mc['note'] + f" OFF A TEE, Nov 4 (sim tee shots, TrackMan label 3w): {am['carry']:.1f} carry, {am['total']:.1f} total to the finish, {am['cs']:.1f} mph, n={am['n']} of 5. Playing carry stays 201 (off the deck)."}})
+    entries.append({'id': 'history-tee-shots-sim-20261104-v1', 'type': 'history', 'date': '2026-11-04',
+                    'text': f"Nov 4 sim tee shots added: Stealth driver {ad['carry']:.1f} carry (n={ad['n']} clean of 5), mini {am['carry']:.1f} carry off a tee (n={am['n']} of 5). Driver offer parked; live carries unchanged."})
     feed = {'updated': '2026-11-04', 'entries': entries}
     (ROOT / 'range-20261104-feed.json').write_text(json.dumps(feed, indent=1, ensure_ascii=False) + '\n')
     for b in (h3, h4):

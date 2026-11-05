@@ -4760,6 +4760,490 @@
    "type": "history",
    "date": "2026-11-04",
    "text": "Second Sep 15 mini table added (7 shots): 179.9 carry by the Nov 4 rule (n=5). Sep 15 total 177.1, n=9 of 17."
+  },
+  {
+   "id": "bay-20261104-driver-sim-v1",
+   "type": "bay",
+   "src": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+   "bay": {
+    "date": "2026-11-04",
+    "venue": "TrackMan · sim round tee shots",
+    "mode": "Sim",
+    "unit": "yd",
+    "discipline": "swing",
+    "norm": "not shown in the recording",
+    "ball": "not shown",
+    "setup": "Nov 4 · TaylorMade Stealth 2 Plus Driver · 5 sim tee shots · off a tee",
+    "finding": "215.1 carry / 235.7 total · 95.1 mph club · smash 1.45 · F-P +1.7° · 3,077 rpm · apex 72′ (3 clean of 5)",
+    "detail": {
+     "gist": "Driver: 3 clean of 5 · 215.1 carry · off a tee",
+     "rangeCaption": "ScreenRecording_11-04-2026_20-01-29_1.mp4 · sim tee shots · mishits held out by Jack's Nov 4 rule",
+     "clubs": [
+      {
+       "club": "Driver",
+       "n": 3,
+       "held": 2,
+       "carry": 215.067,
+       "total": 235.733,
+       "cs": 95.067,
+       "bs": null,
+       "smash": 1.45,
+       "la": null,
+       "spin": 3076.667,
+       "ftp": 1.733,
+       "path": null,
+       "face": null,
+       "aoa": null,
+       "ld": null,
+       "apex": 72.333,
+       "metricCounts": {
+        "carry": 3,
+        "total": 3,
+        "cs": 3,
+        "bs": 0,
+        "smash": 3,
+        "la": 0,
+        "spin": 3,
+        "ftp": 3,
+        "path": 0,
+        "face": 0,
+        "aoa": 0,
+        "ld": 0
+       },
+       "carrySd": 9.441
+      }
+     ],
+     "rangeShots": [
+      {
+       "club": "Driver",
+       "source": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+       "normalization": "not shown",
+       "sourceShotCount": 5,
+       "visibleShotCount": 5,
+       "unseenShotNumbers": [],
+       "partialShotNumbers": [],
+       "distanceMissingShotNumbers": [],
+       "excludedShotNumbers": [
+        2,
+        4
+       ],
+       "appHeader": null,
+       "appHeaderCheck": "Each row read from a stable frame whose hole header matched the shot; set 2 hole 6 carry (184.9) equals hole 5's and was confirmed on its own frame. Ball speed, launch, path and face are not shown on these tiles. Total is the sim shot distance to where it finished on the course.",
+       "shots": [
+        {
+         "shot": 1,
+         "set": 1,
+         "hole": 1,
+         "par": 5,
+         "tmLabel": "Dr",
+         "carry": 208.6,
+         "total": 222.5,
+         "lie": "fairway",
+         "cs": 95.5,
+         "smash": 1.45,
+         "ftp": 2.0,
+         "spin": 4005,
+         "height": 75,
+         "heightText": "75'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+          "row": 1
+         }
+        },
+        {
+         "shot": 2,
+         "set": 1,
+         "hole": 3,
+         "par": 4,
+         "tmLabel": "Dr",
+         "carry": 213.5,
+         "total": 228.8,
+         "lie": "fairway",
+         "cs": 96.1,
+         "smash": 1.38,
+         "ftp": 6.2,
+         "spin": 2761,
+         "height": 79,
+         "heightText": "79'",
+         "mishit": true,
+         "mishitReason": "smash 1.38 < 1.40 (off-centre strike)",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+          "row": 2
+         }
+        },
+        {
+         "shot": 3,
+         "set": 2,
+         "hole": 1,
+         "par": 5,
+         "tmLabel": "Dr",
+         "carry": 210.7,
+         "total": 226.4,
+         "lie": "rough",
+         "cs": 92.0,
+         "smash": 1.42,
+         "ftp": 3.6,
+         "spin": 2396,
+         "height": 79,
+         "heightText": "79'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+          "row": 3
+         }
+        },
+        {
+         "shot": 4,
+         "set": 2,
+         "hole": 6,
+         "par": 5,
+         "tmLabel": "Dr",
+         "carry": 184.9,
+         "total": 206.8,
+         "lie": "fairway",
+         "cs": 94.4,
+         "smash": 1.35,
+         "ftp": 0.9,
+         "spin": 4353,
+         "height": 70,
+         "heightText": "70'",
+         "mishit": true,
+         "mishitReason": "smash 1.35 < 1.40 (off-centre strike)",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+          "row": 4
+         }
+        },
+        {
+         "shot": 5,
+         "set": 2,
+         "hole": 9,
+         "par": 4,
+         "tmLabel": "Dr",
+         "carry": 225.9,
+         "total": 258.3,
+         "lie": "fairway",
+         "cs": 97.7,
+         "smash": 1.48,
+         "ftp": -0.4,
+         "spin": 2829,
+         "height": 63,
+         "heightText": "63'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+          "row": 5
+         }
+        }
+       ],
+       "avg": {
+        "club": "Driver",
+        "n": 3,
+        "held": 2,
+        "carry": 215.067,
+        "total": 235.733,
+        "cs": 95.067,
+        "bs": null,
+        "smash": 1.45,
+        "la": null,
+        "spin": 3076.667,
+        "ftp": 1.733,
+        "path": null,
+        "face": null,
+        "aoa": null,
+        "ld": null,
+        "apex": 72.333,
+        "metricCounts": {
+         "carry": 3,
+         "total": 3,
+         "cs": 3,
+         "bs": 0,
+         "smash": 3,
+         "la": 0,
+         "spin": 3,
+         "ftp": 3,
+         "path": 0,
+         "face": 0,
+         "aoa": 0,
+         "ld": 0
+        },
+        "carrySd": 9.441
+       }
+      }
+     ],
+     "sourceRecord": "data/sim-2026-11-04-tee-shots.json",
+     "rangeSource": {
+      "source": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+      "alias": "Dr",
+      "coverage": "Each row read from a stable frame whose hole header matched the shot; set 2 hole 6 carry (184.9) equals hole 5's and was confirmed on its own frame. Ball speed, launch, path and face are not shown on these tiles. Total is the sim shot distance to where it finished on the course."
+     },
+     "limits": "Tee shots from a TrackMan sim round (Tiburón Gold), at Jack's direction; no round or score data kept. Off a tee. Ball speed, launch, path and face are not on these tiles. Total is the sim distance to where the ball finished (fairway/rough), not a range total. Mishit rule is Jack's Nov 4 rule (smash < 1.40 held). Normalization and ball not shown."
+    }
+   }
+  },
+  {
+   "id": "bay-20261104-mini-sim-v1",
+   "type": "bay",
+   "src": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+   "bay": {
+    "date": "2026-11-04",
+    "venue": "TrackMan · sim round tee shots",
+    "mode": "Sim",
+    "unit": "yd",
+    "discipline": "swing",
+    "norm": "not shown in the recording",
+    "ball": "not shown",
+    "setup": "Nov 4 · TaylorMade r7 Quad Mini 13.5° · 5 sim tee shots · off a tee",
+    "finding": "205.3 carry / 217.1 total · 91.8 mph club · smash 1.45 · F-P +3.0° · 3,060 rpm · apex 70′ (5 clean of 5)",
+    "detail": {
+     "gist": "Mini Driver: 5 clean of 5 · 205.3 carry · off a tee",
+     "rangeCaption": "ScreenRecording_11-04-2026_20-01-29_1.mp4 · sim tee shots · mishits held out by Jack's Nov 4 rule",
+     "clubs": [
+      {
+       "club": "Mini Driver · TrackMan 3w label · teed · 13.5°",
+       "n": 5,
+       "held": 0,
+       "carry": 205.32,
+       "total": 217.08,
+       "cs": 91.78,
+       "bs": null,
+       "smash": 1.452,
+       "la": null,
+       "spin": 3059.8,
+       "ftp": 3.0,
+       "path": null,
+       "face": null,
+       "aoa": null,
+       "ld": null,
+       "apex": 69.6,
+       "metricCounts": {
+        "carry": 5,
+        "total": 5,
+        "cs": 5,
+        "bs": 0,
+        "smash": 5,
+        "la": 0,
+        "spin": 5,
+        "ftp": 5,
+        "path": 0,
+        "face": 0,
+        "aoa": 0,
+        "ld": 0
+       },
+       "carrySd": 7.834
+      }
+     ],
+     "rangeShots": [
+      {
+       "club": "Mini Driver · TrackMan 3w label · teed · 13.5°",
+       "source": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+       "normalization": "not shown",
+       "sourceShotCount": 5,
+       "visibleShotCount": 5,
+       "unseenShotNumbers": [],
+       "partialShotNumbers": [],
+       "distanceMissingShotNumbers": [],
+       "excludedShotNumbers": [],
+       "appHeader": null,
+       "appHeaderCheck": "Each row read from a stable frame whose hole header matched the shot; set 2 hole 6 carry (184.9) equals hole 5's and was confirmed on its own frame. Ball speed, launch, path and face are not shown on these tiles. Total is the sim shot distance to where it finished on the course.",
+       "shots": [
+        {
+         "shot": 1,
+         "set": 1,
+         "hole": 2,
+         "par": 4,
+         "tmLabel": "3w",
+         "carry": 205.7,
+         "total": 215.2,
+         "lie": "pinestraw",
+         "cs": 91.3,
+         "smash": 1.47,
+         "ftp": 1.8,
+         "spin": 3250,
+         "height": 68,
+         "heightText": "68'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+          "row": 1
+         }
+        },
+        {
+         "shot": 2,
+         "set": 1,
+         "hole": 4,
+         "par": 4,
+         "tmLabel": "3w",
+         "carry": 214.0,
+         "total": 226.0,
+         "lie": "fairway",
+         "cs": 95.0,
+         "smash": 1.42,
+         "ftp": 1.5,
+         "spin": 3149,
+         "height": 82,
+         "heightText": "82'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+          "row": 2
+         }
+        },
+        {
+         "shot": 3,
+         "set": 2,
+         "hole": 2,
+         "par": 4,
+         "tmLabel": "3w",
+         "carry": 201.3,
+         "total": 230.8,
+         "lie": "fairway",
+         "cs": 91.2,
+         "smash": 1.5,
+         "ftp": 2.3,
+         "spin": 2883,
+         "height": 43,
+         "heightText": "43'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+          "row": 3
+         }
+        },
+        {
+         "shot": 4,
+         "set": 2,
+         "hole": 3,
+         "par": 4,
+         "tmLabel": "3w",
+         "carry": 211.2,
+         "total": 232.7,
+         "lie": "fairway",
+         "cs": 91.7,
+         "smash": 1.46,
+         "ftp": 3.6,
+         "spin": 2456,
+         "height": 64,
+         "heightText": "64'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+          "row": 4
+         }
+        },
+        {
+         "shot": 5,
+         "set": 2,
+         "hole": 4,
+         "par": 4,
+         "tmLabel": "3w",
+         "carry": 194.4,
+         "total": 180.7,
+         "lie": "deep rough",
+         "cs": 89.7,
+         "smash": 1.41,
+         "ftp": 5.8,
+         "spin": 3561,
+         "height": 91,
+         "heightText": "91'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+          "row": 5
+         }
+        }
+       ],
+       "avg": {
+        "club": "Mini Driver · TrackMan 3w label · teed · 13.5°",
+        "n": 5,
+        "held": 0,
+        "carry": 205.32,
+        "total": 217.08,
+        "cs": 91.78,
+        "bs": null,
+        "smash": 1.452,
+        "la": null,
+        "spin": 3059.8,
+        "ftp": 3.0,
+        "path": null,
+        "face": null,
+        "aoa": null,
+        "ld": null,
+        "apex": 69.6,
+        "metricCounts": {
+         "carry": 5,
+         "total": 5,
+         "cs": 5,
+         "bs": 0,
+         "smash": 5,
+         "la": 0,
+         "spin": 5,
+         "ftp": 5,
+         "path": 0,
+         "face": 0,
+         "aoa": 0,
+         "ld": 0
+        },
+        "carrySd": 7.834
+       }
+      }
+     ],
+     "sourceRecord": "data/sim-2026-11-04-tee-shots.json",
+     "rangeSource": {
+      "source": "ScreenRecording_11-04-2026_20-01-29_1.mp4",
+      "alias": "3w",
+      "coverage": "Each row read from a stable frame whose hole header matched the shot; set 2 hole 6 carry (184.9) equals hole 5's and was confirmed on its own frame. Ball speed, launch, path and face are not shown on these tiles. Total is the sim shot distance to where it finished on the course."
+     },
+     "limits": "Tee shots from a TrackMan sim round (Tiburón Gold), at Jack's direction; no round or score data kept. Off a tee. Ball speed, launch, path and face are not on these tiles. Total is the sim distance to where the ball finished (fairway/rough), not a range total. Mishit rule is Jack's Nov 4 rule (smash < 1.40 held). Normalization and ball not shown."
+    }
+   }
+  },
+  {
+   "id": "carry-meas-driver-sim-20261104-v1",
+   "type": "carry-update",
+   "target": "Driver",
+   "club": {
+    "meas": {
+     "src": "tm:2026-11-04-sim-driver",
+     "n": 3,
+     "sd": 9.441,
+     "date": "2026-11-04",
+     "ball": "not shown",
+     "norm": "not shown",
+     "carry": 215.1,
+     "how": "off a tee · TrackMan sim tee shots (Tiburón Gold) · 3 clean of 5 by the Nov 4 rule · total 235.7 is sim distance to the finish"
+    }
+   }
+  },
+  {
+   "id": "club-minidriver-teed-20261104-v1",
+   "type": "club-update",
+   "target": "add-minidriver",
+   "club": {
+    "noteKeys": [
+     {
+      "k": "Nov 4 · teed",
+      "v": "205",
+      "n": "5 of 5 · sim tee shots"
+     },
+     {
+      "k": "Nov 4 · 13.5°",
+      "v": "201",
+      "n": "6 of 8 · off the deck"
+     },
+     {
+      "k": "Sep 15 · 15.5°",
+      "v": "177",
+      "n": "9 of 17 · two sets · deck"
+     },
+     {
+      "k": "Sep 14 · 15.5°",
+      "v": "182",
+      "n": "6 · Map My Bag · deck"
+     }
+    ],
+    "note": "BACK IN THE BAG Nov 4 2026 (Jack), at 13.5° (Jack). Nov 4 TrackMan Range, off the deck (no tee): 201.1 yd carry, n=6 clean of 8 (filed under the \"3 Wood\" label), 229.5 total, 93.0 club / 134.5 ball mph. OLDER NUMBERS, both at 15.5° and both filed by TrackMan as \"3w\": Sep 14 Map My Bag 182.4 carry, n=6, Consistency 9.2; Sep 15, two tables, same Nov 4 rule as today: 177.1 carry, n=9 of 17 (range set 173.5 n=4 of 10; second set 179.9 n=5 of 7). All three are off the deck: at the sim Jack hits everything but driver off the deck. Normalization was not shown for September. Earlier: out Aug 12 (13.5° then), back Sep 8 at 15.5°, out Sep 18 for the DS-ADAPT X 3-wood (returned Oct 24). OFF A TEE, Nov 4 (sim tee shots, TrackMan label 3w): 205.3 carry, 217.1 total to the finish, 91.8 mph, n=5 of 5. Playing carry stays 201 (off the deck)."
+   }
+  },
+  {
+   "id": "history-tee-shots-sim-20261104-v1",
+   "type": "history",
+   "date": "2026-11-04",
+   "text": "Nov 4 sim tee shots added: Stealth driver 215.1 carry (n=3 clean of 5), mini 205.3 carry off a tee (n=5 of 5). Driver offer parked; live carries unchanged."
   }
  ]
 }
