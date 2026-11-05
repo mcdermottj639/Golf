@@ -4,7 +4,7 @@ const source = require('../data/range-2026-11-04-hybrids.json');
 
 const ids = feed.entries.map(e => e.id);
 assert.equal(new Set(ids).size, ids.length, 'apply-once ids must be unique');
-assert.deepEqual(feed.entries.map(e => e.type), ['bay', 'bay', 'carry-update', 'carry-update', 'history', 'carry-update', 'carry-update', 'history', 'bay', 'club-update', 'carry-update', 'carry-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'carry-update', 'carry-update', 'club-update', 'history']);
+assert.deepEqual(feed.entries.map(e => e.type), ['bay', 'bay', 'carry-update', 'carry-update', 'history', 'carry-update', 'carry-update', 'history', 'bay', 'club-update', 'carry-update', 'carry-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'carry-update', 'carry-update', 'club-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'club-update', 'history']);
 
 const mains = source.sources.filter(s => s.role === 'main');
 assert.deepEqual(mains.map(s => [s.club, s.shots.length]), [['3-hybrid', 32], ['4-hybrid', 12]]);
@@ -52,7 +52,7 @@ assert.deepEqual(h4.excludedShotNumbers, [1, 2, 4, 5, 9, 12]);
 
 // v278 entries park offers only; v279 entries (Jack's instruction) set the live carry to exactly the offer.
 const offers = feed.entries.filter(e => e.type === 'carry-update' && e.club.meas && !e.id.startsWith('carry-offdeck-'));
-const live = feed.entries.filter(e => e.type === 'carry-update' && !e.club.meas);
+const live = feed.entries.filter(e => e.type === 'carry-update' && !e.club.meas && 'carry' in e.club);
 assert.equal(offers.length, 3); assert.equal(live.length, 3);
 for (const e of live) {
   const o = offers.find(x => x.target === e.target);
@@ -75,3 +75,13 @@ const deckRows = feed.entries.filter(e => e.id.startsWith('carry-offdeck-'));
 assert.deepEqual(deckRows.map(e => e.target), ['3-hybrid', '4-hybrid', 'Mini Driver']);
 for (const e of deckRows) { assert.ok(!('carry' in e.club), 'off-deck label never sets a live carry'); assert.ok(e.club.meas.how.startsWith('off the deck')); }
 console.log('off-deck labels ok');
+
+// v282: Sep 14 / Sep 15 mini groups (TrackMan "3w") relabelled to the mini; loft 13.5°.
+const lab = feed.entries.filter(e => e.id.startsWith('bay-minilabel-'));
+assert.deepEqual(lab.map(e => e.target), ['bay-20260914-gl18-map-my-bag', 'bay-20260915-range-54']);
+for (const e of lab) { const js = JSON.stringify(e.bay.detail); assert.ok(!js.includes('3w · TrackMan label')); assert.ok(js.includes('Mini Driver · TrackMan 3w label · 15.5°')); }
+const c14 = lab[0].bay.detail.clubs.find(c => c.club.startsWith('Mini')); assert.equal(c14.carry, 182.4);
+assert.equal(lab[0].bay.detail.clubs.length, 13); assert.equal(lab[1].bay.detail.rangeShots.length, 6);
+assert.equal(feed.entries.find(e => e.id === 'carry-minidriver-loft-20261104-v1').club.loft, '13.5°');
+assert.ok(!('carry' in feed.entries.find(e => e.id === 'carry-minidriver-loft-20261104-v1').club));
+console.log('mini history relabel ok');

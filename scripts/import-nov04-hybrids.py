@@ -201,6 +201,40 @@ def main():
                              'note': mc['note'] + ' OFF THE DECK: all Nov 4 shots were hit off the ground, not a tee (Jack); a teed carry is unmeasured.'}})
     entries.append({'id': 'history-offdeck-20261104-v1', 'type': 'history', 'date': '2026-11-04',
                     'text': 'Nov 4 TrackMan numbers (3H, 4H, mini driver) labelled off the deck (no tee). Carries unchanged: 187 / 178 / 201.'})
+    # v282 — Jack, Nov 4 2026: today's mini is 13.5° (not the 15.5° carried forward), and the older
+    # mini numbers "need to be in the app too". Sep 14 Map My Bag and the Sep 15 range filed the mini under
+    # TrackMan's "3w" label, so their club rows read as the 3-wood. Relabel those rows to the mini (15.5° then),
+    # re-sending each touched detail array WHOLE from its latest feed version (bay-update merges detail shallowly).
+    old = {e['id']: e for e in json.loads((ROOT / 'coach-feed.json').read_text())['entries']}
+    OLD3W = '3w · TrackMan label'; MINI = 'Mini Driver · TrackMan 3w label · 15.5°'
+    def relabel(v):
+        if isinstance(v, list): return [relabel(x) for x in v]
+        if isinstance(v, dict): return {k: (MINI if k == 'club' and x == OLD3W else relabel(x)) for k, x in v.items()}
+        return v
+    m14 = {'clubs': old['bay-swingread-20260917-map']['bay']['detail']['clubs'],
+           'delivery': old['bay-map-repair-20260915-v2']['bay']['detail']['delivery']}
+    r15d = old['bay-20260915-range-54']['bay']['detail']
+    r15 = {k: r15d[k] for k in ('clubs', 'delivery', 'rangeShots')}
+    for tid, det in (('bay-20260914-gl18-map-my-bag', m14), ('bay-20260915-range-54', r15)):
+        new = relabel(det); js = json.dumps(new, ensure_ascii=False); assert js.count(MINI) >= 2 and OLD3W not in js
+        entries.append({'id': f"bay-minilabel-{tid[4:12]}-20261104-v1", 'type': 'bay-update', 'target': tid, 'bay': {'detail': new}})
+    entries.append({'id': 'bay-minidriver-loft-20261104-v1', 'type': 'bay-update', 'target': 'bay-20261104-mini-v1',
+                    'bay': {'setup': 'Nov 4 · TaylorMade r7 Quad Mini 13.5° · 8 shots · off the deck'}})
+    entries.append({'id': 'carry-minidriver-loft-20261104-v1', 'type': 'carry-update', 'target': 'Mini Driver', 'club': {'loft': '13.5°'}})
+    entries.append({'id': 'club-minidriver-loft-20261104-v1', 'type': 'club-update', 'target': 'add-minidriver',
+                    'club': {'loft': '13.5°',
+                             'noteGist': 'Back in the bag Nov 4 2026 at 13.5° · 201 carry off the deck (Sep at 15.5°: 182 map, 168 range) · all off the deck.',
+                             'noteKeys': [{'k': 'Nov 4 · 13.5°', 'v': '201', 'n': '6 of 8 · off the deck'},
+                                          {'k': 'Sep 15 · 15.5°', 'v': '168', 'n': '8 of 10 · range · deck'},
+                                          {'k': 'Sep 14 · 15.5°', 'v': '182', 'n': '6 · Map My Bag · deck'}],
+                             'note': ('BACK IN THE BAG Nov 4 2026 (Jack), at 13.5° (Jack). Nov 4 TrackMan Range, off the deck (no tee): 201.1 yd carry, '
+                                      'n=6 clean of 8 (filed under the "3 Wood" label), 229.5 total, 93.0 club / 134.5 ball mph. '
+                                      'OLDER NUMBERS, both at 15.5° and both filed by TrackMan as "3w": Sep 14 Map My Bag 182.4 carry, n=6, '
+                                      'Consistency 9.2; Sep 15 range 145.5 on screen with two tops in it, 167.5 with the 15.5 and 99.1 held out '
+                                      '(n=8 of 10), best 5 176.1. All three are off the deck: at the sim Jack hits everything but driver off the deck. Normalization was not shown for September. '
+                                      'Earlier: out Aug 12 (13.5° then), back Sep 8 at 15.5°, out Sep 18 for the DS-ADAPT X 3-wood (returned Oct 24).')}})
+    entries.append({'id': 'history-minidriver-loft-20261104-v1', 'type': 'history', 'date': '2026-11-04',
+                    'text': 'Mini driver loft corrected to 13.5° (Nov 4). Sep 14 Map My Bag (182.4) and Sep 15 range (167.5 clean) mini groups now sit under the mini, not the 3-wood.'})
     feed = {'updated': '2026-11-04', 'entries': entries}
     (ROOT / 'range-20261104-feed.json').write_text(json.dumps(feed, indent=1, ensure_ascii=False) + '\n')
     for b in (h3, h4):

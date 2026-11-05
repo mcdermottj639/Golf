@@ -1738,6 +1738,1703 @@
    "type": "history",
    "date": "2026-11-04",
    "text": "Nov 4 TrackMan numbers (3H, 4H, mini driver) labelled off the deck (no tee). Carries unchanged: 187 / 178 / 201."
+  },
+  {
+   "id": "bay-minilabel-20260914-20261104-v1",
+   "type": "bay-update",
+   "target": "bay-20260914-gl18-map-my-bag",
+   "bay": {
+    "detail": {
+     "clubs": [
+      {
+       "aoa": 0.2,
+       "bs": 129.9,
+       "carry": 195.8,
+       "club": "Driver",
+       "cons": 18.4,
+       "cs": 94.4,
+       "curve": 24.5,
+       "la": 14.5,
+       "n": 6,
+       "smash": 1.38,
+       "spin": 3297
+      },
+      {
+       "aoa": -2.4,
+       "bs": 126.3,
+       "carry": 182.4,
+       "club": "Mini Driver · TrackMan 3w label · 15.5°",
+       "cons": 9.2,
+       "cs": 88.3,
+       "curve": 22.4,
+       "la": 10.8,
+       "n": 6,
+       "smash": 1.42
+      },
+      {
+       "carry": 177.6,
+       "club": "5 wood",
+       "cons": 7.3,
+       "curve": 15.1,
+       "n": 6
+      },
+      {
+       "bs": 113.7,
+       "carry": 152.3,
+       "club": "2-iron (utility)",
+       "cons": 18.3,
+       "cs": 82.0,
+       "curve": 22.2,
+       "la": 11.5,
+       "n": 6,
+       "smash": 1.39,
+       "spin": 4303
+      },
+      {
+       "bs": 101.3,
+       "carry": 128.3,
+       "club": "5-iron",
+       "cons": 17.8,
+       "cs": 79.8,
+       "curve": 17.2,
+       "la": 14.0,
+       "n": 6,
+       "smash": 1.27,
+       "spin": 5137
+      },
+      {
+       "carry": 134.5,
+       "club": "6-iron",
+       "cons": 18.2,
+       "n": 6
+      },
+      {
+       "carry": 135.9,
+       "club": "7-iron",
+       "cons": 12.5,
+       "n": 6
+      },
+      {
+       "carry": 124.1,
+       "club": "8-iron",
+       "cons": 7.4,
+       "n": 6
+      },
+      {
+       "carry": 110.2,
+       "club": "9-iron",
+       "cons": 6.4,
+       "n": 6
+      },
+      {
+       "carry": 113.2,
+       "club": "PW",
+       "cons": 7.4,
+       "n": 6
+      },
+      {
+       "bs": 81.3,
+       "carry": 99.1,
+       "club": "50° wedge",
+       "cons": 8.1,
+       "cs": 75.9,
+       "curve": 1.8,
+       "la": 24.6,
+       "n": 6,
+       "smash": 1.09,
+       "spin": 6912
+      },
+      {
+       "carry": 84.5,
+       "club": "56° wedge",
+       "cons": 7.0,
+       "n": 6
+      },
+      {
+       "carry": 66.3,
+       "club": "60° wedge",
+       "cons": 4.1,
+       "n": 6
+      }
+     ],
+     "delivery": [
+      {
+       "club": "Driver",
+       "path": -6.6,
+       "face": -5.7,
+       "ftp": 0.9,
+       "paths": [
+        -5.1,
+        -6.9,
+        -5.1,
+        -9.6,
+        -5.4,
+        -7.2
+       ],
+       "faces": [
+        -3.2,
+        -6.3,
+        -7.0,
+        -8.5,
+        -5.3,
+        -3.8
+       ],
+       "ftps": [
+        1.9,
+        0.6,
+        -1.9,
+        1.1,
+        0.1,
+        3.4
+       ]
+      },
+      {
+       "club": "Mini Driver · TrackMan 3w label · 15.5°",
+       "path": -3.8,
+       "face": -4.2,
+       "ftp": -0.4,
+       "paths": [
+        -3.8,
+        -5.2,
+        null,
+        -5.2,
+        -2.8,
+        -2.0
+       ],
+       "faces": [
+        -5.3,
+        -9.6,
+        null,
+        -3.4,
+        -0.7,
+        -1.8
+       ],
+       "ftps": [
+        -1.5,
+        -4.4,
+        null,
+        1.8,
+        2.1,
+        0.2
+       ]
+      },
+      {
+       "club": "5 wood",
+       "path": -1.9,
+       "face": -1.4,
+       "ftp": 0.6,
+       "paths": [
+        1.5,
+        -2.8,
+        -2.4,
+        -2.5,
+        -1.7,
+        -3.7
+       ],
+       "faces": [
+        -4.7,
+        -4.5,
+        0.6,
+        3.7,
+        -2.7,
+        -0.6
+       ],
+       "ftps": [
+        -6.2,
+        -1.7,
+        3.0,
+        6.2,
+        -1.0,
+        3.1
+       ]
+      },
+      {
+       "club": "2-iron (utility)",
+       "path": -9.8,
+       "face": -0.6,
+       "ftp": 9.2,
+       "paths": [
+        -9.0,
+        -7.8,
+        -7.8,
+        -11.5,
+        -12.1,
+        -10.7
+       ],
+       "faces": [
+        -1.5,
+        1.0,
+        -0.9,
+        -2.7,
+        -0.7,
+        1.0
+       ],
+       "ftps": [
+        7.5,
+        8.8,
+        6.9,
+        8.8,
+        11.4,
+        11.7
+       ]
+      },
+      {
+       "club": "5-iron",
+       "path": -11.0,
+       "face": -2.8,
+       "ftp": 8.1,
+       "paths": [
+        -9.7,
+        -11.5,
+        -9.2,
+        -12.7,
+        -11.4,
+        -11.2
+       ],
+       "faces": [
+        -2.1,
+        -4.2,
+        1.0,
+        -6.0,
+        -2.5,
+        -3.2
+       ],
+       "ftps": [
+        7.6,
+        7.3,
+        10.2,
+        6.7,
+        8.9,
+        8.0
+       ]
+      },
+      {
+       "club": "6-iron",
+       "path": -8.2,
+       "face": 0.3,
+       "ftp": 8.6,
+       "paths": [
+        -9.8,
+        -10.6,
+        -8.1,
+        -5.6,
+        -6.0,
+        -9.2
+       ],
+       "faces": [
+        1.2,
+        1.2,
+        -2.2,
+        -2.9,
+        3.5,
+        1.2
+       ],
+       "ftps": [
+        11.0,
+        11.8,
+        5.9,
+        2.7,
+        9.5,
+        10.4
+       ]
+      },
+      {
+       "club": "7-iron",
+       "path": -6.7,
+       "face": 0.0,
+       "ftp": 6.7,
+       "paths": [
+        -7.6,
+        -6.1,
+        -5.8,
+        -8.1,
+        -6.7,
+        -6.1
+       ],
+       "faces": [
+        -1.8,
+        -0.9,
+        2.5,
+        -0.6,
+        2.7,
+        -2.1
+       ],
+       "ftps": [
+        5.8,
+        5.2,
+        8.3,
+        7.5,
+        9.4,
+        4.0
+       ]
+      },
+      {
+       "club": "8-iron",
+       "path": -7.6,
+       "face": 0.6,
+       "ftp": 8.2,
+       "paths": [
+        -7.9,
+        -10.0,
+        -7.8,
+        -7.5,
+        -6.1,
+        -6.4
+       ],
+       "faces": [
+        2.6,
+        -3.9,
+        1.9,
+        1.7,
+        2.7,
+        -1.7
+       ],
+       "ftps": [
+        10.5,
+        6.1,
+        9.7,
+        9.2,
+        8.8,
+        4.7
+       ]
+      },
+      {
+       "club": "9-iron",
+       "path": -5.2,
+       "face": -1.5,
+       "ftp": 3.7,
+       "paths": [
+        -6.6,
+        -4.4,
+        -4.7,
+        -5.2,
+        -5.4,
+        -4.8
+       ],
+       "faces": [
+        -1.7,
+        -2.9,
+        -0.7,
+        -0.6,
+        -3.6,
+        0.3
+       ],
+       "ftps": [
+        4.9,
+        1.5,
+        4.0,
+        4.6,
+        1.8,
+        5.1
+       ]
+      },
+      {
+       "club": "PW",
+       "path": -2.9,
+       "face": 0.8,
+       "ftp": 3.7,
+       "paths": [
+        -2.6,
+        -5.2,
+        -1.2,
+        -4.6,
+        -2.2,
+        -1.4
+       ],
+       "faces": [
+        0.4,
+        -3.5,
+        3.1,
+        -3.3,
+        4.1,
+        4.0
+       ],
+       "ftps": [
+        3.0,
+        1.7,
+        4.3,
+        1.3,
+        6.3,
+        5.4
+       ]
+      },
+      {
+       "club": "50° wedge",
+       "path": -0.3,
+       "face": -0.3,
+       "ftp": 0.1,
+       "paths": [
+        -2.4,
+        3.4,
+        1.9,
+        null,
+        -3.3,
+        -1.3
+       ],
+       "faces": [
+        0.2,
+        1.6,
+        -3.7,
+        null,
+        0.2,
+        0.3
+       ],
+       "ftps": [
+        2.6,
+        -1.8,
+        -5.6,
+        null,
+        3.5,
+        1.6
+       ]
+      },
+      {
+       "club": "56° wedge",
+       "path": -0.8,
+       "face": 1.2,
+       "ftp": 1.9,
+       "paths": [
+        0.5,
+        -2.7,
+        -1.9,
+        0.0,
+        -1.0,
+        0.6
+       ],
+       "faces": [
+        -3.8,
+        1.2,
+        3.2,
+        3.3,
+        1.9,
+        1.2
+       ],
+       "ftps": [
+        -4.3,
+        3.9,
+        5.1,
+        3.3,
+        2.9,
+        0.6
+       ]
+      },
+      {
+       "club": "60° wedge",
+       "path": 0.4,
+       "face": 1.4,
+       "ftp": 1.0,
+       "paths": [
+        -0.4,
+        0.2,
+        1.6,
+        0.8,
+        -0.4,
+        0.8
+       ],
+       "faces": [
+        1.2,
+        0.5,
+        0.9,
+        2.2,
+        -1.4,
+        5.1
+       ],
+       "ftps": [
+        1.6,
+        0.3,
+        -0.7,
+        1.4,
+        -1.0,
+        4.3
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "bay-minilabel-20260915-20261104-v1",
+   "type": "bay-update",
+   "target": "bay-20260915-range-54",
+   "bay": {
+    "detail": {
+     "clubs": [
+      {
+       "carry": 125.2,
+       "club": "Driver",
+       "n": 6,
+       "total": 149.5
+      },
+      {
+       "carry": 145.5,
+       "club": "Mini Driver · TrackMan 3w label · 15.5°",
+       "n": 10,
+       "total": 180.8
+      },
+      {
+       "carry": 162.3,
+       "club": "5 wood",
+       "n": 9,
+       "total": 195.3
+      },
+      {
+       "carry": 123.5,
+       "club": "6-iron",
+       "n": 10,
+       "total": 146
+      },
+      {
+       "carry": 99.2,
+       "club": "9-iron",
+       "n": 10,
+       "total": 116.7
+      },
+      {
+       "carry": 75.5,
+       "club": "56° wedge",
+       "n": 9,
+       "total": 88.8
+      }
+     ],
+     "delivery": [
+      {
+       "club": "Driver",
+       "face": -0.3,
+       "faces": [
+        1.4,
+        null,
+        2.8,
+        -2.2,
+        5.4,
+        -9.1
+       ],
+       "ftp": 2.5,
+       "ftps": [
+        3.5,
+        null,
+        6.7,
+        -2.5,
+        10.3,
+        -5.3
+       ],
+       "path": -2.9,
+       "paths": [
+        -2,
+        null,
+        -3.9,
+        0.4,
+        -4.9,
+        -3.9
+       ]
+      },
+      {
+       "club": "Mini Driver · TrackMan 3w label · 15.5°",
+       "face": -3.7,
+       "faces": [
+        null,
+        null,
+        null,
+        -11.9,
+        3.4,
+        null,
+        -1.9,
+        -4,
+        -2.9,
+        -5
+       ],
+       "ftp": -0.3,
+       "ftps": [
+        null,
+        null,
+        null,
+        -6.3,
+        4,
+        null,
+        5.2,
+        -0.4,
+        -3.1,
+        -1
+       ],
+       "path": -3.4,
+       "paths": [
+        null,
+        null,
+        null,
+        -5.6,
+        -0.6,
+        null,
+        -7.1,
+        -3.6,
+        0.2,
+        -4
+       ]
+      },
+      {
+       "club": "5 wood",
+       "face": -0.6,
+       "faces": [
+        -0.9,
+        2.3,
+        null,
+        -0.3,
+        -0.6,
+        1.7,
+        0.2,
+        -8.5,
+        1.5
+       ],
+       "ftp": 2.1,
+       "ftps": [
+        1.2,
+        4.3,
+        null,
+        2.8,
+        3.1,
+        2.5,
+        5.6,
+        -1.9,
+        -0.7
+       ],
+       "path": -2.7,
+       "paths": [
+        -2.2,
+        -2,
+        null,
+        -3.1,
+        -3.7,
+        -0.9,
+        -5.4,
+        -6.6,
+        2.2
+       ]
+      },
+      {
+       "club": "6-iron",
+       "face": -2.9,
+       "faces": [
+        null,
+        -3,
+        -0.6,
+        -3,
+        6.7,
+        -4.6,
+        -5.1,
+        -5,
+        -4.8,
+        -6.8
+       ],
+       "ftp": 6,
+       "ftps": [
+        null,
+        5.3,
+        8.3,
+        8.3,
+        12.7,
+        3.7,
+        6.5,
+        4,
+        1.4,
+        4.1
+       ],
+       "path": -8.9,
+       "paths": [
+        null,
+        -8.3,
+        -8.9,
+        -11.3,
+        -5.9,
+        -8.3,
+        -11.6,
+        -9,
+        -6.1,
+        -10.9
+       ]
+      },
+      {
+       "club": "9-iron",
+       "face": -1.1,
+       "faces": [
+        null,
+        2.3,
+        -3.8,
+        -2.1,
+        -2.9,
+        2.1,
+        -3.5,
+        -2.1,
+        2.3,
+        -1.8
+       ],
+       "ftp": 4.2,
+       "ftps": [
+        null,
+        5.1,
+        2.9,
+        3.6,
+        3.3,
+        5.4,
+        0.4,
+        5.2,
+        6.8,
+        5.1
+       ],
+       "path": -5.3,
+       "paths": [
+        null,
+        -2.8,
+        -6.7,
+        -5.8,
+        -6.2,
+        -3.3,
+        -3.9,
+        -7.4,
+        -4.4,
+        -6.9
+       ]
+      },
+      {
+       "club": "56° wedge",
+       "face": -0.9,
+       "faces": [
+        -4.7,
+        -1.3,
+        0.4,
+        -2.3,
+        -0.6,
+        -1.7,
+        0.9,
+        0,
+        1
+       ],
+       "ftp": -1.3,
+       "ftps": [
+        -2.9,
+        -2.6,
+        -3.2,
+        -1.7,
+        -3.9,
+        -0.7,
+        0.1,
+        0.2,
+        2.9
+       ],
+       "path": 0.4,
+       "paths": [
+        -1.8,
+        1.3,
+        3.6,
+        -0.5,
+        3.3,
+        -1,
+        0.7,
+        -0.2,
+        -1.9
+       ]
+      }
+     ],
+     "rangeShots": [
+      {
+       "carryHits": [],
+       "club": "Driver",
+       "displayCarry": 125.2,
+       "displayTotal": 149.5,
+       "distanceSeconds": [
+        4
+       ],
+       "label": "Dr",
+       "metricSeconds": [
+        7,
+        11
+       ],
+       "shots": [
+        {
+         "bs": 122.6,
+         "carry": 167,
+         "carryHit": false,
+         "cs": null,
+         "face": 1.4,
+         "ftp": 3.5,
+         "path": -2,
+         "shot": 1,
+         "spin": 1044,
+         "total": 206.3,
+         "totalHit": false
+        },
+        {
+         "bs": 122.3,
+         "carry": 8,
+         "carryHit": false,
+         "cs": null,
+         "face": null,
+         "ftp": null,
+         "path": null,
+         "shot": 2,
+         "spin": 866,
+         "total": 39.4,
+         "totalHit": false
+        },
+        {
+         "bs": 131.6,
+         "carry": 197.1,
+         "carryHit": false,
+         "cs": 91.6,
+         "face": 2.8,
+         "ftp": 6.7,
+         "path": -3.9,
+         "shot": 3,
+         "spin": 4465,
+         "total": 205.2,
+         "totalHit": false
+        },
+        {
+         "bs": 122.3,
+         "carry": 15.4,
+         "carryHit": false,
+         "cs": 85,
+         "face": -2.2,
+         "ftp": -2.5,
+         "path": 0.4,
+         "shot": 4,
+         "spin": 1834,
+         "total": 45.9,
+         "totalHit": false
+        },
+        {
+         "bs": 129.9,
+         "carry": 181.7,
+         "carryHit": false,
+         "cs": 94.2,
+         "face": 5.4,
+         "ftp": 10.3,
+         "path": -4.9,
+         "shot": 5,
+         "spin": 5455,
+         "total": 190.1,
+         "totalHit": false
+        },
+        {
+         "bs": 126,
+         "carry": 181.8,
+         "carryHit": false,
+         "cs": 93,
+         "face": -9.1,
+         "ftp": -5.3,
+         "path": -3.9,
+         "shot": 6,
+         "spin": 3686,
+         "total": 210,
+         "totalHit": false
+        }
+       ],
+       "target": 218,
+       "totalHits": []
+      },
+      {
+       "carryHits": [],
+       "club": "Mini Driver · TrackMan 3w label · 15.5°",
+       "displayCarry": 145.5,
+       "displayTotal": 180.8,
+       "distanceSeconds": [
+        22,
+        26
+       ],
+       "label": "3w",
+       "metricSeconds": [
+        31,
+        37,
+        43
+       ],
+       "shots": [
+        {
+         "bs": null,
+         "carry": 186.6,
+         "carryHit": false,
+         "cs": 83.7,
+         "face": null,
+         "ftp": null,
+         "path": null,
+         "shot": 1,
+         "spin": null,
+         "total": 220.7,
+         "totalHit": true
+        },
+        {
+         "bs": null,
+         "carry": 172.2,
+         "carryHit": false,
+         "cs": 88.4,
+         "face": null,
+         "ftp": null,
+         "path": null,
+         "shot": 2,
+         "spin": null,
+         "total": 196.5,
+         "totalHit": false
+        },
+        {
+         "bs": null,
+         "carry": 168.3,
+         "carryHit": false,
+         "cs": 85.4,
+         "face": null,
+         "ftp": null,
+         "path": null,
+         "shot": 3,
+         "spin": null,
+         "total": 214,
+         "totalHit": true
+        },
+        {
+         "bs": 118.2,
+         "carry": 99.1,
+         "carryHit": false,
+         "cs": 83.8,
+         "face": -11.9,
+         "ftp": -6.3,
+         "path": -5.6,
+         "shot": 4,
+         "spin": 3111,
+         "total": 132.2,
+         "totalHit": false
+        },
+        {
+         "bs": 119.9,
+         "carry": 173,
+         "carryHit": false,
+         "cs": 81.5,
+         "face": 3.4,
+         "ftp": 4,
+         "path": -0.6,
+         "shot": 5,
+         "spin": 2288,
+         "total": 206.3,
+         "totalHit": false
+        },
+        {
+         "bs": 125.6,
+         "carry": 180.5,
+         "carryHit": false,
+         "cs": null,
+         "face": null,
+         "ftp": null,
+         "path": null,
+         "shot": 6,
+         "spin": 3387,
+         "total": 220.7,
+         "totalHit": true
+        },
+        {
+         "bs": 112.7,
+         "carry": 162.2,
+         "carryHit": false,
+         "cs": 78.8,
+         "face": -1.9,
+         "ftp": 5.2,
+         "path": -7.1,
+         "shot": 7,
+         "spin": 2563,
+         "total": 194.4,
+         "totalHit": false
+        },
+        {
+         "bs": 125.1,
+         "carry": 156.7,
+         "carryHit": false,
+         "cs": 87.3,
+         "face": -4,
+         "ftp": -0.4,
+         "path": -3.6,
+         "shot": 8,
+         "spin": 3731,
+         "total": 196.5,
+         "totalHit": true
+        },
+        {
+         "bs": 116.2,
+         "carry": 140.5,
+         "carryHit": false,
+         "cs": 77.4,
+         "face": -2.9,
+         "ftp": -3.1,
+         "path": 0.2,
+         "shot": 9,
+         "spin": 1351,
+         "total": 178.8,
+         "totalHit": false
+        },
+        {
+         "bs": 111.3,
+         "carry": 15.5,
+         "carryHit": false,
+         "cs": 82.7,
+         "face": -5,
+         "ftp": -1,
+         "path": -4,
+         "shot": 10,
+         "spin": 461,
+         "total": 48.1,
+         "totalHit": false
+        }
+       ],
+       "target": 210,
+       "totalHits": [
+        1,
+        3,
+        6,
+        8
+       ]
+      },
+      {
+       "carryHits": [],
+       "club": "5 wood",
+       "displayCarry": 162.3,
+       "displayTotal": 195.3,
+       "distanceSeconds": [
+        56
+       ],
+       "label": "5w",
+       "metricSeconds": [
+        59,
+        63
+       ],
+       "shots": [
+        {
+         "bs": 107.8,
+         "carry": 158.6,
+         "carryHit": false,
+         "cs": null,
+         "face": -0.9,
+         "ftp": 1.2,
+         "path": -2.2,
+         "shot": 1,
+         "spin": 2294,
+         "total": 194.8,
+         "totalHit": true
+        },
+        {
+         "bs": 113.4,
+         "carry": 168.9,
+         "carryHit": false,
+         "cs": 80,
+         "face": 2.3,
+         "ftp": 4.3,
+         "path": -2,
+         "shot": 2,
+         "spin": 2747,
+         "total": 208.2,
+         "totalHit": true
+        },
+        {
+         "bs": 102.8,
+         "carry": 145,
+         "carryHit": false,
+         "cs": null,
+         "face": null,
+         "ftp": null,
+         "path": null,
+         "shot": 3,
+         "spin": 1498,
+         "total": 179.4,
+         "totalHit": false
+        },
+        {
+         "bs": 120.4,
+         "carry": 169.3,
+         "carryHit": false,
+         "cs": 82.6,
+         "face": -0.3,
+         "ftp": 2.8,
+         "path": -3.1,
+         "shot": 4,
+         "spin": 5016,
+         "total": 194.1,
+         "totalHit": true
+        },
+        {
+         "bs": 102.1,
+         "carry": 136.9,
+         "carryHit": false,
+         "cs": null,
+         "face": -0.6,
+         "ftp": 3.1,
+         "path": -3.7,
+         "shot": 5,
+         "spin": 1043,
+         "total": 172.9,
+         "totalHit": false
+        },
+        {
+         "bs": 119.3,
+         "carry": 183.1,
+         "carryHit": false,
+         "cs": 83,
+         "face": 1.7,
+         "ftp": 2.5,
+         "path": -0.9,
+         "shot": 6,
+         "spin": 3133,
+         "total": 209.9,
+         "totalHit": true
+        },
+        {
+         "bs": 110.9,
+         "carry": 164.2,
+         "carryHit": false,
+         "cs": 78.5,
+         "face": 0.2,
+         "ftp": 5.6,
+         "path": -5.4,
+         "shot": 7,
+         "spin": 3199,
+         "total": 185.7,
+         "totalHit": false
+        },
+        {
+         "bs": 118.4,
+         "carry": 167.3,
+         "carryHit": false,
+         "cs": 82.4,
+         "face": -8.5,
+         "ftp": -1.9,
+         "path": -6.6,
+         "shot": 8,
+         "spin": 3594,
+         "total": 206.6,
+         "totalHit": true
+        },
+        {
+         "bs": 118.1,
+         "carry": 167.5,
+         "carryHit": false,
+         "cs": 80.5,
+         "face": 1.5,
+         "ftp": -0.7,
+         "path": 2.2,
+         "shot": 9,
+         "spin": 3431,
+         "total": 206.5,
+         "totalHit": true
+        }
+       ],
+       "target": 202,
+       "totalHits": [
+        1,
+        2,
+        4,
+        6,
+        8,
+        9
+       ]
+      },
+      {
+       "carryHits": [
+        2,
+        6,
+        7,
+        8
+       ],
+       "club": "6-iron",
+       "displayCarry": 123.5,
+       "displayTotal": 146,
+       "distanceSeconds": [
+        70,
+        71
+       ],
+       "label": "6i",
+       "metricSeconds": [
+        77,
+        85
+       ],
+       "shots": [
+        {
+         "bs": null,
+         "carry": 119,
+         "carryHit": false,
+         "cs": 75.3,
+         "face": null,
+         "ftp": null,
+         "path": null,
+         "shot": 1,
+         "spin": null,
+         "total": 153.5,
+         "totalHit": false
+        },
+        {
+         "bs": null,
+         "carry": 146.9,
+         "carryHit": true,
+         "cs": 76.2,
+         "face": -3,
+         "ftp": 5.3,
+         "path": -8.3,
+         "shot": 2,
+         "spin": null,
+         "total": 166.6,
+         "totalHit": false
+        },
+        {
+         "bs": null,
+         "carry": 136.3,
+         "carryHit": false,
+         "cs": 74.6,
+         "face": -0.6,
+         "ftp": 8.3,
+         "path": -8.9,
+         "shot": 3,
+         "spin": null,
+         "total": 151.2,
+         "totalHit": true
+        },
+        {
+         "bs": 100.9,
+         "carry": 133.6,
+         "carryHit": false,
+         "cs": 76.7,
+         "face": -3,
+         "ftp": 8.3,
+         "path": -11.3,
+         "shot": 4,
+         "spin": 5954,
+         "total": 148,
+         "totalHit": true
+        },
+        {
+         "bs": 98,
+         "carry": 36.3,
+         "carryHit": false,
+         "cs": 71.8,
+         "face": 6.7,
+         "ftp": 12.7,
+         "path": -5.9,
+         "shot": 5,
+         "spin": 3322,
+         "total": 66.7,
+         "totalHit": false
+        },
+        {
+         "bs": 103.6,
+         "carry": 144.8,
+         "carryHit": true,
+         "cs": 74.2,
+         "face": -4.6,
+         "ftp": 3.7,
+         "path": -8.3,
+         "shot": 6,
+         "spin": 4467,
+         "total": 161.2,
+         "totalHit": false
+        },
+        {
+         "bs": 104.6,
+         "carry": 140.5,
+         "carryHit": true,
+         "cs": 78.3,
+         "face": -5.1,
+         "ftp": 6.5,
+         "path": -11.6,
+         "shot": 7,
+         "spin": 6098,
+         "total": 149,
+         "totalHit": true
+        },
+        {
+         "bs": 106.1,
+         "carry": 144.9,
+         "carryHit": true,
+         "cs": 75.8,
+         "face": -5,
+         "ftp": 4,
+         "path": -9,
+         "shot": 8,
+         "spin": 4713,
+         "total": 166.4,
+         "totalHit": false
+        },
+        {
+         "bs": 101.4,
+         "carry": 133.6,
+         "carryHit": false,
+         "cs": 74,
+         "face": -4.8,
+         "ftp": 1.4,
+         "path": -6.1,
+         "shot": 9,
+         "spin": 4629,
+         "total": 166,
+         "totalHit": false
+        },
+        {
+         "bs": 83.1,
+         "carry": 99.1,
+         "carryHit": false,
+         "cs": null,
+         "face": -6.8,
+         "ftp": 4.1,
+         "path": -10.9,
+         "shot": 10,
+         "spin": 2682,
+         "total": 131.1,
+         "totalHit": false
+        }
+       ],
+       "target": 150,
+       "totalHits": [
+        3,
+        4,
+        7
+       ]
+      },
+      {
+       "carryHits": [
+        7
+       ],
+       "club": "9-iron",
+       "displayCarry": 99.2,
+       "displayTotal": null,
+       "distanceSeconds": [
+        96,
+        102
+       ],
+       "label": "9i",
+       "metricSeconds": [
+        102,
+        105,
+        109
+       ],
+       "shots": [
+        {
+         "bs": null,
+         "carry": 97.7,
+         "carryHit": false,
+         "cs": 69.6,
+         "face": null,
+         "ftp": null,
+         "path": null,
+         "shot": 1,
+         "spin": null,
+         "total": 118.8,
+         "totalHit": false
+        },
+        {
+         "bs": 82.8,
+         "carry": 106,
+         "carryHit": false,
+         "cs": 66.5,
+         "face": 2.3,
+         "ftp": 5.1,
+         "path": -2.8,
+         "shot": 2,
+         "spin": 4742,
+         "total": 117.1,
+         "totalHit": false
+        },
+        {
+         "bs": 77.9,
+         "carry": 95.6,
+         "carryHit": false,
+         "cs": 68.7,
+         "face": -3.8,
+         "ftp": 2.9,
+         "path": -6.7,
+         "shot": 3,
+         "spin": 5044,
+         "total": 107.3,
+         "totalHit": false
+        },
+        {
+         "bs": 86.3,
+         "carry": 97.2,
+         "carryHit": false,
+         "cs": 73.3,
+         "face": -2.1,
+         "ftp": 3.6,
+         "path": -5.8,
+         "shot": 4,
+         "spin": 6466,
+         "total": 134.5,
+         "totalHit": false
+        },
+        {
+         "bs": 79.6,
+         "carry": 100.1,
+         "carryHit": false,
+         "cs": 67.3,
+         "face": -2.9,
+         "ftp": 3.3,
+         "path": -6.2,
+         "shot": 5,
+         "spin": 4622,
+         "total": 111.9,
+         "totalHit": false
+        },
+        {
+         "bs": 85.2,
+         "carry": 114.4,
+         "carryHit": false,
+         "cs": 71.1,
+         "face": 2.1,
+         "ftp": 5.4,
+         "path": -3.3,
+         "shot": 6,
+         "spin": 3705,
+         "total": 126,
+         "totalHit": true
+        },
+        {
+         "bs": 88.1,
+         "carry": 120.3,
+         "carryHit": true,
+         "cs": 71.3,
+         "face": -3.5,
+         "ftp": 0.4,
+         "path": -3.9,
+         "shot": 7,
+         "spin": 3623,
+         "total": 131.7,
+         "totalHit": true
+        },
+        {
+         "bs": 85.1,
+         "carry": 108.6,
+         "carryHit": false,
+         "cs": 69.6,
+         "face": -2.1,
+         "ftp": 5.2,
+         "path": -7.4,
+         "shot": 8,
+         "spin": 5643,
+         "total": 113.8,
+         "totalHit": false
+        },
+        {
+         "bs": 73.6,
+         "carry": 82.4,
+         "carryHit": false,
+         "cs": 64.5,
+         "face": 2.3,
+         "ftp": 6.8,
+         "path": -4.4,
+         "shot": 9,
+         "spin": 5555,
+         "total": 103.8,
+         "totalHit": false
+        },
+        {
+         "bs": 87.7,
+         "carry": 69.5,
+         "carryHit": false,
+         "cs": 66.6,
+         "face": -1.8,
+         "ftp": 5.1,
+         "path": -6.9,
+         "shot": 10,
+         "spin": 4239,
+         "total": 102.4,
+         "totalHit": false
+        }
+       ],
+       "target": 127,
+       "totalHits": [
+        6,
+        7
+       ]
+      },
+      {
+       "carryHits": [
+        3,
+        6
+       ],
+       "club": "56° wedge",
+       "displayCarry": 75.5,
+       "displayTotal": null,
+       "distanceSeconds": [
+        121
+       ],
+       "label": "56°",
+       "metricSeconds": [
+        124,
+        125
+       ],
+       "shots": [
+        {
+         "bs": 59.9,
+         "carry": 65.8,
+         "carryHit": false,
+         "cs": 57.9,
+         "face": -4.7,
+         "ftp": -2.9,
+         "path": -1.8,
+         "shot": 1,
+         "spin": 3142,
+         "total": 76.4,
+         "totalHit": false
+        },
+        {
+         "bs": 66.4,
+         "carry": 76.5,
+         "carryHit": false,
+         "cs": 64.5,
+         "face": -1.3,
+         "ftp": -2.6,
+         "path": 1.3,
+         "shot": 2,
+         "spin": 4175,
+         "total": 89.3,
+         "totalHit": true
+        },
+        {
+         "bs": 70.5,
+         "carry": 86.3,
+         "carryHit": true,
+         "cs": 70.6,
+         "face": 0.4,
+         "ftp": -3.2,
+         "path": 3.6,
+         "shot": 3,
+         "spin": 2549,
+         "total": 93.4,
+         "totalHit": true
+        },
+        {
+         "bs": 67.6,
+         "carry": 82.5,
+         "carryHit": false,
+         "cs": 64.1,
+         "face": -2.3,
+         "ftp": -1.7,
+         "path": -0.5,
+         "shot": 4,
+         "spin": 2244,
+         "total": 95.4,
+         "totalHit": true
+        },
+        {
+         "bs": 79.7,
+         "carry": 63.6,
+         "carryHit": false,
+         "cs": 62.8,
+         "face": -0.6,
+         "ftp": -3.9,
+         "path": 3.3,
+         "shot": 5,
+         "spin": 3048,
+         "total": 107.3,
+         "totalHit": false
+        },
+        {
+         "bs": 71.1,
+         "carry": 87.8,
+         "carryHit": true,
+         "cs": 68.4,
+         "face": -1.7,
+         "ftp": -0.7,
+         "path": -1,
+         "shot": 6,
+         "spin": 2696,
+         "total": 95,
+         "totalHit": true
+        },
+        {
+         "bs": 63.1,
+         "carry": 71.5,
+         "carryHit": false,
+         "cs": 71,
+         "face": 0.9,
+         "ftp": 0.1,
+         "path": 0.7,
+         "shot": 7,
+         "spin": 3223,
+         "total": 78.5,
+         "totalHit": false
+        },
+        {
+         "bs": 63.3,
+         "carry": 73.7,
+         "carryHit": false,
+         "cs": 61.9,
+         "face": 0,
+         "ftp": 0.2,
+         "path": -0.2,
+         "shot": 8,
+         "spin": 2273,
+         "total": 84.1,
+         "totalHit": true
+        },
+        {
+         "bs": 63.5,
+         "carry": 71.8,
+         "carryHit": false,
+         "cs": 66.5,
+         "face": 1,
+         "ftp": 2.9,
+         "path": -1.9,
+         "shot": 9,
+         "spin": 3776,
+         "total": 79.4,
+         "totalHit": false
+        }
+       ],
+       "target": 92,
+       "totalHits": [
+        2,
+        3,
+        4,
+        6,
+        8
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "bay-minidriver-loft-20261104-v1",
+   "type": "bay-update",
+   "target": "bay-20261104-mini-v1",
+   "bay": {
+    "setup": "Nov 4 · TaylorMade r7 Quad Mini 13.5° · 8 shots · off the deck"
+   }
+  },
+  {
+   "id": "carry-minidriver-loft-20261104-v1",
+   "type": "carry-update",
+   "target": "Mini Driver",
+   "club": {
+    "loft": "13.5°"
+   }
+  },
+  {
+   "id": "club-minidriver-loft-20261104-v1",
+   "type": "club-update",
+   "target": "add-minidriver",
+   "club": {
+    "loft": "13.5°",
+    "noteGist": "Back in the bag Nov 4 2026 at 13.5° · 201 carry off the deck (Sep at 15.5°: 182 map, 168 range) · all off the deck.",
+    "noteKeys": [
+     {
+      "k": "Nov 4 · 13.5°",
+      "v": "201",
+      "n": "6 of 8 · off the deck"
+     },
+     {
+      "k": "Sep 15 · 15.5°",
+      "v": "168",
+      "n": "8 of 10 · range · deck"
+     },
+     {
+      "k": "Sep 14 · 15.5°",
+      "v": "182",
+      "n": "6 · Map My Bag · deck"
+     }
+    ],
+    "note": "BACK IN THE BAG Nov 4 2026 (Jack), at 13.5° (Jack). Nov 4 TrackMan Range, off the deck (no tee): 201.1 yd carry, n=6 clean of 8 (filed under the \"3 Wood\" label), 229.5 total, 93.0 club / 134.5 ball mph. OLDER NUMBERS, both at 15.5° and both filed by TrackMan as \"3w\": Sep 14 Map My Bag 182.4 carry, n=6, Consistency 9.2; Sep 15 range 145.5 on screen with two tops in it, 167.5 with the 15.5 and 99.1 held out (n=8 of 10), best 5 176.1. All three are off the deck: at the sim Jack hits everything but driver off the deck. Normalization was not shown for September. Earlier: out Aug 12 (13.5° then), back Sep 8 at 15.5°, out Sep 18 for the DS-ADAPT X 3-wood (returned Oct 24)."
+   }
+  },
+  {
+   "id": "history-minidriver-loft-20261104-v1",
+   "type": "history",
+   "date": "2026-11-04",
+   "text": "Mini driver loft corrected to 13.5° (Nov 4). Sep 14 Map My Bag (182.4) and Sep 15 range (167.5 clean) mini groups now sit under the mini, not the 3-wood."
   }
  ]
 }

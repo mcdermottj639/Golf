@@ -25,7 +25,7 @@
     '56-wedge':'56°',
     '60-wedge':'60°'
   }[k] || k);
-  const bayKey = k => ({'Driver':'driver','5 wood':'5-wood','56° wedge':'56-wedge'}[k] || k);
+  const bayKey = k => ({'Driver':'driver','5 wood':'5-wood','56° wedge':'56-wedge'}[k] || (/^mini/i.test(k) ? 'mini-driver' : k));
   function observations(r){ return Array.isArray(r?.review?.shots) ? r.review.shots : []; }
   function resolvedShots(r,identities={}){
     const clubMap=r.review?.clubMap||{},intentByShot=r.review?.intentByShot||{};
