@@ -5,7 +5,7 @@ and courses in one installable web app. This file is the guide for keeping it cu
 
 ## Current bag update (v263, October 24, 2026)
 
-The final apply-once feed, bag-20261024-feed.json, adds the screenshot-confirmed PING G440 3H (Regular, ALTA CB Blue 70 Graphite, right hand), retaining the existing 4H. New club-bench feed entries call the normal benchClub helper so Cobra Utility 2i saved carries remain recoverable and historical shots are untouched. The 3H adapter/degree setting is still unconfirmed; its carry was first measured Nov 4 (187, set live by Jack in v279 — see *November 4 hybrid range session*). Feed runs after prior bag/range feeds and is cached offline. Version 2 additionally removes the returned DS-ADAPT X 3-wood and Hi-Toe 58° by their exact owned-club IDs and removes their carry rows. Past shot/session records remain unchanged; neither returned club is on the bench and no replacement is automatically activated. Active bag count is now 12.
+The final apply-once feed, bag-20261024-feed.json, adds the screenshot-confirmed PING G440 3H (Regular, ALTA CB Blue 70 Graphite, right hand), retaining the existing 4H. New club-bench feed entries call the normal benchClub helper so Cobra Utility 2i saved carries remain recoverable and historical shots are untouched. The 3H adapter/degree setting is still unconfirmed; its carry was first measured Nov 4 (187, set live by Jack in v279 — see *November 4 hybrid range session*). Feed runs after prior bag/range feeds and is cached offline. Version 2 additionally removes the returned DS-ADAPT X 3-wood and Hi-Toe 58° by their exact owned-club IDs and removes their carry rows. Past shot/session records remain unchanged; neither returned club is on the bench and no replacement is automatically activated. Active bag count was then 12; the TaylorMade r7 Quad mini driver came back on Nov 4 2026 (v280), making 13.
 
 ## What it is
 
@@ -764,7 +764,7 @@ inside 1.5° of each other. A club's `note` is never scanned for any of them.
 | Wedges | **Vokey 50.08F · TaylorMade Hi-Toe 5 58.10 ATS** | 58° replaced 56° and 60° Sep24; both Vokeys are benched. Sep25 retained 58° batches carry 75.2/75.5 yd. A 54° is only a proposed demo, not owned or added. |
 | Putter | **L.A.B. Golf LINK.2.1** | the only zero-torque head left. Narrow blade, gamed Jul 30 – Aug 1 and again from **Aug 10, 2026**. **KEPT for good Aug 12, 2026** — Jack closed the return window by decision, so `returnWindow:false` and `pendingReturn()` is empty: the Home return-window card is gone and Decisions reads DECIDED. The putter search is over; every remaining explanation for the left miss is aim or stroke, not gear. Carries a **Lamkin Deep Etched** grip (the app said *Pistol 0* Jul 30 – Aug 14; corrected by looking at it — both are 0° lean, so no cue changed): zero built-in lean, shaft vertical, hands ~1.35" behind the ball — that's the live cue. **Loft confirmed 2° effective** (Aug 14, L.A.B.'s spec panel on the *custom* build page — the stock page and every retailer omit it). Still unknown: **as-built length** (34", confirmed by Jack Oct 31) and **head weight** (never known on any putter Jack has owned) — both build-order facts, so they need L.A.B., not a website. Its column holds the only two reds on the evolution grid (face at impact, 1.5–1.7° left start line, both measured Jul 30) |
 | Bullpen | Titleist TSR2 7-wood | used demo · HZRDUS Red CB regular · picked up Aug 12 2026, **owned not gamed**. Stock is around 21°, which since Sep 8 sits just behind the re-lofted 5-wood (19.5°) rather than the 4-iron that has left the bag — so it is still not in the 14 and still not on the carry ladder |
-| Backup | **TaylorMade r7 Quad Mini Driver · 15.5°** | **OUT of the 14 Sep 18 2026**, replaced by the DS-ADAPT X 3-wood. Kept, not sold. Was back in Sep 8 at 15.5° (up 2° from the 13.5° it played until Aug 12). Its Off-the-tee record stays as history. **The Sep 14 TrackMan `3w` 182.4 and the Sep 15 3w groups belong to this club, not the new 3-wood** |
+| Fairway finder | **TaylorMade r7 Quad Mini Driver · 15.5° (last reported)** | **BACK IN THE BAG Nov 4 2026** (v280): plays **201**, from 6 clean TrackMan shots that day (filed under the 3 Wood label). Was OUT of the 14 Sep 18 2026, replaced by the DS-ADAPT X 3-wood (since returned Oct 24). Kept, not sold. Was back in Sep 8 at 15.5° (up 2° from the 13.5° it played until Aug 12). Its Off-the-tee record stays as history. **The Sep 14 TrackMan `3w` 182.4 and the Sep 15 3w groups belong to this club, not the new 3-wood** |
 | Backup putter | Scotty Newport 2 | arc-suited toe-hang blade — renders a **MISMATCH** flag against the SBST stroke. If the LINK goes back this is all that's left, i.e. the mismatch the whole saga opened with |
 | Returned | ~~L.A.B. Golf DF3i · 34"~~ | **returned Aug 10, 2026 — distance control.** Gamed Jul 18–30 and Aug 1–10. Its Press Pistol 2° went with it, so the "hands even with the ball" cue is **retired** — don't carry it to the LINK. Lost with it: the only measured scoreboard in the project (8/10 from four feet, Jul 20) and the high-MOI control head |
 | Returned | ~~Scotty Phantom 7.5~~ | **officially returned Jul 20, 2026** |
@@ -4158,6 +4158,18 @@ explicit call overriding the standing "don't promote an indoor number" rule for 
 normalization, ball and venue were not shown, and a later outdoor number of his still wins. Two early-session recordings (6 × 3H, 6 × 4H) are
 warm-ups by Jack's word: kept in the source record only, not on any card or average.
 Path stays out-to-in (3H −2.7°, 4H −1.7°) with face-to-path +4.1° / +2.9°: same fade pattern.
+
+**v280 — the mini driver, same day (Jack, 19:02 ET: "mini driver … numbers from today since
+that's back in the bag").** A third recording, TrackMan club filter **"3 Wood"** — the same
+3w-label-for-the-mini mapping as Sep 14/15; the DS-ADAPT 3-wood was returned Oct 24, so the
+label cannot mean it. Source role `mini` in the same transcript, built by the same importer and
+rule: 8 rows, #1 and #2 held (apex 33 / 28 ft), 6 clean at **201.1 carry ±15.8 / 229.5 total**,
+93.0 club / 134.5 ball, 10.6°, 3,664 rpm, apex 63 ft, path −2.8°, face-to-path +2.1°. Its Avg
+row never scrolled into view, so the only check is per-row column alignment (all 8 pass). #3
+(1.40 smash, 5,862 rpm, 173.5) stays in by the rule and is why the spread is wide. Entries:
+`club-update add-minidriver` → `gaming` (13 clubs), a new `Mini Driver` ladder row after Driver
+with the `meas` offer, then the live carry **201**, plus a history line. Loft is carried forward
+as the last reported 15.5° — not re-read.
 
 ## Caddie HQ Links — the course game (v277, November 4 2026)
 

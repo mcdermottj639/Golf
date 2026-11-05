@@ -78,7 +78,7 @@ def r(x, d=1):
     return f'{x:.{d}f}'
 
 
-def bay_entry(blk, label):
+def bay_entry(blk, label, model='PING G440'):
     a = blk['avg']
     finding = (f"{r(a['carry'])} carry / {r(a['total'])} total · {r(a['cs'])} club / {r(a['bs'])} ball mph · "
                f"smash {a['smash']:.2f} · {r(a['la'])}° / {a['spin']:,.0f} rpm · apex {a['apex']:.0f}′ "
@@ -88,7 +88,7 @@ def bay_entry(blk, label):
         'bay': {
             'date': '2026-11-04', 'venue': 'TrackMan · Range mode', 'mode': 'Range', 'unit': 'yd',
             'discipline': 'swing', 'norm': 'not shown in the recording', 'ball': 'not shown',
-            'setup': f"Nov 4 · PING G440 {label} · {blk['sourceShotCount']} shots",
+            'setup': f"Nov 4 · {model} {label} · {blk['sourceShotCount']} shots",
             'finding': finding,
             'detail': {
                 'gist': f"{label}: {a['n']} clean of {blk['sourceShotCount']} · {r(a['carry'])} carry ±{r(a['carrySd'])} · {a['held']} mishits held out",
@@ -145,6 +145,43 @@ def main():
         'text': (f"Playing carries set from the Nov 4 range session at Jack's instruction: 3H {a3['carry']:.1f}, "
                  f"4H {a4['carry']:.1f} (mishits held out). Indoor TrackMan numbers; normalization not shown."),
     })
+    # v280 — Jack, Nov 4 2026, 19:02 ET: "mini driver ... numbers from today since that's back in the bag".
+    # TrackMan filed it under "3 Wood"; same rule, same importer. Back in the 14 (13 clubs after the
+    # Oct 24 returns); a new ladder row with the measured offer, then the live carry in whole yards.
+    mini = build([x for x in SRC['sources'] if x['role'] == 'mini'][0])
+    am = mini['avg']
+    me = bay_entry(mini, 'Mini', 'TaylorMade r7 Quad')
+    me['bay']['detail']['limits'] += ' TrackMan labelled these shots "3 Wood"; Jack identified them as the mini driver. Its Avg row never scrolled into view.'
+    entries.append(me)
+    entries.append({
+        'id': 'club-minidriver-back-20261104-v1', 'type': 'club-update', 'target': 'add-minidriver',
+        'club': {'status': 'gaming',
+                 'noteGist': f"Back in the bag Nov 4 2026 · {am['carry']:.0f} carry on TrackMan that day ({am['n']} clean of {mini['sourceShotCount']}).",
+                 'note': (f"BACK IN THE BAG Nov 4 2026 (Jack). First measured carry for this head: {am['carry']:.1f} yd, "
+                          f"n={am['n']} clean of {mini['sourceShotCount']} on TrackMan Range (filed under the '3 Wood' label), "
+                          f"{am['total']:.1f} total, {am['cs']:.1f} club / {am['bs']:.1f} ball mph. "
+                          "Loft carried forward as the last reported 15.5°; shaft still unrecorded. "
+                          "Earlier: out Aug 12, back Sep 8 at 15.5°, out Sep 18 for the DS-ADAPT X 3-wood (since returned Oct 24).")},
+    })
+    entries.append({
+        'id': 'carry-meas-minidriver-20261104-v1', 'type': 'carry-update', 'target': 'Mini Driver', 'after': 'Driver',
+        'club': {'club': 'Mini Driver', 'loft': '15.5°', 'carry': None,
+                 'meas': {'src': 'tm:2026-11-04-range-mini', 'n': am['n'], 'sd': round(am['carrySd'], 1),
+                          'date': '2026-11-04', 'ball': 'not shown', 'norm': 'not shown',
+                          'carry': round(am['carry'], 1), 'how': how + ' · TrackMan label "3 Wood"'}},
+    })
+    entries.append({
+        'id': 'carry-live-minidriver-20261104-v1', 'type': 'carry-update', 'target': 'Mini Driver', 'force': True,
+        'src': "Jack in chat, 2026-11-04: mini driver numbers from today, it's back in the bag",
+        'club': {'carry': round(am['carry'])},
+    })
+    entries.append({
+        'id': 'history-minidriver-back-20261104-v1', 'type': 'history', 'date': '2026-11-04',
+        'text': (f"TaylorMade r7 Quad Mini Driver back in the bag (13 clubs). Nov 4 TrackMan: {am['carry']:.1f} carry "
+                 f"(n={am['n']} clean of {mini['sourceShotCount']}, ±{am['carrySd']:.1f}), {am['total']:.1f} total; playing carry set to {round(am['carry'])}."),
+    })
+    print('mini n', am['n'], 'held', am['held'], mini['excludedShotNumbers'], 'carry', am['carry'], 'sd', am['carrySd'], 'total', am['total'],
+          'cs', am['cs'], 'bs', am['bs'], 'smash', am['smash'], 'la', am['la'], 'spin', am['spin'], 'apex', am['apex'], 'path', am['path'], 'ftp', am['ftp'])
     feed = {'updated': '2026-11-04', 'entries': entries}
     (ROOT / 'range-20261104-feed.json').write_text(json.dumps(feed, indent=1, ensure_ascii=False) + '\n')
     for b in (h3, h4):
@@ -154,7 +191,7 @@ def main():
               'apex', a['apex'], 'path', a['path'], 'ftp', a['ftp'])
     for s in SRC['sources']:
         c = [x['carry'] for x in s['shots'] if x.get('carry') is not None]
-        print('check', s['file'], s['role'], 'n', len(c), 'raw mean', round(statistics.mean(c), 2), s.get('appHeader', {}).get('carry'))
+        print('check', s['file'], s['role'], 'n', len(c), 'raw mean', round(statistics.mean(c), 2), (s.get('appHeader') or {}).get('carry'))
 
 
 if __name__ == '__main__':
