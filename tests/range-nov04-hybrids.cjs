@@ -6,7 +6,7 @@ const source = require('../data/range-2026-11-04-hybrids.json');
 
 const ids = feed.entries.map(e => e.id);
 assert.equal(new Set(ids).size, ids.length, 'apply-once ids must be unique');
-assert.deepEqual(feed.entries.map(e => e.type), ['bay', 'bay', 'carry-update', 'carry-update', 'history', 'carry-update', 'carry-update', 'history', 'bay', 'club-update', 'carry-update', 'carry-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'carry-update', 'carry-update', 'club-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'club-update', 'history', 'bay-update', 'club-update', 'history', 'bay', 'club-update', 'history']);
+assert.deepEqual(feed.entries.map(e => e.type), ['bay', 'bay', 'carry-update', 'carry-update', 'history', 'carry-update', 'carry-update', 'history', 'bay', 'club-update', 'carry-update', 'carry-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'carry-update', 'carry-update', 'club-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'club-update', 'history', 'bay-update', 'club-update', 'history', 'bay', 'club-update', 'history', 'bay', 'bay', 'carry-update', 'club-update', 'history']);
 
 const mains = source.sources.filter(s => s.role === 'main');
 assert.deepEqual(mains.map(s => [s.club, s.shots.length]), [['3-hybrid', 32], ['4-hybrid', 12]]);
@@ -53,7 +53,7 @@ assert.deepEqual(h3.excludedShotNumbers, [1, 2, 5, 6, 7, 9, 11, 12, 15, 18, 19, 
 assert.deepEqual(h4.excludedShotNumbers, [1, 2, 4, 5, 9, 12]);
 
 // v278 entries park offers only; v279 entries (Jack's instruction) set the live carry to exactly the offer.
-const offers = feed.entries.filter(e => e.type === 'carry-update' && e.club.meas && !e.id.startsWith('carry-offdeck-'));
+const offers = feed.entries.filter(e => e.type === 'carry-update' && e.club.meas && !e.id.startsWith('carry-offdeck-') && e.target !== 'Driver');
 const live = feed.entries.filter(e => e.type === 'carry-update' && !e.club.meas && 'carry' in e.club);
 assert.equal(offers.length, 3); assert.equal(live.length, 3);
 for (const e of live) {
@@ -105,3 +105,13 @@ const bB = feed.entries.find(e => e.id === 'bay-20260915-mini-b-v1').bay;
 assert.equal(bB.date, '2026-09-15'); assert.deepEqual(bB.detail.rangeShots[0].excludedShotNumbers, [2, 5]);
 assert.equal(+bB.detail.clubs[0].carry.toFixed(1), 179.9); assert.ok(bB.detail.rangeShots[0].club.startsWith('Mini Driver'));
 console.log('sep15 second mini table ok');
+
+// v285: Nov 4 sim tee shots — Dr = Stealth driver, 3w = mini, off a tee; Nov 4 rule; driver offer only.
+const tee = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data/sim-2026-11-04-tee-shots.json'), 'utf8'));
+assert.equal(tee.shots.length, 10); assert.ok(!tee.shots.some(s => s.tmLabel === '3h'));
+const bd = feed.entries.find(e => e.id === 'bay-20261104-driver-sim-v1').bay, bm = feed.entries.find(e => e.id === 'bay-20261104-mini-sim-v1').bay;
+assert.deepEqual(bd.detail.rangeShots[0].excludedShotNumbers, [2, 4]); assert.equal(+bd.detail.clubs[0].carry.toFixed(1), 215.1);
+assert.deepEqual(bm.detail.rangeShots[0].excludedShotNumbers, []); assert.equal(+bm.detail.clubs[0].carry.toFixed(1), 205.3);
+assert.ok(bm.detail.rangeShots[0].club.startsWith('Mini Driver'));
+const dm = feed.entries.find(e => e.id === 'carry-meas-driver-sim-20261104-v1'); assert.ok(!('carry' in dm.club)); assert.equal(dm.club.meas.carry, 215.1);
+console.log('sim tee shots ok');

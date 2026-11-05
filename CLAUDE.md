@@ -4179,6 +4179,8 @@ as the last reported 15.5° — not re-read.
 
 **v284 — second Sep 15 mini table.** Jack's 19:34 recording is a separate 7-row TrackMan "3 Wood" (= mini) table from Sep 15 (his date; none on screen), not on file before — new bay `bay-20260915-mini-b-v1` dated 2026-09-15 so it joins that day. Transcript `data/range-2026-09-15-mini-b.json`; all 13 Avg-row figures re-derive within display rounding. Nov 4 rule holds #2 (apex 39) and #5 (top): 5 clean at 179.9. Sep 15 combined: 177.1 over 9 of 17. His earlier 19:22 video was a duplicate of 19:20 (same 10 rows).
 
+**v285 — Nov 4 sim tee shots (Jack, 20:07–20:08).** From a TrackMan sim recording (Tiburón Gold, two sets) Jack wanted the tee-shot stats only, NOT the round: TrackMan `Dr` = Stealth 2 Plus driver, `3w` = the mini, all off a tee; the one 3h tee shot (a top) is out. Transcript `data/sim-2026-11-04-tee-shots.json` (carry, total-to-finish, club speed, smash, F-P, spin, apex — ball speed/launch/path/face not on those tiles). Two bays on Nov 4: driver 3 clean of 5 at 215.1 (smash 1.38 and 1.35 held), mini 5 of 5 at 205.3 / 217.1. Driver offer parked as `meas` on the Driver row (live 235 unchanged); mini gets a `Nov 4 · teed` note tile only, its live 201 (deck) unchanged. Sim totals are distance to where the ball finished on the course, not range totals.
+
 ## Caddie HQ Links — the course game (v277, November 4 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own
