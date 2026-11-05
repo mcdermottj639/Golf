@@ -4175,6 +4175,8 @@ as the last reported 15.5° — not re-read.
 
 **v282 — mini history and loft (Jack, Nov 4).** The mini is **13.5°** today (v280 carried 15.5° forward — wrong). The Sep 14 Map My Bag (182.4, n=6) and Sep 15 range (167.5 clean, n=8 of 10) mini groups were labelled `3w · TrackMan label` and so canonicalised to the 3-wood; two `bay-update`s re-send those bays' `clubs`/`delivery`/`rangeShots` WHOLE with the label `Mini Driver · TrackMan 3w label · 15.5°` (bay-update merges `detail` shallowly, so a partial array would wipe rows). `round-review.js` `bayKey` maps any `Mini…` label to `mini-driver`, so Ballybunion's mini compares against Sep 14. **Standing fact (Jack, Nov 4): at the sim every club is hit OFF THE DECK except driver.** Read every bay carry that way; a teed carry for anything but driver is unmeasured.
 
+**v283 — Sep 15 mini table (Jack's recordings, Nov 4).** Two screen recordings of the same 10-row TrackMan "3 Wood" table (screen order differs from the stored order; matched by carry) — transcript `data/range-2026-09-15-mini.json`, all 12 header averages re-derive. Every stored value agreed; the update only fills blanks (smash, launch, launch dir, attack angle, apex and the missing speeds/delivery) and applies the same Nov 4 rule as today: 4 clean at 173.5 carry / 204.5 total. Sep 14 has no shot table (Jack couldn't find one).
+
 ## Caddie HQ Links — the course game (v277, November 4 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own

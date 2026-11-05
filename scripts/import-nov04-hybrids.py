@@ -235,6 +235,41 @@ def main():
                                       'Earlier: out Aug 12 (13.5° then), back Sep 8 at 15.5°, out Sep 18 for the DS-ADAPT X 3-wood (returned Oct 24).')}})
     entries.append({'id': 'history-minidriver-loft-20261104-v1', 'type': 'history', 'date': '2026-11-04',
                     'text': 'Mini driver loft corrected to 13.5° (Nov 4). Sep 14 Map My Bag (182.4) and Sep 15 range (167.5 clean) mini groups now sit under the mini, not the 3-wood.'})
+    # v283 — Jack, Nov 4 2026, 19:21/19:23: two recordings of the Sep 15 mini (TrackMan "3 Wood") table, every
+    # column. Enrich the 10 stored shots (matched by carry) and hold mishits by the same Nov 4 rule as today.
+    byid = {e['id']: e for e in entries}
+    sep = json.loads((ROOT / 'data' / 'range-2026-09-15-mini.json').read_text())
+    rs = json.loads(json.dumps(byid['bay-minilabel-20260915-20261104-v1']['bay']['detail']['rangeShots']))
+    g = next(x for x in rs if x['club'] == MINI)
+    held = []
+    for v in sep['shots']:
+        tgt = [x for x in g['shots'] if x['carry'] == v['carry']]; assert len(tgt) == 1, v
+        x = tgt[0]
+        for k in ('cs', 'aoa', 'path', 'face', 'ftp', 'bs', 'smash', 'la', 'ld', 'spin', 'total'):
+            if x.get(k) is not None and v[k] is not None: assert abs(x[k] - v[k]) < 0.051, (k, x, v)
+            if v[k] is not None: x[k] = v[k]
+        x['height'] = v['apex']; x['heightText'] = f"{v['apex']}'"
+        x['videoSource'] = {'file': sep['files'][0], 'row': v['screen']}
+        why = held_reason({'carry': v['carry'], 'cs': v['cs'], 'bs': v['bs'], 'smash': v['smash'], 'height': v['apex']})
+        if why: x['mishit'] = True; x['mishitReason'] = why; held.append(x['shot'])
+    g['excludedShotNumbers'] = sorted(held)
+    g['sourceRecord'] = 'data/range-2026-09-15-mini.json'
+    kept = [x for x in g['shots'] if not x.get('mishit')]
+    print('sep15 mini kept', len(kept), round(sum(x['carry'] for x in kept) / len(kept), 2), 'held', g['excludedShotNumbers'])
+    entries.append({'id': 'bay-minishots-20260915-20261104-v1', 'type': 'bay-update', 'target': 'bay-20260915-range-54',
+                    'src': 'video:' + '+'.join(sep['files']), 'bay': {'detail': {'rangeShots': rs}}})
+    note2 = byid['club-minidriver-loft-20261104-v1']['club']['note'].replace(
+        "Sep 15 range 145.5 on screen with two tops in it, 167.5 with the 15.5 and 99.1 held out (n=8 of 10), best 5 176.1.",
+        f"Sep 15 range 145.5 on screen; full table now in (Jack's recordings): by the same Nov 4 rule as today {sum(x['carry'] for x in kept)/len(kept):.1f} carry, n={len(kept)} of 10 (the app's looser carry-only filter gives 167.5, n=8).")
+    assert note2 != byid['club-minidriver-loft-20261104-v1']['club']['note']
+    entries.append({'id': 'club-minidriver-sep15-20261104-v1', 'type': 'club-update', 'target': 'add-minidriver',
+                    'club': {'noteGist': f"Back in the bag Nov 4 2026 at 13.5° · 201 carry off the deck (Sep at 15.5°: 182 map, {round(sum(x['carry'] for x in kept)/len(kept))} range).",
+                             'noteKeys': [{'k': 'Nov 4 · 13.5°', 'v': '201', 'n': '6 of 8 · off the deck'},
+                                          {'k': 'Sep 15 · 15.5°', 'v': str(round(sum(x['carry'] for x in kept)/len(kept))), 'n': f"{len(kept)} of 10 · same rule · deck"},
+                                          {'k': 'Sep 14 · 15.5°', 'v': '182', 'n': '6 · Map My Bag · deck'}],
+                             'note': note2}})
+    entries.append({'id': 'history-minidriver-sep15-20261104-v1', 'type': 'history', 'date': '2026-11-04',
+                    'text': f"Sep 15 mini driver table added from your recordings: {sum(x['carry'] for x in kept)/len(kept):.1f} carry by the Nov 4 rule (n={len(kept)} of 10)."})
     feed = {'updated': '2026-11-04', 'entries': entries}
     (ROOT / 'range-20261104-feed.json').write_text(json.dumps(feed, indent=1, ensure_ascii=False) + '\n')
     for b in (h3, h4):
