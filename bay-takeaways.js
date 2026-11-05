@@ -113,7 +113,7 @@
         const scoped=club.sourceBlocks.length>1?`One source block: ${ss.length} retained shots; full-day club total ${club.shots.length}. `:'';
         const add=(kind,score,title,evidence,meaning,action,track,extra={})=>{
           const c={id:`${kind}-${block.id}`,kind,score,title:`${club.club}: ${title}`,evidence,meaning,action,track,blocks:[b],
-            scope:scoped,smallSample:ss.length<10,reference:reference(b),referenceSource:tourSource,
+            scope:scoped,smallSample:ss.length<10,carryAvg:avg,n:ss.length,reference:reference(b),referenceSource:tourSource,
             rows:[{label:'Carry',unit:'yd',dec:1,values:carries}],
             practice:{heading:`${club.club} · ${title}`,evidence:evidence+' '+meaning,test:action,track,input:'count',max:10},...extra};
           candidates.push(c);
@@ -134,7 +134,7 @@
               `Across ${speed.length} paired shots, swing speed spans only ${fmt(spread(values(speed,'cs')))} mph. Delivery and speed transfer deserve attention before extra effort; this does not identify a mechanical fault.`,
               `Hit 10 ${club.club} shots at steady effort. Display club speed, ball speed and carry; check whether shorter shots also lose ball speed at similar swing speed.`,
               'Save all 10 rows; compare carry spread within similar speeds.',
-              {pair:{shots:[a.shot,z.shot],carryGap:pair.gap},practice:{heading:`${club.club} · Repeat delivery`,evidence:`${fmt(pair.gap)} yd carry difference at similar club speed.`,test:`Hit 10 ${club.club} shots at steady effort. Record club speed, ball speed and carry.`,track:'Enter low/high carry for shots within a 3 mph club-speed window; save all attempts.',input:'range',max:10}});
+              {cmp:[fmt(a.cs),`${Math.round(a.carry)}–${Math.round(z.carry)}`,String(Math.round(pair.gap))],key:pair.gap,pair:{shots:[a.shot,z.shot],carryGap:pair.gap},practice:{heading:`${club.club} · Repeat delivery`,evidence:`${fmt(pair.gap)} yd carry difference at similar club speed.`,test:`Hit 10 ${club.club} shots at steady effort. Record club speed, ball speed and carry.`,track:'Enter low/high carry for shots within a 3 mph club-speed window; save all attempts.',input:'range',max:10}});
           }
         }
         // Select a speed group using speed ONLY, before looking at its carry.
@@ -148,7 +148,7 @@
               `The ${other.length} slower ${other.length===1?'shot pulls':'shots pull'} the full ${carries.length}-shot mean to ${fmt(avg)} yd.${curve} Use the speed group as a provisional practice reference, not a new stock carry.`,
               `Hit 10 ${club.club} shots at one intended effort and unchanged club setting. Record carry, club speed and actual curve; compare the similar-speed group with this baseline.`,
               `Count carries in the observed ${extent(sg,'carry')} yd window out of all 10 attempts; also save speeds and curve.`,
-              {group:{n:sg.length,mean:sa,low:Math.min(...values(sg,'carry')),high:Math.max(...values(sg,'carry'))},flight});
+              {cmp:[`${sg.length}/${speedCarry.length}`,extent(sg,'cs'),String(Math.round(sa)),String(Math.round(avg))],key:sa-avg,group:{n:sg.length,mean:sa,low:Math.min(...values(sg,'carry')),high:Math.max(...values(sg,'carry'))},flight});
           }
         }
         if(finite(b.target)&&Math.max(...carries)<b.target&&b.target-avg>=10){
@@ -159,13 +159,13 @@
             `The selected target is beyond this sample. First test a repeatable landing distance; the longest shot is not established stock carry.`,
             `Hit 10 ${club.club} shots at a ${target} yd on-screen target using the same intended effort. Count carries from ${target-5}–${target+5} yd, including mishits as attempts.`,
             `Landings in ${target-5}–${target+5} yd out of 10. This is a proposed practice window.`,
-            {targetYds:target,cluster:cluster?{n:cg.length,mean:cgMean}:null});
+            {cmp:[String(Math.round(avg)),String(b.target),String(target)],key:b.target-avg,targetYds:target,cluster:cluster?{n:cg.length,mean:cgMean}:null});
         }else if(cluster&&cg.length<carries.length){
           add('Carry group',80,'calibrate the distance you repeat most often',
             `${cg.length}/${carries.length} shots carry ${extent(cg,'carry')} yd (${fmt(mean(values(cg,'carry')))} average); the full sample spans ${extent(carryShots,'carry')} yd.`,
             'The overall mean blends the main group with other valid shots. Test whether the group repeats before using it as a playing yardage.',
             `Hit 10 ${club.club} shots at ${target} yd with one intended effort. Count all attempts in ${target-5}–${target+5} yd.`,
-            `Proposed practice window: ${target-5}–${target+5} yd; record hits out of 10.`,{targetYds:target});
+            `Proposed practice window: ${target-5}–${target+5} yd; record hits out of 10.`,{cmp:[`${cg.length}/${carries.length}`,extent(cg,'carry'),String(target)],key:cg.length/carries.length,targetYds:target});
         }
         if(flight.material>=3&&(flight.left&&flight.right||flight.contradictions||Math.max(flight.left,flight.right)/flight.n>=.8)){
           add('Observed flight',85,flight.left&&flight.right?'address the measured two-way curve':'check your repeated curve against your intended shot',
@@ -173,7 +173,7 @@
             flight.contradictions?'Recorded curve does not always follow the face-to-path prediction. Check strike and the monitor readings before making a face correction; the cause is not established.':
               'Compare this pattern with your intended shot. A repeated curve can be playable; a straight-shot target needs a different test.',
             `Hit 10 ${club.club} shots toward one on-screen start line with one intended curve. Count actual starts and curves; record impact location if available.`,
-            'Count shots matching your intended start and curve out of all 10.',{flight});
+            'Count shots matching your intended start and curve out of all 10.',{cmp:[`${flight.left}L / ${flight.right}R`,flight.paired>=3?`${flight.open}/${flight.paired}`:'—'],key:Math.max(flight.left,flight.right)/flight.n,flight});
         }
         const roll=ss.filter(s=>finite(s.carry)&&finite(s.total)),rollAvg=mean(roll.map(s=>s.total-s.carry));
         if(roll.length>=3&&rollAvg>=15){
@@ -181,7 +181,7 @@
             `Paired shots average ${fmt(mean(values(roll,'carry')))} yd carry and ${fmt(mean(values(roll,'total')))} yd total: ${fmt(rollAvg)} yd after landing.`,
             'The simulator finish overstates the distance you cleared through the air. For a front hazard, judge the landing; this is not an outdoor rollout forecast.',
             `Hit 10 ${club.club} shots at a ${target} yd landing target. Score carry in ${target-10}–${target+10} yd without using total distance.`,
-            `Proposed landing-window hits out of 10: ${target-10}–${target+10} yd.`,{targetYds:target});
+            `Proposed landing-window hits out of 10: ${target-10}–${target+10} yd.`,{cmp:[String(Math.round(mean(values(roll,'carry')))),String(Math.round(mean(values(roll,'total')))),'+'+Math.round(rollAvg),String(target)],key:rollAvg,targetYds:target});
         }
       }
     }
@@ -202,14 +202,54 @@
     const pad=Math.max((hi-lo)*.1,row.dec===2?.01:row.unit==='rpm'?10:.2),min=lo-pad,max=hi+pad,x=v=>14+(v-min)/(max-min)*272;
     return `<div class="rt-plotlabel"><b>${esc(row.label)}</b><span>${fmt(avg,row.dec)} ${esc(row.unit)} · n=${row.values.length}</span></div><svg viewBox="0 0 300 46" role="img" aria-label="${esc(row.label)}: ${row.values.length} readings, mean ${fmt(avg,row.dec)} ${esc(row.unit)}"><line x1="14" y1="19" x2="286" y2="19" class="rt-axis"/>${row.zero?`<line x1="${x(0)}" x2="${x(0)}" y1="5" y2="31" class="rt-zero"/>`:''}${row.values.map((v,i)=>`<circle cx="${x(v)}" cy="${14+i%3*5}" r="3" class="rt-dot"><title>Retained reading ${i+1}: ${fmt(v,row.dec)} ${esc(row.unit)}</title></circle>`).join('')}<path d="M ${x(avg)} 4 l 4 5 l -4 5 l -4 -5 Z" class="rt-mean"/><text x="14" y="42">${fmt(min,row.dec)}${esc(row.unit)}</text><text x="286" y="42" text-anchor="end">${fmt(max,row.dec)}${esc(row.unit)}</text></svg>`;
   }
+  // Same finding on several clubs = ONE comparison card (Jack, Nov 4 2026:
+  // "u just say the same thing for each club"). build() is unchanged so Coach keeps one card per club.
+  const GROUP={
+    'Carry vs roll':{title:'how far each club rolls after landing',cols:['Carry','Total','Roll','Land at'],keyName:'roll',unit:'yd',
+      meaning:'The simulator finish overstates what you cleared in the air. Judge a front hazard by carry; this is not an outdoor rollout forecast.',
+      action:'Hit 10 with each club at its Land-at number. Score carry within ±10 yd and ignore total.'},
+    'Target fit':{title:'establish carry before chasing the screen target',cols:['Avg carry','Screen','Test at'],keyName:'gap to target',unit:'yd',
+      meaning:'Every retained carry fell short of the selected target, so the longest shot is not a stock carry.',
+      action:'Hit 10 with each club at its Test-at number, same effort. Count carries within ±5 yd, mishits included.'},
+    'Carry group':{title:'calibrate the distance each club repeats',cols:['In group','Window','Test at'],keyName:'share in group',unit:'',pct:true,
+      meaning:'The overall mean blends the main group with other valid shots. Test whether the group repeats before using it as a playing yardage.',
+      action:'Hit 10 with each club at its Test-at number, one effort. Count landings within ±5 yd.'},
+    'Speed group':{title:'separate speed changes from carry',cols:['Group','Club mph','Group carry','All carry'],keyName:'gain from the speed group',unit:'yd',
+      meaning:'The slower shots pull each mean down. Use the speed group as a practice reference, not a new stock carry.',
+      action:'Hit 10 with each club at one effort and unchanged setting. Record carry, club speed and curve.'},
+    'Delivery consistency':{title:'repeat delivery before adding speed',cols:['Club mph','Carry range','Gap'],keyName:'carry gap at the same speed',unit:'yd',
+      meaning:'Same swing speed, very different carry: delivery and speed transfer come before extra effort. This does not identify a mechanical fault.',
+      action:'Hit 10 with each club at steady effort. Check whether the short ones also lose ball speed at similar swing speed.'},
+    'Observed flight':{title:'check the repeated curve against your intended shot',cols:['Curves','F–P open'],keyName:'one-way share',unit:'',pct:true,
+      meaning:'A repeated curve can be playable; a straight-shot target needs a different test.',
+      action:'Hit 10 with each club toward one start line with one intended curve. Count matching starts and curves.'}
+  };
+  function group(cards){
+    const out=[],by=new Map();
+    for(const c of cards){const g=GROUP[c.kind];if(!g||!c.cmp){out.push(c);continue;}
+      if(!by.has(c.kind)){const slot={kind:c.kind,members:[],secondary:c.secondary};by.set(c.kind,slot);out.push(slot);}
+      const slot=by.get(c.kind);slot.members.push(c);if(!c.secondary)slot.secondary=false;}
+    return out.map(x=>{
+      if(!x.members)return x;
+      if(x.members.length===1)return {...x.members[0],secondary:x.secondary};
+      const g=GROUP[x.kind],m=x.members.slice().sort((a,b)=>(b.carryAvg??0)-(a.carryAvg??0));
+      const hi=m.reduce((a,b)=>b.key>a.key?b:a),lo=m.reduce((a,b)=>b.key<a.key?b:a),v=k=>g.pct?Math.round(k*100)+'%':Math.round(k)+(g.unit?' '+g.unit:'');
+      const club=c=>c.title.split(':')[0];
+      return {grouped:true,id:`${x.kind}-group`,kind:x.kind,secondary:x.secondary,title:`${m.length} clubs: ${g.title}`,
+        verdict:`Most ${g.keyName}: ${club(hi)} (${v(hi.key)}). Least: ${club(lo)} (${v(lo.key)}).`,
+        meaning:g.meaning,action:g.action,cols:g.cols,members:m,club,smallSample:m.some(c=>c.smallSample)};
+    });
+  }
   function render(day,cards){
     const source=b=>Number.isInteger(b.index)?`<button data-action="bay-takeaway-source" data-i="${b.index}" data-club="${esc(b.club||'')}">${esc(b.club||b.label)} ↗</button>`:'';
     const reviewed=day.blocks.flatMap(b=>(b.distanceMissingReview||[]).map(s=>({...s,club:b.club})));
     const missingReview=reviewed.length?`<details class="rt-source bt-missing"><summary>Distance-missing shots reviewed · ${reviewed.length}</summary><p>Not included in averages or insights. These are contact observations, not recovered distances. A missing distance alone does not mean a mishit.</p>${reviewed.map(s=>`<p><b>${esc(s.club)} · source shot ${esc(s.shot)}: ${esc(s.review)}</b><br>${esc(s.cs)} mph club / ${esc(s.bs)} mph ball · smash ${esc(s.smash)} · launch ${esc(s.la)}° · height ${esc(s.height)}${s.reason?`<br>${esc(s.reason)}`:''}</p>`).join('')}</details>`:'';
     const article=c=>`<article class="card rt-card" data-bay-insight="${esc(c.id)}"><div class="rt-kind">${esc(c.kind)}${c.smallSample?' · small sample':''}</div><h3>${esc(c.title)}</h3><div class="bt-meaning"><b>Why this matters</b><p>${esc(c.evidence)} ${esc(c.meaning)}</p></div><div class="rt-action"><b>Next test</b><span>${esc(c.action)}</span></div>${c.scope?`<p class="bt-scope">${esc(c.scope)}</p>`:''}<details class="rt-source"><summary>Numbers, reference & sources</summary><div class="rt-plots">${c.rows.map(plot).join('')}</div><p class="bt-reference">${esc(c.reference)} <a href="${esc(c.referenceSource)}" target="_blank" rel="noopener noreferrer">Trackman reference ↗</a></p><p>${esc(c.track)}</p>${c.blocks.flatMap(b=>b.sourceBlocks||[b]).map(b=>`<p>Record ${b.record}: ${esc(b.label||b.club)} · ${esc(b.setup)}. ${b.shots.length} usable / ${b.sourceCount} source rows; ${b.missing} missing-distance, ${b.held} clear-mishit exclusions. Source shot IDs: ${b.shots.map(s=>esc(s.shot??'?')).join(', ')}. Conditions: ${esc(b.context)}.</p>`).join('')}<div class="rt-links">${c.blocks.map(source).join('')}</div></details></article>`;
-    const primary=cards.filter(c=>!c.secondary),more=cards.filter(c=>c.secondary);
-    return `<section class="round-takeaways bay-takeaways" aria-label="Bay day takeaways"><h2>Your bay day · ${esc(day.date)}</h2><p class="sm">${day.usable} usable shots · ${day.clubs.length} clubs combined from ${day.blocks.length} source blocks. ${day.missing} distance-dash rows excluded; ${day.held} clear mishits held out.</p><p class="sm faint">Indoor practice evidence, not outdoor stock yardages. Each finding uses one source block; different settings or targets are not pooled into a diagnosis.</p>${primary.length?primary.map(article).join(''):'<p class="sm">No clear practice priority supported by these shots yet. The exact data remains below; more comparable shots can reveal a repeatable pattern.</p>'}${more.length?`<details class="bt-more"><summary>More findings · ${more.length}</summary>${more.map(article).join('')}</details>`:''}${missingReview}${day.summaryOnly.length?`<details class="rt-source"><summary>${day.summaryOnly.length} summary-only day records</summary><p>No individual distance-bearing shots available for the exclusion and relationship checks.</p><div class="rt-links">${day.summaryOnly.map(source).join('')}</div></details>`:''}</section>`;
+    const groupCard=c=>`<article class="card rt-card bt-group" data-bay-insight="${esc(c.id)}"><div class="rt-kind">${esc(c.kind)} · ${c.members.length} clubs${c.smallSample?' · small sample':''}</div><h3>${esc(c.title)}</h3><p class="bt-verdict"><b>${esc(c.verdict)}</b></p><div class="tscroll"><table class="bt-cmp"><thead><tr><th>Club</th>${c.cols.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${c.members.map(m=>`<tr><td>${esc(c.club(m))}</td>${m.cmp.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="bt-meaning"><b>Why this matters</b><p>${esc(c.meaning)}</p></div><div class="rt-action"><b>Next test</b><span>${esc(c.action)}</span></div><details class="rt-source"><summary>Numbers, reference & sources</summary>${c.members.map(m=>`<p><b>${esc(c.club(m))}</b> · ${esc(m.evidence)} ${esc(m.scope||'')}</p><div class="rt-plots">${m.rows.map(plot).join('')}</div>`).join('')}<div class="rt-links">${c.members.flatMap(m=>m.blocks).map(source).join('')}</div></details></article>`;
+    const shown=group(cards),primary=shown.filter(c=>!c.secondary),more=shown.filter(c=>c.secondary);
+    const one=c=>c.grouped?groupCard(c):article(c);
+    return `<section class="round-takeaways bay-takeaways" aria-label="Bay day takeaways"><h2>Your bay day · ${esc(day.date)}</h2><p class="sm">${day.usable} usable shots · ${day.clubs.length} clubs combined from ${day.blocks.length} source blocks. ${day.missing} distance-dash rows excluded; ${day.held} clear mishits held out.</p><p class="sm faint">Indoor practice evidence, not outdoor stock yardages. Each finding uses one source block; different settings or targets are not pooled into a diagnosis.</p>${primary.length?primary.map(one).join(''):'<p class="sm">No clear practice priority supported by these shots yet. The exact data remains below; more comparable shots can reveal a repeatable pattern.</p>'}${more.length?`<details class="bt-more"><summary>More findings · ${more.length}</summary>${more.map(one).join('')}</details>`:''}${missingReview}${day.summaryOnly.length?`<details class="rt-source"><summary>${day.summaryOnly.length} summary-only day records</summary><p>No individual distance-bearing shots available for the exclusion and relationship checks.</p><div class="rt-links">${day.summaryOnly.map(source).join('')}</div></details>`:''}</section>`;
   }
-  root.CaddieBayTakeaways={prepare,combine,build,render,mishit};
+  root.CaddieBayTakeaways={prepare,combine,build,group,render,mishit};
   if(typeof module!=='undefined')module.exports=root.CaddieBayTakeaways;
 })(typeof window!=='undefined'?window:globalThis);

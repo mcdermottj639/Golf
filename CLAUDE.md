@@ -4183,6 +4183,8 @@ as the last reported 15.5° — not re-read.
 
 **v286 — range days list longest club first (Jack, Nov 4).** `bayView()` sorts the combined day's clubs by `bagRank()` (index in `BAG_CANON` via `clubCanon`, unknown last, stable) before building the charts, Exact club data and the per-club shot tables. Presentation only: `bayDayData()` and the takeaways keep source order.
 
+**v287 — one card per finding kind (Jack, Nov 4: "u just say the same thing for each club").** `build()` is UNCHANGED (Coach's sim plan still takes one card per club from it). `render()` passes cards through the new exported `group()`: cards of one kind on 2+ clubs become ONE `bt-group` card — a verdict line naming the club with the most and least of the kind's key figure, a per-club table (`cmp` cells set in each `add()`, whole yards, clubs sorted by carry), one shared meaning and one next test from the `GROUP` table. A kind on one club renders as before. A new finding kind needs a `GROUP` row and a `cmp`/`key` on its `add()`, or it renders per club. Nov 4 shows one Carry vs roll card for driver, mini, 3H, 4H (driver/mini totals are sim finish distances).
+
 ## Caddie HQ Links — the course game (v277, November 4 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own

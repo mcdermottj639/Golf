@@ -62,3 +62,9 @@
 .bay-takeaways .rt-source summary,.bt-more>summary{min-height:44px;font:700 14px var(--sans);cursor:pointer}
 .bay-takeaways .rt-source p,.bay-takeaways .bt-scope{font-size:13px;color:var(--soft)}
 .bay-takeaways .bt-reference{padding:10px}
+/* v287 — one comparison card per finding kind */
+.bay-takeaways .bt-verdict{margin:6px 0 8px;font-size:14px}
+.bay-takeaways .bt-cmp{width:100%;border-collapse:collapse;font:600 13px var(--mono,ui-monospace,monospace);margin-bottom:8px}
+.bay-takeaways .bt-cmp th{font:800 10px var(--sans);letter-spacing:.02em;text-transform:uppercase;color:var(--soft);text-align:right;padding:4px 5px;white-space:nowrap;border-bottom:1px solid var(--line)}
+.bay-takeaways .bt-cmp td{text-align:right;padding:5px 6px;border-bottom:1px solid var(--line)}
+.bay-takeaways .bt-cmp th:first-child,.bay-takeaways .bt-cmp td:first-child{text-align:left;font-family:var(--sans)}
