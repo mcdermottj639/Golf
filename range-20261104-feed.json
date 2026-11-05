@@ -1305,6 +1305,340 @@
    "type": "history",
    "date": "2026-11-04",
    "text": "Playing carries set from the Nov 4 range session at Jack's instruction: 3H 187.3, 4H 178.5 (mishits held out). Indoor TrackMan numbers; normalization not shown."
+  },
+  {
+   "id": "bay-20261104-mini-v1",
+   "type": "bay",
+   "src": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+   "bay": {
+    "date": "2026-11-04",
+    "venue": "TrackMan · Range mode",
+    "mode": "Range",
+    "unit": "yd",
+    "discipline": "swing",
+    "norm": "not shown in the recording",
+    "ball": "not shown",
+    "setup": "Nov 4 · TaylorMade r7 Quad Mini · 8 shots",
+    "finding": "201.1 carry / 229.5 total · 93.0 club / 134.5 ball mph · smash 1.45 · 10.6° / 3,664 rpm · apex 63′ (6 clean of 8)",
+    "detail": {
+     "gist": "Mini: 6 clean of 8 · 201.1 carry ±15.8 · 2 mishits held out",
+     "rangeCaption": "ScreenRecording_11-04-2026_19-01-20_1.mp4 · mishits held out by Jack's Nov 4 rule (no club read, smash < 1.40, apex < 40 ft)",
+     "clubs": [
+      {
+       "club": "Mini Driver",
+       "n": 6,
+       "held": 2,
+       "carry": 201.133,
+       "total": 229.483,
+       "cs": 93.017,
+       "bs": 134.467,
+       "smash": 1.447,
+       "la": 10.55,
+       "spin": 3663.667,
+       "ftp": 2.117,
+       "path": -2.833,
+       "face": -0.733,
+       "aoa": -1.267,
+       "ld": -1.167,
+       "apex": 63.167,
+       "metricCounts": {
+        "carry": 6,
+        "total": 6,
+        "cs": 6,
+        "bs": 6,
+        "smash": 6,
+        "la": 6,
+        "spin": 6,
+        "ftp": 6,
+        "path": 6,
+        "face": 6,
+        "aoa": 6,
+        "ld": 6
+       },
+       "carrySd": 15.806
+      }
+     ],
+     "rangeShots": [
+      {
+       "club": "Mini Driver",
+       "source": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+       "normalization": "not shown",
+       "sourceShotCount": 8,
+       "visibleShotCount": 8,
+       "unseenShotNumbers": [],
+       "partialShotNumbers": [],
+       "distanceMissingShotNumbers": [],
+       "excludedShotNumbers": [
+        1,
+        2
+       ],
+       "appHeader": null,
+       "appHeaderCheck": "The Avg row never scrolled into view, so no header cross-check; every row passes face − path = face-to-path (±0.1) and ball ÷ club = smash.",
+       "shots": [
+        {
+         "shot": 1,
+         "cs": 92.3,
+         "aoa": -0.7,
+         "path": -3.9,
+         "face": -2.5,
+         "ftp": 1.5,
+         "bs": 136.1,
+         "smash": 1.47,
+         "la": 5.9,
+         "ld": -2.8,
+         "spin": 2959,
+         "carry": 189.9,
+         "total": 251.0,
+         "height": 33,
+         "heightText": "33'",
+         "mishit": true,
+         "mishitReason": "apex 33 ft < 40 ft (thin / low strike)",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+          "row": 1
+         }
+        },
+        {
+         "shot": 2,
+         "cs": 90.1,
+         "aoa": -2.2,
+         "path": -4.2,
+         "face": 0.6,
+         "ftp": 4.8,
+         "bs": 131.8,
+         "smash": 1.46,
+         "la": 5.3,
+         "ld": -0.5,
+         "spin": 3313,
+         "carry": 175.8,
+         "total": 221.2,
+         "height": 28,
+         "heightText": "28'",
+         "mishit": true,
+         "mishitReason": "apex 28 ft < 40 ft (thin / low strike)",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+          "row": 2
+         }
+        },
+        {
+         "shot": 3,
+         "cs": 90.7,
+         "aoa": -3.0,
+         "path": -4.6,
+         "face": 3.4,
+         "ftp": 8.1,
+         "bs": 127.1,
+         "smash": 1.4,
+         "la": 12.3,
+         "ld": 1.6,
+         "spin": 5862,
+         "carry": 173.5,
+         "total": 180.3,
+         "height": 69,
+         "heightText": "69'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+          "row": 3
+         }
+        },
+        {
+         "shot": 4,
+         "cs": 92.3,
+         "aoa": -1.4,
+         "path": -4.4,
+         "face": -1.7,
+         "ftp": 2.7,
+         "bs": 133.4,
+         "smash": 1.45,
+         "la": 11.3,
+         "ld": -2.1,
+         "spin": 2610,
+         "carry": 204.1,
+         "total": 244.8,
+         "height": 57,
+         "heightText": "57'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+          "row": 4
+         }
+        },
+        {
+         "shot": 5,
+         "cs": 91.9,
+         "aoa": -0.9,
+         "path": -2.8,
+         "face": -2.8,
+         "ftp": -0.0,
+         "bs": 131.5,
+         "smash": 1.43,
+         "la": 8.7,
+         "ld": -2.8,
+         "spin": 3484,
+         "carry": 191.8,
+         "total": 231.4,
+         "height": 50,
+         "heightText": "50'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+          "row": 5
+         }
+        },
+        {
+         "shot": 6,
+         "cs": 93.2,
+         "aoa": -0.8,
+         "path": -1.2,
+         "face": -2.0,
+         "ftp": -0.8,
+         "bs": 137.5,
+         "smash": 1.48,
+         "la": 10.0,
+         "ld": -1.9,
+         "spin": 2798,
+         "carry": 211.1,
+         "total": 248.5,
+         "height": 57,
+         "heightText": "57'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+          "row": 6
+         }
+        },
+        {
+         "shot": 7,
+         "cs": 94.3,
+         "aoa": 1.4,
+         "path": -3.3,
+         "face": -4.8,
+         "ftp": -1.5,
+         "bs": 136.9,
+         "smash": 1.45,
+         "la": 11.1,
+         "ld": -4.5,
+         "spin": 3268,
+         "carry": 212.3,
+         "total": 240.1,
+         "height": 70,
+         "heightText": "70'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+          "row": 7
+         }
+        },
+        {
+         "shot": 8,
+         "cs": 95.7,
+         "aoa": -2.9,
+         "path": -0.7,
+         "face": 3.5,
+         "ftp": 4.2,
+         "bs": 140.4,
+         "smash": 1.47,
+         "la": 9.9,
+         "ld": 2.7,
+         "spin": 3960,
+         "carry": 214.0,
+         "total": 231.8,
+         "height": 76,
+         "heightText": "76'",
+         "videoSource": {
+          "file": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+          "row": 8
+         }
+        }
+       ],
+       "avg": {
+        "club": "Mini Driver",
+        "n": 6,
+        "held": 2,
+        "carry": 201.133,
+        "total": 229.483,
+        "cs": 93.017,
+        "bs": 134.467,
+        "smash": 1.447,
+        "la": 10.55,
+        "spin": 3663.667,
+        "ftp": 2.117,
+        "path": -2.833,
+        "face": -0.733,
+        "aoa": -1.267,
+        "ld": -1.167,
+        "apex": 63.167,
+        "metricCounts": {
+         "carry": 6,
+         "total": 6,
+         "cs": 6,
+         "bs": 6,
+         "smash": 6,
+         "la": 6,
+         "spin": 6,
+         "ftp": 6,
+         "path": 6,
+         "face": 6,
+         "aoa": 6,
+         "ld": 6
+        },
+        "carrySd": 15.806
+       }
+      }
+     ],
+     "sourceRecord": "data/range-2026-11-04-hybrids.json",
+     "rangeSource": {
+      "source": "ScreenRecording_11-04-2026_19-01-20_1.mp4",
+      "alias": "Mini Driver",
+      "coverage": "Every row transcribed; column cells never scrolled on screen are null, not guessed. The Avg row never scrolled into view, so no header cross-check; every row passes face − path = face-to-path (±0.1) and ball ÷ club = smash."
+     },
+     "limits": "Indoor/outdoor, normalization, ball and sleeve setting are not shown in the recording. Mishit rule is the one Jack approved in chat on Nov 4 (stricter than isClearMishit). Two early-session warm-up recordings (6 × 3H, 6 × 4H) are kept in the source record only, at Jack's direction. Averages are a bay offer, not a 70°F course carry. TrackMan labelled these shots \"3 Wood\"; Jack identified them as the mini driver. Its Avg row never scrolled into view."
+    }
+   }
+  },
+  {
+   "id": "club-minidriver-back-20261104-v1",
+   "type": "club-update",
+   "target": "add-minidriver",
+   "club": {
+    "status": "gaming",
+    "noteGist": "Back in the bag Nov 4 2026 · 201 carry on TrackMan that day (6 clean of 8).",
+    "note": "BACK IN THE BAG Nov 4 2026 (Jack). First measured carry for this head: 201.1 yd, n=6 clean of 8 on TrackMan Range (filed under the '3 Wood' label), 229.5 total, 93.0 club / 134.5 ball mph. Loft carried forward as the last reported 15.5°; shaft still unrecorded. Earlier: out Aug 12, back Sep 8 at 15.5°, out Sep 18 for the DS-ADAPT X 3-wood (since returned Oct 24)."
+   }
+  },
+  {
+   "id": "carry-meas-minidriver-20261104-v1",
+   "type": "carry-update",
+   "target": "Mini Driver",
+   "after": "Driver",
+   "club": {
+    "club": "Mini Driver",
+    "loft": "15.5°",
+    "carry": null,
+    "meas": {
+     "src": "tm:2026-11-04-range-mini",
+     "n": 6,
+     "sd": 15.8,
+     "date": "2026-11-04",
+     "ball": "not shown",
+     "norm": "not shown",
+     "carry": 201.1,
+     "how": "TrackMan Range mode · screen recording · normalization, ball and venue not shown · mishits held out (Nov 4 rule) · TrackMan label \"3 Wood\""
+    }
+   }
+  },
+  {
+   "id": "carry-live-minidriver-20261104-v1",
+   "type": "carry-update",
+   "target": "Mini Driver",
+   "force": true,
+   "src": "Jack in chat, 2026-11-04: mini driver numbers from today, it's back in the bag",
+   "club": {
+    "carry": 201
+   }
+  },
+  {
+   "id": "history-minidriver-back-20261104-v1",
+   "type": "history",
+   "date": "2026-11-04",
+   "text": "TaylorMade r7 Quad Mini Driver back in the bag (13 clubs). Nov 4 TrackMan: 201.1 carry (n=6 clean of 8, ±15.8), 229.5 total; playing carry set to 201."
   }
  ]
 }
