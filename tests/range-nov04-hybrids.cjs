@@ -1,10 +1,12 @@
+const fs = require('node:fs');
+const path = require('node:path');
 const assert = require('node:assert/strict');
 const feed = require('../range-20261104-feed.json');
 const source = require('../data/range-2026-11-04-hybrids.json');
 
 const ids = feed.entries.map(e => e.id);
 assert.equal(new Set(ids).size, ids.length, 'apply-once ids must be unique');
-assert.deepEqual(feed.entries.map(e => e.type), ['bay', 'bay', 'carry-update', 'carry-update', 'history', 'carry-update', 'carry-update', 'history', 'bay', 'club-update', 'carry-update', 'carry-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'carry-update', 'carry-update', 'club-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'club-update', 'history']);
+assert.deepEqual(feed.entries.map(e => e.type), ['bay', 'bay', 'carry-update', 'carry-update', 'history', 'carry-update', 'carry-update', 'history', 'bay', 'club-update', 'carry-update', 'carry-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'carry-update', 'carry-update', 'club-update', 'history', 'bay-update', 'bay-update', 'bay-update', 'carry-update', 'club-update', 'history', 'bay-update', 'club-update', 'history']);
 
 const mains = source.sources.filter(s => s.role === 'main');
 assert.deepEqual(mains.map(s => [s.club, s.shots.length]), [['3-hybrid', 32], ['4-hybrid', 12]]);
@@ -85,3 +87,12 @@ assert.equal(lab[0].bay.detail.clubs.length, 13); assert.equal(lab[1].bay.detail
 assert.equal(feed.entries.find(e => e.id === 'carry-minidriver-loft-20261104-v1').club.loft, '13.5°');
 assert.ok(!('carry' in feed.entries.find(e => e.id === 'carry-minidriver-loft-20261104-v1').club));
 console.log('mini history relabel ok');
+
+// v283: Sep 15 mini table from Jack's recordings — header averages, alignment, same Nov 4 rule.
+const sep = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data/range-2026-09-15-mini.json'), 'utf8'));
+const avgOf = k => { const v = sep.shots.map(s => s[k]).filter(x => x != null); return v.reduce((a, b) => a + b, 0) / v.length; };
+for (const [k, h] of Object.entries(sep.appHeader)) assert.ok(Math.abs(avgOf(k) - h) <= (k === 'spin' ? 1 : k === 'apex' ? 0.5 : 0.051), `sep15 ${k} re-averages to the header`);
+const g15 = feed.entries.find(e => e.id === 'bay-minishots-20260915-20261104-v1').bay.detail.rangeShots.find(g => g.club.startsWith('Mini'));
+assert.equal(g15.shots.length, 10); assert.deepEqual(g15.excludedShotNumbers, [3, 4, 6, 8, 9, 10]);
+const k15 = g15.shots.filter(s => !s.mishit); assert.equal(+(k15.reduce((a, s) => a + s.carry, 0) / k15.length).toFixed(1), 173.5);
+console.log('sep15 mini table ok');
