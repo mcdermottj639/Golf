@@ -4211,9 +4211,11 @@ compact two-column course grid underneath (14 full-width cards had pushed Tee of
 unmount, debug}`. `render()` returns the markup; `render('links')` in app.js then calls
 `mount(document.getElementById('lk-root'), { state:()=>S, clubCanon, toast, onExit })`. Every other view
 calls `unmount()`, which cancels the animation frame, timers, listeners and the body class. The
-module never reads or writes golf state: it only READS `S.carries` through the bridge and writes its
-own `localStorage` keys `chqlinks:mode|course|len|boost|best|cam|hand|records`. Those keys are deliberately outside
-golf backups (game preferences, not golf data).
+module never reads or writes golf state: it only READS `S.carries` (and, with the v289 flag on, `S.bays`) through
+the bridge and writes its own `localStorage` keys `chqlinks:mode|course|len|boost|best|cam|hand|records|flags`. Those
+keys are deliberately outside golf backups (game preferences, not golf data). `chqlinks:flags` is an object of
+feature switches (`store.get('flags',{})`), all off by default; anything that changes where a shot lands or how it
+is scored goes behind one.
 
 **Courses.** The menu lists `window.CADDIE_PREP_COURSES` (the generated directory). On Tee off the
 game calls `CaddieCoursePacks.ensure(id)` — the same download/cache path as Course Prep — and
@@ -4233,6 +4235,33 @@ table of Jack's Map My Bag sessions (9/14 driver, 10/1 everything else) keyed by
 category defaults for clubs that table lacks (marked `~` in the menu's bag table). A menu slider adds
 0–25% (default +10%) to every carry and roll because indoor Normalize-on readings run short of
 outdoor stock numbers — a starting guess, not a measurement. Editing carries belongs in Bag, not here.
+
+**Misses from every range session (v289, PR #96, behind `chqlinks:flags.bayDispersion`, off by default).** The
+menu checkbox *Misses from every range session* replaces the built-in miss table with Jack's own shots.
+`bayDispersion()` is a READER over `S.bays` through the bridge, never a writer: every swing-discipline record,
+every `detail.rangeShots` block, canon id via `bridge.clubCanon` (so `3 wood · after slot`, `5-iron · target 165`
+and `Mini Driver · TrackMan 3w label` all land on their club). Same cohort rule as the app's full-day review,
+mirrored in `clearMishit()`: a row needs a carry or a total, `mishit:true` is held out, and so is a carry under
+two-thirds of the airborne cluster's median (the Sep 2026 `isClearMishit()` rule; the Nov 4 stricter rule arrives
+as `mishit:true` on those rows, so it is honoured without re-deriving it). A block labelled `teed` counts for the
+driver only, because at the sim everything else is hit off the deck and that is how the game plays it. Pooled
+across sessions, one shot one vote, deduplicated on date · club · shot number · carry · total so a block re-sent
+whole by a `bay-update` cannot count twice. A club needs `DISP_MIN` (6) retained shots to override; side and roll
+each need `DISP_SIDE_MIN` (5) readings — side parsed from `carrySide`, then `side`, then `sideYards` (`25'3"L` →
+−8.4 yd; `+` is right), roll = per-shot total − carry. What it changes: the long/short SD (`carrySpread(c)` =
+measured carry SD, else `cons/2` as before — the bag table header switches from *Consist.* to *Carry SD* and shows
+`±`, which is legitimate here because it IS a sample SD, unlike TrackMan's Consistency), `side`, `sideSD` and
+`roll`. **The carry itself stays the ladder's number** — his, and the slider still applies. A club under the
+threshold keeps the built-in row and its `~` marks; a pooled club with no side column (Nov 4 hybrids, Mini,
+56°) keeps the built-in side, still marked `~`. Honest consequence Jack will notice: pooled across days the irons
+spread 14–19 yd long/short against 2–4 yd in the old table, because day-to-day drift is in the pool — that is
+what the range says, and session weighting (newest day first) is the obvious follow-up if it plays too wild.
+`debug()` reports `flags`, `bayDispersion` (the pooled table or null while off) and `bag` (the club list the game
+is using). `tests/links-dispersion-browser.cjs` (390×844 and 320×690): an in-page recount of the Nov 4 3H record
+(32 rows → 16 retained, 187.3 ±7.1, the numbers CLAUDE.md records under *November 4 hybrid range session*)
+cross-checks the game's `3H` entry; 4H pools Oct 1 → Nov 4 with side readings; Mini pools its three deck sessions
+(15 shots) and skips the teed sim block; the flag persists only in `chqlinks:flags`; a Wianno slingshot shot flies
+and lands with it on; off again restores the table; golf state unchanged, zero errors.
 
 **Shot model.** Carry = club carry × lie factor (rough .92, bunker .80, trees .55) × shape/trajectory
 factor; wind adds ±0.5%/1% per mph along the line (×0.5 low, ×1.4 high) and a crosswind drift.
@@ -4492,8 +4521,8 @@ browser checks, not a claim of an on-device Safari test.
 **Backlog.** Surveyed terrain elevations and fuller feature coverage are needed for faithful course
 rehearsal. Graphics: improved canopies (the shadows half of that item shipped as v273), 3D putting when it
 can preserve readability. The current renderer already includes textured surfaces, decorative trees, sun-cast
-shadows and rippling water. Game: per-club dispersion from every bay session instead of
-the built-in table; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry.
+shadows and rippling water. Game: session-weighted dispersion (newest range day first) once Jack has played with the
+v289 pooled version; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry.
 Standing plans are now available from each hole.
 Rules for that task: one improvement per run, feature-flag anything that changes scoring, never touch
 packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item and update this
@@ -4507,7 +4536,9 @@ the November 2 run rebased it again onto e2449cf and renumbered it v273 (BUILD =
 main). The rule stands for every links/ PR: if main moves before the merge, rebase and renumber the same way.
 Shipped: water ripples in the 3D view — PR #84, branch links/20261104-water-ripples, awaiting Jack's merge.
 Authored as v276 on November 4 (main 2733fe9); the fourth course batch took v276 on main the same morning, so
-the midday run rebased it onto 52b7144 and renumbered it v277.
+the midday run rebased it onto 52b7144 and renumbered it v277. Merged by Jack on November 4 (main dd1f1d4).
+Shipped: misses from every range session (per-club dispersion from `S.bays`, behind `chqlinks:flags.bayDispersion`)
+— v289, PR #96, branch links/20261106-bay-dispersion, authored November 6 on main fa48fae; awaiting Jack's merge.
 
 ## Oct 30 putter shootout (v267)
 

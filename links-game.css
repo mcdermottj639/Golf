@@ -244,3 +244,10 @@ body.lk-ingame #view{padding-bottom:0}
 .lk .lk-cardimg img{display:block;width:100%;height:auto}
 .lk .lk-sharerow{gap:6px}
 .lk .lk-sharerow .lk-ghost{min-height:40px;display:inline-flex;align-items:center;text-decoration:none;color:var(--ink)}
+/* v289 — menu flag: misses from every range session (chqlinks:flags.bayDispersion) */
+.lk .lk-flag{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px 12px;cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:400;line-height:1.4;letter-spacing:0;text-transform:none;color:var(--ink);margin:0}
+.lk .lk-flag b{font-weight:650}
+.lk .lk-flag input{flex:0 0 auto;width:22px;height:22px;margin:1px 0 0;font-size:16px;accent-color:var(--green)}
+.lk .lk-flag span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lk .lk-flag small{font-size:11.5px;color:var(--ink62)}
+.lk table.lk-bag td:last-child{white-space:nowrap;text-align:left;color:var(--ink62)} /* v289: the source line ("16 shots · 1 session · Nov 4") scrolls inside .tablewrap instead of wrapping one word per line */
