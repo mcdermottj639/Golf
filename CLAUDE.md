@@ -4236,7 +4236,7 @@ category defaults for clubs that table lacks (marked `~` in the menu's bag table
 0–25% (default +10%) to every carry and roll because indoor Normalize-on readings run short of
 outdoor stock numbers — a starting guess, not a measurement. Editing carries belongs in Bag, not here.
 
-**Misses from every range session (v289, PR #TBD, behind `chqlinks:flags.bayDispersion`, off by default).** The
+**Misses from every range session (v289, PR #96, behind `chqlinks:flags.bayDispersion`, off by default).** The
 menu checkbox *Misses from every range session* replaces the built-in miss table with Jack's own shots.
 `bayDispersion()` is a READER over `S.bays` through the bridge, never a writer: every swing-discipline record,
 every `detail.rangeShots` block, canon id via `bridge.clubCanon` (so `3 wood · after slot`, `5-iron · target 165`
@@ -4538,7 +4538,7 @@ Shipped: water ripples in the 3D view — PR #84, branch links/20261104-water-ri
 Authored as v276 on November 4 (main 2733fe9); the fourth course batch took v276 on main the same morning, so
 the midday run rebased it onto 52b7144 and renumbered it v277. Merged by Jack on November 4 (main dd1f1d4).
 Shipped: misses from every range session (per-club dispersion from `S.bays`, behind `chqlinks:flags.bayDispersion`)
-— v289, PR #TBD, branch links/20261106-bay-dispersion, authored November 6 on main fa48fae; awaiting Jack's merge.
+— v289, PR #96, branch links/20261106-bay-dispersion, authored November 6 on main fa48fae; awaiting Jack's merge.
 
 ## Oct 30 putter shootout (v267)
 
