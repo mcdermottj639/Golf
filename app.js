@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v288';
+const BUILD = 'v289';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v289', d:'2026-11-06', items:['LINKS · YOUR OWN MISSES (off until you turn it on): the course game can now scatter your shots the way your range days say they scatter. On the Links menu, tick "Misses from every range session" and each club\'s long/short spread, left/right bias and roll come from your own retained TrackMan shots across every range day (clear mishits held out); clubs with fewer than six shots keep the built-in table. Off by default because it changes where shots land: pooled across days your irons spread 14–19 yd long/short, far more than the old table, which is what the range says. The carry itself is still your bag ladder number.'] },
   { b:'v288', d:'2026-11-04', items:['COMPARE CLUBS: Bag now has a Compare clubs card. Tap any clubs with sim data and see carry + roll bars and a side-by-side table: carry, roll, total, peak height, speeds, smash, launch, spin, path and face-to-path. Switch between each club\'s latest day and all sessions. Mishits stay out, and returned clubs like the 3W still show.'] },
   { b:'v287', d:'2026-11-04', items:['ONE CARD PER FINDING: When the same takeaway fits several clubs, the bay day now shows it once as a small table instead of a card per club. Nov 4 reads: 4 clubs, how far each rolls after landing — most 3-hybrid (+36 yd), least driver (+21 yd).'] },
   { b:'v286', d:'2026-11-04', items:['LONGEST CLUB FIRST: A range day now lists clubs in bag order, longest at the top: Driver, Mini, then the hybrids and down through the irons and wedges. That applies to the charts, Exact club data and the shot tables.'] },
