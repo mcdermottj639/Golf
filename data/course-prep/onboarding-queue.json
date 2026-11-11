@@ -2991,7 +2991,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": "PENDING_RELEASE_COMMIT",
+      "completionCommit": "6efa99f3bd30d3c9ebda33647a5fa1817af83327",
       "catalogId": "quail-brook",
       "coverage": {
         "holes": 18,
@@ -3184,7 +3184,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": "PENDING_RELEASE_COMMIT",
+      "completionCommit": "6efa99f3bd30d3c9ebda33647a5fa1817af83327",
       "catalogId": "middletown-country-club",
       "coverage": {
         "holes": 18,
@@ -3267,7 +3267,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": "PENDING_RELEASE_COMMIT",
+      "completionCommit": "6efa99f3bd30d3c9ebda33647a5fa1817af83327",
       "catalogId": "broad-run",
       "coverage": {
         "holes": 18,
@@ -3387,7 +3387,7 @@
       ],
       "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": "PENDING_RELEASE_COMMIT",
+      "completionCommit": "6efa99f3bd30d3c9ebda33647a5fa1817af83327",
       "catalogId": "old-corkscrew",
       "coverage": {
         "holes": 18,
@@ -3494,7 +3494,7 @@
           "reason": "No verified original numbered route for hole 18 exists inside the exact course boundary."
         }
       ],
-      "completionCommit": "PENDING_RELEASE_COMMIT",
+      "completionCommit": "6efa99f3bd30d3c9ebda33647a5fa1817af83327",
       "catalogId": "quail-village",
       "coverage": {
         "holes": 18,
