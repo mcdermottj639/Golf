@@ -14,6 +14,12 @@ const server=http.createServer((req,res)=>{
  fs.readFile(file,(err,data)=>{res.writeHead(err?404:200,{'Content-Type':types[path.extname(file)]||'application/octet-stream'});res.end(err?'':data);});
 });
 const qa=process.env.CADDIE_QA_DIR||'/tmp/caddie-v290-ux';
+// Fixed mobile bottom navigation overlays the lowest part of the viewport.
+async function tap(page,selector) {
+ const target=page.locator(selector).first();
+ await target.evaluate(el=>el.scrollIntoView({block:'center',inline:'nearest',behavior:'instant'}));
+ await target.click();
+}
 const snapshot=page=>page.evaluate(()=>{
  const s=JSON.parse(localStorage.getItem('caddiehq_v1')||'{}');
  return JSON.stringify({rounds:s.rounds,clubs:s.clubs,carries:s.carries,coursePrep:s.coursePrep,planCalls:s.planCalls});
@@ -30,13 +36,13 @@ const snapshot=page=>page.evaluate(()=>{
    p.on('pageerror',err=>errors.push(err.message));
    await p.goto('http://127.0.0.1:'+server.address().port+'/');
    await p.locator('#nav [data-view="rounds"]').click();
-   await p.locator('.hq-journey [data-step="course"]').click();
+   await tap(p,'.hq-journey [data-step="course"]');
    assert.equal(await p.locator('#view').getAttribute('data-page'),'rounds');
    assert.ok(await p.locator('.hq-journey [aria-current="step"]').count());
    const before=await snapshot(p);
-   await p.locator('.hq-journey [data-step="guide"]').click();
+   await tap(p,'.hq-journey [data-step="guide"]');
    await p.locator('#course-prep').waitFor();
-   await p.locator('.cp-arrows [data-cp="next"]').click();
+   await tap(p,'.cp-arrows [data-cp="next"]');
    assert.match(await p.locator('.cp-hole-heading h3').innerText(),/^Hole 2/);
    const remembered=await p.evaluate(()=>JSON.parse(sessionStorage.getItem('caddiehq_course_prep_view_v1')));
    assert.equal(remembered.hole,2,'course+hole remembered in UI-only session key');
@@ -52,8 +58,8 @@ const snapshot=page=>page.evaluate(()=>{
    await p.reload();await p.locator('#course-prep').waitFor();
    assert.match(await p.locator('.cp-hole-heading h3').innerText(),/^Hole 2/,'reload restores course/hole at '+width);
    const downloads=p.locator('#cp-downloads');
-   if(await downloads.count()){await downloads.locator('summary').click();assert.equal(await downloads.getAttribute('open'),'');}
-   await p.locator('.themebtn').click();
+   if(await downloads.count()){await downloads.locator('summary').evaluate(el=>el.scrollIntoView({block:'center'}));await downloads.locator('summary').click();assert.equal(await downloads.getAttribute('open'),'');}
+   await tap(p,'.themebtn');
    assert.ok(await p.locator('body.night').count(),'theme can be toggled at '+width);
    await p.screenshot({path:qa+'/night-'+width+'.png'});
    assert.equal(await snapshot(p),before,'navigation does not change saved golf records at '+width);
