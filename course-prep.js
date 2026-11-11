@@ -11,6 +11,7 @@
   let course = courses[0];
   const KEY = 'caddiehq_google_maps_key_v1';
   const RESUME = 'caddiehq_course_prep_resume_v1';
+  const VIEW_MEMORY = 'caddiehq_course_prep_view_v1'; // UI selection only, session-scoped
   const rad = x => x * Math.PI / 180;
   const deg = x => x * 180 / Math.PI;
   const esc = x => String(x == null ? '' : x).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -371,7 +372,23 @@
       (h?.note?'<p>'+prose(h.note)+'</p>':'')+(h?.why?.length?list(h.why):'')+
       (!h?'<p class="cp-muted">No standing advice recorded for this hole yet.</p>':'')+'</section>';
   }
+  // Only course identity, hole number and presentation mode are remembered here.
+  // Never persist device position, map targets, bag data or round scores in this key.
+  function rememberView() {
+    try { sessionStorage.setItem(VIEW_MEMORY,JSON.stringify({courseId:course.id,hole,mode})); } catch {}
+  }
+  function restoreView() {
+    let saved;
+    try { saved=JSON.parse(sessionStorage.getItem(VIEW_MEMORY)||'null'); } catch { return; }
+    const found=saved&&findCourse(saved.courseId), n=Number(saved?.hole);
+    if(!found || !Number.isInteger(n) || !found.holes.some(h=>h.n===n)) return;
+    course=found; hole=n;
+    if(['guide','route','3d'].includes(saved.mode)) mode=saved.mode;
+    if(mode==='guide'&&!hasGuide(course,currentHole()))mode='route';
+    if(mode==='3d'&&(navigator.onLine===false||!key()))mode='route';
+  }
   function render() {
+    rememberView();
     bagSnapshot = null;
     const m = model(), t = teeSet(), h = currentHole(), hs = savedHole();
     const count = course.holes.filter(x => m.holes[m.tee + ':' + x.n]?.reviewed).length;
@@ -409,6 +426,7 @@
       '<p>' + link(course.source, course.sourceLabel || 'Scorecard source') + (course.tour ? ' · ' + link(course.tour, 'Official course tour') : '') + ' · ' + link('https://www.openstreetmap.org/copyright', '© OpenStreetMap contributors · ODbL') + ' · <a href="./data/course-prep/'+course.id+'-osm.json" download>Map source data</a></p></details></div>';
   }
   function redraw() {
+    rememberView();
     if(!liveDialog?.open)return bridge.refresh();
     // Replace only the popup contents. Rerendering the live page would close it
     // and could disturb an unfinished scorecard edit underneath the dialog.
@@ -434,6 +452,7 @@
       projection=null;overview=false;edit='target';guideStyle='auto';lastMapMode='3d';mode=initialMode();
       if(!googleAuthFailed){googleFailure='';googleFailureMode='';}
     }
+    rememberView();
     return true;
   }
   function changeHole(n) {
@@ -1238,12 +1257,13 @@
     if(document.hidden && locationWatch!==null){stopLocation('Location paused while the app was away. Tap Use my location to resume.');updateMeasurements();}
   });
   window.addEventListener('pagehide',()=>stopLocation());
+  restoreView();
   window.CaddieCoursePrep = Object.freeze({
     init: options => {bridge=options;packs?.start();}, render, mount, unmount, teaser, resumeAfterReload, openGuide, openLiveMap,
     openNearest: () => {manualTarget=false;return selectCourse(nearbyCourses()[0].course.id);},
     resumeLiveMap: () => openLiveMap(course.id,hole,mode),
     openHole: (n,courseId) => {manualTarget=false;if(courseId&&!selectCourse(courseId))return false;hole=course.holes.some(h=>h.n===+n)?+n:1;framed3d=null;mode=initialMode();imageError=false;overview=false;return true;},
-    get courseName(){return course.name;}, get courseId(){return course.id;}, findCourse, clean, hasGuide,
+    get courseName(){return course.name;}, get courseId(){return course.id;}, get holeNumber(){return hole;}, findCourse, clean, hasGuide,
     geo: Object.freeze({distance,destination,bearing,pointOK})
   });
 })();
