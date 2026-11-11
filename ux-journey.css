@@ -1,5 +1,12 @@
 /* Caddie HQ v290: compact, non-destructive course → recap navigation.
    The original maps, forms, scorecard and record styles remain authoritative. */
+/* Override Caddie's legacy global nav selector: only #nav should float. */
+#view > nav.hq-journey {
+  position:relative;top:auto;right:auto;bottom:auto;left:auto;
+  transform:none;z-index:auto;
+  display:block;width:auto;max-width:100%;
+  box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+}
 .hq-journey{
   --journey-line:var(--line,#d9e3dd);
   --journey-ink:var(--ink,#1b3f32);
