@@ -1,0 +1,70 @@
+name: Caddie UX journey regression
+on:
+  pull_request:
+    paths:
+      - 'app.js'
+      - 'course-prep.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'ux-journey.css'
+      - 'tests/ux-journey*'
+      - '.github/workflows/ux-journey.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'app.js'
+      - 'course-prep.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'ux-journey.css'
+      - 'tests/ux-journey*'
+      - '.github/workflows/ux-journey.yml'
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax, journey contract, and preservation
+        run: |
+          node --check app.js
+          node --check course-prep.js
+          node --check sw.js
+          node tests/ux-journey.cjs
+          node tests/findability.cjs
+          node tests/course-prep.cjs
+          node tests/course-packs.cjs
+          node tests/round-review.cjs
+          node tests/round-takeaways.cjs
+          node tests/round-identity.cjs
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser runtime
+        run: |
+          npm install --no-save playwright@1.56.1
+          if command -v google-chrome >/dev/null 2>&1; then
+            echo "CADDIE_CHROMIUM=$(command -v google-chrome)" >> "$GITHUB_ENV"
+            google-chrome --version
+          else
+            npx playwright install --with-deps chromium
+          fi
+      - name: Browser journey and offline smoke
+        run: |
+          CADDIE_QA_DIR="$RUNNER_TEMP/caddie-ux-evidence" node tests/ux-journey-browser.cjs
+      - name: Browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: caddie-ux-evidence
+          path: ${{ runner.temp }}/caddie-ux-evidence/
+          if-no-files-found: ignore
