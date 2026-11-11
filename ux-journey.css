@@ -1,0 +1,56 @@
+/* Caddie HQ v290: compact, non-destructive course → recap navigation.
+   The original maps, forms, scorecard and record styles remain authoritative. */
+.hq-journey{
+  --journey-line:var(--line,#d9e3dd);
+  --journey-ink:var(--ink,#1b3f32);
+  margin:0 0 10px;
+  padding:9px 10px;
+  border:1px solid var(--journey-line);
+  border-radius:14px;
+  background:var(--card,#fff);
+  color:var(--journey-ink);
+  min-width:0;
+}
+.hq-journey-top{display:flex;align-items:baseline;gap:9px;min-width:0;margin:0 2px 6px}
+.hq-journey-label{flex:none;font:800 10px/1.2 var(--sans,system-ui);letter-spacing:.08em}
+.hq-journey-state{font:400 12px/1.35 var(--sans,system-ui);min-width:0;overflow-wrap:anywhere;color:var(--soft,#63756b)}
+.hq-journey-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;min-width:0}
+.hq-journey-steps button{
+  display:flex;justify-content:center;align-items:center;gap:6px;
+  min-width:0;min-height:44px;padding:5px 6px;
+  background:var(--card2,#f5f7f4);color:var(--journey-ink);
+  border:1px solid var(--journey-line);border-radius:10px;
+  font:700 11px/1.15 var(--sans,system-ui);text-align:center;
+  cursor:pointer;overflow-wrap:normal;word-break:normal;
+}
+.hq-journey-steps button[aria-current="step"]{
+  background:var(--green,#1c6548);color:#fff;border-color:transparent;
+}
+.hq-journey-steps button:disabled{opacity:.45;cursor:not-allowed}
+.hq-journey-steps button:focus-visible{
+  outline:3px solid var(--gold,#dca54b);outline-offset:2px;
+}
+.hq-journey-n{display:grid;place-items:center;flex:none;width:19px;height:19px;
+  border:1px solid currentColor;border-radius:50%;font-size:10px}
+body.night .hq-journey{--journey-line:rgba(255,255,255,.18);
+  --journey-ink:var(--ink,#eef2ed);background:var(--card,#1e3029)}
+body.night .hq-journey-steps button[aria-current="step"]{background:#b9dc96;color:#173c29}
+@media(max-width:700px){
+  .hq-journey{padding:5px 6px;margin-bottom:7px;border-radius:11px}
+  .hq-journey-top{margin-bottom:4px}
+  .hq-journey-state{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hq-journey-steps{gap:3px}
+  .hq-journey-steps button{gap:3px;padding:4px 3px;font-size:10px;min-height:44px}
+  .hq-journey-n{width:16px;height:16px;font-size:9px}
+  #view[data-page="courseprep"] .cp-grid{gap:11px}
+  #view[data-page="courseprep"] .cp-course-picker{gap:7px;margin:6px 0 9px}
+  #view[data-page="courseprep"] .cp-course-picker select{min-height:44px}
+}
+@media(max-width:400px){
+  .hq-journey-top{display:none}
+  .hq-journey-steps button{flex-direction:column;gap:2px;line-height:1.05}
+  .hq-journey-n{width:14px;height:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  .hq-journey-steps button{scroll-behavior:auto}
+}
