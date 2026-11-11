@@ -1262,7 +1262,7 @@
     init: options => {bridge=options;packs?.start();}, render, mount, unmount, teaser, resumeAfterReload, openGuide, openLiveMap,
     openNearest: () => {manualTarget=false;return selectCourse(nearbyCourses()[0].course.id);},
     resumeLiveMap: () => openLiveMap(course.id,hole,mode),
-    openHole: (n,courseId) => {manualTarget=false;if(courseId&&!selectCourse(courseId))return false;hole=course.holes.some(h=>h.n===+n)?+n:1;framed3d=null;mode=initialMode();imageError=false;overview=false;return true;},
+    openHole: (n,courseId) => {manualTarget=false;if(courseId&&!selectCourse(courseId))return false;hole=course.holes.some(h=>h.n===+n)?+n:1;framed3d=null;mode=initialMode();imageError=false;overview=false;rememberView();return true;},
     get courseName(){return course.name;}, get courseId(){return course.id;}, get holeNumber(){return hole;}, findCourse, clean, hasGuide,
     geo: Object.freeze({distance,destination,bearing,pointOK})
   });
