@@ -10,7 +10,7 @@ assert.ok(css.includes('grid-template-columns:repeat(5')&&css.includes('min-heig
 assert.ok(!app.includes('location.hash')&&!app.includes('location.search'),'route info never leaks to URL');
 assert.ok(prep.includes('const VIEW_MEMORY')&&prep.includes('restoreView();')&&prep.includes('get holeNumber(){return hole;}'));
 assert.ok(prep.includes('sessionStorage.setItem(VIEW_MEMORY,JSON.stringify({courseId:course.id,hole,mode}))'),'only a course id, hole, mode are saved');
-assert.ok(!prep.includes('sessionStorage.setItem(VIEW_MEMORY,JSON.stringify({courseId:course.id,hole,mode,lat')),'no location coordinates in view memory');
+assert.ok(!prep.includes('mode,lat'),'no location coordinates in view memory');
 const first=app.indexOf('const HQ_ROUTE_VIEWS = new Set('),last=app.indexOf("window.addEventListener('popstate'",first);
 assert.ok(first>0&&last>first,'navigation functions found');
 const calls=[],history={
