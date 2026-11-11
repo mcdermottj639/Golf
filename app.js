@@ -2070,10 +2070,17 @@ function hqHistoryRoute(view, arg, keepScroll, changed) {
     }
   } catch { /* Sandboxed/private browser history must not block golf. */ }
 }
-function hqLatestRoundIndex() {
+function hqLatestRoundIndex(courseName) {
   if (!S.rounds?.length) return null;
-  let best = 0;
-  S.rounds.forEach((r,i) => { if (String(r.date||'') > String(S.rounds[best].date||'')) best = i; });
+  const requested = courseName && String(courseName).trim().toLowerCase();
+  const source = requested && window.CaddieCoursePrep?.findCourse(courseName);
+  const same = r => !requested ||
+    String(r.course||'').trim().toLowerCase()===requested ||
+    !!(source && window.CaddieCoursePrep?.findCourse(r.course)?.id===source.id);
+  let best = null;
+  S.rounds.forEach((r,i) => {
+    if(same(r) && (best===null || String(r.date||'')>String(S.rounds[best].date||''))) best=i;
+  });
   return best;
 }
 function hqJourney(view, arg) {
@@ -2082,10 +2089,10 @@ function hqJourney(view, arg) {
   const seg = view === 'rounds' ? (arg || roundsSeg) : '';
   const active = view === 'courseprep' ? 'guide' : view === 'round' ? 'recap'
     : view === 'live' ? 'score' : seg === 'courses' ? 'course' : seg === 'prep' ? 'prep' : 'recap';
-  const latest = hqLatestRoundIndex();
-  const steps = [['course','Courses'],['prep','Prep'],['guide','Hole guide'],['score','Score'],['recap','Recap']];
   const name = view === 'courseprep' ? window.CaddieCoursePrep?.courseName
     : view === 'live' ? S.live?.course : view === 'round' ? S.rounds?.[+arg]?.course : '';
+  const latest = hqLatestRoundIndex(name);
+  const steps = [['course','Courses'],['prep','Prep'],['guide','Hole guide'],['score','Score'],['recap','Recap']];
   const line = view === 'courseprep' ? (name ? name + ' · hole ' + (window.CaddieCoursePrep?.holeNumber||1) : 'Choose a course and inspect its map')
     : view === 'live' ? (S.live ? 'Round ' + (S.live.stage === 'finish' ? 'review before saving' : 'card check') : 'Choose a course; nothing is recorded until you start')
     : view === 'round' ? 'Saved round · score, evidence and takeaways'
@@ -2097,7 +2104,7 @@ function hqJourney(view, arg) {
     '<div class="hq-journey-steps">' + steps.map(([key,label],i) =>
       '<button type="button" data-action="hq-journey-step" data-step="' + key + '"' +
       (key===active ? ' aria-current="step"' : '') +
-      (key==='recap' && latest===null ? ' disabled title="No saved round to review"' : '') +
+      (key==='recap' && latest===null ? ' disabled title="No saved round for this course"' : '') +
       '><span class="hq-journey-n">' + (i+1) + '</span><span>' + label + '</span></button>').join('') +
     '</div></nav>';
 }
@@ -10633,12 +10640,16 @@ const ACTIONS = {
     if(step==='course') return render('rounds','courses');
     if(step==='prep') return render('rounds','prep');
     if(step==='guide'){
-      if(current.view!=='courseprep')render('courseprep');
+      const name=current.view==='live'?S.live?.course:current.view==='round'?S.rounds?.[+current.arg]?.course:null;
+      const source=name&&window.CaddieCoursePrep?.findCourse(name);
+      if(source)window.CaddieCoursePrep.openHole(1,source.id);
+      if(current.view!=='courseprep'||source)render('courseprep');
       document.querySelector('.cp-map-panel')?.scrollIntoView({block:'start',behavior:'smooth'});
       return;
     }
     if(step==='score'){
-      const name=window.CaddieCoursePrep?.courseName;
+      const name=current.view==='courseprep'?window.CaddieCoursePrep?.courseName:
+        current.view==='round'?S.rounds?.[+current.arg]?.course:null;
       render('live');
       if(!S.live && name){
         try { sessionStorage.setItem('caddiehq_live_course_prefill_v1', name); } catch {}
@@ -10648,7 +10659,10 @@ const ACTIONS = {
       return;
     }
     if(step==='recap'){
-      const i=hqLatestRoundIndex();
+      if(current.view==='round')return render('round',current.arg);
+      const name=current.view==='courseprep'?window.CaddieCoursePrep?.courseName:
+        current.view==='live'?S.live?.course:null;
+      const i=hqLatestRoundIndex(name);
       return i===null ? render('rounds','cards') : render('round',i);
     }
   },
