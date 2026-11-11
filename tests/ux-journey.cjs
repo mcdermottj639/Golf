@@ -4,7 +4,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..'),read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const app=read('app.js'),prep=read('course-prep.js'),shell=read('index.html'),sw=read('sw.js'),css=read('ux-journey.css');
-assert.equal(app.match(/const BUILD = '(v\\d+)'/)[1],sw.match(/const CACHE = 'caddiehq-(v\\d+)'/)[1]);
+assert.equal(app.match(/const BUILD = '(v[0-9]+)'/)[1],sw.match(/const CACHE = 'caddiehq-(v[0-9]+)'/)[1]);
 assert.ok(shell.includes('ux-journey.css')&&sw.includes('./ux-journey.css'),'new controls ship in online and offline shells');
 assert.ok(css.includes('grid-template-columns:repeat(5')&&css.includes('min-height:44px'),'compact, usable touch targets');
 assert.ok(!app.includes('location.hash')&&!app.includes('location.search'),'route info never leaks to URL');
