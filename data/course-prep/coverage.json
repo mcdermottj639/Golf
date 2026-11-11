@@ -512,5 +512,76 @@
     "guides": 18,
     "bytes": 13251,
     "exceptions": []
+  },
+  {
+    "id": "quail-brook",
+    "verified": "2026-11-11",
+    "source": "https://18birdies.com/golf-courses/club/98319280-86ac-11e4-8c28-020000005b00/quail-brook-golf-course",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 116044,
+    "exceptions": []
+  },
+  {
+    "id": "middletown-country-club",
+    "verified": "2026-11-11",
+    "source": "https://www.middletowncc.com/wp-content/uploads/sites/6341/2020/05/MCC-Scorecard-Proof.pdf",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 82732,
+    "exceptions": []
+  },
+  {
+    "id": "broad-run",
+    "verified": "2026-11-11",
+    "source": "https://www.broadrungc.com/images/pictures/scorecard.png",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 415426,
+    "exceptions": []
+  },
+  {
+    "id": "old-corkscrew",
+    "verified": "2026-11-11",
+    "source": "https://18birdies.com/golf-courses/club/8f2c75b0-86ac-11e4-8c28-020000005b00/old-corkscrew-golf-club",
+    "holes": 18,
+    "maps": 18,
+    "guides": 18,
+    "bytes": 296406,
+    "exceptions": []
+  },
+  {
+    "id": "quail-village",
+    "verified": "2026-11-11",
+    "source": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+    "holes": 18,
+    "maps": 13,
+    "guides": 13,
+    "bytes": 291789,
+    "exceptions": [
+      {
+        "hole": 14,
+        "reason": "Two unnumbered source routes are present inside the exact course boundary, but neither is identified as hole 14; no assignment is inferred."
+      },
+      {
+        "hole": 15,
+        "reason": "No verified original numbered route for hole 15 exists inside the exact course boundary."
+      },
+      {
+        "hole": 16,
+        "reason": "No verified original numbered route for hole 16 exists inside the exact course boundary."
+      },
+      {
+        "hole": 17,
+        "reason": "No verified original numbered route for hole 17 exists inside the exact course boundary."
+      },
+      {
+        "hole": 18,
+        "reason": "No verified original numbered route for hole 18 exists inside the exact course boundary."
+      }
+    ]
   }
 ]

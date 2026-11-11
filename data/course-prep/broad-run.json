@@ -1,0 +1,202 @@
+{
+  "id": "broad-run",
+  "name": "Broad Run Golfer's Club",
+  "shortName": "Broad Run",
+  "place": "West Chester, PA",
+  "aliases": [
+    "Broad Run Golf Club",
+    "Broad Run Golfer's Club",
+    "Broad Run"
+  ],
+  "source": "https://www.broadrungc.com/images/pictures/scorecard.png",
+  "tour": "https://www.broadrungc.com/golf-course/",
+  "storageKey": "broad_run_golf_club",
+  "bounds": [
+    39.93,
+    -75.74,
+    39.975,
+    -75.675
+  ],
+  "center": [
+    39.9526405814,
+    -75.7075103829
+  ],
+  "par": 72,
+  "defaultTee": "black",
+  "verified": "2026-11-11",
+  "sourceLabel": "Official club scorecard and course page",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-75.740,39.930,-75.675,39.975",
+  "cardNote": "The Black per-hole row totals the club-published 6,751 yards and its 73.4/139 rating and slope. Other tee ratings conflict between current public reproductions, so only Black is included. All 18 original numbered routes carry matching pars.",
+  "additionalSources": [
+    "https://www.broadrungc.com/golf-course/",
+    "https://18birdies.com/golf-courses/club/adb0cea0-86ac-11e4-8c28-020000005b00/broad-run-golfers-club"
+  ],
+  "tees": [
+    {
+      "id": "black",
+      "name": "Black",
+      "total": 6751,
+      "rating": 73.4,
+      "slope": 139,
+      "yards": [
+        474,
+        412,
+        375,
+        383,
+        315,
+        412,
+        425,
+        146,
+        395,
+        201,
+        385,
+        532,
+        195,
+        422,
+        547,
+        398,
+        184,
+        550
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 5,
+      "si": 11,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891718902
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 1,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891718910
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "si": 13,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891718912
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 5,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891730240
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 17,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891730241
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 7,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891730247
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 3,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891733079
+    },
+    {
+      "n": 8,
+      "par": 3,
+      "si": 15,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 891733090
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 9,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891733091
+    },
+    {
+      "n": 10,
+      "par": 3,
+      "si": 8,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 891733953
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 18,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891958996
+    },
+    {
+      "n": 12,
+      "par": 5,
+      "si": 16,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891932849
+    },
+    {
+      "n": 13,
+      "par": 3,
+      "si": 6,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 891737541
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 2,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 891980851
+    },
+    {
+      "n": 15,
+      "par": 5,
+      "si": 14,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 892025571
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 10,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 892025576
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 12,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 891737549
+    },
+    {
+      "n": 18,
+      "par": 5,
+      "si": 4,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 892086704
+    }
+  ],
+  "routeTagCorrections": [
+    {
+      "id": 892086704,
+      "field": "par",
+      "from": "4",
+      "to": "5",
+      "source": "https://www.broadrungc.com/images/pictures/scorecard.png",
+      "confirmed": "2026-11-11",
+      "note": "The official club card identifies hole 18 as par 5; the original numbered route is inside the Broad Run boundary but its raw par tag is incorrect."
+    }
+  ]
+}

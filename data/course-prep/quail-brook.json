@@ -1,0 +1,189 @@
+{
+  "id": "quail-brook",
+  "name": "Quail Brook Golf Course",
+  "shortName": "Quail Brook",
+  "place": "Somerset, NJ",
+  "aliases": [
+    "Quail Brook Golf Course",
+    "Quail Brook"
+  ],
+  "source": "https://18birdies.com/golf-courses/club/98319280-86ac-11e4-8c28-020000005b00/quail-brook-golf-course",
+  "tour": "https://www.somersetcountyparks.org/quail-brook-golf-course",
+  "storageKey": "quail_brook_golf_course",
+  "bounds": [
+    40.498,
+    -74.535,
+    40.528,
+    -74.495
+  ],
+  "center": [
+    40.5130623628,
+    -74.5155829515
+  ],
+  "par": 72,
+  "defaultTee": "gold",
+  "verified": "2026-11-11",
+  "sourceLabel": "Current detailed scorecard checked against USGA rating data and the county course identity",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.535,40.498,-74.495,40.528",
+  "cardNote": "Gold is the only included tee because its 18 per-hole values total 6,499 yards and reconcile exactly to the current USGA length, 71.6 rating and 129 slope. Other public per-hole rows differ from current USGA totals, so they are withheld rather than mixed. All 18 original numbered routes carry matching pars.",
+  "additionalSources": [
+    "https://www.somersetcountyparks.org/quail-brook-golf-course"
+  ],
+  "tees": [
+    {
+      "id": "gold",
+      "name": "Gold",
+      "total": 6499,
+      "rating": 71.6,
+      "slope": 129,
+      "yards": [
+        520,
+        362,
+        340,
+        187,
+        400,
+        538,
+        391,
+        156,
+        363,
+        348,
+        164,
+        409,
+        394,
+        546,
+        140,
+        326,
+        467,
+        448
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 5,
+      "si": 5,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190702684
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 11,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190702693
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "si": 9,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190702702
+    },
+    {
+      "n": 4,
+      "par": 3,
+      "si": 15,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 1190702710
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 3,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190706048
+    },
+    {
+      "n": 6,
+      "par": 5,
+      "si": 1,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190706061
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 7,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190709876
+    },
+    {
+      "n": 8,
+      "par": 3,
+      "si": 17,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 1190709881
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 13,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190709891
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 12,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190709900
+    },
+    {
+      "n": 11,
+      "par": 3,
+      "si": 18,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 1190709906
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 8,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190715000
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": 10,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190715009
+    },
+    {
+      "n": 14,
+      "par": 5,
+      "si": 2,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190718240
+    },
+    {
+      "n": 15,
+      "par": 3,
+      "si": 16,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 1190718259
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 14,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190718267
+    },
+    {
+      "n": 17,
+      "par": 5,
+      "si": 6,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190718251
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 4,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1190714989
+    }
+  ]
+}

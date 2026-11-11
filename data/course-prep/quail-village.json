@@ -1,0 +1,310 @@
+{
+  "id": "quail-village",
+  "name": "Quail Village Golf Club",
+  "shortName": "Quail Village",
+  "place": "Naples, FL",
+  "aliases": [
+    "Quail Village Golf Course",
+    "Quail Village Golf Club",
+    "Quail Village",
+    "Quail Creek Village Golf Club"
+  ],
+  "source": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+  "tour": "https://www.fsga.org/Club/Detail/41f441a4-3cff-4f53-9eba-843d7bc43c35",
+  "storageKey": "quail_village_golf_course",
+  "bounds": [
+    26.275,
+    -81.742,
+    26.295,
+    -81.718
+  ],
+  "center": [
+    26.2855103,
+    -81.7301345
+  ],
+  "par": 69,
+  "defaultTee": "blue",
+  "verified": "2026-11-11",
+  "sourceLabel": "Current detailed scorecard checked against FSGA ratings and exact course boundary",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-81.742,26.275,-81.718,26.295",
+  "cardNote": "The included men’s rows reconcile to their published totals and FSGA ratings. Gold is withheld because its public per-hole values total 4,033 rather than the printed 3,973. The exact Quail Village boundary is kept distinct from the adjacent Quail Creek Country Club. Only numbered routes 1–13 could be assigned inside that boundary; two unnumbered routes are not guessed as holes 14–18, which remain explicit map gaps. OSM hole 7 is preserved with its incorrect raw par 3 tag and audited against the published par 4 card.",
+  "additionalSources": [
+    "https://www.fsga.org/Club/Detail/41f441a4-3cff-4f53-9eba-843d7bc43c35"
+  ],
+  "tees": [
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 4873,
+      "rating": 63.6,
+      "slope": 113,
+      "yards": [
+        319,
+        109,
+        321,
+        157,
+        278,
+        155,
+        220,
+        511,
+        340,
+        267,
+        410,
+        143,
+        442,
+        172,
+        351,
+        247,
+        147,
+        284
+      ]
+    },
+    {
+      "id": "blue-white",
+      "name": "Blue / White",
+      "total": 4714,
+      "rating": 63,
+      "slope": 111,
+      "yards": [
+        319,
+        109,
+        298,
+        157,
+        278,
+        155,
+        220,
+        451,
+        320,
+        267,
+        410,
+        143,
+        442,
+        172,
+        295,
+        247,
+        147,
+        284
+      ]
+    },
+    {
+      "id": "white-gold",
+      "name": "White / Gold",
+      "total": 4177,
+      "rating": 61.2,
+      "slope": 104,
+      "yards": [
+        308,
+        95,
+        245,
+        123,
+        262,
+        140,
+        207,
+        389,
+        240,
+        241,
+        391,
+        115,
+        405,
+        142,
+        257,
+        219,
+        125,
+        273
+      ]
+    },
+    {
+      "id": "red",
+      "name": "Red",
+      "total": 3707,
+      "rating": 59.2,
+      "slope": 100,
+      "yards": [
+        271,
+        85,
+        241,
+        106,
+        233,
+        118,
+        170,
+        348,
+        230,
+        201,
+        332,
+        95,
+        366,
+        110,
+        217,
+        208,
+        110,
+        266
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 3,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1568353979,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568353979 is inside the verified Quail Village Golf Club boundary and matches published hole 1; the raw route omits par, so the published card supplies par 4."
+    },
+    {
+      "n": 2,
+      "par": 3,
+      "si": 17,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 1568354356,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568354356 is inside the verified Quail Village Golf Club boundary and matches published hole 2; the raw route omits par, so the published card supplies par 3."
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "si": 9,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1568354847,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568354847 is inside the verified Quail Village Golf Club boundary and matches published hole 3; the raw route omits par, so the published card supplies par 4."
+    },
+    {
+      "n": 4,
+      "par": 3,
+      "si": 7,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 1568355835
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 15,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1568356297,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568356297 is inside the verified Quail Village Golf Club boundary and matches published hole 5; the raw route omits par, so the published card supplies par 4."
+    },
+    {
+      "n": 6,
+      "par": 3,
+      "si": 11,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 1568356298,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568356298 is inside the verified Quail Village Golf Club boundary and matches published hole 6; the raw route omits par, so the published card supplies par 3."
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 13,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1568361952
+    },
+    {
+      "n": 8,
+      "par": 5,
+      "si": 1,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1568364912,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568364912 is inside the verified Quail Village Golf Club boundary and matches published hole 8; the raw route omits par, so the published card supplies par 5."
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 5,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1568364914,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568364914 is inside the verified Quail Village Golf Club boundary and matches published hole 9; the raw route omits par, so the published card supplies par 4."
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 18,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1568365618,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568365618 is inside the verified Quail Village Golf Club boundary and matches published hole 10; the raw route omits par, so the published card supplies par 4."
+    },
+    {
+      "n": 11,
+      "par": 5,
+      "si": 4,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1568365619,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568365619 is inside the verified Quail Village Golf Club boundary and matches published hole 11; the raw route omits par, so the published card supplies par 5."
+    },
+    {
+      "n": 12,
+      "par": 3,
+      "si": 10,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 1568365620,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568365620 is inside the verified Quail Village Golf Club boundary and matches published hole 12; the raw route omits par, so the published card supplies par 3."
+    },
+    {
+      "n": 13,
+      "par": 5,
+      "si": 2,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1568365799,
+      "parSource": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "mapVerification": "Numbered OSM route 1568365799 is inside the verified Quail Village Golf Club boundary and matches published hole 13; the raw route omits par, so the published card supplies par 5."
+    },
+    {
+      "n": 14,
+      "par": 3,
+      "si": 14,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "mapReady": false,
+      "mapNote": "Two unnumbered source routes are present inside the exact course boundary, but neither is identified as hole 14; no assignment is inferred."
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "si": 8,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapReady": false,
+      "mapNote": "No verified original numbered route for hole 15 exists inside the exact course boundary."
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 16,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapReady": false,
+      "mapNote": "No verified original numbered route for hole 16 exists inside the exact course boundary."
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 12,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "mapReady": false,
+      "mapNote": "No verified original numbered route for hole 17 exists inside the exact course boundary."
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 6,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "mapReady": false,
+      "mapNote": "No verified original numbered route for hole 18 exists inside the exact course boundary."
+    }
+  ],
+  "routeTagCorrections": [
+    {
+      "id": 1568361952,
+      "field": "par",
+      "from": "3",
+      "to": "4",
+      "source": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "confirmed": "2026-11-11",
+      "note": "The exact numbered route lies inside the Quail Village boundary; the current detailed card lists hole 7 as par 4."
+    }
+  ]
+}

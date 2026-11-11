@@ -1,0 +1,205 @@
+{
+  "retrieved": "2026-11-11",
+  "courseIds": [
+    "quail-brook",
+    "middletown-country-club",
+    "broad-run",
+    "old-corkscrew",
+    "quail-village"
+  ],
+  "sourceFiles": [
+    {
+      "courseId": "quail-brook",
+      "url": "https://18birdies.com/golf-courses/club/98319280-86ac-11e4-8c28-020000005b00/quail-brook-golf-course",
+      "kind": "scorecard"
+    },
+    {
+      "courseId": "quail-brook",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.535,40.498,-74.495,40.528",
+      "kind": "original-map-data"
+    },
+    {
+      "courseId": "middletown-country-club",
+      "url": "https://www.middletowncc.com/wp-content/uploads/sites/6341/2020/05/MCC-Scorecard-Proof.pdf",
+      "kind": "scorecard"
+    },
+    {
+      "courseId": "middletown-country-club",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.944,40.168,-74.904,40.198",
+      "kind": "original-map-data"
+    },
+    {
+      "courseId": "broad-run",
+      "url": "https://www.broadrungc.com/images/pictures/scorecard.png",
+      "kind": "scorecard"
+    },
+    {
+      "courseId": "broad-run",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-75.740,39.930,-75.675,39.975",
+      "kind": "original-map-data"
+    },
+    {
+      "courseId": "old-corkscrew",
+      "url": "https://18birdies.com/golf-courses/club/8f2c75b0-86ac-11e4-8c28-020000005b00/old-corkscrew-golf-club",
+      "kind": "scorecard"
+    },
+    {
+      "courseId": "old-corkscrew",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-81.700,26.425,-81.645,26.475",
+      "kind": "original-map-data"
+    },
+    {
+      "courseId": "quail-village",
+      "url": "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+      "kind": "scorecard"
+    },
+    {
+      "courseId": "quail-village",
+      "url": "https://www.openstreetmap.org/api/0.6/map?bbox=-81.742,26.275,-81.718,26.295",
+      "kind": "original-map-data"
+    },
+    {
+      "courseId": "old-corkscrew",
+      "url": "https://oldcorkscrew.com/farewell-to-old-corkscrew/",
+      "kind": "official-closure-notice"
+    },
+    {
+      "courseId": "old-corkscrew",
+      "url": "https://www.fsga.org/Club/Detail/a90edb27-dc39-49e6-856f-854d07b411ad",
+      "kind": "rating-check"
+    },
+    {
+      "courseId": "quail-village",
+      "url": "https://www.fsga.org/Club/Detail/41f441a4-3cff-4f53-9eba-843d7bc43c35",
+      "kind": "identity-and-rating-check"
+    }
+  ],
+  "teeChecks": [
+    {
+      "courseId": "quail-brook",
+      "parFront": 36,
+      "parBack": 36,
+      "tees": [
+        {
+          "id": "gold",
+          "front": 3257,
+          "back": 3242,
+          "total": 6499
+        }
+      ]
+    },
+    {
+      "courseId": "middletown-country-club",
+      "parFront": 35,
+      "parBack": 34,
+      "tees": [
+        {
+          "id": "back",
+          "front": 3198,
+          "back": 3019,
+          "total": 6217
+        }
+      ]
+    },
+    {
+      "courseId": "broad-run",
+      "parFront": 36,
+      "parBack": 36,
+      "tees": [
+        {
+          "id": "black",
+          "front": 3337,
+          "back": 3414,
+          "total": 6751
+        }
+      ]
+    },
+    {
+      "courseId": "old-corkscrew",
+      "parFront": 36,
+      "parBack": 36,
+      "tees": [
+        {
+          "id": "black",
+          "front": 3649,
+          "back": 3656,
+          "total": 7305
+        },
+        {
+          "id": "blue",
+          "front": 3258,
+          "back": 3221,
+          "total": 6479
+        },
+        {
+          "id": "blue-white",
+          "front": 3107,
+          "back": 3160,
+          "total": 6267
+        },
+        {
+          "id": "white",
+          "front": 3021,
+          "back": 3043,
+          "total": 6064
+        },
+        {
+          "id": "green",
+          "front": 2754,
+          "back": 2815,
+          "total": 5569
+        },
+        {
+          "id": "gold",
+          "front": 2516,
+          "back": 2538,
+          "total": 5054
+        }
+      ]
+    },
+    {
+      "courseId": "quail-village",
+      "parFront": 34,
+      "parBack": 35,
+      "tees": [
+        {
+          "id": "blue",
+          "front": 2410,
+          "back": 2463,
+          "total": 4873
+        },
+        {
+          "id": "blue-white",
+          "front": 2307,
+          "back": 2407,
+          "total": 4714
+        },
+        {
+          "id": "white-gold",
+          "front": 2009,
+          "back": 2168,
+          "total": 4177
+        },
+        {
+          "id": "red",
+          "front": 1802,
+          "back": 1905,
+          "total": 3707
+        }
+      ]
+    }
+  ],
+  "mapVerification": {
+    "mappedRoutes": 85,
+    "unavailableRoutes": 5,
+    "note": "Quail Brook, Middletown, Broad Run and the historical Old Corkscrew layout each retain all 18 original numbered routes with matching pars. Quail Village keeps 13 numbered routes inside its exact boundary; holes 14–18 remain explicit gaps because the remaining source routes are unnumbered or absent."
+  },
+  "closureNote": "Old Corkscrew ended daily golf operations in 2026; its pack preserves the played historical layout and is not presented as currently playable.",
+  "nextFive": [
+    "bonita-bay-west-bay-island",
+    "arrowhead-golf-course-at-heritage-greens",
+    "old-head",
+    "waterville",
+    "hogs-head"
+  ]
+}

@@ -30,7 +30,7 @@ const added=ctx.window.CADDIE_PREP_COURSES.filter(c=>ids.includes(c.id));assert.
 assert.ok(added.every(c=>!c.defaultFavorite&&!c.features&&c.holes.every(h=>!h.path)),'directory remains geometry-free and courses remain on demand');
 for(const c of added)assert.deepEqual(JSON.parse(JSON.stringify(c.coverage)),partial.has(c.id)?{holes:18,maps:0,guides:0}:{holes:18,maps:18,guides:18});
 assert.ok(!fs.readFileSync(path.join(root,'sw.js'),'utf8').match(/const ASSETS = ([\s\S]+?);/)[1].includes('data/course-prep/'),'packs are not shell assets');
-const q=read('onboarding-queue');assert.deepEqual(q.progress,{savedPlayedEntries:49,catalogSupportedEntries:24,fullyMappedEntries:18,remainingUniqueEntries:24,duplicateUmbrellaEntries:1});
+const q=read('onboarding-queue');assert.equal(q.progress.savedPlayedEntries,49);assert.ok(q.progress.catalogSupportedEntries>=24);assert.ok(q.progress.fullyMappedEntries>=18);assert.ok(q.progress.remainingUniqueEntries<=24);assert.equal(q.progress.duplicateUmbrellaEntries,1);
 assert.ok(ids.every(id=>q.entries.some(e=>e.catalogId===id&&(partial.has(id)?e.status==='catalog-partial':e.status==='catalog-complete'))));
 for(const queueId of ['trenton-country-club','spring-lake-golf-club','neshaminy-valley-golf-club','green-knoll-golf-course','weequahic-park-golf-course','concordia-golf-club'])assert.equal(q.entries.find(e=>e.queueId===queueId).status,'source-gap');
 for(const id of partial)assert.ok(q.exceptions.some(e=>e.catalogId===id&&e.physicalHoles.length===18));

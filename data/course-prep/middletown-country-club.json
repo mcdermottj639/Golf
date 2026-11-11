@@ -1,0 +1,187 @@
+{
+  "id": "middletown-country-club",
+  "name": "Middletown Country Club",
+  "shortName": "Middletown CC",
+  "place": "Langhorne, PA",
+  "aliases": [
+    "Middletown Country Club",
+    "Middletown CC"
+  ],
+  "source": "https://www.middletowncc.com/wp-content/uploads/sites/6341/2020/05/MCC-Scorecard-Proof.pdf",
+  "tour": "https://www.middletowncc.com/",
+  "storageKey": "middletown_country_club",
+  "bounds": [
+    40.168,
+    -74.944,
+    40.198,
+    -74.904
+  ],
+  "center": [
+    40.1829553948,
+    -74.9241399765
+  ],
+  "par": 69,
+  "defaultTee": "back",
+  "verified": "2026-11-11",
+  "sourceLabel": "Club-hosted scorecard with a current detailed transcription",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-74.944,40.168,-74.904,40.198",
+  "cardNote": "The club-hosted scorecard and current detailed transcription agree on Back tee pars, indexes and 6,217-yard per-hole row. Current public rating summaries disagree on course length, so rating and slope are deliberately unset. Middle and Forward are withheld from this release to avoid mixing editions. All 18 original numbered routes carry matching pars.",
+  "additionalSources": [
+    "https://18birdies.com/golf-courses/club/ad181110-86ac-11e4-8c28-020000005b00/middletown-country-club"
+  ],
+  "tees": [
+    {
+      "id": "back",
+      "name": "Back",
+      "total": 6217,
+      "yards": [
+        413,
+        418,
+        360,
+        532,
+        355,
+        198,
+        412,
+        200,
+        310,
+        224,
+        276,
+        440,
+        422,
+        206,
+        430,
+        455,
+        252,
+        314
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 2,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810621461
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 6,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810621462
+    },
+    {
+      "n": 3,
+      "par": 4,
+      "si": 14,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810621463
+    },
+    {
+      "n": 4,
+      "par": 5,
+      "si": 4,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810621466
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 16,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810621468
+    },
+    {
+      "n": 6,
+      "par": 3,
+      "si": 10,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 810621472
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 8,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810621473
+    },
+    {
+      "n": 8,
+      "par": 3,
+      "si": 12,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 810621474
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 18,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810623085
+    },
+    {
+      "n": 10,
+      "par": 3,
+      "si": 9,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 810623087
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 15,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810623088
+    },
+    {
+      "n": 12,
+      "par": 4,
+      "si": 3,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810623089
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": 5,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810623090
+    },
+    {
+      "n": 14,
+      "par": 3,
+      "si": 11,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 810623092
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "si": 7,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810623093
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 1,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810623094
+    },
+    {
+      "n": 17,
+      "par": 4,
+      "si": 17,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810623096
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 13,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 810623098
+    }
+  ]
+}

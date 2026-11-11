@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "batchCap": 5,
-  "successfulBatches": 4,
+  "successfulBatches": 5,
   "entries": [
     {
       "queueId": "lakeside-country-club",
@@ -2928,17 +2928,82 @@
       "savedName": "Quail Brook Golf Course",
       "canonicalName": "Quail Brook Golf Course",
       "aliases": [
-        "Quail Brook Golf Course"
+        "Quail Brook Golf Course",
+        "Quail Brook"
       ],
       "region": "NJ",
       "priority": 55,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-quailbrook-20260821"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null
+      "completionCommit": "PENDING_RELEASE_COMMIT",
+      "catalogId": "quail-brook",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://18birdies.com/golf-courses/club/98319280-86ac-11e4-8c28-020000005b00/quail-brook-golf-course",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-74.535,40.498,-74.495,40.528",
+        "https://www.somersetcountyparks.org/quail-brook-golf-course"
+      ],
+      "retrieved": "2026-11-11"
     },
     {
       "queueId": "northampton-valley-country-club",
@@ -3056,34 +3121,166 @@
       "savedName": "Middletown Country Club",
       "canonicalName": "Middletown Country Club",
       "aliases": [
-        "Middletown Country Club"
+        "Middletown Country Club",
+        "Middletown CC"
       ],
       "region": "PA",
       "priority": 62,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-middletowncc-20260821"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null
+      "completionCommit": "PENDING_RELEASE_COMMIT",
+      "catalogId": "middletown-country-club",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.middletowncc.com/wp-content/uploads/sites/6341/2020/05/MCC-Scorecard-Proof.pdf",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-74.944,40.168,-74.904,40.198",
+        "https://18birdies.com/golf-courses/club/ad181110-86ac-11e4-8c28-020000005b00/middletown-country-club"
+      ],
+      "retrieved": "2026-11-11"
     },
     {
       "queueId": "broad-run-golf-club",
       "savedName": "Broad Run Golf Club",
-      "canonicalName": "Broad Run Golf Club",
+      "canonicalName": "Broad Run Golfer's Club",
       "aliases": [
-        "Broad Run Golf Club"
+        "Broad Run Golf Club",
+        "Broad Run Golfer's Club",
+        "Broad Run"
       ],
       "region": "PA",
       "priority": 63,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-broadrun-20260821"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null
+      "completionCommit": "PENDING_RELEASE_COMMIT",
+      "catalogId": "broad-run",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://www.broadrungc.com/images/pictures/scorecard.png",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-75.740,39.930,-75.675,39.975",
+        "https://www.broadrungc.com/golf-course/",
+        "https://18birdies.com/golf-courses/club/adb0cea0-86ac-11e4-8c28-020000005b00/broad-run-golfers-club"
+      ],
+      "retrieved": "2026-11-11"
     },
     {
       "queueId": "bonita-bay-club",
@@ -3127,34 +3324,190 @@
       "savedName": "Old Corkscrew Golf Club",
       "canonicalName": "Old Corkscrew Golf Club",
       "aliases": [
-        "Old Corkscrew Golf Club"
+        "Old Corkscrew Golf Club",
+        "Old Corkscrew"
       ],
       "region": "FL",
       "priority": 135,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-oldcorkscrew-20260729"
       ],
-      "status": "pending",
+      "status": "catalog-complete",
       "coverageGaps": [],
-      "completionCommit": null
+      "completionCommit": "PENDING_RELEASE_COMMIT",
+      "catalogId": "old-corkscrew",
+      "coverage": {
+        "holes": 18,
+        "guides": 18,
+        "maps": 18
+      },
+      "sourceUrls": [
+        "https://18birdies.com/golf-courses/club/8f2c75b0-86ac-11e4-8c28-020000005b00/old-corkscrew-golf-club",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-81.700,26.425,-81.645,26.475",
+        "https://oldcorkscrew.com/farewell-to-old-corkscrew/",
+        "https://www.fsga.org/Club/Detail/a90edb27-dc39-49e6-856f-854d07b411ad"
+      ],
+      "retrieved": "2026-11-11",
+      "identityNote": "Historical played layout; daily golf operations officially concluded in 2026 and the site is transitioning to Pandion Club."
     },
     {
       "queueId": "quail-village-golf-course",
       "savedName": "Quail Village Golf Course",
-      "canonicalName": "Quail Village Golf Course",
+      "canonicalName": "Quail Village Golf Club",
       "aliases": [
-        "Quail Village Golf Course"
+        "Quail Village Golf Course",
+        "Quail Village Golf Club",
+        "Quail Village",
+        "Quail Creek Village Golf Club"
       ],
       "region": "FL",
       "priority": 153,
-      "routing": null,
+      "routing": {
+        "physicalHoles": 18,
+        "nines": [
+          {
+            "name": "Front",
+            "holes": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "Back",
+            "holes": [
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18
+            ]
+          }
+        ],
+        "playableOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18
+        ]
+      },
       "evidence": [
         "coach-feed.json#add-quailvillage-20260821"
       ],
-      "status": "pending",
-      "coverageGaps": [],
-      "completionCommit": null
+      "status": "catalog-partial",
+      "coverageGaps": [
+        {
+          "hole": 14,
+          "reason": "Two unnumbered source routes are present inside the exact course boundary, but neither is identified as hole 14; no assignment is inferred."
+        },
+        {
+          "hole": 15,
+          "reason": "No verified original numbered route for hole 15 exists inside the exact course boundary."
+        },
+        {
+          "hole": 16,
+          "reason": "No verified original numbered route for hole 16 exists inside the exact course boundary."
+        },
+        {
+          "hole": 17,
+          "reason": "No verified original numbered route for hole 17 exists inside the exact course boundary."
+        },
+        {
+          "hole": 18,
+          "reason": "No verified original numbered route for hole 18 exists inside the exact course boundary."
+        }
+      ],
+      "completionCommit": "PENDING_RELEASE_COMMIT",
+      "catalogId": "quail-village",
+      "coverage": {
+        "holes": 18,
+        "guides": 13,
+        "maps": 13
+      },
+      "sourceUrls": [
+        "https://18birdies.com/golf-courses/club/8fd42760-86ac-11e4-8c28-020000005b00/quail-village",
+        "https://www.openstreetmap.org/api/0.6/map?bbox=-81.742,26.275,-81.718,26.295",
+        "https://www.fsga.org/Club/Detail/41f441a4-3cff-4f53-9eba-843d7bc43c35"
+      ],
+      "retrieved": "2026-11-11",
+      "identityNote": "Exact Quail Village boundary; distinct from adjacent Quail Creek Country Club."
     },
     {
       "queueId": "bonita-bay-west-bay-island",
@@ -3310,7 +3663,7 @@
       "completionCommit": null
     }
   ],
-  "reconciled": "2026-11-04",
+  "reconciled": "2026-11-11",
   "sourcePolicy": "Frozen seed courses plus course-add/course-remove entries from the current ordered app feeds. Bucket-list and simulator-only records excluded; autocomplete is not play evidence.",
   "excluded": [
     {
@@ -3341,9 +3694,9 @@
   ],
   "progress": {
     "savedPlayedEntries": 49,
-    "catalogSupportedEntries": 24,
-    "fullyMappedEntries": 18,
-    "remainingUniqueEntries": 24,
+    "catalogSupportedEntries": 29,
+    "fullyMappedEntries": 22,
+    "remainingUniqueEntries": 19,
     "duplicateUmbrellaEntries": 1
   },
   "exceptions": [

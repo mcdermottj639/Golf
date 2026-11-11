@@ -320,3 +320,28 @@ Green Knoll, Weequahic and Concordia retain dated `source-gap` findings rather t
 mixing conflicting card editions or pre-renovation data. The queue now has 24 supported
 saved entries, 18 fully mapped entries, 24 remaining unique entries and one Bonita Bay
 onboarding duplicate. New packs remain nonfavorites and outside shell-cache assets.
+
+## November 11, 2026 expansion (v289)
+
+Five additional played-course packs are available on demand: Quail Brook, Middletown
+Country Club, Broad Run, Old Corkscrew and Quail Village. The batch contributes 90
+scorecard holes, 85 generated hole guides and 85 interactive maps. Quail Brook,
+Middletown, Broad Run and Old Corkscrew each retain all 18 original numbered routes.
+Quail Village keeps 13 numbered routes inside its exact boundary; holes 14–18 are
+explicitly unavailable because two remaining routes are unnumbered and the others are
+absent. No route assignment was inferred.
+
+The detailed Quail Brook Gold row is the only public row that reconciles to the current
+USGA total and rating, so the conflicting rows stay out. Middletown uses the scorecard
+still served by the club and leaves ratings unset rather than mixing it with a different
+current USGA length. Broad Run uses the official Black card. Quail Village is kept
+separate from adjacent Quail Creek Country Club, and its incorrect OSM hole 7 par tag is
+preserved with an audited published-card correction. The Gold tee is withheld because
+its public hole values do not add to its printed total.
+
+Old Corkscrew is a historical played-course pack, not a claim that the course remains
+open: the club officially concluded daily golf operations in 2026 while the property
+transitions to Pandion Club. Its final published layout and FSGA ratings are retained for
+historical rounds. The queue now has 29 supported saved entries, 22 fully mapped entries,
+19 remaining unique entries and one Bonita Bay umbrella duplicate. The batch cap remains
+five; source identity and route review are still the limiting work.

@@ -1,0 +1,325 @@
+{
+  "id": "old-corkscrew",
+  "name": "Old Corkscrew Golf Club",
+  "shortName": "Old Corkscrew",
+  "place": "Estero, FL",
+  "aliases": [
+    "Old Corkscrew Golf Club",
+    "Old Corkscrew"
+  ],
+  "source": "https://18birdies.com/golf-courses/club/8f2c75b0-86ac-11e4-8c28-020000005b00/old-corkscrew-golf-club",
+  "tour": "https://oldcorkscrew.com/farewell-to-old-corkscrew/",
+  "storageKey": "old_corkscrew_golf_club",
+  "bounds": [
+    26.425,
+    -81.7,
+    26.475,
+    -81.645
+  ],
+  "center": [
+    26.4486141,
+    -81.6717088
+  ],
+  "par": 72,
+  "defaultTee": "blue",
+  "verified": "2026-11-11",
+  "sourceLabel": "Final published layout checked against FSGA ratings and the official closure notice",
+  "osmSource": "https://www.openstreetmap.org/api/0.6/map?bbox=-81.700,26.425,-81.645,26.475",
+  "cardNote": "This preserves the played Old Corkscrew layout as historical course data. The club officially ended daily operations in 2026 and the property is being rebuilt as Pandion Club; this pack must not imply current playability. Six exact per-hole rows reconcile to the published totals and FSGA ratings. All 18 original numbered routes carry matching pars.",
+  "additionalSources": [
+    "https://oldcorkscrew.com/farewell-to-old-corkscrew/",
+    "https://www.fsga.org/Club/Detail/a90edb27-dc39-49e6-856f-854d07b411ad"
+  ],
+  "tees": [
+    {
+      "id": "black",
+      "name": "Black",
+      "total": 7305,
+      "rating": 77.2,
+      "slope": 155,
+      "yards": [
+        438,
+        217,
+        548,
+        336,
+        442,
+        472,
+        236,
+        537,
+        423,
+        491,
+        537,
+        190,
+        353,
+        450,
+        610,
+        396,
+        169,
+        460
+      ]
+    },
+    {
+      "id": "blue",
+      "name": "Blue",
+      "total": 6479,
+      "rating": 72.9,
+      "slope": 147,
+      "yards": [
+        388,
+        180,
+        499,
+        313,
+        381,
+        422,
+        201,
+        497,
+        377,
+        431,
+        489,
+        136,
+        322,
+        404,
+        544,
+        313,
+        160,
+        422
+      ]
+    },
+    {
+      "id": "blue-white",
+      "name": "Blue / White",
+      "total": 6267,
+      "rating": 71.8,
+      "slope": 144,
+      "yards": [
+        388,
+        133,
+        499,
+        313,
+        339,
+        422,
+        160,
+        497,
+        356,
+        431,
+        489,
+        136,
+        322,
+        387,
+        522,
+        313,
+        160,
+        400
+      ]
+    },
+    {
+      "id": "white",
+      "name": "White",
+      "total": 6064,
+      "rating": 70.9,
+      "slope": 141,
+      "yards": [
+        371,
+        133,
+        482,
+        292,
+        339,
+        408,
+        160,
+        480,
+        356,
+        415,
+        472,
+        119,
+        306,
+        387,
+        522,
+        296,
+        126,
+        400
+      ]
+    },
+    {
+      "id": "green",
+      "name": "Green",
+      "total": 5569,
+      "rating": 67.9,
+      "slope": 134,
+      "yards": [
+        312,
+        133,
+        410,
+        292,
+        306,
+        347,
+        118,
+        480,
+        356,
+        350,
+        472,
+        119,
+        306,
+        314,
+        522,
+        296,
+        126,
+        310
+      ]
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "total": 5054,
+      "rating": 65.4,
+      "slope": 120,
+      "yards": [
+        312,
+        103,
+        410,
+        234,
+        306,
+        347,
+        118,
+        395,
+        291,
+        350,
+        420,
+        107,
+        226,
+        314,
+        447,
+        264,
+        100,
+        310
+      ]
+    }
+  ],
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 12,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 863353964
+    },
+    {
+      "n": 2,
+      "par": 3,
+      "si": 16,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 863353965
+    },
+    {
+      "n": 3,
+      "par": 5,
+      "si": 6,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1272797482
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 18,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 867526128
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 2,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 863353968
+    },
+    {
+      "n": 6,
+      "par": 4,
+      "si": 10,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 863353969
+    },
+    {
+      "n": 7,
+      "par": 3,
+      "si": 14,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 863353970
+    },
+    {
+      "n": 8,
+      "par": 5,
+      "si": 8,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1272797483
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 4,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 863353972
+    },
+    {
+      "n": 10,
+      "par": 4,
+      "si": 1,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 863353973
+    },
+    {
+      "n": 11,
+      "par": 5,
+      "si": 9,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1272797484
+    },
+    {
+      "n": 12,
+      "par": 3,
+      "si": 15,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 863353976
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": 13,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 863353977
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 7,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 863353978
+    },
+    {
+      "n": 15,
+      "par": 5,
+      "si": 5,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 1272797485
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 11,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 863353980
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 17,
+      "prompt": "Compare your stock carry with the mapped green distance, then confirm the actual tee, hazards and conditions before committing.",
+      "osmId": 863353981
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 3,
+      "prompt": "Choose a landing spot on the map and compare it with your own carry distances. Check the actual tee, hazards and conditions before committing.",
+      "osmId": 863353982
+    }
+  ]
+}

@@ -449,6 +449,17 @@ Red/Black routing, withheld holes, queue exclusions and provenance rejection. Th
 browser test checks mobile prep, offline packs and live-hole 9/10 linking using the
 existing renderer. It does not certify live Google imagery.
 
+**v289 course expansion (November 11, 2026):** Quail Brook, Middletown Country Club,
+Broad Run, Old Corkscrew and Quail Village are on-demand nonfavorite packs. The first
+four have 18 verified numbered routes apiece. Quail Village has 13; holes 14–18 stay
+`mapReady:false` because two remaining in-boundary routes are unnumbered and no safe
+assignment exists. Keep Quail Village distinct from adjacent Quail Creek Country Club.
+Its OSM hole 7 par-3 tag is preserved and corrected through `routeTagCorrections` against
+the published par-4 card. Old Corkscrew is a historical layout: its official site says
+daily operations concluded while the property transitions to Pandion Club. Never present
+that pack as a currently playable course. `tests/course-expansion-5.cjs` protects the 90
+scorecard holes, 85 maps/guides, original route IDs, map gaps and on-demand behavior.
+
 **Adding courses:** author a `data/course-prep/<id>.json` pack and its corresponding
 `<id>-osm.json` source subset, then add its slug to `catalog.json`. Run
 `node scripts/build-course-prep.cjs`; CI runs `--check` to reject stale generated data.
