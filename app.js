@@ -10641,6 +10641,7 @@ const ACTIONS = {
       const name=window.CaddieCoursePrep?.courseName;
       render('live');
       if(!S.live && name){
+        try { sessionStorage.setItem('caddiehq_live_course_prefill_v1', name); } catch {}
         const input=document.getElementById('lvCourse');
         if(input){input.value=name;syncLiveRouting();}
       }
@@ -12040,6 +12041,14 @@ const historyRoute = window.history?.state?.hq===1 && HQ_ROUTE_VIEWS.has(window.
   ? window.history.state : null;
 render(prepResume === 'live' ? 'live' : prepResume ? 'courseprep' : historyRoute?.view || 'home',
   prepResume ? undefined : historyRoute?.arg);
+if(!S.live && current.view==='live'){
+  let savedCourse='';
+  try { savedCourse=sessionStorage.getItem('caddiehq_live_course_prefill_v1')||''; } catch {}
+  const source=savedCourse&&window.CaddieCoursePrep?.findCourse(savedCourse);
+  const input=document.getElementById('lvCourse');
+  if(source&&input&&!input.value){input.value=source.name;syncLiveRouting();}
+}
+
 if(prepResume === 'live')window.CaddieCoursePrep.resumeLiveMap();
 fetchFeed();
 if(S.weather) fetchWeather();  // silent refresh only if previously enabled
