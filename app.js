@@ -2073,10 +2073,10 @@ function hqHistoryRoute(view, arg, keepScroll, changed) {
 function hqLatestRoundIndex(courseName) {
   if (!S.rounds?.length) return null;
   const requested = courseName && String(courseName).trim().toLowerCase();
-  const source = requested && window.CaddieCoursePrep?.findCourse(courseName);
+  const source = requested && window.CaddieCoursePrep?.findCourse?.(courseName);
   const same = r => !requested ||
     String(r.course||'').trim().toLowerCase()===requested ||
-    !!(source && window.CaddieCoursePrep?.findCourse(r.course)?.id===source.id);
+    !!(source && window.CaddieCoursePrep?.findCourse?.(r.course)?.id===source.id);
   let best = null;
   S.rounds.forEach((r,i) => {
     if(same(r) && (best===null || String(r.date||'')>String(S.rounds[best].date||''))) best=i;
