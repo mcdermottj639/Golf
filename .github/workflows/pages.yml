@@ -35,6 +35,7 @@ jobs:
           node --check course-packs.js
           node --check course-prep.js
           node --check course-prep-data.js
+          node --check tests/live-shell.cjs
           node scripts/build-course-prep.cjs --check
           node -e "for (const f of ['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"
           node tests/findability.cjs
@@ -67,3 +68,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git push -f origin HEAD:gh-pages
+
+      - name: Verify public Pages served assets
+        run: node tests/live-shell.cjs
