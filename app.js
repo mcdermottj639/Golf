@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v289';
+const BUILD = 'v290';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v290', d:'2026-11-11', items:['COURSE TO RECAP: Compact journey controls link Courses, course prep, the current hole guide, live scoring and saved round evidence without replacing any existing features.','RETURN WITH CONTEXT: Back/Forward and refresh restore the current view and Rounds tab in this browser; course and hole selection stays in session-only UI storage. No course coordinates or records enter the URL.'] },
   { b:'v289', d:'2026-11-11', items:['FIVE MORE PLAYED COURSES: Quail Brook, Middletown Country Club, Broad Run, the historical Old Corkscrew layout and Quail Village are downloadable on demand with exact scorecards and clean 9/10 live-round boundaries.','85 VERIFIED MAPS: Quail Brook, Middletown, Broad Run and Old Corkscrew have all 18 guides and interactive maps. Quail Village has 13; holes 14–18 are clearly marked unavailable because the remaining source routes could not be identified without guessing. Old Corkscrew is labeled historical because daily golf operations have ended.'] },
   { b:'v288', d:'2026-11-04', items:['COMPARE CLUBS: Bag now has a Compare clubs card. Tap any clubs with sim data and see carry + roll bars and a side-by-side table: carry, roll, total, peak height, speeds, smash, launch, spin, path and face-to-path. Switch between each club\'s latest day and all sessions. Mishits stay out, and returned clubs like the 3W still show.'] },
   { b:'v287', d:'2026-11-04', items:['ONE CARD PER FINDING: When the same takeaway fits several clubs, the bay day now shows it once as a small table instead of a card per club. Nov 4 reads: 4 clubs, how far each rolls after landing — most 3-hybrid (+36 yd), least driver (+21 yd).'] },
@@ -2021,9 +2022,16 @@ const ROUND_SEGS = [
 const SEG_OF = Object.fromEntries(ROUND_SEGS.map(s => [s.view, s.k]));
 // View-local state, exactly as the design specifies: which face of Rounds is showing is a
 // property of the view, not of the player, so it is a module variable and never saved.
-let roundsSeg = 'cards';
+const ROUNDS_SEG_KEY = 'caddiehq_rounds_segment_v1';
+let roundsSeg = (() => {
+  try { const saved = localStorage.getItem(ROUNDS_SEG_KEY); return ROUND_SEGS.some(s => s.k === saved) ? saved : 'cards'; }
+  catch { return 'cards'; }
+})();
+function rememberRoundsSeg(seg) {
+  try { localStorage.setItem(ROUNDS_SEG_KEY, seg); } catch {}
+}
 function rounds(seg){
-  if(seg && ROUND_SEGS.some(s => s.k === seg)) roundsSeg = seg;
+  if(seg && ROUND_SEGS.some(s => s.k === seg)) { roundsSeg = seg; rememberRoundsSeg(seg); }
   const cur = ROUND_SEGS.find(s => s.k === roundsSeg) || ROUND_SEGS[0];
   const body = { cards:scores, prep:preps, courses }[cur.k];
   return `<div class="segbar">${ROUND_SEGS.map(s =>
@@ -2042,6 +2050,65 @@ let drillTag = null;
 // reason: it is a question asked once, so it survives a chip tap (a rerender) and dies the
 // moment he navigates anywhere else. Nothing about an open picker belongs in the record.
 let planPick = null;
+
+/* UI-only journey: links existing read and write screens without changing what they
+   save. Never put course names, coordinates or a round's contents into the URL. */
+const HQ_ROUTE_VIEWS = new Set(['home','rounds','round','courseprep','live','bag','game','coach','sessions',
+  'swing','putting','shortgame','mental','positions','clubhistory','bay','session','briefing','decisions',
+  'data','drills','shelf','lesson','links','landed','numbers','timeline']);
+let hqRouteReady = false, hqRouteRestoring = false;
+function hqHistoryRoute(view, arg, keepScroll, changed) {
+  if (!window.history?.replaceState || !HQ_ROUTE_VIEWS.has(view)) return;
+  try {
+    const prev = window.history.state;
+    if (!hqRouteReady) {
+      hqRouteReady = true;
+      window.history.replaceState({hq:1,view,arg:arg??null,depth:prev?.hq===1?prev.depth||0:0,y:0}, '');
+    } else if (!hqRouteRestoring && !hqGoingBack && !keepScroll && changed) {
+      if (prev?.hq===1) window.history.replaceState({...prev,y:window.scrollY}, '');
+      window.history.pushState({hq:1,view,arg:arg??null,depth:(prev?.hq===1?prev.depth||0:0)+1,y:0}, '');
+    }
+  } catch { /* Sandboxed/private browser history must not block golf. */ }
+}
+function hqLatestRoundIndex() {
+  if (!S.rounds?.length) return null;
+  let best = 0;
+  S.rounds.forEach((r,i) => { if (String(r.date||'') > String(S.rounds[best].date||'')) best = i; });
+  return best;
+}
+function hqJourney(view, arg) {
+  if (!['rounds','courseprep','live','round'].includes(view)) return '';
+  if (view === 'live' && S.live?.stage === 'play') return ''; // keep the score tap surface clear
+  const seg = view === 'rounds' ? (arg || roundsSeg) : '';
+  const active = view === 'courseprep' ? 'guide' : view === 'round' ? 'recap'
+    : view === 'live' ? 'score' : seg === 'courses' ? 'course' : seg === 'prep' ? 'prep' : 'recap';
+  const latest = hqLatestRoundIndex();
+  const steps = [['course','Courses'],['prep','Prep'],['guide','Hole guide'],['score','Score'],['recap','Recap']];
+  const name = view === 'courseprep' ? window.CaddieCoursePrep?.courseName
+    : view === 'live' ? S.live?.course : view === 'round' ? S.rounds?.[+arg]?.course : '';
+  const line = view === 'courseprep' ? (name ? name + ' · hole ' + (window.CaddieCoursePrep?.holeNumber||1) : 'Choose a course and inspect its map')
+    : view === 'live' ? (S.live ? 'Round ' + (S.live.stage === 'finish' ? 'review before saving' : 'card check') : 'Choose a course; nothing is recorded until you start')
+    : view === 'round' ? 'Saved round · score, evidence and takeaways'
+    : seg === 'courses' ? 'Pick a course, then open its guide'
+    : seg === 'prep' ? 'Saved plans and course maps'
+    : latest === null ? 'No saved round yet · start from a course' : 'Saved scorecards and recaps';
+  return '<nav class="hq-journey" aria-label="Course to recap"><div class="hq-journey-top">' +
+    '<span class="hq-journey-label">COURSE → RECAP</span><span class="hq-journey-state">' + esc(line) + '</span></div>' +
+    '<div class="hq-journey-steps">' + steps.map(([key,label],i) =>
+      '<button type="button" data-action="hq-journey-step" data-step="' + key + '"' +
+      (key===active ? ' aria-current="step"' : '') +
+      (key==='recap' && latest===null ? ' disabled title="No saved round to review"' : '') +
+      '><span class="hq-journey-n">' + (i+1) + '</span><span>' + label + '</span></button>').join('') +
+    '</div></nav>';
+}
+window.addEventListener('popstate', e => {
+  const entry = e.state;
+  if (entry?.hq !== 1 || !HQ_ROUTE_VIEWS.has(entry.view)) return;
+  hqRouteRestoring = true;
+  try { render(entry.view,entry.arg); }
+  finally { hqRouteRestoring = false; }
+  window.scrollTo(0,Number.isFinite(entry.y)?Math.max(0,entry.y):0);
+});
 function render(view, arg, keepScroll){
   window.CaddieCoursePrep?.unmount(view === 'courseprep');
   if(view !== 'links') window.CaddieLinks?.unmount();
@@ -2054,9 +2121,11 @@ function render(view, arg, keepScroll){
   // here rather than at every call site is the whole reason nothing dead-ended when the
   // nav changed shape: a link written a month ago still lands where it always meant to.
   if(SEG_OF[view]){ arg = SEG_OF[view]; view = 'rounds'; }
-  if(hqHasRendered&&!keepScroll&&!hqGoingBack&&(view!==current.view||String(arg??'')!==String(current.arg??''))){
+  if(hqHasRendered&&!keepScroll&&!hqGoingBack&&!hqRouteRestoring&&(view!==current.view||String(arg??'')!==String(current.arg??''))){
     hqTrail.push({...current,y:window.scrollY});if(hqTrail.length>40)hqTrail.shift();
   }
+  const changed = view!==current.view || String(arg??'')!==String(current.arg??'');
+  hqHistoryRoute(view,arg,keepScroll,changed);
   current = { view, arg };
   let [title, tag] = TITLES[view] || TITLES.home;
   // The Rounds masthead says which face you're on — the tab is one place, the segments
@@ -2113,7 +2182,7 @@ function render(view, arg, keepScroll){
     ? [...$('#view').querySelectorAll('details[id]')].map(d => [d.id, d.open]) : [];
   $('#view').dataset.page = view;
   $('#view').dataset.layout = view === 'sessions' && arg === 'cumulative' ? 'cumulative' : view;
-  $('#view').innerHTML = R(arg);
+  $('#view').innerHTML = hqJourney(view,arg) + R(arg);
   const practice=$('#view .sim-practice');if(practice&&!practice.id)practice.id='sim-practice';
   buildSectionFolds();
   was.forEach(([id, open]) => { const d = document.getElementById(id); if(d) d.open = open; });
@@ -10552,9 +10621,35 @@ const ACTIONS = {
   'open-course-prep': el => { if(!el?.dataset.course)window.CaddieCoursePrep?.openNearest(); window.CaddieCoursePrep?.openHole(el?.dataset.n || 1,el?.dataset.course); render('courseprep'); },
   'hq-explore': () => window.CaddieExplorer?.open(),
   'hq-back': () => {
+    if(window.history?.state?.hq===1 && window.history.state.depth>0) {
+      window.history.back(); return;
+    }
     const previous=hqTrail.pop();if(!previous)return;
     hqGoingBack=true;render(previous.view,previous.arg);hqGoingBack=false;
     window.scrollTo(0,previous.y||0);
+  },
+  'hq-journey-step': el => {
+    const step=el.dataset.step;
+    if(step==='course') return render('rounds','courses');
+    if(step==='prep') return render('rounds','prep');
+    if(step==='guide'){
+      if(current.view!=='courseprep')render('courseprep');
+      document.querySelector('.cp-map-panel')?.scrollIntoView({block:'start',behavior:'smooth'});
+      return;
+    }
+    if(step==='score'){
+      const name=window.CaddieCoursePrep?.courseName;
+      render('live');
+      if(!S.live && name){
+        const input=document.getElementById('lvCourse');
+        if(input){input.value=name;syncLiveRouting();}
+      }
+      return;
+    }
+    if(step==='recap'){
+      const i=hqLatestRoundIndex();
+      return i===null ? render('rounds','cards') : render('round',i);
+    }
   },
   'hq-route': el => {
     render(el.dataset.view||'home',el.dataset.seg);
@@ -10579,7 +10674,7 @@ const ACTIONS = {
   // Switching segment is not going anywhere — it is the same tab showing a different face
   // of the same subject — so it redraws in place and keeps the scroll. current.arg has to
   // move with it, or the next rerender() (a chip tap, a saved course) would snap back.
-  'rounds-seg': el => { roundsSeg = el.dataset.k; current.arg = roundsSeg; rerender(); },
+  'rounds-seg': el => { if(!ROUND_SEGS.some(s=>s.k===el.dataset.k))return; roundsSeg=el.dataset.k; rememberRoundsSeg(roundsSeg); render('rounds',roundsSeg); },
   // Same rule for the labs hub: picking a lab is the page showing a different face of
   // itself, so it redraws in place. Tapping the lab that is already selected OPENS it,
   // which is a navigation and goes through `go`.
@@ -11941,7 +12036,10 @@ load(); save();
 initCoursePrep();
 applyTheme();
 const prepResume = window.CaddieCoursePrep?.resumeAfterReload();
-render(prepResume === 'live' ? 'live' : prepResume ? 'courseprep' : 'home');
+const historyRoute = window.history?.state?.hq===1 && HQ_ROUTE_VIEWS.has(window.history.state.view)
+  ? window.history.state : null;
+render(prepResume === 'live' ? 'live' : prepResume ? 'courseprep' : historyRoute?.view || 'home',
+  prepResume ? undefined : historyRoute?.arg);
 if(prepResume === 'live')window.CaddieCoursePrep.resumeLiveMap();
 fetchFeed();
 if(S.weather) fetchWeather();  // silent refresh only if previously enabled
