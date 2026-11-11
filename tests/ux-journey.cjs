@@ -7,6 +7,7 @@ const app=read('app.js'),prep=read('course-prep.js'),shell=read('index.html'),sw
 assert.equal(app.match(/const BUILD = '(v[0-9]+)'/)[1],sw.match(/const CACHE = 'caddiehq-(v[0-9]+)'/)[1]);
 assert.ok(shell.includes('ux-journey.css')&&sw.includes('./ux-journey.css'),'new controls ship in online and offline shells');
 assert.ok(css.includes('grid-template-columns:repeat(5')&&css.includes('min-height:44px'),'compact, usable touch targets');
+assert.ok(css.includes('#view > nav.hq-journey')&&css.includes('position:relative'),'the journey cannot inherit the global fixed #nav footer');
 assert.ok(!app.includes('location.hash')&&!app.includes('location.search'),'route info never leaks to URL');
 assert.ok(prep.includes('const VIEW_MEMORY')&&prep.includes('restoreView();')&&prep.includes('get holeNumber(){return hole;}'));
 assert.ok(prep.includes('sessionStorage.setItem(VIEW_MEMORY,JSON.stringify({courseId:course.id,hole,mode}))'),'only a course id, hole, mode are saved');
