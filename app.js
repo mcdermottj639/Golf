@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v290';
+const BUILD = 'v291';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v291', d:'2026-11-11', items:['TONIGHT\'S SIM NUMBERS: Mini, 3H and 4H from Nov 11 are in Swing, every shot, all off the deck. With mishits held out (same rule as Nov 4): mini 196 carry (7 of 15), 3H 190 (11 of 26), 4H 178 (4 of 6). Each is parked on its Bag row as an offer to tap. Playing carries stay 201 / 187 / 178.'] },
   { b:'v290', d:'2026-11-11', items:['COURSE TO RECAP: Compact journey controls link Courses, course prep, the current hole guide, live scoring and saved round evidence without replacing any existing features.','RETURN WITH CONTEXT: Back/Forward and refresh restore the current view and Rounds tab in this browser; course and hole selection stays in session-only UI storage. No course coordinates or records enter the URL.'] },
   { b:'v289', d:'2026-11-11', items:['FIVE MORE PLAYED COURSES: Quail Brook, Middletown Country Club, Broad Run, the historical Old Corkscrew layout and Quail Village are downloadable on demand with exact scorecards and clean 9/10 live-round boundaries.','85 VERIFIED MAPS: Quail Brook, Middletown, Broad Run and Old Corkscrew have all 18 guides and interactive maps. Quail Village has 13; holes 14–18 are clearly marked unavailable because the remaining source routes could not be identified without guessing. Old Corkscrew is labeled historical because daily golf operations have ended.'] },
   { b:'v288', d:'2026-11-04', items:['COMPARE CLUBS: Bag now has a Compare clubs card. Tap any clubs with sim data and see carry + roll bars and a side-by-side table: carry, roll, total, peak height, speeds, smash, launch, spin, path and face-to-path. Switch between each club\'s latest day and all sessions. Mishits stay out, and returned clubs like the 3W still show.'] },
@@ -11981,7 +11982,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json','bag-20261024-feed.json','range-20261104-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json','bag-20261024-feed.json','range-20261104-feed.json','range-20261111-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 

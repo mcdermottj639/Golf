@@ -4198,6 +4198,27 @@ as the last reported 15.5° — not re-read.
 
 **v288 — Compare clubs on Bag (Jack, Nov 4: "pull up multiple clubs to compare the sim stats").** `compareCard()` sits right under *In the bag*. It is a READER over `swingEvolutionRows()` (`compareClubData()`): the same retained-shot blocks as club history, shot blocks only (summary-only records are not averaged in), weighted by each metric's own n, and teed blocks count for the driver only (everything else is hit off the deck at the sim). Roll = mean total − mean carry. Chips list every club with data in `BAG_CANON` order; `·out` means the club is not on the ladder now (returned 3W still shows). *Latest day* uses each club's own latest day, so clubs can come from different days, and the table's last row says which. The picked clubs and source live in the UI key `caddiehq_compare_v1` (localStorage, outside golf data and backups). Verified at 390/320: bars + 11-row table fit with no sideways scroll; 3W/5W/3H read 196/194/187 carry, 61/64/53 ft apex.
 
+## November 11 sim session (v291)
+
+Source: Jack's two TrackMan Shots-table screen recordings — "3 Wood" (15 rows; **the mini driver**,
+Jack in chat: "3 wood is mini of course"), 4 Hybrid (6) and 3 Hybrid (26) — transcribed into
+`data/range-2026-11-11-sim.json`; `scripts/import-nov11-sim.py` emits the apply-once
+`range-20261111-feed.json` (fetched after the Nov 4 feed, cached in sw.js). The importer REUSES
+`held_reason()` / `build()` from `scripts/import-nov04-hybrids.py`, so the mishit rule is the Nov 4
+one by construction (no club read, smash < 1.40, apex < 40 ft). **Every column** of each table
+re-averages to the app's own Avg row (`tests/range-nov11-sim.cjs`, in the publish workflow).
+
+This app build shows a **"Smash index" % column, not smash factor** (96 for a 1.44 strike). `smash`
+in the source record is derived ball ÷ club; the raw column is kept as `smashIndex`. Do not feed the
+% into anything that expects a smash factor.
+
+Clean reads, all off the deck: mini 195.6 ±10.4 (7 of 15), 3H 190.4 ±9.3 (11 of 26), 4H 177.6 ±4.4
+(4 of 6). The on-screen averages with the tops in (176.7 / 154.9 / 174.0) are not club numbers.
+**Offers only**: Jack sent the numbers without asking for carries to move, so each sits in its
+carry row's `meas` (replacing the Nov 4 offer) and the live carries stay 201 / 187 / 178. The feed
+has no `carry`/`force` entry and the test asserts that. A 4-shot 4H sample is thin; say so before
+anyone reads the 12.9-yard 3H–4H gap as settled.
+
 ## Caddie HQ Links — the course game (v277, November 4 2026)
 
 **What it is.** A perspective golf game played on the app's mapped courses with Jack's own
