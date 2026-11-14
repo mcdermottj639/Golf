@@ -75,7 +75,7 @@ const wedgeStep=latestSteps.find(b=>b.kind==='Target fit');assert.equal(wedgeSte
 T.get().simPracticePlan=latest;const saved=JSON.stringify(T.get().simPracticePlan);T.get().bays.push(revised);
 T.generateSimPracticePlan();assert.equal(JSON.stringify(T.get().simPracticePlan),saved,'new evidence cannot rewrite a saved plan');T.get().bays.pop();delete T.get().simPracticePlan;
 const stateBeforeRender=JSON.stringify(T.get()),rendered=today.map(b=>T.bayDayTakeaways(b));assert.ok(rendered.every(x=>x===rendered[0]));
-assert.match(rendered[0],/5 clubs combined from 8 source blocks/);assert.match(rendered[0],/Why this matters/);
+assert.match(rendered[0],/5 clubs in 5 analysis groups from 8 source blocks/);assert.match(rendered[0],/Why this matters/);
 const index=T.get().bays.findIndex(b=>b._fid===source.id),html=T.bayView(index);
 assert.ok(html.indexOf('Bay day takeaways')<html.indexOf('Carry vs total'));
 assert.equal((html.match(/class="range-evidence-club" data-club="5-iron"/g)||[]).length,1);
