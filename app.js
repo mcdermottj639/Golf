@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v292';
+const BUILD = 'v293';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v293', d:'2026-11-14', items:['TODAY BY CLUB: Nov 14 now combines all retained shots into one result per club: old Forged 4i 153.6, 6i 142.3, 7i 129.3 and 5W 192.3 yd. All 72 source shots and 16 exclusions stay recorded; playing carries stay unchanged.','Club first stays in Swing Thoughts for your process. Today’s stats no longer split into a before/after cue test. Old KING Forged results remain separate from KING TEC history.'] },
   { b:'v292', d:'2026-11-14', items:['TODAY’S SIM: all irons were old KING Forged / KBS 120 stiff. Before → club first: 4i 160.0 → 148.7 yd; 7i 122.5 → 136.1 yd. 56 clean of 72 shots. Old equipment and cue phases stay separate in sessions, history and Compare clubs.','Club first saved in Swing Thoughts. 5W returns with a 192.3 yd measured offer (6/11); 3H return in progress with its carry/history saved. KING TEC irons, benched 4i and playing distances unchanged.'] },
   { b:'v291', d:'2026-11-11', items:['TONIGHT\'S SIM NUMBERS: Mini, 3H and 4H from Nov 11 are in Swing, every shot, all off the deck. With mishits held out (same rule as Nov 4): mini 196 carry (7 of 15), 3H 190 (11 of 26), 4H 178 (4 of 6). Each is parked on its Bag row as an offer to tap. Playing carries stay 201 / 187 / 178.'] },
   { b:'v290', d:'2026-11-11', items:['COURSE TO RECAP: Compact journey controls link Courses, course prep, the current hole guide, live scoring and saved round evidence without replacing any existing features.','RETURN WITH CONTEXT: Back/Forward and refresh restore the current view and Rounds tab in this browser; course and hole selection stays in session-only UI storage. No course coordinates or records enter the URL.'] },
@@ -3887,6 +3888,11 @@ function compareCard(){
   const data = compareClubData(src);
   const keys = cumulativeClubKeys(data);
   if(keys.length < 2) return '';
+  // Keep a saved selection usable when a session's cue groups are combined.
+  if(pref.clubs){
+    const mapped=[...new Set(pref.clubs.map(k=>!data.has(k)&&data.has(clubCanon(k))?clubCanon(k):k))];
+    if(JSON.stringify(mapped)!==JSON.stringify(pref.clubs)){pref.clubs=mapped;cmpSave(pref);}
+  }
   let pick = (pref.clubs || []).filter(k => data.has(k));
   if(!pref.clubs) pick = keys.filter(k => ['3H','5W'].includes(k)).length === 2 ? ['3H','5W'] : keys.slice(0,2);
   pick = keys.filter(k => pick.includes(k));
@@ -5365,9 +5371,9 @@ function baySessionReview(review){
   if(!review) return '';
   return `<section class="card bay-session-review" aria-label="Session analysis">
     <h3>${esc(review.title || 'Session read')}</h3>
-    <div class="rowgrid g3">${(review.tiles || []).map(m=>`<div class="stat"><div class="v">${esc(m.v)}</div><div class="l">${esc(m.k)}</div><p class="sm">${esc(m.n)}</p></div>`).join('')}</div>
+    <div class="rowgrid ${review.tiles?.length===4?'g2':'g3'}">${(review.tiles || []).map(m=>`<div class="stat"><div class="v">${esc(m.v)}</div><div class="l">${esc(m.k)}</div><p class="sm">${esc(m.n)}</p></div>`).join('')}</div>
     <p class="sm">${esc(review.takeaway)}</p><p class="sm"><b>Club first:</b> ${esc(review.cue)}</p>
-    <details class="sect cue-metrics"><summary>4i &amp; 7i · before and after numbers</summary><div class="rowgrid g2">${(review.comparisons || []).map(c=>`<div class="cue-comparison"><h4>${esc(c.title)}</h4><table><thead><tr><th>Metric</th><th>Before</th><th>Club first</th></tr></thead><tbody><tr><td>Kept</td><td>${esc(c.beforeCount)}</td><td>${esc(c.afterCount)}</td></tr>${c.rows.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(r.before)}</td><td>${esc(r.after)}</td></tr>`).join('')}</tbody></table></div>`).join('')}</div></details>
+    ${review.comparisons?.length?`<details class="sect cue-metrics"><summary>4i &amp; 7i · before and after numbers</summary><div class="rowgrid g2">${review.comparisons.map(c=>`<div class="cue-comparison"><h4>${esc(c.title)}</h4><table><thead><tr><th>Metric</th><th>Before</th><th>Club first</th></tr></thead><tbody><tr><td>Kept</td><td>${esc(c.beforeCount)}</td><td>${esc(c.afterCount)}</td></tr>${c.rows.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(r.before)}</td><td>${esc(r.after)}</td></tr>`).join('')}</tbody></table></div>`).join('')}</div></details>`:''}
     <details class="sect"><summary>Interpretation and next test</summary>${prose(review.story || '')}</details>
     <details class="sect"><summary>Exclusions and source checks</summary>${prose(review.exclusions || '')}${prose(review.limits || '')}<p class="sm">${(review.references || []).filter(r=>/^https:\/\/www\.trackman\.com\//.test(r.url)).map(r=>`<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.label)}</a>`).join(' · ')}</p></details>
   </section>`;
