@@ -15,7 +15,10 @@ window.reviewTest={applyFeed,get:()=>S,roundView,roundDiff,realRounds,bag,bayVie
 })();`;
 vm.runInContext(src,ctx);
 const T=ctx.window.reviewTest,read=f=>JSON.parse(fs.readFileSync(path.join(root,f),'utf8'));
-const source=read('data/range-2026-11-14-sim.json'),feed=read('range-20261114-feed.json'),report=read('data/range-2026-11-14-analysis.json');
+const source=read('data/range-2026-11-14-sim.json'),fullFeed=read('range-20261114-feed.json'),report=read('data/range-2026-11-14-analysis.json');
+const correctionIndex=fullFeed.entries.findIndex(e=>e.id==='bay-20261114-combined-v2');
+assert.ok(correctionIndex>0,'append-only correction follows the original import');
+const feed={entries:fullFeed.entries.slice(0,correctionIndex)},correction={entries:fullFeed.entries.slice(correctionIndex)};
 const eq=(a,b,msg)=>assert.deepEqual(JSON.parse(JSON.stringify(a)),JSON.parse(JSON.stringify(b)),msg);
 const near=(a,b,tol=.001)=>assert.ok(Math.abs(a-b)<tol,`${a} != ${b}`);
 const files=[...fs.readFileSync(path.join(root,'app.js'),'utf8').match(/Promise\.all\(\[([^\]]+)/)[1].matchAll(/'([^']+)'/g)].map(m=>m[1]);
@@ -107,3 +110,54 @@ assert.equal(T.get().clubs.find(c=>c.id==='add-darkspeed-5w-20260812').status,'g
 assert.equal(T.get().carries.find(c=>c.club==='5 wood').carry,199);
 assert.ok(T.activeBagCount()<=14);
 console.log('PASS Nov14: 72 raw / 56 clean / 16 held, exact rules, corrected date/equipment/cue, separate history/Compare cohorts, preserved KING TEC and playing carries, safe 5W restore, idempotence.');
+
+// v293: Jack requests combined club stats but explicitly keeps the thought.
+const beforeCorrection=JSON.parse(JSON.stringify(T.get()));
+T.applyFeed(correction);
+const updated=T.get().bays.find(b=>b._fid==='bay-20261114-club-first-v1');
+const combinedDay=T.bayDayData(updated),combinedCompare=T.compareClubData('latest'),combinedEvo=T.swingEvolutionRows();
+assert.equal(combinedDay.clubs.length,4);assert.equal(combinedDay.raw,72);assert.equal(combinedDay.held,16);assert.equal(combinedDay.usable,56);
+assert.equal(updated.detail.rangeShots.length,4);
+const combinedExpected=[['4-iron [KING Forged]','4i [KING Forged]',32,36,153.64375],['6-iron [KING Forged]','6i [KING Forged]',8,10,142.3125],['7-iron [KING Forged]','7i [KING Forged]',10,15,129.28],['5-wood','5W',6,11,192.283333]];
+const sourceIdentity=s=>s.videoSource.file+'#'+s.videoSource.row;
+const oldShots=new Map(groups.flatMap(g=>g.shots).map(s=>[sourceIdentity(s),s]));
+const combinedShots=updated.detail.rangeShots.flatMap(g=>g.shots);
+assert.equal(new Set(combinedShots.map(sourceIdentity)).size,72);
+for(const s of combinedShots){
+ const old=oldShots.get(sourceIdentity(s));assert.ok(old);
+ for(const k of ['carry','total','cs','bs','smash','height','path','face','ftp','aoa','la','spin','mishit','mishitReason','cuePhase'])assert.equal(s[k],old[k],k+' '+sourceIdentity(s));
+ assert.equal(s.sourceShot,old.shot);
+}
+for(const [label,key,n,raw,carry] of combinedExpected){
+ const g=updated.detail.rangeShots.find(g=>g.club===label),kept=g.shots.filter(s=>!s.mishit);
+ assert.equal(g.shots.length,raw);assert.equal(kept.length,n);assert.equal(g.avg.n,n);near(g.avg.carry,carry);
+ eq(g.avg,report.combinedClubs[label]);
+ const day=combinedDay.clubs.find(c=>c.canon===key);assert.equal(day.shots.length,n);
+ const evo=combinedEvo.get(key).filter(r=>r.date==='2026-11-14');assert.equal(evo.length,1);
+ const history=T.cumulativeClubSeries().get(key).filter(r=>r.date==='2026-11-14');assert.equal(history.length,1);assert.equal(history[0].n,n);near(history[0].carry,carry,.051);
+ for(const m of ['carry','total','cs','bs','smash','la','spin','path','face','ftp','aoa','height']){
+  const xs=kept.map(s=>s[m]).filter(x=>x!=null),metric=m==='height'?'apex':m,avg=xs.reduce((a,b)=>a+b,0)/xs.length;
+  near(g.avg[metric],avg);assert.equal(g.avg.metricCounts[metric],xs.length);
+  near(evo[0].values[metric].value,avg);assert.equal(evo[0].values[metric].n,xs.length);
+  if(combinedCompare.get(key).v[metric])near(combinedCompare.get(key).v[metric].value,avg);
+ }
+ near(g.avg.best,[...kept].sort((a,b)=>b.carry-a.carry).slice(0,5).reduce((a,s)=>a+s.carry,0)/5);
+ near(g.avg.carrySd,Math.sqrt(kept.reduce((sum,s)=>sum+(s.carry-carry)**2,0)/(n-1)));
+ assert.equal(g.measuredOffer.n,n);near(g.measuredOffer.carry,carry,.051);
+}
+assert.ok(![...combinedCompare.keys()].some(k=>/KING Forged.*·/.test(k)));
+assert.ok(!combinedEvo.get('7i').some(r=>r.date==='2026-11-14'));
+assert.ok(!combinedEvo.get('4i').some(r=>r.date==='2026-11-14'));
+eq(T.get().carries,beforeCorrection.carries);eq(T.get().clubs,beforeCorrection.clubs);
+eq(T.get().bays.filter(x=>x._fid!==updated._fid),beforeCorrection.bays.filter(x=>x._fid!==updated._fid));
+const thoughts=T.get().briefings.find(b=>b.course==='Swing Thoughts — Club by Club');
+assert.match(thoughts.focus,/CLUB FIRST/);assert.match(thoughts.sections.find(s=>s.t==='Club first').b,/Keep it in your process/);
+assert.ok(!thoughts.rules.some(s=>/do not blend|separate before\/after/.test(s)));
+eq(T.get().briefings.filter(b=>b.course!==thoughts.course),beforeCorrection.briefings.filter(b=>b.course!==thoughts.course));
+const combinedHTML=T.bayView(T.get().bays.indexOf(updated));
+for(const s of ['153.6 yd','142.3 yd','129.3 yd','192.3 yd','32 clean of 36','10 clean of 15'])assert.ok(combinedHTML.includes(s),s);
+assert.ok(!combinedHTML.includes('before and after numbers'));assert.ok(!combinedHTML.includes('cue-comparison'));
+const combinedOnce=JSON.stringify(T.get());T.applyFeed(fullFeed);assert.equal(JSON.stringify(T.get()),combinedOnce,'existing-phone correction applies once');
+Object.assign(T.get(),JSON.parse(JSON.stringify(before)));T.applyFeed(fullFeed);
+eq(T.get().bays.find(b=>b._fid===updated._fid),updated,'fresh and existing installs get the same combined session');
+console.log('PASS Nov14 combined: four clubs, 56/72 unchanged, source identities and flags preserved, weighted metrics/best-five/SD, one history group per club, cue kept, existing/fresh installs and carries protected.');

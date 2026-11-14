@@ -3,7 +3,36 @@
 Personal golf command center for **Jack McDermott** — bag, stroke diagnosis, coaching,
 and courses in one installable web app. This file is the guide for keeping it current.
 
-## Current session and bag update (v292, November 14, 2026)
+## Current grouping (v293, November 14, 2026)
+
+Jack's latest request supersedes the earlier cue split: **combine all today's stats
+by club, but KEEP "club first" in Swing Thoughts for his process.** Do not interpret
+this as proof that the cue had no effect, or remove his thought. The explicit request
+overrides the default separate-thought grouping guidance for this session only.
+
+| Club | Clean / captured | Carry yd | Best five yd | Carry SD yd |
+|---|---:|---:|---:|---:|
+| 5W | 6/11 | 192.3 | 193.1 | 4.5 |
+| Old KING Forged 4i | 32/36 | 153.6 | 169.3 | 9.7 |
+| Old KING Forged 6i | 8/10 | 142.3 | 148.7 | 10.2 |
+| Old KING Forged 7i | 10/15 | 129.3 | 136.7 | 9.2 |
+
+`scripts/import-nov14-sim.py` now appends `bay-20261114-combined-v2` to the same feed,
+targeting the existing bay ID. It creates four full-day groups for session, history,
+evolution and Compare, recalculating all metrics/best-five/sample SD from individual
+retained rows. No averaging of block averages. Original file/row, cue-phase provenance,
+all 72 raw rows and all 16 original exclusion decisions remain intact. Current metrics
+are `combinedClubs` in the analysis JSON; `cohorts` retains the prior analysis for audit.
+The append-only plan update keeps the thought but removes the performance-split language;
+the bag-history correction uses the combined figures. Existing saved Compare cue picks
+resolve to the combined club without duplicating it. Old KING Forged remains distinct
+from KING TEC. No playing carries, bag membership, or unrelated sessions/plans change.
+
+Validation covers exact source identities and flags, per-metric sample counts, combined
+averages/best-five/SD, fresh and existing installs, cue retention and four-club mobile
+review/Compare. Version and service-worker cache both v293.
+
+## Initial import and bag update (v292; cue grouping superseded above)
 
 **Final user corrections override the monitor labels and initial interpretation:** all six
 recordings are TODAY, Nov 14 (TrackMan shows Nov 13; retain that as source metadata, cause

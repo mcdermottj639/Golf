@@ -145,3 +145,58 @@ plan['sections'].append({'t':'Notes — the paper trail','k':'November 14 · fin
 entries.append({'id':'plan-club-first-20261114-v1','type':'briefing','briefing':plan})
 save('range-20261114-feed.json',{'updated':'2026-11-14','entries':entries})
 for key,a in current.items():print(key, a['n'],'/',a['sourceCount'],'carry',a['carry'],'best5',a['best'],'path',a['path'],'ftp',a['ftp'])
+
+# v293: Jack explicitly requests one full-day result per club, while keeping
+# "club first" as a process thought. This supersedes the earlier grouping request.
+# Preserve the original entries and raw phase/source metadata; append corrections
+# so phones that already applied v292 receive exactly the same combined view.
+combined=[]
+for club in ['5-wood','4-iron [KING Forged]','6-iron [KING Forged]','7-iron [KING Forged]']:
+    blocks=[g for g in groups if g['club'].split(' · ')[0]==club]
+    shots=[]
+    for block in blocks:
+        for original in block['shots']:
+            shot=copy.deepcopy(original)
+            shot.update(shot=len(shots)+1,sourceShot=original['shot'],sourceGroup=block['club'])
+            shots.append(shot)
+    kept=[s for s in shots if not s['mishit']]
+    avg=dict(metrics(kept),club=club,sourceCount=len(shots),held=len(shots)-len(kept))
+    combined.append(dict(club=club,source='Combined November 14 recordings; original file and row on each shot',
+        sourceBlocks=[{k:b[k] for k in ['source','sourceId','club','normalization','sourceShotCount','excludedShotNumbers']} for b in blocks],
+        sourceShotCount=len(shots),visibleShotCount=len(shots),shots=shots,avg=avg,
+        excludedShotNumbers=[s['shot'] for s in shots if s['mishit']],distanceMissingShotNumbers=[],unseenShotNumbers=[],
+        measuredOffer=dict(date=SRC['sessionDate'],carry=round(avg['carry'],1),n=avg['n'],sd=round(avg['carrySd'],1),scope=club,status='measured offer only; no playing-carry change')))
+summary={g['club']:g['avg'] for g in combined}
+analysis.update(combinedClubs=summary,aggregationPolicy='Jack requests all Nov14 shots combined by physical club; club first stays in his process. Earlier cue cohorts are archived provenance, not the current performance grouping.')
+save('data/range-2026-11-14-analysis.json',analysis)
+combinedStory='\n\n'.join(
+    f"{g['club']}: {g['avg']['n']} clean of {len(g['shots'])}; carry {g['avg']['carry']:.1f} yd, best five {g['avg']['best']:.1f}, total {g['avg']['total']:.1f}, roll {g['avg']['roll']:.1f}. Carry SD {g['avg']['carrySd']:.1f} yd. Club speed {g['avg']['cs']:.1f} mph, ball speed {g['avg']['bs']:.1f}, smash {g['avg']['smash']:.3f}; launch {g['avg']['la']:.1f}°, spin {g['avg']['spin']:.0f} rpm, apex {g['avg']['apex']:.1f} ft. Path {g['avg']['path']:+.1f}°, face-to-path {g['avg']['ftp']:+.1f}°, attack angle {g['avg']['aoa']:+.1f}°."
+    for g in combined)
+combinedStory+='\n\nAll retained shots are weighted equally within their club; averages are not averages of block averages. Best five and carry spread are recalculated from the combined retained rows. All irons were old KING Forged / KBS 120 stiff; no KING TECs today. Playing distances remain unchanged.\n\nPROCESS: Keep your club first thought — get the club started down and through first. Today is recorded as one session per club, without a before/after cue verdict. No sequencing change or shaft advantage is established.'
+combinedLimits='\n\n'.join(x for x in SRC['limitations'] if 'before/after' not in x)
+combinedLimits+='\n\nCombined row numbers are reference IDs, not a reconstructed swing order. Each row retains its original file, shot number and cue-phase note. Filtering decisions are unchanged from the source blocks.\n\n'+SRC['mishitDecision']
+combinedReview=dict(title='Today · one result per club',
+    cue='Get the club started down and through first. Kept in Swing Thoughts for your process; today’s stats combine all shots by club.',
+    tiles=[dict(k=g['club'].replace('-iron [KING Forged]','i · old Forged').replace('5-wood','5W'),v=f"{g['avg']['carry']:.1f} yd",n=f"{g['avg']['n']} clean of {len(g['shots'])} · best 5 {g['avg']['best']:.1f}") for g in combined],
+    takeaway='56 clean of 72 shots across four clubs. All irons: old KING Forged / KBS 120 stiff. Mishits remain held out; playing carries stay as saved.',
+    comparisons=[],story=combinedStory,limits=combinedLimits,references=review['references'],
+    exclusions='\n\n'.join(f"{g['club']}: {g['avg']['n']} clean of {len(g['shots'])}. "+' '.join(f"{s['videoSource']['file']} row {s['videoSource']['row']}: {s['mishitReason']}." for s in g['shots'] if s['mishit']) for g in combined))
+combinedGist=' · '.join(f"{g['club'].replace('-iron [KING Forged]','i').replace('5-wood','5W')} {g['avg']['carry']:.1f}" for g in combined)+' yd · 56/72 clean'
+entries.append(dict(id='bay-20261114-combined-v2',type='bay-update',target='bay-20261114-club-first-v1',
+    bay=dict(setup='Old KING Forged / KBS 120 stiff · full-day 4i, 6i, 7i and 5W · off the deck',
+        finding=combinedGist+'. All shots combined per club; club first retained as a process thought.',
+        detail=dict(gist=combinedGist,clubs=[g['avg'] for g in combined],rangeShots=combined,
+            sessionReview=combinedReview,story=combinedStory,limits=combinedLimits,
+            rangeCaption='All six recordings combined into one result per club at Jack’s request. All irons OLD KING Forged / KBS 120 stiff. Every original row and exclusion remains traceable.'))))
+combinedPlan=copy.deepcopy(plan)
+combinedPlan['focus']='Current feel: CLUB FIRST — get the club started down and through first. Kept for your process. November 14 stats combine all shots by club; no before/after cue verdict.'
+for section in combinedPlan['sections']:
+    if section['t']=='Club first':
+        section.update(k='Your process thought · kept at your request',b='YOURS: get the club started down and through first in the downswing. This is a feel, not an instruction to flip the clubhead past the hands or stop body rotation. Keep it in your process. November 14 is now one combined result per club; the stats are not being used as a before/after cue test.')
+    if section['t']=='Irons':
+        section.update(b='All November 14 iron shots were old KING Forged / KBS 120 stiff. The full day is combined by club: 4i 153.6 yd (32/36), 6i 142.3 (8/10), 7i 129.3 (10/15). KING TEC irons were not used. Current iron bag/carry settings and the benched KING TEC 4i are unchanged.')
+combinedPlan['rules'][0]='Keep club first as your process thought. November 14 stats combine all retained shots by club; no before/after cue performance split.'
+entries.append(dict(id='plan-club-first-process-20261114-v2',type='briefing',briefing=combinedPlan))
+entries.append(dict(id='history-sim-combined-20261114-v2',type='history-edit',match="Today's 72-shot sim: ALL irons old KING Forged / KBS 120 stiff, no KING TECs.",text="Today's 72-shot sim: ALL irons old KING Forged / KBS 120 stiff, no KING TECs. Jack requests one combined result per club: "+combinedGist+'. Every raw row and mishit exclusion retained. Club first stays in Swing Thoughts for his process; no cue performance split. Playing carries unchanged; 5W back, 3H return in progress, 4i remains benched.'))
+save('range-20261114-feed.json',{'updated':'2026-11-14','entries':entries})
+for g in combined:print('Combined',g['club'],g['avg'])
