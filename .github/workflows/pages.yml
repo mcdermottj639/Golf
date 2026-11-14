@@ -53,6 +53,7 @@ jobs:
           node tests/bay-takeaways.cjs
           node tests/range-nov04-hybrids.cjs
           node tests/range-nov11-sim.cjs
+          node tests/range-nov14-sim.cjs
           node tests/range-sep22-batch1.cjs
           node tests/round-identity.cjs
           node tests/round-review-import.cjs

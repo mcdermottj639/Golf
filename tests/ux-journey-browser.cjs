@@ -5,6 +5,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),http=require('n
 const {chromium}=require(process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES
   ?process.env.CODEX_PRIMARY_RUNTIME_NODE_MODULES+'/playwright':'playwright');
 const root=path.resolve(__dirname,'..');
+const expectedCache='caddiehq-'+fs.readFileSync(path.join(root,'app.js'),'utf8').match(/const BUILD = '(v\d+)'/)[1];
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json',
  '.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg'};
 const server=http.createServer((req,res)=>{
@@ -71,7 +72,7 @@ const snapshot=page=>page.evaluate(()=>{
   const page=await context.newPage();page.setDefaultTimeout(30000);
   await page.goto('http://127.0.0.1:'+server.address().port+'/');
   await page.waitForFunction(()=>!!navigator.serviceWorker?.controller);
-  await page.waitForFunction(()=>caches.keys().then(keys=>keys.includes('caddiehq-v290')));
+  await page.waitForFunction(expected=>caches.keys().then(keys=>keys.includes(expected)),expectedCache);
   assert.equal(await page.evaluate(()=>caches.match('./ux-journey.css').then(Boolean)),true);
   await context.setOffline(true);
   await page.reload({waitUntil:'domcontentloaded'});

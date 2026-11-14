@@ -792,3 +792,19 @@ html,body{touch-action:manipulation}
 .cmp-table td small{color:var(--soft,#777)}
 .cmp-table .cmp-meta td{font-size:11px;color:var(--soft,#777)}
 @media (max-width:400px){.cmp-table{font-size:12px}.cmp-table th,.cmp-table td{padding:5px 3px}.cmp-table td:first-child{white-space:normal;min-width:0;width:30%}.cmp-table td small{display:none}}
+
+/* v292 — compact, equipment-specific before/after evidence. */
+.bay-session-review .stat .v{color:var(--burg);font-size:clamp(1.05rem,4vw,1.65rem);overflow-wrap:anywhere}
+.bay-session-review .cue-comparison{min-width:0}
+.bay-session-review .cue-comparison h4{margin:12px 0 6px}
+.bay-session-review table{width:100%;table-layout:fixed;font-size:.76rem;border-collapse:collapse}
+.bay-session-review th,.bay-session-review td{padding:6px 4px;text-align:right;overflow-wrap:anywhere;border-bottom:1px solid var(--line)}
+.bay-session-review th:first-child,.bay-session-review td:first-child{text-align:left}
+@media(max-width:540px){.bay-session-review>.rowgrid.g2{grid-template-columns:1fr}.bay-session-review>.rowgrid.g3{grid-template-columns:1fr}}
+.cmp-chips .cmp-chip{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.cmp-bar.cmp-equipment{grid-template-columns:94px minmax(0,1fr) auto}
+.cmp-equipment .cmp-lab{overflow-wrap:anywhere;font-size:12px}
+.bay-session-review .cue-metrics>.rowgrid{margin-top:8px}
+@media(max-width:540px){.bay-session-review .cue-metrics>.rowgrid{grid-template-columns:1fr}}
+.cmp-equipment-table{width:100%;min-width:0;table-layout:fixed}
+.cmp-equipment-table th,.cmp-equipment-table td{min-width:0;white-space:normal;overflow-wrap:anywhere;padding:6px 3px;font-size:11px}

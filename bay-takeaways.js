@@ -31,7 +31,7 @@
         raw+=source.length+archivedMissing;missing+=source.length-distance.length+archivedMissing;held+=distance.length-retained.length;
         const shots=retained.map(s=>({...s,ftp:finite(s.ftp)?s.ftp:finite(s.face)&&finite(s.path)?s.face-s.path:null}));
         const label=(g.club||'Unlabelled club')+(finite(g.target)&&!String(g.club).includes('target')?` · target ${g.target}`:'');
-        blocks.push({id:`${id}-${j}`,club:g.club||'Unlabelled club',label,record:seen.size,canon:g.canon||canon(g.club),target:finite(g.target)?g.target:null,
+        blocks.push({id:`${id}-${j}`,club:g.club||'Unlabelled club',label,record:seen.size,canon:g.canon||canon(g.club),canonicalLabel:g.canonicalLabel,target:finite(g.target)?g.target:null,
           index:b.index,setup:b.setup||b.venue||'',shots,sourceCount:source.length+archivedMissing,
           missing:source.length-distance.length+archivedMissing,held:distance.length-retained.length,
           distanceMissingReview:Array.isArray(g.distanceMissingReview)?g.distanceMissingReview:[],
@@ -41,6 +41,7 @@
     });
     const day={date,blocks,summaryOnly,raw,missing,held,usable:blocks.reduce((n,b)=>n+b.shots.length,0),sessions:seen.size};
     day.clubs=combine(blocks);
+    day.clubCount=new Set(blocks.map(b=>String(b.canon).split('·')[0].trim())).size;
     return day;
   }
   function combine(blocks){
@@ -48,7 +49,7 @@
     const names={Dr:'Driver',Mini:'Mini Driver','3W':'3-wood','5W':'5-wood',...Object.fromEntries([2,3,4,5,6,7,8,9].map(n=>[n+'i',n+'-iron']))};
     for(const b of blocks){
       const key=b.canon||b.club;
-      if(!by.has(key))by.set(key,{id:`club-${key}`,club:names[key]||key,canon:key,index:b.index,shots:[],sourceBlocks:[],
+      if(!by.has(key))by.set(key,{id:`club-${key}`,club:b.canonicalLabel||names[key]||key,canon:key,index:b.index,shots:[],sourceBlocks:[],
         sourceCount:0,missing:0,held:0,carryHits:[],totalHits:[],targets:[],setup:'Combined full-day club data',context:'See original source blocks',retainedOnly:true});
       const c=by.get(key);c.sourceBlocks.push(b);c.sourceCount+=b.sourceCount;c.missing+=b.missing;c.held+=b.held;
       if(b.target!=null)c.targets.push(b.target);
@@ -87,7 +88,7 @@
   const direction=s=>typeof s==='string'&&/[LR]$/.test(s.trim())?s.trim().slice(-1):null;
   const extent=(ss,key,dec=1)=>`${fmt(Math.min(...values(ss,key)),dec)}–${fmt(Math.max(...values(ss,key)),dec)}`;
   function reference(b){
-    const t=tour[b.canon];
+    const t=tour[String(b.canon).split('·')[0].replace(/\s*\[[^\]]+\]/g,'').trim()];
     return t?`PGA Tour ${b.club}: ${t[1]} yd carry at ${t[0]} mph; smash ${t[2].toFixed(2)} (2023). Context, not your target.`:
       `No matching ${b.club} row in the cited Tour table. This practice baseline comes from your shots.`;
   }
@@ -248,7 +249,7 @@
     const groupCard=c=>`<article class="card rt-card bt-group" data-bay-insight="${esc(c.id)}"><div class="rt-kind">${esc(c.kind)} · ${c.members.length} clubs${c.smallSample?' · small sample':''}</div><h3>${esc(c.title)}</h3><p class="bt-verdict"><b>${esc(c.verdict)}</b></p><div class="tscroll"><table class="bt-cmp"><thead><tr><th>Club</th>${c.cols.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${c.members.map(m=>`<tr><td>${esc(c.club(m))}</td>${m.cmp.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><div class="bt-meaning"><b>Why this matters</b><p>${esc(c.meaning)}</p></div><div class="rt-action"><b>Next test</b><span>${esc(c.action)}</span></div><details class="rt-source"><summary>Numbers, reference & sources</summary>${c.members.map(m=>`<p><b>${esc(c.club(m))}</b> · ${esc(m.evidence)} ${esc(m.scope||'')}</p><div class="rt-plots">${m.rows.map(plot).join('')}</div>`).join('')}<div class="rt-links">${c.members.flatMap(m=>m.blocks).map(source).join('')}</div></details></article>`;
     const shown=group(cards),primary=shown.filter(c=>!c.secondary),more=shown.filter(c=>c.secondary);
     const one=c=>c.grouped?groupCard(c):article(c);
-    return `<section class="round-takeaways bay-takeaways" aria-label="Bay day takeaways"><h2>Your bay day · ${esc(day.date)}</h2><p class="sm">${day.usable} usable shots · ${day.clubs.length} clubs combined from ${day.blocks.length} source blocks. ${day.missing} distance-dash rows excluded; ${day.held} clear mishits held out.</p><p class="sm faint">Indoor practice evidence, not outdoor stock yardages. Each finding uses one source block; different settings or targets are not pooled into a diagnosis.</p>${primary.length?primary.map(one).join(''):'<p class="sm">No clear practice priority supported by these shots yet. The exact data remains below; more comparable shots can reveal a repeatable pattern.</p>'}${more.length?`<details class="bt-more"><summary>More findings · ${more.length}</summary>${more.map(one).join('')}</details>`:''}${missingReview}${day.summaryOnly.length?`<details class="rt-source"><summary>${day.summaryOnly.length} summary-only day records</summary><p>No individual distance-bearing shots available for the exclusion and relationship checks.</p><div class="rt-links">${day.summaryOnly.map(source).join('')}</div></details>`:''}</section>`;
+    return `<section class="round-takeaways bay-takeaways" aria-label="Bay day takeaways"><h2>Your bay day · ${esc(day.date)}</h2><p class="sm">${day.usable} usable shots · ${day.clubCount ?? day.clubs.length} clubs in ${day.clubs.length} analysis groups from ${day.blocks.length} source blocks. ${day.missing} distance-dash rows excluded; ${day.held} clear mishits held out.</p><p class="sm faint">Indoor practice evidence, not outdoor stock yardages. Each finding uses one source block; different settings or targets are not pooled into a diagnosis.</p>${primary.length?primary.map(one).join(''):'<p class="sm">No clear practice priority supported by these shots yet. The exact data remains below; more comparable shots can reveal a repeatable pattern.</p>'}${more.length?`<details class="bt-more"><summary>More findings · ${more.length}</summary>${more.map(one).join('')}</details>`:''}${missingReview}${day.summaryOnly.length?`<details class="rt-source"><summary>${day.summaryOnly.length} summary-only day records</summary><p>No individual distance-bearing shots available for the exclusion and relationship checks.</p><div class="rt-links">${day.summaryOnly.map(source).join('')}</div></details>`:''}</section>`;
   }
   root.CaddieBayTakeaways={prepare,combine,build,group,render,mishit};
   if(typeof module!=='undefined')module.exports=root.CaddieBayTakeaways;

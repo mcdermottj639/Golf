@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v291';
+const BUILD = 'v292';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v292', d:'2026-11-14', items:['TODAY’S SIM: all irons were old KING Forged / KBS 120 stiff. Before → club first: 4i 160.0 → 148.7 yd; 7i 122.5 → 136.1 yd. 56 clean of 72 shots. Old equipment and cue phases stay separate in sessions, history and Compare clubs.','Club first saved in Swing Thoughts. 5W returns with a 192.3 yd measured offer (6/11); 3H return in progress with its carry/history saved. KING TEC irons, benched 4i and playing distances unchanged.'] },
   { b:'v291', d:'2026-11-11', items:['TONIGHT\'S SIM NUMBERS: Mini, 3H and 4H from Nov 11 are in Swing, every shot, all off the deck. With mishits held out (same rule as Nov 4): mini 196 carry (7 of 15), 3H 190 (11 of 26), 4H 178 (4 of 6). Each is parked on its Bag row as an offer to tap. Playing carries stay 201 / 187 / 178.'] },
   { b:'v290', d:'2026-11-11', items:['COURSE TO RECAP: Compact journey controls link Courses, course prep, the current hole guide, live scoring and saved round evidence without replacing any existing features.','RETURN WITH CONTEXT: Back/Forward and refresh restore the current view and Rounds tab in this browser; course and hole selection stays in session-only UI storage. No course coordinates or records enter the URL.'] },
   { b:'v289', d:'2026-11-11', items:['FIVE MORE PLAYED COURSES: Quail Brook, Middletown Country Club, Broad Run, the historical Old Corkscrew layout and Quail Village are downloadable on demand with exact scorecards and clean 9/10 live-round boundaries.','85 VERIFIED MAPS: Quail Brook, Middletown, Broad Run and Old Corkscrew have all 18 guides and interactive maps. Quail Village has 13; holes 14–18 are clearly marked unavailable because the remaining source routes could not be identified without guessing. Old Corkscrew is labeled historical because daily golf operations have ended.'] },
@@ -1378,6 +1379,8 @@ function clubName(key){ const c = clubBy(key); return c ? c.name : clubFallback(
 function clubTag(key){
   const raw = String(key || '');
   const phase =
+    /·\s*before cue/i.test(raw) ? ' · before' :
+    /·\s*club first/i.test(raw) ? ' · cue' :
     /after slot/i.test(raw) ? ' · slot' :
     /before slot/i.test(raw) ? ' · pre' :
     /· open/i.test(raw) ? ' · open' :
@@ -1386,7 +1389,7 @@ function clubTag(key){
   const base = raw.replace(/\s*·\s*.*/i, '').trim() || raw;
   const c = clubBy(base) || clubBy(raw);
   const abbr = c ? c.abbr : clubAbbr(clubFallback(base));
-  return abbr + phase;
+  return abbr + (/\[KING Forged\]/i.test(raw)?' Forged':'') + phase;
 }
 
 function groovePct(club){ return Math.max(0, Math.round(100 - (club.rounds||0)/GROOVE_LIFE*100)); }
@@ -1832,7 +1835,7 @@ function evidenceEvents(){
   });
   groupedBayDays((S.bays||[]).map((b,i)=>({b,i}))).forEach(({b,i,day,members}) => {
     ev.push({ d:b.date || '', title:day ? 'Range day' : b.setup || b.mode || 'Bay session',
-      gist:day ? `${day.usable} usable shots · ${day.clubs.length} clubs · ${members.length} source sessions` : bayGist(b),
+      gist:day ? `${day.usable} usable shots · ${day.clubCount ?? day.clubs.length} clubs · ${members.length} source sessions` : bayGist(b),
       prov:'bay', act:{ a:'open-bay', i } });
   });
   (S.combines || []).forEach(c => {
@@ -3897,10 +3900,11 @@ function compareCard(){
     const bars = rows.map(r => {
       const c = r.v.carry?.value, t = r.v.total?.value;
       const cw = c ? c/maxT*100 : 0, rw = (t && c) ? Math.max(t-c,0)/maxT*100 : 0;
-      return `<div class="cmp-bar"><span class="cmp-lab">${esc(r.k)}</span><span class="cmp-track"><i class="cmp-c" style="width:${cw.toFixed(1)}%"></i><i class="cmp-r" style="width:${rw.toFixed(1)}%"></i></span><b>${c!=null?Math.round(c):'—'}${t!=null?' / '+Math.round(t):''}</b></div>`;
+      return `<div class="cmp-bar${r.k.includes('[')?' cmp-equipment':''}"><span class="cmp-lab">${esc(r.k)}</span><span class="cmp-track"><i class="cmp-c" style="width:${cw.toFixed(1)}%"></i><i class="cmp-r" style="width:${rw.toFixed(1)}%"></i></span><b>${c!=null?Math.round(c):'—'}${t!=null?' / '+Math.round(t):''}</b></div>`;
     }).join('');
     const fmtv = (k,m,unit,dec) => m ? `${['path','ftp'].includes(k)&&m.value>0?'+':''}${k==='roll'&&m.value>0?'+':''}${m.value.toFixed(dec)}` : '—';
-    const table = `<div class="tscroll"><table class="cmp-table"><thead><tr><th></th>${rows.map(r=>`<th>${esc(r.k)}</th>`).join('')}</tr></thead><tbody>${
+    const shortLabel=k=>k.replace(' [KING Forged]',' Forged').replace(' · club first',' · cue').replace(' · before cue',' · before');
+    const table = `<div class="tscroll"><table class="cmp-table${rows.some(r=>r.k.includes('['))?' cmp-equipment-table':''}"><thead><tr><th></th>${rows.map(r=>`<th title="${esc(r.k)}">${esc(shortLabel(r.k))}</th>`).join('')}</tr></thead><tbody>${
       CMP_ROWS.filter(([k]) => rows.some(r => r.v[k])).map(([k,l,u,d]) => `<tr><td>${esc(l)}${u?` <small>${esc(u)}</small>`:''}</td>${rows.map(r=>`<td>${fmtv(k,r.v[k],u,d)}</td>`).join('')}</tr>`).join('')
     }<tr class="cmp-meta"><td>Shots · days</td>${rows.map(r=>`<td>${r.n} · ${r.dates.length===1?esc(fmtDate(r.dates[0]).replace(/,? \d{4}$/,'')):r.dates.length+'d'}</td>`).join('')}</tr></tbody></table></div>`;
     body = `<div class="cmp-bars" aria-label="Carry and roll by club">${bars}<p class="cmp-key"><i class="cmp-c"></i>carry <i class="cmp-r"></i>roll · yd</p></div>${table}`;
@@ -4086,12 +4090,12 @@ function swingEvolutionRows(){
     // Historical summary-only records remain labelled; never borrow their AVG into a shot block.
     for(const {b:source,i} of baysFor('swing').filter(x => x.b.date === date)){
       for(const c of primaryClubsForDay(source.detail?.clubs || [])){
-        if((source.detail?.rangeShots || []).some(g => clubCanon(g.club) === clubCanon(c.club) && clubPhaseOf(g.club) === clubPhaseOf(c.club))) continue;
+        if((source.detail?.rangeShots || []).some(g => clubEvidenceKey(g.club) === clubEvidenceKey(c.club) && clubPhaseOf(g.club) === clubPhaseOf(c.club))) continue;
         const values = {};
         for(const [key] of SWING_EVOLUTION_METRICS){
           if(finite(c[key])) values[key] = {value:c[key],n:c.metricCounts?.[key] ?? c.n ?? null};
         }
-        if(Object.keys(values).length) add({club:clubCanon(c.club),date,label:c.club,setup:source.setup||'',index:i,values,summary:true});
+        if(Object.keys(values).length) add({club:clubEvidenceKey(c.club),date,label:c.club,setup:source.setup||'',index:i,values,summary:true});
       }
     }
   }
@@ -4738,7 +4742,7 @@ function allDayRows(){
   const rows = [];
   groupedBayDays((S.bays||[]).map((b,i)=>({b,i}))).forEach(({b,i,day,members}) => rows.push({
     date:b.date, kind:'range', title:day ? 'Range day' : b.mode || b.setup || 'Bay session',
-    sub:day ? `${day.usable} usable shots · ${day.clubs.length} clubs · ${members.length} source sessions` :
+    sub:day ? `${day.usable} usable shots · ${day.clubCount ?? day.clubs.length} clubs · ${members.length} source sessions` :
       [b.venue, bayLiveSetup(b) || b.setup].filter(Boolean).join(' · '),
     action:'open-bay', i, prov:'bay'
   }));
@@ -4817,6 +4821,10 @@ function clubPhaseOf(name){
 }
 function clubCanon(name){
   const raw = clubBaseName(name);
+  // Explicit equipment qualifiers identify a different physical club. Never blend
+  // an old iron with the current set just because their iron numbers match.
+  const equipment = raw.match(/\[([^\]]+)\]/);
+  if(equipment) return clubCanon(raw.replace(equipment[0], '').trim())+' ['+equipment[1]+']';
   if(/mini/i.test(raw)) return 'Mini';
   if(/driver/i.test(raw)) return 'Dr';
   const iron = raw.match(/(\d+)\s*-?\s*iron/i);
@@ -4828,7 +4836,15 @@ function clubCanon(name){
   if(/^pw\b/i.test(raw)) return 'PW';
   return clubAbbr(raw);
 }
+function clubEvidenceKey(name){
+  const cue = String(name || '').match(/·\s*(before cue|club first)\b/i);
+  return clubCanon(name)+(cue?' · '+cue[1].toLowerCase():'');
+}
 function clubCanonLabel(canon){
+  const cue=String(canon).match(/^(.*?)\s*·\s*(before cue|club first)$/i);
+  if(cue)return clubCanonLabel(cue[1])+' · '+cue[2];
+  const equipment=String(canon).match(/^(.*?)\s*\[([^\]]+)\]$/);
+  if(equipment)return clubCanonLabel(equipment[1])+' ['+equipment[2]+']';
   const fromBag = (S.carries || []).find(c => clubCanon(c.club) === canon);
   if(fromBag) return fromBag.club;
   const map = { Dr:'Driver', Mini:'Mini Driver', '3W':'3-wood', '5W':'5-wood',
@@ -4923,7 +4939,7 @@ function cumulativeClubSeries(){
     const detail = b.detail || {};
     const dels = analysisDelivery(detail);
     primaryClubsForDay(analysisClubs(detail)).forEach(c => {
-      const k = clubCanon(c.club);
+      const k = clubEvidenceKey(c.club);
       if(!k) return;
       const d = fillMetrics(c);
       if(d.path == null && d.face == null && c.carry == null && c.best == null) return;
@@ -4943,11 +4959,11 @@ function cumulativeClubSeries(){
   return by;
 }
 function bagRank(club){
-  const k = BAG_CANON.indexOf(clubCanon(club));
+  const k = BAG_CANON.indexOf(clubCanon(String(club).replace(/\[[^\]]+\]/g,'')));
   return k < 0 ? BAG_CANON.length : k;
 }
 function cumulativeClubKeys(by){
-  return BAG_CANON.filter(k => by.has(k)).concat([...by.keys()].filter(k => !BAG_CANON.includes(k)));
+  return BAG_CANON.filter(k => by.has(k)).concat([...by.keys()].filter(k => !BAG_CANON.includes(k)).sort((a,b)=>bagRank(a)-bagRank(b)||a.localeCompare(b)));
 }
 function cumulativeClubDelivery(){
   const by = cumulativeClubSeries();
@@ -5264,7 +5280,7 @@ function bayLog(list){
   return `<p class="sm faint" style="margin-bottom:2px">Tap a session for every number it produced.</p>
   ${groupedBayDays(list).map(({ b, i, day }) => `<div class="seslog" data-action="open-bay" data-i="${i}">
     <div class="sesh"><b>${fmtDate(b.date)}</b><span class="sesm"><span class="bayc">BAY</span>${
-      esc(day ? `${day.usable} usable shots · ${day.clubs.length} clubs` : baySize(b))}${b.detail ? ' ▸' : ''}</span></div>
+      esc(day ? `${day.usable} usable shots · ${day.clubCount ?? day.clubs.length} clubs` : baySize(b))}${b.detail ? ' ▸' : ''}</span></div>
     <div class="sesg">${esc(day ? 'Full range day · all source sessions combined' : bayGist(b))}</div>
   </div>`).join('')}`;
 }
@@ -5335,13 +5351,26 @@ function bayDayData(b){
   const api=window.CaddieBayTakeaways;
   if(!api||!b.date||BAY_DISC(b)!=='swing')return null;
   const bays=(S.bays||[]).map((x,index)=>({...x,index,detail:{...(x.detail||{}),
-    rangeShots:(x.detail?.rangeShots||[]).map(g=>({...g,canon:clubCanon(g.club)}))}}));
+    rangeShots:(x.detail?.rangeShots||[]).map(g=>({...g,canon:clubEvidenceKey(g.club),canonicalLabel:/\[|·\s*(before cue|club first)/i.test(g.club)?clubCanonLabel(clubEvidenceKey(g.club)):undefined}))}}));
   return api.prepare(b.date,bays,isClearMishit);
 }
 function bayDayTakeaways(b,day=bayDayData(b)){
   const api=window.CaddieBayTakeaways;
   if(!day)return '';
   return api.render(day,api.build(day));
+}
+// Authored interpretation stays visible on the combined day as well as its source.
+// Numeric charts still use the retained shot readers; this never changes the cohort.
+function baySessionReview(review){
+  if(!review) return '';
+  return `<section class="card bay-session-review" aria-label="Session analysis">
+    <h3>${esc(review.title || 'Session read')}</h3>
+    <div class="rowgrid g3">${(review.tiles || []).map(m=>`<div class="stat"><div class="v">${esc(m.v)}</div><div class="l">${esc(m.k)}</div><p class="sm">${esc(m.n)}</p></div>`).join('')}</div>
+    <p class="sm">${esc(review.takeaway)}</p><p class="sm"><b>Club first:</b> ${esc(review.cue)}</p>
+    <details class="sect cue-metrics"><summary>4i &amp; 7i · before and after numbers</summary><div class="rowgrid g2">${(review.comparisons || []).map(c=>`<div class="cue-comparison"><h4>${esc(c.title)}</h4><table><thead><tr><th>Metric</th><th>Before</th><th>Club first</th></tr></thead><tbody><tr><td>Kept</td><td>${esc(c.beforeCount)}</td><td>${esc(c.afterCount)}</td></tr>${c.rows.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(r.before)}</td><td>${esc(r.after)}</td></tr>`).join('')}</tbody></table></div>`).join('')}</div></details>
+    <details class="sect"><summary>Interpretation and next test</summary>${prose(review.story || '')}</details>
+    <details class="sect"><summary>Exclusions and source checks</summary>${prose(review.exclusions || '')}${prose(review.limits || '')}<p class="sm">${(review.references || []).filter(r=>/^https:\/\/www\.trackman\.com\//.test(r.url)).map(r=>`<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.label)}</a>`).join(' · ')}</p></details>
+  </section>`;
 }
 function bayView(i){
   const sourceOnly=String(i).startsWith('source:');
@@ -5350,12 +5379,13 @@ function bayView(i){
   if(!b) return game();
   const day=sourceOnly ? null : bayDayData(b);
   const sources=day ? (S.bays||[]).map((x,index)=>({b:x,i:index})).filter(x=>x.b.date===b.date&&BAY_DISC(x.b)==='swing') : [];
+  const reviews=(day ? sources.map(x=>x.b) : [b]).map(x=>x.detail?.sessionReview).filter(Boolean);
   // Longest club first (Jack, Nov 4 2026): the day view follows bag order, not upload order.
-  const dayClubs = day?.usable ? [...day.clubs].sort((x,y)=>bagRank(x.club)-bagRank(y.club)) : null;
+  const dayClubs = day?.usable ? [...day.clubs].sort((x,y)=>bagRank(x.club)-bagRank(y.club)||x.club.localeCompare(y.club)) : null;
   const d = day?.usable ? {combinedDay:true,clubs:dayClubs.map(g=>({club:g.club,n:g.shots.length})),rangeShots:dayClubs,
     rangeCaption:'One combined full-day set per club. Missing-distance rows and clear mishits excluded in their original source blocks.'} : b.detail || {};
   if(day?.usable)b={...b,detail:d,mode:'Range day',setup:'All range and Map My Bag sessions combined',sessionKind:'range-day',venue:'Full-day range review',ball:'See source notes',norm:'See source notes',spin:'See source notes',
-    finding:`${day.usable} usable shots across ${day.clubs.length} clubs. All same-club blocks combined; averages are calculated from individual retained readings, not averages of block averages.`};
+    finding:`${day.usable} usable shots across ${day.clubCount ?? day.clubs.length} clubs. Equipment and explicit cue phases stay separate; averages use individual retained readings, not averages of block averages.`};
   const analyzed = analysisClubs(d);
   const delivery = analysisDelivery(d);
   const clubRows = analyzed.map(c => {
@@ -5377,6 +5407,7 @@ function bayView(i){
   <p class="sm">${esc(b.venue || '')} · ${esc(bayLiveSetup(b) || b.setup || '')}</p>
   ${sourceOnly ? `<button class="btn" data-action="open-bay" data-i="${i}">Open full range day →</button>` : ''}
   ${day ? `<details class="sect day-sources" id="day-sources"><summary>Original sessions · ${sources.length}</summary><p class="sm">Daily averages use individual retained shots with a separate sample count for each metric. Summary-only readings stay in their source and are not counted as extra shots.</p>${sources.map(x=>`<button class="btn" data-action="open-bay-source" data-i="${x.i}">${esc(x.b.mode||'Range')} · ${esc(bayLiveSetup(x.b)||x.b.setup||'Source details')} →</button>`).join('')}</details>` : ''}
+  ${reviews.map(baySessionReview).join('')}
   ${bayDayTakeaways(b,day)}
   ${d.clubs && d.clubs.length ? `<div class="card bayvisuals">${bayVisualMarkup(d)}</div>` : ''}
   <div class="card">
@@ -11754,6 +11785,11 @@ function applyFeed(feed){
       });
     }
     else if(e.type === 'club-bench' && e.target) benchClub(e.target);
+    else if(e.type === 'club-start' && e.target){
+      const c=S.clubs.find(x=>x.id===e.target);
+      if(!c || !['backup','gaming'].includes(c.status)) return;
+      if(c.status==='backup' && startClub(e.target,'',e.playingLabel || '')) return;
+    }
     else if(e.type === 'club-update'){
       const c = S.clubs.find(x => x.id === e.target || x.name === e.target);
       if(c) Object.assign(c, e.club || {});
@@ -11975,14 +12011,14 @@ function applyFeed(feed){
     recordUpdate(e);
     changed = true;
   });
-  if(changed){ save(); rerender(); toast('Coach update from Claude ⛳'); }
+  if(changed){ save(); rerender(); toast('Coach update ready ⛳'); }
 }
 function fetchFeed(){
   // GitHub Pages can keep the PREVIOUS coach-feed.json at an edge for ten minutes even
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json','bag-20261024-feed.json','range-20261104-feed.json','range-20261111-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json','bag-20261024-feed.json','range-20261104-feed.json','range-20261111-feed.json','range-20261114-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 

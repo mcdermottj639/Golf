@@ -5,7 +5,7 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..');
 const base='https://mcdermottj639.github.io/Golf/';
-const files=['index.html','app.js','course-prep.js','ux-journey.css','sw.js'];
+const files=['index.html','app.js','course-prep.js','ux-journey.css','revamp.css','bay-takeaways.js','range-20261114-feed.json','sw.js'];
 const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
 const expected=new Map(files.map(file=>[file,hash(fs.readFileSync(path.join(root,file)))]));
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
