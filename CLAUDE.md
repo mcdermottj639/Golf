@@ -3,7 +3,70 @@
 Personal golf command center for **Jack McDermott** — bag, stroke diagnosis, coaching,
 and courses in one installable web app. This file is the guide for keeping it current.
 
-## Current bag update (v263, October 24, 2026)
+## Current session and bag update (v292, November 14, 2026)
+
+**Final user corrections override the monitor labels and initial interpretation:** all six
+recordings are TODAY, Nov 14 (TrackMan shows Nov 13; retain that as source metadata, cause
+unconfirmed). ALL iron shots are the old Cobra KING Forged irons with **KBS 120 stiff**
+shafts. No KING TEC irons were used. Exact old head generation, loft and shaft submodel
+are unconfirmed. Upload order is not hit order.
+
+| Recording ending | Actual club / cue phase | Kept / captured | Clean carry | Best five |
+|---|---|---:|---:|---:|
+| 05-30-41 | Old 4i BEFORE cue | 14/15 | 160.0 | 169.3 |
+| 05-20-32 rows 1–21 | Old 4i AFTER club first | 18/21 | 148.7 | 156.6 |
+| 05-31-15 | Old 6i BEFORE cue | 8/10 | 142.3 | 148.7 |
+| 05-31-56 | Old 7i BEFORE cue | 5/7 | 122.5 | 122.5 |
+| 05-24-02 | Old 7i AFTER club first | 5/8 | 136.1 | 136.1 |
+| 05-20-32 rows 22–27 + 05-26-54 | 5W, two preserved blocks; cue timing unknown | 6/11 | 192.3 | 193.1 |
+
+56 clean of 72; all 16 held rows remain in the source with explicit reasons. The apparent
+late jump in the first “4 Iron” table is a different club, **5W**, not a 4i breakthrough.
+The 4i/7i cue comparison uses the SAME old equipment: 4i lost carry and speed, while 7i
+gained carry/height but moved farther left in path and more open to path. Keep before/after
+blocks separate. Not a randomized experiment, proof of sequencing, or same-day comparison
+against KING TEC. Historical KING TEC comparisons are contextual and explicitly use the
+same current filter recalculated from their source rows; never overwrite historical flags.
+
+**Current import rule, clarified by Jack Nov 14:** hold a full-swing shot if club speed/read
+is absent OR apex <40 ft. Woods/hybrids additionally require **unrounded ball speed / club
+speed >=1.40**. No blanket 1.40 cutoff for irons; keep imperfect iron strikes that pass
+the remaining checks. The existing two-thirds airborne-cluster top filter still applies.
+Missing AoA or Smash Index alone does NOT mean missing club read when club speed exists.
+Smash Index is a percent, not smash factor. Jack's explicit overrides win. Raw rows stay;
+all averages, Swing evolution, club history and Compare use the retained cohort. Non-driver
+sim shots are off the deck; teed shots only count for driver. The Nov 4/11 historical
+rules below describe those imports, not a universal future iron-smash threshold.
+
+`scripts/transcribe-nov14-sim.py` → `data/range-2026-11-14-sim.json` preserves every visible
+row/column and source identity. `scripts/import-nov14-sim.py` → analysis JSON + append-only
+`range-20261114-feed.json`. Header cross-checks are stored per column; row values win.
+Both 7i percent-index discrepancies and the small old-7i displayed-total discrepancy
+are documented rather than edited to fit. The feed applies once, loads last and is cached.
+One bay holds all six clips, with authored before/after cards and folded interpretation,
+source limitations and exclusion counts. Bracketed equipment qualifiers and explicit
+before-cue / club-first evidence keys remain separate in day, cumulative, history and
+Compare readers. The active KING TEC 4i/7i histories and carry offers receive no old-iron
+data. Old-iron measured offers live on their exact bay cohorts; only 5W gets a Bag offer.
+
+“Club first” means Jack's reported feel: get the club started down and through first.
+It is saved in the existing Swing Thoughts plan, with observed results and a controlled
+retest, not a claim that hips/hands/club moved in a measured order.
+
+Bag: Jack says 5W comes back in place of the PING 3H **being returned**. The feed benches
+3H using `benchClub` (saved carry 187 retained), marks return in progress, and restores 5W
+through the new idempotent `club-start` entry and normal `startClub` helper. That preserves
+device-local 5W identity and saved playing carry. No sleeve setting is inferred. KING TEC
+5–PW and benched 4i are unchanged. Mini 201 and 4H 178 remain; measured offers never replace
+playing carries without Jack's request. Return completion is not confirmed.
+
+Validation: `tests/range-nov14-sim.cjs` covers transcription checks, all exclusions,
+exact ratios, equipment/phase separation across readers, prior-record and playing-carry
+preservation, saved 5W restoration and idempotence. `tests/range-nov14-browser.cjs` checks
+real phone-width session/Compare/Swing Thoughts views. The publish workflow includes the
+data test; live-shell parity includes the new feed, review CSS and range-reader module.
+
+### Earlier bag updates (retained context)
 
 The final apply-once feed, bag-20261024-feed.json, adds the screenshot-confirmed PING G440 3H (Regular, ALTA CB Blue 70 Graphite, right hand), retaining the existing 4H. New club-bench feed entries call the normal benchClub helper so Cobra Utility 2i saved carries remain recoverable and historical shots are untouched. The 3H adapter/degree setting is still unconfirmed; its carry was first measured Nov 4 (187, set live by Jack in v279 — see *November 4 hybrid range session*). Feed runs after prior bag/range feeds and is cached offline. Version 2 additionally removes the returned DS-ADAPT X 3-wood and Hi-Toe 58° by their exact owned-club IDs and removes their carry rows. Past shot/session records remain unchanged; neither returned club is on the bench and no replacement is automatically activated. Active bag count was then 12; the TaylorMade r7 Quad mini driver came back on Nov 4 2026 (v280), making 13.
 

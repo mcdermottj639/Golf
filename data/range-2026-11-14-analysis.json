@@ -1,0 +1,1508 @@
+{
+  "sessionDate": "2026-11-14",
+  "monitorDisplayedDate": "2026-11-13",
+  "dateBasis": "Jack explicitly corrected all six clips to today, November 14, 2026. TrackMan displays Nov 13; source date retained separately. Date discrepancy cause unconfirmed.",
+  "equipment": "FINAL Jack correction: every iron shot in all six clips is with his OLD Cobra KING Forged irons, KBS 120 stiff shafts. No KING TEC iron was used today. First recording: 4i rows 1–21 AFTER the cue, then 5W rows 22–27. Eight-shot 7i recording AFTER the cue. Later uploaded 4i (15), 6i (10) and 7i (7) clips BEFORE the cue. Upload order is not swing order. TrackMan Tec / Cobra labels do not override the user-confirmed equipment.",
+  "rule": "Final Jack clarification November 14: smash adjust as agreed, but remove mishits correctly. Missing club speed/read and apex below 40 ft remain exclusion checks for all clubs in these full-swing blocks. Woods/hybrids also require exact ball-speed / club-speed >= 1.40; irons have no blanket 1.40 cutoff. Preserve imperfect iron strikes that pass the other checks and the carry-cluster top filter. An absent AoA or Smash Index alone is not a missing club reading when club speed is captured.",
+  "cohorts": {
+    "4i-before": {
+      "n": 14,
+      "carry": 160.0214,
+      "total": 176.95,
+      "cs": 81.4786,
+      "bs": 115.1857,
+      "smash": 1.4137,
+      "la": 12.9714,
+      "ld": -2.7429,
+      "spin": 5171.2143,
+      "path": -7.9214,
+      "face": -1.4571,
+      "ftp": 6.4714,
+      "aoa": -5.6769,
+      "apex": 60.2143,
+      "best": 169.34,
+      "bestN": 5,
+      "carrySd": 9.052,
+      "metricCounts": {
+        "carry": 14,
+        "total": 14,
+        "cs": 14,
+        "bs": 14,
+        "smash": 14,
+        "la": 14,
+        "ld": 14,
+        "spin": 14,
+        "path": 14,
+        "face": 14,
+        "ftp": 14,
+        "aoa": 13,
+        "apex": 14
+      },
+      "roll": 16.9286,
+      "pathMedian": -8.4,
+      "pathSd": 1.6674,
+      "ftpMedian": 6.8,
+      "ftpSd": 1.8235,
+      "ftpAbsMean": 6.4714,
+      "sourceCount": 15,
+      "held": 1
+    },
+    "4i-after": {
+      "n": 18,
+      "carry": 148.6833,
+      "total": 165.4611,
+      "cs": 78.5111,
+      "bs": 109.2444,
+      "smash": 1.392,
+      "la": 14.0778,
+      "ld": -1.4111,
+      "spin": 5359.9444,
+      "path": -6.2667,
+      "face": -0.1333,
+      "ftp": 6.1333,
+      "aoa": -5.6176,
+      "apex": 57.5556,
+      "best": 156.56,
+      "bestN": 5,
+      "carrySd": 6.9675,
+      "metricCounts": {
+        "carry": 18,
+        "total": 18,
+        "cs": 18,
+        "bs": 18,
+        "smash": 18,
+        "la": 18,
+        "ld": 18,
+        "spin": 18,
+        "path": 18,
+        "face": 18,
+        "ftp": 18,
+        "aoa": 17,
+        "apex": 18
+      },
+      "roll": 16.7778,
+      "pathMedian": -7.05,
+      "pathSd": 3.6235,
+      "ftpMedian": 5.9,
+      "ftpSd": 2.6495,
+      "ftpAbsMean": 6.1667,
+      "sourceCount": 21,
+      "held": 3
+    },
+    "6i-before": {
+      "n": 8,
+      "carry": 142.3125,
+      "total": 155.0625,
+      "cs": 78.35,
+      "bs": 104.775,
+      "smash": 1.3374,
+      "la": 16.275,
+      "ld": -0.425,
+      "spin": 5531.875,
+      "path": -2.925,
+      "face": 0.25,
+      "ftp": 3.175,
+      "aoa": -4.9,
+      "apex": 62.25,
+      "best": 148.68,
+      "bestN": 5,
+      "carrySd": 10.1765,
+      "metricCounts": {
+        "carry": 8,
+        "total": 8,
+        "cs": 8,
+        "bs": 8,
+        "smash": 8,
+        "la": 8,
+        "ld": 8,
+        "spin": 8,
+        "path": 8,
+        "face": 8,
+        "ftp": 8,
+        "aoa": 6,
+        "apex": 8
+      },
+      "roll": 12.75,
+      "pathMedian": -2.55,
+      "pathSd": 2.6305,
+      "ftpMedian": 3.35,
+      "ftpSd": 2.9702,
+      "ftpAbsMean": 3.925,
+      "sourceCount": 10,
+      "held": 2
+    },
+    "7i-before": {
+      "n": 5,
+      "carry": 122.46,
+      "total": 136.68,
+      "cs": 74.7,
+      "bs": 94.7,
+      "smash": 1.268,
+      "la": 16.82,
+      "ld": -1.7,
+      "spin": 5919.2,
+      "path": -2.1,
+      "face": -1.56,
+      "ftp": 0.54,
+      "aoa": -6.1333,
+      "apex": 50.2,
+      "best": 122.46,
+      "bestN": 5,
+      "carrySd": 7.5666,
+      "metricCounts": {
+        "carry": 5,
+        "total": 5,
+        "cs": 5,
+        "bs": 5,
+        "smash": 5,
+        "la": 5,
+        "ld": 5,
+        "spin": 5,
+        "path": 5,
+        "face": 5,
+        "ftp": 5,
+        "aoa": 3,
+        "apex": 5
+      },
+      "roll": 14.22,
+      "pathMedian": -2.5,
+      "pathSd": 1.8934,
+      "ftpMedian": 0.9,
+      "ftpSd": 1.59,
+      "ftpAbsMean": 1.3,
+      "sourceCount": 7,
+      "held": 2
+    },
+    "7i-after": {
+      "n": 5,
+      "carry": 136.1,
+      "total": 143.74,
+      "cs": 76.44,
+      "bs": 100.28,
+      "smash": 1.3121,
+      "la": 20.42,
+      "ld": -1.2,
+      "spin": 5590.4,
+      "path": -5.62,
+      "face": -0.18,
+      "ftp": 5.46,
+      "aoa": -5.9,
+      "apex": 72.0,
+      "best": 136.1,
+      "bestN": 5,
+      "carrySd": 3.9743,
+      "metricCounts": {
+        "carry": 5,
+        "total": 5,
+        "cs": 5,
+        "bs": 5,
+        "smash": 5,
+        "la": 5,
+        "ld": 5,
+        "spin": 5,
+        "path": 5,
+        "face": 5,
+        "ftp": 5,
+        "aoa": 5,
+        "apex": 5
+      },
+      "roll": 7.64,
+      "pathMedian": -6.1,
+      "pathSd": 1.0134,
+      "ftpMedian": 4.9,
+      "ftpSd": 2.033,
+      "ftpAbsMean": 5.46,
+      "sourceCount": 8,
+      "held": 3
+    },
+    "5W": {
+      "n": 6,
+      "carry": 192.2833,
+      "total": 212.6333,
+      "cs": 88.5,
+      "bs": 127.35,
+      "smash": 1.4392,
+      "la": 12.9167,
+      "ld": 2.1333,
+      "spin": 3637.8333,
+      "path": -1.9833,
+      "face": 2.9667,
+      "ftp": 4.9667,
+      "aoa": -1.7833,
+      "apex": 71.6667,
+      "best": 193.14,
+      "bestN": 5,
+      "carrySd": 4.5385,
+      "metricCounts": {
+        "carry": 6,
+        "total": 6,
+        "cs": 6,
+        "bs": 6,
+        "smash": 6,
+        "la": 6,
+        "ld": 6,
+        "spin": 6,
+        "path": 6,
+        "face": 6,
+        "ftp": 6,
+        "aoa": 6,
+        "apex": 6
+      },
+      "roll": 20.35,
+      "pathMedian": -1.65,
+      "pathSd": 2.1591,
+      "ftpMedian": 5.2,
+      "ftpSd": 1.5513,
+      "ftpAbsMean": 4.9667,
+      "sourceCount": 11,
+      "held": 5
+    }
+  },
+  "historicalSameRule": {
+    "4-iron": {
+      "n": 10,
+      "carry": 156.79,
+      "total": 187.22,
+      "cs": 79.44,
+      "bs": 112.96,
+      "smash": 1.422,
+      "la": 11.92,
+      "ld": -2.72,
+      "spin": 4085.7,
+      "path": -6.44,
+      "face": -3.2667,
+      "ftp": 4.59,
+      "aoa": -4.65,
+      "apex": 48.5333,
+      "best": 164.42,
+      "bestN": 5,
+      "carrySd": 10.0866,
+      "metricCounts": {
+        "carry": 10,
+        "total": 10,
+        "cs": 10,
+        "bs": 10,
+        "smash": 10,
+        "la": 10,
+        "ld": 10,
+        "spin": 10,
+        "path": 10,
+        "face": 3,
+        "ftp": 10,
+        "aoa": 8,
+        "apex": 10
+      },
+      "roll": 30.43,
+      "pathMedian": -6.0,
+      "pathSd": 2.6713,
+      "ftpMedian": 4.3,
+      "ftpSd": 2.1957,
+      "ftpAbsMean": 4.59,
+      "date": "2026-09-25",
+      "equipment": "KING TEC as documented in the repository; not used today",
+      "sources": [
+        "data/range-2026-09-25-4i.json",
+        "data/range-2026-09-25-late.json"
+      ]
+    },
+    "7-iron": {
+      "n": 7,
+      "carry": 148.3429,
+      "total": 161.3714,
+      "cs": 79.7571,
+      "bs": 108.4714,
+      "smash": 1.36,
+      "la": 14.9571,
+      "ld": -0.3429,
+      "spin": 5595.8571,
+      "path": -2.2857,
+      "face": null,
+      "ftp": 2.4571,
+      "aoa": -5.6333,
+      "apex": 62.7143,
+      "best": 151.24,
+      "bestN": 5,
+      "carrySd": 6.662,
+      "metricCounts": {
+        "carry": 7,
+        "total": 7,
+        "cs": 7,
+        "bs": 7,
+        "smash": 7,
+        "la": 7,
+        "ld": 7,
+        "spin": 7,
+        "path": 7,
+        "face": 0,
+        "ftp": 7,
+        "aoa": 6,
+        "apex": 7
+      },
+      "roll": 13.0285,
+      "pathMedian": -2.1,
+      "pathSd": 1.6975,
+      "ftpMedian": 2.2,
+      "ftpSd": 2.9765,
+      "ftpAbsMean": 2.5714,
+      "date": "2026-10-01",
+      "equipment": "KING TEC as documented in the repository; not used today",
+      "sources": [
+        "range-20261001-feed.json#oct01-map-20261001-combine-v1"
+      ]
+    }
+  },
+  "prior3H": {
+    "club": "3-hybrid",
+    "n": 11,
+    "held": 15,
+    "carry": 190.445,
+    "total": 215.818,
+    "cs": 86.409,
+    "bs": 126.782,
+    "smash": 1.468,
+    "la": 12.336,
+    "spin": 3218.727,
+    "ftp": 2.827,
+    "path": -1.118,
+    "face": 1.718,
+    "aoa": -2.927,
+    "ld": 1.273,
+    "apex": 62.273,
+    "metricCounts": {
+      "carry": 11,
+      "total": 11,
+      "cs": 11,
+      "bs": 11,
+      "smash": 11,
+      "la": 11,
+      "spin": 11,
+      "ftp": 11,
+      "path": 11,
+      "face": 11,
+      "aoa": 11,
+      "ld": 11
+    },
+    "carrySd": 9.285,
+    "date": "2026-11-11"
+  },
+  "splitScans": {
+    "4-iron [KING Forged] · club first": {
+      "candidates": [
+        {
+          "afterSourceShot": 1,
+          "beforeN": 1,
+          "afterN": 17,
+          "carry": 4.4294,
+          "path": 5.2235,
+          "ftp": -6.5294,
+          "smash": 0.0683
+        },
+        {
+          "afterSourceShot": 2,
+          "beforeN": 2,
+          "afterN": 16,
+          "carry": 6.7875,
+          "path": 3.6937,
+          "ftp": -4.575,
+          "smash": 0.0656
+        },
+        {
+          "afterSourceShot": 3,
+          "beforeN": 3,
+          "afterN": 15,
+          "carry": 3.02,
+          "path": 3.48,
+          "ftp": -4.08,
+          "smash": 0.044
+        },
+        {
+          "afterSourceShot": 4,
+          "beforeN": 4,
+          "afterN": 14,
+          "carry": 1.875,
+          "path": -1.3393,
+          "ftp": -2.4643,
+          "smash": 0.0253
+        },
+        {
+          "afterSourceShot": 5,
+          "beforeN": 5,
+          "afterN": 13,
+          "carry": 1.5554,
+          "path": -0.7292,
+          "ftp": -2.8062,
+          "smash": 0.0168
+        },
+        {
+          "afterSourceShot": 6,
+          "beforeN": 6,
+          "afterN": 12,
+          "carry": 4.475,
+          "path": -0.3,
+          "ftp": -2.575,
+          "smash": 0.0385
+        },
+        {
+          "afterSourceShot": 7,
+          "beforeN": 7,
+          "afterN": 11,
+          "carry": 1.2116,
+          "path": -0.3195,
+          "ftp": -2.2831,
+          "smash": 0.0258
+        },
+        {
+          "afterSourceShot": 8,
+          "beforeN": 8,
+          "afterN": 10,
+          "carry": 0.915,
+          "path": -0.12,
+          "ftp": -2.595,
+          "smash": 0.0318
+        },
+        {
+          "afterSourceShot": 9,
+          "beforeN": 9,
+          "afterN": 9,
+          "carry": 2.3667,
+          "path": 0.0667,
+          "ftp": -2.3333,
+          "smash": 0.0193
+        },
+        {
+          "afterSourceShot": 11,
+          "beforeN": 10,
+          "afterN": 8,
+          "carry": 4.125,
+          "path": 0.3,
+          "ftp": -1.8375,
+          "smash": 0.028
+        },
+        {
+          "afterSourceShot": 12,
+          "beforeN": 11,
+          "afterN": 7,
+          "carry": 4.5389,
+          "path": -0.4286,
+          "ftp": -1.5507,
+          "smash": 0.0243
+        },
+        {
+          "afterSourceShot": 13,
+          "beforeN": 12,
+          "afterN": 6,
+          "carry": 2.975,
+          "path": -0.275,
+          "ftp": -2.0,
+          "smash": 0.0172
+        },
+        {
+          "afterSourceShot": 14,
+          "beforeN": 13,
+          "afterN": 5,
+          "carry": 6.0323,
+          "path": -0.1846,
+          "ftp": -2.2062,
+          "smash": 0.0224
+        },
+        {
+          "afterSourceShot": 16,
+          "beforeN": 14,
+          "afterN": 4,
+          "carry": 6.3857,
+          "path": -0.1714,
+          "ftp": -2.4214,
+          "smash": 0.0191
+        },
+        {
+          "afterSourceShot": 18,
+          "beforeN": 15,
+          "afterN": 3,
+          "carry": 3.58,
+          "path": 0.04,
+          "ftp": -3.56,
+          "smash": 0.0112
+        }
+      ],
+      "rollingLastFive": [
+        {
+          "endingSourceShot": 5,
+          "carry": 147.56,
+          "path": -5.74,
+          "ftp": 8.16,
+          "smash": 1.3799
+        },
+        {
+          "endingSourceShot": 6,
+          "carry": 145.94,
+          "path": -5.04,
+          "ftp": 6.96,
+          "smash": 1.3741
+        },
+        {
+          "endingSourceShot": 7,
+          "carry": 150.06,
+          "path": -4.68,
+          "ftp": 6.46,
+          "smash": 1.3933
+        },
+        {
+          "endingSourceShot": 8,
+          "carry": 149.38,
+          "path": -4.42,
+          "ftp": 6.4,
+          "smash": 1.3857
+        },
+        {
+          "endingSourceShot": 9,
+          "carry": 147.72,
+          "path": -7.16,
+          "ftp": 6.7,
+          "smash": 1.3903
+        },
+        {
+          "endingSourceShot": 11,
+          "carry": 146.14,
+          "path": -7.06,
+          "ftp": 5.74,
+          "smash": 1.3793
+        },
+        {
+          "endingSourceShot": 12,
+          "carry": 148.38,
+          "path": -6.14,
+          "ftp": 5.4,
+          "smash": 1.4021
+        },
+        {
+          "endingSourceShot": 13,
+          "carry": 147.34,
+          "path": -6.32,
+          "ftp": 5.78,
+          "smash": 1.4004
+        },
+        {
+          "endingSourceShot": 14,
+          "carry": 145.14,
+          "path": -6.24,
+          "ftp": 5.42,
+          "smash": 1.4042
+        },
+        {
+          "endingSourceShot": 16,
+          "carry": 146.84,
+          "path": -6.1,
+          "ftp": 5.54,
+          "smash": 1.3976
+        },
+        {
+          "endingSourceShot": 18,
+          "carry": 150.56,
+          "path": -6.02,
+          "ftp": 6.28,
+          "smash": 1.4114
+        },
+        {
+          "endingSourceShot": 19,
+          "carry": 151.22,
+          "path": -7.06,
+          "ftp": 6.32,
+          "smash": 1.3934
+        },
+        {
+          "endingSourceShot": 20,
+          "carry": 150.46,
+          "path": -6.52,
+          "ftp": 5.82,
+          "smash": 1.3976
+        },
+        {
+          "endingSourceShot": 21,
+          "carry": 153.04,
+          "path": -6.4,
+          "ftp": 4.54,
+          "smash": 1.4082
+        }
+      ],
+      "verdict": "No additional sustained change is established within this short block. Preserve the user-confirmed pre/post-cue boundary; do not manufacture a winning window or join different cue phases."
+    },
+    "5-wood · 4i-label block": {
+      "candidates": [
+        {
+          "afterSourceShot": 22,
+          "beforeN": 1,
+          "afterN": 3,
+          "carry": -1.4333,
+          "path": -2.0667,
+          "ftp": 3.1667,
+          "smash": -0.0454
+        }
+      ],
+      "rollingLastFive": [],
+      "verdict": "No additional sustained change is established within this short block. Preserve the user-confirmed pre/post-cue boundary; do not manufacture a winning window or join different cue phases."
+    },
+    "7-iron [KING Forged] · club first": {
+      "candidates": [
+        {
+          "afterSourceShot": 1,
+          "beforeN": 1,
+          "afterN": 4,
+          "carry": 2.5,
+          "path": 0.6,
+          "ftp": -3.3,
+          "smash": -0.0015
+        },
+        {
+          "afterSourceShot": 2,
+          "beforeN": 2,
+          "afterN": 3,
+          "carry": -1.4167,
+          "path": -0.8667,
+          "ftp": -1.3167,
+          "smash": -0.0107
+        }
+      ],
+      "rollingLastFive": [
+        {
+          "endingSourceShot": 8,
+          "carry": 136.1,
+          "path": -5.62,
+          "ftp": 5.46,
+          "smash": 1.3121
+        }
+      ],
+      "verdict": "No additional sustained change is established within this short block. Preserve the user-confirmed pre/post-cue boundary; do not manufacture a winning window or join different cue phases."
+    },
+    "5-wood · 4w-label block": {
+      "candidates": [],
+      "rollingLastFive": [],
+      "verdict": "No additional sustained change is established within this short block. Preserve the user-confirmed pre/post-cue boundary; do not manufacture a winning window or join different cue phases."
+    },
+    "4-iron [KING Forged] · before cue": {
+      "candidates": [
+        {
+          "afterSourceShot": 1,
+          "beforeN": 1,
+          "afterN": 13,
+          "carry": 3.3615,
+          "path": -2.8231,
+          "ftp": -0.3538,
+          "smash": 0.0068
+        },
+        {
+          "afterSourceShot": 2,
+          "beforeN": 2,
+          "afterN": 12,
+          "carry": -4.875,
+          "path": -0.6667,
+          "ftp": 0.4917,
+          "smash": -0.0202
+        },
+        {
+          "afterSourceShot": 3,
+          "beforeN": 3,
+          "afterN": 11,
+          "carry": -0.0151,
+          "path": -1.1727,
+          "ftp": 0.1758,
+          "smash": -0.0067
+        },
+        {
+          "afterSourceShot": 4,
+          "beforeN": 4,
+          "afterN": 10,
+          "carry": 1.64,
+          "path": -0.94,
+          "ftp": 0.38,
+          "smash": 0.0055
+        },
+        {
+          "afterSourceShot": 5,
+          "beforeN": 5,
+          "afterN": 9,
+          "carry": 5.2289,
+          "path": -0.5933,
+          "ftp": 0.2356,
+          "smash": 0.0293
+        },
+        {
+          "afterSourceShot": 6,
+          "beforeN": 6,
+          "afterN": 8,
+          "carry": 6.9208,
+          "path": -0.8542,
+          "ftp": 0.125,
+          "smash": 0.0396
+        },
+        {
+          "afterSourceShot": 8,
+          "beforeN": 7,
+          "afterN": 7,
+          "carry": 4.9571,
+          "path": -0.5857,
+          "ftp": -0.0857,
+          "smash": 0.0401
+        },
+        {
+          "afterSourceShot": 9,
+          "beforeN": 8,
+          "afterN": 6,
+          "carry": 4.075,
+          "path": -0.1958,
+          "ftp": -0.5333,
+          "smash": 0.0327
+        },
+        {
+          "afterSourceShot": 10,
+          "beforeN": 9,
+          "afterN": 5,
+          "carry": 2.3311,
+          "path": 0.4378,
+          "ftp": -0.92,
+          "smash": 0.0333
+        },
+        {
+          "afterSourceShot": 11,
+          "beforeN": 10,
+          "afterN": 4,
+          "carry": 4.835,
+          "path": 1.22,
+          "ftp": -2.305,
+          "smash": 0.0396
+        },
+        {
+          "afterSourceShot": 12,
+          "beforeN": 11,
+          "afterN": 3,
+          "carry": 2.9,
+          "path": 0.2394,
+          "ftp": -1.0242,
+          "smash": 0.0341
+        }
+      ],
+      "rollingLastFive": [
+        {
+          "endingSourceShot": 5,
+          "carry": 156.66,
+          "path": -7.54,
+          "ftp": 6.32,
+          "smash": 1.3949
+        },
+        {
+          "endingSourceShot": 6,
+          "carry": 155.9,
+          "path": -7.86,
+          "ftp": 6.32,
+          "smash": 1.3879
+        },
+        {
+          "endingSourceShot": 8,
+          "carry": 154.88,
+          "path": -7.74,
+          "ftp": 6.7,
+          "smash": 1.3787
+        },
+        {
+          "endingSourceShot": 9,
+          "carry": 157.22,
+          "path": -8.34,
+          "ftp": 6.92,
+          "smash": 1.3881
+        },
+        {
+          "endingSourceShot": 10,
+          "carry": 159.46,
+          "path": -8.74,
+          "ftp": 7.28,
+          "smash": 1.3955
+        },
+        {
+          "endingSourceShot": 11,
+          "carry": 160.62,
+          "path": -9.0,
+          "ftp": 7.94,
+          "smash": 1.41
+        },
+        {
+          "endingSourceShot": 12,
+          "carry": 163.4,
+          "path": -8.62,
+          "ftp": 7.04,
+          "smash": 1.4248
+        },
+        {
+          "endingSourceShot": 13,
+          "carry": 164.2,
+          "path": -8.14,
+          "ftp": 6.4,
+          "smash": 1.439
+        },
+        {
+          "endingSourceShot": 14,
+          "carry": 160.56,
+          "path": -7.9,
+          "ftp": 6.14,
+          "smash": 1.4279
+        },
+        {
+          "endingSourceShot": 15,
+          "carry": 161.52,
+          "path": -7.64,
+          "ftp": 5.88,
+          "smash": 1.4351
+        }
+      ],
+      "verdict": "No additional sustained change is established within this short block. Preserve the user-confirmed pre/post-cue boundary; do not manufacture a winning window or join different cue phases."
+    },
+    "6-iron [KING Forged] · before cue": {
+      "candidates": [
+        {
+          "afterSourceShot": 2,
+          "beforeN": 1,
+          "afterN": 7,
+          "carry": -1.2429,
+          "path": 3.8571,
+          "ftp": -4.8286,
+          "smash": 0.0278
+        },
+        {
+          "afterSourceShot": 3,
+          "beforeN": 2,
+          "afterN": 6,
+          "carry": -7.7833,
+          "path": 0.7667,
+          "ftp": 1.3,
+          "smash": -0.0536
+        },
+        {
+          "afterSourceShot": 4,
+          "beforeN": 3,
+          "afterN": 5,
+          "carry": -7.18,
+          "path": -0.0933,
+          "ftp": 1.1333,
+          "smash": -0.062
+        },
+        {
+          "afterSourceShot": 5,
+          "beforeN": 4,
+          "afterN": 4,
+          "carry": -1.525,
+          "path": 1.0,
+          "ftp": 0.7,
+          "smash": -0.0322
+        },
+        {
+          "afterSourceShot": 7,
+          "beforeN": 5,
+          "afterN": 3,
+          "carry": -7.4867,
+          "path": 2.6,
+          "ftp": -0.3333,
+          "smash": -0.0589
+        }
+      ],
+      "rollingLastFive": [
+        {
+          "endingSourceShot": 7,
+          "carry": 145.12,
+          "path": -3.9,
+          "ftp": 3.3,
+          "smash": 1.3595
+        },
+        {
+          "endingSourceShot": 8,
+          "carry": 144.14,
+          "path": -3.18,
+          "ftp": 2.28,
+          "smash": 1.3494
+        },
+        {
+          "endingSourceShot": 9,
+          "carry": 143.5,
+          "path": -2.8,
+          "ftp": 3.62,
+          "smash": 1.3368
+        },
+        {
+          "endingSourceShot": 10,
+          "carry": 139.62,
+          "path": -2.96,
+          "ftp": 3.6,
+          "smash": 1.3142
+        }
+      ],
+      "verdict": "No additional sustained change is established within this short block. Preserve the user-confirmed pre/post-cue boundary; do not manufacture a winning window or join different cue phases."
+    },
+    "7-iron [KING Forged] · before cue": {
+      "candidates": [
+        {
+          "afterSourceShot": 1,
+          "beforeN": 1,
+          "afterN": 4,
+          "carry": 4.7,
+          "path": 0.5,
+          "ftp": -0.45,
+          "smash": 0.028
+        },
+        {
+          "afterSourceShot": 4,
+          "beforeN": 2,
+          "afterN": 3,
+          "carry": 5.0167,
+          "path": -0.0833,
+          "ftp": -0.1,
+          "smash": -0.0043
+        }
+      ],
+      "rollingLastFive": [
+        {
+          "endingSourceShot": 7,
+          "carry": 122.46,
+          "path": -2.1,
+          "ftp": 0.54,
+          "smash": 1.268
+        }
+      ],
+      "verdict": "No additional sustained change is established within this short block. Preserve the user-confirmed pre/post-cue boundary; do not manufacture a winning window or join different cue phases."
+    }
+  },
+  "headerChecks": [
+    {
+      "file": "ScreenRecording_11-14-2026 05-20-32_1.mp4",
+      "columns": {
+        "cs": {
+          "rowMean": 80.712,
+          "displayedHeader": 80.7,
+          "difference": 0.012
+        },
+        "aoa": {
+          "rowMean": -4.5348,
+          "displayedHeader": -4.5,
+          "difference": -0.0348
+        },
+        "path": {
+          "rowMean": -5.0778,
+          "displayedHeader": -5.1,
+          "difference": 0.0222
+        },
+        "face": {
+          "rowMean": 0.937,
+          "displayedHeader": 0.9,
+          "difference": 0.037
+        },
+        "ftp": {
+          "rowMean": 6.0185,
+          "displayedHeader": 6.0,
+          "difference": 0.0185
+        },
+        "bs": {
+          "rowMean": 110.3333,
+          "displayedHeader": 110.3,
+          "difference": 0.0333
+        },
+        "smashIndex": {
+          "rowMean": 100.087,
+          "displayedHeader": 100,
+          "difference": 0.087
+        },
+        "la": {
+          "rowMean": 13.8778,
+          "displayedHeader": 13.9,
+          "difference": -0.0222
+        },
+        "ld": {
+          "rowMean": -0.3074,
+          "displayedHeader": -0.3,
+          "difference": -0.0074
+        },
+        "spin": {
+          "rowMean": 4920.7037,
+          "displayedHeader": 4921,
+          "difference": -0.2963
+        },
+        "carry": {
+          "rowMean": 149.063,
+          "displayedHeader": 149.1,
+          "difference": -0.037
+        },
+        "total": {
+          "rowMean": 168.7222,
+          "displayedHeader": 168.7,
+          "difference": 0.0222
+        },
+        "height": {
+          "rowMean": 56.037,
+          "displayedHeader": 56,
+          "difference": 0.037
+        }
+      },
+      "authority": "individual visible shot rows; header is a transcription cross-check, not the clean average"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-24-02_1.mp4",
+      "columns": {
+        "cs": {
+          "rowMean": 75.875,
+          "displayedHeader": 75.9,
+          "difference": -0.025
+        },
+        "aoa": {
+          "rowMean": -5.9,
+          "displayedHeader": -5.9,
+          "difference": 0.0
+        },
+        "path": {
+          "rowMean": -5.8375,
+          "displayedHeader": -5.8,
+          "difference": -0.0375
+        },
+        "face": {
+          "rowMean": -0.3375,
+          "displayedHeader": -0.3,
+          "difference": -0.0375
+        },
+        "ftp": {
+          "rowMean": 5.5125,
+          "displayedHeader": 5.5,
+          "difference": 0.0125
+        },
+        "bs": {
+          "rowMean": 98.1625,
+          "displayedHeader": 98.2,
+          "difference": -0.0375
+        },
+        "smashIndex": {
+          "rowMean": 101.6,
+          "displayedHeader": 101,
+          "difference": 0.6
+        },
+        "la": {
+          "rowMean": 17.1125,
+          "displayedHeader": 17.1,
+          "difference": 0.0125
+        },
+        "ld": {
+          "rowMean": -1.4,
+          "displayedHeader": -1.4,
+          "difference": 0.0
+        },
+        "spin": {
+          "rowMean": 5295,
+          "displayedHeader": 5295,
+          "difference": 0
+        },
+        "carry": {
+          "rowMean": 125.1,
+          "displayedHeader": 125.1,
+          "difference": 0.0
+        },
+        "total": {
+          "rowMean": 141.1375,
+          "displayedHeader": 141.1,
+          "difference": 0.0375
+        },
+        "height": {
+          "rowMean": 54.5,
+          "displayedHeader": 55,
+          "difference": -0.5
+        }
+      },
+      "authority": "individual visible shot rows; header is a transcription cross-check, not the clean average"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-26-54_1.mp4",
+      "columns": {
+        "cs": {
+          "rowMean": 87.325,
+          "displayedHeader": 87.3,
+          "difference": 0.025
+        },
+        "aoa": {
+          "rowMean": -2.225,
+          "displayedHeader": -2.2,
+          "difference": -0.025
+        },
+        "path": {
+          "rowMean": -0.98,
+          "displayedHeader": -1.0,
+          "difference": 0.02
+        },
+        "face": {
+          "rowMean": 3.28,
+          "displayedHeader": 3.3,
+          "difference": -0.02
+        },
+        "ftp": {
+          "rowMean": 4.26,
+          "displayedHeader": 4.3,
+          "difference": -0.04
+        },
+        "bs": {
+          "rowMean": 116.32,
+          "displayedHeader": 116.3,
+          "difference": 0.02
+        },
+        "smashIndex": {
+          "rowMean": 95.75,
+          "displayedHeader": 96,
+          "difference": -0.25
+        },
+        "la": {
+          "rowMean": 14.1,
+          "displayedHeader": 14.1,
+          "difference": 0.0
+        },
+        "ld": {
+          "rowMean": 2.6,
+          "displayedHeader": 2.6,
+          "difference": 0.0
+        },
+        "spin": {
+          "rowMean": 3448.8,
+          "displayedHeader": 3449,
+          "difference": -0.2
+        },
+        "carry": {
+          "rowMean": 168.46,
+          "displayedHeader": 168.5,
+          "difference": -0.04
+        },
+        "total": {
+          "rowMean": 191.92,
+          "displayedHeader": 191.9,
+          "difference": 0.02
+        },
+        "height": {
+          "rowMean": 59.2,
+          "displayedHeader": 59,
+          "difference": 0.2
+        }
+      },
+      "authority": "individual visible shot rows; header is a transcription cross-check, not the clean average"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-30-41_1.mp4",
+      "columns": {
+        "cs": {
+          "rowMean": 81.4786,
+          "displayedHeader": 81.5,
+          "difference": -0.0214
+        },
+        "aoa": {
+          "rowMean": -5.6769,
+          "displayedHeader": -5.7,
+          "difference": 0.0231
+        },
+        "path": {
+          "rowMean": -8.06,
+          "displayedHeader": -8.1,
+          "difference": 0.04
+        },
+        "face": {
+          "rowMean": -1.46,
+          "displayedHeader": -1.5,
+          "difference": 0.04
+        },
+        "ftp": {
+          "rowMean": 6.6067,
+          "displayedHeader": 6.6,
+          "difference": 0.0067
+        },
+        "bs": {
+          "rowMean": 114.2933,
+          "displayedHeader": 114.3,
+          "difference": -0.0067
+        },
+        "smashIndex": {
+          "rowMean": 102.3077,
+          "displayedHeader": 102,
+          "difference": 0.3077
+        },
+        "la": {
+          "rowMean": 13.0333,
+          "displayedHeader": 13.0,
+          "difference": 0.0333
+        },
+        "ld": {
+          "rowMean": -2.78,
+          "displayedHeader": -2.8,
+          "difference": 0.02
+        },
+        "spin": {
+          "rowMean": 5168.4,
+          "displayedHeader": 5168,
+          "difference": 0.4
+        },
+        "carry": {
+          "rowMean": 158.2933,
+          "displayedHeader": 158.3,
+          "difference": -0.0067
+        },
+        "total": {
+          "rowMean": 175.58,
+          "displayedHeader": 175.6,
+          "difference": -0.02
+        },
+        "height": {
+          "rowMean": 59.2667,
+          "displayedHeader": 59,
+          "difference": 0.2667
+        }
+      },
+      "authority": "individual visible shot rows; header is a transcription cross-check, not the clean average"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-31-15_1.mp4",
+      "columns": {
+        "cs": {
+          "rowMean": 78.35,
+          "displayedHeader": 78.4,
+          "difference": -0.05
+        },
+        "aoa": {
+          "rowMean": -4.9,
+          "displayedHeader": -4.9,
+          "difference": 0.0
+        },
+        "path": {
+          "rowMean": -3.4222,
+          "displayedHeader": -3.4,
+          "difference": -0.0222
+        },
+        "face": {
+          "rowMean": 0.1222,
+          "displayedHeader": 0.1,
+          "difference": 0.0222
+        },
+        "ftp": {
+          "rowMean": 3.5444,
+          "displayedHeader": 3.5,
+          "difference": 0.0444
+        },
+        "bs": {
+          "rowMean": 102.74,
+          "displayedHeader": 102.7,
+          "difference": 0.04
+        },
+        "smashIndex": {
+          "rowMean": 99.6667,
+          "displayedHeader": 100,
+          "difference": -0.3333
+        },
+        "la": {
+          "rowMean": 15.01,
+          "displayedHeader": 15.0,
+          "difference": 0.01
+        },
+        "ld": {
+          "rowMean": -0.56,
+          "displayedHeader": -0.6,
+          "difference": 0.04
+        },
+        "spin": {
+          "rowMean": 5292,
+          "displayedHeader": 5292,
+          "difference": 0
+        },
+        "carry": {
+          "rowMean": 128.1,
+          "displayedHeader": 128.1,
+          "difference": 0.0
+        },
+        "total": {
+          "rowMean": 143.13,
+          "displayedHeader": 143.1,
+          "difference": 0.03
+        },
+        "height": {
+          "rowMean": 55.3,
+          "displayedHeader": 55,
+          "difference": 0.3
+        }
+      },
+      "authority": "individual visible shot rows; header is a transcription cross-check, not the clean average"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-31-56_1.mp4",
+      "columns": {
+        "cs": {
+          "rowMean": 73.9667,
+          "displayedHeader": 74.0,
+          "difference": -0.0333
+        },
+        "aoa": {
+          "rowMean": -6.1333,
+          "displayedHeader": -6.1,
+          "difference": -0.0333
+        },
+        "path": {
+          "rowMean": -1.0714,
+          "displayedHeader": -1.1,
+          "difference": 0.0286
+        },
+        "face": {
+          "rowMean": -1.2429,
+          "displayedHeader": -1.2,
+          "difference": -0.0429
+        },
+        "ftp": {
+          "rowMean": -0.1714,
+          "displayedHeader": -0.2,
+          "difference": 0.0286
+        },
+        "bs": {
+          "rowMean": 92.2429,
+          "displayedHeader": 92.2,
+          "difference": 0.0429
+        },
+        "smashIndex": {
+          "rowMean": 92.3333,
+          "displayedHeader": 93,
+          "difference": -0.6667
+        },
+        "la": {
+          "rowMean": 16.0,
+          "displayedHeader": 16.0,
+          "difference": 0.0
+        },
+        "ld": {
+          "rowMean": -1.2714,
+          "displayedHeader": -1.3,
+          "difference": 0.0286
+        },
+        "spin": {
+          "rowMean": 5015.8571,
+          "displayedHeader": 5016,
+          "difference": -0.1429
+        },
+        "carry": {
+          "rowMean": 114.3571,
+          "displayedHeader": 114.4,
+          "difference": -0.0429
+        },
+        "total": {
+          "rowMean": 134.4286,
+          "displayedHeader": 134.5,
+          "difference": -0.0714
+        },
+        "height": {
+          "rowMean": 42.0,
+          "displayedHeader": 42,
+          "difference": 0.0
+        }
+      },
+      "authority": "individual visible shot rows; header is a transcription cross-check, not the clean average"
+    }
+  ],
+  "exclusions": [
+    {
+      "file": "ScreenRecording_11-14-2026 05-20-32_1.mp4",
+      "club": "4-iron [KING Forged] · club first",
+      "shot": 10,
+      "reason": "apex 35 ft below 40 ft"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-20-32_1.mp4",
+      "club": "4-iron [KING Forged] · club first",
+      "shot": 15,
+      "reason": "no club-speed reading captured; apex 25 ft below 40 ft; carry below two-thirds of the airborne cluster"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-20-32_1.mp4",
+      "club": "4-iron [KING Forged] · club first",
+      "shot": 17,
+      "reason": "no club-speed reading captured"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-20-32_1.mp4",
+      "club": "5-wood · 4i-label block",
+      "shot": 24,
+      "reason": "apex 5 ft below 40 ft; ball / club = 1.0894, below the wood/hybrid 1.40 cutoff; carry below two-thirds of the airborne cluster"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-20-32_1.mp4",
+      "club": "5-wood · 4i-label block",
+      "shot": 25,
+      "reason": "ball / club = 1.3932, below the wood/hybrid 1.40 cutoff"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-24-02_1.mp4",
+      "club": "7-iron [KING Forged] · club first",
+      "shot": 3,
+      "reason": "apex 13 ft below 40 ft"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-24-02_1.mp4",
+      "club": "7-iron [KING Forged] · club first",
+      "shot": 4,
+      "reason": "apex 34 ft below 40 ft"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-24-02_1.mp4",
+      "club": "7-iron [KING Forged] · club first",
+      "shot": 7,
+      "reason": "apex 29 ft below 40 ft"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-26-54_1.mp4",
+      "club": "5-wood · 4w-label block",
+      "shot": 2,
+      "reason": "no club-speed reading captured"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-26-54_1.mp4",
+      "club": "5-wood · 4w-label block",
+      "shot": 3,
+      "reason": "apex 35 ft below 40 ft"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-26-54_1.mp4",
+      "club": "5-wood · 4w-label block",
+      "shot": 4,
+      "reason": "ball / club = 1.1622, below the wood/hybrid 1.40 cutoff"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-30-41_1.mp4",
+      "club": "4-iron [KING Forged] · before cue",
+      "shot": 7,
+      "reason": "no club-speed reading captured"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-31-15_1.mp4",
+      "club": "6-iron [KING Forged] · before cue",
+      "shot": 1,
+      "reason": "no club-speed reading captured"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-31-15_1.mp4",
+      "club": "6-iron [KING Forged] · before cue",
+      "shot": 6,
+      "reason": "no club-speed reading captured; apex 0 ft below 40 ft; carry below two-thirds of the airborne cluster"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-31-56_1.mp4",
+      "club": "7-iron [KING Forged] · before cue",
+      "shot": 2,
+      "reason": "no club-speed reading captured; apex 28 ft below 40 ft"
+    },
+    {
+      "file": "ScreenRecording_11-14-2026 05-31-56_1.mp4",
+      "club": "7-iron [KING Forged] · before cue",
+      "shot": 3,
+      "reason": "apex 15 ft below 40 ft"
+    }
+  ],
+  "limits": [
+    "No actual swing footage; cannot infer hand/hip/club sequence or prove cue causation.",
+    "Same-equipment, same-day before/after blocks exist for 4i and 7i. They were not randomized or speed-matched; differences do not isolate cue causation from effort, fatigue, warm-up or order.",
+    "No numeric landing angle or lateral-finish column; do not estimate dispersion from the overview image.",
+    "Venue, ball and normalization temperature/altitude unconfirmed.",
+    "The first 4 Iron header mixes two clubs and is only a transcription checksum, never a 4i average.",
+    "Other clubs shown only in overview are not imported without their shot rows.",
+    "7i Smash Index visible values average 101.6 while the header shows 101; preserve both. This percent index is not used to calculate smash or exclusions.",
+    "Old 6i normalization setting not shown in its clip. All six clips assigned to November 14 by Jack; the monitor displays November 13 in the dated overviews.",
+    "Old KING Forged head generation, loft and precise shaft submodel are not established. Do not attribute a result to shaft flex or weight alone.",
+    "Old 7i visible Smash Index values average 92.33 versus header 93; row-derived total is 134.43 versus table header 134.5 and overview 134.4. Preserve rows and displayed summaries separately."
+  ]
+}

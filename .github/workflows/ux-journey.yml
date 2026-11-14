@@ -41,6 +41,7 @@ jobs:
           node tests/round-review.cjs
           node tests/round-takeaways.cjs
           node tests/round-identity.cjs
+          node tests/range-nov14-sim.cjs
   browser:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -61,6 +62,7 @@ jobs:
       - name: Browser journey and offline smoke
         run: |
           CADDIE_QA_DIR="$RUNNER_TEMP/caddie-ux-evidence" node tests/ux-journey-browser.cjs
+          CADDIE_QA_DIR="$RUNNER_TEMP/caddie-ux-evidence" node tests/range-nov14-browser.cjs
       - name: Browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
