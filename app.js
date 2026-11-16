@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v293';
+const BUILD = 'v294';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v294', d:'2026-11-16', items:['SUNLIT TREES IN LINKS: In the 3D view each tree crown now catches the sun. The side facing the light is warm and bright, the far side cool and dim, and the underside darker. It matches the direction the tree and flag shadows already fall. Looks only: shots, lies and scores are unchanged.'] },
   { b:'v293', d:'2026-11-14', items:['TODAY BY CLUB: Nov 14 now combines all retained shots into one result per club: old Forged 4i 153.6, 6i 142.3, 7i 129.3 and 5W 192.3 yd. All 72 source shots and 16 exclusions stay recorded; playing carries stay unchanged.','Club first stays in Swing Thoughts for your process. Today’s stats no longer split into a before/after cue test. Old KING Forged results remain separate from KING TEC history.'] },
   { b:'v292', d:'2026-11-14', items:['TODAY’S SIM: all irons were old KING Forged / KBS 120 stiff. Before → club first: 4i 160.0 → 148.7 yd; 7i 122.5 → 136.1 yd. 56 clean of 72 shots. Old equipment and cue phases stay separate in sessions, history and Compare clubs.','Club first saved in Swing Thoughts. 5W returns with a 192.3 yd measured offer (6/11); 3H return in progress with its carry/history saved. KING TEC irons, benched 4i and playing distances unchanged.'] },
   { b:'v291', d:'2026-11-11', items:['TONIGHT\'S SIM NUMBERS: Mini, 3H and 4H from Nov 11 are in Swing, every shot, all off the deck. With mishits held out (same rule as Nov 4): mini 196 carry (7 of 15), 3H 190 (11 of 26), 4H 178 (4 of 6). Each is parked on its Bag row as an offer to tap. Playing carries stay 201 / 187 / 178.'] },

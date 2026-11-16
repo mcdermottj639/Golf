@@ -4428,6 +4428,20 @@ shadow darker than the mirrored point and open fairway; the sun side of the trun
 Quit and re-enter, golf state unchanged, zero errors). Nothing about a lie, bounce, score or pack changes,
 so it is not behind a flag.
 
+**Sunlit canopies (v294, branch links/20261116-sunlit-canopies).** A tree crown is a camera-facing InstancedMesh card
+(`leafMat`, a `MeshBasicMaterial` patched in `onBeforeCompile`), so it was one flat tint. The patch now passes the card's UV
+to the fragment shader, which treats the card as a rough sphere: a normal `(q.x*.95, q.y*.8, .6)` from the UV, lit by
+`uLeafSun`. That uniform is the same `sun` light that drives `SUN` and the ground shadows, rotated into camera space every
+`render()` (`matrixWorldInverse` applied to the normalized light position), so the lit side of a crown always faces the
+side the shadows fall away from. The lit side is warm and brighter (tone ×1.14), the far side cool and dim (×.56) and the
+lower edge darkened (`ao` .6) where branches overlap. Vertex billboarding, card size, position and alpha cutout are untouched:
+scenery only, so no lie, shot or score changes and it is not behind a flag. The two replacements assume three's shader text
+contains `void main() {` and `#include <map_fragment>`; if a three upgrade changes either, the trees silently go flat again,
+and `tests/links-canopies-browser.cjs` catches that (pixel read: sun side of a crown brighter and warmer than the far side by
+a margin, `info().leafSun` a unit vector). Frame time, 390×844 / 320×690 SwiftShader `drawMs()`: main 1.26 / 1.16 ms, v294
+1.00 / 1.17 ms (noise). Real-device look unverified. The 2D hole map is unchanged. The per-club dispersion item remains open:
+Jack skipped PR #96 (bay dispersion), so do not resume it unless he asks.
+
 **Water ripples (v277, PR #84, branch links/20261104-water-ripples).** The 3D water was a flat `MeshStandardMaterial`
 teal (v252–v275). `waterMat` in `links-scene.js` is now one `ShaderMaterial` shared by every water polygon
 (`groundMaterials.water` is the same object, not a clone, so one clock drives every pond): three sine wave
@@ -4614,8 +4628,8 @@ browser checks, not a claim of an on-device Safari test.
 **v256 safe exit.** The in-game body supplies top safe-area padding because its normal masthead is hidden. A 44 px minimum Back to Caddie HQ button calls the app bridge to render Home; render unmounts Links and restores the masthead/navigation. Leaving discards the current game without changing golf records. Keep this exit visible when adjusting viewport sizing.
 
 **Backlog.** Surveyed terrain elevations and fuller feature coverage are needed for faithful course
-rehearsal. Graphics: improved canopies (the shadows half of that item shipped as v273), 3D putting when it
-can preserve readability. The current renderer already includes textured surfaces, decorative trees, sun-cast
+rehearsal. Graphics: 3D putting when it
+can preserve readability (canopy lighting shipped as v294, shadows as v273). The current renderer already includes textured surfaces, decorative trees, sun-cast
 shadows and rippling water. Game: per-club dispersion from every bay session instead of
 the built-in table; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry.
 Standing plans are now available from each hole.
@@ -4632,6 +4646,7 @@ main). The rule stands for every links/ PR: if main moves before the merge, reba
 Shipped: water ripples in the 3D view — PR #84, branch links/20261104-water-ripples, awaiting Jack's merge.
 Authored as v276 on November 4 (main 2733fe9); the fourth course batch took v276 on main the same morning, so
 the midday run rebased it onto 52b7144 and renumbered it v277.
+Shipped: sunlit canopies — branch links/20261116-sunlit-canopies, awaiting Jack's merge (v294, authored November 16 on main c265283).
 
 ## Oct 30 putter shootout (v267)
 
