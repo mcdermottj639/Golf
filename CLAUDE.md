@@ -4428,7 +4428,7 @@ shadow darker than the mirrored point and open fairway; the sun side of the trun
 Quit and re-enter, golf state unchanged, zero errors). Nothing about a lie, bounce, score or pack changes,
 so it is not behind a flag.
 
-**Sunlit canopies (v294, branch links/20261116-sunlit-canopies).** A tree crown is a camera-facing InstancedMesh card
+**Sunlit canopies (v294, PR #103, branch links/20261116-sunlit-canopies).** A tree crown is a camera-facing InstancedMesh card
 (`leafMat`, a `MeshBasicMaterial` patched in `onBeforeCompile`), so it was one flat tint. The patch now passes the card's UV
 to the fragment shader, which treats the card as a rough sphere: a normal `(q.x*.95, q.y*.8, .6)` from the UV, lit by
 `uLeafSun`. That uniform is the same `sun` light that drives `SUN` and the ground shadows, rotated into camera space every
@@ -4646,7 +4646,7 @@ main). The rule stands for every links/ PR: if main moves before the merge, reba
 Shipped: water ripples in the 3D view — PR #84, branch links/20261104-water-ripples, awaiting Jack's merge.
 Authored as v276 on November 4 (main 2733fe9); the fourth course batch took v276 on main the same morning, so
 the midday run rebased it onto 52b7144 and renumbered it v277.
-Shipped: sunlit canopies — branch links/20261116-sunlit-canopies, awaiting Jack's merge (v294, authored November 16 on main c265283).
+Shipped: sunlit canopies — PR #103, branch links/20261116-sunlit-canopies, awaiting Jack's merge (v294, authored November 16 on main c265283).
 
 ## Oct 30 putter shootout (v267)
 
