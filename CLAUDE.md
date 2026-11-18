@@ -4524,6 +4524,8 @@ the loop stopped after the window, alive through a slingshot flight, asleep agai
 re-enter; golf state unchanged; zero errors) and a reduced-motion context (water present, still, clock 0).
 Frame time is in the PR; the shader covers a few small polygons, so no measurable change was expected.
 
+**Partial-swing spread flag (v297, beta, off by default).** Shot spread already scaled linearly with `frac` (shot carry ÷ the club's full carry), so a ½ swing scattered half as much as a full one. With `chqlinks:flags.tightPartial` on (menu checkbox *Tighter ¾ and ½ swings*, under the distance slider), `partialTight(frac)` in `links-game.js` uses `frac × (0.6 + 0.4 × frac)` for `frac < 1`: ¾ → 0.675 of full spread (10% tighter than before), ½ → 0.40 (20% tighter). It feeds `forecast()`'s `sc`/`sl`, so the landing oval and the Gaussian landing noise agree. Full swings (`frac ≥ 1`), putting, roll, contact grading and the flag-off path are untouched. The flag lives in `chqlinks:flags` (outside golf backups) and is read through `flagOn()`, so any later scoring-affecting option should use the same key. The numbers are a game-feel guess, not measured dispersion; per-club measured partial-swing spread from bay sessions remains the open item.
+
 **Landing inspection.** Landing spot moves to an elevated close-up centered on the current
 predicted carry point. Its anchor and heading stay fixed during tap/drag aiming; it never moves
 the ball or takes a stroke. Back to tee/ball returns to the address view with aim/club/shape intact.
@@ -4688,7 +4690,7 @@ browser checks, not a claim of an on-device Safari test.
 rehearsal. Graphics: 3D putting when it
 can preserve readability (canopy lighting shipped as v294, shadows as v273). The current renderer already includes textured surfaces, decorative trees, sun-cast
 shadows and rippling water. Game: per-club dispersion from every bay session instead of
-the built-in table; tightened spread on ¾ and ½ swings; green firmness and uphill/downhill carry.
+the built-in table; green firmness and uphill/downhill carry.
 Standing plans are now available from each hole.
 Rules for that task: one improvement per run, feature-flag anything that changes scoring, never touch
 packs or feeds, keep `node --check` green, bump BUILD/CACHE, add a RELEASES item and update this
@@ -4703,7 +4705,8 @@ main). The rule stands for every links/ PR: if main moves before the merge, reba
 Shipped: water ripples in the 3D view — PR #84, branch links/20261104-water-ripples, awaiting Jack's merge.
 Authored as v276 on November 4 (main 2733fe9); the fourth course batch took v276 on main the same morning, so
 the midday run rebased it onto 52b7144 and renumbered it v277.
-Shipped: sunlit canopies — PR #103, branch links/20261116-sunlit-canopies, awaiting Jack's merge (v294, authored November 16 on main c265283).
+Shipped: sunlit canopies — PR #103, merged as v294 (main 2cb6c44).
+Built, awaiting Jack's 'merge' reply: tighter ¾ and ½ swings (beta flag `tightPartial`) — branch links/20261118-tight-partial-swings, authored November 18 as v297 on main a856504; PR number in os/links. See *Partial-swing spread flag* above.
 
 ## Oct 30 putter shootout (v267)
 
