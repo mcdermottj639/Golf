@@ -23,7 +23,10 @@ the app's own Avg row). Spec: ChatGPT's *Caddie HQ Practice Lab Claude Handoff* 
   unrounded smash under the club's line: **woods/hybrids 1.40, 4–6i 1.22, 7–9i 1.18, PW/wedges
   1.10**. Held rows stay in the data and on screen.
 - **A wedge is unclassified until Jack states the swing** (Full / ¾ / Half / Pitch / Chip). Only
-  Full is graded against the 1.10 line. The 56° (3 swings, smash 0.91–1.06) is unclassified.
+  Full is graded against the 1.10 line. Jack's answer goes in the experiment file's `wedgeIntent`
+  (so every device agrees); a tap in the app is stored in `S.practiceLab.intent` and wins, including
+  an explicit `unknown`. **v296: Jack said the Nov 17 56° swings were FULL** — graded, 0/3 clean
+  (smash 0.91–1.06, all under 1.10), so no 56° clean carry from this session.
 - **Clean-shot means and clean rates (clean ÷ ALL attempts) are different numbers.** Combining
   batches uses `weightedMean` over mutually exclusive cohorts, labelled as combined (6i B2+B3:
   153.0 over 12, +13.6 yd vs B1 139.45). Missing values stay null, never zero.
