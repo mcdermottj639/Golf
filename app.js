@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v295';
+const BUILD = 'v296';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v296', d:'2026-11-17', items:['56° GRADED: you said the three 56° swings in the Lower Hands Experiment were full, so Practice Lab now grades them against the 1.10 wedge line. All three come out held: smash 0.91–1.06, ball speed below club speed. 0 of 3 clean, so the 56° has no clean carry from this session. Tap a different swing type on the 56° chip if that changes.', 'NOV 17 IS A RANGE DAY NOW: the 110 swings were only in Practice Lab, so Days/Activity, Cumulative and Compare never saw them. Three bay records (B1 · B2 · B3) now carry the same shots with the same clean/held call. Playing carries unchanged.'] },
   { b:'v295', d:'2026-11-17', items:['PRACTICE LAB: Progress has a new Practice Lab for swing and gear experiments. First one is today\'s Lower Hands Experiment — all 110 sim swings across B1 (baseline), B2 (lower hands, 6 irons) and B3 (exaggerated). Pick a club to see carry, delivery, flight and contact batch by batch, with every shot underneath.','KEPT APART: improvements, regressions and unclear changes are separate lists, not one score. 6i strike 4/10 → 12/12 clean, carry +13.6 yd (B2+B3 weighted); 5i path −7.5° → −9.7° (worse). Mini–5W and 5i–6i are flagged Needs retest.','NOTHING MOVES IN YOUR BAG: practice carries never change playing carries. 56° stays unclassified until you say full or partial. A retest planner logs the next controlled test. On the Duo inner screen, 📖 Book splits it into two pages.'] },
   { b:'v294', d:'2026-11-16', items:['SUNLIT TREES IN LINKS: In the 3D view each tree crown now catches the sun. The side facing the light is warm and bright, the far side cool and dim, and the underside darker. It matches the direction the tree and flag shadows already fall. Looks only: shots, lies and scores are unchanged.'] },
   { b:'v293', d:'2026-11-14', items:['TODAY BY CLUB: Nov 14 now combines all retained shots into one result per club: old Forged 4i 153.6, 6i 142.3, 7i 129.3 and 5W 192.3 yd. All 72 source shots and 16 exclusions stay recorded; playing carries stay unchanged.','Club first stays in Swing Thoughts for your process. Today’s stats no longer split into a before/after cue test. Old KING Forged results remain separate from KING TEC history.'] },
@@ -12041,7 +12042,7 @@ function fetchFeed(){
   // after a new build has already reached the same phone. `cache:'no-store'` bypasses the
   // browser cache, but it does not change that CDN cache key. Tie the feed URL to BUILD so
   // every app release gets a fresh edge key and cannot render new code against old data.
-  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json','bag-20261024-feed.json','range-20261104-feed.json','range-20261111-feed.json','range-20261114-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
+  Promise.all(['coach-feed.json','front9-feed.json','path-feed.json','corrections-20260922.json','range-20260922-feed.json','futurefit-feed.json','range-20260925-feed.json','bag-20261001-feed.json','range-20261001-feed.json','round-20261001-feed.json','course-prep-feed.json','bag-20261024-feed.json','range-20261104-feed.json','range-20261111-feed.json','range-20261114-feed.json','range-20261117-feed.json'].map(name => fetch(`./${name}?build=${encodeURIComponent(BUILD)}`, { cache:'no-store' }).then(r => r.ok ? r.json() : null).catch(()=>null)))
     .then(feeds => feeds.forEach(f => { if(f) applyFeed(f); })); // offline — try again next open
 }
 

@@ -81,14 +81,16 @@ assert.ok(fnd.worse.some(x=>x.club==='5i'&&x.key==='path'));
 assert.ok(fnd.better.some(x=>x.club==='6i'&&x.key==='cleanRate'));
 assert.ok(fnd.mixed.some(x=>x.club==='5W'&&x.key==='f2p'));
 
-// 56°: unclassified until Jack states the swing; no clean count, no averages.
+// 56°: Jack said FULL (data file wedgeIntent) → graded against 1.10, 0/3 clean, no carry.
 const w56=stat('56°','B3');
-assert.equal(w56.status,'unclassified');assert.equal(w56.clean,null);assert.equal(w56.cleanRate,null);assert.equal(w56.mean.carry,null);
-assert.equal(w56.attempts,3);assert.ok(w56.shots.every(s=>s.clean===null&&s.held.length===0));
-const half=stat('56°','B3',{'lower-hands-2026-11-17:56°':'half'});assert.equal(half.status,'unclassified');
-const full=stat('56°','B3',{'lower-hands-2026-11-17:56°':'full'});
-assert.equal(full.status,'graded');assert.equal(full.clean,0);assert.equal(full.mean.carry,null);
-assert.ok(full.shots.every(s=>s.held.some(r=>r.startsWith('smash 0.9')||r.startsWith('smash 1.0'))));
+assert.equal(w56.status,'graded');assert.equal(w56.clean,0);assert.equal(w56.attempts,3);assert.equal(w56.cleanRate,0);assert.equal(w56.mean.carry,null);
+assert.ok(w56.shots.every(s=>s.held.some(r=>r.startsWith('smash 0.9')||r.startsWith('smash 1.0'))));
+assert.equal(exp.wedgeIntent['56°'],'full');
+// A tap in the app wins over the file, including an explicit unknown; partial swings are not graded.
+for(const v of ['half','unknown']){const s=stat('56°','B3',{'lower-hands-2026-11-17:56°':v});assert.equal(s.status,'unclassified',v);assert.equal(s.clean,null);assert.equal(s.mean.carry,null);}
+// The unclassified path still holds for a wedge with no stated intent.
+const noIntent=Object.assign({},exp,{wedgeIntent:{}});
+assert.equal(c.clubStats(noIntent,'56°',{})[0].status,'unclassified');
 
 // Gapping: flagged pairs need a retest; they are not bag edits.
 const gp=c.gapping(exp,{});

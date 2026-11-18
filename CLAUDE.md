@@ -23,7 +23,10 @@ the app's own Avg row). Spec: ChatGPT's *Caddie HQ Practice Lab Claude Handoff* 
   unrounded smash under the club's line: **woods/hybrids 1.40, 4–6i 1.22, 7–9i 1.18, PW/wedges
   1.10**. Held rows stay in the data and on screen.
 - **A wedge is unclassified until Jack states the swing** (Full / ¾ / Half / Pitch / Chip). Only
-  Full is graded against the 1.10 line. The 56° (3 swings, smash 0.91–1.06) is unclassified.
+  Full is graded against the 1.10 line. Jack's answer goes in the experiment file's `wedgeIntent`
+  (so every device agrees); a tap in the app is stored in `S.practiceLab.intent` and wins, including
+  an explicit `unknown`. **v296: Jack said the Nov 17 56° swings were FULL** — graded, 0/3 clean
+  (smash 0.91–1.06, all under 1.10), so no 56° clean carry from this session.
 - **Clean-shot means and clean rates (clean ÷ ALL attempts) are different numbers.** Combining
   batches uses `weightedMean` over mutually exclusive cohorts, labelled as combined (6i B2+B3:
   153.0 over 12, +13.6 yd vs B1 139.45). Missing values stay null, never zero.
@@ -47,6 +50,11 @@ the app's own Avg row). Spec: ChatGPT's *Caddie HQ Practice Lab Claude Handoff* 
   screen. Wide standard screens (≥1100 px) get a two-column dashboard with no hinge.
 - **Adding an experiment:** add a JSON file in `data/practice-lab/`, list it in `EXPERIMENT_FILES`,
   the SW `ASSETS` and `tests/live-shell.cjs`. Shot rows, not averages; `sourceType:'shots'`.
+- **An experiment is also a range day (v296).** v295 put the Nov 17 swings only in Practice Lab, so
+  Days/Activity, Cumulative and Compare had no Nov 17 — Jack noticed. `scripts/import-nov17-sim.cjs`
+  builds `range-20261117-feed.json`: one apply-once `bay` per batch (`bay-20261117-b1/b2/b3-v1`), same
+  shots, `mishit` set by `CaddiePracticeLab.calc.classify` so both views agree (33/63 · 5/5 · 28/42).
+  No `carry-update`. Every new experiment needs the same twin feed in the fetch list, SW and live-shell.
 - Tests: `tests/practice-lab.cjs` (publish + UX workflows) and `tests/practice-lab-browser.cjs`
   (UX browser job: 320/390, Book, top/bottom, folded with Book saved, desktop, night, golf state
   byte-identical). `tests/swing-evolution.cjs` already failed on main c265283 before v295.

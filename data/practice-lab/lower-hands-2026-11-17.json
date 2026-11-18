@@ -62,7 +62,7 @@
   }
  ],
  "wedgeIntent": {
-  "56°": null
+  "56°": "full"
  },
  "defaultClub": "6i",
  "headlines": [
@@ -1888,5 +1888,8 @@
     }
    ]
   }
- ]
+ ],
+ "wedgeIntentNote": {
+  "56°": "Jack, Nov 17 2026: full swings."
+ }
 }

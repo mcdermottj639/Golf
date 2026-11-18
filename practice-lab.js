@@ -349,7 +349,7 @@
   function wedgeCard(exp,club,st){
     if(!isWedge(club))return '';
     var cur=intentOf(exp,club,intents())||'unknown';
-    return '<div class="pl-wedge"><div class="pl-sm"><b>What swing was this '+esc(club)+'?</b> Graded against the '+lineFor(club).line.toFixed(2)+' full-swing line only if you say Full.</div>'+
+    return '<div class="pl-wedge"><div class="pl-sm"><b>What swing was this '+esc(club)+'?</b> Graded against the '+lineFor(club).line.toFixed(2)+' full-swing line only when it is Full.</div>'+
       '<div class="pl-seg" role="group" aria-label="Swing intent">'+INTENTS.map(function(o){
         return '<button type="button" class="pl-segb'+(cur===o[0]?' on':'')+'" data-pl-intent="'+o[0]+'" aria-pressed="'+(cur===o[0])+'">'+o[1]+'</button>';
       }).join('')+'</div>'+
@@ -505,7 +505,7 @@
     if(t.dataset.plIntent){
       var S=ctx.state(),key=ui.exp.id+':'+ui.club,v=t.dataset.plIntent;
       S.practiceLab=S.practiceLab||{};S.practiceLab.intent=S.practiceLab.intent||{};
-      if(v==='unknown')delete S.practiceLab.intent[key];else S.practiceLab.intent[key]=v;
+      S.practiceLab.intent[key]=v;
       ctx.save();paint();return;}
     if(t.dataset.plDelplan){
       var S2=ctx.state();if(S2.practiceLab&&S2.practiceLab.plans)S2.practiceLab.plans=S2.practiceLab.plans.filter(function(p){return p.id!==t.dataset.plDelplan;});

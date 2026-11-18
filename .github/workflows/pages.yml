@@ -55,6 +55,7 @@ jobs:
           node tests/range-nov04-hybrids.cjs
           node tests/range-nov11-sim.cjs
           node tests/range-nov14-sim.cjs
+          node tests/range-nov17-sim.cjs
           node tests/practice-lab.cjs
           node tests/range-sep22-batch1.cjs
           node tests/round-identity.cjs

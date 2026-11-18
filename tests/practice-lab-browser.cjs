@@ -68,15 +68,15 @@ async function openLab(page){
     await page.locator('.pl-chip[data-pl-club="7i"]').click();
     assert.equal(await page.locator('.pl-tabbody .pl-metric').first().locator('.pl-bar').count(),1);
     assert.equal(await page.locator('.pl-tabbody .pl-dl').count(),0);
-    // 56°: unclassified until the swing is stated.
+    // 56°: Jack said full → graded 0/3; a different tap un-grades it; Full again re-grades.
     await page.locator('.pl-chip[data-pl-club="56°"]').click();
-    assert.match(await page.locator('.pl-clubpanel').innerText(),/Unclassified: no clean count/);
+    assert.match(await page.locator('.pl-clubhead').innerText(),/0\/3 clean/);
+    assert.equal(await page.locator('[data-pl-intent="full"]').getAttribute('aria-pressed'),'true');
+    await page.locator('[data-pl-intent="half"]').click();
     assert.match(await page.locator('.pl-clubhead').innerText(),/unclassified · 3 shots/);
+    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('caddiehq_v1')).practiceLab.intent['lower-hands-2026-11-17:56°']),'half');
     await page.locator('[data-pl-intent="full"]').click();
     assert.match(await page.locator('.pl-clubhead').innerText(),/0\/3 clean/);
-    assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('caddiehq_v1')).practiceLab.intent['lower-hands-2026-11-17:56°']),'full');
-    await page.locator('[data-pl-intent="unknown"]').click();
-    assert.match(await page.locator('.pl-clubhead').innerText(),/unclassified/);
     // Retest plan saves under S.practiceLab only, and can be removed.
     const form=page.locator('[data-pl-form]');
     if(!await form.isVisible())await page.locator('#pl-retest summary').click();
