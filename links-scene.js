@@ -83,7 +83,20 @@ void main(){
   const shadowTex=radial();textures.push(shadowTex);
   const shadowMat=new T.MeshBasicMaterial({map:shadowTex,transparent:true,depthWrite:false,opacity:.65});
   const leafMat=new T.MeshBasicMaterial({map:foliage,alphaTest:.45,color:'#e3ecd5',side:T.DoubleSide});
-  leafMat.onBeforeCompile=shader=>{shader.vertexShader=shader.vertexShader.replace('#include <project_vertex>',`vec4 mvPosition=modelViewMatrix*instanceMatrix*vec4(0.,0.,0.,1.);mvPosition.xy+=position.xy*vec2(length(instanceMatrix[0].xyz),length(instanceMatrix[1].xyz));gl_Position=projectionMatrix*mvPosition;`);};
+  // Sunlit canopies (v294): a crown is a camera-facing card, so it used to be one flat tint. The fragment shader now treats
+  // each card as a rough sphere: the side toward the sun (the same light that throws the ground shadows, rotated into the
+  // camera's frame every render) is warm and bright, the far side cool and dim, and the underside darker where the
+  // branches overlap. Scenery only: the card, its size, position and alpha cutout are unchanged, so no lie or score moves.
+  const leafSun={value:new T.Vector3(0,1,0)};
+  leafMat.onBeforeCompile=shader=>{
+    shader.uniforms.uLeafSun=leafSun;
+    shader.vertexShader=shader.vertexShader.replace('#include <project_vertex>',`vec4 mvPosition=modelViewMatrix*instanceMatrix*vec4(0.,0.,0.,1.);mvPosition.xy+=position.xy*vec2(length(instanceMatrix[0].xyz),length(instanceMatrix[1].xyz));gl_Position=projectionMatrix*mvPosition;vLeafUv=uv;`).replace('void main() {','varying vec2 vLeafUv;\nvoid main() {');
+    shader.fragmentShader=shader.fragmentShader.replace('void main() {','uniform vec3 uLeafSun;varying vec2 vLeafUv;\nvoid main() {').replace('#include <map_fragment>',`#include <map_fragment>
+    {vec2 q=(vLeafUv-.5)*2.;vec3 n=normalize(vec3(q.x*.95,q.y*.8,.6));float lit=smoothstep(-.55,.85,dot(n,normalize(uLeafSun)));
+     float ao=mix(.6,1.,smoothstep(.02,.65,vLeafUv.y));
+     vec3 tone=mix(vec3(.82,.93,1.04),vec3(1.1,1.05,.88),lit);
+     diffuseColor.rgb*=tone*mix(.56,1.14,lit)*ao;}`);
+  };
   const markerMat=new T.MeshStandardMaterial({color:'#244c69',roughness:.8});
   const ball=new T.Mesh(new T.SphereGeometry(.15,24,16),new T.MeshStandardMaterial({color:'#fffef4',roughness:.35}));scene.add(ball);
   const ballShadow=new T.Mesh(new T.PlaneGeometry(1,1),shadowMat.clone());ballShadow.quaternion.copy(SUN.flat);scene.add(ballShadow);
@@ -173,7 +186,7 @@ void main(){
     // the water clock runs only while ripples are wanted, and by the frame's own elapsed time, so waking it never jumps the pattern
     if(ripple&&hasWater){waterTime+=dt;waterMat.uniforms.uTime.value=waterTime;}
     if(!valid||reduced){camera.position.copy(wanted);}else camera.position.lerp(wanted,1-Math.exp(-dt*(flight?12:16)));
-    camera.lookAt(look);camera.updateMatrixWorld();valid=true;
+    camera.lookAt(look);camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert();leafSun.value.copy(sun.position).normalize().transformDirection(camera.matrixWorldInverse);valid=true;
     ball.position.copy(bp);ball.position.y+=ballState.lie==='tee'&&!flight?.25:.21;ball.visible=!ballState.holed;
     ball.scale.setScalar(flight?Math.max(1,camera.position.distanceTo(ball.position)*.012):1);
     // the ball's shadow sits under it on the ground and slides away from the sun as the ball climbs (height × cot elevation),
@@ -207,5 +220,5 @@ void main(){
   function unproject(x,y){ray.setFromCamera(new T.Vector2(x/W*2-1,1-y/H*2),camera);const hit=ray.ray.intersectPlane(plane,temp);if(!hit||hit.distanceTo(camera.position)>650)return null;return[hit.x+origin[0],origin[1]-hit.z];}
   function lost(e){e.preventDefault();if(!disposed)onLost?.();}canvas.addEventListener('webglcontextlost',lost);
   function dispose(){if(disposed)return;disposed=true;canvas.removeEventListener('webglcontextlost',lost);const geoms=new Set(),mats=new Set([...Object.values(materials),...Object.values(groundMaterials)]);scene.traverse(o=>{if(o.geometry)geoms.add(o.geometry);if(o.material){for(const m of(Array.isArray(o.material)?o.material:[o.material]))mats.add(m);}if(o.isInstancedMesh)o.dispose();});for(const g of geoms)g.dispose();for(const m of mats)m.dispose();for(const t of textures)t.dispose();renderer.dispose();renderer.forceContextLoss();}
-  return{render,project,unproject,dispose,reset:()=>{valid=false;},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,camera:camera.position.toArray(),sun:{dir:[SUN.dir.x,SUN.dir.z],elevationDeg:Math.round(SUN.elevation*180/Math.PI*10)/10,stretch:SUN.stretch},ballShadow:ballShadow.position.toArray(),ballPos:ball.position.toArray(),poleShadow:poleShadow.position.toArray(),water:hasWater,waterTime})};
+  return{render,project,unproject,dispose,reset:()=>{valid=false;},info:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,camera:camera.position.toArray(),sun:{dir:[SUN.dir.x,SUN.dir.z],elevationDeg:Math.round(SUN.elevation*180/Math.PI*10)/10,stretch:SUN.stretch},ballShadow:ballShadow.position.toArray(),ballPos:ball.position.toArray(),poleShadow:poleShadow.position.toArray(),water:hasWater,waterTime,leafSun:leafSun.value.toArray()})};
 }
