@@ -22,7 +22,8 @@ const feed={entries:fullFeed.entries.slice(0,correctionIndex)},correction={entri
 const eq=(a,b,msg)=>assert.deepEqual(JSON.parse(JSON.stringify(a)),JSON.parse(JSON.stringify(b)),msg);
 const near=(a,b,tol=.001)=>assert.ok(Math.abs(a-b)<tol,`${a} != ${b}`);
 const files=[...fs.readFileSync(path.join(root,'app.js'),'utf8').match(/Promise\.all\(\[([^\]]+)/)[1].matchAll(/'([^']+)'/g)].map(m=>m[1]);
-for(const f of files.filter(f=>f!=='range-20261114-feed.json'))T.applyFeed(read(f));
+// Feeds dated after Nov 14 (e.g. range-20261117) would make a later day "latest" for Compare; this test checks the Nov 14 state.
+for(const f of files.filter(f=>f!=='range-20261114-feed.json'&&!/range-202611(1[5-9]|[23]\d)/.test(f)))T.applyFeed(read(f));
 const before=JSON.parse(JSON.stringify(T.get()));
 assert.equal(source.sessionDate,'2026-11-14');assert.equal(source.monitorDisplayedDate,'2026-11-13');
 assert.match(source.dateBasis,/Jack explicitly corrected/);
