@@ -50,6 +50,11 @@ the app's own Avg row). Spec: ChatGPT's *Caddie HQ Practice Lab Claude Handoff* 
   screen. Wide standard screens (≥1100 px) get a two-column dashboard with no hinge.
 - **Adding an experiment:** add a JSON file in `data/practice-lab/`, list it in `EXPERIMENT_FILES`,
   the SW `ASSETS` and `tests/live-shell.cjs`. Shot rows, not averages; `sourceType:'shots'`.
+- **An experiment is also a range day (v296).** v295 put the Nov 17 swings only in Practice Lab, so
+  Days/Activity, Cumulative and Compare had no Nov 17 — Jack noticed. `scripts/import-nov17-sim.cjs`
+  builds `range-20261117-feed.json`: one apply-once `bay` per batch (`bay-20261117-b1/b2/b3-v1`), same
+  shots, `mishit` set by `CaddiePracticeLab.calc.classify` so both views agree (33/63 · 5/5 · 28/42).
+  No `carry-update`. Every new experiment needs the same twin feed in the fetch list, SW and live-shell.
 - Tests: `tests/practice-lab.cjs` (publish + UX workflows) and `tests/practice-lab-browser.cjs`
   (UX browser job: 320/390, Book, top/bottom, folded with Book saved, desktop, night, golf state
   byte-identical). `tests/swing-evolution.cjs` already failed on main c265283 before v295.
