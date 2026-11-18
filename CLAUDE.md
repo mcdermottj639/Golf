@@ -3,6 +3,55 @@
 Personal golf command center for **Jack McDermott** — bag, stroke diagnosis, coaching,
 and courses in one installable web app. This file is the guide for keeping it current.
 
+## Practice Lab (v295, November 17, 2026)
+
+Progress → **Practice Lab** (`data-view="practicelab"`, NAV_OF `game`) compares swing or gear
+experiments batch by batch. First experiment: **Lower Hands, Nov 17** — B1 baseline (63 swings),
+B2 lower hands (5 × 6i), B3 exaggerated lower hands (42 swings), 110 swings, every one
+transcribed from Jack's three screen recordings into
+`data/practice-lab/lower-hands-2026-11-17.json` (shot rows; each club's carry re-averages to
+the app's own Avg row). Spec: ChatGPT's *Caddie HQ Practice Lab Claude Handoff* (Nov 17).
+
+- **`practice-lab.js` owns the view**; app.js renders an empty `#practice-lab` host and mounts it
+  with `{state, save, toast, playingCarry}`. Calculations live in `CaddiePracticeLab.calc` and are
+  pure (Node-testable). It READS the carry ladder through `practicePlayingCarry()` and never
+  writes carries, clubs, bays or rounds. Its only state writes are Jack's taps: `S.practiceLab.intent`
+  (wedge swing intent) and `S.practiceLab.plans` (retest plans), created on first write so a fresh
+  install's state is unchanged. UI choices (club, tab) live in `caddiehq_practice_ui_v1`.
+- **Mishit rule (Jack, Nov 4 + Nov 17 2026):** held out when there is no club speed (unless Jack
+  kept the shot because the rest of the ball data is complete — `overrides`), apex < 40 ft, or
+  unrounded smash under the club's line: **woods/hybrids 1.40, 4–6i 1.22, 7–9i 1.18, PW/wedges
+  1.10**. Held rows stay in the data and on screen.
+- **A wedge is unclassified until Jack states the swing** (Full / ¾ / Half / Pitch / Chip). Only
+  Full is graded against the 1.10 line. The 56° (3 swings, smash 0.91–1.06) is unclassified.
+- **Clean-shot means and clean rates (clean ÷ ALL attempts) are different numbers.** Combining
+  batches uses `weightedMean` over mutually exclusive cohorts, labelled as combined (6i B2+B3:
+  153.0 over 12, +13.6 yd vs B1 139.45). Missing values stay null, never zero.
+- **Tones are data direction, not significance:** better/worse needs a material change (carry 3 yd,
+  path/F2P 1°, clean rate 15 pts, smash 0.03) and ≥3 clean shots each side; a face-to-path that
+  crosses zero is "unclear" (fade spin swapped for draw spin). Improvements, regressions and
+  unclear changes are separate lists, never one score.
+- **Gapping** flags adjacent clubs whose practice carries sit < 6 yd apart in any non-baseline
+  batch pairing (Mini–5W, 5i–6i) as *Needs retest*. It shows the bag's playing carries
+  beside it and never edits them.
+- **No dispersion is drawn from averages.** The delivery picture uses measured path, face and
+  launch direction per batch (right-handed, angles drawn ×3, labelled). No spin axis or strike
+  location was recorded, so no ball-flight trace.
+- **Fold layouts:** Caddie HQ had no Duo modes before v295 (no Half Fold/Book code existed to
+  preserve). Practice Lab carries its own, built on CFP Study Lab's rules: mode in
+  `caddiehq:duo-mode` (`auto`/`book`/`seated`/`off`, `?duo=` override), Viewport Segments when
+  Safari reports them, otherwise a manual **📖 Book** / **✕ Single page** button on the big inner
+  screen (both sides ≥ 600 px) that splits at the middle. Book = two fixed panes either side of a
+  24 px gutter, each scrolling on its own, document locked (no drift, no abyss), clear of the nav
+  rail or bottom bar. Top · bottom = the same two panes stacked. Never forced on the folded
+  screen. Wide standard screens (≥1100 px) get a two-column dashboard with no hinge.
+- **Adding an experiment:** add a JSON file in `data/practice-lab/`, list it in `EXPERIMENT_FILES`,
+  the SW `ASSETS` and `tests/live-shell.cjs`. Shot rows, not averages; `sourceType:'shots'`.
+- Tests: `tests/practice-lab.cjs` (publish + UX workflows) and `tests/practice-lab-browser.cjs`
+  (UX browser job: 320/390, Book, top/bottom, folded with Book saved, desktop, night, golf state
+  byte-identical). `tests/swing-evolution.cjs` already failed on main c265283 before v295.
+  Ships after v294 (Links sunlit canopies, PR #103), rebased onto main 2cb6c44.
+
 ## Current grouping (v293, November 14, 2026)
 
 Jack's latest request supersedes the earlier cue split: **combine all today's stats
@@ -59,8 +108,8 @@ same current filter recalculated from their source rows; never overwrite histori
 
 **Current import rule, clarified by Jack Nov 14:** hold a full-swing shot if club speed/read
 is absent OR apex <40 ft. Woods/hybrids additionally require **unrounded ball speed / club
-speed >=1.40**. No blanket 1.40 cutoff for irons; keep imperfect iron strikes that pass
-the remaining checks. The existing two-thirds airborne-cluster top filter still applies.
+speed >=1.40**. No blanket 1.40 cutoff for irons. **Superseded Nov 17 2026:** Jack locked iron lines —
+4–6i 1.22, 7–9i 1.18, PW/wedges 1.10 (see *Practice Lab*); Nov 14 records keep their own rule. The existing two-thirds airborne-cluster top filter still applies.
 Missing AoA or Smash Index alone does NOT mean missing club read when club speed exists.
 Smash Index is a percent, not smash factor. Jack's explicit overrides win. Raw rows stay;
 all averages, Swing evolution, club history and Compare use the retained cohort. Non-driver

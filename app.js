@@ -99,13 +99,14 @@ const MENTAL_WHEN = [['open','Opening holes'], ['mid','Middle'], ['close','Closi
 const FOCUS_LAB = ['', 'Gone', 'Patchy', 'In and out', 'Good', 'Locked in'];
 // Bump this WITH `CACHE` in sw.js — they're the same build, and the Data tab shows this
 // one so "is the new version actually on the phone?" is answerable without guessing.
-const BUILD = 'v294';
+const BUILD = 'v295';
 // The app's own changelog. coach-feed.json carries DATA updates and announces itself
 // through them; a change to the app ITSELF has no other route onto the phone and nowhere
 // else to say what it did, so it is written here and merged into Home's What's new block
 // alongside the feed updates. Newest first. Add a block whenever BUILD is bumped — an
 // update he can't see landed is indistinguishable from one that didn't.
 const RELEASES = [
+  { b:'v295', d:'2026-11-17', items:['PRACTICE LAB: Progress has a new Practice Lab for swing and gear experiments. First one is today\'s Lower Hands Experiment — all 110 sim swings across B1 (baseline), B2 (lower hands, 6 irons) and B3 (exaggerated). Pick a club to see carry, delivery, flight and contact batch by batch, with every shot underneath.','KEPT APART: improvements, regressions and unclear changes are separate lists, not one score. 6i strike 4/10 → 12/12 clean, carry +13.6 yd (B2+B3 weighted); 5i path −7.5° → −9.7° (worse). Mini–5W and 5i–6i are flagged Needs retest.','NOTHING MOVES IN YOUR BAG: practice carries never change playing carries. 56° stays unclassified until you say full or partial. A retest planner logs the next controlled test. On the Duo inner screen, 📖 Book splits it into two pages.'] },
   { b:'v294', d:'2026-11-16', items:['SUNLIT TREES IN LINKS: In the 3D view each tree crown now catches the sun. The side facing the light is warm and bright, the far side cool and dim, and the underside darker. It matches the direction the tree and flag shadows already fall. Looks only: shots, lies and scores are unchanged.'] },
   { b:'v293', d:'2026-11-14', items:['TODAY BY CLUB: Nov 14 now combines all retained shots into one result per club: old Forged 4i 153.6, 6i 142.3, 7i 129.3 and 5W 192.3 yd. All 72 source shots and 16 exclusions stay recorded; playing carries stay unchanged.','Club first stays in Swing Thoughts for your process. Today’s stats no longer split into a before/after cue test. Old KING Forged results remain separate from KING TEC history.'] },
   { b:'v292', d:'2026-11-14', items:['TODAY’S SIM: all irons were old KING Forged / KBS 120 stiff. Before → club first: 4i 160.0 → 148.7 yd; 7i 122.5 → 136.1 yd. 56 clean of 72 shots. Old equipment and cue phases stay separate in sessions, history and Compare clubs.','Club first saved in Swing Thoughts. 5W returns with a 192.3 yd measured offer (6/11); 3H return in progress with its carry/history saved. KING TEC irons, benched 4i and playing distances unchanged.'] },
@@ -1410,6 +1411,7 @@ const TITLES = {
   home:['Overview','Your game, connected.'],
   bag:['My Bag','Every club, every spec, and the story of every change.'],
   swing:['Swing Lab','Driver to wedge — film, plans, and speed work.'],
+  practicelab:['Practice Lab','Swing and gear experiments, batch by batch.'],
   positions:['Swing Positions','Where the body goes, address to finish.'],
   game:['Progress','Every session. Every club. Your next breakthrough.'],
   shortgame:['Short Game','Around the green — where the strokes hide.'],
@@ -2061,7 +2063,7 @@ let planPick = null;
    save. Never put course names, coordinates or a round's contents into the URL. */
 const HQ_ROUTE_VIEWS = new Set(['home','rounds','round','courseprep','live','bag','game','coach','sessions',
   'swing','putting','shortgame','mental','positions','clubhistory','bay','session','briefing','decisions',
-  'data','drills','shelf','lesson','links','landed','numbers','timeline']);
+  'data','drills','shelf','lesson','links','landed','numbers','timeline','practicelab']);
 let hqRouteReady = false, hqRouteRestoring = false;
 function hqHistoryRoute(view, arg, keepScroll, changed) {
   if (!window.history?.replaceState || !HQ_ROUTE_VIEWS.has(view)) return;
@@ -2124,6 +2126,7 @@ window.addEventListener('popstate', e => {
 });
 function render(view, arg, keepScroll){
   window.CaddieCoursePrep?.unmount(view === 'courseprep');
+  window.CaddiePracticeLab?.unmount();
   if(view !== 'links') window.CaddieLinks?.unmount();
   window.CaddieExplorer?.close();
   hqSearchCache=null;
@@ -2174,13 +2177,13 @@ function render(view, arg, keepScroll){
   if(bt){ bt.textContent = BUILD; bt.hidden = view !== 'home'; }
   // The four labs live behind one nav button, so they all light it — and so does every
   // view that hangs off Rounds: a round card, and a course plan you opened from one.
-  const NAV_OF = { clubhistory:'game', sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game',
+  const NAV_OF = { clubhistory:'game', sessions:'game', swing:'game', shortgame:'game', putting:'game', mental:'game', positions:'game', game:'game', bay:'game', practicelab:'game',
                    drills:'coach', shelf:'coach', lesson:'coach', landed:'home', numbers:'home', timeline:'home',
                    round:'rounds', rounds:'rounds', courseprep:'rounds', links:'rounds' };
   const navView = NAV_OF[view] || view;
   document.querySelectorAll('#nav button').forEach(b =>
     b.classList.toggle('on', b.dataset.view === navView));
-  const R = { home, bag, game, courseprep:coursePrepView, links:linksView, clubhistory:clubHistoryView, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
+  const R = { home, bag, game, practicelab:practiceLabView, courseprep:coursePrepView, links:linksView, clubhistory:clubHistoryView, sessions:sessionLibrary, swing, shortgame, positions:swingPositions, putting, mental, coach, drills, rounds, decisions, data:dataView, shelf, lesson, session:sessionView, bay:bayView, briefing, round:roundView, live, landed, numbers:numbersView, timeline }[view] || home;
   // An in-place update must not close what he has open. Redrawing the view replaces the
   // DOM, so any <details> he expanded snaps shut — which on the drill bench meant logging
   // a drill collapsed the drill you were reading. Same distinction as the scroll position:
@@ -2202,6 +2205,7 @@ function render(view, arg, keepScroll){
   buildJumpBar();
   hqUpdateShell();hqHasRendered=true;
   if(view === 'courseprep') window.CaddieCoursePrep?.mount(document.getElementById('course-prep'));
+  if(view === 'practicelab') window.CaddiePracticeLab?.mount(document.getElementById('practice-lab'), { state:()=>S, save, toast, playingCarry:practicePlayingCarry });
   if(view === 'links') window.CaddieLinks?.mount(document.getElementById('lk-root'), { state:()=>S, clubCanon, toast, onExit:()=>render('home') });
   if(!keepScroll) window.scrollTo(0,0);
 }
@@ -3205,6 +3209,7 @@ function hqExplore(){
     item('Your workspace','Overview','Latest activity, key numbers and your next move',{a:'go',v:'home'}),
     item('Your workspace','My bag','Clubs, carries, settings, bench and full club history',{a:'go',v:'bag'}),
     item('Your workspace','Progress & trends','Cumulative measurements, delivery patterns and next steps',{a:'session-category',kind:'cumulative'}),
+    item('Your workspace','Practice Lab','Swing and gear experiments: lower hands, batch by batch',{a:'go',v:'practicelab'}),
     item('Your workspace','Activity log','Every range day, simulator round, course round and film',{a:'session-category',kind:'days'}),
     item('Play & improve','Start or resume a round','Live hole-by-hole logging and scoring',{a:'live-new'}),
     item('Play & improve','Rounds & scorecards','Your complete scoring record and analytics',{a:'go',v:'rounds',seg:'cards'}),
@@ -3259,7 +3264,7 @@ function hqSearch(query){
   }).sort((a,b)=>b._score-a._score).map(({_score,...row})=>({...row,description:row.description||(row.act?.value!=null?`${row.act.value}${row.act.unit?' '+row.act.unit:''} · ${row.act.prov||row.kind}`:row.kind+' · open the complete record')}));
 }
 function hqUpdateShell(){
-  let parent={home:'home',bag:'bag',clubhistory:'bag',game:'game',sessions:'game',bay:'game',swing:'game',shortgame:'game',putting:'game',mental:'game',positions:'game',session:'game',rounds:'rounds',round:'rounds',courseprep:'rounds',links:'rounds',briefing:'rounds',live:'rounds',coach:'coach',drills:'coach',shelf:'coach',lesson:'coach'}[current.view]||'home';
+  let parent={home:'home',bag:'bag',clubhistory:'bag',game:'game',practicelab:'game',sessions:'game',bay:'game',swing:'game',shortgame:'game',putting:'game',mental:'game',positions:'game',session:'game',rounds:'rounds',round:'rounds',courseprep:'rounds',links:'rounds',briefing:'rounds',live:'rounds',coach:'coach',drills:'coach',shelf:'coach',lesson:'coach'}[current.view]||'home';
   if(current.view==='briefing'){
     const plan=S.briefings.find(b=>b.id===current.arg);
     const course=plan&&(S.courses.some(c=>c.name.toLowerCase()===String(plan.course||'').toLowerCase())||S.rounds.some(r=>courseMatches(r.course,plan.course)));
@@ -7681,6 +7686,15 @@ function faultRows(disc){
 // you last looked at is a property of the page, not of the player, so it is a module
 // variable and never saved. Switching is a rerender() — you have not gone anywhere.
 let gameLab = LABS[0].disc;
+// Practice Lab (v295): the view is an empty host; practice-lab.js fills it and owns its own
+// taps. It reads the carry ladder through this one getter and never writes it.
+function practiceLabView(){
+  return `<div id="practice-lab" class="pl-root" aria-live="polite"><div class="pl-card"><p>Loading Practice Lab…</p></div></div>`;
+}
+function practicePlayingCarry(canon){
+  const row=(S.carries||[]).find(c=>clubCanon(c.club)===canon);
+  return row&&typeof row.carry==='number'?row.carry:null;
+}
 function game(){
   const cur = LABS.find(l => l.disc === gameLab) || LABS[0];
   const clips = S.sessions.filter(s => sessionDiscipline(s) === cur.disc).length;
@@ -7699,6 +7713,8 @@ function game(){
       <span class="sb">${esc(l.sub)}</span></button>`; }).join('')}</div>
 
   <div class="card flat">
+    <div class="linkrow" data-action="go" data-view="practicelab">
+      <span><b>Practice Lab</b><br><span class="sm">Swing and gear experiments, batch by batch · today: lower hands</span></span><span class="arr">→</span></div>
     <div class="linkrow" data-action="go" data-view="${cur.view}">
       <span><b>Open the ${esc(cur.name)} lab</b><br><span class="sm">The film room, the plans,
         and everything this diagnosis is built on</span></span><span class="arr">→</span></div>

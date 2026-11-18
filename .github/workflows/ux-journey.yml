@@ -3,6 +3,10 @@ on:
   pull_request:
     paths:
       - 'app.js'
+      - 'practice-lab.js'
+      - 'practice-lab.css'
+      - 'data/practice-lab/**'
+      - 'tests/practice-lab*'
       - 'course-prep.js'
       - 'index.html'
       - 'sw.js'
@@ -13,6 +17,10 @@ on:
     branches: [main]
     paths:
       - 'app.js'
+      - 'practice-lab.js'
+      - 'practice-lab.css'
+      - 'data/practice-lab/**'
+      - 'tests/practice-lab*'
       - 'course-prep.js'
       - 'index.html'
       - 'sw.js'
@@ -42,6 +50,8 @@ jobs:
           node tests/round-takeaways.cjs
           node tests/round-identity.cjs
           node tests/range-nov14-sim.cjs
+          node --check practice-lab.js
+          node tests/practice-lab.cjs
   browser:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -63,6 +73,7 @@ jobs:
         run: |
           CADDIE_QA_DIR="$RUNNER_TEMP/caddie-ux-evidence" node tests/ux-journey-browser.cjs
           CADDIE_QA_DIR="$RUNNER_TEMP/caddie-ux-evidence" node tests/range-nov14-browser.cjs
+          CADDIE_QA_DIR="$RUNNER_TEMP/caddie-ux-evidence" node tests/practice-lab-browser.cjs
       - name: Browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
