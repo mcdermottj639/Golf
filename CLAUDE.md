@@ -50,7 +50,7 @@ the app's own Avg row). Spec: ChatGPT's *Caddie HQ Practice Lab Claude Handoff* 
 - Tests: `tests/practice-lab.cjs` (publish + UX workflows) and `tests/practice-lab-browser.cjs`
   (UX browser job: 320/390, Book, top/bottom, folded with Book saved, desktop, night, golf state
   byte-identical). `tests/swing-evolution.cjs` already failed on main c265283 before v295.
-  v294 is taken by the open Links PR #103, so this release is v295.
+  Ships after v294 (Links sunlit canopies, PR #103), rebased onto main 2cb6c44.
 
 ## Current grouping (v293, November 14, 2026)
 
