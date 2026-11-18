@@ -31,6 +31,7 @@ jobs:
           node --check round-review.js
           node --check round-takeaways.js
           node --check bay-takeaways.js
+          node --check practice-lab.js
           node --check hole-guide.js
           node --check course-packs.js
           node --check course-prep.js
@@ -54,6 +55,7 @@ jobs:
           node tests/range-nov04-hybrids.cjs
           node tests/range-nov11-sim.cjs
           node tests/range-nov14-sim.cjs
+          node tests/practice-lab.cjs
           node tests/range-sep22-batch1.cjs
           node tests/round-identity.cjs
           node tests/round-review-import.cjs
