@@ -244,3 +244,7 @@ body.lk-ingame #view{padding-bottom:0}
 .lk .lk-cardimg img{display:block;width:100%;height:auto}
 .lk .lk-sharerow{gap:6px}
 .lk .lk-sharerow .lk-ghost{min-height:40px;display:inline-flex;align-items:center;text-decoration:none;color:var(--ink)}
+
+.lk .lk-flag{text-transform:none;letter-spacing:0;font-weight:400;display:flex;gap:10px;align-items:flex-start;min-height:44px;padding:8px 2px;font-size:13px;color:var(--ink);cursor:pointer}
+.lk .lk-flag input{width:22px;height:22px;flex:0 0 auto;margin:2px 0 0}
+.lk .lk-flag small{text-transform:none;letter-spacing:0;font-weight:400;display:block;margin-top:2px;font-size:11.5px;line-height:1.4;color:var(--ink62)}
